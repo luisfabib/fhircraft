@@ -1,93 +1,137 @@
 import re 
 from dataclasses import make_dataclass
+from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel
+
+NUMERIC_PATTERN = re.compile(r"^\d+$")
+EXTENSION_PATTERN = re.compile(r"extension\([\"|\'](.*?)[\"|\']\)")
+WHERE_PATTERN = re.compile(r"where\((.+?)=[\"|\'](.*?)[\"|\']\)")
+ITEM_PATTERN = re.compile(r"item\((\d+?)\)")
+TYPE_CHOICES_PATTERN = re.compile(r"(.*?)\[x\]")
+FIRST_PATTERN = re.compile(r"^first()$")
+LAST_PATTERN = re.compile(r"^last()$")
+TAIL_PATTERN = re.compile(r"^tail()$")
+
+def ensure_list(variable):
+    if not isinstance(variable, list):
+        variable = [variable]
+    return variable
 
 class FHIRPathNavigator:
-    """ 
-    A class to navigate and manipulate FHIR (Fast Healthcare Interoperability Resources) resources using FHIRPath expressions.
 
-    Attributes:
-        fhir_resource: The FHIR resource to navigate and manipulate.
-        path_origin: The origin path of the FHIR resource.
-
-    Methods:
-        _traverse_path: Recursively traverses the FHIR resource based on the provided path elements.
-        _split_path: Splits the FHIR path at non-quoted dots.
-        navigate: Navigates the FHIR resource based on the provided FHIR path.
-        get_value: Gets the value of the FHIR resource based on the provided FHIR path.
-        set_value: Sets the value of the FHIR resource based on the provided FHIR path and new value.
-    """
-    def __init__(self, fhir_resource):
-        if isinstance(fhir_resource, dict):
-            self.path_origin = fhir_resource.get('resource_type')
-            self.fhir_resource = make_dataclass("FHIRResource", ((k, type(v)) for k, v in fhir_resource.items()))(**fhir_resource)
-
-        else:
-            self.fhir_resource = fhir_resource
-            self.path_origin = fhir_resource.get_resource_type()
-
-    
-    def _traverse_path(self, path_elements):
-        traversed_path = ''
-        if path_elements[0] == self.path_origin:
-            traversed_path = path_elements[0]
-            path_elements = path_elements[1:]
-        current_obj = self.fhir_resource
-        for path_element in path_elements:
-            traversed_path += f'.{path_element}'
-            # FHIRPath 'extension' statements
-            if path_element.startswith('extension('):
-                extension_url = re.findall(r"extension\((.*?)\)", path_element)[0].strip('\"').strip("\'")
-                current_obj = next((ext for ext in current_obj.extension if ext.url == extension_url), None)
-            # FHIRPath 'where' statements
-            elif path_element.startswith('where('):
-                if not isinstance(current_obj, list):
-                    current_obj = [current_obj]
-                condition = re.search(r"where\((.*?)\)", path_element).group(1)
-                condition_path, condition_value = condition.split('=')
-                condition_value = condition_value.strip('\"').strip("'")
-                current_obj = [obj for obj in current_obj if FHIRPathNavigator(obj).get_value(condition_path) == condition_value]
-            # FHIRPath 'typeChoice' statements
-            elif path_element.endswith('[x]'):
-                if not isinstance(current_obj, list):
-                    current_obj = [current_obj]
-                typeChoice_name = re.search(r"(.*?)\[x\]", path_element).group(1)
-                current_obj = [
-                    getattr(obj, element) 
-                        for obj in current_obj
-                            for element in obj.__dict__.keys() 
-                                if element.startswith(typeChoice_name) and getattr(obj, element) 
-                ]
-            # FHIRPath array indexing statements
-            elif isinstance(current_obj, list) and path_element.isnumeric():
-                current_obj = current_obj[int(path_element)]
-            elif isinstance(current_obj, list) and not path_element.isnumeric():
-                current_obj = [getattr(obj, path_element) for obj in current_obj]          
-            # FHIRPath simple
-            elif hasattr(current_obj, path_element):
-                current_obj = getattr(current_obj, path_element)
-            else:
-                raise KeyError(f"Path element '{traversed_path}' does not exist.")
-            if current_obj is None:
-                return current_obj
-        if isinstance(current_obj, list) and len(current_obj) == 1:
-            current_obj = current_obj[0]
-        return current_obj
-    
     def _split_path(self, fhir_path):
         # Split FHIR path only at non-quoted dots
         return re.split(r'\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)', fhir_path)
     
-    def navigate(self, fhir_path):
-        return self._traverse_path(self._split_path(fhir_path))
+    def _set_value_at_path(self, collection, fhir_path_element, value):
+        for element in collection:
+            if not hasattr(element, fhir_path_element):
+                raise AttributeError(f'FHIRPath element in collection has no attribute "{fhir_path_element}"')
+            setattr(element, fhir_path_element, value)
+
+    def __init__(self, fhir_resource):
+        if isinstance(fhir_resource, FHIRAbstractModel):
+            self.fhir_resource = fhir_resource
+            self.path_origin = fhir_resource.get_resource_type()
+        elif isinstance(fhir_resource, dict):
+            self.path_origin = fhir_resource.get('resource_type')
+            self.fhir_resource = make_dataclass("FHIRResource", ((k, type(v)) for k, v in fhir_resource.items()))(**fhir_resource)
+        else: 
+            raise TypeError('Invalid resource type, must be a Pydantic FHIR model or a dict')
+    
+    def _extension(self, collection, statement):
+        extension_url = EXTENSION_PATTERN.search(statement).group(1)
+        return [
+            extension for element in collection 
+                    for extension in element.extension 
+                        if extension.url == extension_url
+        ]
+
+    def _where(self, collection, statement):
+        condition_path, condition_value = WHERE_PATTERN.search(statement).group(1,2)
+        return [
+            obj for element in collection 
+                    for obj in ensure_list(element) 
+                         if FHIRPathNavigator(obj).get_value(condition_path) == condition_value
+        ]    
+    
+    def _item(self, collection, statement):
+        index = int(ITEM_PATTERN.search(statement).group(1))
+        return [collection[index]] 
+        
+    def _first(self, collection):
+        return [collection[0]] 
+        
+    def _last(self, collection):
+        return [collection[-1]] 
+        
+    def _tail(self, collection):
+        return collection[:-1]
+        
+    def _all_type_choices(self, collection, statement):
+        type_choice_name = TYPE_CHOICES_PATTERN.search(statement).group(1)
+        return [
+            getattr(obj, element) 
+                for obj in collection
+                    for element in obj.__dict__.keys() 
+                        if element.startswith(type_choice_name) and getattr(obj, element) 
+        ]
+        
+    def _traverse_fhirpath(self, fhirpath, set_value=None):
+        # Split union collection into individual path collections
+        union_collection = []
+        for fhir_path in fhirpath.split('|'):
+            # Split the path into its segments
+            fhirpath_segments = self._split_path(fhir_path.strip())
+            # If path's entry point is the core resource, remove it
+            if self.path_origin == fhirpath_segments[0]:
+                traversed_path = fhirpath_segments[0]
+                fhirpath_segments = fhirpath_segments[1:]
+            # If a value must be set at the end of the path, remove the last segment
+            if set_value is not None:
+                last_fhirpath_segment = fhirpath_segments[-1]
+                fhirpath_segments = fhirpath_segments[:-1]
+            traversed_path = ''
+            # Initialize the collection with the full resource
+            collection = [self.fhir_resource]
+            # Compile list of FHIRPath segment pattern handlers
+            FHIRPATH_PATTERNS = {
+                WHERE_PATTERN: self._where,
+                EXTENSION_PATTERN: self._extension,
+                ITEM_PATTERN: self._item,
+                NUMERIC_PATTERN: lambda coll, segment: self._item(coll, f'item({segment})'),
+                TYPE_CHOICES_PATTERN: self._all_type_choices,
+                FIRST_PATTERN: lambda coll, _: self._first(coll),
+                LAST_PATTERN: lambda coll, _: self._last(coll),
+                TAIL_PATTERN: lambda coll, _: self._tail(coll)
+            }
+            # Iterate over the FHIRPath segments
+            for fhirpath_segment in fhirpath_segments:
+                traversed_path += f'.{fhirpath_segment}'
+                for pattern, operation in FHIRPATH_PATTERNS.items():
+                    # Look for patterns in the segment
+                    if pattern.match(fhirpath_segment):
+                        collection = operation(collection, fhirpath_segment)
+                        break
+                else:
+                    # Otherwise, assume simple element path segments
+                    collection = [
+                        value for element in collection 
+                            for value in ensure_list(getattr(element, fhirpath_segment)) 
+                    ]   
+                # Remove any Nones from the collection
+                collection = [element for element in collection if element is not None] 
+            # If a value must be set...
+            if set_value is not None: 
+                self._set_value_at_path(collection, last_fhirpath_segment, set_value)
+            # Add the finished collection for this FHIRpath to the union's collection
+            union_collection.extend(collection)
+        # Return single values if there is a single one in the collection
+        if len(union_collection) == 1:
+                union_collection = union_collection[0]            
+        return union_collection
     
     def get_value(self, fhir_path):
-        return self.navigate(fhir_path)
-    
+        return self._traverse_fhirpath(fhir_path)
+            
     def set_value(self, fhir_path, new_value):
-        path_elements = self._split_path(fhir_path)
-        parent_obj = self._traverse_path(path_elements[:-1])
-        if parent_obj is None:
-            raise KeyError(f"Path element '{'.'.join(path_elements)}' does not exist")
-        last_path_element = path_elements[-1]
-        setattr(parent_obj, last_path_element, new_value)
-        
+        self._traverse_fhirpath(fhir_path, new_value)
