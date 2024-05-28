@@ -12,8 +12,14 @@ import datetime
 import json
 import requests
 
+__all__ = ["construct_profiled_resource_model", "validate_profiled_resource"]
+
 PATTERN_FIELDS = [field for field in ElementDefinition.__fields__.keys() if field.startswith('pattern')]
 FIXED_FIELDS = [field for field in ElementDefinition.__fields__.keys() if field.startswith('fixed')]
+
+class FHIRError(Exception):
+    """Exception for FHIR-related issues"""
+    pass
 
 def get_paths(nested_dict: Union[Dict[str, Any], List[Dict[str, Any]]], prefix: str = '') -> Dict[str, Any]:
     paths = {}
@@ -108,13 +114,13 @@ class FHIRSlice:
         for discriminator_path in self.slicing_group.discriminator_paths:
             for constraint in self.constraints:
                 if constraint.pattern and discriminator_path == constraint.path:
-                    return get_paths(constraint.pattern.dict(), prefix=discriminator_path.replace(self.slicing_group.path+'.',''))
+                    return get_paths(constraint.pattern.dict(), prefix=discriminator_path.replace(self.slicing_group.path,''))
         return {}
-    
     @property
     def fhirpath(self):
         fhir_path = self.slicing_group.path
         for path, value in self.discriminator_values.items():
+            if path.startswith('.'): path = path[1:]
             fhir_path += f'.where({path}="{value}")'       
         return fhir_path 
 
@@ -143,7 +149,8 @@ class FHIRSlicing:
 
         
 class ProfiledResourceFactory:
-
+    profiles : dict = {}
+    
     def get_structure_definition(self, profile_url: str) -> Dict[str, Any]:
         """
             Retrieves the structure definition of a FHIR resource from the provided profile URL.
@@ -153,14 +160,13 @@ class ProfiledResourceFactory:
                 
             Returns:
                 Dict[str, Any]: A dictionary representing the structure definition of the FHIR resource.
-        """
+        """       
         if not profile_url.endswith('.json'):
             # Construct endpoint URL for the StructureDefinition JSON
             domain, resource = profile_url.rsplit('/', 1)
             json_url = f"{domain}-{resource}.json"
         else:
             json_url = profile_url
-        print(f'Downloading structure definition from "{json_url}"')
         # Download the StructureDefinition JSON            
         response = requests.get(json_url)
         response.raise_for_status()
@@ -171,28 +177,23 @@ class ProfiledResourceFactory:
         ElementDefinition.__fields__['id'].validators = []
         # Parse JSON into a StructureDefinition model
         return StructureDefinition.parse_obj(structure_definition)
-
-    def get_core_resource(self, profile):
-        try:
-            return get_fhir_model_class(profile.baseDefinition.split('/')[-1])
-        except KeyError:
-            return None
-    
-    def derived_from_core_resource(self, profile):
-        return self.get_core_resource(profile) is not None
-
     
     def construct_profiled_resource_model(self, profile_url):
+        
+        # Check the factory's profiles cache store
+        cached_profile = self.profiles.get(profile_url)
+        if cached_profile:
+            return cached_profile
+        
         # Get the profile's structure definition
         profile_definition = self.get_structure_definition(profile_url)
         
         # Determine the base resource from which this profile is derived
-        base_model = get_fhir_model_class(profile_definition.type)
-        # if self.derived_from_core_resource(profile_definition):
-        #     base_model = self.get_core_resource(profile_definition)
-        # else:
-        #     base_model = self.construct_profiled_resource_model(profile_definition.baseDefinition)
-       
+        try:
+            base_model = get_fhir_model_class(profile_definition.type)
+        except KeyError:
+            raise FHIRError(f"Profile's base definition '{profile_definition.type}' is not a valid FHIR core resource.")
+
         # Get all patterns
         slicing = getattr(base_model, '__slicing__', []) 
         constraints = getattr(base_model, '__constraints__', []) 
@@ -275,6 +276,11 @@ class ProfiledResourceFactory:
                 validate_assignment = False
 
         profile_model = create_model(__model_name=profile_definition.name, __base__=ProfiledModel) 
+        
+        # Cache the profile
+        factory.profiles.update({
+            profile_url: profile_model
+        })
         return profile_model
 
 
@@ -385,17 +391,7 @@ class ProfiledResourceFactory:
         else:
             print('Resource successfully validated')
 
-if __name__ == "__main__":
-    factory = ProfiledResourceFactory()
-    
-    # GENOMIC VARIANT
-    profile = factory.construct_profiled_resource_model('http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant')
-    # resource = profile.parse_file('data\ExampleSomaticCNV.json')
-    resource = profile.parse_file('data\Pgx-var-1014.json')
 
-    # PRIMARY CANCER CONDITION
-    # profile = factory.construct_profiled_resource_model('http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition')
-    # resource = profile.parse_file('data\primary-cancer-condition-breast.json')
-
-    factory.validate(resource)
-    # print(json.dumps(resource.dict(), indent=4))
+factory = ProfiledResourceFactory()
+construct_profiled_resource_model = factory.construct_profiled_resource_model
+validate_profiled_resource = factory.validate
