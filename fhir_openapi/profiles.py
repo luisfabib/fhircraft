@@ -3,6 +3,8 @@ from fhir.resources.R4B.elementdefinition import ElementDefinition
 from fhir.resources.R4B.structuredefinition import StructureDefinition
 from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
+from fhir.resources.R4B.fhirtypes import MetaType
+from fhir.resources.R4B.meta import Meta
 
 from fhir_openapi.utils import get_dict_paths
 
@@ -140,7 +142,7 @@ def construct_with_skeleton(model, depth=5, current_depth=0):
         return None
     defaults = {}
     for name, field in model.__fields__.items():
-        if '_ext' in name or 'extension' in name.lower():
+        if '_ext' in name or 'extension' in name.lower() or 'contained' in name.lower():
             continue
         try:
             primitive = is_primitive_type(field)
@@ -293,7 +295,7 @@ class ProfiledResourceFactory:
             __constraints__: ClassVar[List[FHIRProfileConstraint]] = constraints
             __extensions__: ClassVar[List[FHIRExtension]] = extensions
             resourceType: Optional[str]
-
+            meta: MetaType = Meta(profile=[profile_url], versionId=profile_definition.version)
             class Config:
                 underscore_attrs_are_private = True
                 validate_assignment = False

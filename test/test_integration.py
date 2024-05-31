@@ -1,4 +1,6 @@
 from fhir_openapi.profiles import construct_profiled_resource_model, validate_profiled_resource
+from fhir_openapi.openapi import convert_response_from_api_to_fhir
+from fhir_openapi.utils import load_file
 from fhir_openapi.path import FHIRPathNavigator
 
 from fhir.resources.R4B.patient import Patient
@@ -14,7 +16,7 @@ from unittest.mock import patch, MagicMock
 from unittest import TestCase 
 
 
-class IntegrationTests(TestCase):
+class ValidationTests(TestCase):
     
     def run_integration_test(self, profile_url, resource_file, mutations={}):
         profile = construct_profiled_resource_model(profile_url)
@@ -31,30 +33,78 @@ class IntegrationTests(TestCase):
     
     def test_integration_genomic_variant_1(self):
         profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'observation-genomic-variant-1.json'
+        resource_file = 'fhir-observation-genomic-variant-1.json'
         self.run_integration_test(profile_url, resource_file)
 
     def test_integration_genomic_variant_1_mutated(self):
         profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'observation-genomic-variant-1.json'
+        resource_file = 'fhir-observation-genomic-variant-1.json'
         self.run_integration_test(profile_url, resource_file, mutations={'category.0.coding.0.code': 'wrong_code'})
 
     def test_integration_genomic_variant_2(self):
         profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'observation-genomic-variant-2.json'
+        resource_file = 'fhir-observation-genomic-variant-2.json'
         self.run_integration_test(profile_url, resource_file)
 
     def test_integration_genomic_variant_2_mutated(self):
         profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'observation-genomic-variant-2.json'
+        resource_file = 'fhir-observation-genomic-variant-2.json'
         self.run_integration_test(profile_url, resource_file, mutations={'component.where(code.coding.code="48013-7").valueCodeableConcept': None})
 
     def test_integration_genomic_variant_2_mutated(self):
         profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'observation-genomic-variant-1.json'
+        resource_file = 'fhir-observation-genomic-variant-1.json'
         self.run_integration_test(profile_url, resource_file, mutations={'category.0.coding.0.code': 'wrong_code'})
 
     def test_integration_primary_cancer_condition_1(self):
         profile_url = 'http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition'
-        resource_file = 'condition-primary-cancer-1.json'
+        resource_file = 'fhir-condition-primary-cancer-1.json'
         self.run_integration_test(profile_url, resource_file)
+
+
+
+
+
+
+class TestConvertResponseFromApiToFhir(TestCase):
+    
+    def sort_nested_lists(self,data): 
+        if isinstance(data, list):
+            return sorted([self.sort_nested_lists(item) for item in data], key=lambda x: str(x))
+        elif isinstance(data, dict):
+            sorted_items = sorted(data.items(), key=lambda x: str(x[0]))
+            return {key: self.sort_nested_lists(value) for key, value in sorted_items}
+        else:
+            return data
+        
+    def assertDictEqualUnorderedLists(self, dict1, dict2):
+        sorted_dict1 = self.sort_nested_lists(dict1)
+        sorted_dict2 = self.sort_nested_lists(dict2)
+        print(json.dumps(sorted_dict1))
+        print(len(sorted_dict1['component']), len(sorted_dict2['component']))
+        print(json.dumps(sorted_dict2))
+        
+        self.assertDictEqual(sorted_dict1, sorted_dict2)
+
+    def convert_api_to_fhir_and_assert_equal(self, api_response_file, openapi_spec_file, fhir_response_file):
+        response = load_file(api_response_file)
+        expected_response = load_file(fhir_response_file)
+        converted_response = convert_response_from_api_to_fhir(response, openapi_spec_file, '/endpoint', 'get', '200')
+        converted_response = json.loads(converted_response.json())
+        # Asser that resulting resources are equal
+        self.assertDictEqualUnorderedLists(converted_response, expected_response)
+  
+    def test_conversion_genomic_variant_1(self):
+        self.convert_api_to_fhir_and_assert_equal(
+            api_response_file='test/static/api-observation-genomic-variant-1.json', 
+            openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
+            fhir_response_file='test/static/fhir-observation-genomic-variant-1.json',
+        )
+        
+        
+    def test_conversion_genomic_variant_2(self):
+        self.convert_api_to_fhir_and_assert_equal(
+            api_response_file='test/static/api-observation-genomic-variant-2.json', 
+            openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
+            fhir_response_file='test/static/fhir-observation-genomic-variant-2.json',
+        )

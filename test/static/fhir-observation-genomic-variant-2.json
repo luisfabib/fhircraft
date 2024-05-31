@@ -1,0 +1,170 @@
+
+{
+  "resourceType" : "Observation",
+  "meta" : {
+    "versionId": "2.0.0",
+    "profile" : [
+      "http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant"
+    ]
+  },
+  "status" : "final",
+  "category" : [
+    {
+      "coding" : [
+        {
+          "system" : "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code" : "laboratory"
+        }
+      ]
+    }
+  ],
+  "code" : {
+    "coding" : [
+      {
+        "system" : "http://loinc.org",
+        "code" : "69548-6"
+      }
+    ]
+  },
+  "subject" : {
+    "reference" : "Patient/CGPatientExample01"
+  },
+  "effectiveDateTime" : "2019-04-01",
+  "valueCodeableConcept" : {
+    "coding" : [
+      {
+        "system" : "http://loinc.org",
+        "code" : "LA9633-4",
+        "display" : "Present"
+      }
+    ]
+  },
+  "method" : {
+    "coding" : [
+      {
+        "system" : "http://loinc.org",
+        "code" : "LA26398-0",
+        "display" : "Sequencing"
+      }
+    ]
+  },
+  "component" : [
+    {
+      "code" : {
+        "coding" : [
+          {
+            "system" : "http://loinc.org",
+            "code" : "48019-4"
+          }
+        ]
+      },
+      "valueCodeableConcept" : {
+        "coding" : [
+          {
+            "system" : "http://sequenceontology.org",
+            "code" : "SO:0001019",
+            "display" : "copy_number_variation"
+          }
+        ]
+      }
+    },
+    {
+      "code" : {
+        "coding" : [
+          {
+            "system" : "http://loinc.org",
+            "code" : "69547-8"
+          }
+        ]
+      },
+      "valueString" : "T"
+    },
+    {
+      "code" : {
+        "coding" : [
+          {
+            "system" : "http://loinc.org",
+            "code" : "48002-0"
+          }
+        ]
+      },
+      "valueCodeableConcept" : {
+        "coding" : [
+          {
+            "system" : "http://loinc.org",
+            "code" : "LA6684-0",
+            "display" : "Somatic"
+          }
+        ]
+      }
+    },
+    {
+      "code" : {
+        "coding" : [
+          {
+            "system" : "http://loinc.org",
+            "code" : "48013-7"
+          }
+        ]
+      },
+      "valueCodeableConcept" : {
+        "coding" : [
+          {
+            "system" : "http://www.ncbi.nlm.nih.gov/nuccore",
+            "code" : "NC_000022.10"
+          }
+        ]
+      }
+    },
+    {
+      "code" : {
+        "coding" : [
+          {
+            "system" : "http://loinc.org",
+            "code" : "82155-3"
+          }
+        ]
+      },
+      "valueQuantity" : {
+        "value" : 3
+      }
+    },
+    {
+      "code" : {
+        "coding" : [
+          {
+            "system" : "http://loinc.org",
+            "code" : "92822-6"
+          }
+        ]
+      },
+      "valueCodeableConcept" : {
+        "coding" : [
+          {
+            "system" : "http://loinc.org",
+            "code" : "LA30102-0",
+            "display" : "1-based character counting"
+          }
+        ]
+      }
+    },
+    {
+      "code" : {
+        "coding" : [
+          {
+            "system" : "http://loinc.org",
+            "code" : "81302-2"
+          }
+        ]
+      },
+      "valueRange" : {
+        "low" : {
+          "value" : 42523949
+        },
+        "high" : {
+          "value" : 42533891
+        }
+      }
+    }
+  ]
+}
