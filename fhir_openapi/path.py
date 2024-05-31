@@ -1,6 +1,7 @@
 import re 
 from dataclasses import make_dataclass
 from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel
+from fhir_openapi.utils import ensure_list
 
 NUMERIC_PATTERN = re.compile(r"^\d+$")
 EXTENSION_PATTERN = re.compile(r"extension\([\"|\'](.*?)[\"|\']\)")
@@ -11,10 +12,6 @@ FIRST_PATTERN = re.compile(r"^first()$")
 LAST_PATTERN = re.compile(r"^last()$")
 TAIL_PATTERN = re.compile(r"^tail()$")
 
-def ensure_list(variable):
-    if not isinstance(variable, list):
-        variable = [variable]
-    return variable
 
 class FHIRPathNavigator:
 
@@ -116,7 +113,7 @@ class FHIRPathNavigator:
                     # Otherwise, assume simple element path segments
                     collection = [
                         value for element in collection 
-                            for value in ensure_list(getattr(element, fhirpath_segment)) 
+                            for value in ensure_list(getattr(element, fhirpath_segment, None)) 
                     ]   
                 # Remove any Nones from the collection
                 collection = [element for element in collection if element is not None] 
@@ -126,8 +123,8 @@ class FHIRPathNavigator:
             # Add the finished collection for this FHIRpath to the union's collection
             union_collection.extend(collection)
         # Return single values if there is a single one in the collection
-        if len(union_collection) == 1:
-                union_collection = union_collection[0]            
+        if len(union_collection) <= 1:
+                union_collection = union_collection[0] if len(union_collection) == 1 else None          
         return union_collection
     
     def get_value(self, fhir_path):
@@ -135,3 +132,14 @@ class FHIRPathNavigator:
             
     def set_value(self, fhir_path, new_value):
         self._traverse_fhirpath(fhir_path, new_value)
+        
+    def get_pydantic_field(self, fhir_path):
+        fhirpath_segments = self._split_path(fhir_path)
+        last_fhirpath_segment = fhirpath_segments[-1]
+        fhirpath_segments = fhirpath_segments[:-1]
+        if len(fhirpath_segments)>0:
+            element = self._traverse_fhirpath('.'.join(fhirpath_segments))[0]
+        else:
+            element = self.fhir_resource
+        return element.__class__.__fields__.get(last_fhirpath_segment)
+    

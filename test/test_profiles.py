@@ -1,4 +1,4 @@
-from fhiropenapi.factory import ProfiledResourceFactory, get_paths, FHIRError, construct_profiled_resource_model
+from fhir_openapi.profiles import ProfiledResourceFactory, FHIRError, clear_chache, construct_profiled_resource_model
 
 from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.observation import Observation
@@ -12,34 +12,6 @@ import pytest
 from unittest.mock import patch, MagicMock
 from unittest import TestCase 
 
-
-class TestGetPaths:
-
-    def test_flat_dictionary(self):
-        input_dict = {'a': 1, 'b': 2, 'c': 3}
-        expected_output = {'a': 1, 'b': 2, 'c': 3}
-        assert get_paths(input_dict) == expected_output
-
-    def test_dictionary_with_none_values(self):
-        input_dict = {'a': None, 'b': 2, 'c': None}
-        expected_output = {'b': 2}
-        assert get_paths(input_dict) == expected_output
-
-    def test_nested_dictionaries(self):
-        input_dict = {'a': {'b': 1, 'c': {'d': 2}}}
-        expected_output = {'a.b': 1, 'a.c.d': 2}
-        assert get_paths(input_dict) == expected_output
-
-    def test_lists_of_dictionaries(self):
-        input_dict = {'a': [{'b': 1}, {'c': 2}]}
-        expected_output = {'a.0.b': 1, 'a.1.c': 2}
-        assert get_paths(input_dict) == expected_output
-
-    def test_combine_prefix_with_keys(self):
-        input_dict = {'a': {'b': 1, 'c': 2}}
-        prefix = 'prefix'
-        expected_output = {'prefix.a.b': 1, 'prefix.a.c': 2}
-        assert get_paths(input_dict, prefix) == expected_output
         
 
 class TestGetStructureDefinition(TestCase):
@@ -99,7 +71,7 @@ class TestConstructProfiledResourceModel:
         }
 
     def _construct_mocked_profile(self, element_definitions=[], base_model='Observation'):
-        canonical_url = 'https://fhir.com/StructureDefinition/fhir-profile'
+        canonical_url = f'https://fhir.com/StructureDefinition/fhir-profile-{base_model.lower()}'
         structure_definition = StructureDefinition(
             id='example',
             status='active',
@@ -112,7 +84,8 @@ class TestConstructProfiledResourceModel:
                 ElementDefinition.parse_obj(definition) for definition in element_definitions
             ])
         )
-        with patch('fhiropenapi.factory.ProfiledResourceFactory.get_structure_definition', return_value=structure_definition):
+        with patch('fhir_openapi.profiles.ProfiledResourceFactory.get_structure_definition', return_value=structure_definition):
+            clear_chache()
             profile_model = construct_profiled_resource_model(canonical_url)
             return profile_model
 

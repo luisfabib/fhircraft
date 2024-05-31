@@ -1,18 +1,20 @@
 
 from fhir.resources.R4B.elementdefinition import ElementDefinition
 from fhir.resources.R4B.structuredefinition import StructureDefinition
-
+from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
+
+from fhir_openapi.utils import get_dict_paths
+
 from pydantic.v1 import ValidationError, create_model, validate_model
 from pydantic.v1.error_wrappers import ErrorWrapper
 from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional
 from dataclasses import dataclass, field
-from fhiropenapi.fhirpath import FHIRPathNavigator
+from fhir_openapi.path import FHIRPathNavigator
 import datetime 
 import json
 import requests
 
-__all__ = ["construct_profiled_resource_model", "validate_profiled_resource"]
 
 PATTERN_FIELDS = [field for field in ElementDefinition.__fields__.keys() if field.startswith('pattern')]
 FIXED_FIELDS = [field for field in ElementDefinition.__fields__.keys() if field.startswith('fixed')]
@@ -20,28 +22,6 @@ FIXED_FIELDS = [field for field in ElementDefinition.__fields__.keys() if field.
 class FHIRError(Exception):
     """Exception for FHIR-related issues"""
     pass
-
-def get_paths(nested_dict: Union[Dict[str, Any], List[Dict[str, Any]]], prefix: str = '') -> Dict[str, Any]:
-    paths = {}
-    if isinstance(nested_dict, dict):
-        for key, value in nested_dict.items():
-            new_prefix = f"{prefix}.{key}" if prefix else key
-            if isinstance(value, dict):
-                paths.update(get_paths(value, new_prefix))
-            elif isinstance(value, list):
-                for i, item in enumerate(value):
-                    list_prefix = f"{new_prefix}.{i}"
-                    if isinstance(item, dict):
-                        paths.update(get_paths(item, list_prefix))
-            else:
-                if value is not None:
-                    paths[new_prefix] = value
-    elif isinstance(nested_dict, list):
-        for i, item in enumerate(nested_dict):
-            list_prefix = f"{prefix}[{i}]"
-            if isinstance(item, dict):
-                paths.update(get_paths(item, list_prefix))
-    return paths
 
 @dataclass
 class FHIRConstraint:
@@ -106,16 +86,22 @@ class FHIRSlice:
     
     @property
     def pydantic_model(self):       
-        base_model, element = self.path.split('.')
-        return get_fhir_model_class(get_fhir_model_class(base_model).__fields__.get(element).type_.__resource_type__)
+        base_model, element = self.slicing_group.path.split('.')
+        element = get_fhir_model_class(base_model).__fields__.get(element)
+        if not element:
+            return None
+        model = get_fhir_model_class(element.type_.__resource_type__)
+        model.Config.validate_assignment = False
+        return model
     
     @property
     def discriminator_values(self):
         for discriminator_path in self.slicing_group.discriminator_paths:
             for constraint in self.constraints:
                 if constraint.pattern and discriminator_path == constraint.path:
-                    return get_paths(constraint.pattern.dict(), prefix=discriminator_path.replace(self.slicing_group.path,''))
+                    return get_dict_paths(constraint.pattern.dict(), prefix=discriminator_path.replace(self.slicing_group.path,''))
         return {}
+    
     @property
     def fhirpath(self):
         fhir_path = self.slicing_group.path
@@ -147,7 +133,41 @@ class FHIRSlicing:
     def has_discriminator_type(self, discriminator_type: str) -> bool:
         return any(discriminator.type == discriminator_type for discriminator in self.discriminators)
 
+
+def construct_with_skeleton(model, depth=5, current_depth=0):
+    current_depth += 1 
+    if current_depth>depth:
+        return None
+    defaults = {}
+    for name, field in model.__fields__.items():
+        if '_ext' in name or 'extension' in name.lower():
+            continue
+        try:
+            primitive = is_primitive_type(field)
+        except: 
+            primitive = False
+        try:
+            field_type = get_fhir_type_name(field.type_)
+        except:
+            field_type = field.type_.__class__.__name__
         
+        if field.default:
+            default = field.default
+        else:
+            if primitive:
+                default = None
+            else:
+                try:
+                    default = construct_with_skeleton(get_fhir_model_class(field_type), depth, current_depth)
+                except KeyError:
+                    default = None
+        
+        if is_list_type(field):
+            default = [default]
+            
+        defaults[name] = default 
+    return model.construct(**defaults)
+    
 class ProfiledResourceFactory:
     profiles : dict = {}
     
@@ -178,6 +198,9 @@ class ProfiledResourceFactory:
         # Parse JSON into a StructureDefinition model
         return StructureDefinition.parse_obj(structure_definition)
     
+    def clear_chache(self):
+        self.profiles = {}
+
     def construct_profiled_resource_model(self, profile_url):
         
         # Check the factory's profiles cache store
@@ -270,11 +293,11 @@ class ProfiledResourceFactory:
             __constraints__: ClassVar[List[FHIRProfileConstraint]] = constraints
             __extensions__: ClassVar[List[FHIRExtension]] = extensions
             resourceType: Optional[str]
-            
+
             class Config:
                 underscore_attrs_are_private = True
                 validate_assignment = False
-
+            
         profile_model = create_model(__model_name=profile_definition.name, __base__=ProfiledModel) 
         
         # Cache the profile
@@ -283,9 +306,10 @@ class ProfiledResourceFactory:
         })
         return profile_model
 
-
     def _validate_constraint(self, constrained_elements, constraint, path=None):
         validation_errors = []
+        if constrained_elements is None:
+            constrained_elements = []
         if not isinstance(constrained_elements, list):
             constrained_elements = [constrained_elements]
         for constrained_element in constrained_elements:
@@ -343,7 +367,7 @@ class ProfiledResourceFactory:
         # Core validation
         *_, validation_error = validate_model(resource.__class__, resource.dict())
         if validation_error:
-            validation_errors += [ErrorWrapper(error.exc, error._loc) for error in validation_error.raw_errors]
+            validation_errors += [ErrorWrapper(error.exc, error._loc) for raw_errors in validation_error.raw_errors  for error in raw_errors ]
 
         # Evaluate profile constraints
         for constraint in resource.__class__.__constraints__:
@@ -365,16 +389,16 @@ class ProfiledResourceFactory:
                     # Perform basic validation
                     *_, subvalidation_errors = validate_model(entry.__class__, entry.dict())
                     if subvalidation_errors:
-                        validation_errors += [ErrorWrapper(error.exc, f'{slice_group.path}:{slice.name}.{error._loc}')  for error in subvalidation_errors.raw_errors]
+                        validation_errors += [ErrorWrapper(error.exc, f'{slice_group.path}:{slice.name}.{error._loc}')  for raw_errors in subvalidation_errors.raw_errors  for error in raw_errors ]
                     # Apply core resource validation
                     for validator in entry.__class__.__pre_root_validators__ + entry.__class__.__post_root_validators__:
                         try: 
                             validator(entry.__class__, entry.dict())
-                        except validation_error:
+                        except ValidationError as validation_error:
                             validation_errors.append(ErrorWrapper(
-                                validation_error), 
+                                validation_error, 
                                 f'{slice_group.path}:{slice.name}'
-                            )
+                            ))
                 # Check for all constraints on the current slice
                 for constraint in slice.constraints:
                     slice_subpath = constraint.path.replace(slice_group.path,"")             
@@ -384,7 +408,7 @@ class ProfiledResourceFactory:
                         continue
                     # Validate the constraint(s) for this slice element(s)
                     validation_errors += self._validate_constraint(constrained_slice_elements, constraint, f'{slice_group.path}:{slice.name}{slice_subpath}') 
-                
+        
         # IF there are any validation issues, raise them                     
         if validation_errors:
             raise ValidationError(validation_errors, resource.__class__)                     
@@ -395,3 +419,4 @@ class ProfiledResourceFactory:
 factory = ProfiledResourceFactory()
 construct_profiled_resource_model = factory.construct_profiled_resource_model
 validate_profiled_resource = factory.validate
+clear_chache = factory.clear_chache

@@ -1,5 +1,5 @@
-from fhiropenapi.factory import construct_profiled_resource_model, validate_profiled_resource
-from fhiropenapi.fhirpath import FHIRPathNavigator
+from fhir_openapi.profiles import construct_profiled_resource_model, validate_profiled_resource
+from fhir_openapi.path import FHIRPathNavigator
 
 from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.observation import Observation
