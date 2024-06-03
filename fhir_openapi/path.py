@@ -1,7 +1,11 @@
 import re 
+import traceback
 from dataclasses import make_dataclass
 from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel
+from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
+from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir_openapi.utils import ensure_list
+
 
 NUMERIC_PATTERN = re.compile(r"^\d+$")
 EXTENSION_PATTERN = re.compile(r"extension\([\"|\'](.*?)[\"|\']\)")
@@ -19,10 +23,30 @@ class FHIRPathNavigator:
         # Split FHIR path only at non-quoted dots
         return re.split(r'\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)', fhir_path)
     
+    def _create_empty_segment_resource(self, element, segment):
+        model_field = element.__class__.__fields__.get(segment)
+        if model_field:
+            field_type = get_fhir_type_name(model_field.type_)
+            try:
+                model = get_fhir_model_class(field_type)
+            except KeyError:
+                return None
+            model.validate_assignment = False
+            empty_resource =  model.construct()
+            if is_list_type(model_field):
+                if not isinstance(getattr(element, segment), list):
+                    setattr(element, segment, [])
+                getattr(element, segment).append(empty_resource)
+            else:
+                setattr(element, segment, empty_resource)  
+            return empty_resource    
+    
     def _set_value_at_path(self, collection, fhir_path_element, value):
         for element in collection:
             if not hasattr(element, fhir_path_element):
-                raise AttributeError(f'FHIRPath element in collection has no attribute "{fhir_path_element}"')
+                self._create_empty_segment_resource(element, fhir_path_element)
+                if not hasattr(element, fhir_path_element):
+                    raise AttributeError(f'FHIRPath element in collection has no attribute "{fhir_path_element}"')
             setattr(element, fhir_path_element, value)
 
     def __init__(self, fhir_resource):
@@ -104,19 +128,24 @@ class FHIRPathNavigator:
             # Iterate over the FHIRPath segments
             for fhirpath_segment in fhirpath_segments:
                 traversed_path += f'.{fhirpath_segment}'
-                for pattern, operation in FHIRPATH_PATTERNS.items():
-                    # Look for patterns in the segment
-                    if pattern.match(fhirpath_segment):
-                        collection = operation(collection, fhirpath_segment)
-                        break
-                else:
-                    # Otherwise, assume simple element path segments
-                    collection = [
-                        value for element in collection 
-                            for value in ensure_list(getattr(element, fhirpath_segment, None)) 
-                    ]   
-                # Remove any Nones from the collection
-                collection = [element for element in collection if element is not None] 
+                try:
+                    for pattern, operation in FHIRPATH_PATTERNS.items():
+                        # Look for patterns in the segment
+                        if pattern.match(fhirpath_segment):
+                            collection = operation(collection, fhirpath_segment)
+                            break
+                    else:
+                        # Otherwise, assume simple element path segments
+                        collection = [
+                            value if getattr(element, fhirpath_segment, None)
+                            else self._create_empty_segment_resource(element, fhirpath_segment)
+                                for element in collection                          
+                                    for value in ensure_list(getattr(element, fhirpath_segment, None)) 
+                        ]   
+                    # Remove any Nones from the collection
+                    collection = [element for element in collection if element is not None] 
+                except RuntimeError: 
+                    raise KeyError(f"\nFHIRPath {traversed_path} does not exist.\n\nTraceback:\n{traceback.format_exc()}")
             # If a value must be set...
             if set_value is not None: 
                 self._set_value_at_path(collection, last_fhirpath_segment, set_value)

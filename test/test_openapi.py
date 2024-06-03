@@ -370,7 +370,7 @@ class TestPathMapping:
                 }
             }
         }
-        path_mapping = construct_mapping_from_schema(schema)
+        path_mapping,_ = construct_mapping_from_schema(schema)
         assert path_mapping.convert_jsonpath_to_fhirpath("name") == "Patient.name"
 
     # convert_fhirpath_to_jsonpath returns correct JSONPath for given FHIRPath
@@ -382,7 +382,7 @@ class TestPathMapping:
                 }
             }
         }
-        path_mapping = construct_mapping_from_schema(schema)
+        path_mapping,_ = construct_mapping_from_schema(schema)
         assert path_mapping.convert_fhirpath_to_jsonpath("Patient.name") == "name"
 
     # inverted_mapping property correctly inverts the mapping dictionary
@@ -394,7 +394,7 @@ class TestPathMapping:
                 }
             }
         }
-        path_mapping = construct_mapping_from_schema(schema)
+        path_mapping,_ = construct_mapping_from_schema(schema)
         assert path_mapping.inverted_mapping == {"Patient.name": "name"}
 
     # convert_jsonpath_to_fhirpath returns None for non-existent JSONPath
@@ -406,7 +406,7 @@ class TestPathMapping:
                 }
             }
         }
-        path_mapping = construct_mapping_from_schema(schema)
+        path_mapping,_ = construct_mapping_from_schema(schema)
         assert path_mapping.convert_jsonpath_to_fhirpath("nonexistent") is None
 
     # convert_fhirpath_to_jsonpath returns None for non-existent FHIRPath
@@ -418,7 +418,7 @@ class TestPathMapping:
                 }
             }
         }
-        path_mapping = construct_mapping_from_schema(schema)
+        path_mapping,_ = construct_mapping_from_schema(schema)
         assert path_mapping.convert_fhirpath_to_jsonpath("nonexistent") is None
 
     # construct_mapping_from_schema handles schema with nested properties correctly
@@ -434,7 +434,7 @@ class TestPathMapping:
                 }
             }
         }
-        path_mapping = construct_mapping_from_schema(schema)
+        path_mapping,_ = construct_mapping_from_schema(schema)
         assert path_mapping.mapping == {"address.city": "Patient.address.city"}
 
     # construct_mapping_from_schema correctly constructs PathMapping instance from valid schema
@@ -446,7 +446,7 @@ class TestPathMapping:
                 }
             }
         }
-        path_mapping = construct_mapping_from_schema(schema)
+        path_mapping,_ = construct_mapping_from_schema(schema)
         assert isinstance(path_mapping, PathMapping)
 
     # PathMapping instance correctly initializes with given schema and mapping
@@ -485,7 +485,7 @@ class TestPathMapping:
                 }
             ]
         }
-        path_mapping = construct_mapping_from_schema(schema)
+        path_mapping,_ = construct_mapping_from_schema(schema)
         assert path_mapping.convert_jsonpath_to_fhirpath("name") == "Patient.name"
         assert path_mapping.convert_jsonpath_to_fhirpath("gender") == "Patient.gender"
 
@@ -496,7 +496,7 @@ class TestPathMapping:
                 "name": {}
             }
         }
-        path_mapping = construct_mapping_from_schema(schema)
+        path_mapping,_ = construct_mapping_from_schema(schema)
         assert path_mapping.mapping == {}
         
 

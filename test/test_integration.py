@@ -129,3 +129,10 @@ class TestConvertResponseFromApiToFhir(TestCase):
             openapi_spec_file='test/static/openapi-primary-cancer-condition.yaml', 
             fhir_response_file='test/static/fhir-condition-primary-cancer-2.json',
         )
+        
+    def test_conversion_radiotherapy_1(self):
+        self.convert_api_to_fhir_and_assert_equal(
+            api_response_file='test/static/api-procedure-radiotherapy-1.json', 
+            openapi_spec_file='test/static/openapi-procedure-radiotherapy.yaml', 
+            fhir_response_file='test/static/fhir-procedure-radiotherapy-1.json',
+        )

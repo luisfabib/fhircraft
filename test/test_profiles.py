@@ -1,4 +1,4 @@
-from fhir_openapi.profiles import ProfiledResourceFactory, FHIRError, clear_chache, construct_profiled_resource_model, construct_with_skeleton
+from fhir_openapi.profiles import ProfiledResourceFactory, FHIRError, clear_chache, construct_profiled_resource_model
 
 from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.observation import Observation
@@ -47,32 +47,6 @@ class TestGetStructureDefinition(TestCase):
             result = factory.get_structure_definition(profile_url)
             assert all([getattr(result, field) == value for field,value in self.expected_json.items()])
 
-class TestConstructWithSkeleton:
-    
-    def test_construct_skeleton_basic(self):            
-        resource = construct_with_skeleton(CodeableConcept)
-        assert isinstance(resource, CodeableConcept)
-        assert isinstance(resource.coding, list)
-        assert len(resource.coding) == 1
-        assert isinstance(resource.coding[0], Coding)
-        assert resource.coding[0].code is None
-        assert resource.coding[0].system is None
-        assert resource.coding[0].version is None
-        assert resource.coding[0].display is None
-        
-    def test_construct_skeleton_nested(self):            
-        resource = construct_with_skeleton(Extension)
-        assert isinstance(resource, Extension)
-        assert isinstance(resource.valueCodeableConcept, CodeableConcept)
-        assert isinstance(resource.valueCodeableConcept.coding, list)
-        assert len(resource.valueCodeableConcept.coding) == 1
-        assert isinstance(resource.valueCodeableConcept.coding[0], Coding)
-        assert resource.valueCodeableConcept.coding[0].code is None
-        assert resource.valueCodeableConcept.coding[0].system is None
-        assert resource.valueCodeableConcept.coding[0].version is None
-        assert resource.valueCodeableConcept.coding[0].display is None
-        
-        
         
 class TestConstructProfiledResourceModel:
 

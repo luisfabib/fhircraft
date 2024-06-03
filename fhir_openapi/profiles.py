@@ -149,92 +149,6 @@ class FHIRSlicing:
     def has_discriminator_type(self, discriminator_type: str) -> bool:
         return any(discriminator.type == discriminator_type for discriminator in self.discriminators)
 
-
-def construct_with_skeleton(model, depth=5, current_depth=0):
-    """
-    Recursively initializes objects from the fhir.resources package with default values.
-    
-    Parameters:
-        model: The FHIR model class to instantiate.
-        depth (int): Maximum recursion depth.
-        current_depth (int): Current recursion depth.
-    
-    Returns:
-        An instance of the model class with default values.
-    """
-    def is_primitive(field):
-        try:
-            return is_primitive_type(field)
-        except:
-            return None 
-
-    def should_skip_field(field_name):
-        """
-        Determines if a field should be skipped based on its name.
-
-        Parameters:
-            field_name (str): The name of the field to check.
-
-        Returns:
-            bool: True if the field should be skipped, False otherwise.
-        """
-        return any(substr in field_name.lower() for substr in ['_ext', 'extension', 'contained'])
-
-    def get_default_value(field, depth, current_depth):
-        """
-        Gets the default value for a field.
-
-        Parameters:
-            field: The field to get the default value for.
-            depth (int): The maximum recursion depth.
-            current_depth (int): The current recursion depth.
-
-        Returns:
-            The default value for the field or None if the field type cannot be determined.
-        """
-        if is_primitive(field):
-            return None
-        try:
-            field_type = get_fhir_type_name(field.type_)
-            model = get_fhir_model_class(field_type)
-            model.validate_assignment = False
-            default = construct_with_skeleton(model, depth, current_depth)
-        except:
-            default = None
-        return default
-    
-    def process_field(name, field, depth, current_depth):
-        """
-        Processes a field to determine its default value.
-
-        Parameters:
-            name (str): The name of the field.
-            field: The field to process.
-            depth (int): The maximum recursion depth.
-            current_depth (int): The current recursion depth.
-
-        Returns:
-            The default value for the field or None if the field should be skipped.
-        """
-        if should_skip_field(name):
-            return None
-        default = field.default if field.default else get_default_value(field, depth, current_depth)
-        if is_list_type(field):
-            default = [default]
-        return default
- 
-    current_depth += 1 
-    if current_depth>depth:
-        return None
-    
-    defaults = {}
-    for name, field in model.__fields__.items():
-        default = process_field(name, field, depth, current_depth)
-        if default is not None:
-            defaults[name] = default 
-    return model.construct(**defaults)
-
-
 def construct_with_profiled_elements(profile):
     """
     Constructs a FHIR resource with elements profiled by the given profile.
@@ -246,7 +160,7 @@ def construct_with_profiled_elements(profile):
         The constructed FHIR resource with profiled elements.
     """    
     # Construct FHIR resource with empty structure 
-    resource = construct_with_skeleton(profile)
+    resource = profile.construct()
     resource = set_constraints(resource)
     resource = initialize_slices(resource)
     return resource
@@ -291,7 +205,7 @@ def initialize_slices(resource):
             if not slice.pydantic_model:
                 continue            
             slice.pydantic_model.validate_assignment = False
-            slice_resource = construct_with_skeleton(slice.pydantic_model, depth=6)
+            slice_resource = slice.pydantic_model.construct()
             slice_resource = process_slice_constraints(slice_resource, slice)
             slices_resources.extend([slice_resource.copy(deep=True) for _ in range(min(slice.max_cardinality, 20))])
         navigator.set_value(slicing.path, slices_resources)
@@ -517,7 +431,7 @@ class ProfiledResourceFactory:
             class Config:
                 underscore_attrs_are_private = True
                 validate_assignment = False
-            
+                        
             @classmethod
             def construct_with_profiled_elements(cls):
                 return construct_with_profiled_elements(cls)

@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from dataclasses import dataclass, field
 import traceback
 from fhir_openapi.utils import load_file, load_url
-from fhir_openapi.profiles import construct_profiled_resource_model, construct_with_skeleton
+from fhir_openapi.profiles import construct_profiled_resource_model
 from fhir_openapi.path import FHIRPathNavigator
 from functools import cached_property 
 from fhir_openapi.utils import remove_none_dicts, ensure_list
@@ -310,7 +310,7 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
         for n,value in enumerate(values):
             if jsonpath in items_mapping:       
                 array_path = items_mapping[jsonpath]
-                slice_subpath = fhirpath.replace(array_path+'.','')
+                slice_subpath = fhirpath.replace(array_path+'.','').replace('$this.','')
                 full_fhirpath = f'{array_path}.{n}.{slice_subpath}'
             try:
                 if isinstance(value, dict):
