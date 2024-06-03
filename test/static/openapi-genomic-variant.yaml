@@ -128,7 +128,7 @@ components:
           type: number
           x-fhirpath: Observation.component.where(code.coding.code="81258-6").where(code.coding.system="http://loinc.org").valueString
         allelicReadDepth:
-          type: '#/components/schemas/Quantity'
+          $ref: '#/components/schemas/Quantity'
           x-fhirpath: Observation.component.where(code.coding.code="82121-5").where(code.coding.system="http://loinc.org").valueQuantity
         allelicState:
           $ref: '#/components/schemas/Coding'
@@ -158,12 +158,12 @@ components:
           x-fhiritems: Observation.component.where(code.coding.code="48018-6").where(code.coding.system="http://loinc.org")
           items: 
             $ref: '#/components/schemas/Coding'
-            x-fhirpath: Observation.component.where(code.coding.code="48018-6").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
+            x-fhirpath: Observation.component.where(code.coding.code="48018-6").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
         chromosomeIdentifier:
           x-fhiritems: Observation.component.where(code.coding.code="48000-4").where(code.coding.system="http://loinc.org")
           items:
             $ref: '#/components/schemas/Coding'
-            x-fhirpath: Observation.component.where(code.coding.code="48000-4").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
+            x-fhirpath: Observation.component.where(code.coding.code="48000-4").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
             x-binding: https://loinc.org/LL2938-0/
 
 openapi: 3.1.0

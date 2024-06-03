@@ -31,20 +31,19 @@
     },
     "refAllele": "A",
     "altAllele": "A",
-    "exactStartEnd": {
+    "genomicAlleleExactStartEnd": {
        "low": 96741053,
        "high": 96741053
     },
-    "copyNumber": 3,
     "coordinateSystem": {
        "system": "http://loinc.org",
        "code": "LA30102-0",
        "display": "1-based character counting"
     },
     "codingChangeType": {
-       "system": "http://sequenceontology.org",
-       "code": "SO:0001019",
-       "display": "copy_number_variation"
+        "code": "SO:1000002",
+        "display": "wild type",
+        "system": "http://sequenceontology.org"
     },
     "genomicSourceClass": {
        "system": "http://loinc.org",

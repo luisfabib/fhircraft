@@ -84,6 +84,15 @@ class FHIRSlice:
     constraints: List[FHIRProfileConstraint] = field(default_factory=list)
     slicing_group: Optional[object] = None
     
+    @property
+    def min_cardinality(self):
+        return min([constraint.min for constraint in self.constraints if constraint.min and constraint.path == self.slicing_group.path])       
+    
+    @property
+    def max_cardinality(self):
+        return max([constraint.max for constraint in self.constraints if constraint.max and constraint.path == self.slicing_group.path])       
+    
+    
     def add_constraint(self, constraint):
         self.constraints.append(constraint)
     
@@ -284,7 +293,7 @@ def initialize_slices(resource):
             slice.pydantic_model.validate_assignment = False
             slice_resource = construct_with_skeleton(slice.pydantic_model, depth=6)
             slice_resource = process_slice_constraints(slice_resource, slice)
-            slices_resources.append(slice_resource)
+            slices_resources.extend([slice_resource.copy(deep=True) for _ in range(min(slice.max_cardinality, 20))])
         navigator.set_value(slicing.path, slices_resources)
     return resource
 
