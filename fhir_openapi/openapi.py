@@ -298,51 +298,9 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
             raise ValueError(f'The schema has no FHIR profile associated via the "x-fhir-profile" attribute.')
     profile = construct_profiled_resource_model(profile_url)  
 
-    # Construct FHIR resource with empty structure 
-    resource = construct_with_skeleton(profile)
+    # Construct FHIR resource with propulated fields according to the profile constraints 
+    resource = profile.construct_with_profiled_elements()
     navigator = FHIRPathNavigator(resource)
-
-    # Set any preset values given by the constraints
-    for constraint in profile.__constraints__:
-        if constraint.pattern:
-            navigator.set_value(constraint.path, constraint.pattern)        
-        if constraint.fixedValue:
-            navigator.set_value(constraint.path, constraint.fixedValue)        
-
-    # Initialize slices in the resource
-    for slicing in profile.__slicing__:
-        slices_data = []
-        if '[x]' in slicing.path: continue
-        # Go over all slices
-        for slice in slicing.slices:
-            if not slice.pydantic_model:
-                continue
-            # Construct empty slice structure  
-            slice_data = construct_with_skeleton(slice.pydantic_model, depth=6)
-            slice_navigator = FHIRPathNavigator(slice_data)
-            # Iterate over the slice's constrains
-            for constraint in slice.constraints:
-                # Get the constrained element's internal path within the slice
-                slice_element = constraint.path.replace(slice.slicing_group.path,'')
-                if slice_element.startswith('.'):
-                    slice_element = slice_element[1:]               
-                if '[x]' in slice_element: continue
-                # Set any preset values given by the constraints
-                if constraint.fixedValue:
-                    slice_navigator.set_value(slice_element, constraint.fixedValue)
-                if constraint.pattern:
-                    if slice_element == '':
-                        slice_data = constraint.pattern
-                    else:
-                        is_list = is_list_type(slice_navigator.get_pydantic_field(slice_element))
-                        pattern = constraint.pattern
-                        if is_list and not isinstance(pattern, list):
-                            pattern = [pattern]
-                        slice_navigator.set_value(slice_element, pattern)
-            # Add initialized slice resource to the list
-            slices_data.append(slice_data)
-        # Set the full group of initialized slices to the sliced resource element
-        navigator.set_value(slicing.path, slices_data)        
 
     # Set the values of the API response
     for fhirpath, value in fhir_resource_values.items():
@@ -354,40 +312,7 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
                 navigator.set_value(fhirpath, value)        
         except Exception as e:
             raise AttributeError(f'\nError setting API response value: \n\t{value}\n to FHIR path: \n\t{fhirpath}\n\nTraceback:\n{traceback.format_exc()}')
-            
-    # Remove unused/incomplete slices
-    for slicing in profile.__slicing__:
-        if '[x]' in slicing.path: continue
-        valid_slices = ensure_list(navigator.get_value(slicing.path))
-        for slice in slicing.slices:
-            # Get all the elements that conform to this slice's definition           
-            sliced_entries = ensure_list(navigator.get_value(slice.fhirpath))
-            # Get list of slice elements that have been set by the constraints
-            pattern_elements = sorted([
-                constraint.path 
-                    for constraint in slice.constraints 
-                        if (constraint.pattern or constraint.fixedValue) and not '[x]' in constraint.path
-            ])
-            # Get the min. cardinality of this constraint
-            min_cardinality = max([
-                constraint.min 
-                 for constraint in slice.constraints 
-                        if constraint.path == slicing.path
-            ])
-            # Check for each sliced entry whether they are unusued/incomplete
-            for entry in sliced_entries:
-                # Get the list of non-empty slice elements
-                nonempty_elements = sorted([
-                    f'{slicing.path}.{element}' 
-                        for element in remove_none_dicts(entry.dict()) 
-                ])
-                # If the only elements set are those set by the constraints, and the slice is not needed, remove it
-                if min_cardinality<1 and nonempty_elements == pattern_elements and entry in valid_slices:
-                    valid_slices.remove(entry)
-        # Set the new list with only the valid slices
-        navigator.set_value(slicing.path, valid_slices)
-
-    # Cleanup the resource from empty structures to be valid
-    resource = profile.parse_obj(remove_none_dicts(resource.dict()) )
-
+    
+    # Cleanup resource and remove unused fields
+    resource = profile.clean_elements_and_slices(resource)
     return resource

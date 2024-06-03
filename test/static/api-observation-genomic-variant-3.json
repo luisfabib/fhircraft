@@ -1,0 +1,79 @@
+{
+    "status": "final",
+    "patientId": "Patient/example3",
+    "observationType": {
+       "system": "http://loinc.org",
+       "code": "69548-6"
+    },
+    "chromosomeIdentifier.code": {
+       "coding": [
+          {
+             "system": "http://loinc.org",
+             "code": "69548-6"
+          }
+       ]
+    },
+    "effective": "2020-01-01",
+    "assessment": {
+       "system": "http://loinc.org",
+       "code": "LA9633-4",
+       "display": "Present"
+    },
+    "method": {
+       "system": "http://loinc.org",
+       "code": "LA26398-0",
+       "display": "Sequencing"
+    },
+    "genomicRefSeq": {
+       "system": "http://www.ncbi.nlm.nih.gov/nuccore",
+       "code" : "NC_000010.10",
+       "display" : "b37 Chr10"
+    },
+    "refAllele": "A",
+    "altAllele": "A",
+    "exactStartEnd": {
+       "low": 96741053,
+       "high": 96741053
+    },
+    "copyNumber": 3,
+    "coordinateSystem": {
+       "system": "http://loinc.org",
+       "code": "LA30102-0",
+       "display": "1-based character counting"
+    },
+    "codingChangeType": {
+       "system": "http://sequenceontology.org",
+       "code": "SO:0001019",
+       "display": "copy_number_variation"
+    },
+    "genomicSourceClass": {
+       "system": "http://loinc.org",
+       "code": "LA6683-2",
+       "display": "Germline"
+    },
+    "allelicState": {
+      "system" : "http://loinc.org",
+      "code" : "LA6705-3",
+      "display" : "homozygous"
+    },
+    "geneStudied": [
+      {
+         "system" : "http://www.genenames.org/geneId",
+         "code" : "HGNC:2623",
+         "display" : "CYP2C9"
+      },
+      {
+         "system" : "http://www.genenames.org/geneId",
+         "code" : "HGNC:644",
+         "display" : "AR"
+      }
+    ],
+    "allelicReadDepth": {
+      "value" : 20,
+      "comparator" : ">"
+    },
+    "variantConfidenceStatus": {
+      "system" : "http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/variant-confidence-status-cs",
+      "code" : "intermediate"
+    }
+ }

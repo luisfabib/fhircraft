@@ -6,7 +6,7 @@ from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.R4B.fhirtypes import MetaType
 from fhir.resources.R4B.meta import Meta
 
-from fhir_openapi.utils import get_dict_paths, load_env_variables, ensure_list
+from fhir_openapi.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts
 
 from pydantic.v1 import ValidationError, create_model, validate_model
 from pydantic.v1.error_wrappers import ErrorWrapper
@@ -142,39 +142,220 @@ class FHIRSlicing:
 
 
 def construct_with_skeleton(model, depth=5, current_depth=0):
+    """
+    Recursively initializes objects from the fhir.resources package with default values.
+    
+    Parameters:
+        model: The FHIR model class to instantiate.
+        depth (int): Maximum recursion depth.
+        current_depth (int): Current recursion depth.
+    
+    Returns:
+        An instance of the model class with default values.
+    """
+    def is_primitive(field):
+        try:
+            return is_primitive_type(field)
+        except:
+            return None 
+
+    def should_skip_field(field_name):
+        """
+        Determines if a field should be skipped based on its name.
+
+        Parameters:
+            field_name (str): The name of the field to check.
+
+        Returns:
+            bool: True if the field should be skipped, False otherwise.
+        """
+        return any(substr in field_name.lower() for substr in ['_ext', 'extension', 'contained'])
+
+    def get_default_value(field, depth, current_depth):
+        """
+        Gets the default value for a field.
+
+        Parameters:
+            field: The field to get the default value for.
+            depth (int): The maximum recursion depth.
+            current_depth (int): The current recursion depth.
+
+        Returns:
+            The default value for the field or None if the field type cannot be determined.
+        """
+        if is_primitive(field):
+            return None
+        try:
+            field_type = get_fhir_type_name(field.type_)
+            model = get_fhir_model_class(field_type)
+            model.validate_assignment = False
+            default = construct_with_skeleton(model, depth, current_depth)
+        except:
+            default = None
+        return default
+    
+    def process_field(name, field, depth, current_depth):
+        """
+        Processes a field to determine its default value.
+
+        Parameters:
+            name (str): The name of the field.
+            field: The field to process.
+            depth (int): The maximum recursion depth.
+            current_depth (int): The current recursion depth.
+
+        Returns:
+            The default value for the field or None if the field should be skipped.
+        """
+        if should_skip_field(name):
+            return None
+        default = field.default if field.default else get_default_value(field, depth, current_depth)
+        if is_list_type(field):
+            default = [default]
+        return default
+ 
     current_depth += 1 
     if current_depth>depth:
         return None
+    
     defaults = {}
     for name, field in model.__fields__.items():
-        if '_ext' in name or 'extension' in name.lower() or 'contained' in name.lower():
-            continue
-        try:
-            primitive = is_primitive_type(field)
-        except: 
-            primitive = False
-        try:
-            field_type = get_fhir_type_name(field.type_)
-        except:
-            field_type = field.type_.__class__.__name__
-        
-        if field.default:
-            default = field.default
-        else:
-            if primitive:
-                default = None
-            else:
-                try:
-                    default = construct_with_skeleton(get_fhir_model_class(field_type), depth, current_depth)
-                except KeyError:
-                    default = None
-        
-        if is_list_type(field):
-            default = [default]
-            
-        defaults[name] = default 
+        default = process_field(name, field, depth, current_depth)
+        if default is not None:
+            defaults[name] = default 
     return model.construct(**defaults)
+
+
+def construct_with_profiled_elements(profile):
+    """
+    Constructs a FHIR resource with elements profiled by the given profile.
+
+    Parameters:
+        profile: The FHIR profile containing constraints and slicing information.
     
+    Returns:
+        The constructed FHIR resource with profiled elements.
+    """    
+    # Construct FHIR resource with empty structure 
+    resource = construct_with_skeleton(profile)
+    resource = set_constraints(resource)
+    resource = initialize_slices(resource)
+    return resource
+
+
+def set_constraints(resource):
+    """
+    Sets preset values in the resource according to the constraints in the profile.
+
+    Parameters:
+        resource: The initialized FHIR resource
+        profile: The FHIR profile containing constraints.
+    Return:
+        resource: The FHIR resource
+    """
+    profile = resource.__class__
+    navigator = FHIRPathNavigator(resource)
+    for constraint in profile.__constraints__:
+        if constraint.pattern:
+            navigator.set_value(constraint.path, constraint.pattern)
+        if constraint.fixedValue:
+            navigator.set_value(constraint.path, constraint.fixedValue)
+    return resource
+
+
+def initialize_slices(resource):
+    """
+    Initializes slices in the resource according to the slicing information in the profile.
+
+    Parameters:
+        resource: The FHIR resource
+    Return:
+        resource: The FHIR resource
+    """
+    profile = resource.__class__
+    navigator = FHIRPathNavigator(resource)
+    # Go over all slices
+    for slicing in profile.__slicing__:
+        if '[x]' in slicing.path: continue        
+        slices_resources = []
+        for slice in slicing.slices:
+            if not slice.pydantic_model:
+                continue            
+            slice.pydantic_model.validate_assignment = False
+            slice_resource = construct_with_skeleton(slice.pydantic_model, depth=6)
+            slice_resource = process_slice_constraints(slice_resource, slice)
+            slices_resources.append(slice_resource)
+        navigator.set_value(slicing.path, slices_resources)
+    return resource
+
+
+def process_slice_constraints(slice_resource, slice):
+    """
+    Processes and sets constraints within a slice.
+
+    Parameters:
+        slice: The slice containing constraints.
+        slice_resource: The FHIR resource of the corresponding slice
+    Returns:
+        slice_resource: The FHIR resource of the corresponding slice    
+    """
+    slice_navigator = FHIRPathNavigator(slice_resource)    
+    for constraint in slice.constraints:
+        slice_element = constraint.path.replace(slice.slicing_group.path, '').lstrip('.')
+        if '[x]' in slice_element:
+            continue
+        
+        if constraint.fixedValue:
+            slice_navigator.set_value(slice_element, constraint.fixedValue)
+        
+        if constraint.pattern:
+            if slice_element == '':
+                slice_resource = constraint.pattern
+            else:
+                is_list = is_list_type(slice_navigator.get_pydantic_field(slice_element))
+                pattern = [constraint.pattern] if is_list and not isinstance(constraint.pattern, list) else constraint.pattern
+                slice_navigator.set_value(slice_element, pattern)
+    return slice_resource
+
+def clean_elements_and_slices(resource):
+    profile = resource.__class__
+    navigator = FHIRPathNavigator(resource)
+    # Remove unused/incomplete slices
+    for slicing in profile.__slicing__:
+        if '[x]' in slicing.path: continue
+        valid_slices = ensure_list(navigator.get_value(slicing.path))
+        for slice in slicing.slices:
+            # Get all the elements that conform to this slice's definition           
+            sliced_entries = ensure_list(navigator.get_value(slice.fhirpath))
+            # Get list of slice elements that have been set by the constraints
+            pattern_elements = sorted([
+                constraint.path 
+                    for constraint in slice.constraints 
+                        if (constraint.pattern or constraint.fixedValue) and not '[x]' in constraint.path
+            ])
+            # Get the min. cardinality of this constraint
+            min_cardinality = max([
+                constraint.min 
+                 for constraint in slice.constraints 
+                        if constraint.path == slicing.path
+            ])
+            # Check for each sliced entry whether they are unusued/incomplete
+            for entry in sliced_entries:
+                # Get the list of non-empty slice elements
+                nonempty_elements = sorted([
+                    f'{slicing.path}.{element}' 
+                        for element in remove_none_dicts(entry.dict()) 
+                ])
+                # If the only elements set are those set by the constraints, and the slice is not needed, remove it
+                if min_cardinality<1 and nonempty_elements == pattern_elements and entry in valid_slices:
+                    valid_slices.remove(entry)
+        # Set the new list with only the valid slices
+        navigator.set_value(slicing.path, valid_slices)
+        
+    # Cleanup the resource from empty structures to be valid
+    resource = profile.parse_obj(remove_none_dicts(resource.dict()) )        
+    return resource
+
 class ProfiledResourceFactory:
     profiles : dict = {}
     
@@ -323,9 +504,18 @@ class ProfiledResourceFactory:
             __extensions__: ClassVar[List[FHIRExtension]] = extensions
             resourceType: Optional[str]
             meta: MetaType = Meta(profile=[profile_url], versionId=profile_definition.version)
+            
             class Config:
                 underscore_attrs_are_private = True
                 validate_assignment = False
+            
+            @classmethod
+            def construct_with_profiled_elements(cls):
+                return construct_with_profiled_elements(cls)
+
+            @classmethod
+            def clean_elements_and_slices(cls, resource):
+                return clean_elements_and_slices(resource)
             
         profile_model = create_model(__model_name=profile_definition.name, __base__=ProfiledModel) 
         
@@ -446,20 +636,22 @@ class ProfiledResourceFactory:
                 # Check for all constraints on the current slice
                 for constraint in slice.constraints:
                     slice_subpath = constraint.path.replace(slice_group.path,"")    
-                             
-                    constrained_slice_elements = FHIRPathNavigator(resource).get_value(slice.fhirpath + slice_subpath)
                     # Constrains on elements of the slice should only be applied if the slice is present
                     if constraint.path != slice_group.path and len(sliced_entries)==0:
-                        continue
-                    # Get the element that is constrained in the resource
-                    if not constrained_slice_elements:
-                        # If the element does not exist, check if its ancestor exist
-                        if not self._check_if_path_ancestors_exist(resource, slice.fhirpath + slice_subpath):
-                            # If not, means that the parent elements do not exist, so do not validate the constraint
-                            continue                       
-                    # Validate the constraint(s) for this slice element(s)
-                    validation_errors += self._validate_constraint(constrained_slice_elements, constraint, f'{slice_group.path}:{slice.name}{slice_subpath}') 
-        
+                        continue       
+                    if constraint.path == slice_group.path:        
+                        # Validate the constraint(s) for this slice element(s)
+                        validation_errors += self._validate_constraint(sliced_entries, constraint, f'{slice_group.path}:{slice.name}{slice_subpath}') 
+                    else:
+                        for entry in sliced_entries:
+                            constrained_slice_elements = FHIRPathNavigator(entry).get_value(slice_subpath)
+                            # Get the element that is constrained in the resource
+                            if not constrained_slice_elements:
+                                # If the element does not exist, check if its ancestor exist
+                                if not self._check_if_path_ancestors_exist(entry, slice_subpath):
+                                    # If not, means that the parent elements do not exist, so do not validate the constraint
+                                    continue     
+                            validation_errors += self._validate_constraint(constrained_slice_elements, constraint, f'{slice_group.path}:{slice.name}{slice_subpath}') 
         # IF there are any validation issues, raise them                     
         if validation_errors:
             raise ValidationError(validation_errors, resource.__class__)                     
