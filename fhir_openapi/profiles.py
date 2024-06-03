@@ -6,7 +6,7 @@ from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.R4B.fhirtypes import MetaType
 from fhir.resources.R4B.meta import Meta
 
-from fhir_openapi.utils import get_dict_paths
+from fhir_openapi.utils import get_dict_paths, load_env_variables
 
 from pydantic.v1 import ValidationError, create_model, validate_model
 from pydantic.v1.error_wrappers import ErrorWrapper
@@ -194,8 +194,19 @@ class ProfiledResourceFactory:
             json_url = f"{domain}-{resource}.json"
         else:
             json_url = profile_url
+
+        # Configure proxy if needed
+        settings = load_env_variables()
+        proxies = {
+            'https': settings.get('PROXY_URL_HTTPS'), 
+            'http': settings.get('PROXY_URL_HTTP')
+        } if settings.get('PROXY_URL_HTTPS') or settings.get('PROXY_URL_HTTP') else None
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        }
         # Download the StructureDefinition JSON            
-        response = requests.get(json_url)
+        response = requests.get(json_url, proxies=proxies, verify=settings.get('CERTIFICATE_BUNDLE_PATH'), headers=headers)     
         response.raise_for_status()
         structure_definition = response.json()
         # Disable certain incompatible validators             

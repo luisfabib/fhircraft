@@ -1,6 +1,8 @@
 /data/**
 /experimental/**
 
+pip-proxy.sh
+
 .codiumai.toml 
 
 # Byte-compiled / optimized / DLL files

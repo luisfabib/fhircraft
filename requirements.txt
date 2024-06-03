@@ -2,6 +2,8 @@ requests==2.32.1
 coverage==7.5.1
 dataclasses==0.6
 pytest==8.2.1
+pytest-mock==3.14.0
 pyyaml==6.0.1
 fhir.resources==7.1.0
+python-dotenv==1.0.1
 openapi-pydantic==0.4.0 

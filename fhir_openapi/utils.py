@@ -3,6 +3,22 @@ import json
 import requests 
 import os
 from typing import List, Any, Dict, Union
+from dotenv import dotenv_values
+
+def load_env_variables(file_path=None):
+    """
+    Loads environment variables from a .env file into a dictionary without changing the global environment variables.
+
+    :param file_path: Optional path to the .env file. If not provided, it looks for a .env file in the current directory.
+    :return: A dictionary containing the environment variables from the .env file.
+    """
+    # Determine the file path
+    env_file = file_path if file_path else '.env'
+    
+    # Load the .env file into a dictionary
+    env_vars = dotenv_values(env_file)
+    
+    return env_vars
 
 def ensure_list(item: Any) -> list:
     """
@@ -61,7 +77,14 @@ def load_url(url: str) -> Dict:
         raise ValueError("Invalid URL format. Please provide a valid URL starting with 'http://' or 'https://'.")
     
     # Add a timeout to the requests.get call
-    response = requests.get(url, timeout=10)
+    # Configure proxy if needed
+    settings = load_env_variables()
+    proxies = {
+        'https': settings.get('PROXY_URL_HTTPS'), 
+        'http': settings.get('PROXY_URL_HTTP')
+    } if settings.get('PROXY_URL_HTTPS') or settings.get('PROXY_URL_HTTP') else None
+    # Download the StructureDefinition JSON            
+    response = requests.get(url, proxies=proxies, verify=settings.get('CERTIFICATE_BUNDLE_PATH'), timeout=10)
     
     response.raise_for_status()
     content_type = response.headers['Content-Type']
