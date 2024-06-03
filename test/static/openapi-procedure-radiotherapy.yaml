@@ -1,0 +1,122 @@
+components:
+  schemas:
+    Quantity:
+      type: object
+      properties:
+        value:
+          type: string
+          x-fhirpath: $this.value
+        system:
+          type: string
+          x-fhirpath: $this.system
+        code:
+          type: string
+          x-fhirpath: $this.system
+        comparator:
+          type: string
+          x-fhirpath: $this.comparator
+    Period:
+      type: object
+      properties:
+        start:
+          type: string
+          x-fhirpath: $this.start
+        end:
+          type: string
+          x-fhirpath: $this.end
+    Coding:
+      type: object
+      properties:
+        system:
+          type: string
+          x-fhirpath: $this.system
+        code:
+          type: string
+          x-fhirpath: $this.code
+        display:
+          type: string
+          x-fhirpath: $this.display
+        version:
+          type: string
+          x-fhirpath: $this.version
+    Date: 
+      type: string
+      format: date
+      pattern: '^\d{4}-\d{2}-\d{2}$'
+    TestSchema:
+      title: Procedure
+      x-fhir-profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-course-summary
+      properties:
+        status:
+          type: string
+          x-fhirpath: Procedure.status
+          x-binding: http://hl7.org/fhir/ValueSet/event-status
+        patientId:
+          type: string
+          x-fhirpath: Procedure.subject.reference
+        treatmentPeriod:
+          $ref: '#/components/schemas/Period'
+          x-fhirpath: Procedure.performedPeriod  
+        asserter:
+          type: string
+          x-fhirpath: Procedure.asserter.reference          
+        treatmentIntent:
+          $ref: '#/components/schemas/Coding'
+          x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-procedure-intent").valueCodeableConcept.coding.0
+          x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-procedure-intent-vs
+        performedReasons:
+          x-fhiritems: Procedure.reasonCode
+          items:
+            $ref: '#/components/schemas/Coding'
+            x-fhirpath: Procedure.reasonCode.coding.0
+            x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-cancer-disorder-vs
+        terminationReason:
+          $ref: '#/components/schemas/Coding'
+          x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-treatment-termination-reason").valueCodeableConcept.coding.0
+          x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-treatment-termination-reason-vs
+        methods:
+          x-fhiritems: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")
+          items:
+            type: object
+            properties:
+              modality: 
+                $ref: '#/components/schemas/Coding'
+                x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique").extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality").valueCodeableConcept.coding.0
+                x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-treatment-termination-reason-vs
+              technique: 
+                $ref: '#/components/schemas/Coding'
+                x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique").extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-technique").valueCodeableConcept.coding.0
+                x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-treatment-termination-reason-vs
+        totalSessions:
+          type: integer
+          x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-sessions").valueUnsignedInt
+        dosages:
+          x-fhiritems: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume")
+          items:
+            type: object
+            properties:
+              volume:
+                type: string
+                x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume").extension("volume").valueReference.reference
+              totalDose:
+                $ref: '#/components/schemas/Quantity'
+                x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume").extension("totalDoseDelivered").valueQuantity
+              fractions:
+                type: integer
+                x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume").extension("factionsDelivered").valueUnsignedInt
+        treatedBodyparts: 
+          x-fhiritems: Procedure.bodySite
+          items:
+            $ref: '#/components/schemas/Coding'
+            x-fhirpath: Procedure.bodySite.coding.0
+            x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-radiotherapy-treatment-location-vs
+openapi: 3.1.0
+paths:
+  /endpoint:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSchema'
