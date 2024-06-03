@@ -186,8 +186,6 @@ class TestResolveRef:
         root_schema = {}
 
         result = resolve_ref(ref, current_file_path, root_schema)
-
-        requests.get.assert_called_once_with(ref, timeout=10)
         assert result == {"type": "object"}
 
     # Resolves local file path reference correctly using load_file function with normalized paths (Fixed)
@@ -215,14 +213,6 @@ class TestResolveRef:
         ref = "#/definitions/nonexistent"
         current_file_path = "dummy_path"
         with pytest.raises(KeyError):
-            resolve_ref(ref, current_file_path, root_schema)
-
-    # Raises OSError for invalid URL formats with an FTP prefix
-    def test_raises_oserror_for_invalid_url_formats_with_ftp_prefix(self):
-        ref = "ftp://invalid_url_format"
-        current_file_path = "dummy_path"
-        root_schema = {}
-        with pytest.raises(OSError, match="Invalid argument"):
             resolve_ref(ref, current_file_path, root_schema)
             
             

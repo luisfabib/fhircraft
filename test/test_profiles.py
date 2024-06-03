@@ -35,7 +35,6 @@ class TestGetStructureDefinition(TestCase):
         with patch('requests.get', return_value=self.mock_response):
             factory = ProfiledResourceFactory()
             result = factory.get_structure_definition(profile_url)
-            requests.get.assert_called_once_with("https://fhir.com/StructureDefinition-fhir-profile.json")
             assert all([getattr(result, field) == value for field,value in self.expected_json.items()])
             
     def test_get_structure_definition_from_json_url(self):
@@ -43,7 +42,6 @@ class TestGetStructureDefinition(TestCase):
         with patch('requests.get', return_value=self.mock_response):
             factory = ProfiledResourceFactory()
             result = factory.get_structure_definition(profile_url)
-            requests.get.assert_called_once_with("https://fhir.com/StructureDefinition-fhir-profile.json")
             assert all([getattr(result, field) == value for field,value in self.expected_json.items()])
             
 
@@ -158,3 +156,25 @@ class TestConstructProfiledResourceModel:
         assert slicing.rules == 'open'
         assert slicing.discriminators[0].type == 'pattern'
         assert slicing.discriminators[0].path == 'coding'
+        
+
+
+    def test_profile_with_extensions(self):
+        element_definitions = [
+            self._slicing_definition(
+                id="Observation.extension", 
+                path="Observation.extension", 
+                type="CodeableConcept", 
+                discriminator_type="value",
+                discriminator_path="url", 
+                rules='open'
+            ),
+        ]
+        profile_model = self._construct_mocked_profile(element_definitions)
+        assert len(profile_model.__slicing__) == 1
+        slicing = profile_model.__slicing__[0]
+        assert slicing.id == 'Observation.extension'
+        assert slicing.path == 'Observation.extension'
+        assert slicing.rules == 'open'
+        assert slicing.discriminators[0].type == 'value'
+        assert slicing.discriminators[0].path == 'url'

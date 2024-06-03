@@ -6,13 +6,14 @@ from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.R4B.fhirtypes import MetaType
 from fhir.resources.R4B.meta import Meta
 
-from fhir_openapi.utils import get_dict_paths, load_env_variables
+from fhir_openapi.utils import get_dict_paths, load_env_variables, ensure_list
 
 from pydantic.v1 import ValidationError, create_model, validate_model
 from pydantic.v1.error_wrappers import ErrorWrapper
 from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional
 from dataclasses import dataclass, field
 from fhir_openapi.path import FHIRPathNavigator
+from copy import deepcopy
 import datetime 
 import json
 import requests
@@ -48,7 +49,6 @@ class FHIRProfileConstraint:
     path: str
     min: int
     max: int
-    profile: Optional[Union[str,List[str]]]
     valueType: Optional[List[str]] = field(default_factory=list)
     fixedValue: Optional[Union[str, float, int, Dict[str, Union[str, float, int]]]] = None
     pattern: Optional[Union[str, float, int, Dict[str, Union[str, float, int]]]] = None
@@ -274,14 +274,22 @@ class ProfiledResourceFactory:
                 )
                 slice_group.add_slice(slice)        
 
+        new_constraints = []
         for element in profile_definition.snapshot.element:
             constraint = FHIRProfileConstraint(
                 id=element.id,
                 path=element.path,
-                profile=element.type[0].profile if element.type and element.type[0].code=='Extension' else None,
                 min=int(element.min) if str(element.min).isnumeric() else None,
                 max=int(str(element.max).replace('*','99999')) if str(element.max).replace('*','99999').isnumeric() else None,
             )
+            if element.type and element.type[0].code=='Extension' and element.type[0].profile:
+                new_constraints.append(FHIRProfileConstraint(
+                    id=element.id + '.url',
+                    path=element.path + '.url',
+                    min=1,
+                    max=1,
+                    fixedValue=element.type[0].profile[0]
+                ))
             if element.type:
                 constraint.valueType = [type.code for type in element.type]
             for pattern_field in PATTERN_FIELDS:
@@ -294,7 +302,9 @@ class ProfiledResourceFactory:
                 if pattern_value: 
                     constraint.fixedValue = fixed_value
             
+            new_constraints.append(constraint)
            
+        for constraint in new_constraints:
             if ':' in constraint.id or any([slice_group.path in constraint.path for slice_group in slicing]):
                 for slice_group in slicing:
                     if ':' in constraint.id:  
@@ -325,6 +335,16 @@ class ProfiledResourceFactory:
         })
         return profile_model
 
+    def _check_if_path_ancestors_exist(self, resource, fhirpath):
+        elements = FHIRPathNavigator(resource)  
+        for segment in elements._split_path(fhirpath)[:-1]:
+            child_elements = elements.get_value(segment)
+            if child_elements:
+                elements = FHIRPathNavigator(ensure_list(child_elements)[0])
+            else: 
+                return False
+        return True
+    
     def _validate_constraint(self, constrained_elements, constraint, path=None):
         validation_errors = []
         if constrained_elements is None:
@@ -393,7 +413,12 @@ class ProfiledResourceFactory:
             if constraint.is_slice_constraint:
                 continue
             # Get the element that is constrained in the resource
-            constrained_element = FHIRPathNavigator(resource).get_value(constraint.path)              
+            constrained_element = FHIRPathNavigator(resource).get_value(constraint.path)   
+            if not constrained_element:
+                # If the element does not exist, check if its ancestor exist
+                if not self._check_if_path_ancestors_exist(resource, constraint.path):
+                    # If not, means that the parent elements do not exist, so do not validate the constraint
+                    continue   
             # Validate the constraint(s) for this element(s)
             validation_errors += self._validate_constraint(constrained_element, constraint) 
             
@@ -420,11 +445,18 @@ class ProfiledResourceFactory:
                             ))
                 # Check for all constraints on the current slice
                 for constraint in slice.constraints:
-                    slice_subpath = constraint.path.replace(slice_group.path,"")             
+                    slice_subpath = constraint.path.replace(slice_group.path,"")    
+                             
                     constrained_slice_elements = FHIRPathNavigator(resource).get_value(slice.fhirpath + slice_subpath)
                     # Constrains on elements of the slice should only be applied if the slice is present
                     if constraint.path != slice_group.path and len(sliced_entries)==0:
                         continue
+                    # Get the element that is constrained in the resource
+                    if not constrained_slice_elements:
+                        # If the element does not exist, check if its ancestor exist
+                        if not self._check_if_path_ancestors_exist(resource, slice.fhirpath + slice_subpath):
+                            # If not, means that the parent elements do not exist, so do not validate the constraint
+                            continue                       
                     # Validate the constraint(s) for this slice element(s)
                     validation_errors += self._validate_constraint(constrained_slice_elements, constraint, f'{slice_group.path}:{slice.name}{slice_subpath}') 
         

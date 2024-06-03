@@ -12,6 +12,7 @@ import requests
 import json
 from pydantic.v1 import ValidationError
 import pytest
+import os
 from unittest.mock import patch, MagicMock
 from unittest import TestCase 
 
@@ -20,7 +21,7 @@ class ValidationTests(TestCase):
     
     def run_integration_test(self, profile_url, resource_file, mutations={}):
         profile = construct_profiled_resource_model(profile_url)
-        resource = profile.parse_file(f'test\\static\\{resource_file}')
+        resource = profile.parse_file(os.path.join('test','static',resource_file))
         for path, value in mutations.items():
             FHIRPathNavigator(resource).set_value(path, value)
         try:

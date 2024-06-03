@@ -325,13 +325,11 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
                 # Get the constrained element's internal path within the slice
                 slice_element = constraint.path.replace(slice.slicing_group.path,'')
                 if slice_element.startswith('.'):
-                    slice_element = slice_element[1:]
+                    slice_element = slice_element[1:]               
                 if '[x]' in slice_element: continue
                 # Set any preset values given by the constraints
                 if constraint.fixedValue:
-                    slice_navigator.set_value(slice_element, constraint.pattern)
-                if constraint.profile:
-                    slice_navigator.set_value('url', constraint.profile[0])
+                    slice_navigator.set_value(slice_element, constraint.fixedValue)
                 if constraint.pattern:
                     if slice_element == '':
                         slice_data = constraint.pattern
@@ -369,7 +367,7 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
                 constraint.path 
                     for constraint in slice.constraints 
                         if (constraint.pattern or constraint.fixedValue) and not '[x]' in constraint.path
-            ] + [f'{constraint.path}.url' for constraint in slice.constraints if constraint.profile])
+            ])
             # Get the min. cardinality of this constraint
             min_cardinality = max([
                 constraint.min 
@@ -383,8 +381,6 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
                     f'{slicing.path}.{element}' 
                         for element in remove_none_dicts(entry.dict()) 
                 ])
-                if not 'extension' in slicing.path:
-                    print(slice.name, min_cardinality, nonempty_elements, pattern_elements, entry)
                 # If the only elements set are those set by the constraints, and the slice is not needed, remove it
                 if min_cardinality<1 and nonempty_elements == pattern_elements and entry in valid_slices:
                     valid_slices.remove(entry)
