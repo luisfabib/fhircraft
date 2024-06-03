@@ -1,0 +1,93 @@
+components:
+  schemas:
+    Quantity:
+      type: object
+      properties:
+        value:
+          type: string
+          x-fhirpath: $this.value
+        system:
+          type: string
+          x-fhirpath: $this.system
+        code:
+          type: string
+          x-fhirpath: $this.system
+    Range:
+      type: object
+      properties:
+        low:
+          type: string
+          x-fhirpath: $this.low.value
+        high:
+          type: string
+          x-fhirpath: $this.high.value
+    Coding:
+      type: object
+      properties:
+        system:
+          type: string
+          x-fhirpath: $this.system
+        code:
+          type: string
+          x-fhirpath: $this.code
+        display:
+          type: string
+          x-fhirpath: $this.display
+        version:
+          type: string
+          x-fhirpath: $this.version
+    Date: 
+      type: string
+      format: date
+      pattern: '^\d{4}-\d{2}-\d{2}$'
+    TestSchema:
+      title: Condition
+      x-fhir-profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition
+      properties:
+        status: 
+          $ref: '#/components/schemas/Coding'
+          x-fhirpath: Condition.clinicalStatus.coding.0
+          x-binding: http://hl7.org/fhir/ValueSet/condition-clinical
+        verification: 
+          $ref: '#/components/schemas/Coding'
+          x-fhirpath: Condition.verificationStatus.coding.0
+          x-binding: http://hl7.org/fhir/ValueSet/condition-clinical
+        date:
+          $ref: '#/components/schemas/Date'
+          x-fhirpath: Condition.extension("http://hl7.org/fhir/StructureDefinition/condition-assertedDate").valueDate
+        condition:
+          $ref: '#/components/schemas/Coding'
+          x-fhirpath: Condition.code.coding.0
+          x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-primary-cancer-disorder-vs
+        histology:
+          $ref: '#/components/schemas/Coding'
+          x-fhirpath: Condition.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-histology-morphology-behavior").valueCodeableConcept.coding.0
+          x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-histology-morphology-behavior-vs
+        topography: 
+          $ref: '#/components/schemas/Coding'
+          x-fhirpath: Condition.bodySite.coding.0
+          x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-cancer-body-location-vs
+        laterality: 
+          $ref: '#/components/schemas/Coding'
+          x-fhirpath: Condition.bodySite.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-laterality-qualifier").valueCodeableConcept.coding.0
+          x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-laterality-qualifier-vs        
+        patientId:
+          type: string
+          x-fhirpath: Condition.subject.reference
+        onset: 
+          $ref: '#/components/schemas/Date'
+          x-fhirpath: Condition.onsetDateTime 
+        diagnosedBy:
+          type: string 
+          x-fhirpath: Condition.asserter.reference 
+
+openapi: 3.1.0
+paths:
+  /endpoint:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSchema'

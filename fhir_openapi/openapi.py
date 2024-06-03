@@ -3,7 +3,7 @@ from typing import Union, Any, Optional
 import os 
 from urllib.parse import urlparse
 from dataclasses import dataclass, field
-
+import traceback
 from fhir_openapi.utils import load_file, load_url
 from fhir_openapi.profiles import construct_profiled_resource_model, construct_with_skeleton
 from fhir_openapi.path import FHIRPathNavigator
@@ -318,22 +318,29 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
             if not slice.pydantic_model:
                 continue
             # Construct empty slice structure  
-            slice_data = construct_with_skeleton(slice.pydantic_model)
+            slice_data = construct_with_skeleton(slice.pydantic_model, depth=6)
             slice_navigator = FHIRPathNavigator(slice_data)
             # Iterate over the slice's constrains
             for constraint in slice.constraints:
                 # Get the constrained element's internal path within the slice
-                slice_element = constraint.path.replace(slice.slicing_group.path+'.','')
+                slice_element = constraint.path.replace(slice.slicing_group.path,'')
+                if slice_element.startswith('.'):
+                    slice_element = slice_element[1:]
                 if '[x]' in slice_element: continue
                 # Set any preset values given by the constraints
                 if constraint.fixedValue:
                     slice_navigator.set_value(slice_element, constraint.pattern)
+                if constraint.profile:
+                    slice_navigator.set_value('url', constraint.profile[0])
                 if constraint.pattern:
-                    is_list = is_list_type(slice_navigator.get_pydantic_field(slice_element))
-                    pattern = constraint.pattern
-                    if is_list and not isinstance(pattern, list):
-                        pattern = [pattern]
-                    slice_navigator.set_value(slice_element, pattern)
+                    if slice_element == '':
+                        slice_data = constraint.pattern
+                    else:
+                        is_list = is_list_type(slice_navigator.get_pydantic_field(slice_element))
+                        pattern = constraint.pattern
+                        if is_list and not isinstance(pattern, list):
+                            pattern = [pattern]
+                        slice_navigator.set_value(slice_element, pattern)
             # Add initialized slice resource to the list
             slices_data.append(slice_data)
         # Set the full group of initialized slices to the sliced resource element
@@ -341,12 +348,15 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
 
     # Set the values of the API response
     for fhirpath, value in fhir_resource_values.items():
-        if isinstance(value, dict):
-            for subpath,subvalue in value.items():
-                navigator.set_value(fhirpath + '.' + subpath, subvalue)
-        else:
-            navigator.set_value(fhirpath, value)        
-
+        try:
+            if isinstance(value, dict):
+                for subpath,subvalue in value.items():
+                    navigator.set_value(fhirpath + '.' + subpath, subvalue)
+            else:
+                navigator.set_value(fhirpath, value)        
+        except Exception as e:
+            raise AttributeError(f'\nError setting API response value: \n\t{value}\n to FHIR path: \n\t{fhirpath}\n\nTraceback:\n{traceback.format_exc()}')
+            
     # Remove unused/incomplete slices
     for slicing in profile.__slicing__:
         if '[x]' in slicing.path: continue
@@ -359,7 +369,7 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
                 constraint.path 
                     for constraint in slice.constraints 
                         if (constraint.pattern or constraint.fixedValue) and not '[x]' in constraint.path
-            ])
+            ] + [f'{constraint.path}.url' for constraint in slice.constraints if constraint.profile])
             # Get the min. cardinality of this constraint
             min_cardinality = max([
                 constraint.min 
@@ -373,8 +383,10 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
                     f'{slicing.path}.{element}' 
                         for element in remove_none_dicts(entry.dict()) 
                 ])
+                if not 'extension' in slicing.path:
+                    print(slice.name, min_cardinality, nonempty_elements, pattern_elements, entry)
                 # If the only elements set are those set by the constraints, and the slice is not needed, remove it
-                if min_cardinality<1 and nonempty_elements == pattern_elements:
+                if min_cardinality<1 and nonempty_elements == pattern_elements and entry in valid_slices:
                     valid_slices.remove(entry)
         # Set the new list with only the valid slices
         navigator.set_value(slicing.path, valid_slices)

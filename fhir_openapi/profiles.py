@@ -48,6 +48,7 @@ class FHIRProfileConstraint:
     path: str
     min: int
     max: int
+    profile: Optional[Union[str,List[str]]]
     valueType: Optional[List[str]] = field(default_factory=list)
     fixedValue: Optional[Union[str, float, int, Dict[str, Union[str, float, int]]]] = None
     pattern: Optional[Union[str, float, int, Dict[str, Union[str, float, int]]]] = None
@@ -88,11 +89,15 @@ class FHIRSlice:
     
     @property
     def pydantic_model(self):       
-        base_model, element = self.slicing_group.path.split('.')
-        element = get_fhir_model_class(base_model).__fields__.get(element)
-        if not element:
-            return None
-        model = get_fhir_model_class(element.type_.__resource_type__)
+        
+        base_model, element = self.slicing_group.path.rsplit('.',1)
+        if element.lower() == 'extension':
+            model = get_fhir_model_class('Extension')
+        else:
+            element = get_fhir_model_class(base_model).__fields__.get(element)
+            if not element:
+                return None
+            model = get_fhir_model_class(element.type_.__resource_type__)
         model.Config.validate_assignment = False
         return model
     
@@ -237,7 +242,7 @@ class ProfiledResourceFactory:
             )
         
         for element in profile_definition.snapshot.element: 
-            if element.slicing and not 'extension' in element.id:
+            if element.slicing:
                 slicing.append(
                     FHIRSlicing(
                         id=element.id,
@@ -249,7 +254,7 @@ class ProfiledResourceFactory:
             )
 
         for element in profile_definition.snapshot.element: 
-            if element.sliceName and not any([type.code == 'Extension' for type in element.type]):
+            if element.sliceName:
                 slice_group = next((slice_group for slice_group in slicing if slice_group.path == element.path), None) 
                 slice = FHIRSlice(
                     id=element.id,
@@ -262,6 +267,7 @@ class ProfiledResourceFactory:
             constraint = FHIRProfileConstraint(
                 id=element.id,
                 path=element.path,
+                profile=element.type[0].profile if element.type and element.type[0].code=='Extension' else None,
                 min=int(element.min) if str(element.min).isnumeric() else None,
                 max=int(str(element.max).replace('*','99999')) if str(element.max).replace('*','99999').isnumeric() else None,
             )

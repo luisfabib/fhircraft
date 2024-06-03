@@ -81,7 +81,7 @@ class TestConvertResponseFromApiToFhir(TestCase):
         sorted_dict1 = self.sort_nested_lists(dict1)
         sorted_dict2 = self.sort_nested_lists(dict2)
         print(json.dumps(sorted_dict1))
-        print(len(sorted_dict1['component']), len(sorted_dict2['component']))
+        print()
         print(json.dumps(sorted_dict2))
         
         self.assertDictEqual(sorted_dict1, sorted_dict2)
@@ -101,10 +101,22 @@ class TestConvertResponseFromApiToFhir(TestCase):
             fhir_response_file='test/static/fhir-observation-genomic-variant-1.json',
         )
         
-        
     def test_conversion_genomic_variant_2(self):
         self.convert_api_to_fhir_and_assert_equal(
             api_response_file='test/static/api-observation-genomic-variant-2.json', 
             openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
             fhir_response_file='test/static/fhir-observation-genomic-variant-2.json',
+        )
+        
+    def test_conversion_primary_cancer_condition_1(self):
+        self.convert_api_to_fhir_and_assert_equal(
+            api_response_file='test/static/api-condition-primary-cancer-1.json', 
+            openapi_spec_file='test/static/openapi-primary-cancer-condition.yaml', 
+            fhir_response_file='test/static/fhir-condition-primary-cancer-1.json',
+        )
+    def test_conversion_primary_cancer_condition_2(self):
+        self.convert_api_to_fhir_and_assert_equal(
+            api_response_file='test/static/api-condition-primary-cancer-2.json', 
+            openapi_spec_file='test/static/openapi-primary-cancer-condition.yaml', 
+            fhir_response_file='test/static/fhir-condition-primary-cancer-2.json',
         )

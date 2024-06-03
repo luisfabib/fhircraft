@@ -1,0 +1,35 @@
+{
+   "status": {
+      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+      "code": "active",
+      "display": "Active"
+   },
+   "verification": {
+      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+      "code": "confirmed",
+      "display": "Confirmed"
+   },
+   "condition": {
+      "system": "http://snomed.info/sct",
+      "code": "254637007",
+      "display": "Non-small cell lung cancer (disorder)"
+   },
+   "histology": {
+      "system": "http://snomed.info/sct",
+      "code": "1187332001",
+      "display": "Adenocarcinoma (morphologic abnormality)"
+   },
+   "topography": {
+      "system": "http://snomed.info/sct",
+      "code": "39607008",
+      "display": "Lung structure (body structure)"
+   },
+   "laterality": {
+      "system": "http://snomed.info/sct",
+      "code": "7771000",
+      "display": "Left (qualifier value)"
+   },
+   "patientId": "Patient/cancer-patient-john-anyperson",
+   "onset": "2019-04-01",
+   "diagnosedBy": "Practitioner/us-core-practitioner-kyle-anydoc"
+}

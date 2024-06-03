@@ -5,7 +5,7 @@
     "profile" : [
       "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition"
     ],
-    "versionId": "3.0.0"
+    "versionId": "3.0.0"    
   },
   "extension" : [
     {
@@ -14,8 +14,8 @@
         "coding" : [
           {
             "system" : "http://snomed.info/sct",
-            "code" : "77284006",
-            "display" : "Lobular carcinoma in situ (morphologic abnormality)"
+            "code" : "1187332001",
+            "display" : "Adenocarcinoma (morphologic abnormality)"
           }
         ]
       }
@@ -53,24 +53,38 @@
     "coding" : [
       {
         "system" : "http://snomed.info/sct",
-        "code" : "363346000",
-        "display" : "Malignant neoplastic disease (disorder)"
+        "code" : "254637007",
+        "display" : "Non-small cell lung cancer (disorder)"
       }
     ]
   },
   "bodySite" : [
     {
+      "extension" : [
+        {
+          "url" : "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-laterality-qualifier",
+          "valueCodeableConcept" : {
+            "coding" : [
+              {
+                "system" : "http://snomed.info/sct",
+                "code" : "7771000",
+                "display" : "Left (qualifier value)"
+              }
+            ]
+          }
+        }
+      ],
       "coding" : [
         {
           "system" : "http://snomed.info/sct",
-          "code" : "80248007",
-          "display" : "Left breast structure (body structure)"
+          "code" : "39607008",
+          "display" : "Lung structure (body structure)"
         }
       ]
     }
   ],
   "subject" : {
-    "reference" : "Patient/cancer-patient-eve-anyperson"
+    "reference" : "Patient/cancer-patient-john-anyperson"
   },
   "onsetDateTime" : "2019-04-01",
   "asserter" : {
