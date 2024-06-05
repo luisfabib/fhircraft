@@ -119,11 +119,15 @@ components:
             x-fhirpath: Procedure.bodySite.coding.0
             x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-radiotherapy-treatment-location-vs
 openapi: 3.1.0
+info:
+  title: Test API
+  version: 0.0.1
 paths:
   /endpoint:
     get:
       responses:
         '200':
+          description: Simple response
           content:
             application/json:
               schema:

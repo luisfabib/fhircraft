@@ -169,11 +169,15 @@ components:
             x-binding: https://loinc.org/LL2938-0/
 
 openapi: 3.1.0
+info:
+  title: Test API
+  version: 0.0.1
 paths:
   /endpoint:
     get:
       responses:
         '200':
+          description: Simple response
           content:
             application/json:
               schema:
