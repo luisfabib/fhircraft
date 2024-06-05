@@ -1,8 +1,8 @@
-from typing import Union, Any, Optional, Tuple, List
+from typing import Union, Any, Optional, Tuple, List, Dict
 
 import os 
 from urllib.parse import urlparse
-from dataclasses import dataclass, field
+from dataclasses import dataclass, asdict
 import traceback
 from fhir_openapi.utils import load_file, load_url
 from fhir_openapi.profiles import construct_profiled_resource_model, track_slice_changes
@@ -180,28 +180,32 @@ class PathMapping:
     - mapping (dict): The mapping between FHIRPath and JSONPath expressions.
 
     Attributes:
-    - schema (dict): The schema containing the FHIRPath expressions.
     - mapping (dict): The mapping between FHIRPath and JSONPath expressions.
 
     Methods:
     - convert_fhirpath_to_jsonpath(fhirpath: str) -> Union[str, None]: Converts a FHIRPath expression to a JSONPath expression.
     - convert_jsonpath_to_fhirpath(jsonpath: str) -> Union[str, None]: Converts a JSONPath expression to a FHIRPath expression.
     """    
-    schema: dict
-    mapping: dict
+    mappings: List
 
     @cached_property
     def inverted_mapping(self):
         return {v: k for k, v in self.mapping.items()}
     
+    def get_jsonpath_mapping_properties(self, jsonpath):
+        return next((mapping for mapping in self.mappings if mapping.jsonpath == jsonpath), None)
+    
+    def get_fhirpath_mapping_properties(self, fhirpath):
+        return next((mapping for mapping in self.mappings if mapping.fhirpath == fhirpath), None)
+    
     def convert_fhirpath_to_jsonpath(self, fhirpath: str) -> Union[str, None]:
-        return self.inverted_mapping.get(fhirpath)
+        return self.get_fhirpath_mapping_properties(fhirpath).jsonpath
 
     def convert_jsonpath_to_fhirpath(self, jsonpath: str) -> Union[str, None]:
-        return self.mapping.get(jsonpath)
+        return self.get_jsonpath_mapping_properties(jsonpath).fhirpath
     
     
-def construct_mapping_from_schema(schema: dict) -> Tuple[PathMapping, dict]:
+def construct_mapping_from_schema(schema: dict) -> PathMapping:
     """
     Constructs a mapping from a given schema.
 
@@ -211,47 +215,55 @@ def construct_mapping_from_schema(schema: dict) -> Tuple[PathMapping, dict]:
     Returns:
     - PathMapping: An object containing the mapping generated from the schema.
     """
-    def traverse(schema: dict, attribute: str, path: str = "") -> dict:
-        mapping = {}
+    
+    @dataclass
+    class MappingProperties:
+        fhirpath: str 
+        jsonpath: str 
+        items: Optional[object] = None
+        properties: Optional[object] = None
+
+    X_FHIRPATH = 'x-fhirpath'
+        
+    def traverse(schema: dict, path: str = "") -> dict:
+        mappings = []
         if schema.properties:
             for property_name, property in schema.properties.items():
-                full_path = f"{path}.{property_name}" if path else property_name
-                if hasattr(property, attribute):
-                    mapping[full_path] = getattr(property,attribute)
+                full_json_path = f"{path}.{property_name}" if path else property_name
+                if not hasattr(property, X_FHIRPATH):
+                    continue 
+                
+                property_mapping = MappingProperties(
+                    fhirpath=getattr(property, X_FHIRPATH),
+                    jsonpath=full_json_path,
+                )
+                                        
                 if property.properties:
-                    nested_properties = traverse(property, attribute, full_path)
-                    nested_properties = {
-                        prop: value.replace('$this.','') 
-                        for prop,value in nested_properties.items()
-                    }
-                    mapping.update(nested_properties)
+                    property_mapping.properties = PathMapping(traverse(property, full_json_path))
+
                 if property.items:
-                    nested_properties = traverse(property, attribute, full_path)
-                    nested_properties = {
-                        prop: value.replace('$this.','')
-                        for prop,value in nested_properties.items()
-                    }           
-                    print(full_path, nested_properties)         
-                    mapping.update(nested_properties)
-        
+                    property_mapping.items = PathMapping(traverse(property, full_json_path))
+                mappings.append(property_mapping)
+                
         if schema.items:
-            sub_properties = traverse(schema.items, attribute, path)
-            mapping.update(sub_properties)
-            if hasattr(schema.items, attribute):
-                mapping[path] = getattr(schema.items, attribute)
+            mappings.append(MappingProperties(
+                fhirpath=getattr(schema.items, X_FHIRPATH),
+                jsonpath=path,
+                items=PathMapping(traverse(schema.items, path)),  
+            ))            
                 
         if schema.allOf:
             for sub_schema in schema.allOf:
-                sub_properties = traverse(sub_schema, attribute, path)
-                mapping.update(sub_properties)
+                property_mappings = traverse(sub_schema, path)
+                mappings.extend(property_mappings)
 
         if schema.oneOf:
             for sub_schema in schema.oneOf:
-                sub_properties = traverse(sub_schema, attribute, path)
-                mapping.update(sub_properties)
+                property_mappings = traverse(sub_schema, path)
+                mappings.extend(property_mappings)
         
-        return mapping
-    return PathMapping(schema=schema, mapping=traverse(schema, 'x-fhirpath')), traverse(schema, 'x-fhiritems')
+        return mappings
+    return PathMapping(traverse(schema))
 
 
 def map_response_values_to_fhirpaths(response: dict, mapping: PathMapping, current_path='') -> dict:
@@ -271,20 +283,34 @@ def map_response_values_to_fhirpaths(response: dict, mapping: PathMapping, curre
         # Construct the JSONpath for the response's value
         json_path = f"{current_path}.{parameter}" if current_path else parameter
         # Map it to the corresponding FHIRpath
-        fhir_path = mapping.convert_jsonpath_to_fhirpath(json_path)
-        if not fhir_path:
-            continue
-        # Update the map based on the type of value 
-        if isinstance(value, dict):
-            items[fhir_path] = map_response_values_to_fhirpaths(value, mapping, current_path=json_path)
-        elif isinstance(value, list):
-            items[fhir_path] = [
+        element_map = mapping.get_jsonpath_mapping_properties(json_path)
+        if not element_map:
+           continue
+        if element_map.properties:
+            # Update the map based on the type of value 
+            if not isinstance(value, dict):
+                raise TypeError(f'Expected JSON value at "{json_path}" to be a dict.')
+            properties = map_response_values_to_fhirpaths(value, element_map.properties, current_path=json_path)
+            for subpath, value in properties.items():
+                subpath = subpath.replace(element_map.fhirpath, '').replace('$this', '')
+                items[join_fhirpath(element_map.fhirpath, subpath)] = value 
+        elif element_map.items:
+            if not isinstance(value, list):
+                raise TypeError(f'Expected JSON value at "{json_path}" to be a list.')
+            sliced_path = element_map.fhirpath
+            intermediate_path = element_map.items.get_jsonpath_mapping_properties(parameter).fhirpath
+            list_of_properties = [
                 item if not isinstance(item, dict) 
-                    else map_response_values_to_fhirpaths(item, mapping, current_path=json_path) 
+                    else map_response_values_to_fhirpaths(item, element_map.items.get_jsonpath_mapping_properties(parameter).items, current_path=parameter) 
                         for item in value
             ]
+            for index, properties in enumerate(list_of_properties):
+                for subpath, value in properties.items():
+                    subpath = subpath.replace(intermediate_path, '').replace('$this', '')
+                    intermediate_path = intermediate_path.replace(element_map.fhirpath,'')
+                    items[join_fhirpath(sliced_path, index, intermediate_path, subpath)] = value 
         else:
-            items[fhir_path] = value
+            items[element_map.fhirpath] = value
     return items
 
 
@@ -296,11 +322,12 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     schema = extract_json_schema(specification, enpoint, method, status_code)
     schema = traverse_and_replace_references(schema, openapi_file_location, specification)    
     # print('schema',schema.model_dump_json(indent=3, exclude_unset=True))
-    fhirpath_mapping, items_mapping = construct_mapping_from_schema(schema)
-    fhir_resource_values = map_response_values_to_fhirpaths(response, fhirpath_mapping)
+    fhirpath_mapping = construct_mapping_from_schema(schema)
     import json
-    print('fhir_resource_values', json.dumps(fhirpath_mapping.mapping, indent=3))
-    print('items_mapping', json.dumps(items_mapping, indent=3))
+    print('mapping', json.dumps([asdict(data) for data in fhirpath_mapping.mappings], indent=3))
+    fhir_resource_values = map_response_values_to_fhirpaths(response, fhirpath_mapping)
+    print('\n\n\nfhir_resource_values', json.dumps(fhir_resource_values, indent=3))
+
     # Construct FHIR profile
     if not profile_url:
         profile_url = getattr(schema, "x-fhir-profile")
@@ -317,28 +344,12 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
 
     # Set the values of the API response
     for fhirpath, value in fhir_resource_values.items():
-        jsonpath = fhirpath_mapping.convert_fhirpath_to_jsonpath(fhirpath)
-        values = ensure_list(value)
-        for n,value in enumerate(values):
-            full_fhirpath = fhirpath
-            array_path = next((array_path for array_path in items_mapping.keys() if array_path in jsonpath), None)
-            if array_path:     
-                array_fhirpath = items_mapping[jsonpath]
-                slice_subpath = full_fhirpath.replace(array_fhirpath,'').replace('$this.','')
-                full_fhirpath = join_fhirpath(array_fhirpath, n, slice_subpath)
-                
-            def _add_value_at_path(fhirpath, value):
-                if isinstance(value, dict):
-                    for subpath,subvalue in value.items():
-                        subpath = subpath.replace(fhirpath,'')
-                        _add_value_at_path(join_fhirpath(fhirpath, subpath), subvalue)
-                else:
-                    print(f'SET {fhirpath} -> {value}')
-                    try:            
-                        navigator.set_value(fhirpath, value)        
-                    except:
-                        raise AttributeError(f'\nError setting API response value: \n\t{value}\n to FHIR path: \n\t{full_fhirpath}\n\nTraceback:\n{traceback.format_exc()}')
-            _add_value_at_path(full_fhirpath, value)
+        fhirpath = fhirpath.replace('..','.')
+        print(f'SET {fhirpath} -> {value}')
+        try:            
+            navigator.set_value(fhirpath, value)        
+        except:
+            raise AttributeError(f'\nError setting API response value: \n\t{value}\n to FHIR path: \n\t{fhirpath}\n\nTraceback:\n{traceback.format_exc()}')
     
     # Disable tracking of changes in slices
     track_slice_changes(resource, False)

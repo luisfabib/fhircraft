@@ -71,7 +71,7 @@ components:
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-procedure-intent").valueCodeableConcept.coding.0
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-procedure-intent-vs
         performedReasons:
-          x-fhiritems: Procedure.reasonCode
+          x-fhirpath: Procedure.reasonCode
           items:
             $ref: '#/components/schemas/Coding'
             x-fhirpath: Procedure.reasonCode.coding.0
@@ -81,7 +81,7 @@ components:
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-treatment-termination-reason").valueCodeableConcept.coding.0
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-treatment-termination-reason-vs
         methods:
-          x-fhiritems: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")
+          x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")
           items:
             type: object
             x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")
@@ -98,7 +98,7 @@ components:
           type: integer
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-sessions").valueUnsignedInt
         dosages:
-          x-fhiritems: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume")
+          x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume")
           items:
             type: object
             x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume")
@@ -113,7 +113,7 @@ components:
                 type: integer
                 x-fhirpath: $this.extension("fractionsDelivered").valueUnsignedInt
         treatedBodyparts: 
-          x-fhiritems: Procedure.bodySite
+          x-fhirpath: Procedure.bodySite
           items:
             $ref: '#/components/schemas/Coding'
             x-fhirpath: Procedure.bodySite.coding.0

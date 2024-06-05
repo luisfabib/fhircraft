@@ -22,8 +22,10 @@ def split_fhirpath(fhir_path: str) -> List[str]:
 
 def join_fhirpath(*segments: List[Union[str, int]]) -> str:
     def _clean_segment(segment: str) -> str:
-        if segment.startswith('.'): segment = segment[1:]
-        if segment.endswith('.'): segment = segment[:-1]
+        while segment.startswith('.'): 
+            segment = segment[1:]
+        while segment.endswith('.'): 
+            segment = segment[:-1]
         return segment
     return '.'.join([_clean_segment(str(segment)) for segment in segments]) 
 

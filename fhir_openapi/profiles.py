@@ -309,7 +309,6 @@ def track_slice_changes(resource, value):
         valid_elements = ensure_list(navigator.get_value(slicing.path))
         for entry in valid_elements:
             if entry:
-                print(f'{"Enabling" if value else "Disabling"} __track_changes__ for {slicing.path}')
                 if entry.__slicing__:
                     track_slice_changes(entry, value)        
                 entry.__track_changes__ = value

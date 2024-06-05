@@ -157,12 +157,12 @@ components:
           x-fhirpath: Observation.component.where(code.coding.code="variant-confidence-status").where(code.coding.system="http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs").valueCodeableConcept.coding.0
           x-binding: http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs
         geneStudied:
-          x-fhiritems: Observation.component.where(code.coding.code="48018-6").where(code.coding.system="http://loinc.org")
+          x-fhirpath: Observation.component.where(code.coding.code="48018-6").where(code.coding.system="http://loinc.org")
           items: 
             $ref: '#/components/schemas/Coding'
             x-fhirpath: Observation.component.where(code.coding.code="48018-6").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
         chromosomeIdentifier:
-          x-fhiritems: Observation.component.where(code.coding.code="48000-4").where(code.coding.system="http://loinc.org")
+          x-fhirpath: Observation.component.where(code.coding.code="48000-4").where(code.coding.system="http://loinc.org")
           items:
             $ref: '#/components/schemas/Coding'
             x-fhirpath: Observation.component.where(code.coding.code="48000-4").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
