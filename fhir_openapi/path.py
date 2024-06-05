@@ -1,11 +1,11 @@
 import re 
 import traceback
+from typing import List, Union
 from dataclasses import make_dataclass
 from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel
 from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir_openapi.utils import ensure_list
-
 
 NUMERIC_PATTERN = re.compile(r"^\d+$")
 EXTENSION_PATTERN = re.compile(r"extension\([\"|\'](.*?)[\"|\']\)")
@@ -16,13 +16,19 @@ FIRST_PATTERN = re.compile(r"^first()$")
 LAST_PATTERN = re.compile(r"^last()$")
 TAIL_PATTERN = re.compile(r"^tail()$")
 
+def split_fhirpath(fhir_path: str) -> List[str]:
+    # Split FHIR path only at non-quoted dots
+    return re.split(r'\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)', fhir_path)
+
+def join_fhirpath(*segments: List[Union[str, int]]) -> str:
+    def _clean_segment(segment: str) -> str:
+        if segment.startswith('.'): segment = segment[1:]
+        if segment.endswith('.'): segment = segment[:-1]
+        return segment
+    return '.'.join([_clean_segment(str(segment)) for segment in segments]) 
 
 class FHIRPathNavigator:
 
-    def _split_path(self, fhir_path):
-        # Split FHIR path only at non-quoted dots
-        return re.split(r'\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)', fhir_path)
-    
     def _create_empty_segment_resource(self, element, segment):
         model_field = element.__class__.__fields__.get(segment)
         if model_field:
@@ -102,7 +108,7 @@ class FHIRPathNavigator:
         union_collection = []
         for fhir_path in fhirpath.split('|'):
             # Split the path into its segments
-            fhirpath_segments = self._split_path(fhir_path.strip())
+            fhirpath_segments = split_fhirpath(fhir_path.strip())
             # If path's entry point is the core resource, remove it
             if self.path_origin == fhirpath_segments[0]:
                 traversed_path = fhirpath_segments[0]
@@ -127,7 +133,7 @@ class FHIRPathNavigator:
             }
             # Iterate over the FHIRPath segments
             for fhirpath_segment in fhirpath_segments:
-                traversed_path += f'.{fhirpath_segment}'
+                traversed_path = join_fhirpath(traversed_path, fhirpath_segment)
                 try:
                     for pattern, operation in FHIRPATH_PATTERNS.items():
                         # Look for patterns in the segment
@@ -163,11 +169,11 @@ class FHIRPathNavigator:
         self._traverse_fhirpath(fhir_path, new_value)
         
     def get_pydantic_field(self, fhir_path):
-        fhirpath_segments = self._split_path(fhir_path)
+        fhirpath_segments = split_fhirpath(fhir_path)
         last_fhirpath_segment = fhirpath_segments[-1]
         fhirpath_segments = fhirpath_segments[:-1]
         if len(fhirpath_segments)>0:
-            element = self._traverse_fhirpath('.'.join(fhirpath_segments))[0]
+            element = self._traverse_fhirpath(join_fhirpath(*fhirpath_segments))[0]
         else:
             element = self.fhir_resource
         return element.__class__.__fields__.get(last_fhirpath_segment)

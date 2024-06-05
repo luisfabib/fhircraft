@@ -6,13 +6,13 @@ from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.R4B.fhirtypes import MetaType
 from fhir.resources.R4B.meta import Meta
 
-from fhir_openapi.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts, is_optional
+from fhir_openapi.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts
 
 from pydantic.v1 import ValidationError, create_model, validate_model, Extra
 from pydantic.v1.error_wrappers import ErrorWrapper
 from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_origin
 from dataclasses import dataclass, field
-from fhir_openapi.path import FHIRPathNavigator
+from fhir_openapi.path import FHIRPathNavigator, split_fhirpath, join_fhirpath
 from copy import deepcopy
 import datetime 
 import json
@@ -175,7 +175,11 @@ class FHIRSlicing:
     
     @property
     def discriminator_paths(self) -> str:
-        return [f'{self.path}.{discriminator.path}' if discriminator.path!='$this' else self.path for discriminator in self.discriminators]
+        return [
+            join_fhirpath(self.path, discriminator.path) 
+                if discriminator.path!='$this' else self.path 
+                    for discriminator in self.discriminators
+        ]
         
     def add_slice(self, slice: FHIRSlice):
         slice.slicing_group = self
@@ -319,8 +323,6 @@ def clean_elements_and_slices(resource, depth=0):
             print("\t"*(depth+1)+f'↪ {slice.fhirpath}: {len(sliced_entries)} elements')
             
             for n,entry in enumerate(sliced_entries):
-                if slice.name == 'technique':
-                    print('\t\t\t\t\ttechnique',n, entry.valueCodeableConcept.json() if entry.valueCodeableConcept else entry.valueCodeableConcept)
                 print("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}.{n}  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.__slice_complete__ else "✗"}) {"-> DELETE" if (not entry.__slice_complete__ and not entry.has_been_modified) and entry in valid_elements else ""}' )
                 if not entry.__slice_complete__ and not entry.has_been_modified and entry in valid_elements:
                     valid_elements.remove(entry)                
@@ -505,7 +507,7 @@ class ProfiledResourceFactory:
 
     def _check_if_path_ancestors_exist(self, resource, fhirpath):
         elements = FHIRPathNavigator(resource)  
-        for segment in elements._split_path(fhirpath)[:-1]:
+        for segment in split_fhirpath(fhirpath)[:-1]:
             child_elements = elements.get_value(segment)
             if child_elements:
                 elements = FHIRPathNavigator(ensure_list(child_elements)[0])

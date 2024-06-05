@@ -5,10 +5,6 @@ import os
 from typing import List, Any, Dict, Union, get_args, get_origin
 from dotenv import dotenv_values
 
-def is_optional(field):
-    return get_origin(field) is Union and \
-           type(None) in get_args(field)
-
 def load_env_variables(file_path=None):
     """
     Loads environment variables from a .env file into a dictionary without changing the global environment variables.
