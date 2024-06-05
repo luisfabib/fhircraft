@@ -63,8 +63,8 @@ class FHIRPathNavigator:
         extension_url = EXTENSION_PATTERN.search(statement).group(1)
         return [
             extension for element in collection 
-                    for extension in element.extension 
-                        if extension.url == extension_url
+                    for extension in ensure_list(element.extension) 
+                        if extension is not None and extension.url == extension_url
         ]
 
     def _where(self, collection, statement):

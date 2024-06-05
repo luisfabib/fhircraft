@@ -2,7 +2,7 @@
 {
   "resourceType" : "Procedure",
   "meta" : {
-    "versionId": " 3.0.0",
+    "versionId": "3.0.0",
     "profile" : [
       "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-course-summary"
     ]
@@ -149,7 +149,6 @@
     "coding" : [
       {
         "system" : "http://snomed.info/sct",
-        "version" : "http://snomed.info/sct/900000000000207008",
         "code" : "1217123003"
       }
     ]

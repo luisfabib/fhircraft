@@ -1,17 +1,10 @@
 {
+    "internalId": "123456789",
     "status": "final",
     "patientId": "Patient/example3",
     "observationType": {
        "system": "http://loinc.org",
        "code": "69548-6"
-    },
-    "chromosomeIdentifier.code": {
-       "coding": [
-          {
-             "system": "http://loinc.org",
-             "code": "69548-6"
-          }
-       ]
     },
     "effective": "2020-01-01",
     "assessment": {

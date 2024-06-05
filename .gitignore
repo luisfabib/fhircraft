@@ -1,6 +1,6 @@
 /data/**
 /experimental/**
-
+/ca-certificates/**
 pip-proxy.sh
 
 .codiumai.toml 

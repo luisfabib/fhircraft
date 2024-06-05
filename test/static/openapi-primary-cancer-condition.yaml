@@ -44,6 +44,8 @@ components:
       title: Condition
       x-fhir-profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition
       properties:
+        internalId:
+          type: string
         status: 
           $ref: '#/components/schemas/Coding'
           x-fhirpath: Condition.clinicalStatus.coding.0

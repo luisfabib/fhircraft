@@ -1,5 +1,12 @@
 {
+    "internalId": "123456789",
     "status" : "completed",
+    "category": {
+        "code": "108290001",
+        "display": "Radiation oncology AND/OR radiotherapy (procedure)",
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/900000000000207008"
+    },
     "patientId":  "Patient/cancer-patient-jenny-m",
     "asserter": "Practitioner/us-core-practitioner-kyle-anydoc",
     "treatmentPeriod": {
@@ -47,12 +54,22 @@
         {
            "volume": "BodyStructure/jenny-m-chest-wall-lymph-nodes-treatment-volume",
            "totalDose": {
-                "value" : 5000,
-                "system" : "http://unitsofmeasure.org",
-                "code" : "cGy"
+                "value": 5000,
+                "system": "http://unitsofmeasure.org",
+                "code": "cGy"
             },
             "fractions": 25
-        }
+        },
+        
+        {
+            "volume": "BodyStructure/jenny-m-chest-wall-treatment-volume",
+            "totalDose": {
+                 "value": 6000,
+                 "system": "http://unitsofmeasure.org",
+                 "code": "cGy"
+             },
+             "fractions": 30
+         }
     ],
     "performedReasons": [
         {

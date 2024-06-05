@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from dataclasses import dataclass, field
 import traceback
 from fhir_openapi.utils import load_file, load_url
-from fhir_openapi.profiles import construct_profiled_resource_model
+from fhir_openapi.profiles import construct_profiled_resource_model, track_slice_changes
 from fhir_openapi.path import FHIRPathNavigator
 from functools import cached_property 
 from fhir_openapi.utils import remove_none_dicts, ensure_list
@@ -302,25 +302,39 @@ def convert_response_from_api_to_fhir(response: Any, openapi_specification: str,
     resource = profile.construct_with_profiled_elements()
     navigator = FHIRPathNavigator(resource)
 
+    # import json
+    # print('fhir_resource_values', json.dumps(fhir_resource_values, indent=3))
+    # print('items_mapping', json.dumps(items_mapping, indent=3))
+    track_slice_changes(resource, True)
+
     # Set the values of the API response
     for fhirpath, value in fhir_resource_values.items():
         jsonpath = fhirpath_mapping.convert_fhirpath_to_jsonpath(fhirpath)
-        full_fhirpath = fhirpath
         values = ensure_list(value)
         for n,value in enumerate(values):
-            if jsonpath in items_mapping:       
-                array_path = items_mapping[jsonpath]
-                slice_subpath = fhirpath.replace(array_path+'.','').replace('$this.','')
-                full_fhirpath = f'{array_path}.{n}.{slice_subpath}'
-            try:
+            full_fhirpath = fhirpath
+            array_path = next((array_path for array_path in items_mapping.keys() if array_path in jsonpath), None)
+            if array_path:     
+                array_fhirpath = items_mapping[jsonpath]
+                slice_subpath = full_fhirpath.replace(array_fhirpath,'').replace('$this.','')
+                slice_subpath = slice_subpath[1:] if slice_subpath.startswith('.') else slice_subpath
+                array_fhirpath = array_fhirpath[:-1] if array_fhirpath.endswith('.') else array_fhirpath
+                full_fhirpath = f'{array_fhirpath}.{n}.{slice_subpath}'
+            def add_value_at_path(fhirpath, value):
                 if isinstance(value, dict):
                     for subpath,subvalue in value.items():
-                        navigator.set_value(full_fhirpath + '.' + subpath, subvalue)
+                        subpath = subpath.replace(fhirpath,'')
+                        subpath = subpath[1:] if subpath.startswith('.') else subpath    
+                        fhirpath = fhirpath[:-1] if fhirpath.endswith('.') else fhirpath                        
+                        add_value_at_path(f'{fhirpath}.{subpath}', subvalue)
                 else:
-                    navigator.set_value(full_fhirpath, value)        
-            except:
-                raise AttributeError(f'\nError setting API response value: \n\t{value}\n to FHIR path: \n\t{full_fhirpath}\n\nTraceback:\n{traceback.format_exc()}')
-    
+                    print(f'SET {fhirpath} -> {value}')
+                    try:            
+                        navigator.set_value(fhirpath, value)        
+                    except:
+                        raise AttributeError(f'\nError setting API response value: \n\t{value}\n to FHIR path: \n\t{full_fhirpath}\n\nTraceback:\n{traceback.format_exc()}')
+            add_value_at_path(full_fhirpath, value)
+    track_slice_changes(resource, False)
     # Cleanup resource and remove unused fields
     resource = profile.clean_elements_and_slices(resource)
     return resource

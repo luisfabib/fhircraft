@@ -47,6 +47,8 @@ components:
       title: Observation
       x-fhir-profile: http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant
       properties:
+        internalId:
+          type: string
         status:
           type: string
           x-fhirpath: Observation.status

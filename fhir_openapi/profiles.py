@@ -114,23 +114,27 @@ class FHIRSlice:
             model = get_fhir_model_class(element.type_.__resource_type__)
         
         class ProfiledSlice(model, extra=Extra.allow):
-            __slice_modified__: bool = False 
+            __track_changes__: bool = False 
             __slice_complete__: bool = False 
+            __has_been_modified__: bool = False
+            __path__: str = self.fhirpath
             __slicing__: ClassVar[List[FHIRSlicing]] = self.profile_constraint.__slicing__ if self.profile_constraint else None
 
             def __setattr__(self, name:str, value):
                 super().__setattr__(name, value)
-                if name != '__slice_modified__':
-                    super().__setattr__('__slice_modified__', True)
+                if name not in ['__track_changes__','__has_been_modified__'] and self.__track_changes__:
+                    super().__setattr__('__has_been_modified__', True)
             
             @property
             def has_been_modified(self):
-                if self.__slice_modified__: 
+                if self.__has_been_modified__: 
                     return True
                 else:
                     for element in self.__dict__.values():
-                        if getattr(element,'__slice_modified__', None):
-                            return True
+                        elements = ensure_list(element)
+                        for _element in elements:
+                            if getattr(_element, 'has_been_modified', None):
+                                return True
                 return False
             
         slice_model = create_model(__model_name=model.__name__, __base__=ProfiledSlice) 
@@ -241,9 +245,8 @@ def initialize_slices(resource):
             slice_available_elements = sorted(set([name for name in slice_resource.__class__.__fields__ if '__' not in name and name not in BASE_ELEMENTS]))
             slice_preset_elements = sorted(set([name for name, value in slice_resource.dict().items() if (value is not None or value!=[]) and '__' not in name and name not in BASE_ELEMENTS]))
             slice_resource.__slice_complete__ = slice_available_elements == slice_preset_elements
-            slice_resource.__slice_modified__= False
             if not slice_resource.__slice_complete__ and slice.max_cardinality>1:
-                slices_resources.extend([slice_resource.copy(deep=True) for _ in range(min(slice.max_cardinality, 10))])
+                slices_resources.extend([slice_resource.copy(deep=True) for _ in range(min(slice.max_cardinality, 4))])
             else:
                 slices_resources.append(slice_resource)
         navigator.set_value(slicing.path, slices_resources)
@@ -276,35 +279,54 @@ def process_slice_constraints(slice_resource, slice):
         
         if constraint.pattern:
             if slice_element == '':
-                return slice_resource.__class__.parse_obj(constraint.pattern)
+                for field, value in constraint.pattern.__dict__.items():
+                    setattr(slice_resource, field, value)
             else:
                 is_list = is_list_type(slice_navigator.get_pydantic_field(slice_element))
                 pattern = [constraint.pattern] if is_list and not isinstance(constraint.pattern, list) else constraint.pattern
                 slice_navigator.set_value(slice_element, pattern)
     return slice_resource
 
+def track_slice_changes(resource, value):
+    profile = resource.__class__
+    navigator = FHIRPathNavigator(resource)    
+    for slicing in profile.__slicing__:
+        if '[x]' in slicing.path: continue
+        valid_elements = ensure_list(navigator.get_value(slicing.path))
+        for entry in valid_elements:
+            if entry:
+                print(f'{"Enabling" if value else "Disabling"} __track_changes__ for {slicing.path}')
+                if entry.__slicing__:
+                    track_slice_changes(entry, value)        
+                entry.__track_changes__ = value
+
 def clean_elements_and_slices(resource, depth=0):
     profile = resource.__class__
     profile.validate_assignment = False
-    navigator = FHIRPathNavigator(resource)
+    navigator = FHIRPathNavigator(resource)    
     # Remove unused/incomplete slices
     for slicing in profile.__slicing__:
         if '[x]' in slicing.path: continue
         valid_elements = ensure_list(navigator.get_value(slicing.path))
         valid_elements = [element for element in valid_elements if element is not None]
-        print("\t"*(depth)+f'{slicing.path}: {len(valid_elements)} valid elements in list')
+        if not valid_elements:
+            continue
+        print("\t"*(depth)+f'↪ {slicing.path}: {len(valid_elements)} elements')
         for slice in slicing.slices:
             # Get all the elements that conform to this slice's definition           
             sliced_entries = ensure_list(navigator.get_value(slice.fhirpath))
             sliced_entries = [entry for entry in sliced_entries if entry is not None]
-            print("\t"*(depth+1)+f'{len(sliced_entries)} valid elements in sublist {slice.fhirpath})')
+            print("\t"*(depth+1)+f'↪ {slice.fhirpath}: {len(sliced_entries)} elements')
             
-            for entry in sliced_entries:
-                print("\t"*(depth+1)+f'{slicing.path}:{slice.name} Modified: {entry.has_been_modified} Complete: {entry.__slice_complete__}  {"-> DELETE" if (not entry.__slice_complete__ and not entry.has_been_modified) and entry in valid_elements else ""}' )
+            for n,entry in enumerate(sliced_entries):
+                if slice.name == 'technique':
+                    print('\t\t\t\t\ttechnique',n, entry.valueCodeableConcept.json() if entry.valueCodeableConcept else entry.valueCodeableConcept)
+                print("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}.{n}  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.__slice_complete__ else "✗"}) {"-> DELETE" if (not entry.__slice_complete__ and not entry.has_been_modified) and entry in valid_elements else ""}' )
                 if not entry.__slice_complete__ and not entry.has_been_modified and entry in valid_elements:
                     valid_elements.remove(entry)                
-                elif entry.__slicing__:
-                    clean_elements_and_slices(entry, depth=depth+2)
+                if entry.__slicing__:
+                    clean_elements_and_slices(entry, depth=depth+3)                
+
         # Set the new list with only the valid slices
         navigator.set_value(slicing.path, valid_elements)
         
