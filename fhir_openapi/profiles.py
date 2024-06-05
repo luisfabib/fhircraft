@@ -6,11 +6,11 @@ from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.R4B.fhirtypes import MetaType
 from fhir.resources.R4B.meta import Meta
 
-from fhir_openapi.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts
+from fhir_openapi.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts, is_optional
 
-from pydantic.v1 import ValidationError, create_model, validate_model
+from pydantic.v1 import ValidationError, create_model, validate_model, Extra
 from pydantic.v1.error_wrappers import ErrorWrapper
-from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional
+from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_origin
 from dataclasses import dataclass, field
 from fhir_openapi.path import FHIRPathNavigator
 from copy import deepcopy
@@ -49,6 +49,7 @@ class FHIRProfileConstraint:
     path: str
     min: int
     max: int
+    profile: Optional[object] = None
     valueType: Optional[List[str]] = field(default_factory=list)
     fixedValue: Optional[Union[str, float, int, Dict[str, Union[str, float, int]]]] = None
     pattern: Optional[Union[str, float, int, Dict[str, Union[str, float, int]]]] = None
@@ -89,6 +90,10 @@ class FHIRSlice:
         return min([constraint.min for constraint in self.constraints if constraint.min and constraint.path == self.slicing_group.path])       
     
     @property
+    def profile_constraint(self):
+        return next((constraint.profile for constraint in self.constraints if constraint.profile and constraint.path == self.slicing_group.path),None)       
+    
+    @property
     def max_cardinality(self):
         return max([constraint.max for constraint in self.constraints if constraint.max and constraint.path == self.slicing_group.path])       
     
@@ -107,8 +112,30 @@ class FHIRSlice:
             if not element:
                 return None
             model = get_fhir_model_class(element.type_.__resource_type__)
-        model.Config.validate_assignment = False
-        return model
+        
+        class ProfiledSlice(model, extra=Extra.allow):
+            __slice_modified__: bool = False 
+            __slice_complete__: bool = False 
+            __slicing__: ClassVar[List[FHIRSlicing]] = self.profile_constraint.__slicing__ if self.profile_constraint else None
+
+            def __setattr__(self, name:str, value):
+                super().__setattr__(name, value)
+                if name != '__slice_modified__':
+                    super().__setattr__('__slice_modified__', True)
+            
+            @property
+            def has_been_modified(self):
+                if self.__slice_modified__: 
+                    return True
+                else:
+                    for element in self.__dict__.values():
+                        if getattr(element,'__slice_modified__', None):
+                            return True
+                return False
+            
+        slice_model = create_model(__model_name=model.__name__, __base__=ProfiledSlice) 
+        slice_model.validate_assignment = False
+        return slice_model
     
     @property
     def discriminator_values(self):
@@ -124,6 +151,10 @@ class FHIRSlice:
         for path, value in self.discriminator_values.items():
             if path.startswith('.'): path = path[1:]
             fhir_path += f'.where({path}="{value}")'       
+        if self.profile_constraint:
+            if fhir_path.rsplit('.' ,1)[1] == 'extension':
+                fhir_path = fhir_path.rsplit('.',1)[0]
+            fhir_path += f'.extension("{self.profile_constraint.__canonical_url__}")'   
         return fhir_path 
 
 @dataclass
@@ -204,10 +235,17 @@ def initialize_slices(resource):
         for slice in slicing.slices:
             if not slice.pydantic_model:
                 continue            
-            slice.pydantic_model.validate_assignment = False
             slice_resource = slice.pydantic_model.construct()
             slice_resource = process_slice_constraints(slice_resource, slice)
-            slices_resources.extend([slice_resource.copy(deep=True) for _ in range(min(slice.max_cardinality, 20))])
+            BASE_ELEMENTS = ['text', 'extension', 'id', 'fhir_comments','resource_type']
+            slice_available_elements = sorted(set([name for name in slice_resource.__class__.__fields__ if '__' not in name and name not in BASE_ELEMENTS]))
+            slice_preset_elements = sorted(set([name for name, value in slice_resource.dict().items() if (value is not None or value!=[]) and '__' not in name and name not in BASE_ELEMENTS]))
+            slice_resource.__slice_complete__ = slice_available_elements == slice_preset_elements
+            slice_resource.__slice_modified__= False
+            if not slice_resource.__slice_complete__ and slice.max_cardinality>1:
+                slices_resources.extend([slice_resource.copy(deep=True) for _ in range(min(slice.max_cardinality, 10))])
+            else:
+                slices_resources.append(slice_resource)
         navigator.set_value(slicing.path, slices_resources)
     return resource
 
@@ -228,55 +266,51 @@ def process_slice_constraints(slice_resource, slice):
         if '[x]' in slice_element:
             continue
         
+        if constraint.profile:
+            for field, value in constraint.profile.construct_with_profiled_elements().__dict__.items():
+                setattr(slice_resource, field, value)
+            return slice_resource
+        
         if constraint.fixedValue:
             slice_navigator.set_value(slice_element, constraint.fixedValue)
         
         if constraint.pattern:
             if slice_element == '':
-                slice_resource = constraint.pattern
+                return slice_resource.__class__.parse_obj(constraint.pattern)
             else:
                 is_list = is_list_type(slice_navigator.get_pydantic_field(slice_element))
                 pattern = [constraint.pattern] if is_list and not isinstance(constraint.pattern, list) else constraint.pattern
                 slice_navigator.set_value(slice_element, pattern)
     return slice_resource
 
-def clean_elements_and_slices(resource):
+def clean_elements_and_slices(resource, depth=0):
     profile = resource.__class__
+    profile.validate_assignment = False
     navigator = FHIRPathNavigator(resource)
     # Remove unused/incomplete slices
     for slicing in profile.__slicing__:
         if '[x]' in slicing.path: continue
-        valid_slices = ensure_list(navigator.get_value(slicing.path))
+        valid_elements = ensure_list(navigator.get_value(slicing.path))
+        valid_elements = [element for element in valid_elements if element is not None]
+        print("\t"*(depth)+f'{slicing.path}: {len(valid_elements)} valid elements in list')
         for slice in slicing.slices:
             # Get all the elements that conform to this slice's definition           
             sliced_entries = ensure_list(navigator.get_value(slice.fhirpath))
-            # Get list of slice elements that have been set by the constraints
-            pattern_elements = sorted([
-                constraint.path 
-                    for constraint in slice.constraints 
-                        if (constraint.pattern or constraint.fixedValue) and not '[x]' in constraint.path
-            ])
-            # Get the min. cardinality of this constraint
-            min_cardinality = max([
-                constraint.min 
-                 for constraint in slice.constraints 
-                        if constraint.path == slicing.path
-            ])
-            # Check for each sliced entry whether they are unusued/incomplete
+            sliced_entries = [entry for entry in sliced_entries if entry is not None]
+            print("\t"*(depth+1)+f'{len(sliced_entries)} valid elements in sublist {slice.fhirpath})')
+            
             for entry in sliced_entries:
-                # Get the list of non-empty slice elements
-                nonempty_elements = sorted([
-                    f'{slicing.path}.{element}' 
-                        for element in remove_none_dicts(entry.dict()) 
-                ])
-                # If the only elements set are those set by the constraints, and the slice is not needed, remove it
-                if min_cardinality<1 and nonempty_elements == pattern_elements and entry in valid_slices:
-                    valid_slices.remove(entry)
+                print("\t"*(depth+1)+f'{slicing.path}:{slice.name} Modified: {entry.has_been_modified} Complete: {entry.__slice_complete__}  {"-> DELETE" if (not entry.__slice_complete__ and not entry.has_been_modified) and entry in valid_elements else ""}' )
+                if not entry.__slice_complete__ and not entry.has_been_modified and entry in valid_elements:
+                    valid_elements.remove(entry)                
+                elif entry.__slicing__:
+                    clean_elements_and_slices(entry, depth=depth+2)
         # Set the new list with only the valid slices
-        navigator.set_value(slicing.path, valid_slices)
+        navigator.set_value(slicing.path, valid_elements)
         
     # Cleanup the resource from empty structures to be valid
-    resource = profile.parse_obj(remove_none_dicts(resource.dict()) )        
+    for field, value in remove_none_dicts(resource.dict()).items():
+        setattr(resource, field, value)
     return resource
 
 class ProfiledResourceFactory:
@@ -292,9 +326,15 @@ class ProfiledResourceFactory:
             Returns:
                 Dict[str, Any]: A dictionary representing the structure definition of the FHIR resource.
         """       
+        
         if not profile_url.endswith('.json'):
             # Construct endpoint URL for the StructureDefinition JSON
-            domain, resource = profile_url.rsplit('/', 1)
+            if profile_url.startswith('http://hl7.org/fhir/StructureDefinition'):
+                domain, resource = profile_url.rsplit('/', 1)
+                domain = domain.replace('http://hl7.org/fhir/StructureDefinition','https://hl7.org/fhir/R4/extension')
+                resource = resource.lower()
+            else:
+                domain, resource = profile_url.rsplit('/', 1)
             json_url = f"{domain}-{resource}.json"
         else:
             json_url = profile_url
@@ -378,7 +418,6 @@ class ProfiledResourceFactory:
                 )
                 slice_group.add_slice(slice)        
 
-        new_constraints = []
         for element in profile_definition.snapshot.element:
             constraint = FHIRProfileConstraint(
                 id=element.id,
@@ -387,28 +426,21 @@ class ProfiledResourceFactory:
                 max=int(str(element.max).replace('*','99999')) if str(element.max).replace('*','99999').isnumeric() else None,
             )
             if element.type and element.type[0].code=='Extension' and element.type[0].profile:
-                new_constraints.append(FHIRProfileConstraint(
-                    id=element.id + '.url',
-                    path=element.path + '.url',
-                    min=1,
-                    max=1,
-                    fixedValue=element.type[0].profile[0]
-                ))
+                constraint.profile = construct_profiled_resource_model(element.type[0].profile[0])
+                
             if element.type:
                 constraint.valueType = [type.code for type in element.type]
+                
             for pattern_field in PATTERN_FIELDS:
-                pattern_value = getattr(element, pattern_field)
-                if pattern_value: 
+                pattern_value = getattr(element, pattern_field, None)
+                if pattern_value is not None: 
                     constraint.pattern = pattern_value
 
             for fixed_field in FIXED_FIELDS:
-                fixed_value = getattr(element, fixed_field)
-                if pattern_value: 
+                fixed_value = getattr(element, fixed_field, None)
+                if fixed_value: 
                     constraint.fixedValue = fixed_value
-            
-            new_constraints.append(constraint)
-           
-        for constraint in new_constraints:
+                       
             if ':' in constraint.id or any([slice_group.path in constraint.path for slice_group in slicing]):
                 for slice_group in slicing:
                     if ':' in constraint.id:  
@@ -422,6 +454,7 @@ class ProfiledResourceFactory:
                 constraints.append(constraint)
                         
         class ProfiledModel(base_model):
+            __canonical_url__: ClassVar[str] = profile_url
             __slicing__: ClassVar[List[FHIRSlicing]] = slicing
             __constraints__: ClassVar[List[FHIRProfileConstraint]] = constraints
             __extensions__: ClassVar[List[FHIRExtension]] = extensions
