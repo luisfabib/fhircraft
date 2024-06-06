@@ -1,4 +1,4 @@
-from fhir_openapi.profiles import ProfiledResourceFactory, FHIRError, clear_chache, construct_profiled_resource_model
+from fhircraft.fhir.profiles import ProfiledResourceFactory, FHIRError, clear_chache, construct_profiled_resource_model
 
 from fhir.resources.R4B.patient import Patient
 from fhir.resources.R4B.observation import Observation
@@ -84,7 +84,7 @@ class TestConstructProfiledResourceModel:
                 ElementDefinition.parse_obj(definition) for definition in element_definitions
             ])
         )
-        with patch('fhir_openapi.profiles.ProfiledResourceFactory.get_structure_definition', return_value=structure_definition):
+        with patch('fhircraft.fhir.profiles.ProfiledResourceFactory.get_structure_definition', return_value=structure_definition):
             clear_chache()
             profile_model = construct_profiled_resource_model(canonical_url)
             return profile_model

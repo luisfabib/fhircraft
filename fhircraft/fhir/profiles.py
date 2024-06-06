@@ -6,13 +6,13 @@ from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.R4B.fhirtypes import MetaType
 from fhir.resources.R4B.meta import Meta
 
-from fhir_openapi.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts
+from fhircraft.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts
 
 from pydantic.v1 import ValidationError, create_model, validate_model, Extra
 from pydantic.v1.error_wrappers import ErrorWrapper
 from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_origin
 from dataclasses import dataclass, field
-from fhir_openapi.path import FHIRPathNavigator, split_fhirpath, join_fhirpath
+from fhircraft.fhir.path import FHIRPathNavigator, split_fhirpath, join_fhirpath
 from copy import deepcopy
 import datetime 
 import json

@@ -1,5 +1,5 @@
 
-from fhir_openapi.utils import ensure_list, get_dict_paths, load_file, load_url, contains_only_none, remove_none_dicts, load_env_variables  
+from fhircraft.utils import ensure_list, get_dict_paths, load_file, load_url, contains_only_none, remove_none_dicts, load_env_variables  
 import os 
 import json
 import pytest
@@ -292,21 +292,21 @@ class TestRemoveNoneDicts:
 class TestLoadEnvVariables:
     
     def test_load_env_variables_default_path(self, mocker):
-        mock_dotenv_values = mocker.patch("fhir_openapi.utils.dotenv_values")
+        mock_dotenv_values = mocker.patch("fhircraft.utils.dotenv_values")
         mock_dotenv_values.return_value = {'TEST_VAR': 'value'}
         result = load_env_variables()
         mock_dotenv_values.assert_called_once_with('.env')
         assert result == {'TEST_VAR': 'value'}
 
     def test_load_env_variables_custom_path(self, mocker):
-        mock_dotenv_values = mocker.patch("fhir_openapi.utils.dotenv_values")
+        mock_dotenv_values = mocker.patch("fhircraft.utils.dotenv_values")
         mock_dotenv_values.return_value = {'ANOTHER_VAR': 'another_value'}
         result = load_env_variables('custom.env')
         mock_dotenv_values.assert_called_once_with('custom.env')
         assert result == {'ANOTHER_VAR': 'another_value'}
 
     def test_load_env_variables_no_file(self, mocker):
-        mock_dotenv_values = mocker.patch("fhir_openapi.utils.dotenv_values")
+        mock_dotenv_values = mocker.patch("fhircraft.utils.dotenv_values")
         mock_dotenv_values.return_value = {}
         result = load_env_variables('nonexistent.env')
         mock_dotenv_values.assert_called_once_with('nonexistent.env')

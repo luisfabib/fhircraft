@@ -5,7 +5,7 @@ from dataclasses import make_dataclass
 from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel
 from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
-from fhir_openapi.utils import ensure_list
+from fhircraft.utils import ensure_list
 
 SUBSETTING_PATTERN = re.compile(r"^(.*?)\[(\d+)\]$")
 EXTENSION_PATTERN = re.compile(r"extension\([\"|\'](.*?)[\"|\']\)")

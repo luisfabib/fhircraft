@@ -1,20 +1,13 @@
-from fhir_openapi.profiles import construct_profiled_resource_model, validate_profiled_resource
-from fhir_openapi.openapi import convert_response_from_api_to_fhir, convert_response_from_fhir_to_api
-from fhir_openapi.utils import load_file
-from fhir_openapi.path import FHIRPathNavigator
-
-from fhir.resources.R4B.patient import Patient
-from fhir.resources.R4B.observation import Observation
-from fhir.resources.R4B.elementdefinition import ElementDefinition
-from fhir.resources.R4B.structuredefinition import StructureDefinition, StructureDefinitionSnapshot
-from pydantic.v1 import BaseModel
-import requests
-import json
+from fhircraft.fhir.profiles import construct_profiled_resource_model, validate_profiled_resource
+from fhircraft.fhir.path import FHIRPathNavigator
+from fhircraft.mapping import convert_response_from_api_to_fhir, convert_response_from_fhir_to_api
+from fhircraft.utils import load_file
 from pydantic.v1 import ValidationError
+from unittest import TestCase 
+
+import json
 import pytest
 import os
-from unittest.mock import patch, MagicMock
-from unittest import TestCase 
 
 
 class ValidationTests(TestCase):
