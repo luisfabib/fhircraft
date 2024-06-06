@@ -515,11 +515,11 @@ class ProfiledResourceFactory:
         return profile_model
 
     def _check_if_path_ancestors_exist(self, resource, fhirpath):
-        elements = FHIRPathNavigator(resource)  
+        elements = FHIRPathNavigator(resource, allow_dynamic_paths=False)  
         for segment in split_fhirpath(fhirpath)[:-1]:
             child_elements = elements.get_value(segment)
             if child_elements:
-                elements = FHIRPathNavigator(ensure_list(child_elements)[0])
+                elements = FHIRPathNavigator(ensure_list(child_elements)[0], allow_dynamic_paths=False)
             else: 
                 return False
         return True
@@ -550,13 +550,16 @@ class ProfiledResourceFactory:
                     'dateTime': (datetime.datetime,datetime.date),
                     'instant': datetime.datetime,
                     'time': datetime.time,
-                    'date': datetime.datetime,
+                    'date': datetime.date,
                     'boolean': bool,
                     'integer': int,
                     'code': str,
+                    'uri': str,
+                    'url': str,
                     'http://hl7.org/fhirpath/System.String': str,
                 }
                 if not any([isinstance(constrained_element,FHIR_TYPES.get(type) or get_fhir_model_class(type)) for type in constraint.valueType]): 
+                    print('type(constrained_element) =',type(constrained_element))
                     validation_errors.append(ErrorWrapper(
                     TypeError(f'Value must be of type: {",".join([type.title()for type in constraint.valueType])}'), 
                         f'{path or constraint.path}'
@@ -592,7 +595,7 @@ class ProfiledResourceFactory:
             if constraint.is_slice_constraint:
                 continue
             # Get the element that is constrained in the resource
-            constrained_element = FHIRPathNavigator(resource).get_value(constraint.path)   
+            constrained_element = FHIRPathNavigator(resource, allow_dynamic_paths=False).get_value(constraint.path)   
             if not constrained_element:
                 # If the element does not exist, check if its ancestor exist
                 if not self._check_if_path_ancestors_exist(resource, constraint.path):
@@ -604,7 +607,7 @@ class ProfiledResourceFactory:
         # Slicing validation    
         for slice_group in resource.__class__.__slicing__:
             for slice in slice_group.slices:
-                sliced_entries = FHIRPathNavigator(resource).get_value(slice.fhirpath)
+                sliced_entries = FHIRPathNavigator(resource, allow_dynamic_paths=False).get_value(slice.fhirpath)
                 if not isinstance(sliced_entries, list): 
                     sliced_entries = [sliced_entries]
                 sliced_entries = [entry for entry in sliced_entries if entry is not None]
@@ -633,7 +636,7 @@ class ProfiledResourceFactory:
                         validation_errors += self._validate_constraint(sliced_entries, constraint, f'{slice_group.path}:{slice.name}{slice_subpath}') 
                     else:
                         for entry in sliced_entries:
-                            constrained_slice_elements = FHIRPathNavigator(entry).get_value(slice_subpath)
+                            constrained_slice_elements = FHIRPathNavigator(entry, allow_dynamic_paths=False).get_value(slice_subpath)
                             # Get the element that is constrained in the resource
                             if not constrained_slice_elements:
                                 # If the element does not exist, check if its ancestor exist

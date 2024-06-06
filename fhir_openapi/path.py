@@ -62,7 +62,8 @@ class FHIRPathNavigator:
                     raise AttributeError(f'FHIRPath element in collection has no attribute "{fhir_path_element}"')
             setattr(element, fhir_path_element, value)
 
-    def __init__(self, fhir_resource):
+    def __init__(self, fhir_resource, allow_dynamic_paths=True):
+        self.allow_dynamic_paths = allow_dynamic_paths
         if isinstance(fhir_resource, FHIRAbstractModel):
             self.fhir_resource = fhir_resource
             self.path_origin = fhir_resource.get_resource_type()
@@ -90,6 +91,8 @@ class FHIRPathNavigator:
     
     def _item(self, collection, statement):
         index = int(ITEM_PATTERN.search(statement).group(1))
+        while len(collection)<=index:
+            collection.append(None)
         return [collection[index]] 
         
     def _first(self, collection):
@@ -151,7 +154,7 @@ class FHIRPathNavigator:
                         # Otherwise, assume simple element path segments
                         collection = [
                             value if getattr(element, fhirpath_segment, None)
-                            else self._create_empty_segment_resource(element, fhirpath_segment)
+                            else self._create_empty_segment_resource(element, fhirpath_segment) if self.allow_dynamic_paths else None
                                 for element in collection                          
                                     for value in ensure_list(getattr(element, fhirpath_segment, None)) 
                         ]   

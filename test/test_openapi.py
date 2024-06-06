@@ -1,4 +1,4 @@
-from fhir_openapi.openapi import extract_json_schema, resolve_ref, traverse_and_replace_references, construct_mapping_from_schema, PathMappingCollection, PathMappingProperties, map_response_values_to_fhirpaths, convert_response_from_api_to_fhir
+from fhir_openapi.openapi import extract_json_schema, resolve_ref, traverse_and_replace_references, construct_mapping_from_schema, PathMappingCollection, PathMappingProperties, map_jsonpath_values_to_fhirpaths
 from fhir_openapi.path import FHIRPathError
 import pytest  
 import requests
@@ -568,7 +568,7 @@ class TestMapResponseValuesToFhirpaths:
         mapping = PathMappingCollection([
             PathMappingProperties(json_path="name", fhir_path="Patient.name"),
         ])
-        result = map_response_values_to_fhirpaths(response, mapping)
+        result = map_jsonpath_values_to_fhirpaths(response, mapping)
         assert result == {"Patient.name": "John Doe"}
 
     def test_maps_and_omits_non_mapped_values(self):
@@ -576,7 +576,7 @@ class TestMapResponseValuesToFhirpaths:
         mapping = PathMappingCollection([
             PathMappingProperties(json_path="name", fhir_path="Patient.name"),
         ])
-        result = map_response_values_to_fhirpaths(response, mapping)
+        result = map_jsonpath_values_to_fhirpaths(response, mapping)
         assert result == {"Patient.name": "John Doe"}
 
     def test_maps_primitive_arrays(self):
@@ -588,7 +588,7 @@ class TestMapResponseValuesToFhirpaths:
                 ])
             )
         ])
-        result = map_response_values_to_fhirpaths(response, mapping)
+        result = map_jsonpath_values_to_fhirpaths(response, mapping)
         assert result == {"Patient.phones.0": "123456", "Patient.phones.1": "789012"}
 
     def test_maps_object_arrays(self):
@@ -605,7 +605,7 @@ class TestMapResponseValuesToFhirpaths:
                 ])                
             )
         ])
-        result = map_response_values_to_fhirpaths(response, mapping)
+        result = map_jsonpath_values_to_fhirpaths(response, mapping)
         assert result == {"Patient.name.0.first": "James", "Patient.name.0.last": "Bond", "Patient.name.1.first": "Tom", "Patient.name.1.last": "Cruise"}
         
         
@@ -619,7 +619,7 @@ class TestMapResponseValuesToFhirpaths:
                 ])
             )
         ])
-        result = map_response_values_to_fhirpaths(response, mapping)
+        result = map_jsonpath_values_to_fhirpaths(response, mapping)
         assert result == {"Patient.name": "John Doe", "Patient.phones.0": "123456", "Patient.phones.1": "789012"}
 
 
@@ -670,7 +670,7 @@ class TestMapResponseValuesToFhirpaths:
             "Patient.contact.1.name.1.first": "Tom", 
             "Patient.contact.1.name.1.last": "Cruise"
         }
-        result = map_response_values_to_fhirpaths(response, mapping)
+        result = map_jsonpath_values_to_fhirpaths(response, mapping)
         print(result)
         assert result == expected
         
@@ -678,5 +678,5 @@ class TestMapResponseValuesToFhirpaths:
     def test_handles_empty_response(self):
         response = {}
         mapping = PathMappingCollection([])
-        result = map_response_values_to_fhirpaths(response, mapping)
+        result = map_jsonpath_values_to_fhirpaths(response, mapping)
         assert result == {}
