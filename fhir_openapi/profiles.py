@@ -159,11 +159,11 @@ class FHIRSlice:
         fhir_path = self.slicing_group.path
         for path, value in self.discriminator_values.items():
             if path.startswith('.'): path = path[1:]
-            fhir_path += f'.where({path}="{value}")'       
+            fhir_path = join_fhirpath(fhir_path, f'where({path}="{value}")')       
         if self.profile_constraint:
             if fhir_path.rsplit('.' ,1)[1] == 'extension':
                 fhir_path = fhir_path.rsplit('.',1)[0]
-            fhir_path += f'.extension("{self.profile_constraint.__canonical_url__}")'   
+            fhir_path = join_fhirpath(fhir_path, f'extension("{self.profile_constraint.__canonical_url__}")')   
         return fhir_path 
 
 @dataclass
@@ -333,7 +333,7 @@ def clean_elements_and_slices(resource, depth=0):
             print("\t"*(depth+1)+f'↪ {slice.fhirpath}: {len(sliced_entries)} elements')
             
             for n,entry in enumerate(sliced_entries):
-                print("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}.{n}  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.is_FHIR_complete else "✗"}) {"-> DELETE" if (not entry.is_FHIR_complete and not entry.has_been_modified) and entry in valid_elements else ""}' )
+                print("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}[{n}]  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.is_FHIR_complete else "✗"}) {"-> DELETE" if (not entry.is_FHIR_complete and not entry.has_been_modified) and entry in valid_elements else ""}' )
                 if not entry.is_FHIR_complete and not entry.has_been_modified and entry in valid_elements:
                     valid_elements.remove(entry)                
                 elif entry.__slicing__:

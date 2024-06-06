@@ -20,7 +20,7 @@ class TestExtractJsonSchema:
         })     
             
         openapi_spec = {
-            "openapi": "3.1.0","info": {"title": "Test API","version": "0.0.1"},
+            "openapi": "3.1.0","info": {"title": "Test API","version": "0[0][1]"},
             "paths": { 
                 "/example": {
                     "get": {
@@ -51,7 +51,7 @@ class TestExtractJsonSchema:
             }
         })
         openapi_spec = {
-            "openapi": "3.1.0","info": {"title": "Test API","version": "0.0.1"},
+            "openapi": "3.1.0","info": {"title": "Test API","version": "0[0][1]"},
             "paths": {
                 "/example1": {
                     "get": {
@@ -589,7 +589,7 @@ class TestMapResponseValuesToFhirpaths:
             )
         ])
         result = map_jsonpath_values_to_fhirpaths(response, mapping)
-        assert result == {"Patient.phones.0": "123456", "Patient.phones.1": "789012"}
+        assert result == {"Patient.phones[0]": "123456", "Patient.phones[1]": "789012"}
 
     def test_maps_object_arrays(self):
         response = {"names": [{"first": "James", "last": "Bond"}, {"first": "Tom", "last": "Cruise"}]}
@@ -606,7 +606,7 @@ class TestMapResponseValuesToFhirpaths:
             )
         ])
         result = map_jsonpath_values_to_fhirpaths(response, mapping)
-        assert result == {"Patient.name.0.first": "James", "Patient.name.0.last": "Bond", "Patient.name.1.first": "Tom", "Patient.name.1.last": "Cruise"}
+        assert result == {"Patient.name[0].first": "James", "Patient.name[0].last": "Bond", "Patient.name[1].first": "Tom", "Patient.name[1].last": "Cruise"}
         
         
     def test_handles_mixed_types(self):
@@ -620,7 +620,7 @@ class TestMapResponseValuesToFhirpaths:
             )
         ])
         result = map_jsonpath_values_to_fhirpaths(response, mapping)
-        assert result == {"Patient.name": "John Doe", "Patient.phones.0": "123456", "Patient.phones.1": "789012"}
+        assert result == {"Patient.name": "John Doe", "Patient.phones[0]": "123456", "Patient.phones[1]": "789012"}
 
 
     def test_map_deeply_nested(self):
@@ -661,14 +661,14 @@ class TestMapResponseValuesToFhirpaths:
             )
         ])
         expected = {
-            "Patient.contact.0.name.0.first": "James", 
-            "Patient.contact.0.name.0.last": "Bond", 
-            "Patient.contact.0.name.1.first": "Daniel", 
-            "Patient.contact.0.name.1.last": "Craig", 
-            "Patient.contact.1.name.0.first": "Ethan", 
-            "Patient.contact.1.name.0.last": "Hunt",
-            "Patient.contact.1.name.1.first": "Tom", 
-            "Patient.contact.1.name.1.last": "Cruise"
+            "Patient.contact[0].name[0].first": "James", 
+            "Patient.contact[0].name[0].last": "Bond", 
+            "Patient.contact[0].name[1].first": "Daniel", 
+            "Patient.contact[0].name[1].last": "Craig", 
+            "Patient.contact[1].name[0].first": "Ethan", 
+            "Patient.contact[1].name[0].last": "Hunt",
+            "Patient.contact[1].name[1].first": "Tom", 
+            "Patient.contact[1].name[1].last": "Cruise"
         }
         result = map_jsonpath_values_to_fhirpaths(response, mapping)
         print(result)

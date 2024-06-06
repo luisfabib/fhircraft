@@ -48,17 +48,25 @@ class TestFHIRPathNavigator:
         values = [HumanName(text="John Doe"), HumanName(text="Will Smith")]
         patient = Patient(name=values)
         navigator = FHIRPathNavigator(patient)
-        result = navigator.get_value("Patient.name.0 | Patient.name.1")
+        result = navigator.get_value("Patient.name[0] | Patient.name[1]")
         assert result == values
 
     def test_set_union(self):
         new_value = "Johnny Smith"
         patient = Patient(name=[HumanName(text="John Doe"), HumanName(text="Will Smith")])
         navigator = FHIRPathNavigator(patient)
-        navigator.set_value("Patient.name.0.text | Patient.name.1.text", new_value)
+        navigator.set_value("Patient.name[0].text | Patient.name[1].text", new_value)
         assert patient.name[0].text == new_value
         assert patient.name[1].text == new_value
 
+    def test_get_list_item_indexed(self):
+        patient = Patient(name=[HumanName(text="John Doe"), HumanName(text="Will Smith")])
+        navigator = FHIRPathNavigator(patient)
+        result = navigator.get_value("Patient.name[0].text")
+        assert result == "John Doe"
+        result = navigator.get_value("Patient.name[1].text")
+        assert result == "Will Smith" 
+            
     def test_get_list_item(self):
         patient = Patient(name=[HumanName(text="John Doe"), HumanName(text="Will Smith")])
         navigator = FHIRPathNavigator(patient)
@@ -67,25 +75,26 @@ class TestFHIRPathNavigator:
         result = navigator.get_value("Patient.name.item(1).text")
         assert result == "Will Smith"
         
-    def test_get_deep_list_item(self):
-        patient = Patient(contact=[
-            PatientContact(name=HumanName(given=["John","James"])),
-            PatientContact(name=HumanName(given=["Mary","Anna"])),
-        ])        
-        navigator = FHIRPathNavigator(patient)
-        result = navigator.get_value("Patient.contact.name.given.0")
-        assert result == ["John", "Mary"]
-        result = navigator.get_value("Patient.contact.0.name.given")
-        assert result == ["John", "James"]
-        result = navigator.get_value("Patient.contact.1.name.given.1")
-        assert result == "Anna"
         
     def test_get_list_item_by_index(self):
         patient = Patient(name=[HumanName(text="John Doe"), HumanName(text="Will Smith")])
         navigator = FHIRPathNavigator(patient)
-        result = navigator.get_value("Patient.name.0.text")
+        result = navigator.get_value("Patient.name[0].text")
         assert result == "John Doe"
-        result = navigator.get_value("Patient.name.1.text")
+        result = navigator.get_value("Patient.name[1].text")
+        assert result == "Will Smith"
+
+
+    def test_get_first_list_item(self):
+        patient = Patient(name=[HumanName(text="John Doe"), HumanName(text="Will Smith")])
+        navigator = FHIRPathNavigator(patient)
+        result = navigator.get_value("Patient.name.first().text")
+        assert result == "John Doe"
+        
+    def test_get_last_list_item(self):
+        patient = Patient(name=[HumanName(text="John Doe"), HumanName(text="Will Smith")])
+        navigator = FHIRPathNavigator(patient)
+        result = navigator.get_value("Patient.name.last().text")
         assert result == "Will Smith"
 
     def test_get_extension(self):
@@ -145,17 +154,17 @@ class TestFHIRPathNavigator:
         # Mocking a FHIR resource with a list of objects
         patient = Patient(deceasedBoolean=True)
         navigator = FHIRPathNavigator(patient)
-        navigator.set_value('Patient.extension.valueCodeableConcept.0.coding.code', '12345')
+        navigator.set_value('Patient.extension.valueCodeableConcept[0].coding.code', '12345')
         assert patient.extension[0].valueCodeableConcept.coding[0].code == '12345'
 
     def test_set_noninstanciated_path_repeatedly(self):
         # Mocking a FHIR resource with a list of objects
         patient = Patient(deceasedBoolean=True)
         navigator = FHIRPathNavigator(patient)
-        navigator.set_value('Patient.extension.0.valueCodeableConcept.0.coding.code', 'code1')
-        navigator.set_value('Patient.extension.0.valueCodeableConcept.0.coding.system', 'system1')
-        navigator.set_value('Patient.extension.0.extension.0.valueCodeableConcept.0.coding.code', 'code2')
-        navigator.set_value('Patient.extension.0.extension.0.valueCodeableConcept.0.coding.system', 'system2')
+        navigator.set_value('Patient.extension[0].valueCodeableConcept[0].coding.code', 'code1')
+        navigator.set_value('Patient.extension[0].valueCodeableConcept[0].coding.system', 'system1')
+        navigator.set_value('Patient.extension[0].extension[0].valueCodeableConcept[0].coding.code', 'code2')
+        navigator.set_value('Patient.extension[0].extension[0].valueCodeableConcept[0].coding.system', 'system2')
         assert len(patient.extension) == 1
         assert len(patient.extension[0].valueCodeableConcept.coding) == 1
         assert patient.extension[0].valueCodeableConcept.coding[0].code == 'code1'

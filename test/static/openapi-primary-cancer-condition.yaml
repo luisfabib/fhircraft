@@ -48,30 +48,30 @@ components:
           type: string
         status: 
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Condition.clinicalStatus.coding.0
+          x-fhirpath: Condition.clinicalStatus.coding
           x-binding: http://hl7.org/fhir/ValueSet/condition-clinical
         verification: 
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Condition.verificationStatus.coding.0
+          x-fhirpath: Condition.verificationStatus.coding
           x-binding: http://hl7.org/fhir/ValueSet/condition-clinical
         date:
           $ref: '#/components/schemas/Date'
           x-fhirpath: Condition.extension("http://hl7.org/fhir/StructureDefinition/condition-assertedDate").valueDate
         condition:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Condition.code.coding.0
+          x-fhirpath: Condition.code.coding
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-primary-cancer-disorder-vs
         histology:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Condition.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-histology-morphology-behavior").valueCodeableConcept.coding.0
+          x-fhirpath: Condition.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-histology-morphology-behavior").valueCodeableConcept.coding
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-histology-morphology-behavior-vs
         topography: 
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Condition.bodySite.coding.0
+          x-fhirpath: Condition.bodySite.coding
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-cancer-body-location-vs
         laterality: 
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Condition.bodySite.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-laterality-qualifier").valueCodeableConcept.coding.0
+          x-fhirpath: Condition.bodySite.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-laterality-qualifier").valueCodeableConcept.coding
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-laterality-qualifier-vs        
         patientId:
           type: string

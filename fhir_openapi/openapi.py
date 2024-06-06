@@ -10,6 +10,7 @@ from fhir_openapi.path import FHIRPathNavigator, join_fhirpath, split_fhirpath, 
 from functools import cached_property 
 from fhir_openapi.utils import remove_none_dicts, ensure_list
 from fhir.resources.core.utils.common import is_list_type
+
 from openapi_pydantic import OpenAPI, Schema, Reference
 import datetime
 from openapi_pydantic import OpenAPI, Schema
@@ -300,15 +301,14 @@ def map_jsonpath_values_to_fhirpaths(response: dict, mapping_collection: PathMap
                         response=value, 
                         mapping_collection=array_elements_mapping.nested_properties or array_elements_mapping.nested_items, 
                         current_path=json_path
-                    )
+                    )                    
                 else:
                     # Otherwise just assign the value to the array element path
                     nested_properties = {array_element_fhir_path: value}
                 # For each subpath and value generate a one-to-one mapping to a FHIR path
                 for subpath, value in nested_properties.items():
                     subpath = subpath.replace(array_fhir_path, '')
-                    print(f'{join_fhirpath(array_fhir_path, index, subpath)} = {value}')
-                    items[join_fhirpath(array_fhir_path, index, subpath)] = value
+                    items[join_fhirpath(array_fhir_path+f'[{index}]', subpath)] = value
         else:
             items[mapping.fhir_path] = value
     return items
@@ -322,7 +322,6 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     schema = traverse_and_replace_references(schema, openapi_file_location, specification)    
     mapping_collection = construct_mapping_from_schema(schema)
     fhir_resource_values = map_jsonpath_values_to_fhirpaths(response, mapping_collection)
-
     # Construct FHIR profile
     if not profile_url:
         profile_url = getattr(schema, "x-fhir-profile")
@@ -341,11 +340,9 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     for fhirpath, value in fhir_resource_values.items():
         fhirpath = fhirpath.replace('..','.')
         print(f'SET {fhirpath} -> {value}')
-        try:            
-            navigator.set_value(fhirpath, value)        
-        except:
-            raise AttributeError(f'\nError setting API response value: \n\t{value}\n to FHIR path: \n\t{fhirpath}\n\nTraceback:\n{traceback.format_exc()}')
-    
+        navigator.set_value(fhirpath, value)        
+        navigator.get_value(join_fhirpath(fhirpath, 'single()'))
+
     # Disable tracking of changes in slices
     track_slice_changes(resource, False)
     
@@ -379,20 +376,30 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
                 value = map_fhir_to_api(mapping.nested_properties)
             elif mapping.nested_items:
                 value = map_fhir_to_api(mapping.nested_items)
-                value = list(value.values())
+                value = next(iter(value.values()), {})
+                value = {key: ensure_list(val) for key,val in value.items()}
+                if value:   
+                    value = [dict(zip(value,t)) for t in zip(*value.values())]
             else:
                 value = resource_navigator.get_value(mapping.fhir_path)
-            print(mapping.fhir_path, len(ensure_list(value)))
+                print(f'GOT {mapping.fhir_path} -> {value}')
             import json
-            if hasattr(value,'json'):
-                value = json.loads(value.json())
-            elif isinstance(value, (datetime.date, datetime.datetime)):
-                value = value.strftime('%Y-%m-%d')
-            elif value and not isinstance(value, (list,dict)):
-                value = str(value)
-            if value:
-                # print(mapping.json_path, mapping.fhir_path)
-                data[mapping.json_path.rsplit('.',1)[-1]] = value
+            
+            def _parse_types(value):
+                if hasattr(value,'json'):
+                    value = json.loads(value.json())
+                elif isinstance(value, (datetime.date, datetime.datetime)):
+                    value = value.strftime('%Y-%m-%d')
+                elif isinstance(value, dict):
+                    value = {key: _parse_types(val) for key,val in value.items()}
+                elif isinstance(value, list):
+                    value = [_parse_types(val) for val in value]
+                elif value is not None:
+                    value = str(value)
+                return value
+
+            data[mapping.json_path.rsplit('.',1)[-1]] = _parse_types(value)
+            data = remove_none_dicts(data)
         return data
     
     converted_response = map_fhir_to_api(mapping_collection)

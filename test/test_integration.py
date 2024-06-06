@@ -40,7 +40,7 @@ class ValidationTests(TestCase):
     def test_integration_genomic_variant_1_mutated(self):
         profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
         resource_file = 'fhir-observation-genomic-variant-1.json'
-        self.run_integration_test(profile_url, resource_file, mutations={'category.0.coding.0.code': 'wrong_code'})
+        self.run_integration_test(profile_url, resource_file, mutations={'category[0].coding[0].code': 'wrong_code'})
 
     def test_integration_genomic_variant_2(self):
         profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
@@ -50,7 +50,7 @@ class ValidationTests(TestCase):
     def test_integration_genomic_variant_2_mutated(self):
         profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
         resource_file = 'fhir-observation-genomic-variant-1.json'
-        self.run_integration_test(profile_url, resource_file, mutations={'category.0.coding.0.code': 'wrong_code'})
+        self.run_integration_test(profile_url, resource_file, mutations={'category[0].coding[0].code': 'wrong_code'})
 
     def test_integration_genomic_variant_3(self):
         profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
@@ -194,3 +194,20 @@ class TestConvertResponseFromFhirToApi(TestCase):
             fhir_response_file='test/static/fhir-observation-genomic-variant-3.json',
             internal_values={'internalId': '123456789'}
         )
+        
+    def test_conversion_primary_cancer_condition_1(self):
+        self.convert_fhir_to_api_and_assert_equal(
+            api_response_file='test/static/api-condition-primary-cancer-1.json', 
+            openapi_spec_file='test/static/openapi-primary-cancer-condition.yaml', 
+            fhir_response_file='test/static/fhir-condition-primary-cancer-1.json',
+            internal_values={'internalId': '123456789'}
+        )
+        
+    def test_conversion_primary_cancer_condition_2(self):
+        self.convert_fhir_to_api_and_assert_equal(
+            api_response_file='test/static/api-condition-primary-cancer-2.json', 
+            openapi_spec_file='test/static/openapi-primary-cancer-condition.yaml', 
+            fhir_response_file='test/static/fhir-condition-primary-cancer-2.json',
+            internal_values={'internalId': '123456789'}
+        )
+        

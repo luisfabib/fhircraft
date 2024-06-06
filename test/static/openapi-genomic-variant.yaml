@@ -58,25 +58,25 @@ components:
           x-fhirpath: Observation.subject.reference            
         observationType:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.code.coding.0
+          x-fhirpath: Observation.code.coding
           x-binding: http://hl7.org/fhir/ValueSet/observation-codes
         effective:
           $ref: '#/components/schemas/Date'
           x-fhirpath: Observation.effectiveDateTime
         assessment:
-          x-fhirpath: Observation.valueCodeableConcept.coding.0
+          x-fhirpath: Observation.valueCodeableConcept.coding
           x-binding: https://loinc.org/LL1971-2/
           $ref: '#/components/schemas/Coding'
         method:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.method.coding.0
+          x-fhirpath: Observation.method.coding
           x-binding: http://hl7.org/fhir/ValueSet/observation-methods
         cytogeneticLocation:
           type: string
           x-fhirpath: Observation.component.where(code.coding.code="48001-2").where(code.coding.system="http://loinc.org").valueString
         referenceSequenceAssembly:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="62374-4").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="62374-4").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
           x-binding: https://loinc.org/LL4048-6/
         codingHgvs:
           type: string
@@ -95,10 +95,10 @@ components:
           x-fhirpath: Observation.component.where(code.coding.code="81291-7").where(code.coding.system="http://loinc.org").valueString
         genomicRefSeq:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="48013-7").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="48013-7").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
         transcriptRefSeq:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="51958-7").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="51958-7").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
         refAllele:
           type: string
           x-fhirpath: Observation.component.where(code.coding.code="69547-8").where(code.coding.system="http://loinc.org").valueString
@@ -116,15 +116,15 @@ components:
           x-fhirpath: Observation.component.where(code.coding.code="81301-4").where(code.coding.system="http://loinc.org").valueRange        
         coordinateSystem:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="92822-6").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="92822-6").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
           x-binding: https://loinc.org/LL5323-2/
         codingChangeType:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="48019-4").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="48019-4").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
           x-binding: http://sequenceontology.org
         genomicSourceClass:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="48002-0").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="48002-0").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
           x-binding: https://loinc.org/LL378-1/
         sampleAllelicFrequency:
           type: number
@@ -134,40 +134,40 @@ components:
           x-fhirpath: Observation.component.where(code.coding.code="82121-5").where(code.coding.system="http://loinc.org").valueQuantity
         allelicState:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="53034-5").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="53034-5").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
           x-binding: https://loinc.org/LL381-5/
         variantInheritance:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="variant-inheritance").where(code.coding.system="http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="variant-inheritance").where(code.coding.system="http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs").valueCodeableConcept.coding
           x-binding: http://hl7.org/fhir/uv/genomics-reporting/ValueSet/variant-inheritance-vs
         clinVar:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="81252-9").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="81252-9").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
           x-binding: TBD
         aminoAcidChangeType:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="48006-1").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="48006-1").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
           x-binding: https://loinc.org/LL380-7/
         molecularConsequence:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="molecular-consequence").where(code.coding.system="http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="molecular-consequence").where(code.coding.system="http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs").valueCodeableConcept.coding
           x-binding: http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs
         variantConfidenceStatus:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Observation.component.where(code.coding.code="variant-confidence-status").where(code.coding.system="http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs").valueCodeableConcept.coding.0
+          x-fhirpath: Observation.component.where(code.coding.code="variant-confidence-status").where(code.coding.system="http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs").valueCodeableConcept.coding
           x-binding: http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs
         geneStudied:
           type: array
           x-fhirpath: Observation.component.where(code.coding.code="48018-6").where(code.coding.system="http://loinc.org")
           items: 
             $ref: '#/components/schemas/Coding'
-            x-fhirpath: Observation.component.where(code.coding.code="48018-6").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+            x-fhirpath: Observation.component.where(code.coding.code="48018-6").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
         chromosomeIdentifier:
           type: array
           x-fhirpath: Observation.component.where(code.coding.code="48000-4").where(code.coding.system="http://loinc.org")
           items:
             $ref: '#/components/schemas/Coding'
-            x-fhirpath: Observation.component.where(code.coding.code="48000-4").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding.0
+            x-fhirpath: Observation.component.where(code.coding.code="48000-4").where(code.coding.system="http://loinc.org").valueCodeableConcept.coding
             x-binding: https://loinc.org/LL2938-0/
 
 openapi: 3.1.0

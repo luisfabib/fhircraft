@@ -175,7 +175,7 @@ def get_dict_paths(nested_dict: Union[Dict[str, Any], List[Dict[str, Any]]], pre
                 paths.update(get_dict_paths(value, new_prefix))
             elif isinstance(value, list):
                 for i, item in enumerate(value):
-                    list_prefix = f"{new_prefix}.{i}"
+                    list_prefix = f"{new_prefix}[{i}]"
                     if isinstance(item, dict):
                         paths.update(get_dict_paths(item, list_prefix))
             else:

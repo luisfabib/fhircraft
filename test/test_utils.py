@@ -61,7 +61,7 @@ class TestGetDictPaths:
 
     def test_lists_of_dictionaries(self):
         input_dict = {'a': [{'b': 1}, {'c': 2}]}
-        expected_output = {'a.0.b': 1, 'a.1.c': 2}
+        expected_output = {'a[0].b': 1, 'a[1].c': 2}
         assert get_dict_paths(input_dict) == expected_output
 
     def test_combine_prefix_with_keys(self):

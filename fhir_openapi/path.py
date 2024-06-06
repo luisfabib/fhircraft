@@ -7,14 +7,15 @@ from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, i
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir_openapi.utils import ensure_list
 
-NUMERIC_PATTERN = re.compile(r"^\d+$")
+SUBSETTING_PATTERN = re.compile(r"^(.*?)\[(\d+)\]$")
 EXTENSION_PATTERN = re.compile(r"extension\([\"|\'](.*?)[\"|\']\)")
 WHERE_PATTERN = re.compile(r"where\((.+?)=[\"|\'](.*?)[\"|\']\)")
 ITEM_PATTERN = re.compile(r"item\((\d+?)\)")
 TYPE_CHOICES_PATTERN = re.compile(r"(.*?)\[x\]")
-FIRST_PATTERN = re.compile(r"^first()$")
-LAST_PATTERN = re.compile(r"^last()$")
-TAIL_PATTERN = re.compile(r"^tail()$")
+FIRST_PATTERN = re.compile(r"^first\(\)$")
+LAST_PATTERN = re.compile(r"^last\(\)$")
+TAIL_PATTERN = re.compile(r"^tail\(\)$")
+SINGLE_PATTERN = re.compile(r"^single\(\)$")
 
 class FHIRPathError(Exception):
     """Exception for FHIRPath-related issues"""
@@ -32,7 +33,6 @@ def join_fhirpath(*segments: List[Union[str, int]]) -> str:
             segment = segment[:-1]
         return segment
     return '.'.join([_clean_segment(str(segment)) for segment in segments if segment!='']) 
-
 
 class FHIRPathNavigator:
 
@@ -54,13 +54,13 @@ class FHIRPathNavigator:
                 setattr(element, segment, empty_resource)  
             return empty_resource    
     
-    def _set_value_at_path(self, collection, fhir_path_element, value):
+    def _set_value_at_path(self, collection, segment, value):
         for element in collection:
-            if not hasattr(element, fhir_path_element):
-                self._create_empty_segment_resource(element, fhir_path_element)
-                if not hasattr(element, fhir_path_element):
-                    raise AttributeError(f'FHIRPath element in collection has no attribute "{fhir_path_element}"')
-            setattr(element, fhir_path_element, value)
+            if not hasattr(element, segment):
+                self._create_empty_segment_resource(element, segment)
+                if not hasattr(element, segment):
+                    raise FHIRPathError(f"Cannot set value: \n\t{value}\n to FHIR path: \n\t{self.fhirpath}")
+            setattr(element, segment, value)
 
     def __init__(self, fhir_resource, allow_dynamic_paths=True):
         self.allow_dynamic_paths = allow_dynamic_paths
@@ -72,7 +72,18 @@ class FHIRPathNavigator:
             self.fhir_resource = make_dataclass("FHIRResource", ((k, type(v)) for k, v in fhir_resource.items()))(**fhir_resource)
         else: 
             raise TypeError('Invalid resource type, must be a Pydantic FHIR model or a dict')
-    
+        # Compile list of FHIRPath segment pattern handlers
+        self.FHIRPATH_PATTERNS = {
+            WHERE_PATTERN: self._where,
+            EXTENSION_PATTERN: self._extension,
+            ITEM_PATTERN: self._item,
+            TYPE_CHOICES_PATTERN: self._all_type_choices,
+            FIRST_PATTERN: lambda coll, _: self._first(coll),
+            LAST_PATTERN: lambda coll, _: self._last(coll),
+            TAIL_PATTERN: lambda coll, _: self._tail(coll),
+            SINGLE_PATTERN: lambda coll, _: self._single(coll),
+        }
+        
     def _extension(self, collection, statement):
         extension_url = EXTENSION_PATTERN.search(statement).group(1)
         return [
@@ -89,13 +100,15 @@ class FHIRPathNavigator:
                          if FHIRPathNavigator(obj).get_value(condition_path) == condition_value
         ]    
     
-    def _item(self, collection, statement):
-        index = int(ITEM_PATTERN.search(statement).group(1))
+    def _item(self, collection, statement=None, index=None):
+        if statement:
+            index = int(ITEM_PATTERN.search(statement).group(1))
         while len(collection)<=index:
             collection.append(None)
         return [collection[index]] 
         
     def _first(self, collection):
+        print(f'FROM {collection} RETURN {[collection[0]] }')
         return [collection[0]] 
         
     def _last(self, collection):
@@ -103,7 +116,12 @@ class FHIRPathNavigator:
         
     def _tail(self, collection):
         return collection[:-1]
-        
+    
+    def _single(self, collection):
+        if len(collection)!=1:
+            raise FHIRPathError(f'Expected collection of path "{self.fhirpath}" to have one single item (instead {len(collection)} items collected)')
+        return [collection[0]]
+    
     def _all_type_choices(self, collection, statement):
         type_choice_name = TYPE_CHOICES_PATTERN.search(statement).group(1)
         return [
@@ -114,6 +132,7 @@ class FHIRPathNavigator:
         ]
         
     def _traverse_fhirpath(self, fhirpath, set_value=None):
+        self.fhirpath = fhirpath
         # Split union collection into individual path collections
         union_collection = []
         for fhir_path in fhirpath.split('|'):
@@ -121,31 +140,25 @@ class FHIRPathNavigator:
             fhirpath_segments = split_fhirpath(fhir_path.strip())
             # If path's entry point is the core resource, remove it
             if self.path_origin == fhirpath_segments[0]:
-                traversed_path = fhirpath_segments[0]
+                self.traversed_path = fhirpath_segments[0]
                 fhirpath_segments = fhirpath_segments[1:]
             # If a value must be set at the end of the path, remove the last segment
             if set_value is not None:
                 last_fhirpath_segment = fhirpath_segments[-1]
                 fhirpath_segments = fhirpath_segments[:-1]
-            traversed_path = ''
+            self.traversed_path = ''
             # Initialize the collection with the full resource
             collection = [self.fhir_resource]
-            # Compile list of FHIRPath segment pattern handlers
-            FHIRPATH_PATTERNS = {
-                WHERE_PATTERN: self._where,
-                EXTENSION_PATTERN: self._extension,
-                ITEM_PATTERN: self._item,
-                NUMERIC_PATTERN: lambda coll, segment: self._item(coll, f'item({segment})'),
-                TYPE_CHOICES_PATTERN: self._all_type_choices,
-                FIRST_PATTERN: lambda coll, _: self._first(coll),
-                LAST_PATTERN: lambda coll, _: self._last(coll),
-                TAIL_PATTERN: lambda coll, _: self._tail(coll)
-            }
             # Iterate over the FHIRPath segments
             for fhirpath_segment in fhirpath_segments:
-                traversed_path = join_fhirpath(traversed_path, fhirpath_segment)
+                
+                subset_index = None
+                if SUBSETTING_PATTERN.match(fhirpath_segment):
+                    fhirpath_segment, subset_index = SUBSETTING_PATTERN.search(fhirpath_segment).group(1,2)                
+                    
+                self.traversed_path = join_fhirpath(self.traversed_path, fhirpath_segment)
                 try:
-                    for pattern, operation in FHIRPATH_PATTERNS.items():
+                    for pattern, operation in self.FHIRPATH_PATTERNS.items():
                         # Look for patterns in the segment
                         if pattern.match(fhirpath_segment):
                             collection = operation(collection, fhirpath_segment)
@@ -160,8 +173,11 @@ class FHIRPathNavigator:
                         ]   
                     # Remove any Nones from the collection
                     collection = [element for element in collection if element is not None] 
+                    
+                    if subset_index:
+                        collection = self._item(collection, index=int(subset_index))
                 except RuntimeError: 
-                    raise FHIRPathError(f"\nFHIRPath {traversed_path} does not exist.\n\nTraceback:\n{traceback.format_exc()}")
+                    raise FHIRPathError(f"\nFHIRPath {self.traversed_path} does not exist.\n\nTraceback:\n{traceback.format_exc()}")
             # If a value must be set...
             if set_value is not None: 
                 self._set_value_at_path(collection, last_fhirpath_segment, set_value)

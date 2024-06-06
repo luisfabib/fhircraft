@@ -64,37 +64,37 @@ components:
           x-fhirpath: Procedure.asserter.reference          
         category:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Procedure.category.coding.0
+          x-fhirpath: Procedure.category.coding
           x-binding: null
         treatmentIntent:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-procedure-intent").valueCodeableConcept.coding.0
+          x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-procedure-intent").valueCodeableConcept.coding
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-procedure-intent-vs
         performedReasons:
           type: array
           x-fhirpath: Procedure.reasonCode
           items:
             $ref: '#/components/schemas/Coding'
-            x-fhirpath: Procedure.reasonCode.coding.0
+            x-fhirpath: Procedure.reasonCode.coding
             x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-cancer-disorder-vs
         terminationReason:
           $ref: '#/components/schemas/Coding'
-          x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-treatment-termination-reason").valueCodeableConcept.coding.0
+          x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-treatment-termination-reason").valueCodeableConcept.coding
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-treatment-termination-reason-vs
         methods:
           type: array
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")
           items:
             type: object
-            x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")
+            x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")           
             properties:
               modality: 
                 $ref: '#/components/schemas/Coding'
-                x-fhirpath: $this.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality").0.valueCodeableConcept.coding.0
+                x-fhirpath: $this.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality").valueCodeableConcept.coding
                 x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-treatment-termination-reason-vs
               technique: 
                 $ref: '#/components/schemas/Coding'
-                x-fhirpath: $this.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-technique").0.valueCodeableConcept.coding.0
+                x-fhirpath: $this.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-technique")[0].valueCodeableConcept.coding
                 x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-treatment-termination-reason-vs
         totalSessions:
           type: integer
@@ -104,7 +104,6 @@ components:
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume")
           items:
             type: object
-            x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume")
             properties:
               volume:
                 type: string
@@ -120,7 +119,7 @@ components:
           x-fhirpath: Procedure.bodySite
           items:
             $ref: '#/components/schemas/Coding'
-            x-fhirpath: Procedure.bodySite.coding.0
+            x-fhirpath: Procedure.bodySite.coding
             x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-radiotherapy-treatment-location-vs
 openapi: 3.1.0
 info:
