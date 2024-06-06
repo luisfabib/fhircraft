@@ -27,7 +27,8 @@ def join_fhirpath(*segments: List[Union[str, int]]) -> str:
         while segment.endswith('.'): 
             segment = segment[:-1]
         return segment
-    return '.'.join([_clean_segment(str(segment)) for segment in segments]) 
+    return '.'.join([_clean_segment(str(segment)) for segment in segments if segment!='']) 
+
 
 class FHIRPathNavigator:
 
