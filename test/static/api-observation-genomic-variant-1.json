@@ -1,10 +1,6 @@
 {
     "internalId": "123456789",
     "status": "final",
-    "category": {
-       "system": "http://terminology.hl7.org/CodeSystem/observation-category",
-       "code": "laboratory"
-    },
     "observationType": {
        "system": "http://loinc.org",
        "code": "69548-6"

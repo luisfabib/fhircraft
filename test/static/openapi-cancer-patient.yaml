@@ -1,0 +1,165 @@
+components:
+  schemas:
+    Quantity:
+      type: object
+      properties:
+        value:
+          type: string
+          x-fhirpath: $this.value
+        system:
+          type: string
+          x-fhirpath: $this.system
+        code:
+          type: string
+          x-fhirpath: $this.system
+    Range:
+      type: object
+      properties:
+        low:
+          type: string
+          x-fhirpath: $this.low.value
+        high:
+          type: string
+          x-fhirpath: $this.high.value
+    Coding:
+      type: object
+      properties:
+        system:
+          type: string
+          x-fhirpath: $this.system
+        code:
+          type: string
+          x-fhirpath: $this.code
+        display:
+          type: string
+          x-fhirpath: $this.display
+        version:
+          type: string
+          x-fhirpath: $this.version
+    Date: 
+      type: string
+      format: date
+      pattern: '^\d{4}-\d{2}-\d{2}$'
+    TestSchema:
+      title: Condition
+      x-fhir-profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition
+      properties:
+        internalId:
+          type: string
+        race: 
+          $ref: '#/components/schemas/Coding'
+          x-binding: http://hl7.org/fhir/us/core/StructureDefinition/us-core-race
+          properties:
+            system:
+              type: string
+            code:
+              type: string
+            display:
+              type: string
+              x-fhirpath: Patient.extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race").extension("text").valueString
+            version:
+              type: string
+        ethnicity: 
+          $ref: '#/components/schemas/Coding'
+          x-binding: http://hl7.org/fhir/us/core/ValueSet/omb-ethnicity-category
+          properties:
+            system:
+              type: string
+            code:
+              type: string
+            display:
+              type: string
+              x-fhirpath: Patient.extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity").extension("text").valueString
+            version:
+              type: string
+        gender:
+          $ref: '#/components/schemas/Coding'
+          x-binding: http://hl7.org/fhir/R4/valueset-administrative-gender.html
+          properties:
+            system:
+              type: string
+            code:
+              type: string
+              x-fhirpath: Patient.gender
+            display:
+              type: string
+            version:
+              type: string
+        birthsex:
+          $ref: '#/components/schemas/Coding'
+          x-binding: http://hl7.org/fhir/us/core/ValueSet/birthsex
+          properties:
+            system:
+              type: string
+            code:
+              type: string
+              x-fhirpath: Patient.extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex").valueCode
+            display:
+              type: string
+            version:
+              type: string
+        names:
+          type: array
+          x-fhirpath: Patient.name
+          items: 
+            type: object
+            properties:
+              givenNames: 
+                type: array
+                x-fhirpath: $this.given
+                items:
+                  type: string
+              familyName: 
+                type: string
+                x-fhirpath: $this.family
+        birthDate:
+          type: date
+          x-fhirpath: Patient.birthDate
+        contacts:
+          type: array
+          x-fhirpath: Patient.contact.telecom
+          items: 
+            type: object
+            properties:
+              system: 
+                type: str
+                x-fhirpath: $this.system
+              value:
+                type: str
+                x-fhirpath: $this.value
+              use:
+                type: str
+                x-fhirpath: $this.use
+        identifier:
+          type: array
+          x-fhirpath: Patient.identifier
+          properties:
+            use: 
+              type: string
+                x-fhirpath: $this.use
+            system: 
+              type: string
+                x-fhirpath: $this.system
+            category: 
+                $ref: '#/components/schemas/Coding'
+                x-fhirpath: $this.type.coding.0
+            value: 
+              type: string
+                x-fhirpath: $this.value
+
+
+
+openapi: 3.1.0
+info:
+  title: Test API
+  version: 0.0.1
+paths:
+  /endpoint:
+    get:
+      responses:
+        '200':
+          description: Simple response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSchema'

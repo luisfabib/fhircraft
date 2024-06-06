@@ -11,7 +11,7 @@ from functools import cached_property
 from fhir_openapi.utils import remove_none_dicts, ensure_list
 from fhir.resources.core.utils.common import is_list_type
 from openapi_pydantic import OpenAPI, Schema, Reference
-
+import datetime
 from openapi_pydantic import OpenAPI, Schema
 
 def load_openapi(openapi_file_location):
@@ -254,7 +254,7 @@ def construct_mapping_from_schema(schema: Schema) -> PathMappingCollection:
     return _construct_path_mapping_collection(schema)
 
 
-def map_response_values_to_fhirpaths(response: dict, mapping_collection: PathMappingCollection, current_path='') -> dict:
+def map_jsonpath_values_to_fhirpaths(response: dict, mapping_collection: PathMappingCollection, current_path='') -> dict:
     """
     Map response values to FHIRPaths based on the provided mapping.
 
@@ -278,7 +278,7 @@ def map_response_values_to_fhirpaths(response: dict, mapping_collection: PathMap
             # Update the map based on the type of value 
             if not isinstance(value, dict):
                 raise TypeError(f'Expected JSON value at "{json_path}" to be a dict.')
-            properties = map_response_values_to_fhirpaths(value, mapping.nested_properties, current_path=json_path)
+            properties = map_jsonpath_values_to_fhirpaths(value, mapping.nested_properties, current_path=json_path)
             for subpath, value in properties.items():
                 items[subpath] = value 
         elif mapping.nested_items:
@@ -296,7 +296,7 @@ def map_response_values_to_fhirpaths(response: dict, mapping_collection: PathMap
             for index, value in enumerate(values):
                 if isinstance(value, dict):
                     # If the value is an object (dict), recursively map its values
-                    nested_properties = map_response_values_to_fhirpaths(
+                    nested_properties = map_jsonpath_values_to_fhirpaths(
                         response=value, 
                         mapping_collection=array_elements_mapping.nested_properties or array_elements_mapping.nested_items, 
                         current_path=json_path
@@ -314,17 +314,14 @@ def map_response_values_to_fhirpaths(response: dict, mapping_collection: PathMap
     return items
 
 
-
 def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str, enpoint: str, method: str, status_code: str, profile_url: Optional[str] = None) -> Any:
     
     specification = load_openapi(openapi_file_location)      
 
     schema = extract_json_schema(specification, enpoint, method, status_code)
     schema = traverse_and_replace_references(schema, openapi_file_location, specification)    
-    # print('schema',schema.model_dump_json(indent=3, exclude_unset=True))
-    fhirpath_mapping = construct_mapping_from_schema(schema)
-    import json
-    fhir_resource_values = map_response_values_to_fhirpaths(response, fhirpath_mapping)
+    mapping_collection = construct_mapping_from_schema(schema)
+    fhir_resource_values = map_jsonpath_values_to_fhirpaths(response, mapping_collection)
 
     # Construct FHIR profile
     if not profile_url:
@@ -355,3 +352,50 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     # Cleanup resource and remove unused fields
     resource = profile.clean_elements_and_slices(resource)
     return resource
+
+
+def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str, enpoint: str, method: str, status_code: str, profile_url: Optional[str] = None, internal_values: Optional[dict] = {}) -> Any:
+        
+    specification = load_openapi(openapi_file_location)      
+
+    schema = extract_json_schema(specification, enpoint, method, status_code)
+    schema = traverse_and_replace_references(schema, openapi_file_location, specification)    
+    mapping_collection = construct_mapping_from_schema(schema)
+
+    # Construct FHIR profile
+    if not profile_url:
+        profile_url = getattr(schema, "x-fhir-profile")
+        if not profile_url:
+            raise ValueError(f'The schema has no FHIR profile associated via the "x-fhir-profile" attribute.')
+    profile = construct_profiled_resource_model(profile_url)  
+    
+    fhir_resource = profile.parse_obj(response)
+    resource_navigator = FHIRPathNavigator(fhir_resource)
+    
+    def map_fhir_to_api(mapping_collection):
+        data = {}
+        for mapping in mapping_collection.mapping_properties:
+            if mapping.nested_properties:
+                value = map_fhir_to_api(mapping.nested_properties)
+            elif mapping.nested_items:
+                value = map_fhir_to_api(mapping.nested_items)
+                value = list(value.values())
+            else:
+                value = resource_navigator.get_value(mapping.fhir_path)
+            print(mapping.fhir_path, len(ensure_list(value)))
+            import json
+            if hasattr(value,'json'):
+                value = json.loads(value.json())
+            elif isinstance(value, (datetime.date, datetime.datetime)):
+                value = value.strftime('%Y-%m-%d')
+            elif value and not isinstance(value, (list,dict)):
+                value = str(value)
+            if value:
+                # print(mapping.json_path, mapping.fhir_path)
+                data[mapping.json_path.rsplit('.',1)[-1]] = value
+        return data
+    
+    converted_response = map_fhir_to_api(mapping_collection)
+    for json_path, value in internal_values.items():
+        converted_response[json_path] = value 
+    return converted_response

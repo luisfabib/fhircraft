@@ -1,5 +1,5 @@
 from fhir_openapi.profiles import construct_profiled_resource_model, validate_profiled_resource
-from fhir_openapi.openapi import convert_response_from_api_to_fhir
+from fhir_openapi.openapi import convert_response_from_api_to_fhir, convert_response_from_fhir_to_api
 from fhir_openapi.utils import load_file
 from fhir_openapi.path import FHIRPathNavigator
 
@@ -62,6 +62,10 @@ class ValidationTests(TestCase):
         resource_file = 'fhir-condition-primary-cancer-1.json'
         self.run_integration_test(profile_url, resource_file)
 
+    def test_integration_cancer_patient_1(self):
+        profile_url = 'http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient'
+        resource_file = 'fhir-patient-cancer-1.json'
+        self.run_integration_test(profile_url, resource_file)
 
 
 
@@ -135,4 +139,58 @@ class TestConvertResponseFromApiToFhir(TestCase):
             api_response_file='test/static/api-procedure-radiotherapy-1.json', 
             openapi_spec_file='test/static/openapi-procedure-radiotherapy.yaml', 
             fhir_response_file='test/static/fhir-procedure-radiotherapy-1.json',
+        )
+        
+
+
+class TestConvertResponseFromFhirToApi(TestCase):
+    
+    def sort_nested_lists(self,data): 
+        if isinstance(data, list):
+            return sorted([self.sort_nested_lists(item) for item in data], key=lambda x: str(x))
+        elif isinstance(data, dict):
+            sorted_items = sorted(data.items(), key=lambda x: str(x[0]))
+            return {key: self.sort_nested_lists(value) for key, value in sorted_items}
+        else:
+            return data
+        
+    def assertDictEqualUnorderedLists(self, dict1, dict2):
+        sorted_dict1 = self.sort_nested_lists(dict1)
+        sorted_dict2 = self.sort_nested_lists(dict2)
+        print(json.dumps(sorted_dict1))
+        print()
+        print(json.dumps(sorted_dict2))
+        
+        self.assertDictEqual(sorted_dict1, sorted_dict2)
+
+    def convert_fhir_to_api_and_assert_equal(self, api_response_file, openapi_spec_file, fhir_response_file, internal_values):
+        response = load_file(fhir_response_file)
+        expected_response = load_file(api_response_file)
+        converted_response = convert_response_from_fhir_to_api(response, openapi_spec_file, '/endpoint', 'get', '200',internal_values=internal_values)
+        converted_response = json.loads(json.dumps(converted_response))
+        # Asser that resulting resources are equal
+        self.assertDictEqualUnorderedLists(converted_response, expected_response)
+  
+    def test_conversion_genomic_variant_1(self):
+        self.convert_fhir_to_api_and_assert_equal(
+            api_response_file='test/static/api-observation-genomic-variant-1.json', 
+            openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
+            fhir_response_file='test/static/fhir-observation-genomic-variant-1.json',
+            internal_values={'internalId': '123456789'}
+        )
+        
+    def test_conversion_genomic_variant_2(self):
+        self.convert_fhir_to_api_and_assert_equal(
+            api_response_file='test/static/api-observation-genomic-variant-2.json', 
+            openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
+            fhir_response_file='test/static/fhir-observation-genomic-variant-2.json',
+            internal_values={'internalId': '123456789'}
+        )
+        
+    def test_conversion_genomic_variant_3(self):
+        self.convert_fhir_to_api_and_assert_equal(
+            api_response_file='test/static/api-observation-genomic-variant-3.json', 
+            openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
+            fhir_response_file='test/static/fhir-observation-genomic-variant-3.json',
+            internal_values={'internalId': '123456789'}
         )

@@ -25,8 +25,8 @@
     "refAllele": "A",
     "altAllele": "A",
     "genomicAlleleExactStartEnd": {
-       "low": 96741053,
-       "high": 96741053
+       "low": "96741053",
+       "high": "96741053"
     },
     "coordinateSystem": {
        "system": "http://loinc.org",
@@ -61,7 +61,7 @@
       }
     ],
     "allelicReadDepth": {
-      "value" : 20,
+      "value" : "20",
       "comparator" : ">"
     },
     "variantConfidenceStatus": {
