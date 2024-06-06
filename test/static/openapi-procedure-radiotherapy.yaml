@@ -71,6 +71,7 @@ components:
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-procedure-intent").valueCodeableConcept.coding.0
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-procedure-intent-vs
         performedReasons:
+          type: array
           x-fhirpath: Procedure.reasonCode
           items:
             $ref: '#/components/schemas/Coding'
@@ -81,6 +82,7 @@ components:
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-treatment-termination-reason").valueCodeableConcept.coding.0
           x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-treatment-termination-reason-vs
         methods:
+          type: array
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")
           items:
             type: object
@@ -98,6 +100,7 @@ components:
           type: integer
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-sessions").valueUnsignedInt
         dosages:
+          type: array
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-dose-delivered-to-volume")
           items:
             type: object
@@ -113,6 +116,7 @@ components:
                 type: integer
                 x-fhirpath: $this.extension("fractionsDelivered").valueUnsignedInt
         treatedBodyparts: 
+          type: array
           x-fhirpath: Procedure.bodySite
           items:
             $ref: '#/components/schemas/Coding'

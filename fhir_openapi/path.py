@@ -16,6 +16,10 @@ FIRST_PATTERN = re.compile(r"^first()$")
 LAST_PATTERN = re.compile(r"^last()$")
 TAIL_PATTERN = re.compile(r"^tail()$")
 
+class FHIRPathError(Exception):
+    """Exception for FHIRPath-related issues"""
+    pass
+
 def split_fhirpath(fhir_path: str) -> List[str]:
     # Split FHIR path only at non-quoted dots
     return re.split(r'\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)', fhir_path)
@@ -154,7 +158,7 @@ class FHIRPathNavigator:
                     # Remove any Nones from the collection
                     collection = [element for element in collection if element is not None] 
                 except RuntimeError: 
-                    raise KeyError(f"\nFHIRPath {traversed_path} does not exist.\n\nTraceback:\n{traceback.format_exc()}")
+                    raise FHIRPathError(f"\nFHIRPath {traversed_path} does not exist.\n\nTraceback:\n{traceback.format_exc()}")
             # If a value must be set...
             if set_value is not None: 
                 self._set_value_at_path(collection, last_fhirpath_segment, set_value)

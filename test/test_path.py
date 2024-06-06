@@ -191,12 +191,16 @@ class Test_JoinFhirPath:
         result = join_fhirpath("patient", "name", "family", "where(family='Smith')", "given")
         assert result == "patient.name.family.where(family='Smith').given"
 
+    def test_handle_paths_with_empty_segments(self):
+        result = join_fhirpath("patient", "name", "", "family",  "", "where(family='Smith.Jones')", "given")
+        assert result == "patient.name.family.where(family='Smith.Jones').given"
+
     def test_handle_paths_with_dots_in_quotes(self):
         result = join_fhirpath("patient", "name", "family", "where(family='Smith.Jones')", "given")
         assert result == "patient.name.family.where(family='Smith.Jones').given"
 
     def test_handle_segments_with_spurious_dots(self):
-        result = join_fhirpath("patient.", "name", ".family", ".where(family='Smith').", ".given")
+        result = join_fhirpath("patient.", "...name", ".family", ".where(family='Smith').", ".given")
         assert result == "patient.name.family.where(family='Smith').given"
         
 
