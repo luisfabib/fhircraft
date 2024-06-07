@@ -8,6 +8,7 @@ from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, i
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhircraft.utils import ensure_list
 
+FHIRPATH_SEPARATORS = re.compile(r'\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)')
 SUBSETTING_PATTERN = re.compile(r"^(.*?)\[(\d+)\]$")
 EXTENSION_PATTERN = re.compile(r"extension\([\"|\'](.*?)[\"|\']\)")
 WHERE_PATTERN = re.compile(r"where\((.+?)=[\"|\'](.*?)[\"|\']\)")
@@ -22,31 +23,96 @@ class FHIRPathError(Exception):
     """Exception for FHIRPath-related issues"""
     pass
 
-def split_fhirpath(fhir_path: str) -> List[str]:
-    # Split FHIR path only at non-quoted dots
-    return re.split(r'\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)', fhir_path)
 
-def join_fhirpath(*segments: List[Union[str, int]]) -> str:
-    def _clean_segment(segment: str) -> str:
-        while segment.startswith('.'): 
-            segment = segment[1:]
-        while segment.endswith('.'): 
-            segment = segment[:-1]
-        return segment
-    return '.'.join([_clean_segment(str(segment)) for segment in segments if segment!='']) 
+def split_fhirpath(fhir_path: str) -> List[str]:
+    """
+    Split a FHIR path string at non-quoted dots.
+
+    Parameters:
+    - fhir_path (str): The FHIR path string to split.
+
+    Returns:
+    - List[str]: A list of strings resulting from splitting the FHIR path at non-quoted dots.
+    """    
+    # Split FHIR path only at non-quoted dots
+    return FHIRPATH_SEPARATORS.split(fhir_path)
+
+
+def join_fhirpath(*segments: str) -> str:
+    """
+    Join multiple FHIR path segments into a single FHIR path string.
+
+    Parameters:
+    - segments (str): Variable number of FHIR path segments to join.
+
+    Returns:
+    - str: A single FHIR path string created by joining the input segments with dots.
+    """    
+    return '.'.join((
+        str(segment).strip('.') 
+            for segment in segments if segment!=''
+    )) 
 
 class FHIRPathNavigator:
 
-    def _create_empty_array_element(self, array_path):
-        array_path,_ = self._check_segment_subsetting(array_path)     
-        path_collection = ensure_list(self._traverse_fhirpath(array_path))
-        if len(path_collection)>0 and isinstance(path_collection[0],BaseModel):
-            new_entry = path_collection[0].__class__.construct()
-            path_collection.append(new_entry)
-            self._traverse_fhirpath(array_path, path_collection)
-            return path_collection
+    def __init__(self, fhir_resource: Union[FHIRAbstractModel, dict], allow_dynamic_paths: bool=True):
+        """
+        Initialize the FHIRPathNavigator class.
 
+        Parameters:
+        - fhir_resource: Union[FHIRAbstractModel, dict] - The FHIR resource to navigate.
+        - allow_dynamic_paths: bool - Flag indicating whether dynamic paths are allowed.
+
+        Raises:
+        - TypeError: If the fhir_resource is not a Pydantic FHIR model or a dict.
+        """        
+        self.allow_dynamic_paths = allow_dynamic_paths
+        self.traversed_path = None        
+        if isinstance(fhir_resource, FHIRAbstractModel):
+            self.fhir_resource = fhir_resource
+            self.path_origin = fhir_resource.get_resource_type()
+        elif isinstance(fhir_resource, dict):
+            self.path_origin = fhir_resource.get('resource_type')
+            self.fhir_resource = make_dataclass("FHIRResource", ((k, type(v)) for k, v in fhir_resource.items()))(**fhir_resource)
+        else: 
+            raise TypeError('Invalid resource type, must be a Pydantic FHIR model or a dict')
+        # Compile list of FHIRPath segment pattern handlers
+        self.FHIRPATH_PATTERNS = {
+            WHERE_PATTERN: self._where,
+            EXTENSION_PATTERN: self._extension,
+            ITEM_PATTERN: self._item,
+            TYPE_CHOICES_PATTERN: self._all_type_choices,
+            FIRST_PATTERN: lambda coll, _: self._first(coll),
+            LAST_PATTERN: lambda coll, _: self._last(coll),
+            TAIL_PATTERN: lambda coll, _: self._tail(coll),
+            SINGLE_PATTERN: lambda coll, _: self._single(coll),
+        }
+    
+    def _extend_array_with_empty_element(self, array_fhir_path: str):
+        """
+        Extends an array at the specified FHIR path by adding an empty element if needed.
+        """        
+        # Parse and cleanup the FHIR path string
+        array_fhir_path,_ = self._check_segment_subsetting(array_fhir_path)   
+        # Get the current elements in the array
+        array_elements = ensure_list(self._traverse_fhirpath(array_fhir_path))
+        if not array_elements:
+            return None
+        if isinstance(array_elements[0],BaseModel):
+            # Construct empty FHIR resource
+            new_element = array_elements[0].__class__.construct()
+            # Add it to the array
+            array_elements.append(new_element)
+        else:
+            array_elements.append(None)
+        # Set the extended array to the FHIR path element
+        self._traverse_fhirpath(array_fhir_path, array_elements)
+        return array_elements
+    
     def _create_empty_segment_resource(self, element, segment=None):
+        """
+        Creates and returns an empty resource for the specified segment of the given element.
+        """
         if segment is not None:
             model_field = element.__class__.__fields__.get(segment)
             if not model_field:
@@ -60,7 +126,6 @@ class FHIRPathNavigator:
             except KeyError:
                 return None
             model.validate_assignment = False
-            print('CREATED', self.traversed_path, segment, model)
             empty_resource =  model.construct()
             if is_list_type(model_field):
                 getattr(element, segment).append(empty_resource)
@@ -75,6 +140,9 @@ class FHIRPathNavigator:
         return empty_resource    
     
     def _set_value_at_path(self, collection, segment, value):
+        """
+        Set the value at the specified FHIR path to the new provided value.
+        """
         for element in collection:
             segment, subset_index = self._check_segment_subsetting(segment)     
 
@@ -86,45 +154,30 @@ class FHIRPathNavigator:
             if subset_index is not None and isinstance(array, list):
                 while len(array)<=subset_index:
                     if len(array)>0 and isinstance(array[0], BaseModel):
-                        array = self._create_empty_array_element(join_fhirpath(self.traversed_path, segment))
+                        array = self._extend_array_with_empty_element(join_fhirpath(self.traversed_path, segment))
                     else:
                         array.append(None)
                 array[subset_index] = value
                 setattr(element, segment, array)
             else:
                 setattr(element, segment, value)
-
-    def __init__(self, fhir_resource, allow_dynamic_paths=True):
-        self.allow_dynamic_paths = allow_dynamic_paths
-        if isinstance(fhir_resource, FHIRAbstractModel):
-            self.fhir_resource = fhir_resource
-            self.path_origin = fhir_resource.get_resource_type()
-        elif isinstance(fhir_resource, dict):
-            self.path_origin = fhir_resource.get('resource_type')
-            self.fhir_resource = make_dataclass("FHIRResource", ((k, type(v)) for k, v in fhir_resource.items()))(**fhir_resource)
-        else: 
-            raise TypeError('Invalid resource type, must be a Pydantic FHIR model or a dict')
-        self.traversed_path = None        
-        # Compile list of FHIRPath segment pattern handlers
-        self.FHIRPATH_PATTERNS = {
-            WHERE_PATTERN: self._where,
-            EXTENSION_PATTERN: self._extension,
-            ITEM_PATTERN: self._item,
-            TYPE_CHOICES_PATTERN: self._all_type_choices,
-            FIRST_PATTERN: lambda coll, _: self._first(coll),
-            LAST_PATTERN: lambda coll, _: self._last(coll),
-            TAIL_PATTERN: lambda coll, _: self._tail(coll),
-            SINGLE_PATTERN: lambda coll, _: self._single(coll),
-        }
+                
     
-    def _check_segment_subsetting(self, segment):
+    def _check_segment_subsetting(self, segment: str):
+        """
+        Checks if the segment contains a subset index and extracts it if present.
+        """        
         subset_index = None
         if SUBSETTING_PATTERN.match(segment):
             segment, subset_index = SUBSETTING_PATTERN.search(segment).group(1,2)      
             subset_index = int(subset_index)
         return segment, subset_index
     
-    def _extension(self, collection, segment):
+    
+    def _extension(self, collection: List, segment: str):
+        """
+        Returns a collection of extensions from the given collection that match the specified extension URL.
+        """        
         extension_url = EXTENSION_PATTERN.search(segment).group(1)
         return [
             extension for element in collection 
@@ -133,6 +186,9 @@ class FHIRPathNavigator:
         ]
 
     def _where(self, collection, segment):
+        """
+        Returns a collection of elements from the given collection that match the specified condition.
+        """        
         condition_path, condition_value = WHERE_PATTERN.search(segment).group(1,2)
         return [
             obj for element in collection 
@@ -141,32 +197,56 @@ class FHIRPathNavigator:
         ]    
     
     def _get_index(self, collection, index):
+        """
+        Returns the element at the specified index in the given collection.
+        """        
         while len(collection)<=index:
             if self.allow_dynamic_paths:
-                collection = self._create_empty_array_element(self.traversed_path)
+                collection = self._extend_array_with_empty_element(self.traversed_path)
             else:
                 collection.append(None)
         return [collection[index]] 
     
     def _item(self, collection, segment):
+        """
+        Parses the segment and returns the element at the specified index in the given collection.
+        """        
         index = int(ITEM_PATTERN.search(segment).group(1))
         return self._get_index(collection, index)
         
     def _first(self, collection):
+        """
+        Returns the first element in the given collection.
+        """
         return self._get_index(collection, index=0)
         
     def _last(self, collection):
+        """
+        Returns the last element in the given collection.
+        """
         return self._get_index(collection, index=-1)
         
     def _tail(self, collection):
+        """
+        Returns the all elements except the last in the given collection.
+        """        
         return collection[:-1]
     
     def _single(self, collection):
+        """
+        Returns a single item from the given collection.
+
+        Raises:
+        - FHIRPathError: If the collection does not contain exactly one item.
+        """        
         if len(collection)!=1:
             raise FHIRPathError(f'Expected collection of path "{self.fhirpath}" to have one single item (instead {len(collection)} items collected)')
         return [collection[0]]
     
     def _all_type_choices(self, collection, statement):
+        """
+        Returns a list of values for a specific type choice element from the given collection.
+        """
         type_choice_name = TYPE_CHOICES_PATTERN.search(statement).group(1)
         return [
             getattr(obj, element) 
@@ -176,6 +256,21 @@ class FHIRPathNavigator:
         ]
         
     def _traverse_fhirpath(self, fhirpath, set_value=None):
+        """
+        Traverse the given FHIR path and return the corresponding elements or set a new value if specified.
+
+        Parameters:
+        - fhirpath (str): The FHIR path to traverse.
+        - set_value (Any): The new value to set at the end of the path, default is None.
+
+        Returns:
+        - Union[Any, List[Any]]: The element(s) at the specified FHIR path.
+
+        Raises:
+        - ValueError: If no FHIR path is specified (fhir_path=None).
+        - FHIRPathError: If the FHIR path does not exist.
+
+        """        
         if fhirpath is None:
             raise ValueError('No FHIRPath has been specified (fhir_path=None)')
         self.traversed_path = ''
@@ -234,12 +329,52 @@ class FHIRPathNavigator:
         return union_collection
     
     def get_value(self, fhir_path):
+        """
+        Get the value at the specified FHIR path.
+
+        Parameters:
+        - fhir_path (str): The FHIR path to traverse and retrieve the value.
+
+        Returns:
+        - Union[Any, List[Any]]: The element(s) at the specified FHIR path.
+
+        Raises:
+        - ValueError: If no FHIR path is specified (fhir_path=None).
+        - FHIRPathError: If the FHIR path does not exist.
+        """        
         return self._traverse_fhirpath(fhir_path)
             
     def set_value(self, fhir_path, new_value):
+        """
+        Set the value at the specified FHIR path to the new provided value.
+
+        Parameters:
+        - fhir_path (str): The FHIR path where the new value should be set.
+        - new_value (Any): The new value to set at the specified FHIR path.
+
+        Returns:
+        - None
+
+        Raises:
+        - ValueError: If no FHIR path is specified (fhir_path=None).
+        - FHIRPathError: If the FHIR path does not exist.
+        """        
         self._traverse_fhirpath(fhir_path, new_value)
         
     def get_pydantic_field(self, fhir_path):
+        """
+        Get the Pydantic field at the specified FHIR path.
+
+        Parameters:
+        - fhir_path (str): The FHIR path to traverse and retrieve the Pydantic field.
+
+        Returns:
+        - Optional[Field]: The Pydantic field at the specified FHIR path, or None if not found.
+
+        Raises:
+        - ValueError: If no FHIR path is specified (fhir_path=None).
+        - FHIRPathError: If the FHIR path does not exist.
+        """        
         fhirpath_segments = split_fhirpath(fhir_path)
         last_fhirpath_segment = fhirpath_segments[-1]
         fhirpath_segments = fhirpath_segments[:-1]
