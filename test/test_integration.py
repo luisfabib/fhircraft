@@ -133,6 +133,13 @@ class TestConvertResponseFromApiToFhir(TestCase):
             openapi_spec_file='test/static/openapi-procedure-radiotherapy.yaml', 
             fhir_response_file='test/static/fhir-procedure-radiotherapy-1.json',
         )
+
+    def test_conversion_cancer_patient_1(self):
+        self.convert_api_to_fhir_and_assert_equal(
+            api_response_file='test/static/api-patient-cancer-1.json', 
+            openapi_spec_file='test/static/openapi-cancer-patient.yaml', 
+            fhir_response_file='test/static/fhir-patient-cancer-1.json',
+        )
         
 
 
@@ -204,3 +211,10 @@ class TestConvertResponseFromFhirToApi(TestCase):
             internal_values={'internalId': '123456789'}
         )
         
+    def test_conversion_cancer_patient_1(self):
+        self.convert_fhir_to_api_and_assert_equal(
+            api_response_file='test/static/api-patient-cancer-1.json', 
+            openapi_spec_file='test/static/openapi-cancer-patient.yaml', 
+            fhir_response_file='test/static/fhir-patient-cancer-1.json',
+            internal_values={'internalId': '123456789'}
+        )

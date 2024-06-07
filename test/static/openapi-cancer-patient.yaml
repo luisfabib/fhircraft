@@ -42,7 +42,7 @@ components:
       pattern: '^\d{4}-\d{2}-\d{2}$'
     TestSchema:
       title: Condition
-      x-fhir-profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition
+      x-fhir-profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient
       properties:
         internalId:
           type: string
@@ -52,39 +52,48 @@ components:
           properties:
             system:
               type: string
+              x-fhirpath: null
             code:
               type: string
+              x-fhirpath: null
             display:
               type: string
               x-fhirpath: Patient.extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race").extension("text").valueString
             version:
               type: string
+              x-fhirpath: null
         ethnicity: 
           $ref: '#/components/schemas/Coding'
           x-binding: http://hl7.org/fhir/us/core/ValueSet/omb-ethnicity-category
           properties:
             system:
               type: string
+              x-fhirpath: null
             code:
               type: string
+              x-fhirpath: null
             display:
               type: string
               x-fhirpath: Patient.extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity").extension("text").valueString
             version:
               type: string
+              x-fhirpath: null
         gender:
           $ref: '#/components/schemas/Coding'
           x-binding: http://hl7.org/fhir/R4/valueset-administrative-gender.html
           properties:
             system:
               type: string
+              x-fhirpath: null
             code:
               type: string
               x-fhirpath: Patient.gender
             display:
               type: string
+              x-fhirpath: null
             version:
               type: string
+              x-fhirpath: null
         birthsex:
           $ref: '#/components/schemas/Coding'
           x-binding: http://hl7.org/fhir/us/core/ValueSet/birthsex
@@ -113,7 +122,7 @@ components:
                 type: string
                 x-fhirpath: $this.family
         birthDate:
-          type: date
+          type: string
           x-fhirpath: Patient.birthDate
         contacts:
           type: array
@@ -122,13 +131,13 @@ components:
             type: object
             properties:
               system: 
-                type: str
+                type: string
                 x-fhirpath: $this.system
               value:
-                type: str
+                type: string
                 x-fhirpath: $this.value
               use:
-                type: str
+                type: string
                 x-fhirpath: $this.use
         identifier:
           type: array
@@ -136,16 +145,16 @@ components:
           properties:
             use: 
               type: string
-                x-fhirpath: $this.use
+              x-fhirpath: $this.use
             system: 
               type: string
-                x-fhirpath: $this.system
+              x-fhirpath: $this.system
             category: 
-                $ref: '#/components/schemas/Coding'
-                x-fhirpath: $this.type.coding.0
+              $ref: '#/components/schemas/Coding'
+              x-fhirpath: $this.type.coding
             value: 
               type: string
-                x-fhirpath: $this.value
+              x-fhirpath: $this.value
 
 
 

@@ -1,7 +1,7 @@
 from typing import Union, Any, Optional, Tuple, List, Dict
 
 from dataclasses import dataclass
-from fhircraft.fhir.profiles import construct_profiled_resource_model, track_slice_changes
+from fhircraft.fhir.profiles import construct_profiled_resource_model, track_slice_changes, validate_profiled_resource
 from fhircraft.fhir.path import FHIRPathNavigator, join_fhirpath, split_fhirpath, FHIRPathError
 from fhircraft.utils import remove_none_dicts, ensure_list
 from fhircraft.openapi.parser import load_openapi, traverse_and_replace_references, extract_json_schema
@@ -178,8 +178,6 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     track_slice_changes(resource, True)
 
     # Set the values of the API response
-    import json
-    print(json.dumps(fhir_resource_values, indent=2))
     for fhirpath, value in fhir_resource_values.items():
         print(f'SET {fhirpath} -> {value}')
         navigator.set_value(fhirpath, value)        
@@ -190,6 +188,11 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     
     # Cleanup resource and remove unused fields
     resource = profile.clean_elements_and_slices(resource)
+    # Cleanup the resource from empty structures to be valid
+    resource = profile.parse_obj(resource.dict())
+
+    validate_profiled_resource(resource)
+    
     return resource
 
 

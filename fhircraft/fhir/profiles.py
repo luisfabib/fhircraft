@@ -18,6 +18,7 @@ import datetime
 import json
 import requests
 
+BASE_ELEMENTS = ['text', 'extension', 'id', 'fhir_comments','resource_type']
 
 PATTERN_FIELDS = [field for field in ElementDefinition.__fields__.keys() if field.startswith('pattern')]
 FIXED_FIELDS = [field for field in ElementDefinition.__fields__.keys() if field.startswith('fixed')]
@@ -125,7 +126,6 @@ class FHIRSlice:
             
             @property
             def is_FHIR_complete(self):
-                BASE_ELEMENTS = ['text', 'extension', 'id', 'fhir_comments','resource_type']
                 slice_available_elements = sorted(set([name for name in self.__class__.__fields__ if '__' not in name and name not in BASE_ELEMENTS]))
                 slice_preset_elements = sorted(set([name for name, value in self.dict().items() if (value is not None or value!=[]) and '__' not in name and name not in BASE_ELEMENTS]))
                 return slice_available_elements == slice_preset_elements
@@ -497,7 +497,7 @@ class ProfiledResourceFactory:
             class Config:
                 underscore_attrs_are_private = True
                 validate_assignment = False
-                        
+          
             @classmethod
             def construct_with_profiled_elements(cls):
                 return construct_with_profiled_elements(cls)
@@ -582,16 +582,19 @@ class ProfiledResourceFactory:
         return validation_errors
     
     
-    def validate(self, resource):
+    def validate(self, resource, profile=None):
+        
+        if not profile:
+            profile = resource.__class__
         validation_errors = []
 
         # Core validation
-        *_, validation_error = validate_model(resource.__class__, resource.dict())
+        *_, validation_error = validate_model(profile, resource.dict())
         if validation_error:
             validation_errors += [ErrorWrapper(error.exc, error._loc) for raw_errors in validation_error.raw_errors  for error in raw_errors ]
 
         # Evaluate profile constraints
-        for constraint in resource.__class__.__constraints__:
+        for constraint in profile.__constraints__:
             if constraint.is_slice_constraint:
                 continue
             # Get the element that is constrained in the resource
@@ -605,7 +608,7 @@ class ProfiledResourceFactory:
             validation_errors += self._validate_constraint(constrained_element, constraint) 
             
         # Slicing validation    
-        for slice_group in resource.__class__.__slicing__:
+        for slice_group in profile.__slicing__:
             for slice in slice_group.slices:
                 sliced_entries = FHIRPathNavigator(resource, allow_dynamic_paths=False).get_value(slice.fhirpath)
                 if not isinstance(sliced_entries, list): 
@@ -646,7 +649,7 @@ class ProfiledResourceFactory:
                             validation_errors += self._validate_constraint(constrained_slice_elements, constraint, f'{slice_group.path}:{slice.name}{slice_subpath}') 
         # IF there are any validation issues, raise them                     
         if validation_errors:
-            raise ValidationError(validation_errors, resource.__class__)                     
+            raise ValidationError(validation_errors, profile)                     
         else:
             print('Resource successfully validated')
 

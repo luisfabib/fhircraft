@@ -126,7 +126,6 @@ class TestFHIRPathNavigator:
         assert patient.extension[0].extension[0].valueString == 'test_value_2_new', "Failed to set value to the complex extension."
     
     def test_get_where(self):
-        # Mocking a FHIR resource with a list of objects
         patient = Patient(name=[HumanName(family="Doe", given=["John"]), HumanName(family="Smith", given=["Will"])])
         navigator = FHIRPathNavigator(patient)
         result = navigator.get_value('Patient.name.where(family="Doe")')
@@ -135,7 +134,6 @@ class TestFHIRPathNavigator:
         assert result.given[0] == "Will", "Failed to filter items correctly with where statement."
         
     def test_set_where(self):
-        # Mocking a FHIR resource with a list of objects
         patient = Patient(name=[HumanName(family="Doe", given=["John"]), HumanName(family="Smith", given=["Will"])])
         navigator = FHIRPathNavigator(patient)
         navigator.set_value('Patient.name.where(family="Doe").given',["Johnny"])
@@ -144,33 +142,47 @@ class TestFHIRPathNavigator:
         assert patient.name[1].given[0] == "Willy", "Failed to set the value of the filter item correctly with where statement."
         
     def test_navigate_type_choice(self):
-        # Mocking a FHIR resource with a list of objects
         patient = Patient(deceasedBoolean=True)
         navigator = FHIRPathNavigator(patient)
         result = navigator.get_value('Patient.deceased[x]')
         assert result == True
 
     def test_set_noninstanciated_path(self):
-        # Mocking a FHIR resource with a list of objects
         patient = Patient(deceasedBoolean=True)
         navigator = FHIRPathNavigator(patient)
         navigator.set_value('Patient.extension.valueCodeableConcept[0].coding.code', '12345')
         assert patient.extension[0].valueCodeableConcept.coding[0].code == '12345'
 
     def test_set_noninstanciated_path_repeatedly(self):
-        # Mocking a FHIR resource with a list of objects
         patient = Patient(deceasedBoolean=True)
         navigator = FHIRPathNavigator(patient)
-        navigator.set_value('Patient.extension[0].valueCodeableConcept[0].coding.code', 'code1')
-        navigator.set_value('Patient.extension[0].valueCodeableConcept[0].coding.system', 'system1')
-        navigator.set_value('Patient.extension[0].extension[0].valueCodeableConcept[0].coding.code', 'code2')
-        navigator.set_value('Patient.extension[0].extension[0].valueCodeableConcept[0].coding.system', 'system2')
+        navigator.set_value('Patient.extension[0].valueCodeableConcept.coding.code', 'code1')
+        navigator.set_value('Patient.extension[0].valueCodeableConcept.coding.system', 'system1')
+        navigator.set_value('Patient.extension[0].extension[0].valueCodeableConcept.coding.code', 'code2')
+        navigator.set_value('Patient.extension[0].extension[0].valueCodeableConcept.coding.system', 'system2')
         assert len(patient.extension) == 1
         assert len(patient.extension[0].valueCodeableConcept.coding) == 1
         assert patient.extension[0].valueCodeableConcept.coding[0].code == 'code1'
         assert patient.extension[0].valueCodeableConcept.coding[0].system == 'system1'
         assert patient.extension[0].extension[0].valueCodeableConcept.coding[0].code == 'code2'
         assert patient.extension[0].extension[0].valueCodeableConcept.coding[0].system == 'system2'
+
+    def test_set_noninstanciated_array_elements(self):
+        patient = Patient(deceasedBoolean=True)
+        navigator = FHIRPathNavigator(patient)
+        navigator.set_value('Patient.extension[0].valueCodeableConcept.coding.code', '12345')
+        navigator.set_value('Patient.extension[1].valueCodeableConcept.coding.code', '67890')
+        assert patient.extension[0].valueCodeableConcept.coding[0].code == '12345'
+        assert patient.extension[1].valueCodeableConcept.coding[0].code == '67890'
+
+    def test_set_noninstanciated_final_array_elements(self):
+        patient = Patient(deceasedBoolean=True)
+        navigator = FHIRPathNavigator(patient)
+        navigator.set_value('Patient.contact[0].name.given[0]', 'Alex')
+        navigator.set_value('Patient.contact[0].name.given[1]', 'James')
+        assert patient.contact[0].name.given[0] == 'Alex'
+        assert patient.contact[0].name.given[1] == 'James'
+
 
 class Test_SplitFhirPath:
 
