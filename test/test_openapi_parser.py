@@ -293,4 +293,41 @@ class TestTraverseAndReplaceReferences:
             traverse_and_replace_references(schema, current_file_path, root_schema)
             
             
-            
+
+    def test_resolving_references_with_override_values(self):
+        schema = Schema.model_validate({
+            "components": {
+                "schemas": {
+                    "ReferencedObject": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                            },
+                            "age": {
+                                "type": "string",
+                            },
+                            "alive": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                }
+            },
+            "$ref": "#/components/schemas/ReferencedObject",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "x-custom-attribute": "custom-value"
+                },
+                "age": {
+                    "type": "integer"
+                }
+            }
+        })
+        current_file_path = "test_file.json"
+        root_schema = schema
+        result = traverse_and_replace_references(schema, current_file_path, root_schema)
+        assert getattr(result.properties['name'],'x-custom-attribute') == 'custom-value'
+        assert getattr(result.properties['age'],'type') == 'integer'
+        assert getattr(result.properties['alive'],'type') == 'boolean'

@@ -140,8 +140,22 @@ def traverse_and_replace_references(schema: Union[Schema, List[Schema]], current
                 # Recursively traverse the resolved object to resolve any nested references
                 ref_content_resolved = process_iteratively(ref_content, os.path.join(os.path.dirname(current_file_path), ref), root_schema)
                 # Merge the schemas
-                schema_resolved = {k: v for k, v in schema.items() if k not in ["$ref","ref"] and k is not None}
-                schema_resolved.update(ref_content_resolved)
+                
+                def merge(base, resolved):
+                    resolved_base = {}
+                    combined_keys = list(base.keys()) + list(resolved.keys())
+                    for key in combined_keys:
+                        if key in ["$ref","ref"] or key is None:
+                            continue
+                        if key in resolved and key in base:
+                            value = base[key]
+                            if isinstance(value, dict):
+                                value = merge(base[key], resolved[key])
+                            resolved_base[key] = value
+                        else:
+                            resolved_base[key] = base.get(key) or resolved.get(key)
+                    return resolved_base
+                schema_resolved = merge(schema, ref_content_resolved)
                 return schema_resolved
             else:
                 # If not, go over the items in the schema and replace any nested references
