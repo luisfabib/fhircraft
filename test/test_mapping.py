@@ -191,6 +191,39 @@ class TestPathMapping:
         assert array_mapping_info.fhir_path == 'Patient.address.city'
 
 
+    def test_nested_path_without_parent_paths(self):
+        schema = Schema.model_validate({
+            "properties": {
+                "information": {
+                    "type": "object",
+                    "properties": {
+                        "personal": {
+                            "type": "object",
+                            "properties": {
+                                "gender": {
+                                    "type": "string",
+                                    "x-fhirpath": "Patient.gender",   
+                                },
+                                "phone": {
+                                    "type": "string",
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        path_mapping = construct_mapping_from_schema(schema)
+        mapping_info = path_mapping.mapping_properties[0]
+        assert mapping_info.json_path == "information"
+        assert mapping_info.fhir_path == None
+        nested_mapping_info = mapping_info.nested_properties.mapping_properties[0]
+        assert nested_mapping_info.json_path == 'information.personal'
+        assert nested_mapping_info.fhir_path == None
+        nested_mapping_info = nested_mapping_info.nested_properties.mapping_properties[0]
+        assert nested_mapping_info.json_path == 'information.personal.gender'
+        assert nested_mapping_info.fhir_path == 'Patient.gender'
+        
     def test_incompatible_fhirpaths(self):
         schema = Schema.model_validate({
             "properties": {
@@ -378,6 +411,23 @@ class TestMapResponseValuesToFhirpaths:
         print(result)
         assert result == expected
         
+    def test_maps_nested_without_parents(self):
+        response = {"information": {"personal": {"gender": "female", "name": "Jane"}}}
+        mapping = PathMappingCollection([
+            PathMappingProperties(json_path="information", fhir_path=None,
+                nested_properties=PathMappingCollection([
+                    PathMappingProperties(json_path="information.personal", fhir_path=None,
+                        nested_properties=PathMappingCollection([
+                                PathMappingProperties(json_path="information.personal.gender", fhir_path="Patient.gender"),
+                                PathMappingProperties(json_path="information.personal.name", fhir_path=None),
+                        ])
+                    )
+                ])
+            ),
+        ])
+        result = map_jsonpath_values_to_fhirpaths(response, mapping)
+        assert result == {"Patient.gender": "female"}
+
         
     def test_handles_empty_response(self):
         response = {}

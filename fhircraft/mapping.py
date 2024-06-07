@@ -38,20 +38,22 @@ def construct_mapping_from_schema(schema: Schema) -> PathMappingCollection:
     X_FHIRPATH = 'x-fhirpath'
     
     def _parse_fhirpath(jsonpath, fhirpath, parent_fhirpath):    
+        if not parent_fhirpath:
+            return fhirpath            
         if fhirpath.startswith('$this'):
             fhirpath = join_fhirpath(parent_fhirpath, fhirpath.replace('$this', ''))
         if parent_fhirpath not in fhirpath:
             raise FHIRPathError(f'Incompatible {X_FHIRPATH} definition for JSON element {jsonpath}:\n"{fhirpath}" cannot be a child element of "{parent_fhirpath}"')
         return fhirpath
     
-    def _construct_path_mapping_collection(schema: Schema, parent_json_path: str = "", parent_fhir_path: str = "") -> PathMappingCollection:
+    def _construct_path_mapping_collection(schema: Schema, parent_json_path: str = "", parent_fhir_path: str = None) -> PathMappingCollection:
         mappings = []
         if schema.properties:
             for property_name, property in schema.properties.items():
                 full_json_path = f"{parent_json_path}.{property_name}" if parent_json_path else property_name
-                if not hasattr(property, X_FHIRPATH):
-                    continue 
-                full_fhir_path = getattr(property, X_FHIRPATH, parent_fhir_path)
+
+                
+                full_fhir_path = getattr(property, X_FHIRPATH, parent_fhir_path or None)
                 full_fhir_path = _parse_fhirpath(full_json_path, full_fhir_path, parent_fhir_path)
                 property_mapping = PathMappingProperties(
                     fhir_path=full_fhir_path,
@@ -118,7 +120,8 @@ def map_jsonpath_values_to_fhirpaths(response: dict, mapping_collection: PathMap
                 raise TypeError(f'Expected JSON value at "{json_path}" to be a dict.')
             properties = map_jsonpath_values_to_fhirpaths(value, mapping.nested_properties, current_path=json_path)
             for subpath, value in properties.items():
-                items[subpath] = value 
+                if subpath:
+                    items[subpath] = value 
         elif mapping.nested_items:
             if not isinstance(value, list):
                 raise TypeError(f'Expected JSON value at "{json_path}" to be a list.')
@@ -147,7 +150,8 @@ def map_jsonpath_values_to_fhirpaths(response: dict, mapping_collection: PathMap
                     subpath = subpath.replace(array_fhir_path, '')
                     items[join_fhirpath(array_fhir_path+f'[{index}]', subpath)] = value
         else:
-            items[mapping.fhir_path] = value
+            if mapping.fhir_path:
+                items[mapping.fhir_path] = value
     return items
 
 
@@ -174,8 +178,9 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     track_slice_changes(resource, True)
 
     # Set the values of the API response
+    import json
+    print(json.dumps(fhir_resource_values, indent=2))
     for fhirpath, value in fhir_resource_values.items():
-        fhirpath = fhirpath.replace('..','.')
         print(f'SET {fhirpath} -> {value}')
         navigator.set_value(fhirpath, value)        
         navigator.get_value(join_fhirpath(fhirpath, 'single()'))
@@ -206,6 +211,8 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
     fhir_resource = profile.parse_obj(response)
     resource_navigator = FHIRPathNavigator(fhir_resource)
     
+    print(schema.model_dump_json(indent=3, exclude_unset=True))
+    
     def map_fhir_to_api(mapping_collection):
         data = {}
         for mapping in mapping_collection.mapping_properties:
@@ -214,10 +221,14 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
             elif mapping.nested_items:
                 value = map_fhir_to_api(mapping.nested_items)
                 value = next(iter(value.values()), {})
-                value = {key: ensure_list(val) for key,val in value.items()}
-                if value:   
-                    value = [dict(zip(value,t)) for t in zip(*value.values())]
+                if isinstance(value, dict):
+                    value = {key: ensure_list(val) for key,val in value.items()}
+                    if value:   
+                        value = [dict(zip(value,t)) for t in zip(*value.values())]
+                
             else:
+                if not mapping.fhir_path:
+                    continue
                 value = resource_navigator.get_value(mapping.fhir_path)
                 print(f'GOT {mapping.fhir_path} -> {value}')
             import json
