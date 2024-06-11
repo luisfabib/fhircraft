@@ -3,12 +3,15 @@ import traceback
 from typing import List, Union
 from dataclasses import make_dataclass
 from pydantic.v1 import BaseModel
+from pydantic import ValidationError
 from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel
 from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhircraft.utils import ensure_list
 
 FHIRPATH_SEPARATORS = re.compile(r'\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)')
+WORD_PATTERN = re.compile(r"^\D+$")
+THIS_PATTERN = re.compile(r"^\$this$")
 SUBSETTING_PATTERN = re.compile(r"^(.*?)\[(\d+)\]$")
 EXTENSION_PATTERN = re.compile(r"extension\([\"|\'](.*?)[\"|\']\)")
 WHERE_PATTERN = re.compile(r"where\((.+?)=[\"|\'](.*?)[\"|\']\)")
@@ -24,6 +27,22 @@ class FHIRPathError(Exception):
     pass
 
 
+
+def validate_fhirpath(fhir_path: str) -> List[str]:
+    """
+    Validate a FHIR path string
+
+    Parameters:
+    - fhir_path (str): The FHIR path string to split.
+    """    
+    segments = split_fhirpath(fhir_path)
+    for segment in segments:
+        for pattern in [WORD_PATTERN, SINGLE_PATTERN, THIS_PATTERN, FIRST_PATTERN, LAST_PATTERN, TAIL_PATTERN, SUBSETTING_PATTERN, EXTENSION_PATTERN, WHERE_PATTERN, ITEM_PATTERN, TYPE_CHOICES_PATTERN]:
+            if pattern.match(segment):
+                break
+        else:
+            raise FHIRPathError(f'Invalid FHIRPath segment: {segment}')
+        
 def split_fhirpath(fhir_path: str) -> List[str]:
     """
     Split a FHIR path string at non-quoted dots.
