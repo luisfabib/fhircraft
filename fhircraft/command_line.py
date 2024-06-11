@@ -11,7 +11,7 @@ app = typer.Typer()
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 @app.command()
-def convert_api_to_fhir(api_response: str, openapi_spec: str, enpoint: str, method: str, status_code: str, profile_url: str = None):
+def convert_api_to_fhir(api_response: str, openapi_spec: str, enpoint: str, method: str, status_code: str, format: str = 'json'):
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -20,7 +20,12 @@ def convert_api_to_fhir(api_response: str, openapi_spec: str, enpoint: str, meth
         api_response = load_file(api_response)
         progress.add_task(description="Processing...", total=None)
         fhir_response = convert_response_from_api_to_fhir(api_response, openapi_spec, enpoint, method, status_code)
-        print_json(fhir_response.json(indent=2))
+        if format=='json':
+            print_json(fhir_response.json(indent=2))
+        elif format=='yaml':
+            print(fhir_response.yaml(indent=2))
+        elif format=='xml':
+            print(fhir_response.xml(pretty_print=True))
 
 
 @app.command()
