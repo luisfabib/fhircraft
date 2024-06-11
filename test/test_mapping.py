@@ -408,7 +408,6 @@ class TestMapResponseValuesToFhirpaths:
             "Patient.contact[1].name[1].last": "Cruise"
         }
         result = map_jsonpath_values_to_fhirpaths(response, mapping)
-        print(result)
         assert result == expected
         
     def test_maps_nested_without_parents(self):

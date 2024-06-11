@@ -17,6 +17,7 @@ from copy import deepcopy
 import datetime 
 import json
 import requests
+import logging
 
 BASE_ELEMENTS = ['text', 'extension', 'id', 'fhir_comments','resource_type']
 
@@ -325,15 +326,15 @@ def clean_elements_and_slices(resource, depth=0):
         valid_elements = [element for element in valid_elements if element is not None]
         if not valid_elements:
             continue
-        print("\t"*(depth)+f'↪ {slicing.path}: {len(valid_elements)} elements')
+        logging.debug("\t"*(depth)+f'↪ {slicing.path}: {len(valid_elements)} elements')
         for slice in slicing.slices:
             # Get all the elements that conform to this slice's definition           
             sliced_entries = ensure_list(navigator.get_value(slice.fhirpath))
             sliced_entries = [entry for entry in sliced_entries if entry is not None]
-            print("\t"*(depth+1)+f'↪ {slice.fhirpath}: {len(sliced_entries)} elements')
+            logging.debug("\t"*(depth+1)+f'↪ {slice.fhirpath}: {len(sliced_entries)} elements')
             
             for n,entry in enumerate(sliced_entries):
-                print("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}[{n}]  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.is_FHIR_complete else "✗"}) {"-> DELETE" if (not entry.is_FHIR_complete and not entry.has_been_modified) and entry in valid_elements else ""}' )
+                logging.debug("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}[{n}]  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.is_FHIR_complete else "✗"}) {"-> DELETE" if (not entry.is_FHIR_complete and not entry.has_been_modified) and entry in valid_elements else ""}' )
                 if not entry.is_FHIR_complete and not entry.has_been_modified and entry in valid_elements:
                     valid_elements.remove(entry)                
                 elif entry.__slicing__:
@@ -559,7 +560,6 @@ class ProfiledResourceFactory:
                     'http://hl7.org/fhirpath/System.String': str,
                 }
                 if not any([isinstance(constrained_element,FHIR_TYPES.get(type) or get_fhir_model_class(type)) for type in constraint.valueType]): 
-                    print('type(constrained_element) =',type(constrained_element))
                     validation_errors.append(ErrorWrapper(
                     TypeError(f'Value must be of type: {",".join([type.title()for type in constraint.valueType])}'), 
                         f'{path or constraint.path}'
@@ -651,7 +651,7 @@ class ProfiledResourceFactory:
         if validation_errors:
             raise ValidationError(validation_errors, profile)                     
         else:
-            print('Resource successfully validated')
+            logging.debug('Resource successfully validated')
 
 
 factory = ProfiledResourceFactory()

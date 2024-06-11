@@ -7,7 +7,7 @@ from fhircraft.utils import remove_none_dicts, ensure_list
 from fhircraft.openapi.parser import load_openapi, traverse_and_replace_references, extract_json_schema
 from openapi_pydantic import Schema
 import datetime
-    
+import logging
 
 @dataclass
 class PathMappingProperties:
@@ -179,7 +179,7 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
 
     # Set the values of the API response
     for fhirpath, value in fhir_resource_values.items():
-        print(f'SET {fhirpath} -> {value}')
+        logging.debug(f'SET {fhirpath} -> {value}')
         navigator.set_value(fhirpath, value)        
         navigator.get_value(join_fhirpath(fhirpath, 'single()'))
 
@@ -214,7 +214,7 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
     fhir_resource = profile.parse_obj(response)
     resource_navigator = FHIRPathNavigator(fhir_resource)
     
-    print(schema.model_dump_json(indent=3, exclude_unset=True))
+    logging.debug(schema.model_dump_json(indent=3, exclude_unset=True))
     
     def map_fhir_to_api(mapping_collection):
         data = {}
@@ -233,7 +233,7 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
                 if not mapping.fhir_path:
                     continue
                 value = resource_navigator.get_value(mapping.fhir_path)
-                print(f'GOT {mapping.fhir_path} -> {value}')
+                logging.debug(f'GOT {mapping.fhir_path} -> {value}')
             import json
             
             def _parse_types(value):
