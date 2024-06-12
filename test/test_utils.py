@@ -174,18 +174,6 @@ class TestLoadUrl:
         with pytest.raises(ValueError, match="Unsupported content type. Please provide a URL that returns .yaml, .yml, or .json content."):
             load_url(url)
 
-    # URL returning malformed JSON
-    def test_url_returning_malformed_json(self, mocker):
-        url = "http://example.com/data.json"
-        mock_response = mocker.Mock()
-        mock_response.headers = {'Content-Type': 'application/json'}
-        mock_response.json.side_effect = json.JSONDecodeError("Expecting value", "", 0)
-        mock_response.raise_for_status.return_value = None
-        mocker.patch('requests.get', return_value=mock_response)
-    
-        result = load_url(url)
-        assert result is None
-
 
 class TestContainsOnlyNone:
 

@@ -7,11 +7,22 @@ from pydantic import ValidationError
 from rich import print, print_json
 from rich.table import Table
 from rich.console import Console
-app = typer.Typer()
 from rich.progress import Progress, SpinnerColumn, TextColumn
+from typing_extensions import Annotated
+
+
+app = typer.Typer()
+
 
 @app.command()
-def convert_api_to_fhir(api_response: str, openapi_spec: str, enpoint: str, method: str, status_code: str, format: str = 'json'):
+def convert_api_to_fhir(
+        api_response: Annotated[str, typer.Argument(help="Path to the JSON file")],
+        openapi_spec: Annotated[str, typer.Argument(help="Path to the OpenAPI specification file")],
+        endpoint: Annotated[str, typer.Argument(help="API Enpoint used to obtain the JSON file")],
+        method: Annotated[str, typer.Argument(help="API HTTP method used to obtain the JSON file")] = 'get',
+        status_code: Annotated[int, typer.Argument(help="API status code obtained along the JSON file")] = 200,
+        format: Annotated[str, typer.Option(help="Format of the converted FHIR resource")] = 'json'
+    ):
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -19,7 +30,7 @@ def convert_api_to_fhir(api_response: str, openapi_spec: str, enpoint: str, meth
     ) as progress:
         api_response = load_file(api_response)
         progress.add_task(description="Processing...", total=None)
-        fhir_response = convert_response_from_api_to_fhir(api_response, openapi_spec, enpoint, method, status_code)
+        fhir_response = convert_response_from_api_to_fhir(api_response, openapi_spec, endpoint, method, str(status_code))
         if format=='json':
             print_json(fhir_response.json(indent=2))
         elif format=='yaml':

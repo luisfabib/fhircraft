@@ -8,6 +8,7 @@ from fhircraft.openapi.parser import load_openapi, traverse_and_replace_referenc
 from openapi_pydantic import Schema
 import datetime
 import logging
+import json
 
 @dataclass
 class PathMappingProperties:
@@ -189,7 +190,7 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     # Cleanup resource and remove unused fields
     resource = profile.clean_elements_and_slices(resource)
     # Cleanup the resource from empty structures to be valid
-    resource = profile.parse_obj(resource.dict())
+    resource = profile.parse_obj(remove_none_dicts(resource.dict()))
 
     validate_profiled_resource(resource)
     
@@ -213,15 +214,15 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
     
     fhir_resource = profile.parse_obj(response)
     resource_navigator = FHIRPathNavigator(fhir_resource)
-    
-    logging.debug(schema.model_dump_json(indent=3, exclude_unset=True))
-    
+    from  rich import print
+    print(mapping_collection)
     def map_fhir_to_api(mapping_collection):
         data = {}
         for mapping in mapping_collection.mapping_properties:
             if mapping.nested_properties:
                 value = map_fhir_to_api(mapping.nested_properties)
             elif mapping.nested_items:
+                print('value',resource_navigator.get_value(mapping.fhir_path))
                 value = map_fhir_to_api(mapping.nested_items)
                 value = next(iter(value.values()), {})
                 if isinstance(value, dict):
@@ -234,7 +235,6 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
                     continue
                 value = resource_navigator.get_value(mapping.fhir_path)
                 logging.debug(f'GOT {mapping.fhir_path} -> {value}')
-            import json
             
             def _parse_types(value):
                 if hasattr(value,'json'):
