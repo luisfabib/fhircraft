@@ -94,12 +94,12 @@ def load_url(url: str) -> Dict:
         try:
             return yaml.safe_load(response.text)
         except yaml.YAMLError as e:
-            raise yaml.YAMLError(f"Error loading YAML: {e}")
+            raise ValueError(f"Error loading YAML: {e}")
     elif 'json' in content_type.lower():
         try:
             return response.json()
         except json.JSONDecodeError as e:
-            raise json.JSONDecodeError(f"Error loading JSON: {e}")
+            raise ValueError(f"Error loading JSON: {e}")
     else:
         raise ValueError("Unsupported content type. Please provide a URL that returns .yaml, .yml, or .json content.")
 
