@@ -4,6 +4,7 @@ import requests
 import os
 from typing import List, Any, Dict, Union, get_args, get_origin
 from dotenv import dotenv_values
+import re
 
 def load_env_variables(file_path=None):
     """
@@ -212,3 +213,12 @@ def find_all_values_for_key(nested_object, key, current_path=''):
                 values.update(find_all_values_for_key(item, key, new_path))
 
     return values
+
+
+def replace_nth(string, sub, wanted, n):
+    pattern = re.compile(sub)
+    where = [m for m in pattern.finditer(string)][n-1]
+    before = string[:where.start()]
+    after = string[where.end():]
+    newString = before + wanted + after
+    return newString

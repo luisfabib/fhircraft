@@ -75,7 +75,7 @@ components:
           x-fhirpath: Procedure.reasonCode
           items:
             $ref: '#/components/schemas/Coding'
-            x-fhirpath: Procedure.reasonCode.coding
+            x-fhirpath: $this.coding
             x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-cancer-disorder-vs
         terminationReason:
           $ref: '#/components/schemas/Coding'
@@ -86,7 +86,6 @@ components:
           x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")
           items:
             type: object
-            x-fhirpath: Procedure.extension("http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality-and-technique")           
             properties:
               modality: 
                 $ref: '#/components/schemas/Coding'
@@ -119,7 +118,7 @@ components:
           x-fhirpath: Procedure.bodySite
           items:
             $ref: '#/components/schemas/Coding'
-            x-fhirpath: Procedure.bodySite.coding
+            x-fhirpath: $this.coding
             x-binding: http://hl7.org/fhir/us/mcode/ValueSet/mcode-radiotherapy-treatment-location-vs
 openapi: 3.1.0
 info:
