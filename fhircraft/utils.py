@@ -222,3 +222,13 @@ def replace_nth(string, sub, wanted, n):
     after = string[where.end():]
     newString = before + wanted + after
     return newString
+
+def is_list_of_lists(variable):
+    if isinstance(variable, list) and all(isinstance(i, list) for i in variable):
+        return True
+    return False
+
+def flatten_list_of_lists(list_of_lists):
+    if not is_list_of_lists(list_of_lists):
+        raise ValueError("Input is not a list of lists")
+    return [item for sublist in list_of_lists for item in sublist]

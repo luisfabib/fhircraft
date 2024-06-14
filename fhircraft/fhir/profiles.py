@@ -492,7 +492,7 @@ class ProfiledResourceFactory:
             __slicing__: ClassVar[List[FHIRSlicing]] = slicing
             __constraints__: ClassVar[List[FHIRProfileConstraint]] = constraints
             __extensions__: ClassVar[List[FHIRExtension]] = extensions
-            resourceType: Optional[str]
+            resourceType: Optional[str] = base_model.__name__
             meta: MetaType = Meta(profile=[profile_url], versionId=profile_definition.version)
             
             class Config:

@@ -140,7 +140,7 @@ components:
                 type: string
                 x-fhirpath: $this.use
         identifier:
-          type: array
+          type: object
           x-fhirpath: Patient.identifier
           properties:
             use: 

@@ -1,6 +1,7 @@
 import sys
 import logging
 
+from fhir.resources.R4B.fhirtypesvalidators import MODEL_CLASSES as FHIR_BASE_RESOURCES
 import ply.lex
 
 
@@ -51,7 +52,8 @@ class FhirPathLexer:
         'last': 'LAST',
         'tail': 'TAIL',
         'single': 'SINGLE',    
-        'extension': 'EXTENSION',                        
+        'extension': 'EXTENSION',      
+        **{resource: 'RESOURCE_BASE' for resource in FHIR_BASE_RESOURCES}                  
     }
 
     states = [ ('singlequote', 'exclusive'),
@@ -59,7 +61,7 @@ class FhirPathLexer:
                ('backquote', 'exclusive') ]
 
     # List of token names
-    tokens = list(reserved_words.values()) + [
+    tokens = list(set(reserved_words.values())) + [
         'ID',
         'NAMED_OPERATOR',
         'NUMBER',
@@ -173,4 +175,5 @@ class FhirPathLexer:
 
     def t_error(self, t):
         raise FhirPathLexerError('Error on line %s, col %s: Unexpected character: %s ' % (t.lexer.lineno, t.lexpos - t.lexer.latest_newline, t.value[0]))
+    
 

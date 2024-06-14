@@ -26,8 +26,6 @@ class FhirPathParser:
         if self.__doc__ is None:
             raise JsonPathParserError(
                 'Docstrings have been removed! By design of PLY, '
-                'fhirpath-rw requires docstrings. You must not use '
-                'PYTHONOPTIMIZE=2 or python -OO.'
             )
 
         self.debug = debug
@@ -92,6 +90,10 @@ class FhirPathParser:
         "fhirpath : '$'"
         p[0] = Root()
 
+    def p_fhirpath_base_resource_root(self, p):
+        "fhirpath : RESOURCE_BASE"
+        p[0] = Root()
+        
     def p_fhirpath_named_operator(self, p):
         "fhirpath : NAMED_OPERATOR"
         if p[1] == 'this':
@@ -104,7 +106,7 @@ class FhirPathParser:
             
     def p_fhirpath_where(self, p):
         """fhirpath : fhirpath '.' WHERE '(' fhirpath '=' string ')' """
-        p[0] = Where(p[1], p[5], p[7])
+        p[0] = Child(p[1], Where(p[5], p[7]))
         
     def p_fhirpath_extension(self, p):
         """fhirpath : fhirpath '.' EXTENSION '(' url ')' """
@@ -173,38 +175,6 @@ class FhirPathParser:
     def p_fhirpath_parens(self, p):
         "fhirpath : '(' fhirpath ')'"
         p[0] = p[2]
-
-
-    # def p_arguments_multiple(self, p):
-    #     """arguments : argument ',' arguments"""
-    #     p[0] = [p[1]] + p[3]
-
-    # def p_arguments_single(self, p):
-    #     """arguments : argument"""
-    #     p[0] = [p[1]]
-
-    # def p_argument(self, p):
-    #     """argument : condition
-    #                 | value"""
-    #     p[0] = p[1]
-
-    # def p_condition(self, p):
-    #     """condition : fhirpath '=' value"""
-    #     p[0] = ('condition', p[1], p[3])
-
-        
-    # def p_value_string(self, p):
-    #     """value : STRING"""
-    #     p[0] = p[1]
-
-    # def p_value_number(self, p):
-    #     """value : NUMBER"""
-    #     p[0] = p[1]
-
-    # def p_value_identifier(self, p):
-    #     """value : IDENTIFIER"""
-    #     p[0] = p[1]
-        
 
     def p_idx(self, p):
         "idx : NUMBER"

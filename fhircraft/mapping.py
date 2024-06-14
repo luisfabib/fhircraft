@@ -117,7 +117,8 @@ def map_jsonpath_values_to_fhirpaths(response: dict, schema: Schema) -> dict:
                 items[fhir_path] = match[0].value
     return items
 
-
+import fhircraft.fhir.parser as fhirpath
+from rich import print as rprint
 def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str, enpoint: str, method: str, status_code: str, profile_url: Optional[str] = None) -> Any:
     
     specification = load_openapi(openapi_file_location)      
@@ -134,23 +135,29 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
 
     # Construct FHIR resource with propulated fields according to the profile constraints 
     resource = profile.construct_with_profiled_elements()
-    navigator = FHIRPathNavigator(resource)
+    data = json.loads(resource.json())
 
     # Enable tracking of changes in slices (to determine which slices were given values)
     track_slice_changes(resource, True)
 
     # Set the values of the API response
-    for fhirpath, value in fhir_resource_values.items():
-        navigator.set_value(fhirpath, value)        
-        navigator.get_value(join_fhirpath(fhirpath, 'single()'))
-
+    for fhir_path, value in fhir_resource_values.items():
+        print('SET', fhir_path, '>', value)
+        fhirpath.parse(fhir_path).update_or_create(resource, value)        
+    
+    
     # Disable tracking of changes in slices
     track_slice_changes(resource, False)
     
     # Cleanup resource and remove unused fields
     resource = profile.clean_elements_and_slices(resource)
+    
+
+    rprint(resource.json(indent=3))
+    
     # Cleanup the resource from empty structures to be valid
     resource = profile.parse_obj(remove_none_dicts(resource.dict()))
+
 
     validate_profiled_resource(resource)
     

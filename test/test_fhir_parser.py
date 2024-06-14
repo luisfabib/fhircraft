@@ -1,6 +1,6 @@
 import pytest
 
-from fhircraft.fhir.fhirpath import Child, Descendants, Fields, Index, Slice, Where, Extension, Single
+from fhircraft.fhir.fhirpath import Child, Root, Fields, Index, Slice, Where, Extension, Single
 from fhircraft.fhir.lexer import FhirPathLexer
 from fhircraft.fhir.parser import FhirPathParser
 
@@ -24,16 +24,16 @@ parser_test_cases = (
     # Nested
     # ------
     #
+    ("Observation.code", Child(Root(), Fields("code"))),
+    ("Observation.code[1]", Child(Child(Root(), Fields("code")), Index(1))),
+    ('Observation.component.where(code.coding.code="test")', Where(Child(Root(), Fields("component")), Child(Child(Fields("code"), Fields("coding")), Fields("code")), "test")),
+    ('Observation.component.where(code.coding.code="test").where(code.coding.system="test2")',  Where(Where(Child(Root(), Fields("component")), Child(Child(Fields("code"), Fields("coding")), Fields("code")), "test"), Child(Child(Fields("code"), Fields("coding")), Fields("system")), "test2")),
     ("foo.baz", Child(Fields("foo"), Fields("baz"))),
-    ("foo.baz[1]", Child(Child(Fields("foo"), Fields("baz")), Index(1))),
-    ("foo.baz,bizzle", Child(Fields("foo"), Fields("baz", "bizzle"))),
-    ('foo.where(bar.bizzle="test")', Where(Fields("foo"), Child(Fields("bar"), Fields("bizzle")), "test")),
-    ("foo.baz", Child(Fields("foo"), Fields("baz"))),
-    ("foo.baz.first()", Child(Child(Fields("foo"), Fields("baz")), Index(0))),
-    ("foo.baz.last()", Child(Child(Fields("foo"), Fields("baz")), Index(-1))),
-    ("foo.baz.tail()", Child(Child(Fields("foo"), Fields("baz")), Slice(0,-1))),
-    ("foo.baz.single()", Child(Child(Fields("foo"), Fields("baz")), Single())),
-    ('foo.extension("http://domain.org/extension")', Extension(Fields("foo"), "http://domain.org/extension")),
+    ("Observation.identifier.first().value", Child(Child(Child(Root(), Fields("identifier")), Index(0)), Fields("value"))),
+    ("Observation.identifier.last().value", Child(Child(Child(Root(), Fields("identifier")), Index(-1)), Fields("value"))),
+    ("Observation.identifier.tail().value", Child(Child(Child(Root(), Fields("identifier")), Slice(0,-1)), Fields("value"))),
+    ("Observation.identifier.single().value", Child(Child(Child(Root(), Fields("identifier")), Single()), Fields("value"))),
+    ('Observation.extension("http://domain.org/extension")', Extension(Root(), "http://domain.org/extension")),
 )
 
 

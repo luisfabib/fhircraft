@@ -1,6 +1,9 @@
 import logging
 from itertools import *  # noqa
 from fhircraft.fhir.lexer import FhirPathLexer
+from fhircraft.utils import ensure_list, flatten_list_of_lists, is_list_of_lists
+from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
+from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 
 # Get logger name
 logger = logging.getLogger(__name__)
@@ -265,7 +268,6 @@ class Child(FHIRPath):
         Extra special case: auto ids do not have children,
         so cut it off right now rather than auto id the auto id
         """
-
         return [submatch
                 for subdata in self.left.find(datum)
                 if not isinstance(subdata, AutoIdForDatum)
@@ -284,12 +286,14 @@ class Child(FHIRPath):
                 # Extra special case: auto ids do not have children,
                 # so cut it off right now rather than auto id the auto id
                 continue
+
             for submatch in self.right.find_or_create(subdata):
                 submatches.append(submatch)
         return submatches
 
     def update_or_create(self, data, val):
-        for datum in self.left.find_or_create(data):
+        for datum in self.left.find_or_create(data):     
+            print('UPDATING', self.right, f'({type( self.right)})')
             self.right.update_or_create(datum.value, val)
         return _clean_list_keys(data)
 
@@ -337,19 +341,20 @@ class Parent(FHIRPath):
 
 class Where(FHIRPath):
 
-    def __init__(self, left, descendant, value):
-        self.left = left
+    def __init__(self, descendant, value):
         self.descendant = descendant
         self.value = value
 
-    def find(self, data):
-        return [
-            DatumInContext(value=subdatum, context=match, path=match.context)
-                for match in self.left.find(data)
-                    for subdatum in match.value 
-                        for match in self.descendant.find(subdatum)
-                            if match and str(match.value) == str(self.value)
-        ]
+    def find(self, datum):
+        print(f'FIND WHERE({self.descendant}="{self.value}")')
+        matches = DatumInContext(value=[
+                item
+                for item in datum.value
+                    for descendant_match in self.descendant.find(item)
+                        for condition_value in ensure_list(descendant_match.value)
+                            if condition_value is not None and condition_value == str(self.value)
+        ], context=datum, path=datum.path)
+        return [matches] 
 
     def update(self, data, val):
         for datum in self.find(data):
@@ -382,11 +387,12 @@ class Extension(FHIRPath):
         self.url = url
 
     def find(self, data):
+        print('FIND EXTENSION', self.url)
         return [
-            DatumInContext(value=subdatum, context=match, path=match.context)
+            DatumInContext(value=extension, context=match, path=match.context)
                 for match in self.left.find(data)
-                    for subdatum in match.value 
-                        if subdatum and subdatum.get('url') == self.url
+                    for extension in match.value.extension
+                        if extension and isinstance(extension, get_fhir_model_class('Extension')) and extension.url == self.url
         ]
 
     def update(self, data, val):
@@ -598,16 +604,44 @@ class Fields(FHIRPath):
     def get_field_datum(datum, field, create):
         if field == auto_id_field:
             return AutoIdForDatum(datum)
-        try:
-            field_value = datum.value.get(field, NOT_SET)
-            if field_value is NOT_SET:
-                if create:
-                    datum.value[field] = field_value = {}
+        if isinstance(datum.value, list):
+            field_value = [getattr(value, field, None) for value in datum.value]
+            empty_value = all([val is None for val in field_value])
+        else:
+            field_value = getattr(datum.value, field, None)
+            empty_value = field_value is None
+        if empty_value:
+            if create:
+                if isinstance(datum.value, list):
+                    example_value = datum.value[0]
                 else:
-                    return None
-            return DatumInContext(field_value, path=Fields(field), context=datum)
-        except (TypeError, AttributeError):
-            return None
+                    example_value = datum.value
+                field_info = example_value.__fields__.get(field)
+                field_type = get_fhir_type_name(field_info.type_)
+                try:
+                    model = get_fhir_model_class(field_type)
+                    print('CREATE PYDANTIC', f'{datum.full_path}.{field}')
+                except KeyError:
+                    if is_list_type(field_info):
+                        setattr(datum.value, field, [])
+                        return DatumInContext(getattr(datum.value, field), path=Fields(field), context=datum)
+                    else:
+                        return None         
+                model.validate_assignment = False
+                field_value =  model.construct()
+                
+                if is_list_type(field_info):
+                    field_value = [field_value]              
+                if isinstance(datum.value, list):
+                    for val in datum.value:
+                        setattr(val, field, field_value)
+                else:
+                    setattr(datum.value, field, field_value)
+                    
+            else:
+                return None
+        return DatumInContext(field_value, path=Fields(field), context=datum)
+
 
     def reified_fields(self, datum):
         if '*' not in self.fields:
@@ -627,8 +661,10 @@ class Fields(FHIRPath):
 
     def _find_base(self, datum, create):
         datum = DatumInContext.wrap(datum)
-        field_data = [self.get_field_datum(datum, field, create)
-                      for field in self.reified_fields(datum)]
+        field_data = [
+            self.get_field_datum(datum, field, create)
+                for field in self.reified_fields(datum)
+        ]
         return [fd for fd in field_data if fd is not None]
 
     def update(self, data, val):
@@ -638,15 +674,23 @@ class Fields(FHIRPath):
         return self._update_base(data, val, create=True)
 
     def _update_base(self, data, val, create):
-        if data is not None:
+        print('Update try', data is not None, val)                                    
+        if data is not None: 
+            if isinstance(data, list):
+                return [self._update_base(d, val, create) for d in data]
             for field in self.reified_fields(DatumInContext.wrap(data)):
-                if create and field not in data:
-                    data[field] = {}
-                if type(data) is not bool and field in data:
+                if create:
+                    if not hasattr(data, field):
+                        print('Update Create', data, field)
+                        data[field] = {}
+                if type(data) is not bool and hasattr(data, field):
                     if hasattr(val, '__call__'):
-                        data[field] = val(data[field], data, field)
+                        setattr(data, field, val(getattr(data, field), data, field))
                     else:
-                        data[field] = val
+                        if isinstance(getattr(data, field), list) and not isinstance(val, list):
+                            val = [val]     
+                        print('Update', field, val)                            
+                        setattr(data, field, val)
         return data
 
     def filter(self, fn, data):
@@ -692,16 +736,18 @@ class Index(FHIRPath):
     def find(self, datum):
         return self._find_base(datum, create=False)
 
-    def find_or_create(self, datum):
+    def find_or_create(self, datum):   
         return self._find_base(datum, create=True)
 
     def _find_base(self, datum, create):
+        print('FIND INDEX', datum.path,  self.index)
         datum = DatumInContext.wrap(datum)
         if create:
             if datum.value == {}:
                 datum.value = _create_list_key(datum.value)
             self._pad_value(datum.value)
         if datum.value and len(datum.value) > self.index:
+            print('ACCESSING INDEX', self.index)
             return [DatumInContext(datum.value[self.index], path=self, context=datum)]
         else:
             return []
@@ -713,6 +759,7 @@ class Index(FHIRPath):
         return self._update_base(data, val, create=True)
 
     def _update_base(self, data, val, create):
+        print('UPDATE INDEX', data,  self.index, val)
         if create:
             if data == {}:
                 data = _create_list_key(data)
@@ -720,6 +767,7 @@ class Index(FHIRPath):
         if hasattr(val, '__call__'):
             data[self.index] = val.__call__(data[self.index], data, self.index)
         elif len(data) > self.index:
+            print('ACCESSING INDEX', self.index)
             data[self.index] = val
         return data
 
@@ -738,10 +786,16 @@ class Index(FHIRPath):
         return '%s(index=%r)' % (self.__class__.__name__, self.index)
 
     def _pad_value(self, value):
-        if len(value) <= self.index:
+        if len(value) <= self.index:          
             pad = self.index - len(value) + 1
-            value += [{} for __ in range(pad)]
-
+            if len(value)>0 and hasattr(value[0].__class__, 'construct'):
+                print('Create Pydantic model @ Index', f'[{self.index}]') 
+                value += [value[0].__class__.construct() for __ in range(pad)]   
+            else:
+                print('Create None @ Index', f'[{self.index}]')  
+                value += [None for __ in range(pad)]     
+            return value
+        
     def __hash__(self):
         return hash(self.index)
 

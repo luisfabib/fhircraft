@@ -30,6 +30,8 @@ token_test_cases = (
     ("tail", (("tail", "TAIL"),)),
     ("single", (("single", "SINGLE"),)),
     ("extension", (("extension", "EXTENSION"),)),
+    ("Observation", (("Observation", "RESOURCE_BASE"),)),
+    ("CodeableConcept", (("CodeableConcept", "RESOURCE_BASE"),)),
 )
 
 
