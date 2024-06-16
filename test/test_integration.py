@@ -1,5 +1,5 @@
 from fhircraft.fhir.profiles import construct_profiled_resource_model, validate_profiled_resource
-from fhircraft.fhir.parser import parse
+from fhircraft.fhir.path.parser import parse
 from fhircraft.mapping import convert_response_from_api_to_fhir, convert_response_from_fhir_to_api
 from fhircraft.utils import load_file
 from pydantic.v1 import ValidationError

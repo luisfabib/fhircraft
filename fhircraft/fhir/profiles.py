@@ -6,13 +6,13 @@ from fhir.resources.R4B.fhirtypes import MetaType
 from fhir.resources.R4B.meta import Meta
 
 from fhircraft.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts
-import fhircraft.fhir.parser as fhirpath
 
 from pydantic.v1 import ValidationError, create_model, validate_model, Extra
 from pydantic.v1.error_wrappers import ErrorWrapper
 from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_origin
 from dataclasses import dataclass, field
-from fhircraft.fhir.fhirpath import split_fhirpath, join_fhirpath
+from fhircraft.fhir.path.utils import split_fhirpath, join_fhirpath
+from fhircraft.fhir.path import fhirpath
 import datetime 
 import json
 import requests

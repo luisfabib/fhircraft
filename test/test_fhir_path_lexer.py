@@ -1,6 +1,6 @@
 import pytest
 
-from fhircraft.fhir.lexer import FhirPathLexer, FhirPathLexerError
+from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 
 token_test_cases = (
     ("$", (("$", "$"),)),

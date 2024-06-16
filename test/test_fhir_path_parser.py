@@ -1,8 +1,8 @@
 import pytest
 
-from fhircraft.fhir.fhirpath import Child, Root, Fields, Index, Slice, Where, Extension, Single, TypeChoice
-from fhircraft.fhir.lexer import FhirPathLexer
-from fhircraft.fhir.parser import FhirPathParser
+from fhircraft.fhir.path.engine import Child, Root, Fields, Index, Slice, Where, Extension, Single, TypeChoice
+from fhircraft.fhir.path.lexer import FhirPathLexer
+from fhircraft.fhir.path.parser import FhirPathParser
 
 # Format: (string, expected_object)
 parser_test_cases = (

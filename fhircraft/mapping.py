@@ -1,11 +1,9 @@
 from typing import Union, Any, Optional, Tuple, List, Dict
-
-from dataclasses import dataclass
 from fhircraft.fhir.profiles import construct_profiled_resource_model, track_slice_changes, validate_profiled_resource
-from fhircraft.fhir.fhirpath import join_fhirpath, FHIRPathError
-from fhircraft.utils import remove_none_dicts, ensure_list, replace_nth
+from fhircraft.fhir.path import fhirpath, FHIRPathError
+from fhircraft.fhir.path.utils import join_fhirpath
 from fhircraft.openapi.parser import load_openapi, traverse_and_replace_references, extract_json_schema
-import fhircraft.fhir.parser as fhirpath
+from fhircraft.utils import remove_none_dicts, ensure_list, replace_nth
 from openapi_pydantic import Schema
 from jsonpath_ng.ext import parse
 import datetime

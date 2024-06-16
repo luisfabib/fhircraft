@@ -4,8 +4,8 @@ import os.path
 
 import ply.yacc
 
-from fhircraft.fhir.fhirpath import *
-from fhircraft.fhir.lexer import FhirPathLexer
+from fhircraft.fhir.path.engine import *
+from fhircraft.fhir.path.lexer import FhirPathLexer
 
 logger = logging.getLogger(__name__)
 
