@@ -1,5 +1,5 @@
 from fhircraft.mapping import  merge_schemas, map_json_paths_to_fhir_paths
-from fhircraft.fhir.path import FHIRPathError
+from fhircraft.fhir.fhirpath import FHIRPathError
 from openapi_pydantic import OpenAPI, Schema
 import pytest
 

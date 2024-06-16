@@ -65,10 +65,12 @@ class FhirPathLexer:
         'ID',
         'NAMED_OPERATOR',
         'NUMBER',
+        'TYPE_CHOICE',
     ]
 
     # Regular expression rules for simple tokens
     t_ignore = ' \t'
+    t_TYPE_CHOICE = r'\[x\]'
     
     # Complex token definitions with actions
     def t_ID(self, t):

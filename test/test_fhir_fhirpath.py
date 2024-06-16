@@ -1,6 +1,6 @@
 import pytest
 
-from fhircraft.fhir.fhirpath import Child, Root, Fields, Index, Slice, Where, Extension, Single
+from fhircraft.fhir.fhirpath import Child, Root, Fields, Index, Slice, Where, Extension, Single, split_fhirpath, join_fhirpath
 from fhircraft.fhir.parser import parse
 from  fhir.resources.R4B.observation import Observation 
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
@@ -46,7 +46,16 @@ observation = Observation(**{
                     'system': 'https://system.org'
                 }]
             },
-            'valueString': 'component-1-value'
+            'valueString': 'component-1-value-1'
+        },
+        {
+            'code': {
+                'coding': [{
+                    'code': 'component-1',
+                    'system': 'https://system.org'
+                }]
+            },
+            'valueString': 'component-1-value-2'
         },
         {
             'code': {
@@ -55,7 +64,12 @@ observation = Observation(**{
                     'system': 'https://system.org'
                 }]
             },
-            'valueString': 'component-2-value'
+            'valueCodeableConcept': {
+                'coding': [{
+                    'code': 'component-2-code',
+                    'system': 'https://system.org'
+                }]
+            },
         }
     ]
 })
@@ -152,8 +166,10 @@ fhirpath_find_test_cases = (
     ('Observation.fhir_comments', observation, 'Commenting'),
     ('Observation.extension("http://domain.org/extension-1").valueString', observation, 'extension-value-1'),
     ('Observation.extension("http://domain.org/extension-1").extension("http://domain.org/extension-2").valueString', observation, 'extension-value-2'),
-    ('Observation.component.where(code.coding.code="component-1").valueString', observation, 'component-1-value'),
-    ('Observation.component.where(code.coding.system="https://system.org").where(code.coding.code="component-1").valueString', observation, 'component-1-value'),
+    ('Observation.component.where(code.coding.code="component-1")[0].value[x]', observation, 'component-1-value-1'),
+    ('Observation.component.where(code.coding.code="component-1")[0].valueString', observation, 'component-1-value-1'),
+    ('Observation.component.where(code.coding.code="component-1")[1].valueString', observation, 'component-1-value-2'),
+    ('Observation.component.where(code.coding.system="https://system.org").where(code.coding.code="component-2").valueCodeableConcept.coding.code', observation, 'component-2-code'),
 )
 
 @pytest.mark.parametrize("path_string, data_object, expected_value", fhirpath_find_test_cases)
@@ -204,3 +220,57 @@ def test_fhirpath_create(path_string, update_value, getattr_fcn):
     new_resource = get_fhir_model_class(path_string.split('.',1)[0]).construct()
     parse(path_string).update_or_create(new_resource, update_value)
     assert getattr_fcn(new_resource) == update_value
+
+class Test_SplitFhirPath:
+
+    def test_split_simple_paths(self):
+        result = split_fhirpath("patient.name.family")
+        assert result == ["patient", "name", "family"]
+
+    def test_handle_multiple_segments(self):
+        result = split_fhirpath("patient.name.family.given")
+        assert result == ["patient", "name", "family", "given"]
+
+    def test_return_list_of_segments(self):
+        result = split_fhirpath("patient.name.family")
+        assert isinstance(result, list)
+
+    def test_handle_nested_functions(self):
+        result = split_fhirpath("patient.name.family.where(family='Smith').given")
+        assert result == ["patient", "name", "family", "where(family='Smith')", "given"]
+
+    def test_split_paths_with_dots_in_quotes(self):
+        result = split_fhirpath("patient.name.family.where(family='Smith.Jones').given")
+        assert result == ["patient", "name", "family", "where(family='Smith.Jones')", "given"]
+
+    def test_empty_input_returns_empty_list(self):
+        result = split_fhirpath("")
+        assert result == ['']
+        
+
+class Test_JoinFhirPath:
+
+    def test_split_simple_paths(self):
+        result = join_fhirpath("patient", "name", "family")
+        assert result == "patient.name.family"
+
+    def test_return_string(self):
+        result = join_fhirpath("patient", "name", "family")
+        assert isinstance(result, str)
+
+    def test_handle_nested_functions(self):
+        result = join_fhirpath("patient", "name", "family", "where(family='Smith')", "given")
+        assert result == "patient.name.family.where(family='Smith').given"
+
+    def test_handle_paths_with_empty_segments(self):
+        result = join_fhirpath("patient", "name", "", "family",  "", "where(family='Smith.Jones')", "given")
+        assert result == "patient.name.family.where(family='Smith.Jones').given"
+
+    def test_handle_paths_with_dots_in_quotes(self):
+        result = join_fhirpath("patient", "name", "family", "where(family='Smith.Jones')", "given")
+        assert result == "patient.name.family.where(family='Smith.Jones').given"
+
+    def test_handle_segments_with_spurious_dots(self):
+        result = join_fhirpath("patient.", "...name", ".family", ".where(family='Smith').", ".given")
+        assert result == "patient.name.family.where(family='Smith').given"
+        

@@ -4,7 +4,6 @@ import os.path
 
 import ply.yacc
 
-from jsonpath_ng.exceptions import JsonPathParserError
 from fhircraft.fhir.fhirpath import *
 from fhircraft.fhir.lexer import FhirPathLexer
 
@@ -15,6 +14,9 @@ def parse(string):
     return FhirPathParser().parse(string)
 
 
+class FhirPathParserError(Exception):
+    pass
+
 class FhirPathParser:
     """
     An LALR-parser for FHIRPath
@@ -24,7 +26,7 @@ class FhirPathParser:
 
     def __init__(self, debug=False, lexer_class=None):
         if self.__doc__ is None:
-            raise JsonPathParserError(
+            raise FhirPathParserError(
                 'Docstrings have been removed! By design of PLY, '
             )
 
@@ -69,8 +71,8 @@ class FhirPathParser:
 
     def p_error(self, t):
         if t is None:
-            raise JsonPathParserError('Parse error near the end of string!')
-        raise JsonPathParserError(f'Parse error at {t.lineno}:{t.col} near token {t.value} ({t.type}): \n\t\t     {self.string}\n\t\t     {" "*t.col}^')
+            raise FhirPathParserError(f'Parse error near the end of string "{self.string}"!')
+        raise FhirPathParserError(f'Parse error at {t.lineno}:{t.col} near token {t.value} ({t.type}): \n\t\t     {self.string}\n\t\t     {" "*t.col}^')
 
     def p_fhirpath_binop(self, p):
         """fhirpath : fhirpath '.' fhirpath
@@ -101,7 +103,7 @@ class FhirPathParser:
         elif p[1] == 'parent':
             p[0] = Parent()
         else:
-            raise JsonPathParserError('Unknown named operator `%s` at %s:%s'
+            raise FhirPathParserError('Unknown named operator `%s` at %s:%s'
                                       % (p[1], p.lineno(1), p.lexpos(1)))
             
     def p_fhirpath_where(self, p):
@@ -148,6 +150,10 @@ class FhirPathParser:
         "fhirpath : '[' idx ']'"
         p[0] = p[2]
 
+    def p_fhirpath_type_choice(self, p):
+        "fhirpath : string TYPE_CHOICE"
+        p[0] = TypeChoice(p[1])
+        
     def p_fhirpath_slice(self, p):
         "fhirpath : '[' slice ']'"
         p[0] = p[2]

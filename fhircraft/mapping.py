@@ -2,14 +2,14 @@ from typing import Union, Any, Optional, Tuple, List, Dict
 
 from dataclasses import dataclass
 from fhircraft.fhir.profiles import construct_profiled_resource_model, track_slice_changes, validate_profiled_resource
-from fhircraft.fhir.path import FHIRPathNavigator, join_fhirpath, split_fhirpath, FHIRPathError
+from fhircraft.fhir.fhirpath import join_fhirpath, FHIRPathError
 from fhircraft.utils import remove_none_dicts, ensure_list, replace_nth
 from fhircraft.openapi.parser import load_openapi, traverse_and_replace_references, extract_json_schema
+import fhircraft.fhir.parser as fhirpath
 from openapi_pydantic import Schema
 from jsonpath_ng.ext import parse
 import datetime
 import itertools
-import logging
 import json
     
     
@@ -37,14 +37,14 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
 
     X_FHIRPATH = 'x-fhirpath'
     
-    def _parse_and_join_fhir_path(parent_fhirpath, fhirpath):    
-        if not parent_fhirpath:
-            return fhirpath            
-        if fhirpath.startswith('$this'):
-            fhirpath = join_fhirpath(parent_fhirpath, fhirpath.replace('$this', ''))
-        if parent_fhirpath not in fhirpath:
-            raise FHIRPathError(f'Incompatible {X_FHIRPATH} definition for JSON element {current_json_path}:\n"{fhirpath}" cannot be a child element of "{parent_fhirpath}"')
-        return fhirpath
+    def _parse_and_join_fhir_path(parent_fhir_path, fhir_path):    
+        if not parent_fhir_path:
+            return fhir_path            
+        if fhir_path.startswith('$this'):
+            fhir_path = join_fhirpath(parent_fhir_path, fhir_path.replace('$this', ''))
+        if parent_fhir_path not in fhir_path:
+            raise FHIRPathError(f'Incompatible {X_FHIRPATH} definition for JSON element {current_json_path}:\n"{fhir_path}" cannot be a child element of "{parent_fhir_path}"')
+        return fhir_path
 
     paths = {}
     
@@ -66,7 +66,7 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
     node_type = schema.get('type')
     has_properties = bool(schema.get('properties'))
     has_items = bool(schema.get('has_items'))
-    fhir_path = _parse_and_join_fhir_path(current_fhir_path, schema.get('x-fhirpath', current_fhir_path or None)) 
+    fhir_path = _parse_and_join_fhir_path(current_fhir_path, schema.get(X_FHIRPATH, current_fhir_path or None)) 
 
     if node_type == 'object' or has_properties:
         properties = schema.get('properties', {})
@@ -117,8 +117,6 @@ def map_jsonpath_values_to_fhirpaths(response: dict, schema: Schema) -> dict:
                 items[fhir_path] = match[0].value
     return items
 
-import fhircraft.fhir.parser as fhirpath
-from rich import print as rprint
 def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str, enpoint: str, method: str, status_code: str, profile_url: Optional[str] = None) -> Any:
     
     specification = load_openapi(openapi_file_location)      
@@ -135,7 +133,6 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
 
     # Construct FHIR resource with propulated fields according to the profile constraints 
     resource = profile.construct_with_profiled_elements()
-    data = json.loads(resource.json())
 
     # Enable tracking of changes in slices (to determine which slices were given values)
     track_slice_changes(resource, True)
@@ -145,15 +142,11 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
         print('SET', fhir_path, '>', value)
         fhirpath.parse(fhir_path).update_or_create(resource, value)        
     
-    
     # Disable tracking of changes in slices
     track_slice_changes(resource, False)
     
     # Cleanup resource and remove unused fields
     resource = profile.clean_elements_and_slices(resource)
-    
-
-    rprint(resource.json(indent=3))
     
     # Cleanup the resource from empty structures to be valid
     resource = profile.parse_obj(remove_none_dicts(resource.dict()))
@@ -180,7 +173,6 @@ def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
             value = str(value)
         return value
     
-    navigator = FHIRPathNavigator(resource)
     # Create the map JSONpath <-> FHIRpath
     jsonpath_to_fhirmap_map = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True)))
     
@@ -192,8 +184,9 @@ def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
         # Check if there are arrays in the JSONPath
         array_splices = json_path.count('[*]')
         if array_splices>0:
-            # Check how many elements in total are in the flattened (sub)arrays
-            total_elements = len(navigator.get_value(fhir_path.replace('[*]','')) or [])
+            # Check how many elements in total are in the flattened (sub)arrays            
+            total_elements = len(fhirpath.parse(fhir_path.replace('[*]','')).get_value(resource)  or [])
+            print(fhir_path.replace('[*]',''), len(fhirpath.parse(fhir_path.replace('[*]','')).get_value(resource)  or []))
             # Create individual JSON/FHIR-Paths for each of the items 
             for indices in itertools.product(*[range(total_elements)]*array_splices):
                 item_fhir_path, item_json_path = fhir_path, json_path
@@ -202,13 +195,15 @@ def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
                     item_fhir_path = replace_nth(item_fhir_path, r'\[\*\]', f'[{index}]', n)
                     item_json_path = replace_nth(item_json_path, r'\[\*\]', f'[{index}]', n)
                 # Find the element item in the response
-                value = navigator.get_value(item_fhir_path)
+                value = fhirpath.parse(item_fhir_path).get_value(resource) 
                 if value is not None:
+                    print(f'SET {item_json_path} > {value}')
                     items[item_json_path] = _parse_types(value)
         else:
             # Otherwise just look for the value at the JSON-path
-            value = navigator.get_value(fhir_path)
+            value = fhirpath.parse(fhir_path).get_value(resource) 
             if value is not None:
+                print(f'SET {json_path} > {value}')
                 # Assign it to the corresponding FHIR-path if there is a value 
                 items[json_path] = _parse_types(value)
     return items
@@ -232,9 +227,10 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
     
     # Map FHIRpath valules to the corresponding JSONpaths
     json_path_values = map_fhirpath_values_to_jsonpaths(fhir_resource, schema)
-
+    
     data = {}
     # Set the mapped values from the FHIR resource as well as the provided internal values 
+
     for json_path, value in (json_path_values | internal_values).items():
         data = parse(json_path).update_or_create(data, value)
     return data

@@ -100,13 +100,16 @@ components:
           properties:
             system:
               type: string
+              x-fhirpath: null
             code:
               type: string
               x-fhirpath: Patient.extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex").valueCode
             display:
               type: string
+              x-fhirpath: null
             version:
               type: string
+              x-fhirpath: null
         names:
           type: array
           x-fhirpath: Patient.name

@@ -1,6 +1,6 @@
 import pytest
 
-from fhircraft.fhir.fhirpath import Child, Root, Fields, Index, Slice, Where, Extension, Single
+from fhircraft.fhir.fhirpath import Child, Root, Fields, Index, Slice, Where, Extension, Single, TypeChoice
 from fhircraft.fhir.lexer import FhirPathLexer
 from fhircraft.fhir.parser import FhirPathParser
 
@@ -34,6 +34,7 @@ parser_test_cases = (
     ("Observation.identifier.tail().value", Child(Child(Child(Root(), Fields("identifier")), Slice(0,-1)), Fields("value"))),
     ("Observation.identifier.single().value", Child(Child(Child(Root(), Fields("identifier")), Single()), Fields("value"))),
     ('Observation.extension("http://domain.org/extension")', Extension(Root(), "http://domain.org/extension")),
+    ("Observation.component.value[x]", Child(Child(Root(), Fields('component')), TypeChoice('value'))),
 )
 
 

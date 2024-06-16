@@ -1,19 +1,18 @@
 
 from fhir.resources.R4B.elementdefinition import ElementDefinition
 from fhir.resources.R4B.structuredefinition import StructureDefinition
-from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.R4B.fhirtypes import MetaType
 from fhir.resources.R4B.meta import Meta
 
 from fhircraft.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts
+import fhircraft.fhir.parser as fhirpath
 
 from pydantic.v1 import ValidationError, create_model, validate_model, Extra
 from pydantic.v1.error_wrappers import ErrorWrapper
 from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_origin
 from dataclasses import dataclass, field
-from fhircraft.fhir.path import FHIRPathNavigator, split_fhirpath, join_fhirpath
-from copy import deepcopy
+from fhircraft.fhir.fhirpath import split_fhirpath, join_fhirpath
 import datetime 
 import json
 import requests
@@ -222,12 +221,12 @@ def set_constraints(resource):
         resource: The FHIR resource
     """
     profile = resource.__class__
-    navigator = FHIRPathNavigator(resource)
+    
     for constraint in profile.__constraints__:
         if constraint.pattern:
-            navigator.set_value(constraint.path, constraint.pattern)
+            fhirpath.parse(constraint.path).update_or_create(resource, constraint.pattern)
         if constraint.fixedValue:
-            navigator.set_value(constraint.path, constraint.fixedValue)
+            fhirpath.parse(constraint.path).update_or_create(resource, constraint.fixedValue)            
     return resource
 
 
@@ -241,7 +240,6 @@ def initialize_slices(resource):
         resource: The FHIR resource
     """
     profile = resource.__class__
-    navigator = FHIRPathNavigator(resource)
     # Go over all slices
     for slicing in profile.__slicing__:
         if '[x]' in slicing.path: continue        
@@ -263,7 +261,7 @@ def initialize_slices(resource):
                 # Otherwise just add the slice instance to the list of slices
                 slices_resources.append(slice_resource)
         # Set the whole list of slices in the resource
-        navigator.set_value(slicing.path, slices_resources)
+        fhirpath.parse(slicing.path).update_or_create(resource, slices_resources)       
     return resource
 
 
@@ -277,7 +275,6 @@ def process_slice_constraints(slice_resource, slice):
     Returns:
         slice_resource: The FHIR resource of the corresponding slice    
     """
-    slice_navigator = FHIRPathNavigator(slice_resource)    
     for constraint in slice.constraints:
         slice_element = constraint.path.replace(slice.slicing_group.path, '').lstrip('.')
         if '[x]' in slice_element:
@@ -289,25 +286,22 @@ def process_slice_constraints(slice_resource, slice):
             return slice_resource
         
         if constraint.fixedValue:
-            slice_navigator.set_value(slice_element, constraint.fixedValue)
-        
+            fhirpath.parse(slice_element).update_or_create(slice_resource, constraint.fixedValue)       
         if constraint.pattern:
             if slice_element == '':
                 for field, value in constraint.pattern.__dict__.items():
                     setattr(slice_resource, field, value)
             else:
-                is_list = is_list_type(slice_navigator.get_pydantic_field(slice_element))
-                pattern = [constraint.pattern] if is_list and not isinstance(constraint.pattern, list) else constraint.pattern
-                slice_navigator.set_value(slice_element, pattern)
+                fhirpath.parse(slice_element).update_or_create(slice_resource, constraint.pattern)       
+    
     return slice_resource
 
 
 def track_slice_changes(resource, value):
     profile = resource.__class__
-    navigator = FHIRPathNavigator(resource)    
     for slicing in profile.__slicing__:
         if '[x]' in slicing.path: continue
-        valid_elements = ensure_list(navigator.get_value(slicing.path))
+        valid_elements = ensure_list(fhirpath.parse(slicing.path).get_value(resource))    
         for entry in valid_elements:
             if entry:
                 if entry.__slicing__:
@@ -318,18 +312,18 @@ def track_slice_changes(resource, value):
 def clean_elements_and_slices(resource, depth=0):
     profile = resource.__class__
     profile.validate_assignment = False
-    navigator = FHIRPathNavigator(resource)    
     # Remove unused/incomplete slices
     for slicing in profile.__slicing__:
         if '[x]' in slicing.path: continue
-        valid_elements = ensure_list(navigator.get_value(slicing.path))
-        valid_elements = [element for element in valid_elements if element is not None]
+        valid_elements = ensure_list(fhirpath.parse(slicing.path).get_value(resource))
+
+        valid_elements = [element for element in valid_elements if element or isinstance(element, bool)]
         if not valid_elements:
             continue
         logging.debug("\t"*(depth)+f'↪ {slicing.path}: {len(valid_elements)} elements')
         for slice in slicing.slices:
             # Get all the elements that conform to this slice's definition           
-            sliced_entries = ensure_list(navigator.get_value(slice.fhirpath))
+            sliced_entries = ensure_list(fhirpath.parse(slice.fhirpath).get_value(resource))       
             sliced_entries = [entry for entry in sliced_entries if entry is not None]
             logging.debug("\t"*(depth+1)+f'↪ {slice.fhirpath}: {len(sliced_entries)} elements')
             
@@ -340,8 +334,8 @@ def clean_elements_and_slices(resource, depth=0):
                 elif entry.__slicing__:
                     clean_elements_and_slices(entry, depth=depth+3)                
         # Set the new list with only the valid slices
-        navigator.set_value(slicing.path, valid_elements)
-        
+        fhirpath.parse(slicing.path).update_or_create(resource, valid_elements)       
+
     # Cleanup the resource from empty structures to be valid
     for field, value in remove_none_dicts(resource.dict()).items():
         setattr(resource, field, value)
@@ -515,13 +509,14 @@ class ProfiledResourceFactory:
         })
         return profile_model
 
-    def _check_if_path_ancestors_exist(self, resource, fhirpath):
-        elements = FHIRPathNavigator(resource, allow_dynamic_paths=False)  
-        for segment in split_fhirpath(fhirpath)[:-1]:
-            child_elements = elements.get_value(segment)
-            if child_elements:
-                elements = FHIRPathNavigator(ensure_list(child_elements)[0], allow_dynamic_paths=False)
-            else: 
+    def _check_if_path_ancestors_exist(self, resource, fhir_path):
+        segments = split_fhirpath(fhir_path)
+        path = segments[0] 
+        for segment in segments[1:-1]:
+            parent_fhir_path = join_fhirpath(path, segment)
+            child_elements = fhirpath.parse(parent_fhir_path).get_value(resource)
+            print('child_elements', parent_fhir_path, fhirpath.parse(parent_fhir_path).find(resource))
+            if not child_elements:
                 return False
         return True
     
@@ -598,7 +593,7 @@ class ProfiledResourceFactory:
             if constraint.is_slice_constraint:
                 continue
             # Get the element that is constrained in the resource
-            constrained_element = FHIRPathNavigator(resource, allow_dynamic_paths=False).get_value(constraint.path)   
+            constrained_element = fhirpath.parse(constraint.path).get_value(resource)   
             if not constrained_element:
                 # If the element does not exist, check if its ancestor exist
                 if not self._check_if_path_ancestors_exist(resource, constraint.path):
@@ -610,7 +605,8 @@ class ProfiledResourceFactory:
         # Slicing validation    
         for slice_group in profile.__slicing__:
             for slice in slice_group.slices:
-                sliced_entries = FHIRPathNavigator(resource, allow_dynamic_paths=False).get_value(slice.fhirpath)
+                sliced_entries = fhirpath.parse(slice.fhirpath).get_value(resource)   
+
                 if not isinstance(sliced_entries, list): 
                     sliced_entries = [sliced_entries]
                 sliced_entries = [entry for entry in sliced_entries if entry is not None]
@@ -630,7 +626,7 @@ class ProfiledResourceFactory:
                             ))
                 # Check for all constraints on the current slice
                 for constraint in slice.constraints:
-                    slice_subpath = constraint.path.replace(slice_group.path,"")    
+                    slice_subpath = constraint.path.replace(slice_group.path,"$")    
                     # Constrains on elements of the slice should only be applied if the slice is present
                     if constraint.path != slice_group.path and len(sliced_entries)==0:
                         continue       
@@ -639,7 +635,8 @@ class ProfiledResourceFactory:
                         validation_errors += self._validate_constraint(sliced_entries, constraint, f'{slice_group.path}:{slice.name}{slice_subpath}') 
                     else:
                         for entry in sliced_entries:
-                            constrained_slice_elements = FHIRPathNavigator(entry, allow_dynamic_paths=False).get_value(slice_subpath)
+                            constrained_slice_elements = fhirpath.parse(slice_subpath).get_value(entry)   
+                            print('VALIDATION SLICE', slice_subpath, constrained_slice_elements)
                             # Get the element that is constrained in the resource
                             if not constrained_slice_elements:
                                 # If the element does not exist, check if its ancestor exist

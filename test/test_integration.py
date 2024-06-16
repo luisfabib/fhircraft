@@ -1,5 +1,5 @@
 from fhircraft.fhir.profiles import construct_profiled_resource_model, validate_profiled_resource
-from fhircraft.fhir.path import FHIRPathNavigator
+from fhircraft.fhir.parser import parse
 from fhircraft.mapping import convert_response_from_api_to_fhir, convert_response_from_fhir_to_api
 from fhircraft.utils import load_file
 from pydantic.v1 import ValidationError
@@ -16,7 +16,7 @@ class ValidationTests(TestCase):
         profile = construct_profiled_resource_model(profile_url)
         resource = profile.parse_file(os.path.join('test','static',resource_file))
         for path, value in mutations.items():
-            FHIRPathNavigator(resource).set_value(path, value)
+            parse(path).update_or_create(resource, value)
         try:
             validate_profiled_resource(resource)
             if mutations:

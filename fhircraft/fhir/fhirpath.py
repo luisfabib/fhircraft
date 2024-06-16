@@ -5,7 +5,9 @@ from fhircraft.utils import ensure_list, flatten_list_of_lists, is_list_of_lists
 from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel as FhirResource
+from typing import List
 import typing
+import re
 
 # Get logger name
 logger = logging.getLogger(__name__)
@@ -20,12 +22,52 @@ LIST_KEY = object()
 class FHIRPathError(Exception):
     pass
 
+
+def split_fhirpath(fhir_path: str) -> List[str]:
+    """
+    Split a FHIR path string at non-quoted dots.
+
+    Parameters:
+    - fhir_path (str): The FHIR path string to split.
+
+    Returns:
+    - List[str]: A list of strings resulting from splitting the FHIR path at non-quoted dots.
+    """    
+    FHIRPATH_SEPARATORS = re.compile(r'\.(?=(?:[^\)]*\([^\(]*\))*[^\(\)]*$)')
+    # Split FHIR path only at non-quoted dots
+    return FHIRPATH_SEPARATORS.split(fhir_path)
+
+
+def join_fhirpath(*segments: str) -> str:
+    """
+    Join multiple FHIR path segments into a single FHIR path string.
+
+    Parameters:
+    - segments (str): Variable number of FHIR path segments to join.
+
+    Returns:
+    - str: A single FHIR path string created by joining the input segments with dots.
+    """    
+    return '.'.join((
+        str(segment).strip('.') 
+            for segment in segments if segment!=''
+    )) 
+
 class FHIRPath:
     """
     The base class for FHIRPath abstract syntax; those
     methods stubbed here are the interface to supported
     FHIRPath semantics.
     """
+
+    def get_value(self, data):
+        matches = ensure_list(self.find(data))
+        values = [match.value for match in matches if match.value is not None or match.value != [] or isinstance(match.value, bool)]
+        if len(values) == 1:
+            values = values[0]
+        elif len(values) == 0:
+            return None
+        return values        
 
     def find(self, data):
         """
@@ -114,8 +156,7 @@ class FHIRElementContext:
 
     def set_value(self, value): 
         if self.is_list_type: 
-            if not isinstance(value, list):
-                value = [value]
+            value = ensure_list(value)
         else:
             if isinstance(value, list):
                 if len(value)>1:
@@ -124,7 +165,6 @@ class FHIRElementContext:
         parents = self.context.value
         if not isinstance(parents, list):
             parents = [parents]
-            
         for parent in parents:
             setattr(parent, self.name, value)
             self.value = getattr(parent, self.name)
@@ -386,7 +426,7 @@ class Where(FHIRPath):
     def __init__(self, descendant, value):
         self.descendant = descendant
         self.value = value
-
+        
     def find(self, datum):
         matches = FHIRElementContext(value=[
                 item
@@ -434,7 +474,7 @@ class Extension(FHIRPath):
                 for match in self.left.find(element)
                     for value in ensure_list(match.value)
                         if hasattr(value, 'extension')
-                            for extension in value.extension
+                            for extension in ensure_list(value.extension)
                                 if extension and isinstance(extension, get_fhir_model_class('Extension')) and extension.url == self.url
         ], context=element, path=element.context)
         return [matches]
@@ -462,6 +502,34 @@ class Extension(FHIRPath):
         return hash((self.left, self.url))
 
 
+class TypeChoice(FHIRPath):
+    
+    def __init__(self, type_choice_name):
+        self.type_choice_name = type_choice_name
+
+    def find(self, element):
+        # type_choice_name = self.type_choice_name.right.fields[0]
+        element = FHIRElementContext.wrap(element)
+        matches = [
+            FHIRElementContext(getattr(obj, field), path=Fields(field), context=element) 
+                for obj in ensure_list(element.value)
+                    for field in obj.__fields__.keys() 
+                        if field.startswith(self.type_choice_name) and getattr(obj, field) 
+        ]
+        return matches
+
+    def __str__(self):
+        return f'{self.type_choice_name}[x]'
+
+    def __repr__(self):
+        return f'{self.type_choice_name}[x]'
+    
+    def __eq__(self, other):
+        return isinstance(other, TypeChoice) and other.type_choice_name == self.type_choice_name
+
+    def __hash__(self):
+        return hash((self.type_choice_name))
+    
 class Descendants(FHIRPath):
     """
     FHIRPath that matches first the left expression then any descendant
@@ -647,10 +715,16 @@ class Fields(FHIRPath):
     @staticmethod
     def get_subelement(element, field, create):
         if isinstance(element.value, list):
-            field_value = [getattr(value, field, None) for value in element.value]
+            field_value = []
+            for value in element.value:
+                if isinstance(value, list):
+                    field_value.extend([getattr(val, field, None) for val in value])
+                else:
+                    field_value.append(getattr(value, field, None))
             empty_value = all([val is None for val in field_value])
             if len(field_value)==1:
                 field_value = field_value[0]
+
         else:
             field_value = getattr(element.value, field, None)
             empty_value = field_value is None
