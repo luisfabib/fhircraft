@@ -4,6 +4,8 @@ from fhircraft.fhir.lexer import FhirPathLexer
 from fhircraft.utils import ensure_list, flatten_list_of_lists, is_list_of_lists
 from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
+from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel as FhirResource
+import typing
 
 # Get logger name
 logger = logging.getLogger(__name__)
@@ -27,7 +29,7 @@ class FHIRPath:
 
     def find(self, data):
         """
-        All `FHIRPath` types support `find()`, which returns an iterable of `DatumInContext`s.
+        All `FHIRPath` types support `find()`, which returns an iterable of `FHIRElementContext`s.
         They keep track of the path followed to the current location, so if the calling code
         has some opinion about that, it can be passed in here as a starting point.
         """
@@ -74,13 +76,13 @@ class FHIRPath:
             return Child(self, child)
 
     def make_datum(self, value):
-        if isinstance(value, DatumInContext):
+        if isinstance(value, FHIRElementContext):
             return value
         else:
-            return DatumInContext(value, path=Root(), context=None)
+            return FHIRElementContext(value, path=Root(), context=None)
 
 
-class DatumInContext:
+class FHIRElementContext:
     """
     Represents a datum along a path from a context.
 
@@ -98,24 +100,74 @@ class DatumInContext:
     out.
     """
     @classmethod
-    def wrap(cls, data):
+    def wrap(cls, data: typing.Union["FHIRElementContext",FhirResource]):
         if isinstance(data, cls):
             return data
         else:
             return cls(data)
 
-    def __init__(self, value, path=None, context=None):
+    def __init__(self, value, path=None, index=None, context=None):
         self.value = value
         self.path = path or This()
-        self.context = None if context is None else DatumInContext.wrap(context)
+        self.index =  index
+        self.context = None if context is None else FHIRElementContext.wrap(context)
 
+    def set_value(self, value): 
+        if self.is_list_type: 
+            if not isinstance(value, list):
+                value = [value]
+        else:
+            if isinstance(value, list):
+                if len(value)>1:
+                    raise ValueError(f'Value has {len(value)} items, but element <{self.full_path}> does not allow arrays')
+                value = value[0]
+        parents = self.context.value
+        if not isinstance(parents, list):
+            parents = [parents]
+            
+        for parent in parents:
+            setattr(parent, self.name, value)
+            self.value = getattr(parent, self.name)
+
+    def set_index(self, index):
+        parents = []
+        for item in ensure_list(self.context.value):
+            if isinstance(item, list):
+                parents.extend(item)  # Flatten one level
+            else:
+                parents.append(item)  # Preserve non-list items     
+        self.value = parents[index]
+
+    @property
+    def name(self) -> str:
+        return ''.join(self.path.fields)
+    
+    @property
+    def field_info(self):
+        parent = self.context.value
+        if isinstance(parent, list):
+            parent = parent[0]
+        return parent.__fields__.get(*self.path.fields)
+    
+    @property
+    def is_list_type(self):
+        return is_list_type(self.field_info)
+
+    def construct_resource(self):
+        try:
+            model = get_fhir_model_class(get_fhir_type_name(self.field_info.type_))
+            model.Config.validate_assignment = False
+            return model.construct()
+        except KeyError:
+            return None 
+        
     def in_context(self, context, path):
-        context = DatumInContext.wrap(context)
+        context = FHIRElementContext.wrap(context)
 
         if self.context:
-            return DatumInContext(value=self.value, path=self.path, context=context.in_context(path=path, context=context))
+            return FHIRElementContext(value=self.value, path=self.path, context=context.in_context(path=path, context=context))
         else:
-            return DatumInContext(value=self.value, path=path, context=context)
+            return FHIRElementContext(value=self.value, path=path, context=context)
 
     @property
     def full_path(self):
@@ -140,18 +192,18 @@ class DatumInContext:
         return '%s(value=%r, path=%r, context=%r)' % (self.__class__.__name__, self.value, self.path, self.context)
 
     def __eq__(self, other):
-        return isinstance(other, DatumInContext) and other.value == self.value and other.path == self.path and self.context == other.context
+        return isinstance(other, FHIRElementContext) and other.value == self.value and other.path == self.path and self.context == other.context
 
 
-class AutoIdForDatum(DatumInContext):
+class AutoIdForDatum(FHIRElementContext):
     """
-    This behaves like a DatumInContext, but the value is
+    This behaves like a FHIRElementContext, but the value is
     always the path leading up to it, not including the "id",
     and with any "id" fields along the way replacing the prior
     segment of the path
 
     For example, it will make "foo.bar.id" return a datum
-    that behaves like DatumInContext(value="foo.bar", path="foo.bar.id").
+    that behaves like FHIRElementContext(value="foo.bar", path="foo.bar.id").
 
     This is disabled by default; it can be turned on by
     settings the `auto_id_field` global to a value other
@@ -199,11 +251,11 @@ class Root(FHIRPath):
     """
 
     def find(self, data):
-        if not isinstance(data, DatumInContext):
-            return [DatumInContext(data, path=Root(), context=None)]
+        if not isinstance(data, FHIRElementContext):
+            return [FHIRElementContext(data, path=Root(), context=None)]
         else:
             if data.context is None:
-                return [DatumInContext(data.value, context=None, path=Root())]
+                return [FHIRElementContext(data.value, context=None, path=Root())]
             else:
                 return Root().find(data.context)
 
@@ -232,7 +284,7 @@ class This(FHIRPath):
     """
 
     def find(self, datum):
-        return [DatumInContext.wrap(datum)]
+        return [FHIRElementContext.wrap(datum)]
 
     def update(self, data, val):
         return val
@@ -259,43 +311,33 @@ class Child(FHIRPath):
     Concrete syntax is <left> '.' <right>
     """
 
-    def __init__(self, left, right):
+    def __init__(self, left:FHIRPath, right:FHIRPath):
         self.left = left
         self.right = right
 
-    def find(self, datum):
-        """
-        Extra special case: auto ids do not have children,
-        so cut it off right now rather than auto id the auto id
-        """
-        return [submatch
-                for subdata in self.left.find(datum)
-                if not isinstance(subdata, AutoIdForDatum)
-                for submatch in self.right.find(subdata)]
+    def find(self, resource: FhirResource):
+        return [
+            submatch
+                for subdata in self.left.find(resource)
+                    for submatch in self.right.find(subdata)
+        ]
 
-    def update(self, data, val):
-        for datum in self.left.find(data):
-            self.right.update(datum.value, val)
-        return data
+    def update(self, resource: FhirResource, value: typing.Any):
+        for element in self.left.find(resource):
+            self.right.update(element, value)
 
-    def find_or_create(self, datum):
-        datum = DatumInContext.wrap(datum)
+    def find_or_create(self, element):
+        element = FHIRElementContext.wrap(element)
         submatches = []
-        for subdata in self.left.find_or_create(datum):
-            if isinstance(subdata, AutoIdForDatum):
-                # Extra special case: auto ids do not have children,
-                # so cut it off right now rather than auto id the auto id
-                continue
-
-            for submatch in self.right.find_or_create(subdata):
+        for subelement in self.left.find_or_create(element):
+            for submatch in self.right.find_or_create(subelement):
                 submatches.append(submatch)
         return submatches
 
-    def update_or_create(self, data, val):
-        for datum in self.left.find_or_create(data):     
-            print('UPDATING', self.right, f'({type( self.right)})')
-            self.right.update_or_create(datum.value, val)
-        return _clean_list_keys(data)
+    def update_or_create(self, resource: FhirResource, value: typing.Any):
+        for element in self.left.find_or_create(resource):                
+            self.right.update_or_create(element, value)
+        return _clean_list_keys(resource)
 
     def filter(self, fn, data):
         for datum in self.left.find(data):
@@ -323,7 +365,7 @@ class Parent(FHIRPath):
     """
 
     def find(self, datum):
-        datum = DatumInContext.wrap(datum)
+        datum = FHIRElementContext.wrap(datum)
         return [datum.context]
 
     def __eq__(self, other):
@@ -346,8 +388,7 @@ class Where(FHIRPath):
         self.value = value
 
     def find(self, datum):
-        print(f'FIND WHERE({self.descendant}="{self.value}")')
-        matches = DatumInContext(value=[
+        matches = FHIRElementContext(value=[
                 item
                 for item in datum.value
                     for descendant_match in self.descendant.find(item)
@@ -373,7 +414,7 @@ class Where(FHIRPath):
         return f'{self.left}.Where({self.descendant}="{self.value}")'
     
     def __eq__(self, other):
-        return isinstance(other, Where) and other.left == self.left and other.descendant == self.descendant  and other.value == self.value
+        return isinstance(other, Where) and other.descendant == self.descendant  and other.value == self.value
 
     def __hash__(self):
         return hash((self.left, self.descendant, self.value))
@@ -386,14 +427,17 @@ class Extension(FHIRPath):
         self.left = left
         self.url = url
 
-    def find(self, data):
-        print('FIND EXTENSION', self.url)
-        return [
-            DatumInContext(value=extension, context=match, path=match.context)
-                for match in self.left.find(data)
-                    for extension in match.value.extension
-                        if extension and isinstance(extension, get_fhir_model_class('Extension')) and extension.url == self.url
-        ]
+    def find(self, element):
+        element = FHIRElementContext.wrap(element)
+        matches = FHIRElementContext(value=[
+            extension
+                for match in self.left.find(element)
+                    for value in ensure_list(match.value)
+                        if hasattr(value, 'extension')
+                            for extension in value.extension
+                                if extension and isinstance(extension, get_fhir_model_class('Extension')) and extension.url == self.url
+        ], context=element, path=element.context)
+        return [matches]
 
     def update(self, data, val):
         for datum in self.find(data):
@@ -447,12 +491,12 @@ class Descendants(FHIRPath):
             if isinstance(datum.value, list):
                 recursive_matches = [submatch
                                      for i in range(0, len(datum.value))
-                                     for submatch in match_recursively(DatumInContext(datum.value[i], context=datum, path=Index(i)))]
+                                     for submatch in match_recursively(FHIRElementContext(datum.value[i], context=datum, path=Index(i)))]
 
             elif isinstance(datum.value, dict):
                 recursive_matches = [submatch
                                      for field in datum.value.keys()
-                                     for submatch in match_recursively(DatumInContext(datum.value[field], context=datum, path=Fields(field)))]
+                                     for submatch in match_recursively(FHIRElementContext(datum.value[field], context=datum, path=Fields(field)))]
 
             else:
                 recursive_matches = []
@@ -601,111 +645,82 @@ class Fields(FHIRPath):
         self.fields = fields
 
     @staticmethod
-    def get_field_datum(datum, field, create):
-        if field == auto_id_field:
-            return AutoIdForDatum(datum)
-        if isinstance(datum.value, list):
-            field_value = [getattr(value, field, None) for value in datum.value]
+    def get_subelement(element, field, create):
+        if isinstance(element.value, list):
+            field_value = [getattr(value, field, None) for value in element.value]
             empty_value = all([val is None for val in field_value])
+            if len(field_value)==1:
+                field_value = field_value[0]
         else:
-            field_value = getattr(datum.value, field, None)
+            field_value = getattr(element.value, field, None)
             empty_value = field_value is None
+        sub_element = FHIRElementContext(field_value, path=Fields(field), context=element)
         if empty_value:
             if create:
-                if isinstance(datum.value, list):
-                    example_value = datum.value[0]
-                else:
-                    example_value = datum.value
-                field_info = example_value.__fields__.get(field)
-                field_type = get_fhir_type_name(field_info.type_)
                 try:
-                    model = get_fhir_model_class(field_type)
-                    print('CREATE PYDANTIC', f'{datum.full_path}.{field}')
+                    field_value = sub_element.construct_resource()
+                    sub_element.set_value(field_value)
                 except KeyError:
-                    if is_list_type(field_info):
-                        setattr(datum.value, field, [])
-                        return DatumInContext(getattr(datum.value, field), path=Fields(field), context=datum)
+                    if sub_element.is_list_type:
+                        sub_element.set_value([])
+                        return sub_element
                     else:
-                        return None         
-                model.validate_assignment = False
-                field_value =  model.construct()
-                
-                if is_list_type(field_info):
-                    field_value = [field_value]              
-                if isinstance(datum.value, list):
-                    for val in datum.value:
-                        setattr(val, field, field_value)
-                else:
-                    setattr(datum.value, field, field_value)
-                    
+                        return None            
             else:
                 return None
-        return DatumInContext(field_value, path=Fields(field), context=datum)
+        return sub_element
 
 
     def reified_fields(self, datum):
         if '*' not in self.fields:
             return self.fields
         else:
-            try:
-                fields = tuple(datum.value.keys())
-                return fields if auto_id_field is None else fields + (auto_id_field,)
-            except AttributeError:
-                return ()
+            fields = tuple(datum.value.__fields__keys())
+            return fields
 
-    def find(self, datum):
-        return self._find_base(datum, create=False)
+    def find(self, element: typing.Union[FHIRElementContext,FhirResource]):
+        return self._find_base(element, create=False)
 
-    def find_or_create(self, datum):
-        return self._find_base(datum, create=True)
+    def find_or_create(self, element: typing.Union[FHIRElementContext,FhirResource]):
+        return self._find_base(element, create=True)
 
-    def _find_base(self, datum, create):
-        datum = DatumInContext.wrap(datum)
+    def _find_base(self, element: typing.Union[FHIRElementContext,FhirResource], create:bool):
+        # Ensure that element is of a FHIRElementContext 
+        element = FHIRElementContext.wrap(element)
+        # Get subelements
         field_data = [
-            self.get_field_datum(datum, field, create)
-                for field in self.reified_fields(datum)
+            self.get_subelement(element, field, create)
+                for field in self.reified_fields(element)
         ]
-        return [fd for fd in field_data if fd is not None]
+        # Clean unset values
+        field_data = [fd for fd in field_data if fd is not None]
+        return field_data
 
-    def update(self, data, val):
-        return self._update_base(data, val, create=False)
+    def update(self, element: typing.Union[FHIRElementContext,FhirResource], value):
+        return self._update_base(element, value, create=False)
 
-    def update_or_create(self, data, val):
-        return self._update_base(data, val, create=True)
+    def update_or_create(self, element: typing.Union[FHIRElementContext,FhirResource], value):
+        return self._update_base(element, value, create=True)
 
-    def _update_base(self, data, val, create):
-        print('Update try', data is not None, val)                                    
-        if data is not None: 
-            if isinstance(data, list):
-                return [self._update_base(d, val, create) for d in data]
-            for field in self.reified_fields(DatumInContext.wrap(data)):
-                if create:
-                    if not hasattr(data, field):
-                        print('Update Create', data, field)
-                        data[field] = {}
-                if type(data) is not bool and hasattr(data, field):
-                    if hasattr(val, '__call__'):
-                        setattr(data, field, val(getattr(data, field), data, field))
-                    else:
-                        if isinstance(getattr(data, field), list) and not isinstance(val, list):
-                            val = [val]     
-                        print('Update', field, val)                            
-                        setattr(data, field, val)
-        return data
+    def _update_base(self, element: typing.Union[FHIRElementContext,FhirResource], val: typing.Any, create: bool):
+        element = FHIRElementContext.wrap(element)       
+        if element.value is not None: 
+            if isinstance(element.value, list):
+                return [self._update_base(el, val, create) for el in element.value]
+            for field in self.reified_fields(element):
+                sub_element = FHIRElementContext(None, path=Fields(field), context=element)
+                sub_element.set_value(val)
+        return element
 
     def filter(self, fn, data):
         if data is not None:
-            for field in self.reified_fields(DatumInContext.wrap(data)):
+            for field in self.reified_fields(FHIRElementContext.wrap(data)):
                 if field in data:
                     if fn(data[field]):
                         data.pop(field)
         return data
 
     def __str__(self):
-        # If any FhirPathLexer.literals are included in field name need quotes
-        # This avoids unnecessary quotes to keep strings short.
-        # Test each field whether it contains a literal and only then add quotes
-        # The test loops over all literals, could possibly optimize to short circuit if one found
         fields_as_str = ("'" + str(f) + "'" if any([l in f for l in FhirPathLexer.literals]) else
                          str(f) for f in self.fields)
         return ','.join(fields_as_str)
@@ -733,47 +748,58 @@ class Index(FHIRPath):
     def __init__(self, index):
         self.index = index
 
+    def _pad_array(self, element:FHIRElementContext) -> FHIRElementContext:
+        # Use a list comprehension to flatten the list of lists
+        array = []
+        for item in element.value:
+            if isinstance(item, list):
+                array.extend(item)  # Flatten one level
+            else:
+                array.append(item)  # Preserve non-list items
+        
+        if len(array) <= self.index:          
+            pad = self.index - len(array) + 1
+            array.extend([element.construct_resource() for __ in range(pad)])   
+            element.set_value(array)
+        
     def find(self, datum):
         return self._find_base(datum, create=False)
 
     def find_or_create(self, datum):   
         return self._find_base(datum, create=True)
 
-    def _find_base(self, datum, create):
-        print('FIND INDEX', datum.path,  self.index)
-        datum = DatumInContext.wrap(datum)
+    def _find_base(self, element: typing.Union[FHIRElementContext,FhirResource], create: bool):
+        element = FHIRElementContext.wrap(element)
         if create:
-            if datum.value == {}:
-                datum.value = _create_list_key(datum.value)
-            self._pad_value(datum.value)
-        if datum.value and len(datum.value) > self.index:
-            print('ACCESSING INDEX', self.index)
-            return [DatumInContext(datum.value[self.index], path=self, context=datum)]
+            self._pad_array(element)
+        if element.value and len(element.value) > self.index:
+            item_element = FHIRElementContext(None, path=self,  context=element)
+            item_element.set_index(self.index)
+            return [item_element]
         else:
             return []
 
-    def update(self, data, val):
+    def update(self, data: typing.Union[FHIRElementContext,FhirResource], val: typing.Any):
         return self._update_base(data, val, create=False)
 
-    def update_or_create(self, data, val):
+    def update_or_create(self, data: typing.Union[FHIRElementContext,FhirResource], val: typing.Any):
         return self._update_base(data, val, create=True)
 
-    def _update_base(self, data, val, create):
-        print('UPDATE INDEX', data,  self.index, val)
+    def _update_base(self, element: typing.Union[FHIRElementContext,FhirResource], val: typing.Any, create: bool):
+        element = FHIRElementContext.wrap(element)                          
         if create:
-            if data == {}:
-                data = _create_list_key(data)
-            self._pad_value(data)
+            self._pad_array(element)
+        array = element.value
         if hasattr(val, '__call__'):
-            data[self.index] = val.__call__(data[self.index], data, self.index)
-        elif len(data) > self.index:
-            print('ACCESSING INDEX', self.index)
-            data[self.index] = val
-        return data
+            array[self.index] = val.__call__(array[self.index], element, self.index)
+        elif len(array) > self.index:
+            array[self.index] = val
+        element.set_value(array)
+        return element
 
     def filter(self, fn, data):
         if fn(data[self.index]):
-            data.pop(self.index)  # relies on mutation :(
+            data.pop(self.index) 
         return data
 
     def __eq__(self, other):
@@ -784,17 +810,6 @@ class Index(FHIRPath):
 
     def __repr__(self):
         return '%s(index=%r)' % (self.__class__.__name__, self.index)
-
-    def _pad_value(self, value):
-        if len(value) <= self.index:          
-            pad = self.index - len(value) + 1
-            if len(value)>0 and hasattr(value[0].__class__, 'construct'):
-                print('Create Pydantic model @ Index', f'[{self.index}]') 
-                value += [value[0].__class__.construct() for __ in range(pad)]   
-            else:
-                print('Create None @ Index', f'[{self.index}]')  
-                value += [None for __ in range(pad)]     
-            return value
         
     def __hash__(self):
         return hash(self.index)
@@ -847,7 +862,7 @@ class Slice(FHIRPath):
         self.step = step
 
     def find(self, datum):
-        datum = DatumInContext.wrap(datum)
+        datum = FHIRElementContext.wrap(datum)
 
         # Used for catching null value instead of empty list in path
         if not datum.value:
@@ -857,14 +872,14 @@ class Slice(FHIRPath):
         # Here's the hack. If it is a dictionary or some kind of constant,
         # put it in a single-element list
         if (isinstance(datum.value, dict) or isinstance(datum.value, int) or isinstance(datum.value, str)):
-            return self.find(DatumInContext([datum.value], path=datum.path, context=datum.context))
+            return self.find(FHIRElementContext([datum.value], path=datum.path, context=datum.context))
 
         # Some iterators do not support slicing but we can still
         # at least work for '*'
         if self.start is None and self.end is None and self.step is None:
-            return [DatumInContext(datum.value[i], path=Index(i), context=datum) for i in range(0, len(datum.value))]
+            return [FHIRElementContext(datum.value[i], path=Index(i), context=datum) for i in range(0, len(datum.value))]
         else:
-            return [DatumInContext(datum.value[i], path=Index(i), context=datum) for i in range(0, len(datum.value))[self.start:self.end:self.step]]
+            return [FHIRElementContext(datum.value[i], path=Index(i), context=datum) for i in range(0, len(datum.value))[self.start:self.end:self.step]]
 
     def update(self, data, val):
         for datum in self.find(data):

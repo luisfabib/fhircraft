@@ -26,8 +26,8 @@ parser_test_cases = (
     #
     ("Observation.code", Child(Root(), Fields("code"))),
     ("Observation.code[1]", Child(Child(Root(), Fields("code")), Index(1))),
-    ('Observation.component.where(code.coding.code="test")', Where(Child(Root(), Fields("component")), Child(Child(Fields("code"), Fields("coding")), Fields("code")), "test")),
-    ('Observation.component.where(code.coding.code="test").where(code.coding.system="test2")',  Where(Where(Child(Root(), Fields("component")), Child(Child(Fields("code"), Fields("coding")), Fields("code")), "test"), Child(Child(Fields("code"), Fields("coding")), Fields("system")), "test2")),
+    ('Observation.component.where(code.coding.code="test")', Child(Child(Root(), Fields("component")), Where(Child(Child(Fields("code"), Fields("coding")), Fields("code")), "test"))),
+    ('Observation.component.where(code.coding.code="test").where(code.coding.system="test2")', Child(Child(Child(Root(), Fields("component")),Where(Child(Child(Fields("code"), Fields("coding")), Fields("code")), "test"),),Where(Child(Child(Fields("code"), Fields("coding")), Fields("system")), "test2"))),
     ("foo.baz", Child(Fields("foo"), Fields("baz"))),
     ("Observation.identifier.first().value", Child(Child(Child(Root(), Fields("identifier")), Index(0)), Fields("value"))),
     ("Observation.identifier.last().value", Child(Child(Child(Root(), Fields("identifier")), Index(-1)), Fields("value"))),

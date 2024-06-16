@@ -112,6 +112,10 @@ class FhirPathParser:
         """fhirpath : fhirpath '.' EXTENSION '(' url ')' """
         p[0] = Extension(p[1], p[5])
 
+    def p_fhirpath_extension_element(self, p):
+        """fhirpath : fhirpath '.' EXTENSION """
+        p[0] = Child(p[1], Fields(p[3]))
+
     def p_fhirpath_last(self, p):
         """fhirpath : fhirpath '.' LAST '(' ')' """
         p[0] = Child(p[1], Index(-1))
