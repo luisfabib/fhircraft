@@ -44,7 +44,7 @@ class FhirPathLexer:
     #
     # =========================================================
     
-    literals = ['*', '.', '[', ']', '(', ')', '$', ',', ':', '|', '&', '=']
+    literals = ['*', '.', '[', ']', '(', ')', ',', ':', '|', '&', '=']
 
     reserved_words = { 
         'where': 'WHERE',
@@ -52,18 +52,19 @@ class FhirPathLexer:
         'last': 'LAST',
         'tail': 'TAIL',
         'single': 'SINGLE',    
-        'extension': 'EXTENSION',      
+        'extension': 'EXTENSION',  
         **{resource: 'RESOURCE_BASE' for resource in FHIR_BASE_RESOURCES}                  
     }
 
-    states = [ ('singlequote', 'exclusive'),
-               ('doublequote', 'exclusive'),
-               ('backquote', 'exclusive') ]
+    states = [ 
+        ('singlequote', 'exclusive'),
+        ('doublequote', 'exclusive'),
+    ]
 
     # List of token names
     tokens = list(set(reserved_words.values())) + [
         'ID',
-        'NAMED_OPERATOR',
+        'CONTEXTUAL_OPERATOR',
         'NUMBER',
         'TYPE_CHOICE',
     ]
@@ -71,6 +72,7 @@ class FhirPathLexer:
     # Regular expression rules for simple tokens
     t_ignore = ' \t'
     t_TYPE_CHOICE = r'\[x\]'
+    t_CONTEXTUAL_OPERATOR = r'\$'
     
     # Complex token definitions with actions
     def t_ID(self, t):
@@ -139,34 +141,6 @@ class FhirPathLexer:
 
     def t_doublequote_error(self, t):
         raise FhirPathLexerError('Error on line %s, col %s while lexing doublequoted field: Unexpected character: %s ' % (t.lexer.lineno, t.lexpos - t.lexer.latest_newline, t.value[0]))
-
-
-    # Back-quoted "magic" operators
-    t_backquote_ignore = ''
-    def t_backquote(self, t):
-        r'`'
-        t.lexer.string_start = t.lexer.lexpos
-        t.lexer.string_value = ''
-        t.lexer.push_state('backquote')
-
-    def t_backquote_escape(self, t):
-        r'\\.'
-        t.lexer.string_value += t.value[1]
-
-    def t_backquote_content(self, t):
-        r"[^`\\]+"
-        t.lexer.string_value += t.value
-
-    def t_backquote_end(self, t):
-        r'`'
-        t.value = t.lexer.string_value
-        t.type = 'NAMED_OPERATOR'
-        t.lexer.string_value = None
-        t.lexer.pop_state()
-        return t
-
-    def t_backquote_error(self, t):
-        raise FhirPathLexerError('Error on line %s, col %s while lexing backquoted operator: Unexpected character: %s ' % (t.lexer.lineno, t.lexpos - t.lexer.latest_newline, t.value[0]))
 
 
     # Counting lines, handling errors

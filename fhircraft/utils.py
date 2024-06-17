@@ -6,6 +6,22 @@ from typing import List, Any, Dict, Union, get_args, get_origin
 from dotenv import dotenv_values
 import re
 
+# URL regex pattern
+URL_PATTERNS = re.compile(
+    r'^(https?|ftp)://'                      # Scheme (HTTP, HTTPS, FTP)
+    r'(?:(?:[a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}|' # Domain name
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'   # OR IPv4 address
+    r'\[?[a-fA-F0-9:]+\]?)'                  # OR IPv6 address
+    r'(:\d+)?'                               # Optional port
+    r'(\/[a-zA-Z0-9@:%._\+~#=\/-]*)?'        # Optional path
+    r'(\?[a-zA-Z0-9@:%._\+~#&=\/-]*)?'       # Optional query
+    r'(#[-a-zA-Z0-9@:%._\+~#=]*)?$'          # Optional fragment
+)
+
+# Function to check if a string is a URL
+def is_url(string):
+    return re.match(URL_PATTERNS, string) is not None
+
 def load_env_variables(file_path=None):
     """
     Loads environment variables from a .env file into a dictionary without changing the global environment variables.

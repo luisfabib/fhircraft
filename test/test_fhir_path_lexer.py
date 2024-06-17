@@ -3,7 +3,7 @@ import pytest
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 
 token_test_cases = (
-    ("$", (("$", "$"),)),
+    ("$", (("$", "CONTEXTUAL_OPERATOR"),)),
     ('"hello"', (("hello", "ID"),)),
     ("'goodbye'", (("goodbye", "ID"),)),
     ("'doublequote\"'", (('doublequote"', "ID"),)),
@@ -22,7 +22,6 @@ token_test_cases = (
     ("fuzz.*", (("fuzz", "ID"), (".", "."), ("*", "*"))),
     ("&", (("&", "&"),)),
     ("@", (("@", "ID"),)),
-    ("`this`", (("this", "NAMED_OPERATOR"),)),
     ("|", (("|", "|"),)),
     ("where", (("where", "WHERE"),)),
     ("first", (("first", "FIRST"),)),

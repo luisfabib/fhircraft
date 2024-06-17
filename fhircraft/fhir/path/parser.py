@@ -1,11 +1,12 @@
 import logging
 import sys
 import os.path
-
+import re
 import ply.yacc
 
 from fhircraft.fhir.path.engine import *
 from fhircraft.fhir.path.lexer import FhirPathLexer
+from fhircraft.utils import is_url
 
 logger = logging.getLogger(__name__)
 
@@ -87,24 +88,19 @@ class FhirPathParser:
         elif op == '&':
             p[0] = Intersect(p[1], p[3])
 
-
-    def p_fhirpath_root(self, p):
-        "fhirpath : '$'"
-        p[0] = Root()
-
     def p_fhirpath_base_resource_root(self, p):
         "fhirpath : RESOURCE_BASE"
         p[0] = Root()
         
-    def p_fhirpath_named_operator(self, p):
-        "fhirpath : NAMED_OPERATOR"
-        if p[1] == 'this':
+    def p_fhirpath_contextual_operator(self, p):
+        """fhirpath : CONTEXTUAL_OPERATOR ID 
+                    | CONTEXTUAL_OPERATOR empty """
+        if p[2] is None:
+            p[0] = Root()
+        elif p[2] == 'this':
             p[0] = This()
-        elif p[1] == 'parent':
-            p[0] = Parent()
         else:
-            raise FhirPathParserError('Unknown named operator `%s` at %s:%s'
-                                      % (p[1], p.lineno(1), p.lexpos(1)))
+            raise FhirPathParserError(f'Unknown context operator ${p[2]} at {p.lineno(1)}:{p.lexpos(1)}')
             
     def p_fhirpath_where(self, p):
         """fhirpath : fhirpath '.' WHERE '(' fhirpath '=' string ')' """
@@ -112,6 +108,8 @@ class FhirPathParser:
         
     def p_fhirpath_extension(self, p):
         """fhirpath : fhirpath '.' EXTENSION '(' url ')' """
+        if not is_url(p[5]):
+            FhirPathParserError(f'Invalid URL for extension() operation: {p[5]}')
         p[0] = Extension(p[1], p[5])
 
     def p_fhirpath_extension_element(self, p):
