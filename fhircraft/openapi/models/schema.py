@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
+from fhircraft.fhir.path import fhirpath
 from fhircraft.openapi.models.compat import PYDANTIC_V2, ConfigDict, Extra, min_length_arg
 
 from .datatype import DataType
@@ -949,6 +950,14 @@ class Schema(BaseModel):
     An OpenAPI extension to specify the FHIR profile related to this instance
     """
 
+
+    @field_validator('fhirpath')
+    @classmethod
+    def must_be_valid_fhirpath(cls, fhir_path: str) -> str:
+        if not fhir_path:
+            return None
+        fhirpath.parse(fhir_path)
+        return fhir_path
 
     if PYDANTIC_V2:
         model_config = ConfigDict(
