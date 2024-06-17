@@ -54,7 +54,7 @@
         {
            "volume": "BodyStructure/jenny-m-chest-wall-lymph-nodes-treatment-volume",
            "totalDose": {
-                "value": 5000,
+                "value": "5000",
                 "system": "http://unitsofmeasure.org",
                 "code": "cGy"
             },
@@ -64,7 +64,7 @@
         {
             "volume": "BodyStructure/jenny-m-chest-wall-treatment-volume",
             "totalDose": {
-                 "value": 6000,
+                 "value": "6000",
                  "system": "http://unitsofmeasure.org",
                  "code": "cGy"
              },

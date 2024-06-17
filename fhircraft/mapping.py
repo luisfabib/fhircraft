@@ -105,13 +105,15 @@ def map_jsonpath_values_to_fhirpaths(response: dict, schema: Schema) -> dict:
                 # Find the element item in the response
                 match = parse(item_json_path).find(response)
                 if match:
-                    items[item_fhir_path] = match[0].value
+                    value = match[0].value
+                    items[item_fhir_path] = str(value) if value is not None and not isinstance(value, bool) else value
         else:
             # Otherwise just look for the value at the JSON-path
             match = parse(json_path).find(response)
             if match:
+                value = match[0].value
                 # Assign it to the corresponding FHIR-path if there is a value 
-                items[fhir_path] = match[0].value
+                items[fhir_path] = str(value) if value is not None and not isinstance(value, bool) else value
     return items
 
 def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str, enpoint: str, method: str, status_code: str, profile_url: Optional[str] = None) -> Any:
@@ -140,7 +142,6 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
 
     # Set the values of the API response
     for fhir_path, value in fhir_resource_values.items():
-        print('SET', fhir_path, '>', value)
         fhirpath.parse(fhir_path).update_or_create(resource, value)        
     
     # Disable tracking of changes in slices
