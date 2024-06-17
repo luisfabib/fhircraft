@@ -23,10 +23,10 @@
     },
     "refAllele": "T",
     "innerStartEnd": {
-       "low": "42523949",
-       "high": "42533891"
+       "low": 42523949,
+       "high": 42533891
     },
-    "copyNumber": "3",
+    "copyNumber": 3,
     "coordinateSystem": {
        "system": "http://loinc.org",
        "code": "LA30102-0",

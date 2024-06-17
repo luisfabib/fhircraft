@@ -45,7 +45,7 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
         return fhir_path
 
     paths = {}
-    
+    schemas = {}    
 
     # Handle 'allOf'
     if 'allOf' in schema:
@@ -57,8 +57,10 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
     if 'anyOf' in schema:
         any_of_schemas = schema['anyOf']
         for subschema in any_of_schemas:
-            paths.update(map_json_paths_to_fhir_paths(subschema, current_json_path, current_fhir_path))
-        return paths
+            sub_paths, sub_schemas = map_json_paths_to_fhir_paths(subschema, current_json_path, current_fhir_path)
+            paths.update(sub_paths)
+            schemas.update(sub_schemas)
+        return paths, schemas
 
     # Determine the type of the schema node
     node_type = schema.get('type')
@@ -69,21 +71,26 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
         properties = schema.get('properties', {})
         for prop, subschema in properties.items():
             prop_json_path = f"{current_json_path}.{prop}" if current_json_path else prop
-            paths.update(map_json_paths_to_fhir_paths(subschema, prop_json_path, fhir_path))
+            prop_paths, prop_schemas = map_json_paths_to_fhir_paths(subschema, prop_json_path, fhir_path)
+            paths.update(prop_paths)
+            schemas.update(prop_schemas)
     elif node_type == 'array' or has_items:
         items = schema.get('items', {})
         item_json_path = f"{current_json_path}[*]" if current_json_path else "[*]"
         item_fhir_path = f"{fhir_path}[*]" if fhir_path else "[*]"
-        paths.update(map_json_paths_to_fhir_paths(items, item_json_path, item_fhir_path))
+        item_paths, item_schemas = map_json_paths_to_fhir_paths(items, item_json_path, item_fhir_path)
+        paths.update(item_paths)
+        schemas.update(item_schemas)
     else:
         paths[current_json_path] = fhir_path
+        schemas[current_json_path] = schema
     
-    return paths
+    return paths, schemas
 
 def map_jsonpath_values_to_fhirpaths(response: dict, schema: Schema) -> dict:
 
     # Create the map JSONpath <-> FHIRpath
-    jsonpath_to_fhirmap_map = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True, by_alias=True)))
+    jsonpath_to_fhirmap_map, jsonpath_to_schemas = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True, by_alias=True)))
 
     items = dict()
     for json_path, fhir_path in jsonpath_to_fhirmap_map.items():
@@ -162,27 +169,32 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
 
 def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
     
-    def _parse_types(value):
-        if hasattr(value,'json'):
+    def _parse_types(value, json_type):
+        if json_type == 'object' and hasattr(value,'json'):
             value = json.loads(value.json())
-        elif isinstance(value, (datetime.date, datetime.datetime)):
+        elif json_type == 'string' and isinstance(value, (datetime.date, datetime.datetime)):
             value = value.strftime('%Y-%m-%d')
-        elif isinstance(value, dict):
+        elif json_type == 'object' and isinstance(value, dict):
             value = {key: _parse_types(val) for key,val in value.items()}
-        elif isinstance(value, list):
+        elif json_type == 'array' and isinstance(value, list):
             value = [_parse_types(val) for val in value]
+        elif json_type == 'number' and not isinstance(value, (float, int)):
+            value = float(value)
+        elif json_type == 'integer' and not isinstance(value, int):
+            value = int(value)
         elif value is not None:
             value = str(value)
         return value
     
     # Create the map JSONpath <-> FHIRpath
-    jsonpath_to_fhirmap_map = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True, by_alias=True)))
+    jsonpath_to_fhirmap_map, jsonpath_to_schemas = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True, by_alias=True)))
     
     items = dict()
     for json_path, fhir_path in jsonpath_to_fhirmap_map.items():
         # If the JSONPath has not FHIRPath associated, just skip it
         if not fhir_path:
             continue
+        path_schema = jsonpath_to_schemas[json_path]
         # Check if there are arrays in the JSONPath
         array_splices = json_path.count('[*]')
         if array_splices>0:
@@ -198,13 +210,13 @@ def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
                 # Find the element item in the response
                 value = fhirpath.parse(item_fhir_path).get_value(resource) 
                 if value is not None:
-                    items[item_json_path] = _parse_types(value)
+                    items[item_json_path] = _parse_types(value, path_schema.get('type'))
         else:
             # Otherwise just look for the value at the JSON-path
             value = fhirpath.parse(fhir_path).get_value(resource) 
             if value is not None:
                 # Assign it to the corresponding FHIR-path if there is a value 
-                items[json_path] = _parse_types(value)
+                items[json_path] = _parse_types(value, path_schema.get('type'))
     return items
 
 def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str, enpoint: str, method: str, status_code: str, profile_url: Optional[str] = None, internal_values: Optional[dict] = {}) -> Any:
@@ -230,4 +242,7 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
 
     for json_path, value in (json_path_values | internal_values).items():
         data = parse(json_path).update_or_create(data, value)
+
+    validate_json_schema(instance=data, schema=schema.model_dump(exclude_none=True, by_alias=True))
+
     return data

@@ -53,7 +53,7 @@ class TestMapJsonPathsToFhirPaths:
             }
         }
         expected = {"name": "Patient.name"}
-        result = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_paths_to_fhir_paths(schema)
         assert result == expected
 
     def test_handles_allof_schemas_by_merging_and_mapping_correctly(self):
@@ -80,7 +80,7 @@ class TestMapJsonPathsToFhirPaths:
             ]
         }
         expected = {"name": "Patient.name", "birthDate": "Patient.birthDate"}
-        result = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_paths_to_fhir_paths(schema)
         assert result == expected
 
     def test_handles_anyof_schemas_by_mapping_each_subschema_correctly(self):
@@ -107,7 +107,7 @@ class TestMapJsonPathsToFhirPaths:
             ]
         }
         expected = {"name": "Patient.name", "birthDate": "Patient.birthDate"}
-        result = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_paths_to_fhir_paths(schema)
         assert result == expected
 
 
@@ -134,7 +134,7 @@ class TestMapJsonPathsToFhirPaths:
             }
         }
         expected = {"name": "Patient.name"}
-        result = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_paths_to_fhir_paths(schema)
         assert result == expected
 
     def test_handles_schemas_with_unexpected_types_gracefully(self):
@@ -143,5 +143,5 @@ class TestMapJsonPathsToFhirPaths:
             "x-fhirpath": "Patient.unexpected"
         }
         expected = {"": "Patient.unexpected"}
-        result = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_paths_to_fhir_paths(schema)
         assert result == expected

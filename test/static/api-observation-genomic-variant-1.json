@@ -54,7 +54,7 @@
     "refAllele": "G",
     "altAllele": "G",
     "genomicAlleleExactStartEnd": {
-        "high": "96535210",
-        "low": "96535210"
+        "high": 96535210,
+        "low": 96535210
     }
  }

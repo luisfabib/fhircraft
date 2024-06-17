@@ -4,7 +4,7 @@ components:
       type: object
       properties:
         value:
-          type: string
+          type: number
           x-fhirpath: $this.value
         system:
           type: string
@@ -19,10 +19,10 @@ components:
       type: object
       properties:
         low:
-          type: string
+          type: number
           x-fhirpath: $this.low.value
         high:
-          type: string
+          type: number
           x-fhirpath: $this.high.value
     Coding:
       type: object
@@ -88,7 +88,7 @@ components:
           type: string
           x-fhirpath: Observation.component.where(code.coding.code="48005-3").where(code.coding.system="http://loinc.org").valueString
         copyNumber:
-          type: string
+          type: integer
           x-fhirpath: Observation.component.where(code.coding.code="82155-3").where(code.coding.system="http://loinc.org").valueQuantity.value
         cytogenomicNomeclature:
           type: string
