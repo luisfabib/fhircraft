@@ -1,5 +1,5 @@
 from fhircraft.openapi.parser import extract_json_schema, resolve_ref, traverse_and_replace_references
-from openapi_pydantic import OpenAPI, Schema
+from fhircraft.openapi.models import OpenAPI, Schema
 import pytest  
 
 
@@ -195,8 +195,6 @@ class TestTraverseAndReplaceReferences:
         })
         current_file_path = "test_file.json"
         root_schema = Schema()
-
-        visited_refs = set()
 
         mock_load_url = mocker.patch('fhircraft.openapi.parser.load_url')
         mock_load_url.return_value = {

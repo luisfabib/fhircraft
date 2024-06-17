@@ -3,7 +3,7 @@ from typing import Union, Any, Optional, Tuple, List, Dict
 import os 
 from urllib.parse import urlparse
 from fhircraft.utils import load_file, load_url
-from openapi_pydantic import OpenAPI, Schema
+from fhircraft.openapi.models import OpenAPI, Schema
 
 def load_openapi(openapi_file_location):
     if urlparse(openapi_file_location).scheme in ['http', 'https']:
@@ -172,5 +172,5 @@ def traverse_and_replace_references(schema: Union[Schema, List[Schema]], current
         else:
             return schema
 
-    schema_data = process_iteratively(schema.model_dump(exclude_unset=True), current_file_path, root_schema.model_dump(exclude_unset=True))
+    schema_data = process_iteratively(schema.model_dump(exclude_unset=True, by_alias=True), current_file_path, root_schema.model_dump(exclude_unset=True, by_alias=True))
     return Schema.model_validate(schema_data)

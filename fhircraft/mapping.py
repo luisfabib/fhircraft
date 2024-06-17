@@ -4,7 +4,7 @@ from fhircraft.fhir.path import fhirpath, FHIRPathError
 from fhircraft.fhir.path.utils import join_fhirpath
 from fhircraft.openapi.parser import load_openapi, traverse_and_replace_references, extract_json_schema
 from fhircraft.utils import remove_none_dicts, ensure_list, replace_nth
-from openapi_pydantic import Schema
+from fhircraft.openapi.models import Schema
 from jsonpath_ng.ext import parse
 import datetime
 import itertools
@@ -33,15 +33,13 @@ def merge_schemas(schemas):
 
 def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path=''):
 
-    X_FHIRPATH = 'x-fhirpath'
-    
     def _parse_and_join_fhir_path(parent_fhir_path, fhir_path):    
         if not parent_fhir_path:
             return fhir_path            
         if fhir_path.startswith('$this'):
             fhir_path = join_fhirpath(parent_fhir_path, fhir_path.replace('$this', ''))
         if parent_fhir_path not in fhir_path:
-            raise FHIRPathError(f'Incompatible {X_FHIRPATH} definition for JSON element {current_json_path}:\n"{fhir_path}" cannot be a child element of "{parent_fhir_path}"')
+            raise FHIRPathError(f'Incompatible FHIRPath definition for JSON element {current_json_path}:\n"{fhir_path}" cannot be a child element of "{parent_fhir_path}"')
         return fhir_path
 
     paths = {}
@@ -64,8 +62,7 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
     node_type = schema.get('type')
     has_properties = bool(schema.get('properties'))
     has_items = bool(schema.get('has_items'))
-    fhir_path = _parse_and_join_fhir_path(current_fhir_path, schema.get(X_FHIRPATH, current_fhir_path or None)) 
-
+    fhir_path = _parse_and_join_fhir_path(current_fhir_path, schema.get('x-fhirpath', current_fhir_path or None)) 
     if node_type == 'object' or has_properties:
         properties = schema.get('properties', {})
         for prop, subschema in properties.items():
@@ -84,7 +81,7 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
 def map_jsonpath_values_to_fhirpaths(response: dict, schema: Schema) -> dict:
 
     # Create the map JSONpath <-> FHIRpath
-    jsonpath_to_fhirmap_map = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True)))
+    jsonpath_to_fhirmap_map = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True, by_alias=True)))
 
     items = dict()
     for json_path, fhir_path in jsonpath_to_fhirmap_map.items():
@@ -123,11 +120,9 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     schema = traverse_and_replace_references(schema, openapi_file_location, specification)    
     fhir_resource_values = map_jsonpath_values_to_fhirpaths(response, schema)
     # Construct FHIR profile
-    if not profile_url:
-        profile_url = getattr(schema, "x-fhir-profile")
-        if not profile_url:
-            raise ValueError(f'The schema has no FHIR profile associated via the "x-fhir-profile" attribute.')
-    profile = construct_profiled_resource_model(profile_url)  
+    if not profile_url and not schema.fhirprofile:
+        raise ValueError(f'The schema has no FHIR profile associated via the "x-fhir-profile" attribute.')
+    profile = construct_profiled_resource_model(profile_url or schema.fhirprofile)  
 
     # Construct FHIR resource with propulated fields according to the profile constraints 
     resource = profile.construct_with_profiled_elements()
@@ -172,7 +167,7 @@ def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
         return value
     
     # Create the map JSONpath <-> FHIRpath
-    jsonpath_to_fhirmap_map = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True)))
+    jsonpath_to_fhirmap_map = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True, by_alias=True)))
     
     items = dict()
     for json_path, fhir_path in jsonpath_to_fhirmap_map.items():
@@ -214,11 +209,9 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
     schema = traverse_and_replace_references(schema, openapi_file_location, specification)    
 
     # Construct FHIR profile
-    if not profile_url:
-        profile_url = getattr(schema, "x-fhir-profile")
-        if not profile_url:
-            raise ValueError(f'The schema has no FHIR profile associated via the "x-fhir-profile" attribute.')
-    profile = construct_profiled_resource_model(profile_url)  
+    if not profile_url and not schema.fhirprofile:
+        raise ValueError(f'The schema has no FHIR profile associated via the "x-fhir-profile" attribute.')
+    profile = construct_profiled_resource_model(profile_url or schema.fhirprofile)  
     
     # Parse input response into the FHIR profile
     fhir_resource = profile.parse_obj(response)
