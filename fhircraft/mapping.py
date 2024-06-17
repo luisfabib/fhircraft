@@ -6,6 +6,8 @@ from fhircraft.openapi.parser import load_openapi, traverse_and_replace_referenc
 from fhircraft.utils import remove_none_dicts, ensure_list, replace_nth
 from fhircraft.openapi.models import Schema
 from jsonpath_ng.ext import parse
+from jsonschema import validate as validate_json_schema
+from jsonschema.exceptions import ValidationError as JSONValidationError
 import datetime
 import itertools
 import json
@@ -118,6 +120,12 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
 
     schema = extract_json_schema(specification, enpoint, method, status_code)
     schema = traverse_and_replace_references(schema, openapi_file_location, specification)    
+    
+    try:
+        validate_json_schema(instance=response, schema=schema.model_dump(exclude_none=True, by_alias=True))
+    except JSONValidationError as validation_error: 
+        raise JSONValidationError(f'Invalid API response for specified JSON schema.\n{validation_error.message}')
+        
     fhir_resource_values = map_jsonpath_values_to_fhirpaths(response, schema)
     # Construct FHIR profile
     if not profile_url and not schema.fhirprofile:
@@ -179,7 +187,6 @@ def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
         if array_splices>0:
             # Check how many elements in total are in the flattened (sub)arrays            
             total_elements = len(fhirpath.parse(fhir_path.replace('[*]','')).get_value(resource)  or [])
-            print(fhir_path.replace('[*]',''), len(fhirpath.parse(fhir_path.replace('[*]','')).get_value(resource)  or []))
             # Create individual JSON/FHIR-Paths for each of the items 
             for indices in itertools.product(*[range(total_elements)]*array_splices):
                 item_fhir_path, item_json_path = fhir_path, json_path
@@ -190,13 +197,11 @@ def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
                 # Find the element item in the response
                 value = fhirpath.parse(item_fhir_path).get_value(resource) 
                 if value is not None:
-                    print(f'SET {item_json_path} > {value}')
                     items[item_json_path] = _parse_types(value)
         else:
             # Otherwise just look for the value at the JSON-path
             value = fhirpath.parse(fhir_path).get_value(resource) 
             if value is not None:
-                print(f'SET {json_path} > {value}')
                 # Assign it to the corresponding FHIR-path if there is a value 
                 items[json_path] = _parse_types(value)
     return items

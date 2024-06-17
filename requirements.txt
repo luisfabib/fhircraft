@@ -8,3 +8,4 @@ pyyaml==6.0.1
 fhir.resources[xml]==7.1.0
 python-dotenv==1.0.1
 jsonpath-ng==1.6.1
+jsonschema==4.22.0
