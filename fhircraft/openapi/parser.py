@@ -1,16 +1,49 @@
 from typing import Union, Any, Optional, Tuple, List, Dict
-
+import warnings
 import os 
 from urllib.parse import urlparse
-from fhircraft.utils import load_file, load_url
+from fhircraft.utils import load_file, load_url, suspend_assignment_validation
 from fhircraft.openapi.models import OpenAPI, Schema
+from pydantic import ValidationError
+import json 
 
-def load_openapi(openapi_file_location):
+def load_openapi(openapi_file_location, resolve=False, validate=True):
     if urlparse(openapi_file_location).scheme in ['http', 'https']:
         specification = load_url(openapi_file_location)
     else:
         specification = load_file(openapi_file_location)      
-    return OpenAPI.model_validate(specification)
+
+
+    if resolve:
+        for endpoint in specification['paths'].values():
+            for method in ['get','post', 'put']:
+                method = endpoint.get(method)
+                if not method:
+                    continue
+                for response in method['responses'].values():
+                        content = response.get('content')
+                        if not content:
+                            continue
+                        if 'application/json' in content:
+                            schema = content['application/json']['schema']
+                            schema = traverse_and_replace_references(schema, openapi_file_location, root_schema=specification)
+                            content['application/json']['schema'] = schema
+    if validate:
+        return OpenAPI.model_validate(specification)
+    return specification
+
+
+def validate_specs(openapi_file_location):
+    openapi = load_openapi(openapi_file_location, resolve=True, validate=False) 
+    validation_errors = []
+    try:
+        OpenAPI.model_validate(openapi)
+    except ValidationError as e:
+        validation_errors = e.errors()
+
+    return validation_errors
+    
+
 
 def extract_json_schema(openapi: OpenAPI, endpoint: str, method: str, status_code: str) -> Schema:
     """
@@ -136,7 +169,7 @@ def traverse_and_replace_references(schema: Union[Schema, List[Schema]], current
                 try:
                     ref_content = resolve_ref(ref, current_file_path, root_schema)
                 except Exception as e:
-                    raise RuntimeError(f"Error resolving reference:\n{e}")
+                    raise RuntimeError(f"Error resolving reference in {os.path.abspath(current_file_path)}:\n{e}")
                 # Recursively traverse the resolved object to resolve any nested references
                 ref_content_resolved = process_iteratively(ref_content, os.path.join(os.path.dirname(current_file_path), ref), root_schema)
                 # Merge the schemas
@@ -172,5 +205,5 @@ def traverse_and_replace_references(schema: Union[Schema, List[Schema]], current
         else:
             return schema
 
-    schema_data = process_iteratively(schema.model_dump(exclude_unset=True, by_alias=True), current_file_path, root_schema.model_dump(exclude_unset=True, by_alias=True))
-    return Schema.model_validate(schema_data)
+    schema_data = process_iteratively(schema, current_file_path, root_schema)
+    return schema_data 

@@ -515,7 +515,6 @@ class ProfiledResourceFactory:
         for segment in segments[1:-1]:
             parent_fhir_path = join_fhirpath(path, segment)
             child_elements = fhirpath.parse(parent_fhir_path).get_value(resource)
-            print('child_elements', parent_fhir_path, fhirpath.parse(parent_fhir_path).find(resource))
             if not child_elements:
                 return False
         return True
@@ -636,7 +635,6 @@ class ProfiledResourceFactory:
                     else:
                         for entry in sliced_entries:
                             constrained_slice_elements = fhirpath.parse(slice_subpath).get_value(entry)   
-                            print('VALIDATION SLICE', slice_subpath, constrained_slice_elements)
                             # Get the element that is constrained in the resource
                             if not constrained_slice_elements:
                                 # If the element does not exist, check if its ancestor exist

@@ -5,6 +5,10 @@ import os
 from typing import List, Any, Dict, Union, get_args, get_origin
 from dotenv import dotenv_values
 import re
+from contextlib import contextmanager
+from pydantic import BaseModel as PydanticV2BaseModel
+from pydantic.v1 import BaseModel as PydanticV1BaseModel
+
 
 # URL regex pattern
 URL_PATTERNS = re.compile(
@@ -248,3 +252,33 @@ def flatten_list_of_lists(list_of_lists):
     if not is_list_of_lists(list_of_lists):
         raise ValueError("Input is not a list of lists")
     return [item for sublist in list_of_lists for item in sublist]
+
+
+@contextmanager
+def suspend_assignment_validation(cls: Union[PydanticV1BaseModel,PydanticV2BaseModel], validate=False):
+    
+    def _get_validate_assignment():
+        if isinstance(cls, PydanticV2BaseModel) or issubclass(cls, PydanticV2BaseModel):
+            return cls.model_config.get('validate_assignment', True)
+        elif isinstance(cls, PydanticV1BaseModel) or issubclass(cls, PydanticV1BaseModel): 
+            return cls.Config.validate_assignment
+        else: 
+            raise TypeError('Must be a valid Pydantic v1 or v2 BaseModel')
+            
+    def _set_validate_assignment(val=None):
+        if isinstance(cls, PydanticV2BaseModel) or issubclass(cls, PydanticV2BaseModel):
+            cls.model_config['validate_assignment'] = val
+        elif isinstance(cls, PydanticV1BaseModel) or issubclass(cls, PydanticV1BaseModel): 
+            cls.Config.validate_assignment = val
+        else: 
+            raise TypeError('Must be a valid Pydantic v1 or v2 BaseModel')
+            
+    # Store the original value
+    original_value = _get_validate_assignment()
+    
+    try:
+        # Set validate_assignment to False
+        _set_validate_assignment(validate)
+        yield cls
+    finally:
+        _set_validate_assignment(original_value)

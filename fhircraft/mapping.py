@@ -41,7 +41,7 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
         if fhir_path.startswith('$this'):
             fhir_path = join_fhirpath(parent_fhir_path, fhir_path.replace('$this', ''))
         if parent_fhir_path not in fhir_path:
-            raise FHIRPathError(f'Incompatible FHIRPath definition for JSON element {current_json_path}:\n"{fhir_path}" cannot be a child element of "{parent_fhir_path}"')
+            raise FHIRPathError(f'FHIRPath inheritance error for JSON element <{current_json_path.replace("[*]","")}>:\n"{fhir_path.replace("[*]","")}" cannot be a child element of "{parent_fhir_path.replace("[*]","")}"')
         return fhir_path
 
     paths = {}
@@ -90,7 +90,7 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
 def map_jsonpath_values_to_fhirpaths(response: dict, schema: Schema) -> dict:
 
     # Create the map JSONpath <-> FHIRpath
-    jsonpath_to_fhirmap_map, jsonpath_to_schemas = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True, by_alias=True)))
+    jsonpath_to_fhirmap_map,_ = map_json_paths_to_fhir_paths(json.loads(schema.model_dump_json(exclude_none=True, by_alias=True)))
 
     items = dict()
     for json_path, fhir_path in jsonpath_to_fhirmap_map.items():
@@ -128,7 +128,7 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     specification = load_openapi(openapi_file_location)      
 
     schema = extract_json_schema(specification, enpoint, method, status_code)
-    schema = traverse_and_replace_references(schema, openapi_file_location, specification)    
+    schema = Schema.model_validate(traverse_and_replace_references(schema.model_dump(by_alias=True), openapi_file_location, specification.model_dump(by_alias=True)))    
     
     try:
         validate_json_schema(instance=response, schema=schema.model_dump(exclude_none=True, by_alias=True))
@@ -224,7 +224,7 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
     specification = load_openapi(openapi_file_location)      
 
     schema = extract_json_schema(specification, enpoint, method, status_code)
-    schema = traverse_and_replace_references(schema, openapi_file_location, specification)    
+    schema = Schema.model_validate(traverse_and_replace_references(schema.model_dump(by_alias=True), openapi_file_location, specification.model_dump(by_alias=True)))    
 
     # Construct FHIR profile
     if not profile_url and not schema.fhirprofile:

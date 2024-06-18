@@ -156,7 +156,7 @@ class TestTraverseAndReplaceReferences:
 
     # correctly resolves local references within the same file and includes the 'definitions' key in the expected result
     def test_resolves_local_references_with_definitions_key(self):
-        schema = Schema.model_validate({
+        schema = {
             "definitions": {
                 "example": {
                     "type": "object",
@@ -166,12 +166,12 @@ class TestTraverseAndReplaceReferences:
                 }
             },
             "$ref": "#/definitions/example"
-        })
+        }
         current_file_path = "test_file.json"
         root_schema = schema
 
         result = traverse_and_replace_references(schema, current_file_path, root_schema)
-        expected = Schema.model_validate({
+        expected = {
             "type": "object",
             "properties": {
                 "name": {"type": "string"}
@@ -184,15 +184,15 @@ class TestTraverseAndReplaceReferences:
                     }
                 }
             }
-        })
+        }
 
-        assert result.model_dump() == expected.model_dump()
+        assert result == expected
 
     # Ensure that external references from URLs are resolved successfully with a mocked response without raising HTTP errors
     def test_resolves_external_references_from_urls_with_mock_success_response(self, mocker):
-        schema = Schema.model_validate({
+        schema = {
             "$ref": "http://example.com/schema.json"
-        })
+        }
         current_file_path = "test_file.json"
         root_schema = Schema()
 
@@ -205,20 +205,20 @@ class TestTraverseAndReplaceReferences:
         }
 
         result = traverse_and_replace_references(schema, current_file_path, root_schema)
-        expected = Schema.model_validate({
+        expected = {
             "type": "object",
             "properties": {
                 "name": {"type": "string"}
             }
-        })
+        }
 
-        assert result.model_dump() == expected.model_dump()
+        assert result == expected
 
     # Ensure that external references from local file paths are resolved correctly with the 'os.path.normpath' function mocked.
     def test_resolves_external_references_from_local_file_paths_with_normpath_mocked(self, mocker):
-        schema = Schema.model_validate({
+        schema = {
             "$ref": "external_schema.json"
-        })
+        }
         current_file_path = "/path/to/test_file.json"
         root_schema = Schema()
 
@@ -233,39 +233,39 @@ class TestTraverseAndReplaceReferences:
         }
 
         result = traverse_and_replace_references(schema, current_file_path, root_schema)
-        expected = Schema.model_validate({
+        expected = {
             "type": "object",
             "properties": {
                 "name": {"type": "string"}
             }
-        })
+        }
 
-        assert result.model_dump() == expected.model_dump()
+        assert result == expected
 
     # Detects and handles RecursionError when circular references occur
     def test_detects_and_handles_recursion_error(self):
-        schema = Schema.model_validate({
+        schema = {
             "$ref": "#/definitions/example"
-        })
+        }
         current_file_path = "test_file.json"
-        root_schema = Schema.model_validate({
+        root_schema = {
             "definitions": {
                 "example": {
                     "$ref": "#/definitions/example"
                 }
             }
-        })
+        }
 
         with pytest.raises(RecursionError):
             traverse_and_replace_references(schema, current_file_path, root_schema)
 
     # handles missing keys in reference paths
     def test_handles_missing_keys_in_reference_paths(self):
-        schema = Schema.model_validate({
+        schema = {
             "$ref": "#/definitions/nonexistent"
-        })
+        }
         current_file_path = "test_file.json"
-        root_schema = Schema.model_validate({
+        root_schema = {
             "definitions": {
                 "example": {
                     "type": "object",
@@ -274,16 +274,16 @@ class TestTraverseAndReplaceReferences:
                     }
                 }
             }
-        })
+        }
 
         with pytest.raises(RuntimeError, match="Error resolving reference"):
             traverse_and_replace_references(schema, current_file_path, root_schema)
 
     # handles invalid reference formats
     def test_handles_invalid_reference_formats(self):
-        schema = Schema.model_validate({
+        schema = {
             "$ref": "invalid_format"
-        })
+        }
         current_file_path = "test_file.json"
         root_schema = Schema()
 
@@ -293,7 +293,7 @@ class TestTraverseAndReplaceReferences:
             
 
     def test_resolving_references_with_override_values(self):
-        schema = Schema.model_validate({
+        schema = {
             "components": {
                 "schemas": {
                     "ReferencedObject": {
@@ -322,10 +322,11 @@ class TestTraverseAndReplaceReferences:
                     "type": "integer"
                 }
             }
-        })
+        }
         current_file_path = "test_file.json"
         root_schema = schema
         result = traverse_and_replace_references(schema, current_file_path, root_schema)
+        result = Schema.model_validate(result)
         assert getattr(result.properties['name'],'x-custom-attribute') == 'custom-value'
         assert getattr(result.properties['age'],'type') == 'integer'
         assert getattr(result.properties['alive'],'type') == 'boolean'

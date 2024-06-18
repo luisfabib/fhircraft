@@ -72,8 +72,8 @@ class FhirPathParser:
 
     def p_error(self, t):
         if t is None:
-            raise FhirPathParserError(f'Parse error near the end of string "{self.string}"!')
-        raise FhirPathParserError(f'Parse error at {t.lineno}:{t.col} near token {t.value} ({t.type}): \n\t\t     {self.string}\n\t\t     {" "*t.col}^')
+            raise FhirPathParserError(f'FHIRPath parser error near the end of string "{self.string}"!')
+        raise FhirPathParserError(f'FHIRPath parser error at {t.lineno}:{t.col} near token <{t.value}> ({t.type}): \n{self.string}\n{" "*t.col}^')
 
     def p_fhirpath_binop(self, p):
         """fhirpath : fhirpath '.' fhirpath

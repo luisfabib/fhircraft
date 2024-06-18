@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field, field_validator
-
-from fhircraft.fhir.path import fhirpath
+from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic_core import PydanticCustomError
+from fhircraft.fhir.path import fhirpath, FhirPathParserError
 from fhircraft.openapi.models.compat import PYDANTIC_V2, ConfigDict, Extra, min_length_arg
 
 from .datatype import DataType
@@ -950,14 +950,46 @@ class Schema(BaseModel):
     An OpenAPI extension to specify the FHIR profile related to this instance
     """
 
+    
+    @model_validator(mode='after')
+    def child_fhirpaths_must_be_valid(self):
+        from fhircraft.mapping import map_json_paths_to_fhir_paths, FHIRPathError
+        if self.fhirprofile:
+            try:
+                map_json_paths_to_fhir_paths(self.model_dump(by_alias=True, exclude_none=True))        
+            except FHIRPathError as e:        
+                raise PydanticCustomError('fhirpath',str(e))
+        return self
+
+    # @model_validator(mode='after')
+    # def only_parent_schema_can_have_fhir_profile(self):
+    #     if self.fhirprofile:
+    #         schemas = []
+    #         def recursively_get_decendant_schemas(schema):
+    #             if not schema:
+    #                 return
+    #             schemas.append(schema)
+    #             if schema and schema.get('properties'):
+    #                 [recursively_get_decendant_schemas(schema) for schema in schema['properties'].values()]
+    #             # elif schema and schema.get('items'):
+    #             #     [recursively_get_decendant_schemas(schema) for schema in schema['items'].values()]
+
+    #         recursively_get_decendant_schemas(self.model_dump(exclude_unset=True, by_alias=True, mode='json'))
+    #         assert sum([1 for schema in schemas if schema.get('x-fhir-profile')]) == 1, 'FHIR Profile has been specified other than in the parent schema'
+    #     return self
 
     @field_validator('fhirpath')
     @classmethod
     def must_be_valid_fhirpath(cls, fhir_path: str) -> str:
         if not fhir_path:
             return None
-        fhirpath.parse(fhir_path)
+        try:
+            fhirpath.parse(fhir_path)
+        except FhirPathParserError as e:
+            raise PydanticCustomError('fhirpath',str(e))
         return fhir_path
+
+
 
     if PYDANTIC_V2:
         model_config = ConfigDict(
