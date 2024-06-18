@@ -1,15 +1,11 @@
 import pytest
 
-from fhircraft.fhir.path.engine import Child, Root, Fields, Index, Slice, Where, Extension, Single, TypeChoice, This
+from fhircraft.fhir.path.engine import Child, Root, Fields, Index, Slice, Where, Extension, Single, TypeChoice, This, Expression
 from fhircraft.fhir.path.lexer import FhirPathLexer
 from fhircraft.fhir.path.parser import FhirPathParser
 
 # Format: (string, expected_object)
 parser_test_cases = (
-    #
-    # Atomic
-    # ------
-    #
     ("foo", Fields("foo")),
     ("*", Fields("*")),
     ("baz,bizzle", Fields("baz", "bizzle")),
@@ -20,22 +16,27 @@ parser_test_cases = (
     ("[:2]", Slice(end=2)),
     ("[1:2]", Slice(start=1, end=2)),
     ("[5:-2]", Slice(start=5, end=-2)),
-    #
-    # Nested
-    # ------
-    #
-    ("$.code", Child(Root(), Fields("code"))),
-    ("$this.code", Child(This(), Fields("code"))),
-    ("Observation.code", Child(Root(), Fields("code"))),
-    ("Observation.code[1]", Child(Child(Root(), Fields("code")), Index(1))),
-    ('Observation.component.where(code.coding.code="test")', Child(Child(Root(), Fields("component")), Where(Child(Child(Fields("code"), Fields("coding")), Fields("code")), "test"))),
-    ('Observation.component.where(code.coding.code="test").where(code.coding.system="test2")', Child(Child(Child(Root(), Fields("component")),Where(Child(Child(Fields("code"), Fields("coding")), Fields("code")), "test"),),Where(Child(Child(Fields("code"), Fields("coding")), Fields("system")), "test2"))),
-    ("Observation.identifier.first().value", Child(Child(Child(Root(), Fields("identifier")), Index(0)), Fields("value"))),
-    ("Observation.identifier.last().value", Child(Child(Child(Root(), Fields("identifier")), Index(-1)), Fields("value"))),
-    ("Observation.identifier.tail().value", Child(Child(Child(Root(), Fields("identifier")), Slice(0,-1)), Fields("value"))),
-    ("Observation.identifier.single().value", Child(Child(Child(Root(), Fields("identifier")), Single()), Fields("value"))),
-    ('Observation.extension("http://domain.org/extension")', Extension(Root(), "http://domain.org/extension")),
-    ("Observation.component.value[x]", Child(Child(Root(), Fields('component')), TypeChoice('value'))),
+    ("$", Root()),
+    ("$this", This()),
+    ("%resource", Root()),
+    ("%context", This()),
+    ("parent.child", Child(Fields('parent'), Fields("child"))),    
+    ("parent.child[1]", Child(Child(Fields('parent'), Fields("child")), Index(1))),    
+    ("parent.where(child='string')", Child(Fields('parent'), Where(Expression(Fields('child'),'=', 'string')))),
+    ("parent.where(child=1234)", Child(Fields('parent'), Where(Expression(Fields('child'), '=',1234)))),
+    ("parent.where(child=@2024)", Child(Fields('parent'), Where(Expression(Fields('child'),'=', '2024')))),
+    ("parent.where(child=@2024-12-01)", Child(Fields('parent'), Where(Expression(Fields('child'), '=','2024-12-01')))),
+    ("parent.where(child=@T12:05)", Child(Fields('parent'), Where(Expression(Fields('child'),'=','12:05')))),
+    ("parent.where(child=@T12:05)", Child(Fields('parent'), Where(Expression(Fields('child'),'=','12:05')))),
+    ("parent.where(child=@2024)", Child(Fields('parent'), Where(Expression(Fields('child'),'=', '2024')))),
+    ("parent.extension('http://domain.org/extension')", Child(Fields('parent'), Extension("http://domain.org/extension"))),
+    ("parent.single()", Child(Fields('parent'), Single())),    
+    ("parent.first()", Child(Fields('parent'), Index(0))),    
+    ("parent.last()", Child(Fields('parent'), Index(-1))),    
+    ("parent.tail()", Child(Fields('parent'), Slice(0,-1))),  
+    ("parent.skip(3)", Child(Fields('parent'), Slice(3,-1))),    
+    ("parent.take(3)", Child(Fields('parent'), Slice(0,3))),     
+    ("parent.value[x]", Child(Fields('parent'), TypeChoice('value'))),
 )
 
 

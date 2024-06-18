@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_core import PydanticCustomError
-from fhircraft.fhir.path import fhirpath, FhirPathParserError
+from fhircraft.fhir.path import fhirpath, FhirPathParserError, FhirPathLexerError
 from fhircraft.openapi.models.compat import PYDANTIC_V2, ConfigDict, Extra, min_length_arg
 
 from .datatype import DataType
@@ -985,7 +985,7 @@ class Schema(BaseModel):
             return None
         try:
             fhirpath.parse(fhir_path)
-        except FhirPathParserError as e:
+        except (FhirPathParserError, FhirPathLexerError) as e:
             raise PydanticCustomError('fhirpath',str(e))
         return fhir_path
 

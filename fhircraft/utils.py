@@ -52,6 +52,8 @@ def ensure_list(item: Any) -> list:
     list: The input variable converted into a list, or the input variable itself if it was already an iterable.
     """
     if not isinstance(item, list):
+        if isinstance(item, tuple):
+            return list(item)
         return [item]
     return item
 

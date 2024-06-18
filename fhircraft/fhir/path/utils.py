@@ -31,3 +31,7 @@ def join_fhirpath(*segments: str) -> str:
         str(segment).strip('.') 
             for segment in segments if segment!=''
     )) 
+    
+
+def _underline_error_in_fhir_path(fhir_path, error, error_position):
+    return f'{fhir_path[:error_position+len(str(error))+15]}...\n{" "*error_position}{"—"*len(str(error))}'

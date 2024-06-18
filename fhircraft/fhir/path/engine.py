@@ -6,6 +6,7 @@ from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, i
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel as FhirResource
 import typing
+from dataclasses import dataclass
 
 # Get logger name
 logger = logging.getLogger(__name__)
@@ -252,6 +253,27 @@ class AutoIdForDatum(FHIRElementContext):
         return isinstance(other, AutoIdForDatum) and other.datum == self.datum and self.id_field == other.id_field
 
 
+@dataclass
+class Expression:
+    left : typing.Union[str,FHIRPath]  
+    op : str
+    right : typing.Any   
+
+    def __str__(self):
+        return f'{self.left}{self.op}{self.right}'
+
+    def __repr__(self):
+        return f'Expression({self.left.__repr__()}{self.op}{self.right.__repr__()})'
+
+    def __eq__(self, other):
+        return isinstance(other, Expression) and self.left == other.left and self.right == other.right and self.op == other.op
+
+    def __hash__(self):
+        return hash((self.left, self.op, self.right))
+        
+    
+
+
 class Root(FHIRPath):
     """
     The FHIRPath referring to the "root" object. Concrete syntax is '$'.
@@ -391,17 +413,19 @@ class Parent(FHIRPath):
 
 class Where(FHIRPath):
 
-    def __init__(self, descendant, value):
-        self.descendant = descendant
-        self.value = value
+    def __init__(self, expression: Expression):
+        self.expression = expression
+        # Currently, Where only handles equality expressions
+        if self.expression.op != '=':
+            raise NotImplementedError()
         
     def find(self, datum):
         matches = FHIRElementContext(value=[
                 item
                 for item in datum.value
-                    for descendant_match in self.descendant.find(item)
-                        for condition_value in ensure_list(descendant_match.value)
-                            if condition_value is not None and condition_value == str(self.value)
+                    for descendant_match in self.expression.left.find(item)
+                        for righthand in ensure_list(descendant_match.value)
+                            if righthand is not None and righthand == str(self.expression.right)
         ], context=datum, path=datum.path)
         return [matches] 
 
@@ -416,31 +440,29 @@ class Where(FHIRPath):
         return data
 
     def __str__(self):
-        return f'{self.left}.Where({self.descendant}="{self.value}")'
+        return f'Where({self.expression})'
 
     def __repr__(self):
-        return f'{self.left}.Where({self.descendant}="{self.value}")'
+        return f'Where({self.expression.__repr__})'
     
     def __eq__(self, other):
-        return isinstance(other, Where) and other.descendant == self.descendant  and other.value == self.value
+        return isinstance(other, Where) and other.expression == self.expression
 
     def __hash__(self):
-        return hash((self.left, self.descendant, self.value))
+        return hash((self.expression))
 
 
 
 class Extension(FHIRPath):
 
-    def __init__(self, left, url):
-        self.left = left
+    def __init__(self, url):
         self.url = url
 
     def find(self, element):
         element = FHIRElementContext.wrap(element)
         matches = FHIRElementContext(value=[
             extension
-                for match in self.left.find(element)
-                    for value in ensure_list(match.value)
+                    for value in ensure_list(element.value)
                         if hasattr(value, 'extension')
                             for extension in ensure_list(value.extension)
                                 if extension and isinstance(extension, get_fhir_model_class('Extension')) and extension.url == self.url
@@ -458,16 +480,16 @@ class Extension(FHIRPath):
         return data
 
     def __str__(self):
-        return f'{self.left}.Extension("{self.url}")'
+        return f'Extension("{self.url}")'
 
     def __repr__(self):
-        return f'{self.left}.Extension("{self.url}")'
+        return f'Extension("{self.url}")'
     
     def __eq__(self, other):
         return isinstance(other, Extension) and other.url == self.url
 
     def __hash__(self):
-        return hash((self.left, self.url))
+        return hash((self.url))
 
 
 class TypeChoice(FHIRPath):
@@ -812,6 +834,7 @@ class Index(FHIRPath):
 
     def _find_base(self, element: typing.Union[FHIRElementContext,FhirResource], create: bool):
         element = FHIRElementContext.wrap(element)
+        element.value = ensure_list(element.value)
         if create:
             self._pad_array(element)
         if element.value and len(element.value) > self.index:
@@ -828,7 +851,8 @@ class Index(FHIRPath):
         return self._update_base(data, val, create=True)
 
     def _update_base(self, element: typing.Union[FHIRElementContext,FhirResource], val: typing.Any, create: bool):
-        element = FHIRElementContext.wrap(element)                          
+        element = FHIRElementContext.wrap(element)      
+        element.value = ensure_list(element.value)                    
         if create:
             self._pad_array(element)
         array = element.value
@@ -862,13 +886,13 @@ class Single(Index):
         super().__init__(index=0)
 
     def _find_base(self, datum, create):
-        if not datum.value or len(datum.value) != 1:
-            raise FHIRPathError(f'Expected single value for {datum.full_path}.single(), instead got {len(datum.value)} values')
+        vals = ensure_list(datum.value)
+        if not datum.value or len(vals) != 1:
+            raise FHIRPathError(f'Expected single value for {datum.full_path}.single(), instead got {len(vals)} values')
         return super()._find_base(datum, create)
 
     def _update_base(self, data, val, create):
-        if not isinstance(val, list):
-            vals = [val]
+        vals = ensure_list(val)
         if len(vals) != 1:
             raise FHIRPathError(f'Expected single value, instead got {len(vals)} values')
         return super()._update_base(data, val, create)
@@ -910,7 +934,7 @@ class Slice(FHIRPath):
         if not datum.value:
             return []
         if self.end < 0:
-            self.end = len(datum.value) + self.end 
+            self.end = len(datum.value) + self.end + 1 
         # Here's the hack. If it is a dictionary or some kind of constant,
         # put it in a single-element list
         if (isinstance(datum.value, dict) or isinstance(datum.value, int) or isinstance(datum.value, str)):

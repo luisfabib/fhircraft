@@ -159,11 +159,11 @@ class FHIRSlice:
         fhir_path = self.slicing_group.path
         for path, value in self.discriminator_values.items():
             if path.startswith('.'): path = path[1:]
-            fhir_path = join_fhirpath(fhir_path, f'where({path}="{value}")')       
+            fhir_path = join_fhirpath(fhir_path, f"where({path}='{value}')")       
         if self.profile_constraint:
             if fhir_path.rsplit('.' ,1)[1] == 'extension':
                 fhir_path = fhir_path.rsplit('.',1)[0]
-            fhir_path = join_fhirpath(fhir_path, f'extension("{self.profile_constraint.__canonical_url__}")')   
+            fhir_path = join_fhirpath(fhir_path, f"extension('{self.profile_constraint.__canonical_url__}')")   
         return fhir_path 
 
 @dataclass

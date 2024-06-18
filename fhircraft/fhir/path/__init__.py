@@ -1,5 +1,9 @@
-from .parser import FhirPathParser 
+from .parser import FhirPathParser, FhirPathParserError
 from .engine import FHIRPathError 
-from .parser import FhirPathParserError 
+from .lexer import FhirPathLexerError 
 
-fhirpath = FhirPathParser()
+try:
+    fhirpath = FhirPathParser()
+except Exception as e:
+    print(e)
+    fhirpath = None

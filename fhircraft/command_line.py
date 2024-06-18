@@ -8,6 +8,7 @@ from fhircraft.utils import load_file, ensure_list
 from pydantic import ValidationError
 from rich import print, print_json
 from rich.table import Table
+from rich.text import Text
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from typing_extensions import Annotated
@@ -82,14 +83,15 @@ def validate_openapi_spec(
         validation_errors = validate_specs(openapi_spec)
     if validation_errors:
         console = Console()
-        table = Table("Field", "Error","Message")
+        table = Table("OpenAPI specification path", "Error","Error message", leading=2, highlight=True)
         for error in validation_errors:
-            location = '.'.join([loc if isinstance(loc, str) else f'[{loc}]' for loc in error['loc'] if isinstance(loc, (str, int)) and str(loc) not in ['Schema', 'function-after']])
+            location = '.'.join([loc.split('[')[0] if isinstance(loc, str) else f'[{loc}]' for loc in error['loc'] if isinstance(loc, (str, int)) and loc not in ['Schema', 'properties']])
             location = location.replace('function-after','').replace('..','.').replace('.[','[')
+            location = f'{location[:30]}(...){location[-70:]}'
             if location.endswith('Reference.$ref'):
                 continue
-            table.add_row(location, error['type'], error['msg'])
-        console.print(f'\n  [red]:x: The OpenAPI specification is not valid and contains the following errors:\n', style='red')
+            table.add_row(Text(location, overflow='ellipsis'), error['type'], error['msg'])
+        console.print(f'\n :x: VALIDATION FAILED \n\n The OpenAPI specification is not valid and contains the following errors:\n', style='bright_red')
         console.print(table)
         console.print()
         raise typer.Exit(code=1)

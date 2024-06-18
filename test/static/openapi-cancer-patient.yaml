@@ -58,7 +58,7 @@ components:
               x-fhirpath: null
             display:
               type: string
-              x-fhirpath: Patient.extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-race").extension("text").valueString
+              x-fhirpath: Patient.extension('http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension('text').valueString
             version:
               type: string
               x-fhirpath: null
@@ -74,7 +74,7 @@ components:
               x-fhirpath: null
             display:
               type: string
-              x-fhirpath: Patient.extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity").extension("text").valueString
+              x-fhirpath: Patient.extension('http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity').extension('text').valueString
             version:
               type: string
               x-fhirpath: null
@@ -103,7 +103,7 @@ components:
               x-fhirpath: null
             code:
               type: string
-              x-fhirpath: Patient.extension("http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex").valueCode
+              x-fhirpath: Patient.extension('http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex').valueCode
             display:
               type: string
               x-fhirpath: null
