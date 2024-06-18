@@ -4,6 +4,8 @@
 
 ## Features
 
+![](https://github.com/luisfabib/fhircraft/blob/main/docs/static/terminal.gif)
+
 - **Offline FHIR Profile Construction:** Create and manage FHIR profiles.
 - **FHIR Profile Validation:** Validate resources against FHIR profiles.
 - **OpenAPI Parsing:** Parse OpenAPI specifications with FHIR-related extensions.
