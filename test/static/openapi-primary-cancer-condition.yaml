@@ -5,37 +5,37 @@ components:
       properties:
         value:
           type: string
-          x-fhirpath: $this.value
+          x-fhirpath: '%context.value'
         system:
           type: string
-          x-fhirpath: $this.system
+          x-fhirpath: '%context.system'
         code:
           type: string
-          x-fhirpath: $this.system
+          x-fhirpath: '%context.system'
     Range:
       type: object
       properties:
         low:
           type: string
-          x-fhirpath: $this.low.value
+          x-fhirpath: '%context.low.value'
         high:
           type: string
-          x-fhirpath: $this.high.value
+          x-fhirpath: '%context.high.value'
     Coding:
       type: object
       properties:
         system:
           type: string
-          x-fhirpath: $this.system
+          x-fhirpath: '%context.system'
         code:
           type: string
-          x-fhirpath: $this.code
+          x-fhirpath: '%context.code'
         display:
           type: string
-          x-fhirpath: $this.display
+          x-fhirpath: '%context.display'
         version:
           type: string
-          x-fhirpath: $this.version
+          x-fhirpath: '%context.version'
     Date: 
       type: string
       format: date
