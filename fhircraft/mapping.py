@@ -1,5 +1,5 @@
 from typing import Union, Any, Optional, Tuple, List, Dict
-from fhircraft.fhir.profiles import construct_profiled_resource_model, track_slice_changes, validate_profiled_resource
+from fhircraft.fhir.profiling.factory import construct_profiled_resource_model, track_slice_changes, validate_profiled_resource
 from fhircraft.fhir.path import fhirpath, FHIRPathError
 from fhircraft.fhir.path.utils import join_fhirpath
 from fhircraft.openapi.parser import load_openapi, traverse_and_replace_references, extract_json_schema
