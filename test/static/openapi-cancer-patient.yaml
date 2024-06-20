@@ -5,37 +5,37 @@ components:
       properties:
         value:
           type: string
-          x-fhirpath: $this.value
+          x-fhirpath: '%context.value'
         system:
           type: string
-          x-fhirpath: $this.system
+          x-fhirpath: '%context.system'
         code:
           type: string
-          x-fhirpath: $this.system
+          x-fhirpath: '%context.system'
     Range:
       type: object
       properties:
         low:
           type: string
-          x-fhirpath: $this.low.value
+          x-fhirpath: '%context.low.value'
         high:
           type: string
-          x-fhirpath: $this.high.value
+          x-fhirpath: '%context.high.value'
     Coding:
       type: object
       properties:
         system:
           type: string
-          x-fhirpath: $this.system
+          x-fhirpath: '%context.system'
         code:
           type: string
-          x-fhirpath: $this.code
+          x-fhirpath: '%context.code'
         display:
           type: string
-          x-fhirpath: $this.display
+          x-fhirpath: '%context.display'
         version:
           type: string
-          x-fhirpath: $this.version
+          x-fhirpath: '%context.version'
     Date: 
       type: string
       format: date
@@ -118,46 +118,46 @@ components:
             properties:
               givenNames: 
                 type: array
-                x-fhirpath: $this.given
+                x-fhirpath: '%context.given'
                 items:
                   type: string
               familyName: 
                 type: string
-                x-fhirpath: $this.family
+                x-fhirpath: '%context.family'
         birthDate:
           type: string
           x-fhirpath: Patient.birthDate
         contacts:
           type: array
-          x-fhirpath: Patient.contact.telecom
+          x-fhirpath: 'Patient.contact.telecom'
           items: 
             type: object
             properties:
               system: 
                 type: string
-                x-fhirpath: $this.system
+                x-fhirpath: '%context.system'
               value:
                 type: string
-                x-fhirpath: $this.value
+                x-fhirpath: '%context.value'
               use:
                 type: string
-                x-fhirpath: $this.use
+                x-fhirpath: '%context.use'
         identifier:
           type: object
           x-fhirpath: Patient.identifier
           properties:
             use: 
               type: string
-              x-fhirpath: $this.use
+              x-fhirpath: '%context.use'
             system: 
               type: string
-              x-fhirpath: $this.system
+              x-fhirpath: '%context.system'
             category: 
               $ref: '#/components/schemas/Coding'
-              x-fhirpath: $this.type.coding
+              x-fhirpath: '%context.type.coding'
             value: 
               type: string
-              x-fhirpath: $this.value
+              x-fhirpath: '%context.value'
 
 
 

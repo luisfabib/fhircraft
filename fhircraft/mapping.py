@@ -38,8 +38,8 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
     def _parse_and_join_fhir_path(parent_fhir_path, fhir_path):    
         if not parent_fhir_path:
             return fhir_path            
-        if fhir_path.startswith('$this'):
-            fhir_path = join_fhirpath(parent_fhir_path, fhir_path.replace('$this', ''))
+        if fhir_path.startswith('%context'):
+            fhir_path = join_fhirpath(parent_fhir_path, fhir_path.replace('%context', ''))
         if parent_fhir_path not in fhir_path:
             raise FHIRPathError(f'FHIRPath inheritance error for JSON element <{current_json_path.replace("[*]","")}>:\n"{fhir_path.replace("[*]","")}" cannot be a child element of "{parent_fhir_path.replace("[*]","")}"')
         return fhir_path
