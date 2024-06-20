@@ -9,10 +9,12 @@ from fhircraft.utils import get_dict_paths, load_env_variables, ensure_list, rem
 
 from pydantic.v1 import ValidationError, create_model, validate_model, Extra
 from pydantic.v1.error_wrappers import ErrorWrapper
-from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_origin
-from dataclasses import dataclass, field
+from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_origin, Literal
 from fhircraft.fhir.path.utils import split_fhirpath, join_fhirpath
-from fhircraft.fhir.path import fhirpath
+from fhircraft.fhir.path import fhirpath, FHIRPathError, FhirPathParserError, FhirPathLexerError
+from dataclasses import dataclass, field
+from enum import StrEnum
+import re
 import datetime 
 import json
 import requests
@@ -36,16 +38,7 @@ class FHIRConstraint:
     xpath: Optional[str] = None
 
 @dataclass
-class FHIRBinding:
-    strength: Optional[str] = None
-    valueSet: Optional[str] = None
-
-@dataclass
-class FHIRPattern:
-    value: Optional[Union[str, float, int, Dict[str, Union[str, float, int]]]] = None
-
-@dataclass
-class FHIRProfileConstraint:
+class Constraint:
     id: str
     path: str
     min: int
@@ -54,7 +47,7 @@ class FHIRProfileConstraint:
     valueType: Optional[List[str]] = field(default_factory=list)
     fixedValue: Optional[Union[str, float, int, Dict[str, Union[str, float, int]]]] = None
     pattern: Optional[Union[str, float, int, Dict[str, Union[str, float, int]]]] = None
-    binding: Optional[FHIRBinding] = None
+    binding: Optional[str] = None
     constraints: Optional[List[FHIRConstraint]] = field(default_factory=list)
 
     @property
@@ -65,47 +58,242 @@ class FHIRProfileConstraint:
         slice_name = self.id.split(':')[1].split('.')[0]
         return slice_name
 
+
+
 @dataclass
-class FHIRDiscriminator:
-    type: str  # E.g., "pattern"
-    path: str  # E.g., "code"
-    
-@dataclass
-class FHIRExtension:
-    id : str
-    name : str
-    path : str
-    url: str
-    constraints: List[FHIRProfileConstraint] = field(default_factory=list)
+class Discriminator:
+    """
+    Discriminator 
+    --------------
+    Each discriminator is a pair of values: a type that indicates how the field 
+    is processed when evaluating the discriminator, and a FHIRPath expression that 
+    identifies the element in which the discriminator is found.
+    """
+    class DiscriminatorType(StrEnum):
+        """
+        There are five different processing types for discriminators: 
+        """
+        VALUE = "value"      
+        PATTERN = "pattern"   
+        EXISTS = "exists"     
+        TYPE = "type"         
+        PROFILE = "profile"   
+        POSITION = "position" 
         
+    type: DiscriminatorType 
+    path: str
+    _RESTRICTED_FHIRPATH_FUNCTIONS = ('extension', 'resolve', 'ofType')
+  
+    def __post_init__(self):
+        # Check if self.type is a valid DiscriminatorType
+        if not self.type in self.DiscriminatorType._value2member_map_:
+            raise ValueError(f"Invalid discriminator type: '{self.type}'")
+        # Parse FHIRPath to ensure it is valid
+        if not fhirpath.is_valid(self.path):
+            raise FHIRPathError(f'Slice discriminator FHIRPath is not valid: {self.path}')
+        # Check that only the restricted FHIRPath function are used
+        matches = re.finditer(r"\.?([a-zA-Z]*)\(.*\)", self.path)
+        for match in matches:
+            function = match.group(1)
+            if function not in self._RESTRICTED_FHIRPATH_FUNCTIONS:
+                raise FHIRPathError(f'Slice discriminator FHIRPath is not valid: Invalid function "{function}" used in restricted discriminator FHIRPath')
+    
+    def construct_fhirpath_expression(self, value=None):
+        match self.type:
+            case self.DiscriminatorType.VALUE | self.DiscriminatorType.PATTERN:
+                return f"where({self.path}='{value}')"
+            case self.DiscriminatorType.EXISTS:
+                return f"where({self.path}.exists())"     
+            case self.DiscriminatorType.TYPE:
+                return f"where({self.path} is {value})"   
+            case self.DiscriminatorType.PROFILE:
+                return f"where({self.path}.conformsTo('{value}')"     
+            case self.DiscriminatorType.POSITION:
+                return f"index({value})"               
+                
 @dataclass
-class FHIRSlice:
+class Slice:
+    """
+    Slice
+    -----
+    A slice is a specific subset or a partition of the elements that results from the slicing process.
+    Each slice is defined with its own constraints or characteristics based on the slicing criteria. 
+    Essentially, a slice is a unique subgroup within the repeating element that is differentiated by 
+    the defined slicing criteria.   
+    """
     id : str
     name : str
-    type: str  # Type of the slice
-    constraints: List[FHIRProfileConstraint] = field(default_factory=list)
-    slicing_group: Optional[object] = None
-    
+    type: str 
+    constraints: List[Constraint] = field(default_factory=list)
+    slicing: Optional["SlicingGroup"] = None
+      
+    @property
+    def full_fhir_path(self):
+        """
+        Construct the full FHIRPath for the slice based on the slicing path and the discriminating expression.
+        
+        Returns:
+        --------
+        str
+            The full FHIR path constructed by combining the slicing path and the discriminating expression.
+        """        
+        if self.slicing.path.endswith('extension') and self.discriminating_expression.startswith('extension'):
+            return join_fhirpath(self.slicing.path.replace('extension',''), self.discriminating_expression)
+        else:
+            return join_fhirpath(self.slicing.path, self.discriminating_expression)
+              
     @property
     def min_cardinality(self):
-        return min([constraint.min for constraint in self.constraints if constraint.min and constraint.path == self.slicing_group.path])       
-    
-    @property
-    def profile_constraint(self):
-        return next((constraint.profile for constraint in self.constraints if constraint.profile and constraint.path == self.slicing_group.path),None)       
+        """
+        Calculate the minimum cardinality among the slice constraints.
+        
+        Returns:
+        --------
+        int
+            The minimum cardinality value.
+        """        
+        return min([constraint.min for constraint in self.get_constraints_on_slice()])       
     
     @property
     def max_cardinality(self):
-        return max([constraint.max for constraint in self.constraints if constraint.max and constraint.path == self.slicing_group.path])       
+        """
+        Calculate the maximum cardinality among the sliceconstraints.
+        
+        Returns:
+        --------
+        int
+            The maximum cardinality value.
+        """        
+        return max([constraint.max for constraint in self.get_constraints_on_slice()])       
+    
+    @property
+    def profile_constraint(self):
+        return next((constraint.profile for constraint in self.constraints if constraint.profile and constraint.path == self.slicing.path),None)       
     
     
-    def add_constraint(self, constraint):
+    def get_constraints_on_slice(self):
+        """
+        Get the constraints specific to the slice as element based on the path
+        
+        Returns:
+        --------
+        List[Constraint]
+            A list of constraints that apply to this slice, filtered by the slicing path.
+        """        
+        return [constraint for constraint in self.constraints if constraint.path == self.slicing.path]       
+    
+    
+    def add_constraint(self, constraint):        
+        """
+        Convinience function to add a constraint to to the slice.
+        
+        Arguments:
+        ----------
+        constraint: Constraint
+            The constraint to be added to the slice
+        """   
+        if not isinstance(constraint, Constraint):
+            raise TypeError('The constraint must be a valid <Constraint> instance')
         self.constraints.append(constraint)
+    
+    @property
+    def discriminating_expression(self):
+        """
+        Construct the discriminating expression for the slice based on its discriminators.
+
+        This method iterates over all discriminators in the slicing group and constructs an expression
+        to identify the slice based on the discriminator type and the constraints applied to the slice.
+
+        Returns:
+        --------
+        str
+            The discriminating FHIRPath expression for the slice.
+        
+        Notes:
+        ------
+        The expression is constructed differently based on the type of discriminator:
+        - VALUE/PATTERN: Differentiates slices by fixed values, patterns, or required ValueSet bindings.
+        - EXISTS: Differentiates slices by the presence or absence of the nominated element.
+        - TYPE: Differentiates slices by the type of the nominated element.
+        - PROFILE: Differentiates slices by conformance to a specified profile.
+        - POSITION: Differentiates slices by their index within the slicing group.
+        
+        Special handling is applied for 'Extension' types with profile constraints, 
+        where the profile URL is included in the expression.
+        """        
+        expression = ''
+        # Loop over all discriminators for the slice
+        for discriminator in self.slicing.discriminators:
+            # Get the constraints that apply specifically to the discriminator element
+            discriminator_constraints = [
+                constraint for constraint in self.constraints 
+                if constraint.path == join_fhirpath(self.slicing.path, discriminator.path)
+            ]
+            # Construct the discrimination expression based on the type of discriminator
+            match discriminator.type:
+                case discriminator.DiscriminatorType.VALUE | discriminator.DiscriminatorType.PATTERN:
+                    """
+                    Discriminator - Value/Pattern
+                    The slices have different values in the nominated element, as determined by the applicable 
+                    fixed value, pattern, or required ValueSet binding.
+                    """
+                    # Handle special case of extensions
+                    profile_constraint = next((constraint.profile for constraint in self.get_constraints_on_slice() if constraint.profile), None)
+                    if self.type=='Extension' and profile_constraint:
+                        expression = join_fhirpath(expression, f"extension('{profile_constraint.__canonical_url__}')")
+                        continue
+                    # Get the constrained pattern applied to the discriminator element 
+                    pattern = next((constraint.pattern for constraint in discriminator_constraints if constraint.pattern),None)
+                    discriminating_values = get_dict_paths(pattern.dict(), prefix=discriminator.path) if pattern else {}
+                    # Get the constrained fixed values applied to the discriminator element 
+                    fixedValues = {discriminator.path: constraint.fixedValue for constraint in discriminator_constraints if constraint.fixedValue}
+                    discriminating_values.update(fixedValues)
+                    # Get the paths to the individual values set by the pattern
+                    for path, value in discriminating_values.items():
+                        # Discriminating expression for current pattern value
+                        expression = join_fhirpath(expression, f"where({path}='{value}')")
+
+                case discriminator.DiscriminatorType.EXISTS:
+                    """
+                    Discriminator - Existence
+                    The slices are differentiated by the presence or absence of the nominated element.
+                    """
+                    expression = join_fhirpath(expression, f"where({discriminator.path}.exists())")
+                    
+                case discriminator.DiscriminatorType.TYPE:
+                    """
+                    Discriminator - Type
+                    The slices are differentiated by type of the nominated element.
+                    """
+                    expression = join_fhirpath(expression, f"where({discriminator.path} is {self.type})")
+                    
+                case discriminator.DiscriminatorType.PROFILE:
+                    """
+                    Discriminator - Profile
+                    The slices are differentiated by conformance of the nominated element to a specified profile.
+                    Note that if the path specifies .resolve() then the profile is the target profile on the reference. 
+                    """
+                    # raise NotImplementedError() 
+                
+                case discriminator.DiscriminatorType.POSITION:
+                    """
+                    Discriminator - Existence
+                    The slices are differentiated by their index. This is only possible if all but the last 
+                    slice have min=max cardinality, and the (optional) last slice contains other undifferentiated elements.
+                    """
+                    # Find position of current slice in slicing group
+                    index = next((index for index,slice in enumerate(self.slicing.slices) if slice == self))
+                    expression = join_fhirpath(expression, f"index({index})")
+                    
+        return expression
+
+
+
     
     @property
     def pydantic_model(self):       
         
-        base_model, element = self.slicing_group.path.rsplit('.',1)
+        base_model, element = self.slicing.path.rsplit('.',1)
         if element.lower() == 'extension':
             model = get_fhir_model_class('Extension')
         else:
@@ -117,7 +305,7 @@ class FHIRSlice:
         class ProfiledSlice(model, extra=Extra.allow):
             __track_changes__: bool = False 
             __has_been_modified__: bool = False
-            __slicing__: ClassVar[List[FHIRSlicing]] = self.profile_constraint.__slicing__ if self.profile_constraint else None
+            __slicing__: ClassVar[List[SlicingGroup]] = self.profile_constraint.__slicing__ if self.profile_constraint else None
 
             def __setattr__(self, name:str, value):
                 super().__setattr__(name, value)
@@ -146,52 +334,48 @@ class FHIRSlice:
         slice_model.validate_assignment = False
         return slice_model
     
-    @property
-    def discriminator_values(self):
-        for discriminator_path in self.slicing_group.discriminator_paths:
-            for constraint in self.constraints:
-                if constraint.pattern and discriminator_path == constraint.path:
-                    return get_dict_paths(constraint.pattern.dict(), prefix=discriminator_path.replace(self.slicing_group.path,''))
-        return {}
     
-    @property
-    def fhirpath(self):
-        fhir_path = self.slicing_group.path
-        for path, value in self.discriminator_values.items():
-            if path.startswith('.'): path = path[1:]
-            fhir_path = join_fhirpath(fhir_path, f"where({path}='{value}')")       
-        if self.profile_constraint:
-            if fhir_path.rsplit('.' ,1)[1] == 'extension':
-                fhir_path = fhir_path.rsplit('.',1)[0]
-            fhir_path = join_fhirpath(fhir_path, f"extension('{self.profile_constraint.__canonical_url__}')")   
-        return fhir_path 
-
 @dataclass
-class FHIRSlicing:
-    id : str
-    path: str  # The path within the resource where slicing is applied
-    discriminators: List[FHIRDiscriminator]  # List of discriminators used for slicing
-    description: Optional[str] = None  # Optional description of the slicing
-    rules: Optional[str] = "open"  # Rules for the slicing, default is "open"
-    slices: List[FHIRSlice] = field(default_factory=list)  # List to hold the slices
+class SlicingGroup:
+    """
+    Slicing Group
+    -------------
+    A collection of slices along with the rules for the slicing process.
     
+    Slicing is the process of defining a way to differentiate between repeated elements within 
+    a FHIR resource or profile. It allows for the creation of subsets (slices) of these elements
+    based on certain criteria, such as different codes, values, or properties. Slicing is useful
+    when you need to apply different constraints or requirements to different occurrences of the
+    same repeating element.
+    """    
+    class SlicingRules(StrEnum):
+        CLOSED = "closed"     
+        OPEN = "open"   
+        OPENATEND = "openAtEnd"   
+    id : str
+    path: str 
+    discriminators: List[Discriminator]
+    rules: SlicingRules = SlicingRules.OPEN 
+    ordered: Optional[bool] = False
+    slices: List[Slice] = field(default_factory=list)  # List to hold the slices
+    description: Optional[str] = None  
+      
+    def __post_init__(self):
+        # Check if self.type is a valid DiscriminatorType
+        if not self.rules in self.SlicingRules._value2member_map_:
+            raise ValueError(f"Invalid slicing rules: '{self.rules}'")
+        # Parse FHIRPath to ensure it is valid
+        if not fhirpath.is_valid(self.path):
+            raise FHIRPathError(f'Slicing FHIRPath is not valid: {self.path}')
+        
     def get_slice_by_name(self, slice_name):
         return next((slice for slice in self.slices if slice.name == slice_name), None)
     
-    @property
-    def discriminator_paths(self) -> str:
-        return [
-            join_fhirpath(self.path, discriminator.path) 
-                if discriminator.path!='$this' else self.path 
-                    for discriminator in self.discriminators
-        ]
-        
-    def add_slice(self, slice: FHIRSlice):
-        slice.slicing_group = self
+    def add_slice(self, slice: Slice):
+        slice.slicing = self
         self.slices.append(slice)
     
-    def has_discriminator_type(self, discriminator_type: str) -> bool:
-        return any(discriminator.type == discriminator_type for discriminator in self.discriminators)
+
 
 def construct_with_profiled_elements(profile):
     """
@@ -276,7 +460,7 @@ def process_slice_constraints(slice_resource, slice):
         slice_resource: The FHIR resource of the corresponding slice    
     """
     for constraint in slice.constraints:
-        slice_element = constraint.path.replace(slice.slicing_group.path, '').lstrip('.')
+        slice_element = constraint.path.replace(slice.slicing.path, '').lstrip('.')
         if '[x]' in slice_element:
             continue
         
@@ -323,9 +507,9 @@ def clean_elements_and_slices(resource, depth=0):
         logging.debug("\t"*(depth)+f'↪ {slicing.path}: {len(valid_elements)} elements')
         for slice in slicing.slices:
             # Get all the elements that conform to this slice's definition           
-            sliced_entries = ensure_list(fhirpath.parse(slice.fhirpath).get_value(resource))       
+            sliced_entries = ensure_list(fhirpath.parse(slice.full_fhir_path).get_value(resource))       
             sliced_entries = [entry for entry in sliced_entries if entry is not None]
-            logging.debug("\t"*(depth+1)+f'↪ {slice.fhirpath}: {len(sliced_entries)} elements')
+            logging.debug("\t"*(depth+1)+f'↪ {slice.full_fhir_path}: {len(sliced_entries)} elements')
             
             for n,entry in enumerate(sliced_entries):
                 logging.debug("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}[{n}]  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.is_FHIR_complete else "✗"}) {"-> DELETE" if (not entry.is_FHIR_complete and not entry.has_been_modified) and entry in valid_elements else ""}' )
@@ -410,44 +594,34 @@ class ProfiledResourceFactory:
         # Get all patterns
         slicing = getattr(base_model, '__slicing__', []) 
         constraints = getattr(base_model, '__constraints__', []) 
-        extensions = getattr(base_model, '__extensions__', []) 
         
-                
-        for element in profile_definition.snapshot.element: 
-            if element.slicing and any([type.code == 'Extension' for type in element.type]):
-                extensions.append(
-                    FHIRExtension(
-                        id=element.id,
-                        path=element.path,
-                        name=element.sliceName,
-                        url=next((type.profile for type in element.type), None)
-                )
-            )
+            
         
         for element in profile_definition.snapshot.element: 
             if element.slicing:
                 slicing.append(
-                    FHIRSlicing(
+                    SlicingGroup(
                         id=element.id,
                         path=element.path,
-                        discriminators=element.slicing.discriminator,
+                        discriminators=[Discriminator(type=d.type, path=d.path) for d in element.slicing.discriminator],
                         description=element.slicing.description,
                         rules=element.slicing.rules,
+                        ordered=element.slicing.ordered,
                 )
             )
 
         for element in profile_definition.snapshot.element: 
             if element.sliceName:
                 slice_group = next((slice_group for slice_group in slicing if slice_group.path == element.path), None) 
-                slice = FHIRSlice(
+                slice = Slice(
                     id=element.id,
                     name=element.sliceName,
-                    type=element.type,
+                    type=element.type[0].code,
                 )
                 slice_group.add_slice(slice)        
 
         for element in profile_definition.snapshot.element:
-            constraint = FHIRProfileConstraint(
+            constraint = Constraint(
                 id=element.id,
                 path=element.path,
                 min=int(element.min) if str(element.min).isnumeric() else None,
@@ -455,7 +629,6 @@ class ProfiledResourceFactory:
             )
             if element.type and element.type[0].code=='Extension' and element.type[0].profile:
                 constraint.profile = construct_profiled_resource_model(element.type[0].profile[0])
-                
             if element.type:
                 constraint.valueType = [type.code for type in element.type]
                 
@@ -483,9 +656,8 @@ class ProfiledResourceFactory:
                         
         class ProfiledModel(base_model):
             __canonical_url__: ClassVar[str] = profile_url
-            __slicing__: ClassVar[List[FHIRSlicing]] = slicing
-            __constraints__: ClassVar[List[FHIRProfileConstraint]] = constraints
-            __extensions__: ClassVar[List[FHIRExtension]] = extensions
+            __slicing__: ClassVar[List[SlicingGroup]] = slicing
+            __constraints__: ClassVar[List[Constraint]] = constraints
             resourceType: Optional[str] = base_model.__name__
             meta: MetaType = Meta(profile=[profile_url], versionId=profile_definition.version)
             
@@ -604,7 +776,7 @@ class ProfiledResourceFactory:
         # Slicing validation    
         for slice_group in profile.__slicing__:
             for slice in slice_group.slices:
-                sliced_entries = fhirpath.parse(slice.fhirpath).get_value(resource)   
+                sliced_entries = fhirpath.parse(slice.full_fhir_path).get_value(resource)   
 
                 if not isinstance(sliced_entries, list): 
                     sliced_entries = [sliced_entries]

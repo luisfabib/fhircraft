@@ -68,6 +68,8 @@ token_test_cases = (
     ("or", (("or", "BOOLEAN_OPERATOR"),)),
     ("xor", (("xor", "BOOLEAN_OPERATOR"),)),
     ("implies", (("implies", "BOOLEAN_OPERATOR"),)),
+    ("as", (("as", "TYPES_OPERATOR"),)),
+    ("is", (("is", "TYPES_OPERATOR"),)),
     ("year", (("year", "CALENDAR_DURATION"),)),
     ("month", (("month", "CALENDAR_DURATION"),)),
     ("week", (("week", "CALENDAR_DURATION"),)),

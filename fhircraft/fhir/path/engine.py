@@ -416,7 +416,7 @@ class Where(FHIRPath):
     def __init__(self, expression: Expression):
         self.expression = expression
         # Currently, Where only handles equality expressions
-        if self.expression.op != '=':
+        if self.expression.op not in  ['=','is']:
             raise NotImplementedError()
         
     def find(self, datum):

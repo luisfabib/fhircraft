@@ -6,7 +6,7 @@ import ply.yacc
 
 from fhircraft.fhir.path.engine import *
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
-from fhircraft.fhir.path.lexer import FhirPathLexer
+from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +58,16 @@ class FhirPathParser:
         self.string = string
         lexer = lexer or self.lexer_class()
         return self.parse_token_stream(lexer.tokenize(string))
+
+    def is_valid(self, string):
+        try: 
+            try:
+                self.parse(string)
+                return True     
+            except NotImplementedError:
+                return True     
+        except (FhirPathParserError, FhirPathLexerError):   
+            return False     
 
     def parse_token_stream(self, token_iterator):
         return self.parser.parse(lexer = IteratorToTokenStream(token_iterator))
@@ -170,7 +180,9 @@ class FhirPathParser:
         # Additional functions
         # -------------------------------------------------------------------------------
         elif check(p, 'extension', nargs=1):
-            p[0] = Extension(*p[3])
+            p[0] = Extension(*p[3])        
+        elif check(p, 'resolve', nargs=0):
+            raise NotImplementedError()
         # -------------------------------------------------------------------------------
         # Subsetting
         # -------------------------------------------------------------------------------
@@ -399,7 +411,8 @@ class FhirPathParser:
                     | '<' 
                     | '<' '=' 
                     | '>' '=' 
-                    | BOOLEAN_OPERATOR"""
+                    | BOOLEAN_OPERATOR
+                    | TYPES_OPERATOR"""
         p[0] = ''.join(p[1:])
                 
     def p_quantity(self, p):

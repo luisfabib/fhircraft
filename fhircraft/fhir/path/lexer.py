@@ -84,8 +84,12 @@ class FhirPathLexer:
             # Utility functions (http://hl7.org/fhirpath/N1/#utility-functions)
             'trace', 'now', 'timeOfDay', 'today',
             # Additional functions (https://build.fhir.org/fhirpath.html#functions)            
-            #'extension',
+            #'extension', 
         ]},  
+        
+        # Boolean logic (http://hl7.org/fhirpath/N1/#boolean-logic)
+        # -------------------------------------------------------------------------------
+        **{operator: 'TYPES_OPERATOR' for operator in ['is','as']},  
         
         # Boolean logic (http://hl7.org/fhirpath/N1/#boolean-logic)
         # -------------------------------------------------------------------------------
