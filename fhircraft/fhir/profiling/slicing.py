@@ -9,7 +9,7 @@ from pydantic.v1 import create_model, Extra
 
 from typing import List, ClassVar, Optional
 from dataclasses import dataclass, field
-from enum import StrEnum
+from enum import Enum
 import re 
 
 @dataclass
@@ -21,7 +21,7 @@ class Discriminator:
     is processed when evaluating the discriminator, and a FHIRPath expression that 
     identifies the element in which the discriminator is found.
     """
-    class DiscriminatorType(StrEnum):
+    class DiscriminatorType(Enum):
         """
         There are five different processing types for discriminators: 
         """
@@ -37,8 +37,9 @@ class Discriminator:
     _RESTRICTED_FHIRPATH_FUNCTIONS = ('extension', 'resolve', 'ofType')
   
     def __post_init__(self):
+        self.type = self.DiscriminatorType(self.type)
         # Check if self.type is a valid DiscriminatorType
-        if not self.type in self.DiscriminatorType._value2member_map_:
+        if not self.type in self.DiscriminatorType:
             raise ValueError(f"Invalid discriminator type: '{self.type}'")
         # Parse FHIRPath to ensure it is valid
         if not fhirpath.is_valid(self.path):
@@ -49,19 +50,6 @@ class Discriminator:
             function = match.group(1)
             if function not in self._RESTRICTED_FHIRPATH_FUNCTIONS:
                 raise FHIRPathError(f'Slice discriminator FHIRPath is not valid: Invalid function "{function}" used in restricted discriminator FHIRPath')
-    
-    def construct_fhirpath_expression(self, value=None):
-        match self.type:
-            case self.DiscriminatorType.VALUE | self.DiscriminatorType.PATTERN:
-                return f"where({self.path}='{value}')"
-            case self.DiscriminatorType.EXISTS:
-                return f"where({self.path}.exists())"     
-            case self.DiscriminatorType.TYPE:
-                return f"where({self.path} is {value})"   
-            case self.DiscriminatorType.PROFILE:
-                return f"where({self.path}.conformsTo('{value}')"     
-            case self.DiscriminatorType.POSITION:
-                return f"index({value})"               
                 
 @dataclass
 class Slice:
@@ -182,60 +170,59 @@ class Slice:
                 if constraint.path == join_fhirpath(self.slicing.path, discriminator.path)
             ]
             # Construct the discrimination expression based on the type of discriminator
-            match discriminator.type:
-                case discriminator.DiscriminatorType.VALUE | discriminator.DiscriminatorType.PATTERN:
-                    """
-                    Discriminator - Value/Pattern
-                    The slices have different values in the nominated element, as determined by the applicable 
-                    fixed value, pattern, or required ValueSet binding.
-                    """
-                    # Handle special case of extensions
-                    profile_constraint = next((constraint.profile for constraint in self.get_constraints_on_slice() if constraint.profile), None)
-                    if self.type=='Extension' and profile_constraint:
-                        expression = join_fhirpath(expression, f"extension('{profile_constraint.__canonical_url__}')")
-                        continue
-                    # Get the constrained pattern applied to the discriminator element 
-                    pattern = next((constraint.pattern for constraint in discriminator_constraints if constraint.pattern),None)
-                    discriminating_values = get_dict_paths(pattern.dict(), prefix=discriminator.path) if pattern else {}
-                    # Get the constrained fixed values applied to the discriminator element 
-                    fixedValues = {discriminator.path: constraint.fixedValue for constraint in discriminator_constraints if constraint.fixedValue}
-                    discriminating_values.update(fixedValues)
-                    # Get the paths to the individual values set by the pattern
-                    for path, value in discriminating_values.items():
-                        # Discriminating expression for current pattern value
-                        expression = join_fhirpath(expression, f"where({path}='{value}')")
+            if discriminator.type is discriminator.DiscriminatorType.VALUE or discriminator.type is discriminator.DiscriminatorType.PATTERN:
+                """
+                Discriminator - Value/Pattern
+                The slices have different values in the nominated element, as determined by the applicable 
+                fixed value, pattern, or required ValueSet binding.
+                """
+                # Handle special case of extensions
+                profile_constraint = next((constraint.profile for constraint in self.get_constraints_on_slice() if constraint.profile), None)
+                if self.type=='Extension' and profile_constraint:
+                    expression = join_fhirpath(expression, f"extension('{profile_constraint.__canonical_url__}')")
+                    continue
+                # Get the constrained pattern applied to the discriminator element 
+                pattern = next((constraint.pattern for constraint in discriminator_constraints if constraint.pattern),None)
+                discriminating_values = get_dict_paths(pattern.dict(), prefix=discriminator.path) if pattern else {}
+                # Get the constrained fixed values applied to the discriminator element 
+                fixedValues = {discriminator.path: constraint.fixedValue for constraint in discriminator_constraints if constraint.fixedValue}
+                discriminating_values.update(fixedValues)
+                # Get the paths to the individual values set by the pattern
+                for path, value in discriminating_values.items():
+                    # Discriminating expression for current pattern value
+                    expression = join_fhirpath(expression, f"where({path}='{value}')")
 
-                case discriminator.DiscriminatorType.EXISTS:
-                    """
-                    Discriminator - Existence
-                    The slices are differentiated by the presence or absence of the nominated element.
-                    """
-                    expression = join_fhirpath(expression, f"where({discriminator.path}.exists())")
+            elif discriminator.type is discriminator.DiscriminatorType.EXISTS:
+                """
+                Discriminator - Existence
+                The slices are differentiated by the presence or absence of the nominated element.
+                """
+                expression = join_fhirpath(expression, f"where({discriminator.path}.exists())")
                     
-                case discriminator.DiscriminatorType.TYPE:
-                    """
-                    Discriminator - Type
-                    The slices are differentiated by type of the nominated element.
-                    """
-                    expression = join_fhirpath(expression, f"where({discriminator.path} is {self.type})")
+            elif discriminator.type is discriminator.DiscriminatorType.TYPE:
+                """
+                Discriminator - Type
+                The slices are differentiated by type of the nominated element.
+                """
+                expression = join_fhirpath(expression, f"where({discriminator.path} is {self.type})")
                     
-                case discriminator.DiscriminatorType.PROFILE:
-                    """
-                    Discriminator - Profile
-                    The slices are differentiated by conformance of the nominated element to a specified profile.
-                    Note that if the path specifies .resolve() then the profile is the target profile on the reference. 
-                    """
-                    # raise NotImplementedError() 
+            elif discriminator.type is discriminator.DiscriminatorType.PROFILE:
+                """
+                Discriminator - Profile
+                The slices are differentiated by conformance of the nominated element to a specified profile.
+                Note that if the path specifies .resolve() then the profile is the target profile on the reference. 
+                """
+                # raise NotImplementedError() 
                 
-                case discriminator.DiscriminatorType.POSITION:
-                    """
-                    Discriminator - Existence
-                    The slices are differentiated by their index. This is only possible if all but the last 
-                    slice have min=max cardinality, and the (optional) last slice contains other undifferentiated elements.
-                    """
-                    # Find position of current slice in slicing group
-                    index = next((index for index,slice in enumerate(self.slicing.slices) if slice == self))
-                    expression = join_fhirpath(expression, f"index({index})")
+            elif discriminator.type is discriminator.DiscriminatorType.POSITION:
+                """
+                Discriminator - Existence
+                The slices are differentiated by their index. This is only possible if all but the last 
+                slice have min=max cardinality, and the (optional) last slice contains other undifferentiated elements.
+                """
+                # Find position of current slice in slicing group
+                index = next((index for index,slice in enumerate(self.slicing.slices) if slice == self))
+                expression = join_fhirpath(expression, f"index({index})")
                     
         return expression
 
@@ -301,7 +288,7 @@ class SlicingGroup:
     when you need to apply different constraints or requirements to different occurrences of the
     same repeating element.
     """    
-    class SlicingRules(StrEnum):
+    class SlicingRules(Enum):
         CLOSED = "closed"     
         OPEN = "open"   
         OPENATEND = "openAtEnd"   
@@ -314,8 +301,9 @@ class SlicingGroup:
     description: Optional[str] = None  
       
     def __post_init__(self):
+        self.rules = self.SlicingRules(self.rules)
         # Check if self.type is a valid DiscriminatorType
-        if not self.rules in self.SlicingRules._value2member_map_:
+        if not self.rules in self.SlicingRules:
             raise ValueError(f"Invalid slicing rules: '{self.rules}'")
         # Parse FHIRPath to ensure it is valid
         if not fhirpath.is_valid(self.path):

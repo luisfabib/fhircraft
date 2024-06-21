@@ -9,7 +9,7 @@ class TestDiscriminator(TestCase):
     
     def test_discriminator_construction(self):
         obj = Discriminator(type='value', path='code')
-        assert obj.type == 'value'
+        assert obj.type == obj.DiscriminatorType.VALUE
         assert obj.path == 'code'
     
     def test_discriminator_type_enum(self):
@@ -34,7 +34,7 @@ class TestSlicingGroup(TestCase):
         )
         assert obj.id == 'Observation.component'
         assert obj.path == 'Observation.component'
-        assert obj.rules == 'open'
+        assert obj.rules ==  obj.SlicingRules.OPEN
         assert obj.ordered == False
         assert obj.discriminators[0].path == 'Observation.component.code'
     

@@ -125,8 +125,8 @@ class TestConstructProfiledResourceModel:
         slicing = profile_model.__slicing__[0]
         assert slicing.id == 'Observation.category'
         assert slicing.path == 'Observation.category'
-        assert slicing.rules == 'open'
-        assert slicing.discriminators[0].type == 'value'
+        assert slicing.rules == slicing.SlicingRules.OPEN
+        assert slicing.discriminators[0].type == slicing.discriminators[0].DiscriminatorType.VALUE
         assert slicing.discriminators[0].path == 'coding'
         
 
@@ -154,8 +154,8 @@ class TestConstructProfiledResourceModel:
         slicing = profile_model.__slicing__[1]
         assert slicing.id == 'Observation.component'
         assert slicing.path == 'Observation.component'
-        assert slicing.rules == 'open'
-        assert slicing.discriminators[0].type == 'pattern'
+        assert slicing.rules == slicing.SlicingRules.OPEN
+        assert slicing.discriminators[0].type == slicing.discriminators[0].DiscriminatorType.PATTERN
         assert slicing.discriminators[0].path == 'coding'
         
 
@@ -176,6 +176,6 @@ class TestConstructProfiledResourceModel:
         slicing = profile_model.__slicing__[0]
         assert slicing.id == 'Observation.extension'
         assert slicing.path == 'Observation.extension'
-        assert slicing.rules == 'open'
-        assert slicing.discriminators[0].type == 'value'
+        assert slicing.rules == slicing.SlicingRules.OPEN
+        assert slicing.discriminators[0].type == slicing.discriminators[0].DiscriminatorType.VALUE
         assert slicing.discriminators[0].path == 'url'

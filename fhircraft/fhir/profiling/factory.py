@@ -14,11 +14,8 @@ from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_
 from fhircraft.fhir.profiling.constraint import Constraint
 from fhircraft.fhir.profiling.slicing import SlicingGroup, Slice, Discriminator
 from fhircraft.fhir.path.utils import split_fhirpath, join_fhirpath
-from fhircraft.fhir.path import fhirpath, FHIRPathError, FhirPathParserError, FhirPathLexerError
+from fhircraft.fhir.path import fhirpath
 
-from dataclasses import dataclass, field
-from enum import StrEnum
-import re
 import datetime 
 import json
 import requests
