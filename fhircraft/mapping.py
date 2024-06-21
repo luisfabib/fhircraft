@@ -216,6 +216,7 @@ def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
             value = fhirpath.parse(fhir_path).get_value(resource) 
             if value is not None:
                 # Assign it to the corresponding FHIR-path if there is a value 
+                print('SET', json_path, '->', value)
                 items[json_path] = _parse_types(value, path_schema.get('type'))
     return items
 

@@ -3,6 +3,7 @@ import sys
 import os.path
 import re
 import ply.yacc
+import operator 
 
 from fhircraft.fhir.path.engine import *
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
@@ -316,17 +317,9 @@ class FhirPathParser:
             pos = self.string.find(p[1])
             raise FhirPathParserError(f'FHIRPath parser error at {p.lineno(1)}:{pos}: Invalid function "{p[1]}".\n{_underline_error_in_fhir_path(self.string,p[1], pos)}')
 
-    def p_fhirpath_fields(self, p):
-        "fhirpath : fields_or_any"
-        p[0] = Fields(*p[1])
-
-    def p_fields_or_any(self, p):
-        """fields_or_any : fields
-                         | '*'    """
-        if p[1] == '*':
-            p[0] = ['*']
-        else:
-            p[0] = p[1]
+    def p_fhirpath_segment(self, p):
+        "fhirpath : IDENTIFIER"
+        p[0] = Element(p[1])
         
     def p_fhirpath_idx(self, p):
         "fhirpath : '[' idx ']'"
@@ -339,16 +332,7 @@ class FhirPathParser:
     def p_fhirpath_slice(self, p):
         "fhirpath : '[' slice ']'"
         p[0] = p[2]
-        
-    def p_fields_id(self, p):
-        "fields : IDENTIFIER"
-        p[0] = [p[1]]
        
-
-    def p_fields_comma(self, p):
-        "fields : fields ',' fields"
-        p[0] = p[1] + p[3]
-        
     def p_fhirpath_child_idxbrackets(self, p):
         "fhirpath : fhirpath '[' idx ']'"
         p[0] = Child(p[1], p[3])
@@ -367,7 +351,7 @@ class FhirPathParser:
         p[0] = p[1]
         
     def p_function_arguments(self, p):
-        """arguments : expression
+        """arguments : bindary_expression
                      | value
                      | empty """
         p[0] = [p[1]]
@@ -376,9 +360,9 @@ class FhirPathParser:
         """arguments : arguments ',' arguments """
         p[0] = p[1] + p[2]
         
-    def p_expression(self, p):
-        "expression : fhirpath operator righthand"
-        p[0] = Expression(p[1], p[2], p[3])
+    def p_bindary_expression(self, p):
+        "bindary_expression : fhirpath operator righthand"
+        p[0] = BinaryExpression(p[1], p[2], p[3])
             
     def p_righthand(self, p):
         """righthand : fhirpath
@@ -413,7 +397,33 @@ class FhirPathParser:
                     | '>' '=' 
                     | BOOLEAN_OPERATOR
                     | TYPES_OPERATOR"""
-        p[0] = ''.join(p[1:])
+        op = ''.join(p[1:])
+        if op == '=':
+            p[0] = operator.eq
+        elif op == '!=':
+            p[0] = lambda a,b: operator.not_(operator.eq(a,b))
+        elif op == '>':
+            p[0] = operator.gt
+        elif op == '>=':
+            p[0] = operator.ge
+        elif op == '<':
+            p[0] = operator.lt
+        elif op == '<=':
+            p[0] = operator.le
+        elif op == '+':
+            p[0] = operator.add
+        elif op == '-':
+            p[0] = operator.sub
+        elif op == '*':
+            p[0] = operator.mul
+        elif op == '/':
+            p[0] = operator.truediv 
+        elif op == '|':
+            p[0] = operator.or_ 
+        elif op == '&':
+            p[0] = operator.and_ 
+            
+        
                 
     def p_quantity(self, p):
         """quantity : number STRING
