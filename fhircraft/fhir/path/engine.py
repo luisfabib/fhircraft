@@ -195,12 +195,12 @@ class FHIRPathCollection:
         return isinstance(other, FHIRPathCollection) and other.value == self.value and other.path == self.path and self.context == other.context
 
 
-@dataclass
 class BinaryExpression(FHIRPath):
-    left : typing.Union[str,FHIRPath]  
-    op : callable
-    right : typing.Union[str,FHIRPath] 
-
+    def __init__(self, left : typing.Union[str,FHIRPath], op : callable,right : typing.Union[str,FHIRPath]):
+        self.left = left
+        self.op = op
+        self.right = right
+        
     def evaluate(self, collection, create):
         return self.op(
             self.left.get_value(collection) if isinstance(self.left, FHIRPath) else self.left, 
@@ -333,7 +333,7 @@ class Where(FHIRPath):
     def evaluate(self, collection, create):
         matches = FHIRPathCollection(value=[
                 item
-                for item in collection.value
+                for item in ensure_list(collection.value)
                     if self.expression.evaluate(item, create) 
         ], context=collection, path=collection.path)
         return [matches] 

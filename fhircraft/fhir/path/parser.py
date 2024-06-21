@@ -422,6 +422,11 @@ class FhirPathParser:
             p[0] = operator.or_ 
         elif op == '&':
             p[0] = operator.and_ 
+        elif op == 'is':
+            p[0] = operator.eq 
+        else:
+            raise NotImplementedError(f'Operator "{op}" not implemented')
+             
             
         
                 
