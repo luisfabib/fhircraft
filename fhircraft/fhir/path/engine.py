@@ -6,18 +6,13 @@ from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, i
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel as FhirResource
 import typing
+from typing import List, Optional
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from functools import partial
 
 # Get logger name
 logger = logging.getLogger(__name__)
-
-# Turn on/off the automatic creation of id attributes
-# ... could be a kwarg pervasively but uses are rare and simple today
-auto_id_field = None
-
-NOT_SET = object()
-LIST_KEY = object()
 
 class FHIRPathError(Exception):
     pass
@@ -31,60 +26,40 @@ class FHIRPath(ABC):
     """
 
     def get_value(self, data):
-        matches = ensure_list(self.find(data))
-        values = [match.value for match in matches if match.value is not None and match.value != [] and not isinstance(match.value, bool)]
+        collection = self.find(data)
+        values = [item.value for item in collection if item.value and not isinstance(item.value, bool)]
         if len(values) == 1:
             values = values[0]
         elif len(values) == 0:
             return None
         return values        
 
-    def find(self, resource):
-        """
-        All `FHIRPath` types support `find()`, which returns an iterable of `FHIRPathCollection`s.
-        They keep track of the path followed to the current location, so if the calling code
-        has some opinion about that, it can be passed in here as a starting point.
-        """
-        # Ensure that entrypoint is a FHIRPathCollection instance
-        collection = FHIRPathCollection.wrap(resource)
+    def find(self, collection):
+        # Ensure that entrypoint is a FHIRPathCollectionItem instance
+        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
         return self.evaluate(collection, create=False)
 
-    def find_or_create(self, resource):
-        """
-        All `FHIRPath` types support `find()`, which returns an iterable of `FHIRPathCollection`s.
-        They keep track of the path followed to the current location, so if the calling code
-        has some opinion about that, it can be passed in here as a starting point.
-        """
-        # Ensure that entrypoint is a FHIRPathCollection instance
-        collection = FHIRPathCollection.wrap(resource)
+    def find_or_create(self, collection):
+        # Ensure that entrypoint is a FHIRPathCollectionItem instance
+        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
         return self.evaluate(collection, create=True)
 
-    def update(self, resource, value):
-        """
-        Returns `collection` with the specified path replaced by `value`. Only updates
-        if the specified path exists.
-        """
-        # Ensure that entrypoint is a FHIRPathCollection instance
-        base_collection = FHIRPathCollection.wrap(resource)
+    def update(self, collection, value):
+        # Ensure that entrypoint is a FHIRPathCollectionItem instance
+        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
         # Collect the elements and set the values for each of them
-        for collection in self.evaluate(base_collection, create=False):
-            collection.set_value(value)
+        new_collection = self.evaluate(collection, create=False)
+        for item in new_collection:
+            item.set_value(value)
 
-    def update_or_create(self, resource, value):
-        """
-        Returns `data` with the specified path replaced by `value`. Creates uthe specified 
-        path if it does not exist.
-        """        
-        # Ensure that entrypoint is a FHIRPathCollection instance
-        base_collection = FHIRPathCollection.wrap(resource)
+    def update_or_create(self, collection, value, replace=False):      
+        # Ensure that entrypoint is a FHIRPathCollectionItem instance
+        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
         # Collect the elements and set the values for each of them
-        for collection in self.evaluate(base_collection, create=True):
-            collection.set_value(value)
+        for item in self.evaluate(collection, create=True):
+            item.set_value(value)
 
     def evaluate(self, collection, create):
-        """
-        Placeholder for update logic
-        """   
         raise NotImplementedError()        
 
     def child(self, child):
@@ -100,60 +75,41 @@ class FHIRPath(ABC):
         else:
             return Child(self, child)
 
-    def make_collection(self, value):
-        if isinstance(value, FHIRPathCollection):
-            return value
-        else:
-            return FHIRPathCollection(value, path=Root(), context=None)
 
+@dataclass
+class FHIRPathCollectionItem(object):
+    """
+    A parent-aware represetation of a FHIRPath collection item.
+    """
+    value: typing.Any
+    path: FHIRPath = field(default_factory=lambda: This())
+    element: Optional[str] = None
+    index: Optional[int] = None
+    parent: Optional["FHIRPathCollectionItem"] = None
+    setter: Optional[callable] = None
 
-class FHIRPathCollection:
-    """
-    A context-aware represetation of a FHIRPath collection.
-    """
     @classmethod
-    def wrap(cls, data: typing.Union["FHIRPathCollection",FhirResource]):
+    def wrap(cls, data: typing.Union["FHIRPathCollectionItem",FhirResource]):
         if isinstance(data, cls):
             return data
         else:
             return cls(data)
 
-    def __init__(self, value, path=None, index=None, context=None):
-        self.value = value
-        self.path = path or This()
-        self.index =  index
-        self.context = None if context is None else FHIRPathCollection.wrap(context)
-
-    def set_value(self, value): 
-        """
-        Set the value of the current FHIRPathCollection instance.
-
-        Parameters:
-        value (any): The value to be set for the current FHIRPathCollection instance.
-
-        Raises:
-        ValueError: If the value has more than one item and the element does not allow arrays.
-        """        
-        if self.is_list_type: 
-            value = ensure_list(value)
-        else:
-            if isinstance(value, list):
-                if len(value)>1:
-                    raise ValueError(f'Value has {len(value)} items, but element <{self.full_path}> does not allow arrays')
-                value = value[0]
-        parents = ensure_list(self.context.value)
-        if getattr(self.path, 'index', None) is not None: 
-                parents[self.path.index] = value
-        elif getattr(self.path, 'label', None) is not None:
-            for parent in parents:
-                setattr(parent, self.path.label, value)
-                self.value = getattr(parent, self.path.label)
-        else:
-            raise NotImplementedError()
+    def set_literal(self,value):
+        setattr(self.parent.value, self.path.label, value)
         
+    def set_value(self,value):
+        if self.setter:
+            if isinstance(value, list):
+                raise ValueError('Only single value is accepted')
+            self.setter(value)
+        else:
+            raise RuntimeError('There is not setter function associated with this item')
+        
+
     def set_index(self, index):
         parents = []
-        for item in ensure_list(self.context.value):
+        for item in ensure_list(self.parent.value):
             if isinstance(item, list):
                 parents.extend(item)  
             else:
@@ -162,7 +118,7 @@ class FHIRPathCollection:
 
     @property
     def field_info(self):
-        parent = self.context.value
+        parent = self.parent.value
         if isinstance(parent, list):
             parent = parent[0]
         if hasattr(parent, '__fields__') and hasattr(self.path, 'label'):
@@ -185,15 +141,10 @@ class FHIRPathCollection:
         
     @property
     def full_path(self):
-        return self.path if self.context is None else self.context.full_path.child(self.path)
-
+        return self.path if self.parent is None else self.parent.full_path.child(self.path)
 
     def __repr__(self):
-        return '%s(value=%r, path=%r, context=%r)' % (self.__class__.__name__, self.value, self.path, self.context)
-
-    def __eq__(self, other):
-        return isinstance(other, FHIRPathCollection) and other.value == self.value and other.path == self.path and self.context == other.context
-
+        return f'FHIRPathCollectionItem(value={self.value.__repr__()[:10]}, element={self.element.__repr__()[:10]}..., index={self.index}, parent={self.parent.full_path if self.parent else None})'
 
 class BinaryExpression(FHIRPath):
     def __init__(self, left : typing.Union[str,FHIRPath], op : callable,right : typing.Union[str,FHIRPath]):
@@ -202,9 +153,10 @@ class BinaryExpression(FHIRPath):
         self.right = right
         
     def evaluate(self, collection, create):
+        collection = ensure_list(collection)
         return self.op(
-            self.left.get_value(collection) if isinstance(self.left, FHIRPath) else self.left, 
-            self.right.get_value(collection) if isinstance(self.right, FHIRPath) else self.right
+            self.left.evaluate(collection, create)[0].value if isinstance(self.left, FHIRPath) else self.left, 
+            self.right.evaluate(collection, create)[0].value if isinstance(self.right, FHIRPath) else self.right
         )
 
     def __str__(self):
@@ -225,17 +177,20 @@ class BinaryExpression(FHIRPath):
 class Root(FHIRPath):
     """
     The FHIRPath referring to the "root" object. Concrete syntax is '$'.
-    The root is the topmost collection without any context attached.
+    The root is the topmost collection without any parent attached.
     """
 
-    def evaluate(self, collection, create):
-        if not isinstance(collection, FHIRPathCollection):
-            return [FHIRPathCollection(collection, path=Root(), context=None)]
-        else:
-            if collection.context is None:
-                return [FHIRPathCollection(collection.value, context=None, path=Root())]
-            else:
-                return Root().find(collection.context)
+    def evaluate(self, collection, *args, **kwargs):
+        collection = ensure_list(collection)
+
+
+        return [
+            FHIRPathCollectionItem(item, path=Root(), parent=None)
+                if not isinstance(item, FHIRPathCollectionItem)
+                else FHIRPathCollectionItem(item.value, parent=None, path=Root())
+                    if item.parent is None else Root().find(item.parent)[0]
+                        for item in collection
+        ]
 
     def __str__(self):
         return '$'
@@ -256,7 +211,7 @@ class This(FHIRPath):
     """
 
     def evaluate(self, collection, create):
-        return [FHIRPathCollection.wrap(collection)]
+        return ensure_list(collection)
 
     def __str__(self):
         return '`this`'
@@ -281,12 +236,10 @@ class Child(FHIRPath):
         self.left = left
         self.right = right
 
-    def evaluate(self, collection: FHIRPathCollection, create: bool):
-        return [
-            child_collection
-                for parent_collection in self.left.evaluate(collection, create)
-                    for child_collection in self.right.evaluate(parent_collection, create)
-        ]
+    def evaluate(self, collection: List[FHIRPathCollectionItem], create: bool):
+        parent_collection = self.left.evaluate(collection, create)
+        child_collection = self.right.evaluate(parent_collection, create)
+        return child_collection
 
     def __eq__(self, other):
         return isinstance(other, Child) and self.left == other.left and self.right == other.right
@@ -309,8 +262,7 @@ class Parent(FHIRPath):
     """
 
     def find(self, collection):
-        collection = FHIRPathCollection.wrap(collection)
-        return [collection.context]
+        return [item.parent for item in collection]
 
     def __eq__(self, other):
         return isinstance(other, Parent)
@@ -331,12 +283,8 @@ class Where(FHIRPath):
         self.expression = expression
         
     def evaluate(self, collection, create):
-        matches = FHIRPathCollection(value=[
-                item
-                for item in ensure_list(collection.value)
-                    if self.expression.evaluate(item, create) 
-        ], context=collection, path=collection.path)
-        return [matches] 
+        collection = ensure_list(collection)
+        return [item for item in collection if self.expression.evaluate(item, create)]
 
     def __str__(self):
         return f'Where({self.expression})'
@@ -356,17 +304,15 @@ class Extension(FHIRPath):
 
     def __init__(self, url):
         self.url = url
+        self.extension_class =  get_fhir_model_class('Extension')
 
     def evaluate(self, collection, create):
-        collection = FHIRPathCollection.wrap(collection)
-        matches = FHIRPathCollection(value=[
-            extension
-                    for value in ensure_list(collection.value)
-                        if hasattr(value, 'extension')
-                            for extension in ensure_list(value.extension)
-                                if extension and isinstance(extension, get_fhir_model_class('Extension')) and extension.url == self.url
-        ], context=collection, path=collection.context)
-        return [matches]
+        collection = ensure_list(collection)
+        return [
+            item
+                for item in Element('extension').find(collection)
+                    if isinstance(item.value, self.extension_class) and item.value.url == self.url
+        ]
 
     def __str__(self):
         return f'Extension("{self.url}")'
@@ -386,15 +332,14 @@ class TypeChoice(FHIRPath):
     def __init__(self, type_choice_name):
         self.type_choice_name = type_choice_name
 
-    def evaluate(self, element, create):
-        element = FHIRPathCollection.wrap(element)
-        matches = [
-            FHIRPathCollection(getattr(obj, field), path=Element(field), context=element) 
-                for obj in ensure_list(element.value)
-                    for field in obj.__fields__.keys() 
-                        if field.startswith(self.type_choice_name) and getattr(obj, field) 
+    def evaluate(self, collection, *args, **kwargs):
+        collection = ensure_list(collection)
+        return  [
+            FHIRPathCollectionItem(getattr(item.value, field), path=Element(field), parent=item) 
+                for item in collection
+                    for field in item.value.__fields__.keys() 
+                        if field.startswith(self.type_choice_name) and getattr(item.value, field) 
         ]
-        return matches
 
     def __str__(self):
         return f'{self.type_choice_name}[x]'
@@ -437,12 +382,12 @@ class Descendants(FHIRPath):
             if isinstance(collection.value, list):
                 recursive_matches = [submatch
                                      for i in range(0, len(collection.value))
-                                     for submatch in match_recursively(FHIRPathCollection(collection.value[i], context=collection, path=Index(i)))]
+                                     for submatch in match_recursively(FHIRPathCollectionItem(collection.value[i], parent=collection, path=Index(i)))]
 
             elif isinstance(collection.value, dict):
                 recursive_matches = [submatch
                                      for field in collection.value.keys()
-                                     for submatch in match_recursively(FHIRPathCollection(collection.value[field], context=collection, path=Element(field)))]
+                                     for submatch in match_recursively(FHIRPathCollectionItem(collection.value[field], parent=collection, path=Element(field)))]
 
             else:
                 recursive_matches = []
@@ -559,24 +504,55 @@ class Element(FHIRPath):
     def __init__(self, label: str):
         self.label = label
 
-    def evaluate(self, collection: FHIRPathCollection, create: bool):
-        parents = ensure_list(collection.value)
-        element_collections = []
-        for parent in parents:
-            element = getattr(parent, self.label, None)
-            # Create new collection for the element 
-            element_collection = FHIRPathCollection(element, path=Element(self.label), context=collection)
-            if element is None and create:
-                    element = element_collection.construct_resource()
-                    if is_list_type(element_collection.field_info):
-                        element = [element]
-                    element_collection.set_value(element)
-            element_collections.append(element_collection)
-        if len(element_collections)==1:
-            return [element_collections[0]]
-        else:
-            return [FHIRPathCollection([col.value for col in element_collections], path=Element(self.label), context=collection)]
+    def create_element(self, parent):
+        if not parent:
+            return None
+        if not hasattr(parent, '__fields__'):
+            return None 
+        field_info = parent.__fields__.get(self.label)
+        try:
+            model = get_fhir_model_class(get_fhir_type_name(field_info.type_))
+            model.Config.validate_assignment = False
+            new_element = model.construct()    
+            if is_list_type(field_info):
+                new_element = ensure_list(new_element)
+            return new_element
+        except (KeyError, AttributeError):
+            return None 
 
+    @staticmethod
+    def setter(value, item, index, label):
+        parent = item.value
+        parents = getattr(parent, label)
+        if not isinstance(parents, list):
+            setattr(parent, label, value)
+        else:
+            if len(parents)<=index:
+                parents.insert(index, value)
+            else:                
+                parents[index] = value
+        
+
+    def evaluate(self, collection: List[FHIRPathCollectionItem], create: bool) -> List[FHIRPathCollectionItem]:
+        collection = ensure_list(collection)
+        element_collection = []
+        for item in collection:
+            if not item.value:
+                continue
+            element_value = getattr(item.value, self.label, None)         
+            if not element_value and not isinstance(element_value, bool) and create:
+                element_value = self.create_element(item.value)  
+                setattr(item.value, self.label, element_value)  
+            for index, value in enumerate(ensure_list(element_value)):
+                element = FHIRPathCollectionItem(
+                    value, 
+                    path=Element(self.label), 
+                    parent=item, 
+                    setter=partial(self.setter, item=item, index=index, label=self.label)
+                )
+                element.set_value(value)
+                element_collection.append(element)
+        return element_collection
 
     def __str__(self):
         return self.label
@@ -599,41 +575,50 @@ class Index(FHIRPath):
         index (int): The index value for the FHIRPath index.
 
     Methods:
-        evaluate(collection: FHIRPathCollection, create: bool): Evaluates the index on the given FHIRPathCollection.
+        evaluate(collection: FHIRPathCollectionItem, create: bool): Evaluates the index on the given FHIRPathCollectionItem.
     """
     def __init__(self, index: int):
         if not isinstance(index, int):
             raise FHIRPathError('Index() argument must be an integer number.')
         self.index = index
     
-    def evaluate(self, collection: FHIRPathCollection, create: bool) -> typing.List[FHIRPathCollection]:
+    def evaluate(self, collection: FHIRPathCollectionItem, create: bool) -> typing.List[FHIRPathCollectionItem]:
         """
         Evaluates the index on the given collection.
 
         Parameters:
-            collection (FHIRPathCollection): The FHIRPathCollection on which the index is evaluated.
+            collection (FHIRPathCollectionItem): The FHIRPathCollectionItem on which the index is evaluated.
             create (bool): A flag indicating whether to create new elements if the array is too short.
 
         Returns:
-            List[FHIRPathCollection]: A list containing the FHIRPathCollection of the element at the specified index, if within array bounds.
+            List[FHIRPathCollectionItem]: A list containing the FHIRPathCollectionItem of the element at the specified index, if within array bounds.
 
         Raises:
             FHIRPathError: If the collection value is not a list, or if the index is out of bounds and create is False.
         """        
         # Ensure that we are working with an array            
-        array = ensure_list(collection.value)
+        collection = ensure_list(collection)
         # Check wheter array is too short and it can be extended 
-        if len(array) <= self.index and create:
+        if len(collection) <= self.index and create:
             # Calculate how many elements must be padded
-            pad = self.index - len(array) + 1
-            if collection.context:
-                array.extend([collection.construct_resource() for __ in range(pad)])   
+            pad = self.index - len(collection) + 1
+            # if collection.parent:
+            #     collection.extend([collection.construct_resource() for __ in range(pad)])   
+            # else:
+            all_same_parent = all([item.parent.value == collection[0].parent.value for item in collection])
+            if all_same_parent:
+                parent_array = collection[0]
+                new_values = ensure_list(getattr(parent_array.parent.value, parent_array.path.label))
+                if parent_array.parent:
+                    new_values.extend([parent_array.construct_resource() for __ in range(pad)])   
+                else:
+                    new_values.extend([None for __ in range(pad)])
+                return [FHIRPathCollectionItem(new_values[self.index], path=Element(parent_array.element), setter=partial(parent_array.setter, index=self.index), parent=parent_array.parent)]
             else:
-                array.extend([FHIRPathCollection.wrap(None) for __ in range(pad)])
+                raise FHIRPathError(f'Cannot create new array element due to inhomogeneity in parents')
         # If index is within array bounds, get element
-        if array and len(array) > self.index:
-            item_collection = FHIRPathCollection(array[self.index], path=self,  context=collection)            
-            return [item_collection]
+        if collection and len(collection) > self.index:
+            return [collection[self.index]]
         # Else return empty list
         return []
 
@@ -693,31 +678,16 @@ class Slice(FHIRPath):
     an iterator, but dictionaries and other objects may also be iterable,
     so this is the compromise.
     """
-    def __init__(self, start=None, end=None, step=None):
+    def __init__(self, start=None, end=None, step=1):
         self.start = start
         self.end = end
         self.step = step
 
-    def evaluate(self, collection, create):
-        collection = FHIRPathCollection.wrap(collection)
-
-        # Used for catching null value instead of empty list in path
-        if not collection.value:
-            return []
-        if self.end < 0:
-            self.end = len(collection.value) + self.end + 1 
-        # Here's the hack. If it is a dictionary or some kind of constant,
-        # put it in a single-element list
-        if (isinstance(collection.value, dict) or isinstance(collection.value, int) or isinstance(collection.value, str)):
-            return self.find(FHIRPathCollection([collection.value], path=collection.path, context=collection.context))
-
-        # Some iterators do not support slicing but we can still
-        # at least work for '*'
-        if self.start is None and self.end is None and self.step is None:
-            return [FHIRPathCollection(collection.value[i], path=Index(i), context=collection) for i in range(0, len(collection.value))]
-        else:
-            return [FHIRPathCollection(collection.value[i], path=Index(i), context=collection) for i in range(0, len(collection.value))[self.start:self.end:self.step]]
-
+    def evaluate(self, collection, *args, **kwargs):
+        collection = ensure_list(collection)
+        # Slice the collection
+        return collection[self.start:self.step:self.end]
+        
     def __str__(self):
         if self.start is None and self.end is None and self.step is None:
             return '[*]'

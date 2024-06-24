@@ -99,7 +99,8 @@ def initialize_slices(resource):
                 # Otherwise just add the slice instance to the list of slices
                 slices_resources.append(slice_resource)
         # Set the whole list of slices in the resource
-        fhirpath.parse(slicing.path).update_or_create(resource, slices_resources)       
+        collection = fhirpath.parse(slicing.path).find_or_create(resource)       
+        collection[0].set_literal(slices_resources)
     return resource
 
 

@@ -1,7 +1,8 @@
 import pytest
 
-from fhircraft.fhir.path.engine import FHIRPathCollection, FHIRPathError, Child, Root, Element, Index, Slice, Where, Extension, Single
+from fhircraft.fhir.path.engine import FHIRPathCollectionItem, FHIRPathError, Child, Root, Element, Index, Slice, Where, Extension, Single
 from fhircraft.fhir.path.parser import parse
+from fhircraft.utils import ensure_list
 from  fhir.resources.R4B.observation import Observation, ObservationComponent
 from  fhir.resources.R4B.coding import Coding 
 from  fhir.resources.R4B.codeableconcept import CodeableConcept 
@@ -11,38 +12,26 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 from collections import namedtuple
 
-class TestFHIRPathCollection(TestCase):
+
+
+class TestRoot(TestCase):
 
     def setUp(self):
-        self.resource = MagicMock()
-        self.resource.__fields__ = {'element': MagicMock()}
-        self.context = FHIRPathCollection(value=self.resource)
-        self.element = self.resource.element
-        self.collection = FHIRPathCollection(value=self.element, path=Element('element'), context=self.context)
-        
-    def test_value_passed_by_reference(self):
-        collection = FHIRPathCollection(value=self.resource)
-        assert collection.value is self.resource
-        assert collection.context is None
-
-    def test_context_passed_by_reference(self):
-        assert self.collection.value is self.element
-        assert self.collection.context is self.context
-
-    def test_set_value_by_reference(self):
-        new_value = 'value'
-        self.collection.set_value(new_value)
-        assert self.collection.value == new_value
-        assert self.resource.element == new_value
-             
-             
+        self.resource = Observation.construct(status='final', identifier=[Identifier(value='A'), Identifier(value='B')])
+        self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
+    
+    def test_element_evaluates_correctly(self):
+        result = Root().evaluate(self.resource)
+        assert len(result) == 1         
+        assert result[0].value == self.resource 
+        assert result[0].parent is None         
+                          
 
 class TestElement(TestCase):
 
     def setUp(self):
         self.resource = Observation.construct(status='final', identifier=[Identifier(value='A'), Identifier(value='B')])
-        self.collection = FHIRPathCollection(self.resource, path=Root())
-        # self.collection = FHIRPathCollection(self.resource.parent, path=Element('parent'), context=context)
+        self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
     
     def test_element_evaluates_correctly(self):
         result = Element('status').evaluate(self.collection, create=False)
@@ -64,18 +53,14 @@ class TestElement(TestCase):
     def test_element_creates_missing_complex_list_element(self):
         result = Element('component').evaluate(self.collection, create=True)
         assert len(result) == 1
-        assert result[0].value == [ObservationComponent.construct()]
-        assert self.resource.component == result[0].value
-        
-    def test_element_updates_list_element(self):
-        new_value = [ObservationComponent.construct(valueString='A'), ObservationComponent.construct(valueString='B')]
-        Element('component').update_or_create(self.collection, value=new_value)
-        assert self.resource.component == new_value
+        assert result[0].value == ObservationComponent.construct()
+        assert self.resource.component == [result[0].value]
         
     def test_element_evaluate_element_with_list(self):
         result = Element('identifier').child(Element('value')).evaluate(self.collection, create=False)
-        assert len(result) == 1
-        assert result[0].value == ['A','B']
+        assert len(result) == 2
+        assert result[0].value == 'A'
+        assert result[1].value == 'B'
         
     def test_element_update_element_with_list(self):
         Element('identifier').child(Element('value')).update(self.collection, value='C')
@@ -86,43 +71,43 @@ class TestElement(TestCase):
 class TestIndexPrimitive(TestCase):
 
     def setUp(self):
-        TestResource = namedtuple('TestResource', 'element')
-        self.resource = TestResource(element=[1, 2, 3])
-        context = FHIRPathCollection(self.resource, path=Root())
-        self.collection = FHIRPathCollection(self.resource.element, path=Element('element'), context=context)
+        TestResource = namedtuple('TestResource', 'field')
+        self.resource = TestResource(field=[1, 2, 3])
+        parent = FHIRPathCollectionItem(self.resource, path=Root())
+        self.collection = Element('field').find(parent)
     
     def test_index_evaluates_correctly(self):
         result = Index(2).evaluate(self.collection, create=False)
         assert len(result) == 1
         assert result[0].value == 3
-        assert len(self.resource.element) == 3
+        assert len(self.resource.field) == 3
 
     def test_index_creates_missing_elements(self):
         result = Index(5).evaluate(self.collection, create=True)
         assert len(result) == 1
         assert result[0].value is None
-        assert len(self.resource.element) == 6
+        assert len(self.resource.field) == 6
 
     def test_index_does_not_modify_collection_out_of_bounds(self):
         result = Index(10).evaluate(self.collection, create=False)
         assert len(result) == 0
-        assert len(self.resource.element) == 3
+        assert len(self.resource.field) == 3
 
     def test_index_updates_value(self):
         Index(2).update(self.collection, value='value')
-        assert len(self.resource.element) == 3
-        assert self.resource.element[2] == 'value'
+        assert len(self.resource.field) == 3
+        assert self.resource.field[2] == 'value'
 
     def test_index_updates_and_creates_value(self):
         Index(10).update_or_create(self.collection, value='value')
-        assert len(self.resource.element) == 11
-        assert self.resource.element[10] == 'value'
+        assert len(self.resource.field) == 11
+        assert self.resource.field[10] == 'value'
 
     def test_index_handles_negative_indices(self):
         result = Index(-1).evaluate(self.collection, create=False)
         assert len(result) == 1
         assert result[0].value == 3        
-        assert len(self.resource.element) == 3
+        assert len(self.resource.field) == 3
 
     def test_index_handles_non_integer_indices(self):
         with pytest.raises(FHIRPathError):
@@ -138,8 +123,8 @@ class TestIndexResources(TestCase):
             Coding(code='code-2',system='system-2'),
             Coding(code='code-3',system='system-3'),
         ])
-        context = FHIRPathCollection(self.resource, path=Root())
-        self.collection = FHIRPathCollection(self.resource.coding, path=Element('coding'), context=context)
+        parent = FHIRPathCollectionItem(self.resource, path=Root())
+        self.collection = Element('coding').find(parent)
     
     def test_index_evaluates_correctly(self):
         result = Index(2).evaluate(self.collection, create=False)
@@ -172,6 +157,14 @@ class TestIndexResources(TestCase):
         Index(1).child(Element('code')).evaluate(self.collection, create=False)[0].set_value('code-999')
         assert len(self.resource.coding) == 3
         assert self.resource.coding[1].code == 'code-999'
+
+    def test_index_creates_with_empty_list(self):
+        resource = CodeableConcept(coding=[])
+        parent = FHIRPathCollectionItem(resource, path=Root())
+        collection = Element('coding').evaluate(parent, create=True)
+        Index(0).evaluate(collection, create=True)
+        assert len(resource.coding) == 1
+        assert resource.coding == [Coding.construct()]
 
 
 
@@ -254,10 +247,9 @@ fhirpath_child_find_test_cases = (
     
 @pytest.mark.parametrize("path_object, expected_value", fhirpath_child_find_test_cases)
 def test_fhirpath_child_find(path_object, expected_value):
-    matches = path_object.find(observation)
-    assert len(matches) == 1, "No match found"
-    expected_values = expected_value if isinstance(expected_value, list) else [expected_value]
-    found_values = matches[0].value if isinstance(matches[0].value, list) else [matches[0].value]
+    expected_values = ensure_list(expected_value)
+    collection = path_object.find(observation)
+    found_values = [item.value for item in collection]
     assert len(found_values) == len(expected_values)
     for value, expected in zip(found_values, expected_values):
         assert value == expected
@@ -269,7 +261,7 @@ def test_fhirpath_child_find(path_object, expected_value):
 fhirpath_child_update_test_cases = (
     # Update
     (Child(Root(), Element("status")), "pending", lambda obs: obs.status),
-    (Child(Root(), Element("identifier")), observation.identifier, lambda obs: obs.identifier),
+    (Child(Child(Root(), Element("identifier")), Index(0)), observation.identifier[0], lambda obs: obs.identifier[0]),
     # Create
     (Child(Root(), Element("id")), "ID12345", lambda obs: obs.id),    
     (Child(Child(Root(), Element("subject")), Element("reference")), "subjectX", lambda obs: obs.subject.reference),
@@ -297,13 +289,13 @@ fhirpath_index_find_test_cases = (
     
 @pytest.mark.parametrize("path_object, expected_value", fhirpath_index_find_test_cases)
 def test_fhirpath_index_find(path_object, expected_value):
-    matches = path_object.find(observation)
-    assert len(matches) == 1, "No match found"
-    expected_values = expected_value if isinstance(expected_value, list) else [expected_value]
-    found_values = matches[0].value if isinstance(matches[0].value, list) else [matches[0].value]
+    expected_values = ensure_list(expected_value)
+    collection = path_object.find(observation)
+    found_values = [item.value for item in collection]
     assert len(found_values) == len(expected_values)
     for value, expected in zip(found_values, expected_values):
         assert value == expected
+
         
 
 # ======== Index - FHIRPath ============
@@ -346,13 +338,13 @@ fhirpath_find_test_cases = (
 
 @pytest.mark.parametrize("path_string, data_object, expected_value", fhirpath_find_test_cases)
 def test_fhirpath_find(path_string, data_object, expected_value):
-    match = parse(path_string).find(data_object)
-    assert len(match) == 1, "No match found"
-    expected_values = expected_value if isinstance(expected_value, list) else [expected_value]
-    found_values = match[0].value if isinstance(match[0].value, list) else [match[0].value]
+    expected_values = ensure_list(expected_value)
+    collection = parse(path_string).find(data_object)
+    found_values = [item.value for item in collection]
     assert len(found_values) == len(expected_values)
     for value, expected in zip(found_values, expected_values):
         assert value == expected
+
         
 
 
@@ -381,6 +373,7 @@ fhirpath_create_test_cases = (
     ("Observation.identifier.first().value", "123", lambda obs: obs.identifier[0].value),
     ("Observation.identifier.last().value", "789", lambda obs: obs.identifier[-1].value),
     ("Observation.fhir_comments", "Commenting", lambda obs: obs.fhir_comments),
+    ("Observation.extension.extension.valueString", "testvalue", lambda obs: obs.extension[0].extension[2].valueString),
     ("Patient.contact[0].telecom[0].value", "teletest", lambda pat: pat.contact[0].telecom[0].value),
     ("Patient.contact.telecom[1].use", "home", lambda pat: pat.contact[0].telecom[1].use),
     ("Patient.name[0].given[0]", "John", lambda pat: pat.name[0].given[0]),
@@ -391,4 +384,5 @@ def test_fhirpath_create(path_string, update_value, getattr_fcn):
     Observation.Config.validate_assignment = False
     new_resource = get_fhir_model_class(path_string.split(".",1)[0]).construct()
     parse(path_string).update_or_create(new_resource, update_value)
+    print(new_resource.json(indent=3))
     assert getattr_fcn(new_resource) == update_value
