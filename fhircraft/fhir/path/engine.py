@@ -57,7 +57,6 @@ class FHIRPath(ABC):
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
         # Collect the elements and set the values for each of them
         for item in self.evaluate(collection, create=True):
-            print('-> SET VALUE')
             item.set_value(value)
 
     def evaluate(self, collection, create):
@@ -156,8 +155,8 @@ class BinaryExpression(FHIRPath):
     def evaluate(self, collection, create):
         collection = ensure_list(collection)
         return self.op(
-            self.left.evaluate(collection, create)[0].value if isinstance(self.left, FHIRPath) else self.left, 
-            self.right.evaluate(collection, create)[0].value if isinstance(self.right, FHIRPath) else self.right
+            [item.value for item in self.left.evaluate(collection, create)] if isinstance(self.left, FHIRPath) else ensure_list(self.left), 
+            [item.value for item in self.right.evaluate(collection, create)] if isinstance(self.right, FHIRPath) else ensure_list(self.right)
         )
 
     def __str__(self):

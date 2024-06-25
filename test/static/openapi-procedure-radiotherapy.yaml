@@ -125,7 +125,7 @@ info:
   title: Test API
   version: 0.0.1
 paths:
-  /endpoint:
+  '\endpoint':
     get:
       responses:
         '200':
@@ -134,3 +134,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestSchema'
+  '\endpoint-multiple':
+    get:
+      responses:
+        '200':
+          description: Simple response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestSchema'

@@ -19,6 +19,8 @@ def merge_schemas(schemas):
     """
     merged_schema = {}
     for schema in schemas:
+        if schema.get('allOf'):
+            merged_schema.update(merge_schemas(schema.get('allOf')))
         for key, value in schema.items():
             if key in merged_schema:
                 if isinstance(merged_schema[key], dict) and isinstance(value, dict):
@@ -51,7 +53,9 @@ def map_json_paths_to_fhir_paths(schema, current_json_path='', current_fhir_path
     if 'allOf' in schema:
         all_of_schemas = schema['allOf']
         merged_schema = merge_schemas(all_of_schemas)
-        return map_json_paths_to_fhir_paths(merged_schema, current_json_path, current_fhir_path)
+        # merged_schema.update(schema)
+        merged_schema.update(schema)
+        schema = merged_schema
 
     # Handle 'anyOf'
     if 'anyOf' in schema:
@@ -123,7 +127,7 @@ def map_jsonpath_values_to_fhirpaths(response: dict, schema: Schema) -> dict:
                 items[fhir_path] = str(value) if value is not None and not isinstance(value, bool) else value
     return items
 
-def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str, enpoint: str, method: str, status_code: str, profile_url: Optional[str] = None) -> Any:
+def convert_response_from_api_to_fhir(api_response: Any, openapi_file_location: str, enpoint: str, method: str, status_code: str, profile_url: Optional[str] = None) -> Any:
     
     specification = load_openapi(openapi_file_location)      
 
@@ -131,37 +135,42 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
     schema = Schema.model_validate(traverse_and_replace_references(schema.model_dump(by_alias=True), openapi_file_location, specification.model_dump(by_alias=True)))    
     
     try:
-        validate_json_schema(instance=response, schema=schema.model_dump(exclude_none=True, by_alias=True))
+        validate_json_schema(instance=api_response, schema=schema.model_dump(exclude_none=True, by_alias=True))
     except JSONValidationError as validation_error: 
         raise JSONValidationError(f'Invalid API response for specified JSON schema.\n{validation_error.message}')
-        
-    fhir_resource_values = map_jsonpath_values_to_fhirpaths(response, schema)
-    # Construct FHIR profile
-    if not profile_url and not schema.fhirprofile:
-        raise ValueError(f'The schema has no FHIR profile associated via the "x-fhir-profile" attribute.')
-    profile = construct_profiled_resource_model(profile_url or schema.fhirprofile)  
-
-    # Construct FHIR resource with propulated fields according to the profile constraints 
-    resource = profile.construct_with_profiled_elements()
-
-    # Enable tracking of changes in slices (to determine which slices were given values)
-    track_slice_changes(resource, True)
-    # Set the values of the API response
-    for fhir_path, value in fhir_resource_values.items():
-        print(f'SET {fhir_path} -> {value}')
-        fhirpath.parse(fhir_path).update_or_create(resource, value)     
-
-    # Disable tracking of changes in slices
-    track_slice_changes(resource, False)
     
-    # Cleanup resource and remove unused fields
-    resource = profile.clean_elements_and_slices(resource)
+    for response in ensure_list(api_response):
 
-    # Cleanup the resource from empty structures to be valid
-    resource = profile.parse_obj(remove_none_dicts(resource.dict()))
+        if not schema.fhirprofile and schema.items:
+            schema = schema.items
+        # Construct FHIR profile
+        if not profile_url and not schema.fhirprofile:
+            raise ValueError(f'The schema has no FHIR profile associated via the "x-fhir-profile" attribute.')
+        fhir_resource_values = map_jsonpath_values_to_fhirpaths(response, schema)
+        print(fhir_resource_values)
+        profile = construct_profiled_resource_model(profile_url or schema.fhirprofile)  
+
+        # Construct FHIR resource with propulated fields according to the profile constraints 
+        resource = profile.construct_with_profiled_elements()
+
+        # Enable tracking of changes in slices (to determine which slices were given values)
+        track_slice_changes(resource, True)
+        # Set the values of the API response
+        for fhir_path, value in fhir_resource_values.items():
+            print(f'SET {fhir_path} -> {value}')
+            fhirpath.parse(fhir_path).update_or_create(resource, value)     
+
+        # Disable tracking of changes in slices
+        track_slice_changes(resource, False)
+        
+        # Cleanup resource and remove unused fields
+        resource = profile.clean_elements_and_slices(resource)
+
+        # Cleanup the resource from empty structures to be valid
+        resource = profile.parse_obj(remove_none_dicts(resource.dict()))
 
 
-    validate_profiled_resource(resource)
+        validate_profiled_resource(resource)
     
     return resource
 

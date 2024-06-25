@@ -83,6 +83,53 @@ class TestMapJsonPathsToFhirPaths:
         result,_ = map_json_paths_to_fhir_paths(schema)
         assert result == expected
 
+    def test_handles_nested_allof_schemas_by_merging_and_mapping_correctly(self):
+        schema = {
+            "allOf": [
+                {
+                    "allOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "address": {
+                                    "type": "string",
+                                    "x-fhirpath": "Patient.address"
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "job": {
+                                    "type": "string",
+                                    "x-fhirpath": "Patient.job"
+                                }
+                            }
+                        },
+                    ],
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "x-fhirpath": "Patient.name"
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "birthDate": {
+                            "type": "string",
+                            "x-fhirpath": "Patient.birthDate"
+                        }
+                    }
+                }
+            ]
+        }
+        expected = {"job": "Patient.job", "address": "Patient.address", "name": "Patient.name", "birthDate": "Patient.birthDate"}
+        result,_ = map_json_paths_to_fhir_paths(schema)
+        assert result == expected
+
     def test_handles_anyof_schemas_by_mapping_each_subschema_correctly(self):
         schema = {
             "anyOf": [

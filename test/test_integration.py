@@ -84,10 +84,12 @@ class TestConvertResponseFromApiToFhir(TestCase):
         
         self.assertDictEqual(sorted_dict1, sorted_dict2)
 
-    def convert_api_to_fhir_and_assert_equal(self, api_response_file, openapi_spec_file, fhir_response_file):
+    def convert_api_to_fhir_and_assert_equal(self, api_response_file, openapi_spec_file, fhir_response_file, endpoint):
         response = load_file(api_response_file)
+        if endpoint == '\endpoint-multiple':
+            response = [response]
         expected_response = load_file(fhir_response_file)
-        converted_response = convert_response_from_api_to_fhir(response, openapi_spec_file, '/endpoint', 'get', '200')
+        converted_response = convert_response_from_api_to_fhir(response, openapi_spec_file, endpoint, 'get', '200')
         converted_response = json.loads(converted_response.json())
         # Asser that resulting resources are equal
         self.assertDictEqualUnorderedLists(converted_response, expected_response)
@@ -97,6 +99,14 @@ class TestConvertResponseFromApiToFhir(TestCase):
             api_response_file='test/static/api-observation-genomic-variant-1.json', 
             openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
             fhir_response_file='test/static/fhir-observation-genomic-variant-1.json',
+            endpoint='\endpoint'
+        )
+    def test_conversion_genomic_variant_1_multiple(self):
+        self.convert_api_to_fhir_and_assert_equal(
+            api_response_file='test/static/api-observation-genomic-variant-1.json', 
+            openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
+            fhir_response_file='test/static/fhir-observation-genomic-variant-1.json',
+            endpoint='\endpoint-multiple'
         )
         
     def test_conversion_genomic_variant_2(self):
@@ -104,6 +114,7 @@ class TestConvertResponseFromApiToFhir(TestCase):
             api_response_file='test/static/api-observation-genomic-variant-2.json', 
             openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
             fhir_response_file='test/static/fhir-observation-genomic-variant-2.json',
+            endpoint='\endpoint'
         )
         
     def test_conversion_genomic_variant_3(self):
@@ -111,6 +122,7 @@ class TestConvertResponseFromApiToFhir(TestCase):
             api_response_file='test/static/api-observation-genomic-variant-3.json', 
             openapi_spec_file='test/static/openapi-genomic-variant.yaml', 
             fhir_response_file='test/static/fhir-observation-genomic-variant-3.json',
+            endpoint='\endpoint'
         )
         
     def test_conversion_primary_cancer_condition_1(self):
@@ -118,6 +130,7 @@ class TestConvertResponseFromApiToFhir(TestCase):
             api_response_file='test/static/api-condition-primary-cancer-1.json', 
             openapi_spec_file='test/static/openapi-primary-cancer-condition.yaml', 
             fhir_response_file='test/static/fhir-condition-primary-cancer-1.json',
+            endpoint='\endpoint'
         )
         
     def test_conversion_primary_cancer_condition_2(self):
@@ -125,6 +138,7 @@ class TestConvertResponseFromApiToFhir(TestCase):
             api_response_file='test/static/api-condition-primary-cancer-2.json', 
             openapi_spec_file='test/static/openapi-primary-cancer-condition.yaml', 
             fhir_response_file='test/static/fhir-condition-primary-cancer-2.json',
+            endpoint='\endpoint'
         )
         
     def test_conversion_radiotherapy_1(self):
@@ -132,6 +146,7 @@ class TestConvertResponseFromApiToFhir(TestCase):
             api_response_file='test/static/api-procedure-radiotherapy-1.json', 
             openapi_spec_file='test/static/openapi-procedure-radiotherapy.yaml', 
             fhir_response_file='test/static/fhir-procedure-radiotherapy-1.json',
+            endpoint='\endpoint'
         )
 
     def test_conversion_cancer_patient_1(self):
@@ -139,6 +154,7 @@ class TestConvertResponseFromApiToFhir(TestCase):
             api_response_file='test/static/api-patient-cancer-1.json', 
             openapi_spec_file='test/static/openapi-cancer-patient.yaml', 
             fhir_response_file='test/static/fhir-patient-cancer-1.json',
+            endpoint='\endpoint'
         )
         
 
@@ -166,7 +182,7 @@ class TestConvertResponseFromFhirToApi(TestCase):
     def convert_fhir_to_api_and_assert_equal(self, api_response_file, openapi_spec_file, fhir_response_file, internal_values):
         response = load_file(fhir_response_file)
         expected_response = load_file(api_response_file)
-        converted_response = convert_response_from_fhir_to_api(response, openapi_spec_file, '/endpoint', 'get', '200',internal_values=internal_values)
+        converted_response = convert_response_from_fhir_to_api(response, openapi_spec_file, '\endpoint', 'get', '200',internal_values=internal_values)
         converted_response = json.loads(json.dumps(converted_response))
         # Asser that resulting resources are equal
         self.assertDictEqualUnorderedLists(converted_response, expected_response)
