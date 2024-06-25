@@ -398,10 +398,11 @@ class FhirPathParser:
                     | BOOLEAN_OPERATOR
                     | TYPES_OPERATOR"""
         op = ''.join(p[1:])
+        # Binary Operators
         if op == '=':
             p[0] = operator.eq
         elif op == '!=':
-            p[0] = lambda a,b: operator.not_(operator.eq(a,b))
+            p[0] = operator.ne
         elif op == '>':
             p[0] = operator.gt
         elif op == '>=':
@@ -418,16 +419,18 @@ class FhirPathParser:
             p[0] = operator.mul
         elif op == '/':
             p[0] = operator.truediv 
+        # Boolean Operators
         elif op == '|':
             p[0] = operator.or_ 
         elif op == '&':
             p[0] = operator.and_ 
+        elif op == 'xor':
+            p[0] = operator.xor 
+        # Types Operators
         elif op == 'is':
             p[0] = operator.eq 
         else:
             raise NotImplementedError(f'Operator "{op}" not implemented')
-             
-            
         
                 
     def p_quantity(self, p):

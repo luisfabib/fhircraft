@@ -92,7 +92,7 @@ class Slice:
         int
             The minimum cardinality value.
         """        
-        return min([constraint.min for constraint in self.get_constraints_on_slice()])       
+        return min([constraint.min for constraint in self.get_constraints_on_slice()] or [0]) 
     
     @property
     def max_cardinality(self):
@@ -104,7 +104,7 @@ class Slice:
         int
             The maximum cardinality value.
         """        
-        return max([constraint.max for constraint in self.get_constraints_on_slice()])       
+        return max([constraint.max for constraint in self.get_constraints_on_slice()] or [1])      
     
     @property
     def profile_constraint(self):

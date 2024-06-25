@@ -146,17 +146,17 @@ def convert_response_from_api_to_fhir(response: Any, openapi_file_location: str,
 
     # Enable tracking of changes in slices (to determine which slices were given values)
     track_slice_changes(resource, True)
-
     # Set the values of the API response
     for fhir_path, value in fhir_resource_values.items():
-        fhirpath.parse(fhir_path).update_or_create(resource, value)        
-    
+        print(f'SET {fhir_path} -> {value}')
+        fhirpath.parse(fhir_path).update_or_create(resource, value)     
+
     # Disable tracking of changes in slices
     track_slice_changes(resource, False)
     
     # Cleanup resource and remove unused fields
     resource = profile.clean_elements_and_slices(resource)
-    
+
     # Cleanup the resource from empty structures to be valid
     resource = profile.parse_obj(remove_none_dicts(resource.dict()))
 

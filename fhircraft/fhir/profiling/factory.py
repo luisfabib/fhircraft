@@ -68,7 +68,7 @@ def set_constraints(resource):
     return resource
 
 
-def initialize_slices(resource):
+def initialize_slices(resource, slice_copies=9):
     """
     Initializes slices in the resource according to the slicing information in the profile.
 
@@ -90,17 +90,18 @@ def initialize_slices(resource):
             # Check if the slice is valid by the preset values and if more than one slice instance is allowed
             if not slice_resource.is_FHIR_complete and slice.max_cardinality>1:
                 # Create multiple copies of the slice, unused copies will be deleted later
-                SLICE_COPIES = 9
                 slices_resources.extend([
                     slice_resource.copy(deep=True) 
-                        for _ in range(min(slice.max_cardinality, SLICE_COPIES))
+                        for _ in range(min(slice.max_cardinality, slice_copies))
                 ])
             else:
                 # Otherwise just add the slice instance to the list of slices
                 slices_resources.append(slice_resource)
         # Set the whole list of slices in the resource
-        collection = fhirpath.parse(slicing.path).find_or_create(resource)       
-        collection[0].set_literal(slices_resources)
+        collection = fhirpath.parse(slicing.path).find_or_create(resource)
+        for col in collection:
+            col.set_literal(slices_resources)
+
     return resource
 
 
@@ -143,7 +144,7 @@ def track_slice_changes(resource, value):
         valid_elements = ensure_list(fhirpath.parse(slicing.path).get_value(resource))    
         for entry in valid_elements:
             if entry:
-                if entry.__slicing__:
+                if getattr(entry,'__slicing__', None):
                     track_slice_changes(entry, value)        
                 entry.__track_changes__ = value
 
@@ -159,22 +160,23 @@ def clean_elements_and_slices(resource, depth=0):
         valid_elements = [element for element in valid_elements if element or isinstance(element, bool)]
         if not valid_elements:
             continue
-        logging.debug("\t"*(depth)+f'↪ {slicing.path}: {len(valid_elements)} elements')
+        print("\t"*(depth)+f'↪ {slicing.path}: {len(valid_elements)} elements')
         for slice in slicing.slices:
             # Get all the elements that conform to this slice's definition           
             sliced_entries = ensure_list(fhirpath.parse(slice.full_fhir_path).get_value(resource))       
             sliced_entries = [entry for entry in sliced_entries if entry is not None]
-            logging.debug("\t"*(depth+1)+f'↪ {slice.full_fhir_path}: {len(sliced_entries)} elements')
+            print("\t"*(depth+1)+f'↪ {slice.full_fhir_path}: {len(sliced_entries)} elements')
             
             for n,entry in enumerate(sliced_entries):
-                logging.debug("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}[{n}]  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.is_FHIR_complete else "✗"}) {"-> DELETE" if (not entry.is_FHIR_complete and not entry.has_been_modified) and entry in valid_elements else ""}' )
+                print("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}[{n}]  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.is_FHIR_complete else "✗"}) {"-> DELETE" if (not entry.is_FHIR_complete and not entry.has_been_modified) and entry in valid_elements else ""}' )
                 if not entry.is_FHIR_complete and not entry.has_been_modified and entry in valid_elements:
                     valid_elements.remove(entry)                
                 elif entry.__slicing__:
                     clean_elements_and_slices(entry, depth=depth+3)                
         # Set the new list with only the valid slices
-        fhirpath.parse(slicing.path).update_or_create(resource, valid_elements)       
-
+        collection = fhirpath.parse(slicing.path).find_or_create(resource)
+        for col in collection:
+            col.set_literal(valid_elements)
     # Cleanup the resource from empty structures to be valid
     for field, value in remove_none_dicts(resource.dict()).items():
         setattr(resource, field, value)
@@ -473,7 +475,7 @@ class ProfiledResourceFactory:
         if validation_errors:
             raise ValidationError(validation_errors, profile)                     
         else:
-            logging.debug('Resource successfully validated')
+            print('Resource successfully validated')
 
 
 factory = ProfiledResourceFactory()

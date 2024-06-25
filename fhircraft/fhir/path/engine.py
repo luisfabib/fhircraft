@@ -57,6 +57,7 @@ class FHIRPath(ABC):
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
         # Collect the elements and set the values for each of them
         for item in self.evaluate(collection, create=True):
+            print('-> SET VALUE')
             item.set_value(value)
 
     def evaluate(self, collection, create):
@@ -514,11 +515,11 @@ class Element(FHIRPath):
             model = get_fhir_model_class(get_fhir_type_name(field_info.type_))
             model.Config.validate_assignment = False
             new_element = model.construct()    
-            if is_list_type(field_info):
-                new_element = ensure_list(new_element)
-            return new_element
         except (KeyError, AttributeError):
-            return None 
+            new_element = None 
+        if is_list_type(field_info):
+            new_element = ensure_list(new_element)
+        return new_element
 
     @staticmethod
     def setter(value, item, index, label):
@@ -550,7 +551,7 @@ class Element(FHIRPath):
                     parent=item, 
                     setter=partial(self.setter, item=item, index=index, label=self.label)
                 )
-                element.set_value(value)
+                # element.set_value(value)
                 element_collection.append(element)
         return element_collection
 

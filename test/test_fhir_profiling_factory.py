@@ -1,5 +1,5 @@
 from fhircraft.fhir.profiling.factory import ProfiledResourceFactory, FHIRError, \
-                        clear_chache, construct_profiled_resource_model
+                        clear_chache, construct_profiled_resource_model, track_slice_changes, initialize_slices
 from fhircraft.fhir.profiling import SlicingGroup, Slice, Discriminator, Constraint
 from fhircraft.fhir.path import FHIRPathError
 from fhir.resources.R4B.patient import Patient
@@ -179,3 +179,46 @@ class TestConstructProfiledResourceModel:
         assert slicing.rules == slicing.SlicingRules.OPEN
         assert slicing.discriminators[0].type == slicing.discriminators[0].DiscriminatorType.VALUE
         assert slicing.discriminators[0].path == 'url'
+
+
+class TestSlicingManagement(TestCase):
+
+    def setUp(self):
+        slicing = SlicingGroup(path='Observation.component', id='Observation.component', discriminators=[Discriminator(type='pattern', path='Observation.component.code')])
+        slicing.add_slice(Slice(id='Observation.component:slice-1', name='slice-1', type='Observation.component.code.coding.code'))
+        slicing.add_slice(Slice(id='Observation.component:slice-2', name='slice-2', type='Observation.component.code.coding.code'))
+        slicing.add_slice(Slice(id='Observation.component:slice-3', name='slice-3', type='Observation.component.code.coding.code', constraints=[Constraint(id='', max=999, min=0,path='Observation.component')]))
+
+        self.components = []
+        for slice in slicing.slices:
+            self.components.append(slice.pydantic_model.construct())
+
+        profile = MagicMock()
+        profile.__slicing__ = [slicing]
+        resource = MagicMock(profile)
+        resource.__class__ = profile
+        self.resource = resource
+
+    def test_initialize_slices(self):
+        resource = initialize_slices(self.resource, slice_copies=5)
+        assert len(resource.component) == 7
+
+    def test_tracking_changes_initialized_slices(self):
+        resource = initialize_slices(self.resource, slice_copies=5)
+        track_slice_changes(resource, True)
+        self.resource.component[4].valueString = 'value'
+        track_slice_changes(self.resource, False)
+        for idx, component in enumerate(self.resource.component):
+            assert component.__has_been_modified__ == (True if idx == 4 else False), f'Slice #{idx} should not be marked as modified'
+
+    def test_tracking_changes(self):
+        self.resource.component = self.components
+        track_slice_changes(self.resource, True)
+        assert len(self.resource.component) == 3
+        for component in self.resource.component:
+            assert component.__has_been_modified__ == False
+        self.resource.component[1].valueString = 'value'
+        assert self.resource.component[0].__has_been_modified__ == False
+        assert self.resource.component[1].__has_been_modified__ == True
+        assert self.resource.component[2].__has_been_modified__ == False
+    
