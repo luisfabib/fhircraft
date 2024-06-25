@@ -1,6 +1,7 @@
 import pytest
 
-from fhircraft.fhir.path.engine import Child, Root, Element, Index, Slice, Where, Extension, Single, TypeChoice, This, BinaryExpression
+from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.path.engine.existence import *
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 from fhircraft.fhir.path.parser import FhirPathParser, FhirPathParserError
 import operator
@@ -36,6 +37,22 @@ parser_test_cases = (
     ("parent.skip(3)", Child(Element('parent'), Slice(3,-1))),    
     ("parent.take(3)", Child(Element('parent'), Slice(0,3))),     
     ("parent.value[x]", Child(Element('parent'), TypeChoice('value'))),
+    # ------------------------
+    # Existence functions
+    # ------------------------
+    ("parent.empty()", Child(Element('parent'), Empty())),
+    ("parent.exists()", Child(Element('parent'), Exists())),
+    ("parent.all(parent.children)", Child(Element('parent'), All(Child(Element('parent'), Element('children'))))),
+    ("parent.all($this = 'parent')", Child(Element('parent'), All(BinaryExpression(This(), operator.eq, 'parent')))),
+    ("parent.allTrue()", Child(Element('parent'), AllTrue())),
+    ("parent.anyTrue()", Child(Element('parent'), AnyTrue())),
+    ("parent.allFalse()", Child(Element('parent'), AllFalse())),
+    ("parent.anyFalse()", Child(Element('parent'), AnyFalse())),
+    ("parent.subsetOf(parent.children)", Child(Element('parent'), SubsetOf(Child(Element('parent'), Element('children'))))),
+    ("parent.supersetOf(parent.children)", Child(Element('parent'), SupersetOf(Child(Element('parent'), Element('children'))))),
+    ("parent.count()", Child(Element('parent'), Count())),
+    ("parent.distinct()", Child(Element('parent'), Distinct())),
+    ("parent.isDistinct()", Child(Element('parent'), IsDistinct())),
 )
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(string, expected_object):

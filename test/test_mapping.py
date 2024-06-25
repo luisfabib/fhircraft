@@ -1,5 +1,5 @@
 from fhircraft.mapping import  merge_schemas, map_json_paths_to_fhir_paths
-from fhircraft.fhir.path.engine import FHIRPathError
+from fhircraft.fhir.path.engine.core import FHIRPathError
 import pytest
 
 class TestMergeSchemas:

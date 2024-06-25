@@ -5,7 +5,9 @@ import re
 import ply.yacc
 import operator 
 
-from fhircraft.fhir.path.engine import *
+from fhircraft.fhir.path.engine.core import *
+import fhircraft.fhir.path.engine.existence as existence
+from fhircraft.fhir.path.engine.existence import *
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 
@@ -84,13 +86,12 @@ class FhirPathParser:
     def p_error(self, t):
         if t is None:
             raise FhirPathParserError(f'FHIRPath parser error near the end of string "{self.string}"!')
-        raise FhirPathParserError(f'FHIRPath parser error at {t.lineno}:{t.col} - Invalid token <{t.value}> ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col)}')
+        raise FhirPathParserError(f'FHIRPath parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col)}')
 
     def p_fhirpath_binop(self, p):
         """fhirpath : fhirpath '.' fhirpath
                     | fhirpath '|' fhirpath
-                    | fhirpath '&' fhirpath
-                    | fhirpath BOOLEAN_OPERATOR fhirpath"""
+                    | fhirpath '&' fhirpath"""
         op = p[2]
 
         if op == '.':
@@ -126,46 +127,70 @@ class FhirPathParser:
         else:
             raise FhirPathParserError(f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Unknown environmental variable "{p[1]}".\n{_underline_error_in_fhir_path(self.string, p[1], p.lexpos(1))}')
             
+    def p_fhirpath_segment(self, p):
+        "fhirpath : IDENTIFIER"
+        p[0] = Element(p[1])
+        
+    def p_fhirpath_idx(self, p):
+        "fhirpath : '[' idx ']'"
+        p[0] = p[2]
+
+    def p_fhirpath_choice_element(self, p):
+        "fhirpath : CHOICE_ELEMENT"
+        p[0] = TypeChoice(p[1])
+        
+    def p_fhirpath_slice(self, p):
+        "fhirpath : '[' slice ']'"
+        p[0] = p[2]
+       
+    def p_fhirpath_child_idxbrackets(self, p):
+        "fhirpath : fhirpath '[' idx ']'"
+        p[0] = Child(p[1], p[3])
+
+    def p_fhirpath_child_slicebrackets(self, p):
+        "fhirpath : fhirpath '[' slice ']'"
+        p[0] = Child(p[1], p[3])
+
+
     def p_fhirpath_function(self, p):
-        """fhirpath : function '(' arguments ')' """
+        """fhirpath : IDENTIFIER '(' arguments ')' """
         
         def check(args, function, nargs):
             if args[1] == function:
                 params = ensure_list(args[3] or [])
                 params = [param for param in params if param is not None]
                 nprovided = len(params)
-                if nprovided != nargs:
+                if nprovided not in ensure_list(nargs):
                     raise FhirPathParserError(f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Function {function}() requires {nargs} arguments, but {nprovided} were provided.\n{_underline_error_in_fhir_path(self.string, function, p.lexpos(1))}')
                 return True 
             return False
-        
         # -------------------------------------------------------------------------------
         # Existence
         # -------------------------------------------------------------------------------
         if check(p, 'empty', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'exists', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'all', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'allTrue', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'anyTrue', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'allFalse', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'anyFalse', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'subsetOf', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'supersetOf', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'count', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'distinct', nargs=0):
-            raise NotImplementedError()
-        if check(p, 'isDistinct', nargs=0):
-            raise NotImplementedError()
+            p[0] = Empty()
+        elif check(p, 'exists', nargs=[0,1]):
+            p[0] = Exists(*p[3])
+        elif check(p, 'all', nargs=[0,1]):
+            p[0] = All(*p[3])
+        elif check(p, 'allTrue', nargs=0):
+            p[0] = AllTrue()
+        elif check(p, 'anyTrue', nargs=0):
+            p[0] = AnyTrue()
+        elif check(p, 'allFalse', nargs=0):
+            p[0] = AllFalse()
+        elif check(p, 'anyFalse', nargs=0):
+            p[0] = AnyFalse()
+        elif check(p, 'subsetOf', nargs=1):
+            p[0] = SubsetOf(*p[3])
+        elif check(p, 'supersetOf', nargs=1):
+            p[0] = SupersetOf(*p[3])
+        elif check(p, 'count', nargs=0):
+            p[0] = Count()
+        elif check(p, 'distinct', nargs=0):
+            p[0] = Distinct()
+        elif check(p, 'isDistinct', nargs=0):
+            p[0] = IsDistinct()
         # -------------------------------------------------------------------------------
         # Subsetting
         # -------------------------------------------------------------------------------
@@ -317,41 +342,10 @@ class FhirPathParser:
             pos = self.string.find(p[1])
             raise FhirPathParserError(f'FHIRPath parser error at {p.lineno(1)}:{pos}: Invalid function "{p[1]}".\n{_underline_error_in_fhir_path(self.string,p[1], pos)}')
 
-    def p_fhirpath_segment(self, p):
-        "fhirpath : IDENTIFIER"
-        p[0] = Element(p[1])
-        
-    def p_fhirpath_idx(self, p):
-        "fhirpath : '[' idx ']'"
-        p[0] = p[2]
 
-    def p_fhirpath_choice_element(self, p):
-        "fhirpath : CHOICE_ELEMENT"
-        p[0] = TypeChoice(p[1])
-        
-    def p_fhirpath_slice(self, p):
-        "fhirpath : '[' slice ']'"
-        p[0] = p[2]
-       
-    def p_fhirpath_child_idxbrackets(self, p):
-        "fhirpath : fhirpath '[' idx ']'"
-        p[0] = Child(p[1], p[3])
-
-    def p_fhirpath_child_slicebrackets(self, p):
-        "fhirpath : fhirpath '[' slice ']'"
-        p[0] = Child(p[1], p[3])
-
-    def p_fhirpath_parens(self, p):
-        "fhirpath : '(' fhirpath ')'"
-        p[0] = p[2]
-
-    def p_function_name(self, p):
-        """function : FUNCTION
-                    | IDENTIFIER """
-        p[0] = p[1]
-        
     def p_function_arguments(self, p):
-        """arguments : bindary_expression
+        """arguments : fhirpath
+                     | binary_expression
                      | value
                      | empty """
         p[0] = [p[1]]
@@ -360,8 +354,8 @@ class FhirPathParser:
         """arguments : arguments ',' arguments """
         p[0] = p[1] + p[2]
         
-    def p_bindary_expression(self, p):
-        "bindary_expression : fhirpath operator righthand"
+    def p_binary_expression(self, p):
+        "binary_expression : fhirpath operator righthand"
         p[0] = BinaryExpression(p[1], p[2], p[3])
             
     def p_righthand(self, p):

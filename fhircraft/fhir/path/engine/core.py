@@ -146,6 +146,12 @@ class FHIRPathCollectionItem(object):
     def __repr__(self):
         return f'FHIRPathCollectionItem(value={self.value.__repr__()[:10]}, element={self.element.__repr__()[:10]}..., index={self.index}, parent={self.parent.full_path if self.parent else None})'
 
+    def __hash__(self):
+        return hash((self.value, self.path, self.parent))
+        
+
+
+
 class BinaryExpression(FHIRPath):
     def __init__(self, left : typing.Union[str,FHIRPath], op : callable,right : typing.Union[str,FHIRPath]):
         self.left = left

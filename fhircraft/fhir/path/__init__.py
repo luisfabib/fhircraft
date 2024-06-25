@@ -1,5 +1,5 @@
 from .parser import FhirPathParser, FhirPathParserError
-from .engine import FHIRPathError 
+from .engine.core import FHIRPathError 
 from .lexer import FhirPathLexerError 
 
 try:

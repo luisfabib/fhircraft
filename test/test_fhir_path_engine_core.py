@@ -1,6 +1,6 @@
 import pytest
 
-from fhircraft.fhir.path.engine import FHIRPathCollectionItem, FHIRPathError, Child, Root, Element, Index, Slice, Where, Extension, Single
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Child, Root, Element, Index, Slice, Where, Extension, Single
 from fhircraft.fhir.path.parser import parse
 from fhircraft.utils import ensure_list
 from  fhir.resources.R4B.observation import Observation, ObservationComponent

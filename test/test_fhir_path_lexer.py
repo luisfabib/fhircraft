@@ -57,11 +57,12 @@ token_test_cases = (
     ("parent.child", (("parent", "IDENTIFIER"), (".", "."), ("child", "IDENTIFIER"))),
     ("parent.*", (("parent", "IDENTIFIER"), (".", "."), ("*", "*"))),
     # -------------  Functions --------------
-    ("where", (("where", "FUNCTION"),)),
-    ("first", (("first", "FUNCTION"),)),
-    ("last", (("last", "FUNCTION"),)),
-    ("tail", (("tail", "FUNCTION"),)),
-    ("single", (("single", "FUNCTION"),)),
+    ("where", (("where", "IDENTIFIER"),)),
+    ("where(arg1,arg2)", (("where", "IDENTIFIER"),("(", "("),("arg1", "IDENTIFIER"),(",", ","),("arg2", "IDENTIFIER"),(")", ")"))),
+    ("first", (("first", "IDENTIFIER"),)),
+    ("last", (("last", "IDENTIFIER"),)),
+    ("tail", (("tail", "IDENTIFIER"),)),
+    ("single", (("single", "IDENTIFIER"),)),
     ("extension", (("extension", "IDENTIFIER"),)),
     # --------------  Keywords ---------------
     ("and", (("and", "BOOLEAN_OPERATOR"),)),

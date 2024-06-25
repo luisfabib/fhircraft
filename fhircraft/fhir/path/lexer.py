@@ -56,37 +56,6 @@ class FhirPathLexer:
 
     reserved_words = { 
         
-        # Funtions (http://hl7.org/fhirpath/N1/#functions)
-        # -------------------------------------------------------------------------------
-        **{operator: 'FUNCTION' for operator in [
-            # Existence (http://hl7.org/fhirpath/N1/#existence)
-            'empty', 'exists', 'all', 'allTrue', 'anyTrue', 'allFalse', 'anyFalse',
-            'subsetOf', 'supersetOf', 'count', 'distinct', 'isDistinct',
-            # Filtering and projection (http://hl7.org/fhirpath/N1/#filtering-and-projection)
-            'where', 'select', 'repeat', 'ofType',
-            # Subsetting (http://hl7.org/fhirpath/N1/#subsetting)
-            'first', 'last', 'tail', 'single', 'skip', 'take', 'intersect', 'exclude',
-            # Combining (http://hl7.org/fhirpath/N1/#combining)
-            'union', 'combine',
-            # Conversion (http://hl7.org/fhirpath/N1/#conversion)
-            'iif', 'toBoolean', 'convertsToBoolean', 'toInteger', 'convertsToInteger',
-            'toDate', 'convertsToDate', 'toDateTime', 'convertsToDateTime', 'toDecimal', 
-            'convertsToDecimal', 'toQuantity', 'convertsToQuantity', 'toString', 'convertsToString',
-            'toTime', 'convertsToTime',
-            # String manipulation (http://hl7.org/fhirpath/N1/#string-manipulation)
-            'indexOf', 'substring', 'startsWith', 'endsWith', 'contains', 'upper', 'lower', 'replace',
-            'matches', 'replaceMatches', 'length', 'toChars',
-            # Math (http://hl7.org/fhirpath/N1/#math)
-            'abs', 'ceiling', 'exp', 'floor', 'ln', 'log', 'power', 'round',
-            'sqrt', 'truncate',
-            # Tree navigation (http://hl7.org/fhirpath/N1/#tree-navigation)
-            'children', 'descendants',
-            # Utility functions (http://hl7.org/fhirpath/N1/#utility-functions)
-            'trace', 'now', 'timeOfDay', 'today',
-            # Additional functions (https://build.fhir.org/fhirpath.html#functions)            
-            #'extension', 
-        ]},  
-        
         # Boolean logic (http://hl7.org/fhirpath/N1/#boolean-logic)
         # -------------------------------------------------------------------------------
         **{operator: 'TYPES_OPERATOR' for operator in ['is','as']},  
