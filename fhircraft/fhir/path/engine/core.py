@@ -76,6 +76,18 @@ class FHIRPath(ABC):
             return Child(self, child)
 
 
+class FHIRPathFunction(FHIRPath):
+
+    def __str__(self):
+        return f'{self.__class__.__name__.lower()}()'
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}()'
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__)
+
+
 @dataclass
 class FHIRPathCollectionItem(object):
     """
@@ -152,13 +164,13 @@ class FHIRPathCollectionItem(object):
 
 
 
-class BinaryExpression(FHIRPath):
+class Operation(FHIRPath):
     def __init__(self, left : typing.Union[str,FHIRPath], op : callable,right : typing.Union[str,FHIRPath]):
         self.left = left
         self.op = op
         self.right = right
         
-    def evaluate(self, collection, create):
+    def evaluate(self, collection: List[FHIRPathCollectionItem], create: bool) -> bool:
         collection = ensure_list(collection)
         return self.op(
             [item.value for item in self.left.evaluate(collection, create)] if isinstance(self.left, FHIRPath) else ensure_list(self.left), 
@@ -169,10 +181,10 @@ class BinaryExpression(FHIRPath):
         return f'{self.left}{self.op}{self.right}'
 
     def __repr__(self):
-        return f'BinaryExpression({self.left.__repr__()}{self.op}{self.right.__repr__()})'
+        return f'Operation({self.left.__repr__()}{self.op}{self.right.__repr__()})'
 
     def __eq__(self, other):
-        return isinstance(other, BinaryExpression) and self.left == other.left and self.right == other.right and self.op == other.op
+        return isinstance(other, Operation) and self.left == other.left and self.right == other.right and self.op == other.op
 
     def __hash__(self):
         return hash((self.left, self.op, self.right))
@@ -281,28 +293,6 @@ class Parent(FHIRPath):
 
     def __hash__(self):
         return hash('parent')
-
-
-class Where(FHIRPath):
-
-    def __init__(self, expression: BinaryExpression):
-        self.expression = expression
-        
-    def evaluate(self, collection, create):
-        collection = ensure_list(collection)
-        return [item for item in collection if self.expression.evaluate(item, create)]
-
-    def __str__(self):
-        return f'Where({self.expression})'
-
-    def __repr__(self):
-        return f'Where({self.expression.__repr__})'
-    
-    def __eq__(self, other):
-        return isinstance(other, Where) and other.expression == self.expression
-
-    def __hash__(self):
-        return hash((self.expression))
 
 
 

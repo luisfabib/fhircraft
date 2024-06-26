@@ -6,8 +6,8 @@ import ply.yacc
 import operator 
 
 from fhircraft.fhir.path.engine.core import *
-import fhircraft.fhir.path.engine.existence as existence
 from fhircraft.fhir.path.engine.existence import *
+from fhircraft.fhir.path.engine.filtering import *
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 
@@ -196,12 +196,12 @@ class FhirPathParser:
         # -------------------------------------------------------------------------------
         elif check(p, 'where', nargs=1):
             p[0] = Where(*p[3])
-        elif check(p, 'select', nargs=2):
-            raise NotImplementedError()
-        elif check(p, 'repeat', nargs=2):
-            raise NotImplementedError()
+        elif check(p, 'select', nargs=1):
+            p[0] = Select(*p[3])
+        elif check(p, 'repeat', nargs=1):
+            p[0] = Repeat(*p[3])
         elif check(p, 'ofType', nargs=1):
-            raise NotImplementedError()
+            p[0] = OfType(*p[3])
         # -------------------------------------------------------------------------------
         # Additional functions
         # -------------------------------------------------------------------------------
@@ -345,7 +345,7 @@ class FhirPathParser:
 
     def p_function_arguments(self, p):
         """arguments : fhirpath
-                     | binary_expression
+                     | operation
                      | value
                      | empty """
         p[0] = [p[1]]
@@ -354,9 +354,9 @@ class FhirPathParser:
         """arguments : arguments ',' arguments """
         p[0] = p[1] + p[2]
         
-    def p_binary_expression(self, p):
-        "binary_expression : fhirpath operator righthand"
-        p[0] = BinaryExpression(p[1], p[2], p[3])
+    def p_operation(self, p):
+        "operation : fhirpath operator righthand"
+        p[0] = Operation(p[1], p[2], p[3])
             
     def p_righthand(self, p):
         """righthand : fhirpath

@@ -36,13 +36,13 @@ def test_exists_returns_true_for_non_empty_collection():
     assert result is True
 
 def test_exists_applies_criteria_correctly_and_returns_true_if_filtered_collection_has_elements():
-    criteria = Where(BinaryExpression(This(), operator.gt,1))
+    criteria = Where(Operation(This(), operator.gt,1))
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     result = Exists(criteria).evaluate(collection)
     assert result is True
 
 def test_exists_applies_criteria_correctly_and_returns_false_if_filtered_collection_is_empty():
-    criteria = Where(BinaryExpression(This(), operator.gt,9999))
+    criteria = Where(Operation(This(), operator.gt,9999))
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     result = Exists(criteria).evaluate(collection)
     assert result is False
@@ -57,13 +57,13 @@ def test_all_returns_true_for_empty_collection():
     assert result is True
     
 def test_all_returns_true_for_criteria_applying_to_all():
-    criteria = BinaryExpression(This(), operator.gt,0)
+    criteria = Operation(This(), operator.gt,0)
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     result = All(criteria).evaluate(collection)
     assert result is True
     
 def test_all_returns_false_for_criteria_not_applying_to_all():
-    criteria = BinaryExpression(This(), operator.gt,0)
+    criteria = Operation(This(), operator.gt,0)
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     result = All(criteria).evaluate(collection)
     assert result is True

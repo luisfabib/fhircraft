@@ -1,18 +1,8 @@
 
-from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollectionItem, Where, FHIRPathError
+from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollectionItem, FHIRPathError, FHIRPathFunction
+from fhircraft.fhir.path.engine.filtering import Where
 from typing import List, Optional,Union
 
-class FHIRPathFunction(FHIRPath):
-    invocation: str = None
-
-    def __str__(self):
-        return f'{self.__class__.__name__.lower()}()'
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}()'
-
-    def __eq__(self, other):
-        return isinstance(other, self.__class__)
 
 
 class Empty(FHIRPathFunction):
@@ -250,5 +240,5 @@ class IsDistinct(FHIRPathFunction):
     If the input collection is empty ({ }), the result is true.
     """
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> List[FHIRPathCollectionItem]:
+    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
         return len(list(set(collection))) == len(collection)

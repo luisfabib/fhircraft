@@ -1,6 +1,6 @@
 import pytest
 
-from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Child, Root, Element, Index, Slice, Where, Extension, Single
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Child, Root, Element, Index
 from fhircraft.fhir.path.parser import parse
 from fhircraft.utils import ensure_list
 from  fhir.resources.R4B.observation import Observation, ObservationComponent
@@ -9,7 +9,6 @@ from  fhir.resources.R4B.codeableconcept import CodeableConcept
 from  fhir.resources.R4B.identifier import Identifier 
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from unittest import TestCase
-from unittest.mock import MagicMock
 from collections import namedtuple
 
 
