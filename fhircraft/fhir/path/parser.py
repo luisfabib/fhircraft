@@ -125,8 +125,8 @@ class FhirPathParser:
         elif p[1] == '%context':
             p[0] = This()
         else:
-            raise FhirPathParserError(f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Unknown environmental variable "{p[1]}".\n{_underline_error_in_fhir_path(self.string, p[1], p.lexpos(1))}')
-            
+            p[0] = p[1]
+                          
     def p_fhirpath_segment(self, p):
         "fhirpath : IDENTIFIER"
         p[0] = Element(p[1])

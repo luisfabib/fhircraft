@@ -6,7 +6,7 @@ from fhircraft.openapi.models.compat import PYDANTIC_V2, ConfigDict, Extra
 
 _examples = [
     {
-        "profile": "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient",
+        "profile": "http://hl7.org/fhir/us/mcode/StructureDefinition/profile-example",
         "resourceType": "Patient"
     },
 ]

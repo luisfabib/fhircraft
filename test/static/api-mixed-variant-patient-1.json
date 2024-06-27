@@ -1,0 +1,101 @@
+{
+    "internalId": "123456789",
+    "status": "final",
+    "observationType": {
+       "system": "http://loinc.org",
+       "code": "69548-6"
+    },
+    "patient": {
+        "race": {
+           "display": "White"
+        },
+        "ethnicity": {
+           "display": "Not Hispanic or Latino"
+        },
+        "gender": {
+           "code": "female"
+        },
+        "names": [
+           {
+             "givenNames": [
+                 "Jenny"
+             ],
+             "familyName": "M"
+           }
+        ],
+        "birthDate": "1965-01-01",
+        "contacts": [
+           {
+              "system": "phone",
+              "value": "555-867-5309",
+              "use": "home"
+           },
+           {
+               "system": "email",
+               "value": "example@example.com"
+           }
+        ],
+        "identifier": {
+           "use": "usual",
+           "system": "http://hospital.example.org",
+           "value": "MRN1234",
+           "category": {
+             "code": "MR",
+             "display": "Medical Record Number",
+             "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+         }      
+        },
+        "internalId": "Patient/CGPatientExample01"
+     },
+    "effective": "2020-01-01",
+    "method": {
+       "system": "http://loinc.org",
+       "code": "LA26398-0",
+       "display": "Sequencing"
+    },
+    "assessment": {
+       "system": "http://loinc.org",
+       "code": "LA9633-4",
+       "display": "Present"
+    },
+    "coordinateSystem": {
+       "system": "http://loinc.org",
+       "code": "LA30102-0",
+       "display": "1-based character counting"
+    },
+    "codingChangeType": {
+       "system": "http://sequenceontology.org",
+       "code": "SO:0002073",
+       "display": "wild type"
+    },
+    "genomicSourceClass": {
+       "system": "http://loinc.org",
+       "code": "LA6683-2",
+       "display": "Germline"
+    },
+    "genomicRefSeq": {
+        "system": "http://www.ncbi.nlm.nih.gov/nuccore",
+        "code": "NC_000010.10",
+        "display": "b37 Chr10"
+    },
+    "allelicState": {
+       "system": "http://loinc.org",
+       "code": "LA6705-3",
+       "display": "homozygous"
+    },
+    "variantConfidenceStatus": {
+       "system": "http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/variant-confidence-status-cs",
+       "code": "high"
+    },
+    "geneStudied": [{
+       "system": "http://www.genenames.org/geneId",
+       "code": "HGNC:2621",
+       "display": "CYP2C19"
+    }],
+    "refAllele": "G",
+    "altAllele": "G",
+    "genomicAlleleExactStartEnd": {
+        "high": 96535210,
+        "low": 96535210
+    }
+ }

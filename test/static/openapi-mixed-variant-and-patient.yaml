@@ -43,11 +43,133 @@ components:
       type: string
       format: date
       pattern: '^\d{4}-\d{2}-\d{2}$'
-    TestSchema:
+    Patient:
+      title: Patient      
+      x-fhir-resource: 
+        profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient
+        resourceType: Patient
+        alias: '%patient'
+      properties:
+        internalId:
+          type: string
+        race: 
+          $ref: '#/components/schemas/Coding'
+          x-binding: http://hl7.org/fhir/us/core/StructureDefinition/us-core-race
+          properties:
+            system:
+              type: string
+              x-fhirpath: null
+            code:
+              type: string
+              x-fhirpath: null
+            display:
+              type: string
+              x-fhirpath: Patient.extension('http://hl7.org/fhir/us/core/StructureDefinition/us-core-race').extension('text').valueString
+            version:
+              type: string
+              x-fhirpath: null
+        ethnicity: 
+          $ref: '#/components/schemas/Coding'
+          x-binding: http://hl7.org/fhir/us/core/ValueSet/omb-ethnicity-category
+          properties:
+            system:
+              type: string
+              x-fhirpath: null
+            code:
+              type: string
+              x-fhirpath: null
+            display:
+              type: string
+              x-fhirpath: Patient.extension('http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity').extension('text').valueString
+            version:
+              type: string
+              x-fhirpath: null
+        gender:
+          $ref: '#/components/schemas/Coding'
+          x-binding: http://hl7.org/fhir/R4/valueset-administrative-gender.html
+          properties:
+            system:
+              type: string
+              x-fhirpath: null
+            code:
+              type: string
+              x-fhirpath: Patient.gender
+            display:
+              type: string
+              x-fhirpath: null
+            version:
+              type: string
+              x-fhirpath: null
+        birthsex:
+          $ref: '#/components/schemas/Coding'
+          x-binding: http://hl7.org/fhir/us/core/ValueSet/birthsex
+          properties:
+            system:
+              type: string
+              x-fhirpath: null
+            code:
+              type: string
+              x-fhirpath: Patient.extension('http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex').valueCode
+            display:
+              type: string
+              x-fhirpath: null
+            version:
+              type: string
+              x-fhirpath: null
+        names:
+          type: array
+          x-fhirpath: Patient.name
+          items: 
+            type: object
+            properties:
+              givenNames: 
+                type: array
+                x-fhirpath: '%context.given'
+                items:
+                  type: string
+              familyName: 
+                type: string
+                x-fhirpath: '%context.family'
+        birthDate:
+          type: string
+          x-fhirpath: Patient.birthDate
+        contacts:
+          type: array
+          x-fhirpath: 'Patient.contact.telecom'
+          items: 
+            type: object
+            properties:
+              system: 
+                type: string
+                x-fhirpath: '%context.system'
+              value:
+                type: string
+                x-fhirpath: '%context.value'
+              use:
+                type: string
+                x-fhirpath: '%context.use'
+        identifier:
+          type: object
+          x-fhirpath: Patient.identifier
+          properties:
+            use: 
+              type: string
+              x-fhirpath: '%context.use'
+            system: 
+              type: string
+              x-fhirpath: '%context.system'
+            category: 
+              $ref: '#/components/schemas/Coding'
+              x-fhirpath: '%context.type.coding'
+            value: 
+              type: string
+              x-fhirpath: '%context.value'
+    Variant:
       title: Observation
       x-fhir-resource: 
         profile: http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant
         resourceType: Observation
+        alias: '%variant'
       properties:
         internalId:
           type: string
@@ -55,9 +177,13 @@ components:
           type: string
           x-fhirpath: Observation.status
           x-binding: http://hl7.org/fhir/ValueSet/observation-status
-        patientId:
-          type: string
-          x-fhirpath: Observation.subject.reference            
+        patient:
+          allOf:
+          - $ref: '#/components/schemas/Patient'
+          - type: object
+            properties:
+              internalId: 
+                x-fhirpath: '%variant.subject.reference'     
         observationType:
           $ref: '#/components/schemas/Coding'
           x-fhirpath: Observation.code.coding
@@ -185,7 +311,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TestSchema'
+                $ref: '#/components/schemas/Variant'
   '/endpoint-multiple':
     get:
       responses:
@@ -196,4 +322,4 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TestSchema'
+                  $ref: '#/components/schemas/Variant'
