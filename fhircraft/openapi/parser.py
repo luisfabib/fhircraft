@@ -1,11 +1,9 @@
-from typing import Union, Any, Optional, Tuple, List, Dict
-import warnings
+from typing import Union, List
 import os 
 from urllib.parse import urlparse
-from fhircraft.utils import load_file, load_url, suspend_assignment_validation
+from fhircraft.utils import load_file, load_url
 from fhircraft.openapi.models import OpenAPI, Schema
 from pydantic import ValidationError
-import json 
 
 def load_openapi(openapi_file_location, resolve=False, validate=True):
     if urlparse(openapi_file_location).scheme in ['http', 'https']:

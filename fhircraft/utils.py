@@ -209,33 +209,6 @@ def get_dict_paths(nested_dict: Union[Dict[str, Any], List[Dict[str, Any]]], pre
                 paths.update(get_dict_paths(item, list_prefix))
     return paths
 
-def find_all_values_for_key(nested_object, key, current_path=''):
-    """
-    Recursively finds all values for a given key in a deeply nested object and returns a dictionary
-    with JSONPaths as keys and the values as values.
-
-    :param nested_object: The nested object (dictionary or list) to search.
-    :param key: The key whose values are to be found.
-    :param current_path: The current JSONPath (used during recursion).
-    :return: A dictionary with JSONPaths as keys and the corresponding values as values.
-    """
-    values = {}
-
-    if isinstance(nested_object, dict):
-        for k, v in nested_object.items():
-            new_path = f"{current_path}.{k}" if current_path else k
-            if k == key:
-                values[new_path] = v
-            if isinstance(v, (dict, list)):
-                values.update(find_all_values_for_key(v, key, new_path))
-    elif isinstance(nested_object, list):
-        for i, item in enumerate(nested_object):
-            new_path = f"{current_path}[{i}]"
-            if isinstance(item, (dict, list)):
-                values.update(find_all_values_for_key(item, key, new_path))
-
-    return values
-
 
 def replace_nth(string, sub, wanted, n):
     pattern = re.compile(sub)
@@ -244,43 +217,3 @@ def replace_nth(string, sub, wanted, n):
     after = string[where.end():]
     newString = before + wanted + after
     return newString
-
-def is_list_of_lists(variable):
-    if isinstance(variable, list) and all(isinstance(i, list) for i in variable):
-        return True
-    return False
-
-def flatten_list_of_lists(list_of_lists):
-    if not is_list_of_lists(list_of_lists):
-        raise ValueError("Input is not a list of lists")
-    return [item for sublist in list_of_lists for item in sublist]
-
-
-@contextmanager
-def suspend_assignment_validation(cls: Union[PydanticV1BaseModel,PydanticV2BaseModel], validate=False):
-    
-    def _get_validate_assignment():
-        if isinstance(cls, PydanticV2BaseModel) or issubclass(cls, PydanticV2BaseModel):
-            return cls.model_config.get('validate_assignment', True)
-        elif isinstance(cls, PydanticV1BaseModel) or issubclass(cls, PydanticV1BaseModel): 
-            return cls.Config.validate_assignment
-        else: 
-            raise TypeError('Must be a valid Pydantic v1 or v2 BaseModel')
-            
-    def _set_validate_assignment(val=None):
-        if isinstance(cls, PydanticV2BaseModel) or issubclass(cls, PydanticV2BaseModel):
-            cls.model_config['validate_assignment'] = val
-        elif isinstance(cls, PydanticV1BaseModel) or issubclass(cls, PydanticV1BaseModel): 
-            cls.Config.validate_assignment = val
-        else: 
-            raise TypeError('Must be a valid Pydantic v1 or v2 BaseModel')
-            
-    # Store the original value
-    original_value = _get_validate_assignment()
-    
-    try:
-        # Set validate_assignment to False
-        _set_validate_assignment(validate)
-        yield cls
-    finally:
-        _set_validate_assignment(original_value)

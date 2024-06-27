@@ -6,38 +6,37 @@ import pytest
 
 class TestEnsureList:
 
-    # input is already a list
-    def test_input_is_already_a_list(self):
+    def test_ensure_list_of_ints(self):
         input_data = [1, 2, 3]
         result = ensure_list(input_data)
         assert result == input_data
 
-    # input is a string
-    def test_input_is_a_string(self):
+    def test_ensure_list_of_strings(self):
         input_data = "hello"
         result = ensure_list(input_data)
         assert result == ["hello"]
 
-    # input is an integer
-    def test_input_is_an_integer(self):
+    def test_ensure_list_of_an_int(self):
         input_data = 42
         result = ensure_list(input_data)
         assert result == [42]
 
-    # input is None
-    def test_input_is_none(self):
+    def test_ensure_list_of_a_none(self):
         input_data = None
         result = ensure_list(input_data)
         assert result == [None]
 
-    # input is an empty list
-    def test_input_is_an_empty_list(self):
+    def test_ensure_empty_list_is_list(self):
         input_data = []
         result = ensure_list(input_data)
         assert result == input_data
 
-    # input is an empty string
-    def test_input_is_an_empty_string(self):
+    def test_ensure_list_from_tuple(self):
+        input_data = (1,2,3)
+        result = ensure_list(input_data)
+        assert result == [1,2,3]
+
+    def test_ensure_list_of_empty_string(self):
         input_data = ""
         result = ensure_list(input_data)
         assert result == [""]
@@ -121,7 +120,6 @@ class TestLoadFile:
 
 class TestLoadUrl:
 
-    # Valid URL returning JSON content
     def test_valid_url_returning_json_content(self, mocker):
         url = "http://example.com/data.json"
         mock_response = mocker.Mock()
@@ -133,7 +131,6 @@ class TestLoadUrl:
         result = load_url(url)
         assert result == {"key": "value"}
 
-    # Valid URL returning YAML content
     def test_valid_url_returning_yaml_content(self, mocker):
         url = "http://example.com/data.yaml"
         mock_response = mocker.Mock()
@@ -145,7 +142,6 @@ class TestLoadUrl:
         result = load_url(url)
         assert result == {"key": "value"}
 
-    # Valid URL with mixed case content type headers for JSON
     def test_valid_url_mixed_case_content_type_json(self, mocker):
         url = "http://example.com/data.json"
         mock_response = mocker.Mock()
@@ -157,13 +153,11 @@ class TestLoadUrl:
         result = load_url(url)
         assert result == {"key": "value"}
 
-    # Invalid URL format not starting with 'http://' or 'https://'
     def test_invalid_url_format(self):
         url = "ftp://example.com/data.json"
         with pytest.raises(ValueError, match="Invalid URL format. Please provide a valid URL starting with 'http://' or 'https://'."):
             load_url(url)
 
-    # URL returning unsupported content type
     def test_url_returning_unsupported_content_type(self, mocker):
         url = "http://example.com/data.txt"
         mock_response = mocker.Mock()

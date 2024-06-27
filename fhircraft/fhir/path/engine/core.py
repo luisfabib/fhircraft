@@ -1,8 +1,7 @@
 import logging
 from itertools import *  # noqa
-from fhircraft.fhir.path.lexer import FhirPathLexer
-from fhircraft.utils import ensure_list, flatten_list_of_lists, is_list_of_lists
-from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name, is_primitive_type
+from fhircraft.utils import ensure_list
+from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel as FhirResource
 import typing
