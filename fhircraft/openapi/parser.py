@@ -47,20 +47,20 @@ def extract_json_schema(openapi: OpenAPI, endpoint: str, method: str, status_cod
     """
     Extracts the JSON schema for a specific endpoint, method, and status code from an OpenAPI specification.
 
-    Parameters:
-    - openapi (dict): The OpenAPI specification containing the endpoint definitions.
-    - endpoint (str): The endpoint for which to extract the schema.
-    - method (str): The HTTP method (e.g., GET, POST) for the endpoint.
-    - status_code (str): The HTTP status code for which to extract the schema.
+    Args:
+        openapi (dict): The OpenAPI specification containing the endpoint definitions.
+        endpoint (str): The endpoint for which to extract the schema.
+        method (str): The HTTP method (e.g., GET, POST) for the endpoint.
+        status_code (str): The HTTP status code for which to extract the schema.
 
     Returns:
-    - dict: The JSON schema for the specified endpoint, method, and status code.
+        schema (dict): The JSON schema for the specified endpoint, method, and status code.
 
     Raises:
-    - ValueError: If the OpenAPI specification has no defined endpoints, the endpoint is not found in the 
-                  specification, the method is not found for the endpoint, the status code is not found
-                  for the endpoint and method, or if the content type 'application/json' is not found 
-                  for the status code.
+        ValueError: If the OpenAPI specification has no defined endpoints, the endpoint is not found in the 
+                    specification, the method is not found for the endpoint, the status code is not found
+                    for the endpoint and method, or if the content type `application/json` is not found 
+                    for the status code.
     """
     # Get the API endpoints
     if not openapi.paths:
@@ -90,22 +90,22 @@ def resolve_ref(reference: str, current_file_path: str, root_schema: dict) -> di
     """
     Resolve a reference to a resource based on the provided reference, current file path, and root schema.
 
-    Parameters:
-    - reference (str): The reference to resolve, which can be a local reference within the same file starting with '#', a URL, or a local file path.
-    - current_file_path (str): The path of the current file where the reference is being resolved.
-    - root_schema (dict): The root schema or data structure where the reference will be resolved.
+    Args:
+        reference (str): The reference to resolve, which can be a local reference within the same file starting with '#', a URL, or a local file path.
+        current_file_path (str): The path of the current file where the reference is being resolved.
+        root_schema (dict): The root schema or data structure where the reference will be resolved.
 
     Returns:
-    - dict or list or any: The resolved content based on the reference. It can be a dictionary, list, or any other valid data type.
+        resolved_schema (dict): The resolved content based on the reference. It can be a dictionary, list, or any other valid data type.
 
     Raises:
-    - KeyError: If a key in the reference path is not found in the root schema.
-    - ValueError: If the reference format is invalid or the content type is not supported when resolving a URL.
+        KeyError: If a key in the reference path is not found in the root schema.
+        ValueError: If the reference format is invalid or the content type is not supported when resolving a URL.
 
-    Note:
-    - If the reference starts with '#', it is assumed to be a local reference within the same file.
-    - If the reference is a URL, it will be loaded using the 'load_url' function.
-    - If the reference is a local file path, it will be resolved based on the current file path.
+    Notes:
+        - If the reference starts with `#`, it is assumed to be a local reference within the same file.
+        - If the reference is a URL, it will be loaded using the `load_url` function.
+        - If the reference is a local file path, it will be resolved based on the current file path.
     """    
     if reference.startswith('#'):
         # Local ref within the same file
@@ -134,22 +134,22 @@ def traverse_and_replace_references(schema: Union[Schema, List[Schema]], current
     """
     Traverse the input schema recursively, replace any references with their resolved content, and merge additional attributes.
 
-    Parameters:
-    - schema (Union[Schema, List[Schema]]): The schema to traverse and replace references within. It can be a dictionary, list, or any other valid data type.
-    - current_file_path (str): The path of the current file where the schema is being processed.
-    - root_schema (dict): The root schema or data structure where the references will be resolved.
+    Args:
+        schema (Union[Schema, List[Schema]]): The schema to traverse and replace references within. It can be a dictionary, list, or any other valid data type.
+        current_file_path (str): The path of the current file where the schema is being processed.
+        root_schema (dict): The root schema or data structure where the references will be resolved.
 
     Returns:
-    - Union[Schema, List[Schema]]: The schema with references replaced by their resolved content and any additional attributes merged.
+        schema (Union[Schema, List[Schema]]): The schema with references replaced by their resolved content and any additional attributes merged.
 
     Raises:
-    - ValueError: If a circular reference is detected in the schema.
-    - RuntimeError: If an error occurs while resolving a reference.
+        ValueError: If a circular reference is detected in the schema.
+        RuntimeError: If an error occurs while resolving a reference.
 
-    Note:
-    - This function handles both local references within the same file and external references (URLs or local file paths).
-    - Circular references are prevented to avoid infinite loops during traversal.
-    - Any errors that occur during reference resolution are caught and raised as a RuntimeError.
+    Notes:
+        - This function handles both local references within the same file and external references (URLs or local file paths).
+        - Circular references are prevented to avoid infinite loops during traversal.
+        - Any errors that occur during reference resolution are caught and raised as a `RuntimeError`.
     """
     # Initialize set of visited references
     visited_refs = set()

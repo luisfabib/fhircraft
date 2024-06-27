@@ -17,7 +17,7 @@ class FhirPathLexer:
     def __init__(self, debug=False):
         self.debug = debug
         if self.__doc__ is None:
-            raise FhirPathLexerError('Docstrings have been removed! By design of PLY, jsonpath-rw requires docstrings. You must not use PYTHONOPTIMIZE=2 or python -OO.')
+            raise FhirPathLexerError('Docstrings have been removed by design of PLY.')
 
     def tokenize(self, string):
         '''

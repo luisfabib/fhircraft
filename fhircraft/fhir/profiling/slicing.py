@@ -54,12 +54,18 @@ class Discriminator:
 @dataclass
 class Slice:
     """
-    Slice
-    -----
     A slice is a specific subset or a partition of the elements that results from the slicing process.
     Each slice is defined with its own constraints or characteristics based on the slicing criteria. 
     Essentially, a slice is a unique subgroup within the repeating element that is differentiated by 
     the defined slicing criteria.   
+    
+    Attributes:
+        id (str): Identifier of the slice as given in the `StructureDefinition`.
+        name (str): Name of the slice as given in the `StructureDefinition`.
+        type (str): Type of slice.
+        constraints (List[Constraint]): Collection of constraints on this slice.
+        slicing (Optional[SlicingGroup]): Slicing group to which this slice belongs.
+        
     """
     id : str
     name : str
@@ -73,9 +79,7 @@ class Slice:
         Construct the full FHIRPath for the slice based on the slicing path and the discriminating expression.
         
         Returns:
-        --------
-        str
-            The full FHIR path constructed by combining the slicing path and the discriminating expression.
+            path (str): The full FHIR path constructed by combining the slicing path and the discriminating expression.
         """        
         if self.slicing.path.endswith('extension') and self.discriminating_expression.startswith('extension'):
             return join_fhirpath(self.slicing.path.replace('extension',''), self.discriminating_expression)
@@ -88,9 +92,7 @@ class Slice:
         Calculate the minimum cardinality among the slice constraints.
         
         Returns:
-        --------
-        int
-            The minimum cardinality value.
+            min_cardinality (int): The minimum cardinality value.
         """        
         return min([constraint.min for constraint in self.get_constraints_on_slice()] or [0]) 
     
@@ -100,9 +102,7 @@ class Slice:
         Calculate the maximum cardinality among the sliceconstraints.
         
         Returns:
-        --------
-        int
-            The maximum cardinality value.
+            max_cardinality (int): The maximum cardinality value.
         """        
         return max([constraint.max for constraint in self.get_constraints_on_slice()] or [1])      
     
@@ -116,9 +116,7 @@ class Slice:
         Get the constraints specific to the slice as element based on the path
         
         Returns:
-        --------
-        List[Constraint]
-            A list of constraints that apply to this slice, filtered by the slicing path.
+            (List[Constraint]): A list of constraints that apply to this slice, filtered by the slicing path.
         """        
         return [constraint for constraint in self.constraints if constraint.path == self.slicing.path]       
     
@@ -127,10 +125,11 @@ class Slice:
         """
         Convinience function to add a constraint to to the slice.
         
-        Arguments:
-        ----------
-        constraint: Constraint
-            The constraint to be added to the slice
+        Args:
+        constraint (Constraint): The constraint to be added to the slice
+        
+        Raises:
+            TypeError: If constraint is not an instance of `Constraint`.
         """   
         if not isinstance(constraint, Constraint):
             raise TypeError('The constraint must be a valid <Constraint> instance')
@@ -145,21 +144,20 @@ class Slice:
         to identify the slice based on the discriminator type and the constraints applied to the slice.
 
         Returns:
-        --------
-        str
-            The discriminating FHIRPath expression for the slice.
+            expression (str): The discriminating FHIRPath expression for the slice.
         
         Notes:
-        ------
-        The expression is constructed differently based on the type of discriminator:
-        - VALUE/PATTERN: Differentiates slices by fixed values, patterns, or required ValueSet bindings.
-        - EXISTS: Differentiates slices by the presence or absence of the nominated element.
-        - TYPE: Differentiates slices by the type of the nominated element.
-        - PROFILE: Differentiates slices by conformance to a specified profile.
-        - POSITION: Differentiates slices by their index within the slicing group.
+            The expression is constructed differently based on the type of discriminator:
+            
+            - `VALUE/PATTERN`: Differentiates slices by fixed values, patterns, or required `ValueSet` bindings.
+            - `EXISTS`: Differentiates slices by the presence or absence of the nominated element.
+            - `TYPE`: Differentiates slices by the type of the nominated element.
+            - `PROFILE`: Differentiates slices by conformance to a specified profile.
+            - `POSITION`: Differentiates slices by their index within the slicing group.
         
-        Special handling is applied for 'Extension' types with profile constraints, 
-        where the profile URL is included in the expression.
+        Info:
+            Special handling is applied for `Extension` types with profile constraints, 
+            where the profile URL is included in the expression.
         """        
         expression = ''
         # Loop over all discriminators for the slice
@@ -226,9 +224,6 @@ class Slice:
                     
         return expression
 
-
-
-    
     @property
     def pydantic_model(self):       
         

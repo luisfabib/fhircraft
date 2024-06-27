@@ -1,3 +1,4 @@
+"""The filtering module contains the object representations of the existence-category FHIRPath functions."""
 
 from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollectionItem, FHIRPathError, FHIRPathFunction
 from fhircraft.fhir.path.engine.filtering import Where
@@ -7,29 +8,46 @@ from typing import List, Optional,Union
 
 class Empty(FHIRPathFunction):
     """
-    5.1.1. Empty
-    -------------
-    Returns `True` if the input collection is empty (`{}`) and `False` otherwise.
+    Representation of the FHIRPath [`empty()`](http://hl7.org/fhirpath/N1/#empty-boolean) function.
     """
     def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+        """
+        Returns `True` if the input collection is empty (`{}`) and `False` otherwise.
+        
+        Args: 
+            collection (List[FHIRPathCollectionItem])): The input collection
+        
+        Returns:
+            bool
+        """
         return len(collection) == 0
 
 class Exists(FHIRPathFunction):
     """
-    5.1.2. Exists
-    -------------
-    Returns `True` if the collection has any elements, and `False` otherwise. 
-    This is the opposite of empty(), and as such is a shorthand for empty().not().
-    If the input collection is empty (`{}`), the result is `False`.
-    The function can also take an optional criteria to be applied to the collection
-    prior to the determination of the exists. In this case, the function is 
-    shorthand for where(criteria).exists().
+    Representation of the FHIRPath [`exists()`](http://hl7.org/fhirpath/N1/#existscriteria-expression-boolean) function.
+
+    Attributes:
+        criteria (FHIRPath): Optional criteria to be applied to the collection prior to the determination of the exists
     """
     
     def __init__(self, criteria: FHIRPath = None):
         self.criteria = criteria
 
     def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+        """
+        Returns `True` if the collection has any elements, and `False` otherwise. 
+        This is the opposite of empty(), and as such is a shorthand for empty().not().
+        If the input collection is empty (`{}`), the result is `False`.
+        The function can also take an optional criteria to be applied to the collection
+        prior to the determination of the exists. In this case, the function is 
+        shorthand for where(criteria).exists().
+        
+        Args: 
+            collection (List[FHIRPathCollectionItem])): The input collection
+        
+        Returns:
+            bool
+        """    
         if self.criteria:
             collection = Where(self.criteria).evaluate(collection, create=False)
         return len(collection) > 0
