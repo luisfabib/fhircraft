@@ -45,7 +45,9 @@ components:
       pattern: '^\d{4}-\d{2}-\d{2}$'
     TestSchema:
       title: Procedure
-      x-fhir-profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-course-summary
+      x-fhir-resource: 
+        profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-course-summary
+        resourceType: Procedure
       properties:
         status:
           type: string

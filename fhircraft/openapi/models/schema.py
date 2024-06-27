@@ -10,6 +10,7 @@ from .discriminator import Discriminator
 from .external_documentation import ExternalDocumentation
 from .reference import Reference
 from .xml import XML
+from .fhir_resource_extension import FhirResourceExtension
 
 _examples = [
     {"type": "string", "format": "email"},
@@ -945,7 +946,7 @@ class Schema(BaseModel):
     An OpenAPI extension to specify the FHIRPath mapping of this instance
     """
     
-    fhirprofile: Optional[str] = Field(default=None, alias='x-fhir-profile')
+    fhir_resource: Optional[FhirResourceExtension] = Field(default=None, alias='x-fhir-resource')
     """
     An OpenAPI extension to specify the FHIR profile related to this instance
     """
@@ -954,7 +955,7 @@ class Schema(BaseModel):
     @model_validator(mode='after')
     def child_fhirpaths_must_be_valid(self):
         from fhircraft.mapping import map_json_paths_to_fhir_paths, FHIRPathError
-        if self.fhirprofile:
+        if self.fhir_resource:
             try:
                 map_json_paths_to_fhir_paths(self.model_dump(by_alias=True, exclude_none=True))        
             except FHIRPathError as e:        

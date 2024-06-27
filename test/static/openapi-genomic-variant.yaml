@@ -45,7 +45,9 @@ components:
       pattern: '^\d{4}-\d{2}-\d{2}$'
     TestSchema:
       title: Observation
-      x-fhir-profile: http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant
+      x-fhir-resource: 
+        profile: http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant
+        resourceType: Observation
       properties:
         internalId:
           type: string

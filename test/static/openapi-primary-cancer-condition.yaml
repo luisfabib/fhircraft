@@ -42,7 +42,9 @@ components:
       pattern: '^\d{4}-\d{2}-\d{2}$'
     TestSchema:
       title: Condition
-      x-fhir-profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition
+      x-fhir-resource: 
+        profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition
+        resourceType: Condition
       properties:
         internalId:
           type: string
