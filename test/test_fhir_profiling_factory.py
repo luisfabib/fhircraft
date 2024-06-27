@@ -192,11 +192,11 @@ class TestSlicingManagement(TestCase):
         self.components = []
         for slice in slicing.slices:
             self.components.append(slice.pydantic_model.construct())
-
-        profile = MagicMock()
-        profile.__slicing__ = [slicing]
-        resource = MagicMock(profile)
-        resource.__class__ = profile
+                
+        class MockedProfile(MagicMock):
+            __slicing__ = [slicing]
+            
+        resource = MockedProfile()
         self.resource = resource
 
     def test_initialize_slices(self):
