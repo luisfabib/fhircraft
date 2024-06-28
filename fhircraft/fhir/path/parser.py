@@ -6,8 +6,11 @@ import ply.yacc
 import operator 
 
 from fhircraft.fhir.path.engine.core import *
-from fhircraft.fhir.path.engine.existence import *
-from fhircraft.fhir.path.engine.filtering import *
+import fhircraft.fhir.path.engine.existence as existence
+import fhircraft.fhir.path.engine.filtering as filtering
+import fhircraft.fhir.path.engine.subsetting as subsetting
+import fhircraft.fhir.path.engine.combining as combining
+import fhircraft.fhir.path.engine.strings as strings
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 
@@ -80,7 +83,6 @@ class FhirPathParser:
     precedence = [
         ('left', '.'),
         ('left', '|'),
-        ('left', '&'),
     ]
 
     def p_error(self, t):
@@ -90,16 +92,13 @@ class FhirPathParser:
 
     def p_fhirpath_binop(self, p):
         """fhirpath : fhirpath '.' fhirpath
-                    | fhirpath '|' fhirpath
-                    | fhirpath '&' fhirpath"""
+                    | fhirpath '|' fhirpath"""
         op = p[2]
 
         if op == '.':
             p[0] = Child(p[1], p[3])
         elif op == '|':
             p[0] = Union(p[1], p[3])
-        elif op == '&':
-            p[0] = Intersect(p[1], p[3])
 
     def p_fhirpath_base_resource_root(self, p):
         "fhirpath : ROOT_NODE"
@@ -138,17 +137,9 @@ class FhirPathParser:
     def p_fhirpath_choice_element(self, p):
         "fhirpath : CHOICE_ELEMENT"
         p[0] = TypeChoice(p[1])
-        
-    def p_fhirpath_slice(self, p):
-        "fhirpath : '[' slice ']'"
-        p[0] = p[2]
        
     def p_fhirpath_child_idxbrackets(self, p):
         "fhirpath : fhirpath '[' idx ']'"
-        p[0] = Child(p[1], p[3])
-
-    def p_fhirpath_child_slicebrackets(self, p):
-        "fhirpath : fhirpath '[' slice ']'"
         p[0] = Child(p[1], p[3])
 
 
@@ -168,40 +159,40 @@ class FhirPathParser:
         # Existence
         # -------------------------------------------------------------------------------
         if check(p, 'empty', nargs=0):
-            p[0] = Empty()
+            p[0] = existence.Empty()
         elif check(p, 'exists', nargs=[0,1]):
-            p[0] = Exists(*p[3])
+            p[0] = existence.Exists(*p[3])
         elif check(p, 'all', nargs=[0,1]):
-            p[0] = All(*p[3])
+            p[0] = existence.All(*p[3])
         elif check(p, 'allTrue', nargs=0):
-            p[0] = AllTrue()
+            p[0] = existence.AllTrue()
         elif check(p, 'anyTrue', nargs=0):
-            p[0] = AnyTrue()
+            p[0] = existence.AnyTrue()
         elif check(p, 'allFalse', nargs=0):
-            p[0] = AllFalse()
+            p[0] = existence.AllFalse()
         elif check(p, 'anyFalse', nargs=0):
-            p[0] = AnyFalse()
+            p[0] = existence.AnyFalse()
         elif check(p, 'subsetOf', nargs=1):
-            p[0] = SubsetOf(*p[3])
+            p[0] = existence.SubsetOf(*p[3])
         elif check(p, 'supersetOf', nargs=1):
-            p[0] = SupersetOf(*p[3])
+            p[0] = existence.SupersetOf(*p[3])
         elif check(p, 'count', nargs=0):
-            p[0] = Count()
+            p[0] = existence.Count()
         elif check(p, 'distinct', nargs=0):
-            p[0] = Distinct()
+            p[0] = existence.Distinct()
         elif check(p, 'isDistinct', nargs=0):
-            p[0] = IsDistinct()
+            p[0] = existence.IsDistinct()
         # -------------------------------------------------------------------------------
         # Subsetting
         # -------------------------------------------------------------------------------
         elif check(p, 'where', nargs=1):
-            p[0] = Where(*p[3])
+            p[0] = filtering.Where(*p[3])
         elif check(p, 'select', nargs=1):
-            p[0] = Select(*p[3])
+            p[0] = filtering.Select(*p[3])
         elif check(p, 'repeat', nargs=1):
-            p[0] = Repeat(*p[3])
+            p[0] = filtering.Repeat(*p[3])
         elif check(p, 'ofType', nargs=1):
-            p[0] = OfType(*p[3])
+            p[0] = filtering.OfType(*p[3])
         # -------------------------------------------------------------------------------
         # Additional functions
         # -------------------------------------------------------------------------------
@@ -213,28 +204,28 @@ class FhirPathParser:
         # Subsetting
         # -------------------------------------------------------------------------------
         elif check(p, 'single', nargs=0):
-            p[0] = Single()
+            p[0] = subsetting.Single()
         elif check(p, 'first', nargs=0):
-            p[0] = Index(0)
+            p[0] = subsetting.First()
         elif check(p, 'last', nargs=0):
-            p[0] = Index(-1)
+            p[0] = subsetting.Last()
         elif check(p, 'tail', nargs=0):
-            p[0] = Slice(0,-1)
+            p[0] = subsetting.Tail()
         elif check(p, 'skip', nargs=1):
-            p[0] = Slice(p[3][0],-1)
+            p[0] = subsetting.Skip(*p[3])
         elif check(p, 'take', nargs=1):
-            p[0] = Slice(0,p[3][0])
+            p[0] = subsetting.Take(*p[3])
         elif check(p, 'intersect', nargs=1):
-            raise NotImplementedError()
+            p[0] = subsetting.Intersect(*p[3])
         elif check(p, 'exclude', nargs=1):
-            raise NotImplementedError()
+            p[0] = subsetting.Exclude(*p[3])
         # -------------------------------------------------------------------------------
         # Combining
         # -------------------------------------------------------------------------------
         elif check(p, 'union', nargs=1):
-            raise NotImplementedError()
+            p[0] = combining.Union(*p[3])
         elif check(p, 'combine', nargs=1):
-            raise NotImplementedError()
+            p[0] = combining.Combine(*p[3])
         # -------------------------------------------------------------------------------
         # Conversion
         # -------------------------------------------------------------------------------
@@ -274,29 +265,29 @@ class FhirPathParser:
         # String manipulation
         # -------------------------------------------------------------------------------   
         elif check(p, 'indexOf', nargs=1):
-            raise NotImplementedError()        
-        elif check(p, 'substring', nargs=2):
-            raise NotImplementedError()        
-        elif check(p, 'startsWith', nargs=1):
-            raise NotImplementedError()        
+            p[0] = strings.IndexOf(*p[3]) 
+        elif check(p, 'substring', nargs=(1,2)):
+            p[0] = strings.Substring(*p[3]) 
+        elif check(p, 'startsWith', nargs=1): 
+            p[0] = strings.StartsWith(*p[3])   
         elif check(p, 'endsWith', nargs=1):
-            raise NotImplementedError()        
+            p[0] = strings.EndsWith(*p[3])     
         elif check(p, 'contains', nargs=1):
-            raise NotImplementedError()        
+            p[0] = strings.Contains(*p[3])   
         elif check(p, 'upper', nargs=0):
-            raise NotImplementedError()     
+            p[0] = strings.Upper()   
         elif check(p, 'lower', nargs=0):
-            raise NotImplementedError()     
-        elif check(p, 'replace', nargs=1):
-            raise NotImplementedError()     
+            p[0] = strings.Lower()   
+        elif check(p, 'replace', nargs=2):
+            p[0] = strings.Replace(*p[3])   
         elif check(p, 'matches', nargs=1):
-            raise NotImplementedError()     
+            p[0] = strings.Matches(*p[3])   
         elif check(p, 'replaceMatches', nargs=2):
-            raise NotImplementedError()     
+            p[0] = strings.ReplaceMatches(*p[3])   
         elif check(p, 'length', nargs=0):
-            raise NotImplementedError()     
+            p[0] = strings.Length()   
         elif check(p, 'toChars', nargs=0):
-            raise NotImplementedError()     
+            p[0] = strings.ToChars()    
         # -------------------------------------------------------------------------------
         # Math
         # -------------------------------------------------------------------------------   
@@ -352,7 +343,7 @@ class FhirPathParser:
 
     def p_function_arguments_list(self, p):
         """arguments : arguments ',' arguments """
-        p[0] = p[1] + p[2]
+        p[0] = ensure_list(p[1]) + ensure_list(p[2])
         
     def p_operation(self, p):
         "operation : fhirpath operator righthand"
@@ -443,21 +434,8 @@ class FhirPathParser:
 
     def p_idx(self, p):
         "idx : INTEGER"
-        p[0] = Index(p[1])
+        p[0] = subsetting.Index(p[1])
 
-    def p_slice_any(self, p):
-        "slice : '*'"
-        p[0] = Slice()
-
-    def p_slice(self, p): # Currently does not support `step`
-        """slice : maybe_int ':' maybe_int
-                 | maybe_int ':' maybe_int ':' maybe_int """
-        p[0] = Slice(*p[1::2])
-
-    def p_maybe_int(self, p):
-        """maybe_int : INTEGER
-                     | empty"""
-        p[0] = p[1]
         
     def p_empty(self, p):
         'empty :'

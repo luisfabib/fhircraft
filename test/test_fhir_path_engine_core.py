@@ -1,6 +1,7 @@
 import pytest
 
-from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Child, Root, Element, Index
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Child, Root, Element
+from fhircraft.fhir.path.engine.subsetting import Index
 from fhircraft.fhir.path.parser import parse
 from fhircraft.utils import ensure_list
 from  fhir.resources.R4B.observation import Observation, ObservationComponent
@@ -9,7 +10,6 @@ from  fhir.resources.R4B.codeableconcept import CodeableConcept
 from  fhir.resources.R4B.identifier import Identifier 
 from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
 from unittest import TestCase
-from collections import namedtuple
 
 
 
@@ -66,105 +66,6 @@ class TestElement(TestCase):
         assert self.resource.identifier[0].value == 'C'
         assert self.resource.identifier[1].value == 'C'
              
-        
-class TestIndexPrimitive(TestCase):
-
-    def setUp(self):
-        TestResource = namedtuple('TestResource', 'field')
-        self.resource = TestResource(field=[1, 2, 3])
-        parent = FHIRPathCollectionItem(self.resource, path=Root())
-        self.collection = Element('field').find(parent)
-    
-    def test_index_evaluates_correctly(self):
-        result = Index(2).evaluate(self.collection, create=False)
-        assert len(result) == 1
-        assert result[0].value == 3
-        assert len(self.resource.field) == 3
-
-    def test_index_creates_missing_elements(self):
-        result = Index(5).evaluate(self.collection, create=True)
-        assert len(result) == 1
-        assert result[0].value is None
-        assert len(self.resource.field) == 6
-
-    def test_index_does_not_modify_collection_out_of_bounds(self):
-        result = Index(10).evaluate(self.collection, create=False)
-        assert len(result) == 0
-        assert len(self.resource.field) == 3
-
-    def test_index_updates_value(self):
-        Index(2).update(self.collection, value='value')
-        assert len(self.resource.field) == 3
-        assert self.resource.field[2] == 'value'
-
-    def test_index_updates_and_creates_value(self):
-        Index(10).update_or_create(self.collection, value='value')
-        assert len(self.resource.field) == 11
-        assert self.resource.field[10] == 'value'
-
-    def test_index_handles_negative_indices(self):
-        result = Index(-1).evaluate(self.collection, create=False)
-        assert len(result) == 1
-        assert result[0].value == 3        
-        assert len(self.resource.field) == 3
-
-    def test_index_handles_non_integer_indices(self):
-        with pytest.raises(FHIRPathError):
-            Index("a")
-            
-
-
-class TestIndexResources(TestCase):
-
-    def setUp(self):
-        self.resource = CodeableConcept(coding=[
-            Coding(code='code-1',system='system-1'),
-            Coding(code='code-2',system='system-2'),
-            Coding(code='code-3',system='system-3'),
-        ])
-        parent = FHIRPathCollectionItem(self.resource, path=Root())
-        self.collection = Element('coding').find(parent)
-    
-    def test_index_evaluates_correctly(self):
-        result = Index(2).evaluate(self.collection, create=False)
-        assert len(result) == 1
-        assert result[0].value == Coding(code='code-3',system='system-3')
-        assert len(self.resource.coding) == 3
-
-    def test_index_creates_missing_elements(self):
-        result = Index(5).evaluate(self.collection, create=True)
-        assert len(result) == 1
-        assert result[0].value == Coding.construct()
-        assert len(self.resource.coding) == 6
-
-    def test_index_does_not_modify_collection_out_of_bounds(self):
-        result = Index(10).evaluate(self.collection, create=False)
-        assert len(result) == 0
-        assert len(self.resource.coding) == 3
-
-    def test_index_updates_value(self):
-        Index(2).update(self.collection, value=Coding(code='code-5',system='system-5'))
-        assert len(self.resource.coding) == 3
-        assert self.resource.coding[2] == Coding(code='code-5',system='system-5')
-
-    def test_index_updates_and_creates_value(self):
-        Index(10).update_or_create(self.collection, value=Coding(code='code-5',system='system-5'))
-        assert len(self.resource.coding) == 11
-        assert self.resource.coding[10] == Coding(code='code-5',system='system-5')
-
-    def test_index_evaluates_by_reference(self):
-        Index(1).child(Element('code')).evaluate(self.collection, create=False)[0].set_value('code-999')
-        assert len(self.resource.coding) == 3
-        assert self.resource.coding[1].code == 'code-999'
-
-    def test_index_creates_with_empty_list(self):
-        resource = CodeableConcept(coding=[])
-        parent = FHIRPathCollectionItem(resource, path=Root())
-        collection = Element('coding').evaluate(parent, create=True)
-        Index(0).evaluate(collection, create=True)
-        assert len(resource.coding) == 1
-        assert resource.coding == [Coding.construct()]
-
 
 
 observation = Observation(**{

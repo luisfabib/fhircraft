@@ -3,6 +3,9 @@ import pytest
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.existence import *
 from fhircraft.fhir.path.engine.filtering import *
+from fhircraft.fhir.path.engine.subsetting import *
+from fhircraft.fhir.path.engine.combining import *
+from fhircraft.fhir.path.engine.strings import *
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 from fhircraft.fhir.path.parser import FhirPathParser, FhirPathParserError
 import operator
@@ -11,12 +14,6 @@ import operator
 parser_test_cases = (
     ("foo", Element("foo")),
     ("[1]", Index(1)),
-    ("[1:]", Slice(start=1)),
-    ("[:]", Slice()),
-    ("[*]", Slice()),
-    ("[:2]", Slice(end=2)),
-    ("[1:2]", Slice(start=1, end=2)),
-    ("[5:-2]", Slice(start=5, end=-2)),
     ("$", Root()),
     ("$this", This()),
     ("%resource", Root()),
@@ -31,13 +28,16 @@ parser_test_cases = (
     ("parent.where(child=@T12:05)", Child(Element('parent'), Where(Operation(Element('child'), operator.eq,'12:05')))),
     ("parent.where(child & daughter)", Child(Element('parent'), Where(Operation(Element('child'), operator.and_, Element('daughter'))))),
     ("parent.extension('http://domain.org/extension')", Child(Element('parent'), Extension("http://domain.org/extension"))),
-    ("parent.single()", Child(Element('parent'), Single())),    
-    ("parent.first()", Child(Element('parent'), Index(0))),    
-    ("parent.last()", Child(Element('parent'), Index(-1))),    
-    ("parent.tail()", Child(Element('parent'), Slice(0,-1))),  
-    ("parent.skip(3)", Child(Element('parent'), Slice(3,-1))),    
-    ("parent.take(3)", Child(Element('parent'), Slice(0,3))),     
     ("parent.value[x]", Child(Element('parent'), TypeChoice('value'))),
+    # ----------------------------------
+    # Subsetting functions
+    # ----------------------------------
+    ("parent.single()", Child(Element('parent'), Single())),    
+    ("parent.first()", Child(Element('parent'), First())),    
+    ("parent.last()", Child(Element('parent'), Last())),    
+    ("parent.tail()", Child(Element('parent'), Tail())),  
+    ("parent.skip(3)", Child(Element('parent'), Skip(3))),    
+    ("parent.take(3)", Child(Element('parent'), Take(3))),     
     # ----------------------------------
     # Existence functions
     # ----------------------------------
@@ -60,6 +60,26 @@ parser_test_cases = (
     ("parent.where(child='name')", Child(Element('parent'), Where(Operation(Element('child'), operator.eq, 'name')))),
     ("parent.select($this.child)", Child(Element('parent'), Select(Child(This(), Element('child'))))),
     ("parent.repeat($this.child)", Child(Element('parent'), Repeat(Child(This(), Element('child'))))),
+    # ----------------------------------
+    # Combining functions
+    # ----------------------------------
+    ("parent.combine(mother)", Child(Element('parent'), Combine(Element('mother')))),  
+    ("parent.union(mother)", Child(Element('parent'), Union(Element('mother')))),  
+    # ----------------------------------
+    # String manipualtion functions
+    # ----------------------------------
+    ("parent.indexOf('John')", Child(Element('parent'), IndexOf('Lucas'))),  
+    ("parent.substring(1,2)", Child(Element('parent'), Substring(1,2))),  
+    ("parent.startsWith('John')", Child(Element('parent'), StartsWith('John'))),  
+    ("parent.endsWith('John')", Child(Element('parent'), EndsWith('John'))),  
+    ("parent.contains('John')", Child(Element('parent'), Contains('John'))),  
+    ("parent.upper()", Child(Element('parent'), Upper())),  
+    ("parent.lower()", Child(Element('parent'), Lower())),  
+    ("parent.replace('John','James')", Child(Element('parent'), Replace('John','James'))),  
+    ("parent.matches('^(?:John)')", Child(Element('parent'), Matches('^(?:John)'))),  
+    ("parent.replaceMatches('^(?:John)','James')", Child(Element('parent'), ReplaceMatches('^(?:John)','James'))),  
+    ("parent.length()", Child(Element('parent'), Length())),  
+    ("parent.toChars()", Child(Element('parent'), ToChars())),  
 )
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(string, expected_object):

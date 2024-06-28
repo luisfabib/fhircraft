@@ -408,93 +408,93 @@ class TypeChoice(FHIRPath):
     def __hash__(self):
         return hash((self.type_choice_name))
     
-class Descendants(FHIRPath):
-    """
-    FHIRPath that matches first the left expression then any descendant
-    of it which matches the right expression.
-    """
+# class Descendants(FHIRPath):
+#     """
+#     FHIRPath that matches first the left expression then any descendant
+#     of it which matches the right expression.
+#     """
 
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
+#     def __init__(self, left, right):
+#         self.left = left
+#         self.right = right
 
-    def find(self, collection):
-        # <left> .. <right> ==> <left> . (<right> | *..<right> | [*]..<right>)
-        #
-        # With with a wonky caveat that since Slice() has funky coercions
-        # we cannot just delegate to that equivalence or we'll hit an
-        # infinite loop. So right here we implement the coercion-free version.
+#     def find(self, collection):
+#         # <left> .. <right> ==> <left> . (<right> | *..<right> | [*]..<right>)
+#         #
+#         # With with a wonky caveat that since Slice() has funky coercions
+#         # we cannot just delegate to that equivalence or we'll hit an
+#         # infinite loop. So right here we implement the coercion-free version.
 
-        # Get all left matches into a list
-        left_matches = self.left.find(collection)
-        if not isinstance(left_matches, list):
-            left_matches = [left_matches]
+#         # Get all left matches into a list
+#         left_matches = self.left.find(collection)
+#         if not isinstance(left_matches, list):
+#             left_matches = [left_matches]
 
-        def match_recursively(collection):
-            right_matches = self.right.find(collection)
+#         def match_recursively(collection):
+#             right_matches = self.right.find(collection)
 
-            # Manually do the * or [*] to avoid coercion and recurse just the right-hand pattern
-            if isinstance(collection.value, list):
-                recursive_matches = [submatch
-                                     for i in range(0, len(collection.value))
-                                     for submatch in match_recursively(FHIRPathCollectionItem(collection.value[i], parent=collection, path=Index(i)))]
+#             # Manually do the * or [*] to avoid coercion and recurse just the right-hand pattern
+#             if isinstance(collection.value, list):
+#                 recursive_matches = [submatch
+#                                      for i in range(0, len(collection.value))
+#                                      for submatch in match_recursively(FHIRPathCollectionItem(collection.value[i], parent=collection, path=Index(i)))]
 
-            elif isinstance(collection.value, dict):
-                recursive_matches = [submatch
-                                     for field in collection.value.keys()
-                                     for submatch in match_recursively(FHIRPathCollectionItem(collection.value[field], parent=collection, path=Element(field)))]
+#             elif isinstance(collection.value, dict):
+#                 recursive_matches = [submatch
+#                                      for field in collection.value.keys()
+#                                      for submatch in match_recursively(FHIRPathCollectionItem(collection.value[field], parent=collection, path=Element(field)))]
 
-            else:
-                recursive_matches = []
+#             else:
+#                 recursive_matches = []
 
-            return right_matches + list(recursive_matches)
+#             return right_matches + list(recursive_matches)
 
-        # TODO: repeatable iterator instead of list?
-        return [submatch
-                for left_match in left_matches
-                for submatch in match_recursively(left_match)]
+#         # TODO: repeatable iterator instead of list?
+#         return [submatch
+#                 for left_match in left_matches
+#                 for submatch in match_recursively(left_match)]
 
-    def is_singular(self):
-        return False
+#     def is_singular(self):
+#         return False
 
-    def update(self, data, val):
-        # Get all left matches into a list
-        left_matches = self.left.find(data)
-        if not isinstance(left_matches, list):
-            left_matches = [left_matches]
+#     def update(self, data, val):
+#         # Get all left matches into a list
+#         left_matches = self.left.find(data)
+#         if not isinstance(left_matches, list):
+#             left_matches = [left_matches]
 
-        def update_recursively(data):
-            # Update only mutable values corresponding to JSON types
-            if not (isinstance(data, list) or isinstance(data, dict)):
-                return
+#         def update_recursively(data):
+#             # Update only mutable values corresponding to JSON types
+#             if not (isinstance(data, list) or isinstance(data, dict)):
+#                 return
 
-            self.right.update(data, val)
+#             self.right.update(data, val)
 
-            # Manually do the * or [*] to avoid coercion and recurse just the right-hand pattern
-            if isinstance(data, list):
-                for i in range(0, len(data)):
-                    update_recursively(data[i])
+#             # Manually do the * or [*] to avoid coercion and recurse just the right-hand pattern
+#             if isinstance(data, list):
+#                 for i in range(0, len(data)):
+#                     update_recursively(data[i])
 
-            elif isinstance(data, dict):
-                for field in data.keys():
-                    update_recursively(data[field])
+#             elif isinstance(data, dict):
+#                 for field in data.keys():
+#                     update_recursively(data[field])
 
-        for submatch in left_matches:
-            update_recursively(submatch.value)
+#         for submatch in left_matches:
+#             update_recursively(submatch.value)
 
-        return data
+#         return data
 
-    def __str__(self):
-        return '%s..%s' % (self.left, self.right)
+#     def __str__(self):
+#         return '%s..%s' % (self.left, self.right)
 
-    def __eq__(self, other):
-        return isinstance(other, Descendants) and self.left == other.left and self.right == other.right
+#     def __eq__(self, other):
+#         return isinstance(other, Descendants) and self.left == other.left and self.right == other.right
 
-    def __repr__(self):
-        return '%s(%r, %r)' % (self.__class__.__name__, self.left, self.right)
+#     def __repr__(self):
+#         return '%s(%r, %r)' % (self.__class__.__name__, self.left, self.right)
 
-    def __hash__(self):
-        return hash((self.left, self.right))
+#     def __hash__(self):
+#         return hash((self.left, self.right))
 
 
 class Union(FHIRPath):
@@ -522,34 +522,6 @@ class Union(FHIRPath):
 
     def __hash__(self):
         return hash((self.left, self.right))
-
-class Intersect(FHIRPath):
-    """
-    FHIRPath for bits that match *both* patterns.
-
-    This can be accomplished a couple of ways. The most
-    efficient is to actually build the intersected
-    AST as in building a state machine for matching the
-    intersection of regular languages. The next
-    idea is to build a filtered data and match against
-    that.
-    """
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def is_singular(self):
-        return False
-
-    def find(self, data):
-        raise NotImplementedError()
-
-    def __eq__(self, other):
-        return isinstance(other, Intersect) and self.left == other.left and self.right == other.right
-
-    def __hash__(self):
-        return hash((self.left, self.right))
-
 
 class Element(FHIRPath):
     """
@@ -621,141 +593,3 @@ class Element(FHIRPath):
     def __hash__(self):
         return hash(self.label)
 
-
-class Index(FHIRPath):
-    """
-    A FHIRPath segment representing an index operator.
-
-    Attributes:
-        index (int): The index value for the FHIRPath index.
-
-    Methods:
-        evaluate(collection: FHIRPathCollectionItem, create: bool): Evaluates the index on the given FHIRPathCollectionItem.
-    """
-    def __init__(self, index: int):
-        if not isinstance(index, int):
-            raise FHIRPathError('Index() argument must be an integer number.')
-        self.index = index
-    
-    def evaluate(self, collection: FHIRPathCollectionItem, create: bool) -> typing.List[FHIRPathCollectionItem]:
-        """
-        Evaluates the index on the given collection.
-
-        Parameters:
-            collection (FHIRPathCollectionItem): The FHIRPathCollectionItem on which the index is evaluated.
-            create (bool): A flag indicating whether to create new elements if the array is too short.
-
-        Returns:
-            List[FHIRPathCollectionItem]: A list containing the FHIRPathCollectionItem of the element at the specified index, if within array bounds.
-
-        Raises:
-            FHIRPathError: If the collection value is not a list, or if the index is out of bounds and create is False.
-        """        
-        # Ensure that we are working with an array            
-        collection = ensure_list(collection)
-        # Check wheter array is too short and it can be extended 
-        if len(collection) <= self.index and create:
-            # Calculate how many elements must be padded
-            pad = self.index - len(collection) + 1
-            # if collection.parent:
-            #     collection.extend([collection.construct_resource() for __ in range(pad)])   
-            # else:
-            all_same_parent = all([item.parent.value == collection[0].parent.value for item in collection])
-            if all_same_parent:
-                parent_array = collection[0]
-                new_values = ensure_list(getattr(parent_array.parent.value, parent_array.path.label))
-                if parent_array.parent:
-                    new_values.extend([parent_array.construct_resource() for __ in range(pad)])   
-                else:
-                    new_values.extend([None for __ in range(pad)])
-                return [FHIRPathCollectionItem(new_values[self.index], path=Element(parent_array.element), setter=partial(parent_array.setter, index=self.index), parent=parent_array.parent)]
-            else:
-                raise FHIRPathError(f'Cannot create new array element due to inhomogeneity in parents')
-        # If index is within array bounds, get element
-        if collection and len(collection) > self.index:
-            return [collection[self.index]]
-        # Else return empty list
-        return []
-
-    def __eq__(self, other):
-        return isinstance(other, Index) and self.index == other.index
-
-    def __str__(self):
-        return '[%i]' % self.index
-
-    def __repr__(self):
-        return '%s(index=%r)' % (self.__class__.__name__, self.index)
-        
-    def __hash__(self):
-        return hash(self.index)
-
-
-
-class Single(Index):
-    
-    def __init__(self):
-        super().__init__(index=0)
-
-    def _find_base(self, collection, create):
-        vals = ensure_list(collection.value)
-        if not collection.value or len(vals) != 1:
-            raise FHIRPathError(f'Expected single value for {collection.full_path}.single(), instead got {len(vals)} values')
-        return super()._find_base(collection, create)
-
-    def _update_base(self, data, val, create):
-        vals = ensure_list(val)
-        if len(vals) != 1:
-            raise FHIRPathError(f'Expected single value, instead got {len(vals)} values')
-        return super()._update_base(data, val, create)
-
-
-class Slice(FHIRPath):
-    """
-    FHIRPath matching a slice of an array.
-
-    Because of a mismatch between JSON and XML when schema-unaware,
-    this always returns an iterable; if the incoming data
-    was not a list, then it returns a one element list _containing_ that
-    data.
-
-    Consider these two docs, and their schema-unaware translation to JSON:
-
-    <a><b>hello</b></a> ==> {"a": {"b": "hello"}}
-    <a><b>hello</b><b>goodbye</b></a> ==> {"a": {"b": ["hello", "goodbye"]}}
-
-    If there were a schema, it would be known that "b" should always be an
-    array (unless the schema were wonky, but that is too much to fix here)
-    so when querying with JSON if the one writing the JSON knows that it
-    should be an array, they can write a slice operator and it will coerce
-    a non-array value to an array.
-
-    This may be a bit unfortunate because it would be nice to always have
-    an iterator, but dictionaries and other objects may also be iterable,
-    so this is the compromise.
-    """
-    def __init__(self, start=None, end=None, step=1):
-        self.start = start
-        self.end = end
-        self.step = step
-
-    def evaluate(self, collection, *args, **kwargs):
-        collection = ensure_list(collection)
-        # Slice the collection
-        return collection[self.start:self.step:self.end]
-        
-    def __str__(self):
-        if self.start is None and self.end is None and self.step is None:
-            return '[*]'
-        else:
-            return '[%s%s%s]' % (self.start or '',
-                                   ':%d'%self.end if self.end else '',
-                                   ':%d'%self.step if self.step else '')
-
-    def __repr__(self):
-        return '%s(start=%r,end=%r,step=%r)' % (self.__class__.__name__, self.start, self.end, self.step)
-
-    def __eq__(self, other):
-        return isinstance(other, Slice) and other.start == self.start and self.end == other.end and other.step == self.step
-
-    def __hash__(self):
-        return hash((self.start, self.end, self.step))
