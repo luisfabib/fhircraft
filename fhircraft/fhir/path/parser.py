@@ -5,13 +5,15 @@ import re
 import ply.yacc
 import operator 
 
-from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.path.engine.core import Element, Root, This, Operation, Invocation
 import fhircraft.fhir.path.engine.existence as existence
 import fhircraft.fhir.path.engine.filtering as filtering
 import fhircraft.fhir.path.engine.subsetting as subsetting
 import fhircraft.fhir.path.engine.combining as combining
 import fhircraft.fhir.path.engine.strings as strings
+import fhircraft.fhir.path.engine.additional as additional
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
+from fhircraft.utils import ensure_list
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 
 logger = logging.getLogger(__name__)
@@ -96,9 +98,9 @@ class FhirPathParser:
         op = p[2]
 
         if op == '.':
-            p[0] = Child(p[1], p[3])
+            p[0] = Invocation(p[1], p[3])
         elif op == '|':
-            p[0] = Union(p[1], p[3])
+            p[0] = combining.Union(p[1], p[3])
 
     def p_fhirpath_base_resource_root(self, p):
         "fhirpath : ROOT_NODE"
@@ -136,11 +138,11 @@ class FhirPathParser:
 
     def p_fhirpath_choice_element(self, p):
         "fhirpath : CHOICE_ELEMENT"
-        p[0] = TypeChoice(p[1])
+        p[0] = additional.TypeChoice(p[1])
        
     def p_fhirpath_child_idxbrackets(self, p):
         "fhirpath : fhirpath '[' idx ']'"
-        p[0] = Child(p[1], p[3])
+        p[0] = Invocation(p[1], p[3])
 
 
     def p_fhirpath_function(self, p):
@@ -197,7 +199,7 @@ class FhirPathParser:
         # Additional functions
         # -------------------------------------------------------------------------------
         elif check(p, 'extension', nargs=1):
-            p[0] = Extension(*p[3])        
+            p[0] = additional.Extension(*p[3])        
         elif check(p, 'resolve', nargs=0):
             raise NotImplementedError()
         # -------------------------------------------------------------------------------

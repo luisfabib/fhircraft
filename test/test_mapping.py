@@ -1,4 +1,4 @@
-from fhircraft.mapping import  merge_schemas, map_json_paths_to_fhir_paths
+from fhircraft.mapping import  merge_schemas, map_json_schema_to_fhir_paths
 from fhircraft.fhir.path.engine.core import FHIRPathError
 import pytest
 
@@ -61,7 +61,7 @@ class TestMapJsonPathsToFhirPaths:
             }
         }
         expected = {"profileA": {}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
 
     def test_core_rule1_multiple_fhir_resource_scopes(self):
@@ -91,7 +91,7 @@ class TestMapJsonPathsToFhirPaths:
             "profileA": {"id": "Patient.id"},
             "profileB": {"observation.id": "Observation.id"}
         }
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
     
     def test_core_rule2_complete_fhir_paths(self):
@@ -113,7 +113,7 @@ class TestMapJsonPathsToFhirPaths:
             }
         }
         expected = {"profileA": {"id": "Patient.id"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
 
 
@@ -135,7 +135,7 @@ class TestMapJsonPathsToFhirPaths:
             }
         }
         expected = {'profileA': {"name.surname": "Patient.name.given"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
 
 
@@ -160,7 +160,7 @@ class TestMapJsonPathsToFhirPaths:
             }
         }
         expected = {"profileA": {"section.subsection.id": "Patient.id"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
         
         
@@ -184,7 +184,7 @@ class TestMapJsonPathsToFhirPaths:
             }
         }
         expected = {"profileA": {"id": "Patient.id"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
         
         
@@ -210,7 +210,7 @@ class TestMapJsonPathsToFhirPaths:
             }
         }
         expected = {"profileA": {"id": "Patient.id"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
     
 
@@ -255,7 +255,7 @@ class TestMapJsonPathsToFhirPaths:
                 "observation.id": "Observation.id"
             }
         }
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
         
         
@@ -290,7 +290,7 @@ class TestMapJsonPathsToFhirPaths:
             ]
         }
         expected = {"profileA": {"name": "Patient.name"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
 
 
@@ -314,7 +314,7 @@ class TestMapJsonPathsToFhirPaths:
             ]
         }
         expected = {"profileA": {"name": "Patient.name"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
 
 
@@ -349,7 +349,7 @@ class TestMapJsonPathsToFhirPaths:
             ]
         }
         expected = {"profileA": {"name": "Patient.name.given"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
 
 
@@ -382,7 +382,7 @@ class TestMapJsonPathsToFhirPaths:
             ]
         }
         expected = {"profileA": {"name": "Patient.name"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
 
 
@@ -419,7 +419,7 @@ class TestMapJsonPathsToFhirPaths:
             ]
         }
         expected = {"profileA": {"name": "Patient.name", "surname": "Patient.surname"}}
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
 
 
@@ -475,6 +475,6 @@ class TestMapJsonPathsToFhirPaths:
                 "birthDate": "Patient.birthDate",
             }
         }
-        result,_ = map_json_paths_to_fhir_paths(schema)
+        result,_ = map_json_schema_to_fhir_paths(schema)
         assert result == expected
 

@@ -28,13 +28,13 @@ def test_where_returns_valid_items_in_collection_where_true():
 
 def test_select_returns_empty_for_empty_collection():
     collection = []
-    result = Select(Child(This(), Element('field'))).evaluate(collection)
+    result = Select(Invocation(This(), Element('field'))).evaluate(collection)
     assert result == []
 
 def test_select_returns_collection_of_projected_elements():
     Resource = namedtuple('Resource', 'field')
     collection = [FHIRPathCollectionItem(value=Resource(field=123)), FHIRPathCollectionItem(value=Resource(field=456))]
-    result = Select(Child(This(), Element('field'))).evaluate(collection)
+    result = Select(Invocation(This(), Element('field'))).evaluate(collection)
     assert result[0].value == 123
     assert result[1].value == 456
 
@@ -46,7 +46,7 @@ def test_select_returns_collection_of_projected_elements():
 
 def test_repeat_returns_empty_for_empty_collection():
     collection = []
-    result = Repeat(Child(This(), Element('field'))).evaluate(collection)
+    result = Repeat(Invocation(This(), Element('field'))).evaluate(collection)
     assert result == []
 
 def test_repeat_returns_collection_of_nested_repeating_elements():
@@ -62,7 +62,7 @@ def test_repeat_returns_collection_of_nested_repeating_elements():
             ]), 
         ]))
     ]
-    result = Repeat(Child(This(), Element('items'))).evaluate(collection)
+    result = Repeat(Invocation(This(), Element('items'))).evaluate(collection)
     assert [item.value.label for item in result] == ['1.1', '1.2', '1.3', '1.2.1', '1.3.1']
 
     

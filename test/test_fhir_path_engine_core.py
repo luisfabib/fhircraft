@@ -1,6 +1,6 @@
 import pytest
 
-from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Child, Root, Element
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Invocation, Root, Element
 from fhircraft.fhir.path.engine.subsetting import Index
 from fhircraft.fhir.path.parser import parse
 from fhircraft.utils import ensure_list
@@ -136,13 +136,13 @@ observation = Observation(**{
     ]
 })
 
-# ======== Child - FHIRPath ============
+# ======== Invocation - FHIRPath ============
 #               Find                        
 # ======================================
 fhirpath_child_find_test_cases = (
-    (Child(Root(), Element("status")), observation.status),
-    (Child(Root(), Element("identifier")), observation.identifier),
-    (Child(Child(Root(), Element("identifier")), Element("value")), [id.value for id in observation.identifier]),
+    (Invocation(Root(), Element("status")), observation.status),
+    (Invocation(Root(), Element("identifier")), observation.identifier),
+    (Invocation(Invocation(Root(), Element("identifier")), Element("value")), [id.value for id in observation.identifier]),
 )
     
 @pytest.mark.parametrize("path_object, expected_value", fhirpath_child_find_test_cases)
@@ -154,17 +154,17 @@ def test_fhirpath_child_find(path_object, expected_value):
     for value, expected in zip(found_values, expected_values):
         assert value == expected
 
-# ======== Child - FHIRPath ============
+# ======== Invocation - FHIRPath ============
 #           Update & Create                        
 # ======================================
 
 fhirpath_child_update_test_cases = (
     # Update
-    (Child(Root(), Element("status")), "pending", lambda obs: obs.status),
-    (Child(Child(Root(), Element("identifier")), Index(0)), observation.identifier[0], lambda obs: obs.identifier[0]),
+    (Invocation(Root(), Element("status")), "pending", lambda obs: obs.status),
+    (Invocation(Invocation(Root(), Element("identifier")), Index(0)), observation.identifier[0], lambda obs: obs.identifier[0]),
     # Create
-    (Child(Root(), Element("id")), "ID12345", lambda obs: obs.id),    
-    (Child(Child(Root(), Element("subject")), Element("reference")), "subjectX", lambda obs: obs.subject.reference),
+    (Invocation(Root(), Element("id")), "ID12345", lambda obs: obs.id),    
+    (Invocation(Invocation(Root(), Element("subject")), Element("reference")), "subjectX", lambda obs: obs.subject.reference),
 )        
 
 @pytest.mark.parametrize("path_object, update_value, getattr_fcn", fhirpath_child_update_test_cases)
@@ -180,11 +180,11 @@ def test_fhirpath_child_update(path_object, update_value, getattr_fcn):
 # ======================================
 fhirpath_index_find_test_cases = (
     # Update
-    (Child(Child(Root(), Element("identifier")), Index(0)), observation.identifier[0]),
-    (Child(Child(Child(Root(), Element("identifier")), Index(0)), Element("value")), observation.identifier[0].value),
+    (Invocation(Invocation(Root(), Element("identifier")), Index(0)), observation.identifier[0]),
+    (Invocation(Invocation(Invocation(Root(), Element("identifier")), Index(0)), Element("value")), observation.identifier[0].value),
     # Create
-    (Child(Child(Root(), Element("identifier")), Index(0)), observation.identifier[0]),
-    (Child(Child(Child(Root(), Element("identifier")), Index(0)), Element("value")), observation.identifier[0].value),
+    (Invocation(Invocation(Root(), Element("identifier")), Index(0)), observation.identifier[0]),
+    (Invocation(Invocation(Invocation(Root(), Element("identifier")), Index(0)), Element("value")), observation.identifier[0].value),
 )
     
 @pytest.mark.parametrize("path_object, expected_value", fhirpath_index_find_test_cases)
@@ -203,10 +203,10 @@ def test_fhirpath_index_find(path_object, expected_value):
 # ======================================
 
 fhirpath_index_update_test_cases = (
-    (Child(Child(Root(), Element("identifier")), Index(0)), observation.identifier[1], lambda obs: obs.identifier[0]),
-    (Child(Child(Child(Root(), Element("identifier")), Index(0)), Element("value")), "ABC123", lambda obs: obs.identifier[0].value),
-    (Child(Child(Root(), Element("identifier")), Index(4)), observation.identifier[1], lambda obs: obs.identifier[4]),
-    (Child(Child(Child(Root(), Element("identifier")), Index(4)), Element("value")), "ABC123", lambda obs: obs.identifier[4].value),
+    (Invocation(Invocation(Root(), Element("identifier")), Index(0)), observation.identifier[1], lambda obs: obs.identifier[0]),
+    (Invocation(Invocation(Invocation(Root(), Element("identifier")), Index(0)), Element("value")), "ABC123", lambda obs: obs.identifier[0].value),
+    (Invocation(Invocation(Root(), Element("identifier")), Index(4)), observation.identifier[1], lambda obs: obs.identifier[4]),
+    (Invocation(Invocation(Invocation(Root(), Element("identifier")), Index(4)), Element("value")), "ABC123", lambda obs: obs.identifier[4].value),
 )        
 
 @pytest.mark.parametrize("path_object, update_value, getattr_fcn", fhirpath_index_update_test_cases)

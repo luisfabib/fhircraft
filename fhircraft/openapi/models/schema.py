@@ -954,10 +954,10 @@ class Schema(BaseModel):
     
     @model_validator(mode='after')
     def child_fhirpaths_must_be_valid(self):
-        from fhircraft.mapping import map_json_paths_to_fhir_paths, FHIRPathError
+        from fhircraft.mapping import map_json_schema_to_fhir_paths, FHIRPathError
         if self.fhir_resource:
             try:
-                map_json_paths_to_fhir_paths(self.model_dump(by_alias=True, exclude_none=True))        
+                map_json_schema_to_fhir_paths(self.model_dump(by_alias=True, exclude_none=True))        
             except FHIRPathError as e:        
                 raise PydanticCustomError('fhirpath',str(e))
         return self

@@ -2,7 +2,7 @@ import yaml
 import json 
 import requests 
 import os
-from typing import List, Any, Dict, Union, get_args, get_origin
+from typing import List, Any, Dict, Union, get_args, get_origin, Optional
 from dotenv import dotenv_values
 import re
 from contextlib import contextmanager
@@ -26,11 +26,12 @@ URL_PATTERNS = re.compile(
 def is_url(string):
     return re.match(URL_PATTERNS, string) is not None
 
-def load_env_variables(file_path=None):
+def load_env_variables(file_path: Optional[str]=None) -> dict:
     """
     Loads environment variables from a .env file into a dictionary without changing the global environment variables.
 
-    :param file_path: Optional path to the .env file. If not provided, it looks for a .env file in the current directory.
+    Args:
+        file_path (Optional[str]): Optional path to the .env file. If not provided, it looks for a .env file in the current directory.
     :return: A dictionary containing the environment variables from the .env file.
     """
     # Determine the file path
@@ -45,11 +46,11 @@ def ensure_list(item: Any) -> list:
     """
     Ensure that the input variable is converted into a list if it is not already an iterable.
 
-    Parameters:
-    variable (any): The input variable that needs to be converted into a list if it is not already an iterable.
+    Args:
+        variable (any): The input variable that needs to be converted into a list if it is not already an iterable.
 
     Returns:
-    list: The input variable converted into a list, or the input variable itself if it was already an iterable.
+        list: The input variable converted into a list, or the input variable itself if it was already an iterable.
     """
     if not isinstance(item, list):
         if isinstance(item, tuple):
@@ -61,14 +62,14 @@ def load_file(file_path: str) -> Dict:
     """
     Load data from a file based on its extension.
 
-    Parameters:
-    file_path (str): The path to the file to load.
+    Args:
+        file_path (str): The path to the file to load.
 
     Returns:
-    dict: The data loaded from the file as a dictionary.
+        dict: The data loaded from the file as a dictionary.
 
     Raises:
-    ValueError: If the file content is not a dictionary (for YAML files).
+        ValueError: If the file content is not a dictionary (for YAML files).
     """    
     with open(file_path, 'r') as file:
         file_extension = os.path.splitext(file_path)[1]
@@ -86,14 +87,14 @@ def load_url(url: str) -> Dict:
     """
     Load content from a URL and parse it based on the content type (YAML or JSON).
 
-    Parameters:
-    url (str): The URL to load content from.
+    Args:
+        url (str): The URL to load content from.
 
     Returns:
-    Union[Dict, List, Any]: Parsed content from the URL. Can be a dictionary, list, or any other valid JSON/YAML data type.
+        Union[Dict, List, Any]: Parsed content from the URL. Can be a dictionary, list, or any other valid JSON/YAML data type.
 
     Raises:
-    ValueError: If the URL format is invalid or the content type is not supported.
+        ValueError: If the URL format is invalid or the content type is not supported.
     """    
     # Validate the URL format
     if not url.startswith('http://') and not url.startswith('https://'):
@@ -130,11 +131,11 @@ def contains_only_none(d: Any) -> bool:
     """
     Check if the input contains only None values recursively.
 
-    Parameters:
-    d (Any): The input dictionary or list to check for only None values.
+    Args:
+        d (Any): The input dictionary or list to check for only None values.
 
     Returns:
-    bool: True if the input contains only None values, False otherwise.
+        bool: True if the input contains only None values, False otherwise.
     """    
     if isinstance(d, dict):
         return all(contains_only_none(v) for v in d.values())
@@ -147,11 +148,11 @@ def remove_none_dicts(d: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[st
     """
     Remove any dictionaries with all values being None from the input dictionary recursively.
 
-    Parameters:
-    d (Union[Dict[str, Any], List[Any], Any]): The input dictionary or list to remove None values from.
+    Args:
+        d (Union[Dict[str, Any], List[Any], Any]): The input dictionary or list to remove None values from.
 
     Returns:
-    Union[Dict[str, Any], List[Any], Any]: The dictionary or list with None values removed.
+        Union[Dict[str, Any], List[Any], Any]: The dictionary or list with None values removed.
     """
     if not isinstance(d, dict):
         return d    
@@ -181,12 +182,12 @@ def get_dict_paths(nested_dict: Union[Dict[str, Any], List[Dict[str, Any]]], pre
     """
     Get all paths in a nested dictionary with their corresponding values.
 
-    Parameters:
-    nested_dict (Union[Dict[str, Any], List[Dict[str, Any]]]): The nested dictionary or list of dictionaries to extract paths from.
-    prefix (str): The prefix to be added to the paths (default is '').
+    Args:
+        nested_dict (Union[Dict[str, Any], List[Dict[str, Any]]]): The nested dictionary or list of dictionaries to extract paths from.
+        prefix (str): The prefix to be added to the paths (default is '').
 
     Returns:
-    Dict[str, Any]: A dictionary containing all paths in the nested dictionary with their corresponding values.
+        Dict[str, Any]: A dictionary containing all paths in the nested dictionary with their corresponding values.
     """
     paths = {}
     if isinstance(nested_dict, dict):
