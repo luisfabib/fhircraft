@@ -179,7 +179,7 @@ class TestMapJsonPathsToFhirPaths:
             },
             "properties": {
                 "id": {
-                    "x-fhirpath": "Patient.id"
+                    "x-fhirpath": "%context.id"
                 }
             }
         }
