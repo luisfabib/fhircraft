@@ -9,7 +9,7 @@ import re
 # VERSION: R4B
 # SOURCE: https://hl7.org/fhir/R4B/datatypes.html#string
 
-boolean = Union[
+Boolean = Union[
     bool,
     Annotated[
         str,
@@ -17,7 +17,8 @@ boolean = Union[
         AfterValidator(lambda x: x=='true')
     ]
 ]
-integer = Union[
+
+Integer = Union[
     int,
     Annotated[
         str,
@@ -25,13 +26,14 @@ integer = Union[
         AfterValidator(int)
     ]
 ]
-string = Annotated[
+
+String = Annotated[
     str,
     Field(pattern=r'[\r\n\t\S]+')
 ]
 
 
-decimal = Union[
+Decimal = Union[
     float,
     Annotated[
         str,
@@ -41,19 +43,19 @@ decimal = Union[
 ]
 
 
-uri = Annotated[
+Uri = Annotated[
     str,
     Field(pattern=r'\S*'),
 ]
 
 
-url = str
+Url = str
 
 
-canonical = str
+Canonical = str
 
 
-base64Binary = Annotated[
+Base64Binary = Annotated[
     str,
     Field(pattern=r'(\s*([0-9a-zA-Z\+\=]){4}\s*)+')
 ]
@@ -67,7 +69,7 @@ MINUTES_REGEX = r'[0-5][0-9]'
 SECONDS_REGEX = r'([0-5][0-9]|60)(\.[0-9]+)'
 TIMEZONE_REGEX = r'(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))'
 
-instant = Union[
+Instant = Union[
     python_datetime.datetime,
     Annotated[
         str,
@@ -76,7 +78,7 @@ instant = Union[
     ]
 ]
 
-date = Union[
+Date = Union[
     python_datetime.date,
     Annotated[
         str,
@@ -94,7 +96,7 @@ date = Union[
 ]
 
 
-datetime = Union[
+DateTime = Union[
     python_datetime.datetime,
     Annotated[
         str,
@@ -113,7 +115,7 @@ datetime = Union[
 ]
 
 
-time = Union[
+Time = Union[
     python_datetime.time,
     Annotated[
         str,
@@ -123,27 +125,27 @@ time = Union[
 ]
 
 
-code = Annotated[
+Code = Annotated[
     str,
     Field(pattern=r'[^\s]+(\s[^\s]+)*'),
 ]
 
-oid = Annotated[
+Oid = Annotated[
     str,
     Field(pattern=r'urn:oid:[0-2](\.(0|[1-9][0-9]*))+'),
 ]
 
-id = Annotated[
+Id = Annotated[
     str,
     Field(pattern=r'[A-Za-z0-9\-\.]{1,64}'),
 ]
 
-markdown = Annotated[
+Markdown = Annotated[
     str,
     Field(pattern=r'\s*(\S|\s)*'),
 ]
 
-unsignedInt = Union[
+UnsignedInt = Union[
     int, 
     Annotated[
         str,
@@ -152,7 +154,7 @@ unsignedInt = Union[
     ]
 ]
 
-positiveInt = Union[
+PositiveInt = Union[
     int, 
     Annotated[
         str,
@@ -161,4 +163,4 @@ positiveInt = Union[
     ]
 ]
 
-uuid = str
+Uuid = str
