@@ -26,6 +26,9 @@ URL_PATTERNS = re.compile(
 def is_url(string):
     return re.match(URL_PATTERNS, string) is not None
 
+def capitalize(string):
+    return string[0].upper() + string[1:]
+
 def load_env_variables(file_path: Optional[str]=None) -> dict:
     """
     Loads environment variables from a .env file into a dictionary without changing the global environment variables.

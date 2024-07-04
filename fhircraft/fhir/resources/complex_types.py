@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field
-from fhircraft.fhir.profiling import primitive_types as fhirtypes
+from pydantic import BaseModel, Field, ConfigDict
+from fhircraft.fhir.resources import primitive_types as fhirtypes
 from typing import Optional, List, Literal
+from abc import ABC 
 
-class Element(BaseModel):
+class Element(BaseModel, ABC):
     id: Optional[fhirtypes.Id] = None 
     extension: Optional[List["Extension"]] = Field(        
         default_factory=list,
@@ -43,20 +44,6 @@ class Attachment(Element):
         description="The date that the attachment was first created."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "contentType": "application/pdf",
-                "language": "en",
-                "data": "SGVsbG8gd29ybGQ=",
-                "url": "http://example.org/fhir/DocumentReference/12345",
-                "size": 12345,
-                "hash": "2jmj7l5rSw0yVb/vlWAYkK/YBwk=",
-                "title": "Example PDF",
-                "creation": "2020-01-01T00:00:00Z"
-            }
-        }
-
 
 class Coding(Element):
     system: Optional[fhirtypes.Uri] = Field(
@@ -80,17 +67,6 @@ class Coding(Element):
         description="Indicates that this coding was chosen by a user directly - e.g., off a pick list of available items (codes or displays)."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "system": "http://loinc.org",
-                "version": "2.67",
-                "code": "4548-4",
-                "display": "Hematocrit [Volume Fraction] of Blood by Automated count",
-                "userSelected": True
-            }
-        }
-
 class CodeableConcept(Element):
     coding: Optional[List[Coding]] = Field(
         default_factory=list,
@@ -100,21 +76,6 @@ class CodeableConcept(Element):
         None,
         description="A human language representation of the concept as seen/selected/uttered by the user who entered the data and/or which represents the intended meaning of the user."
     )
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "coding": [
-                    {
-                        "system": "http://loinc.org",
-                        "code": "1234-5",
-                        "display": "Example code display"
-                    }
-                ],
-                "text": "Example text"
-            }
-        }
-
 
 class Quantity(Element):
     value: Optional[fhirtypes.Decimal] = Field(
@@ -138,27 +99,8 @@ class Quantity(Element):
         description="A computer processable form of the unit in some unit representation system."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "value": 123.45,
-                "comparator": ">",
-                "unit": "mg",
-                "system": "http://unitsofmeasure.org",
-                "code": "mg"
-            }
-        }
-
 class SimpleQuantity(Quantity):
-    class Config:
-        schema_extra = {
-            "example": {
-                "value": 123.45,
-                "unit": "mg",
-                "system": "http://unitsofmeasure.org",
-                "code": "mg"
-            }
-        }
+    pass
 
 
 class Money(Element):
@@ -171,14 +113,6 @@ class Money(Element):
         description="ISO 4217 Currency Code."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "value": 100.00,
-                "currency": "USD"
-            }
-        }
-
 class Range(Element):
     low: Optional[Quantity] = Field(
         None,
@@ -189,24 +123,6 @@ class Range(Element):
         description="The high limit. The boundary is inclusive."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "low": {
-                    "value": 10,
-                    "unit": "mg",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "mg"
-                },
-                "high": {
-                    "value": 20,
-                    "unit": "mg",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "mg"
-                }
-            }
-        }
-
 class Ratio(Element):
     numerator: Optional[Quantity] = Field(
         None,
@@ -216,20 +132,6 @@ class Ratio(Element):
         None,
         description="The value of the denominator."
     )
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "numerator": {
-                    "value": 1,
-                    "unit": "mg"
-                },
-                "denominator": {
-                    "value": 1,
-                    "unit": "mL"
-                }
-            }
-        }
 
 class RatioRange(Element):
     lowNumerator: Optional[Quantity] = Field(
@@ -245,24 +147,6 @@ class RatioRange(Element):
         description="The value of the denominator."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "lowNumerator": {
-                    "value": 1,
-                    "unit": "mg"
-                },
-                "highNumerator": {
-                    "value": 2,
-                    "unit": "mg"
-                },
-                "denominator": {
-                    "value": 1,
-                    "unit": "mL"
-                }
-            }
-        }
-
 class Period(Element):
     start: Optional[fhirtypes.DateTime] = Field(
         None,
@@ -272,14 +156,6 @@ class Period(Element):
         None,
         description="The end of the period. The boundary is inclusive."
     )
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "start": "2020-01-01T00:00:00Z",
-                "end": "2020-12-31T23:59:59Z"
-            }
-        }
 
 class SampledData(Element):
     origin: Quantity = Field(
@@ -311,24 +187,6 @@ class SampledData(Element):
         description="A series of data points that are measured."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "origin": {
-                    "value": 0,
-                    "unit": "mV",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "mV"
-                },
-                "period": 10,
-                "factor": 1,
-                "lowerLimit": -0.5,
-                "upperLimit": 0.5,
-                "dimensions": 1,
-                "data": "0 1 2 3 4 5 6 7 8 9"
-            }
-        }
-
 class Identifier(Element):
     use: Optional[fhirtypes.Code] = Field(
         None,
@@ -355,30 +213,6 @@ class Identifier(Element):
         description="Organization that issued the identifier."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "use": "official",
-                "type": {
-                    "coding": [
-                        {
-                            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-                            "code": "MR",
-                            "display": "Medical Record Number"
-                        }
-                    ]
-                },
-                "system": "http://hospital.smarthealthit.org",
-                "value": "12345",
-                "period": {
-                    "start": "2001-05-06"
-                },
-                "assigner": {
-                    "display": "Acme Healthcare"
-                }
-            }
-        }
-
 
 class Reference(Element):
     reference: Optional[fhirtypes.String] = Field(
@@ -397,20 +231,6 @@ class Reference(Element):
         None,
         description="Plain text narrative that identifies the resource."
     )
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "reference": "Patient/example",
-                "type": "Patient",
-                "identifier": {
-                    "use": "official",
-                    "system": "http://hospital.smarthealthit.org",
-                    "value": "12345"
-                },
-                "display": "Example Patient"
-            }
-        }
 
 class HumanName(Element):
     use: Optional[fhirtypes.Code] = Field(
@@ -441,21 +261,6 @@ class HumanName(Element):
         None,
         description="Time period when name was/is in use."
     )
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "use": "official",
-                "text": "Mr. John Doe",
-                "family": "Doe",
-                "given": ["John", "Joseph"],
-                "prefix": ["Mr."],
-                "suffix": ["Jr."],
-                "period": {
-                    "start": "2001-05-06"
-                }
-            }
-        }
 
 class Address(Element):
     use: Optional[fhirtypes.Code] = Field(
@@ -499,24 +304,6 @@ class Address(Element):
         description="Time period when address was/is in use."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "use": "home",
-                "type": "both",
-                "text": "1234 Main St, Springfield, IL 62704",
-                "line": ["1234 Main St"],
-                "city": "Springfield",
-                "district": "Sangamon",
-                "state": "IL",
-                "postalCode": "62704",
-                "country": "USA",
-                "period": {
-                    "start": "2001-05-06"
-                }
-            }
-        }
-
 class ContactPoint(Element):
     system: Optional[fhirtypes.Code] = Field(
         None,
@@ -538,19 +325,6 @@ class ContactPoint(Element):
         None,
         description="Time period when the contact point was/is in use."
     )
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "system": "phone",
-                "value": "(555) 555-5555",
-                "use": "work",
-                "rank": 1,
-                "period": {
-                    "start": "2010-04-01"
-                }
-            }
-        }
 
 class BackboneElement(Element):
     modifierExtension: Optional[List["Extension"]] = Field(
@@ -628,24 +402,6 @@ class Repeat(BaseModel):
         description="The minutes from the event. "
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "boundsDuration": {
-                    "value": 30,
-                    "unit": "days",
-                    "system": "http://unitsofmeasure.org",
-                    "code": "d"
-                },
-                "count": 2,
-                "duration": 1,
-                "durationUnit": "d",
-                "frequency": 1,
-                "period": 1,
-                "periodUnit": "d"
-            }
-        }
-
 class Timing(BackboneElement):
     event: Optional[List[fhirtypes.DateTime]] = Field(
         default_factory=list,
@@ -659,28 +415,6 @@ class Timing(BackboneElement):
         None,
         description="A code for the timing schedule."
     )
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "event": ["2012-05-31T09:00:00Z"],
-                "repeat": {
-                    "frequency": 1,
-                    "period": 1,
-                    "periodUnit": "d"
-                },
-                "code": {
-                    "coding": [
-                        {
-                            "system": "http://loinc.org",
-                            "code": "1234-5",
-                            "display": "Timing code"
-                        }
-                    ],
-                    "text": "Every morning at 9am"
-                }
-            }
-        }
 
 class Signature(Element):
     type: List[Coding] = Field(
@@ -712,29 +446,6 @@ class Signature(Element):
         description="The actual signature content."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "type": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-                        "code": "TREAT",
-                        "display": "Treatment"
-                    }
-                ],
-                "when": "2017-01-01T12:00:00Z",
-                "who": {
-                    "reference": "Practitioner/example"
-                },
-                "onBehalfOf": {
-                    "reference": "Organization/example"
-                },
-                "targetFormat": "application/fhir+xml",
-                "sigFormat": "application/jose",
-                "data": "dGVzdA=="
-            }
-        }
-
 class Annotation(Element):
     authorReference: Optional[Reference] = Field(
         None,
@@ -753,27 +464,11 @@ class Annotation(Element):
         description="The text of the annotation."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "authorString": "Practitioner/example",
-                "time": "2018-01-01T12:00:00Z",
-                "text": "This is an annotation."
-            }
-        }
-
 class Resource(BaseModel):
     resourceType: str = Field(
         ...,
         description="Type of the resource."
     )
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "resourceType": "Patient"
-            }
-        }
 
 
 class Meta(Element):
@@ -802,42 +497,8 @@ class Meta(Element):
         description="Tags applied to the resource."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "versionId": "1",
-                "lastUpdated": "2020-01-01T12:00:00Z",
-                "source": "http://hospital.smarthealthit.org",
-                "profile": [
-                    "http://hl7.org/fhir/StructureDefinition/Patient"
-                ],
-                "security": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-                        "code": "TREAT",
-                        "display": "Treatment"
-                    }
-                ],
-                "tag": [
-                    {
-                        "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-                        "code": "HTEST",
-                        "display": "test health data"
-                    }
-                ]
-            }
-        }
-
 class Age(Quantity):
-    class Config:
-        schema_extra = {
-            "example": {
-                "value": 30,
-                "unit": "years",
-                "system": "http://unitsofmeasure.org",
-                "code": "a"
-            }
-        }
+    pass
 
 class CodeableReference(Element):
     concept: Optional[CodeableConcept] = Field(
@@ -849,57 +510,15 @@ class CodeableReference(Element):
         description="A reference to another resource."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "concept": {
-                    "coding": [
-                        {
-                            "system": "http://snomed.info/sct",
-                            "code": "123456",
-                            "display": "Example concept"
-                        }
-                    ],
-                    "text": "Example concept text"
-                },
-                "reference": {
-                    "reference": "Patient/example"
-                }
-            }
-        }
 
 class Count(Quantity):
-    class Config:
-        schema_extra = {
-            "example": {
-                "value": 10,
-                "unit": "times",
-                "system": "http://unitsofmeasure.org",
-                "code": "count"
-            }
-        }
+    pass
 
 class Distance(Quantity):
-    class Config:
-        schema_extra = {
-            "example": {
-                "value": 5,
-                "unit": "km",
-                "system": "http://unitsofmeasure.org",
-                "code": "km"
-            }
-        }
+    pass
 
 class Duration(Quantity):
-    class Config:
-        schema_extra = {
-            "example": {
-                "value": 30,
-                "unit": "minutes",
-                "system": "http://unitsofmeasure.org",
-                "code": "min"
-            }
-        }
+    pass
 
 class ContactDetail(Element):
     name: Optional[fhirtypes.String] = Field(
@@ -911,19 +530,6 @@ class ContactDetail(Element):
         description="The contact details for the individual."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "name": "John Doe",
-                "telecom": [
-                    {
-                        "system": "phone",
-                        "value": "(555) 555-5555",
-                        "use": "work"
-                    }
-                ]
-            }
-        }
 
 class Contributor(Element):
     type: fhirtypes.Code = Field(
@@ -939,25 +545,6 @@ class Contributor(Element):
         description="The contact details of the contributor."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "type": "author",
-                "name": "Jane Smith",
-                "contact": [
-                    {
-                        "name": "John Doe",
-                        "telecom": [
-                            {
-                                "system": "phone",
-                                "value": "(555) 555-5555",
-                                "use": "work"
-                            }
-                        ]
-                    }
-                ]
-            }
-        }
 
 class DataRequirement(Element):
     type: fhirtypes.Code = Field(
@@ -977,28 +564,6 @@ class DataRequirement(Element):
         description="The reference of the subject."
     )
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "type": "Observation",
-                "profile": [
-                    "http://hl7.org/fhir/StructureDefinition/vitalsigns"
-                ],
-                "subjectCodeableConcept": {
-                    "coding": [
-                        {
-                            "system": "http://snomed.info/sct",
-                            "code": "123456",
-                            "display": "Example subject"
-                        }
-                    ],
-                    "text": "Example subject text"
-                },
-                "subjectReference": {
-                    "reference": "Patient/example"
-                }
-            }
-        }
 
 class Expression(Element):
     description: Optional[fhirtypes.String] = Field(
@@ -1023,7 +588,7 @@ class Expression(Element):
     )
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "description": "Example expression",
                 "name": "ExampleExpression",
@@ -1033,11 +598,17 @@ class Expression(Element):
             }
         }
 
+class Narrative(Element):
+    status: fhirtypes.Code = Field(
+        description="The status of a resource narrative."
+    )    
+    div: fhirtypes.String = Field(
+        description="Limited xhtml content"
+    )
 
 
 class Extension(Element):
     url: fhirtypes.Uri = Field(
-        ...,
         description="Source of the definition for the extension code - a logical name or a URL."
     )
     valueBase64Binary : Optional[fhirtypes.Base64Binary] = None
@@ -1100,10 +671,6 @@ class Extension(Element):
     #         raise ValueError("Only one of the value[x] fields can be set.")
     #     return values
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "url": "http://example.org/fhir/StructureDefinition/example",
-                "valueString": "example value"
-            }
-        }
+        
+Element.model_rebuild()
+BackboneElement.model_rebuild()
