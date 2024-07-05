@@ -32,7 +32,7 @@ fhir_resources_test_cases = [case for cases in fhir_resources_test_cases for cas
 def test_construct_core_resource(resource_label, filename):   
     resource_model = ResourceFactory().construct_resource_model(f'https://hl7.org/fhir/R4B/{resource_label}.profile.json')
 
-    with open(os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), filename)) as file:
+    with open(os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), filename), encoding="utf8") as file:
         fhir_resource = json.load(file)
         fhir_resource_instance = resource_model.model_validate(fhir_resource)
         assert json.loads(fhir_resource_instance.model_dump_json(exclude_unset=True, by_alias=True)) == fhir_resource

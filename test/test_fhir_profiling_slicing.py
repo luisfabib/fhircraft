@@ -1,5 +1,5 @@
 
-from fhircraft.fhir.profiling import SlicingGroup, Slice, Discriminator, Constraint
+from fhircraft.fhir.resources.slicing import SlicingGroup, Slice, Discriminator, Constraint
 from fhircraft.fhir.path import FHIRPathError
 from unittest.mock import patch, MagicMock
 from unittest import TestCase 
@@ -108,7 +108,7 @@ class TestSlice(TestCase):
         self.slicing.discriminators = [Discriminator(type='value', path='code')]
         pattern = MagicMock()
         self.constraint.path = 'Observation.component.code'
-        pattern.dict.return_value = {'coding': [{
+        pattern.model_dump.return_value = {'coding': [{
             'code': "123456", 
             "system": "http://system.org",
             }]
@@ -150,7 +150,7 @@ class TestSlice(TestCase):
         self.slicing.path = 'Observation.extension'
         self.constraint.path = self.slicing.path
         profile = MagicMock()
-        profile.__canonical_url__ = 'http://doman.org/extension'
+        profile.canonical_url = 'http://doman.org/extension'
         self.constraint.profile = profile
         self.slice.add_constraint(self.constraint)
                 

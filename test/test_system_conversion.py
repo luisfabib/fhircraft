@@ -1,68 +1,10 @@
-from fhircraft.fhir.profiling.factory import construct_profiled_resource_model, validate_profiled_resource
-from fhircraft.fhir.path.parser import parse
 from fhircraft.mapping import convert_response_from_api_to_fhir, convert_response_from_fhir_to_api
 from fhircraft.utils import load_file, ensure_list
-from pydantic.v1 import ValidationError
 from unittest import TestCase 
 
 import json
 import pytest
 import os
-
-
-class ValidationTests(TestCase):
-    
-    def run_integration_test(self, profile_url, resource_file, mutations={}):
-        profile = construct_profiled_resource_model(profile_url)
-        resource = profile.parse_file(os.path.join('test','static',resource_file))
-        for path, value in mutations.items():
-            parse(path).update_or_create(resource, value)
-        try:
-            validate_profiled_resource(resource)
-            if mutations:
-                pytest.fail(f'Resource validation did not catch mutation')
-        except ValidationError as e:
-            if not mutations:
-                pytest.fail(f'Resource validation failed:\n{e}')
-    
-    def test_integration_genomic_variant_1(self):
-        profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'fhir-observation-genomic-variant-1.json'
-        self.run_integration_test(profile_url, resource_file)
-
-    def test_integration_genomic_variant_1_mutated(self):
-        profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'fhir-observation-genomic-variant-1.json'
-        self.run_integration_test(profile_url, resource_file, mutations={'category[0].coding[0].code': 'wrong_code'})
-
-    def test_integration_genomic_variant_2(self):
-        profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'fhir-observation-genomic-variant-2.json'
-        self.run_integration_test(profile_url, resource_file)
-
-    def test_integration_genomic_variant_2_mutated(self):
-        profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'fhir-observation-genomic-variant-1.json'
-        self.run_integration_test(profile_url, resource_file, mutations={'category[0].coding[0].code': 'wrong_code'})
-
-    def test_integration_genomic_variant_3(self):
-        profile_url = 'http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/variant'
-        resource_file = 'fhir-observation-genomic-variant-3.json'
-        self.run_integration_test(profile_url, resource_file)
-
-    def test_integration_primary_cancer_condition_1(self):
-        profile_url = 'http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition'
-        resource_file = 'fhir-condition-primary-cancer-1.json'
-        self.run_integration_test(profile_url, resource_file)
-
-    def test_integration_cancer_patient_1(self):
-        profile_url = 'http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient'
-        resource_file = 'fhir-patient-cancer-1.json'
-        self.run_integration_test(profile_url, resource_file)
-
-
-
-
 
 class TestConvertResponseFromApiToFhir(TestCase):
     
@@ -94,7 +36,7 @@ class TestConvertResponseFromApiToFhir(TestCase):
         assert len(converted_responses) == len(expected_responses)
         converted_responses = sorted(converted_responses, key=lambda obj: obj.__class__.__name__)
         for converted_response, expected_response in zip(converted_responses, expected_responses):
-            converted_response = json.loads(converted_response.json())
+            converted_response = json.loads(converted_response.model_dump_json(exclude_none=True, by_alias=True))
             # Asser that resulting resources are equal
             self.assertDictEqualUnorderedLists(converted_response, expected_response)
   

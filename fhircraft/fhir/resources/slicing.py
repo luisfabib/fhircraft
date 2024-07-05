@@ -1,12 +1,9 @@
 from fhircraft.fhir.path import fhirpath, FHIRPathError, FhirPathParserError, FhirPathLexerError
 from fhircraft.fhir.path.utils import split_fhirpath, join_fhirpath
-from fhircraft.fhir.profiling import Constraint
-from fhircraft.utils import get_dict_paths, load_env_variables, ensure_list, remove_none_dicts
-
-from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
-
-from pydantic.v1 import create_model, Extra
-
+from fhircraft.fhir.resources.constraint import Constraint
+from fhircraft.fhir.resources.complex_types import Extension
+from fhircraft.utils import get_dict_paths, ensure_list, get_fhir_model_from_field
+from pydantic import create_model
 from typing import List, ClassVar, Optional
 from dataclasses import dataclass, field
 from enum import Enum
@@ -177,11 +174,11 @@ class Slice:
                 # Handle special case of extensions
                 profile_constraint = next((constraint.profile for constraint in self.get_constraints_on_slice() if constraint.profile), None)
                 if self.type=='Extension' and profile_constraint:
-                    expression = join_fhirpath(expression, f"extension('{profile_constraint.__canonical_url__}')")
+                    expression = join_fhirpath(expression, f"extension('{profile_constraint.canonical_url}')")
                     continue
                 # Get the constrained pattern applied to the discriminator element 
                 pattern = next((constraint.pattern for constraint in discriminator_constraints if constraint.pattern),None)
-                discriminating_values = get_dict_paths(pattern.dict(), prefix=discriminator.path) if pattern else {}
+                discriminating_values = get_dict_paths(pattern.model_dump(), prefix=discriminator.path) if pattern else {}
                 # Get the constrained fixed values applied to the discriminator element 
                 fixedValues = {discriminator.path: constraint.fixedValue for constraint in discriminator_constraints if constraint.fixedValue}
                 discriminating_values.update(fixedValues)
@@ -224,22 +221,19 @@ class Slice:
                     
         return expression
 
-    @property
-    def pydantic_model(self):       
+    def get_pydantic_model(self, resource):       
         
-        base_model, element = self.slicing.path.rsplit('.',1)
+        base_path, element = self.slicing.path.rsplit('.',1)
+        base = fhirpath.parse(base_path).get_value(resource)
         if element.lower() == 'extension':
-            model = get_fhir_model_class('Extension')
+            model = Extension
         else:
-            element = get_fhir_model_class(base_model).__fields__.get(element)
-            if not element:
-                return None
-            model = get_fhir_model_class(element.type_.__resource_type__)
+            model = get_fhir_model_from_field(base.model_fields.get(element))
         
-        class ProfiledSlice(model, extra=Extra.allow):
+        class ProfiledSlice(model):
             __track_changes__: bool = False 
             __has_been_modified__: bool = False
-            __slicing__: ClassVar[List[SlicingGroup]] = self.profile_constraint.__slicing__ if self.profile_constraint else None
+            profile_slicing: ClassVar[List[SlicingGroup]] = self.profile_constraint.profile_slicing if self.profile_constraint else None
 
             def __setattr__(self, name:str, value):
                 super().__setattr__(name, value)
@@ -248,9 +242,9 @@ class Slice:
             
             @property
             def is_FHIR_complete(self):
-                BASE_ELEMENTS = ['text', 'extension', 'id', 'fhir_comments','resource_type']
-                slice_available_elements = sorted(set([name for name in self.__class__.__fields__ if '__' not in name and name not in BASE_ELEMENTS]))
-                slice_preset_elements = sorted(set([name for name, value in self.dict().items() if (value is not None or value!=[]) and '__' not in name and name not in BASE_ELEMENTS]))
+                BASE_ELEMENTS = ['text','extension', 'id', 'resourceType']
+                slice_available_elements = sorted(set([name for name in self.__class__.model_fields if '_ext' not in name and name not in BASE_ELEMENTS]))
+                slice_preset_elements = sorted(set([name for name, value in self.model_dump(by_alias=True, exclude_unset=True).items() if (value is not None or value!=[]) and '_ext' not in name and name not in BASE_ELEMENTS]))
                 return slice_available_elements == slice_preset_elements
             
             @property
@@ -265,7 +259,7 @@ class Slice:
                                 return True
                 return False
             
-        slice_model = create_model(__model_name=model.__name__, __base__=ProfiledSlice) 
+        slice_model = create_model(__model_name=f'Sliced{model.__name__}', __base__=ProfiledSlice) 
         slice_model.validate_assignment = False
         return slice_model
     

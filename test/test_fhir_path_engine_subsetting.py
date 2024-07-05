@@ -1,7 +1,6 @@
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Invocation, Root, Element
 from fhircraft.fhir.path.engine.subsetting import *
-from  fhir.resources.R4B.coding import Coding 
-from  fhir.resources.R4B.codeableconcept import CodeableConcept 
+from fhircraft.fhir.resources.complex_types import Coding, CodeableConcept
 from collections import namedtuple
 from unittest import TestCase
 import pytest 
@@ -107,7 +106,7 @@ class TestIndexResources(TestCase):
     def test_index_creates_missing_elements(self):
         result = Index(5).evaluate(self.collection, create=True)
         assert len(result) == 1
-        assert result[0].value == Coding.construct()
+        assert result[0].value == Coding.model_construct()
         assert len(self.resource.coding) == 6
 
     def test_index_does_not_modify_collection_out_of_bounds(self):
@@ -136,7 +135,7 @@ class TestIndexResources(TestCase):
         collection = Element('coding').evaluate(parent, create=True)
         Index(0).evaluate(collection, create=True)
         assert len(resource.coding) == 1
-        assert resource.coding == [Coding.construct()]
+        assert resource.coding == [Coding.model_construct()]
 
 
 

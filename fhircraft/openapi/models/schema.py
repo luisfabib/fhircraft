@@ -954,7 +954,8 @@ class Schema(BaseModel):
     
     @model_validator(mode='after')
     def child_fhirpaths_must_be_valid(self):
-        from fhircraft.mapping import map_json_schema_to_fhir_paths, FHIRPathError
+        from fhircraft.fhir.path import FHIRPathError
+        from fhircraft.mapping import map_json_schema_to_fhir_paths
         if self.fhir_resource:
             try:
                 map_json_schema_to_fhir_paths(self.model_dump(by_alias=True, exclude_none=True))        

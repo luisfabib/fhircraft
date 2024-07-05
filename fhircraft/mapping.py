@@ -1,7 +1,6 @@
 from typing import Union, Any, Optional, Tuple, List, Dict
-from fhircraft.fhir.profiling.factory import construct_profiled_resource_model, track_slice_changes, validate_profiled_resource
-from fhircraft.fhir.path import fhirpath, FHIRPathError
-from fhircraft.fhir.path.utils import join_fhirpath
+from fhircraft.fhir.resources.factory import construct_resource_model, track_slice_changes, clean_elements_and_slices, construct_with_profiled_elements
+from fhircraft.fhir.path import fhirpath
 from fhircraft.openapi.parser import load_openapi, traverse_and_replace_references, extract_json_schema
 from fhircraft.utils import remove_none_dicts, ensure_list, replace_nth
 from fhircraft.openapi.models import Schema
@@ -257,10 +256,10 @@ def convert_response_from_api_to_fhir(api_response: Any, openapi_file_location: 
 
         for profile_url, fhir_resource_values in profiles_fhir_resource_values.items():
             
-            profile = construct_profiled_resource_model(profile_url)  
+            profile = construct_resource_model(profile_url)  
 
             # Construct FHIR resource with propulated fields according to the profile constraints 
-            resource = profile.construct_with_profiled_elements()
+            resource = construct_with_profiled_elements(profile)
 
             # Enable tracking of changes in slices (to determine which slices were given values)
             track_slice_changes(resource, True)
@@ -272,13 +271,10 @@ def convert_response_from_api_to_fhir(api_response: Any, openapi_file_location: 
             track_slice_changes(resource, False)
             
             # Cleanup resource and remove unused fields
-            resource = profile.clean_elements_and_slices(resource)
+            resource = clean_elements_and_slices(resource)
 
             # Cleanup the resource from empty structures to be valid
-            resource = profile.parse_obj(remove_none_dicts(resource.dict()))
-
-
-            validate_profiled_resource(resource)
+            resource = profile.model_validate(remove_none_dicts(resource.model_dump(by_alias=True, exclude_unset=True)))
 
             resources.append(resource)
             
@@ -306,10 +302,12 @@ def map_fhirpath_values_to_jsonpaths(resource: dict, schema: Schema) -> dict:
             value = {key: _parse_types(val) for key,val in value.items()}
         elif json_type == 'array' and isinstance(value, list):
             value = [_parse_types(val) for val in value]
-        elif json_type == 'number' and not isinstance(value, (float, int)):
-            value = float(value)
-        elif json_type == 'integer' and not isinstance(value, int):
-            value = int(value)
+        elif json_type == 'number':
+            if not isinstance(value, (float, int)):
+                value = float(value)
+        elif json_type == 'integer':
+            if isinstance(value, int):
+                value = int(value)
         elif value is not None:
             value = str(value)
         return value
@@ -387,10 +385,10 @@ def convert_response_from_fhir_to_api(response: Any, openapi_file_location: str,
     # Construct FHIR profile
     if not profile_url and not schema.fhir_resource:
         raise ValueError(f'The schema has no FHIR profile associated via the "x-fhir-resource" attribute.')
-    profile = construct_profiled_resource_model(profile_url or schema.fhir_resource.profile)  
+    profile = construct_resource_model(profile_url or schema.fhir_resource.profile)  
     
     # Parse input response into the FHIR profile
-    fhir_resource = profile.parse_obj(response)
+    fhir_resource = profile.model_validate(response)
     
     # Map FHIRpath valules to the corresponding JSONpaths
     profiles_json_path_values = map_fhirpath_values_to_jsonpaths(fhir_resource, schema)

@@ -1,9 +1,7 @@
 import logging
 from itertools import *  # noqa
-from fhircraft.utils import ensure_list
-from fhir.resources.core.utils.common import is_list_type, get_fhir_type_name
-from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
-from fhir.resources.core.fhirabstractmodel import FHIRAbstractModel as FhirResource
+from fhircraft.utils import ensure_list, contains_list_type, get_fhir_model_from_field
+
 import typing
 from typing import List, Optional
 from abc import ABC
@@ -41,12 +39,12 @@ class FHIRPathCollectionItem(object):
     setter: Optional[callable] = None
 
     @classmethod
-    def wrap(cls, data: typing.Union["FHIRPathCollectionItem",FhirResource]):
+    def wrap(cls, data: typing.Union["FHIRPathCollectionItem"]):
         """
         Wraps data in a FHIRPathCollectionItem instance.
 
         Args:
-            data (Union[FHIRPathCollectionItem, FhirResource): The data to be wrapped.
+            data (Union[FHIRPathCollectionItem): The data to be wrapped.
 
         Returns:
             item (FHIRPathCollectionItem): The wrapped FHIRPathCollectionItem instance.
@@ -89,8 +87,8 @@ class FHIRPathCollectionItem(object):
         parent = self.parent.value
         if isinstance(parent, list):
             parent = parent[0]
-        if hasattr(parent, '__fields__') and hasattr(self.path, 'label'):
-            return parent.__fields__.get(self.path.label)
+        if hasattr(parent, 'model_fields') and hasattr(self.path, 'label'):
+            return parent.model_fields.get(self.path.label)
         return None
     
     @property
@@ -103,7 +101,7 @@ class FHIRPathCollectionItem(object):
         """        
         if not self.field_info:
             return False
-        return is_list_type(self.field_info)
+        return contains_list_type(self.field_info.annotation)
 
     def construct_resource(self):
         """
@@ -112,13 +110,10 @@ class FHIRPathCollectionItem(object):
         Returns:
             Any: The constructed FHIR resource, or None if construction fails.
         """        
-        try:
-            model = get_fhir_model_class(get_fhir_type_name(self.field_info.type_))
-            model.Config.validate_assignment = False
-            return model.construct()    
-        except (KeyError, AttributeError):
-            return None 
-        
+        if self.field_info:
+            model = get_fhir_model_from_field(self.field_info)
+            return model.model_construct()    
+                
     @property
     def full_path(self):
         """
@@ -295,16 +290,15 @@ class Element(FHIRPath):
         """
         if not parent:
             return None
-        if not hasattr(parent, '__fields__'):
+        if not hasattr(parent, 'model_fields'):
             return None 
-        field_info = parent.__fields__.get(self.label)
+        field_info = parent.model_fields.get(self.label)
         try:
-            model = get_fhir_model_class(get_fhir_type_name(field_info.type_))
-            model.Config.validate_assignment = False
-            new_element = model.construct()    
+            model = get_fhir_model_from_field(field_info)
+            new_element = model.model_construct()    
         except (KeyError, AttributeError):
             new_element = None 
-        if is_list_type(field_info):
+        if field_info and contains_list_type(field_info.annotation):
             new_element = ensure_list(new_element)
         return new_element
 

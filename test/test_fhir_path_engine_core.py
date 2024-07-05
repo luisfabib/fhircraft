@@ -3,20 +3,22 @@ import pytest
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Invocation, Root, Element
 from fhircraft.fhir.path.engine.subsetting import Index
 from fhircraft.fhir.path.parser import parse
-from fhircraft.utils import ensure_list
-from  fhir.resources.R4B.observation import Observation, ObservationComponent
-from  fhir.resources.R4B.coding import Coding 
-from  fhir.resources.R4B.codeableconcept import CodeableConcept 
-from  fhir.resources.R4B.identifier import Identifier 
-from fhir.resources.R4B.fhirtypesvalidators import get_fhir_model_class
+from fhircraft.utils import ensure_list, get_fhir_model_from_field
+from fhircraft.fhir.resources.complex_types import Coding, CodeableConcept, Identifier
+
+
 from unittest import TestCase
 
+
+from fhircraft.fhir.resources.factory import construct_resource_model
+Observation = construct_resource_model(f'https://hl7.org/fhir/R4B/observation.profile.json')
+ObservationComponent = get_fhir_model_from_field(Observation.model_fields.get('component'))
 
 
 class TestRoot(TestCase):
 
     def setUp(self):
-        self.resource = Observation.construct(status='final', identifier=[Identifier(value='A'), Identifier(value='B')])
+        self.resource = Observation.model_construct(status='final', identifier=[Identifier(value='A'), Identifier(value='B')])
         self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
     
     def test_element_evaluates_correctly(self):
@@ -29,7 +31,7 @@ class TestRoot(TestCase):
 class TestElement(TestCase):
 
     def setUp(self):
-        self.resource = Observation.construct(status='final', identifier=[Identifier(value='A'), Identifier(value='B')])
+        self.resource = Observation.model_construct(status='final', identifier=[Identifier(value='A'), Identifier(value='B')])
         self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
     
     def test_element_evaluates_correctly(self):
@@ -46,13 +48,13 @@ class TestElement(TestCase):
     def test_element_creates_missing_complex_element(self):
         result = Element('valueCodeableConcept').evaluate(self.collection, create=True)
         assert len(result) == 1
-        assert result[0].value == CodeableConcept.construct()
+        assert result[0].value == CodeableConcept.model_construct()
         assert self.resource.valueCodeableConcept == result[0].value
         
     def test_element_creates_missing_complex_list_element(self):
         result = Element('component').evaluate(self.collection, create=True)
         assert len(result) == 1
-        assert result[0].value == ObservationComponent.construct()
+        assert result[0].value == ObservationComponent.model_construct()
         assert self.resource.component == [result[0].value]
         
     def test_element_evaluate_element_with_list(self):
@@ -69,6 +71,7 @@ class TestElement(TestCase):
 
 
 observation = Observation(**{
+    "resourceType": "Observation",
     "status": "final", 
     "code": {
         "coding": [{"code": "C1"}],
@@ -87,7 +90,6 @@ observation = Observation(**{
         "value": "789",
     }],
     "valueInteger": 5,
-    "fhir_comments":"Commenting",
     "extension": [
         {
             "url": "http://domain.org/extension-1",
@@ -169,7 +171,7 @@ fhirpath_child_update_test_cases = (
 
 @pytest.mark.parametrize("path_object, update_value, getattr_fcn", fhirpath_child_update_test_cases)
 def test_fhirpath_child_update(path_object, update_value, getattr_fcn):
-    new_observation = observation.copy(deep=True)
+    new_observation = observation.model_copy(deep=True)
     path_object.update_or_create(new_observation, update_value)
     assert getattr_fcn(new_observation) == update_value
     
@@ -211,7 +213,7 @@ fhirpath_index_update_test_cases = (
 
 @pytest.mark.parametrize("path_object, update_value, getattr_fcn", fhirpath_index_update_test_cases)
 def test_fhirpath_index_update(path_object, update_value, getattr_fcn):
-    new_observation = observation.copy(deep=True)
+    new_observation = observation.model_copy(deep=True)
     path_object.update_or_create(new_observation, update_value)
     assert getattr_fcn(new_observation) == update_value
     
@@ -227,7 +229,6 @@ fhirpath_find_test_cases = (
     ("Observation.identifier.last().value", observation, "789"),
     ("Observation.identifier.skip(2).value", observation, "789"),
     ("Observation.identifier.take(1).value", observation, "123"),
-    ("Observation.fhir_comments", observation, "Commenting"),
     ("Observation.extension('http://domain.org/extension-1').valueString", observation, "extension-value-1"),
     ("Observation.extension('http://domain.org/extension-1').extension('http://domain.org/extension-2').valueString", observation, "extension-value-2"),
     ("Observation.component.where(code.coding.code='component-1')[0].value[x]", observation, "component-1-value-1"),
@@ -255,34 +256,11 @@ fhirpath_update_test_cases = (
     ("Observation.identifier[4].value", "123", lambda obs: obs.identifier[4].value),
     ("Observation.identifier.first().value", "123", lambda obs: obs.identifier[0].value),
     ("Observation.identifier.last().value", "789", lambda obs: obs.identifier[-1].value),
-    ("Observation.fhir_comments", "Commenting", lambda obs: obs.fhir_comments),
     ("Observation.extension[0].extension[2].valueString", "testvalue", lambda obs: obs.extension[0].extension[2].valueString),
 )
 
 @pytest.mark.parametrize("path_string, update_value, getattr_fcn", fhirpath_update_test_cases)
 def test_fhirpath_update_existing(path_string, update_value, getattr_fcn):
-    _observation = observation.copy(deep=True)
+    _observation = observation.model_copy(deep=True)
     parse(path_string).update_or_create(_observation, update_value)
     assert getattr_fcn(_observation) == update_value
-
-
-fhirpath_create_test_cases = (
-    ("Observation.valueInteger", 12, lambda obs: obs.valueInteger),
-    ("Observation.identifier[0].value", "456", lambda obs: obs.identifier[0].value),
-    ("Observation.identifier[1].value", "456", lambda obs: obs.identifier[1].value),
-    ("Observation.identifier.first().value", "123", lambda obs: obs.identifier[0].value),
-    ("Observation.identifier.last().value", "789", lambda obs: obs.identifier[-1].value),
-    ("Observation.fhir_comments", "Commenting", lambda obs: obs.fhir_comments),
-    ("Observation.extension.extension.valueString", "testvalue", lambda obs: obs.extension[0].extension[2].valueString),
-    ("Patient.contact[0].telecom[0].value", "teletest", lambda pat: pat.contact[0].telecom[0].value),
-    ("Patient.contact.telecom[1].use", "home", lambda pat: pat.contact[0].telecom[1].use),
-    ("Patient.name[0].given[0]", "John", lambda pat: pat.name[0].given[0]),
-)
-
-@pytest.mark.parametrize("path_string, update_value, getattr_fcn", fhirpath_update_test_cases)
-def test_fhirpath_create(path_string, update_value, getattr_fcn):
-    Observation.Config.validate_assignment = False
-    new_resource = get_fhir_model_class(path_string.split(".",1)[0]).construct()
-    parse(path_string).update_or_create(new_resource, update_value)
-    print(new_resource.json(indent=3))
-    assert getattr_fcn(new_resource) == update_value

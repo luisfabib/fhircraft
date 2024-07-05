@@ -5,9 +5,7 @@ from abc import ABC
 
 class Element(BaseModel, ABC):
     id: Optional[fhirtypes.Id] = None 
-    extension: Optional[List["Extension"]] = Field(        
-        default_factory=list,
-    )
+    extension: Optional[List["Extension"]] = None
 
 
 class Attachment(Element):
@@ -69,7 +67,7 @@ class Coding(Element):
 
 class CodeableConcept(Element):
     coding: Optional[List[Coding]] = Field(
-        default_factory=list,
+        None,
         description="A reference to a code defined by a terminology system."
     )
     text: Optional[fhirtypes.String] = Field(
@@ -246,15 +244,15 @@ class HumanName(Element):
         description="The part of a name that links to the genealogy."
     )
     given: Optional[List[fhirtypes.String]] = Field(
-        default_factory=list,
+        None,
         description="Given names."
     )
     prefix: Optional[List[fhirtypes.String]] = Field(
-        default_factory=list,
+        None,
         description="Parts that come before the name."
     )
     suffix: Optional[List[fhirtypes.String]] = Field(
-        default_factory=list,
+        None,
         description="Parts that come after the name."
     )
     period: Optional[Period] = Field(
@@ -276,7 +274,7 @@ class Address(Element):
         description="Text representation of the address."
     )
     line: Optional[List[fhirtypes.String]] = Field(
-        default_factory=list,
+        None,
         description="Street name, number, direction & P.O. Box."
     )
     city: Optional[fhirtypes.String] = Field(
@@ -328,7 +326,7 @@ class ContactPoint(Element):
 
 class BackboneElement(Element):
     modifierExtension: Optional[List["Extension"]] = Field(
-        default_factory=list,
+        None,
         description="Extensions that cannot be ignored even if unrecognized."
     )
 
@@ -386,15 +384,15 @@ class Repeat(BaseModel):
         description="Unit of time (UCUM)."
     )
     dayOfWeek: Optional[List[fhirtypes.Code]] = Field(
-        default_factory=list,
+        None,
         description="If one or more days of the week is specified, then the event is limited to occur on the specified day(s)."
     )
     timeOfDay: Optional[List[fhirtypes.Time]] = Field(
-        default_factory=list,
+        None,
         description="Specified time(s) of day for the event."
     )
     when: Optional[List[fhirtypes.Code]] = Field(
-        default_factory=list,
+        None,
         description="Real world event related time events."
     )
     offset: Optional[fhirtypes.UnsignedInt] = Field(
@@ -404,7 +402,7 @@ class Repeat(BaseModel):
 
 class Timing(BackboneElement):
     event: Optional[List[fhirtypes.DateTime]] = Field(
-        default_factory=list,
+        None,
         description="When the event(s) is/are to occur."
     )
     repeat: Optional[Repeat] = Field(
@@ -485,15 +483,15 @@ class Meta(Element):
         description="A uri that identifies the source system of the resource."
     )
     profile: Optional[List[fhirtypes.Canonical]] = Field(
-        default_factory=list,
+        None,
         description="A list of profiles the resource claims to conform to."
     )
     security: Optional[List[Coding]] = Field(
-        default_factory=list,
+        None,
         description="Security labels applied to the resource."
     )
     tag: Optional[List[Coding]] = Field(
-        default_factory=list,
+        None,
         description="Tags applied to the resource."
     )
 
@@ -526,7 +524,7 @@ class ContactDetail(Element):
         description="The name of the individual to contact."
     )
     telecom: Optional[List[ContactPoint]] = Field(
-        default_factory=list,
+        None,
         description="The contact details for the individual."
     )
 
@@ -541,7 +539,7 @@ class Contributor(Element):
         description="The name of the contributor."
     )
     contact: Optional[List[ContactDetail]] = Field(
-        default_factory=list,
+        None,
         description="The contact details of the contributor."
     )
 
@@ -552,7 +550,7 @@ class DataRequirement(Element):
         description="The type of data."
     )
     profile: Optional[List[fhirtypes.Canonical]] = Field(
-        default_factory=list,
+        None,
         description="The profile of the data."
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
@@ -587,17 +585,6 @@ class Expression(Element):
         description="A URI that provides a reference to the expression."
     )
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "description": "Example expression",
-                "name": "ExampleExpression",
-                "language": "text/fhirpath",
-                "expression": "Patient.name.given",
-                "reference": "http://example.org/fhirpath"
-            }
-        }
-
 class Narrative(Element):
     status: fhirtypes.Code = Field(
         description="The status of the narrative (generated, extensions, additional, empty)."
@@ -613,7 +600,7 @@ class DataRequirement(Element):
         description="The type of the required data."
     )
     profile: Optional[List[fhirtypes.Canonical]] = Field(
-        default_factory=list,
+        None,
         description="The profiles of the required data."
     )
     subjectCodeableConcept: Optional[CodeableConcept] = Field(
@@ -738,7 +725,7 @@ class TriggerDefinition(Element):
         description="Timing data as a dateTime."
     )
     data: Optional[List[DataRequirement]] = Field(
-        default_factory=list,
+        None,
         description="Data elements used in the triggering."
     )
     condition: Optional[Expression] = Field(
@@ -806,7 +793,7 @@ class Dosage(BackboneElement):
         description="Free text dosage instructions."
     )
     additionalInstruction: Optional[List[CodeableConcept]] = Field(
-        default_factory=list,
+        None,
         description="Supplemental instruction - e.g., 'with meals'."
     )
     patientInstruction: Optional[fhirtypes.String] = Field(
@@ -838,7 +825,7 @@ class Dosage(BackboneElement):
         description="Technique for administering medication."
     )
     doseAndRate: Optional[List[DosageDoseAndRate]] = Field(
-        default_factory=list,
+        None,
         description="Amount of medication per dose."
     )
     maxDosePerPeriod: Optional[Ratio] = Field(
@@ -906,11 +893,11 @@ class Extension(Element):
     valueContributor :  Optional[Contributor] = None
     valueDataRequirement :  Optional[DataRequirement] = None
     valueExpression :  Optional[Expression] = None
-    # valueParameterDefinition :  Optional[ParameterDefinition] = None
-    # valueRelatedArtifact :  Optional[RelatedArtifact] = None
-    # valueTriggerDefinition :  Optional[TriggerDefinition] = None
-    # valueUsageContext :  Optional[UsageContext] = None
-    # valueDosage :  Optional[Dosage] = None
+    valueParameterDefinition :  Optional[ParameterDefinition] = None
+    valueRelatedArtifact :  Optional[RelatedArtifact] = None
+    valueTriggerDefinition :  Optional[TriggerDefinition] = None
+    valueUsageContext :  Optional[UsageContext] = None
+    valueDosage :  Optional[Dosage] = None
 
     # @root_validator(pre=True)
     # def check_value_x(cls, values):

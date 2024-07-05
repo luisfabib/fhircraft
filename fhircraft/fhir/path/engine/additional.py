@@ -64,7 +64,7 @@ class TypeChoice(FHIRPath):
         return  [
             FHIRPathCollectionItem(getattr(item.value, field), path=Element(field), parent=item) 
                 for item in collection
-                    for field in item.value.__fields__.keys() 
+                    for field in item.value.model_fields.keys() 
                         if field.startswith(self.type_choice_name) and getattr(item.value, field) 
         ]
 

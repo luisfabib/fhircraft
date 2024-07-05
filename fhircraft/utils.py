@@ -6,9 +6,8 @@ from typing import List, Any, Dict, Union, get_args, get_origin, Optional
 from dotenv import dotenv_values
 import re
 from contextlib import contextmanager
-from pydantic import BaseModel as PydanticV2BaseModel
-from pydantic.v1 import BaseModel as PydanticV1BaseModel
-
+from pydantic import BaseModel
+import inspect
 
 # URL regex pattern
 URL_PATTERNS = re.compile(
@@ -221,3 +220,35 @@ def replace_nth(string, sub, wanted, n):
     after = string[where.end():]
     newString = before + wanted + after
     return newString
+
+
+def contains_list_type(tp: Any) -> bool:
+    """Recursively check if List is anywhere in the variable's typing."""   
+    # Check if the current type is a List
+    if get_origin(tp) in [List, list]:
+        return True
+
+    # Recursively check the type arguments
+    for arg in get_args(tp):
+        if contains_list_type(arg):
+            return True
+    
+    return False
+
+
+def get_fhir_model_from_field(field):
+    
+    def _get_deepest_args(tp: Any) -> list:
+        """Recursively get the deepest type arguments of nested typing constructs."""
+        args = get_args(tp)
+        if not args:
+            # Base case: no further nested types
+            return [tp]
+        
+        # Recursively find the deepest types
+        deepest_args = []
+        for arg in args:
+            deepest_args.extend(_get_deepest_args(arg))
+        return deepest_args
+    results = _get_deepest_args(field.annotation)
+    return next((arg for arg in results if inspect.isclass(arg) and issubclass(arg, BaseModel)), None)

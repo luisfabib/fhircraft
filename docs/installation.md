@@ -12,7 +12,6 @@ pip install fhircraft
 Fhircraft has a few dependencies:
 
 - [`Pydantic`](https://docs.pydantic.dev/latest/): Pydantic is the most widely used data validation library for Python.
-- [`Python FHIR Resources`](https://github.com/nazrulworld/fhir.resources): Tools and classes for all of the FHIR Resources defined in the FHIR specification, to manipulate FHIR resources in Python.
 - [`Python JSONPath Next-Generation`](https://github.com/h2non/jsonpath-ng): A standard compliant implementation of JSONPath for Python.
 
 ## Optional dependencies

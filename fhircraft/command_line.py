@@ -3,7 +3,6 @@ import typer
 from fhircraft.mapping import convert_response_from_api_to_fhir, convert_response_from_fhir_to_api
 from fhircraft.openapi.parser import load_openapi, validate_specs
 from fhircraft.fhir.path import fhirpath
-from fhir.resources.R4B import get_fhir_model_class
 from fhircraft.utils import load_file, ensure_list
 from pydantic import ValidationError
 from rich import print, print_json
@@ -99,18 +98,6 @@ def validate_openapi_spec(
         print('[green]:heavy_check_mark: Successfully validated the OpenAPI specification. No errors found.')
 
 
-
-@app.command()
-def get_fhir_path(
-        fhir_response: Annotated[str, typer.Argument(help="Path to the FHIR file")],
-        fhir_path: Annotated[str, typer.Argument(help="FHIRpath to access")],   
-    ):
-    "Get the value in FHIR resource based on FHIRpath"
-    fhir_response = load_file(fhir_response)
-    model = get_fhir_model_class(fhir_response.get('resourceType'))
-    value = fhirpath.parse(fhir_path).get_value(model.parse_obj(fhir_response))
-    value = json.dumps([json.loads(val.json()) if hasattr(val,'json') else val for val in ensure_list(value)], indent=3)
-    print(value)    
     
 @app.command()
 def get_json_path(

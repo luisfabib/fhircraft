@@ -77,7 +77,7 @@ token_test_cases = (
     ("day", (("day", "CALENDAR_DURATION"),)),
     # -------------  Root Nodes --------------
     ("Observation", (("Observation", "ROOT_NODE"),)),
-    ("CodeableConcept", (("CodeableConcept", "ROOT_NODE"),)),
+    ("Patient", (("Patient", "ROOT_NODE"),)),
 )
 
 
