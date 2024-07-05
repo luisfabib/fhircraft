@@ -600,11 +600,260 @@ class Expression(Element):
 
 class Narrative(Element):
     status: fhirtypes.Code = Field(
-        description="The status of a resource narrative."
-    )    
-    div: fhirtypes.String = Field(
-        description="Limited xhtml content"
+        description="The status of the narrative (generated, extensions, additional, empty)."
     )
+    div: fhirtypes.String = Field(
+        description="The actual narrative content, a xhtml:div."
+    )
+
+
+class DataRequirement(Element):
+    type: fhirtypes.Code = Field(
+        ...,
+        description="The type of the required data."
+    )
+    profile: Optional[List[fhirtypes.Canonical]] = Field(
+        default_factory=list,
+        description="The profiles of the required data."
+    )
+    subjectCodeableConcept: Optional[CodeableConcept] = Field(
+        None,
+        description="The codeable concept of the subject."
+    )
+    subjectReference: Optional[Reference] = Field(
+        None,
+        description="The reference of the subject."
+    )
+
+
+class Expression(Element):
+    description: Optional[fhirtypes.String] = Field(
+        None,
+        description="A brief, natural language description of the condition."
+    )
+    name: Optional[fhirtypes.Id] = Field(
+        None,
+        description="A short name assigned to the expression to allow for multiple reuse."
+    )
+    language: fhirtypes.Code = Field(
+        ...,
+        description="The media type of the language for the expression."
+    )
+    expression: Optional[fhirtypes.String] = Field(
+        None,
+        description="An expression in the specified language that returns a value."
+    )
+    reference: Optional[fhirtypes.Uri] = Field(
+        None,
+        description="A URI that provides a reference to the expression."
+    )
+
+
+class ParameterDefinition(Element):
+    name: fhirtypes.Code = Field(
+        ...,
+        description="The name of the parameter."
+    )
+    use: fhirtypes.Code = Field(
+        ...,
+        description="The type of parameter (input or output)."
+    )
+    min: Optional[fhirtypes.Integer] = Field(
+        None,
+        description="The minimum number of times the parameter can appear."
+    )
+    max: Optional[fhirtypes.String] = Field(
+        None,
+        description="The maximum number of times the parameter can appear."
+    )
+    documentation: Optional[fhirtypes.String] = Field(
+        None,
+        description="A brief description of the parameter."
+    )
+    type: fhirtypes.Code = Field(
+        ...,
+        description="The type of the parameter."
+    )
+    profile: Optional[fhirtypes.Canonical] = Field(
+        None,
+        description="A profile to which the parameter conforms."
+    )
+
+
+
+class RelatedArtifact(Element):
+    type: fhirtypes.Code = Field(
+        ...,
+        description="The type of relationship to the related artifact."
+    )
+    label: Optional[fhirtypes.String] = Field(
+        None,
+        description="A brief label for the artifact."
+    )
+    display: Optional[fhirtypes.String] = Field(
+        None,
+        description="A brief description of the artifact."
+    )
+    citation: Optional[fhirtypes.String] = Field(
+        None,
+        description="A bibliographic citation for the artifact."
+    )
+    url: Optional[fhirtypes.Url] = Field(
+        None,
+        description="A URL for the artifact."
+    )
+    document: Optional[Attachment] = Field(
+        None,
+        description="The document of the related artifact."
+    )
+    resource: Optional[fhirtypes.Canonical] = Field(
+        None,
+        description="The resource of the related artifact."
+    )
+
+
+class TriggerDefinition(Element):
+    type: fhirtypes.Code = Field(
+        ...,
+        description="The type of triggering event."
+    )
+    name: Optional[fhirtypes.String] = Field(
+        None,
+        description="Name or URI to reference this trigger definition."
+    )
+    timingTiming: Optional[Timing] = Field(
+        None,
+        description="Timing data in a Timing structure."
+    )
+    timingReference: Optional[Reference] = Field(
+        None,
+        description="Timing data as a reference to an event."
+    )
+    timingDate: Optional[fhirtypes.Date] = Field(
+        None,
+        description="Timing data as a date."
+    )
+    timingDateTime: Optional[fhirtypes.DateTime] = Field(
+        None,
+        description="Timing data as a dateTime."
+    )
+    data: Optional[List[DataRequirement]] = Field(
+        default_factory=list,
+        description="Data elements used in the triggering."
+    )
+    condition: Optional[Expression] = Field(
+        None,
+        description="Boolean-valued expression."
+    )
+
+
+class UsageContext(Element):
+    code: Coding = Field(
+        ...,
+        description="The code of the context."
+    )
+    valueCodeableConcept: Optional[CodeableConcept] = Field(
+        None,
+        description="A value that defines the context."
+    )
+    valueQuantity: Optional[Quantity] = Field(
+        None,
+        description="A value that defines the context."
+    )
+    valueRange: Optional[Range] = Field(
+        None,
+        description="A value that defines the context."
+    )
+    valueReference: Optional[Reference] = Field(
+        None,
+        description="A value that defines the context."
+    )
+
+
+class DosageDoseAndRate(Element):
+    type: Optional[CodeableConcept] = Field(
+        None,
+        description="The kind of dose or rate specified"
+    )
+    doseQuantity: Optional[Quantity] = Field(
+        None,
+        description="Amount of medication per dose"
+    )
+    doseRatio: Optional[Ratio] = Field(
+        None,
+        description="Amount of medication per dose"
+    )
+    rateRange: Optional[Range] = Field(
+        None,
+        description="Amount of medication per unit of time"
+    )
+    rateRange: Optional[Range] = Field(
+        None,
+        description="Amount of medication per unit of time"
+    )
+    rateRQuantity: Optional[SimpleQuantity] = Field(
+        None,
+        description="Amount of medication per unit of time"
+    )
+
+class Dosage(BackboneElement):
+    sequence: Optional[fhirtypes.Integer] = Field(
+        None,
+        description="The order in which the dosage instructions should be applied or interpreted."
+    )
+    text: Optional[fhirtypes.String] = Field(
+        None,
+        description="Free text dosage instructions."
+    )
+    additionalInstruction: Optional[List[CodeableConcept]] = Field(
+        default_factory=list,
+        description="Supplemental instruction - e.g., 'with meals'."
+    )
+    patientInstruction: Optional[fhirtypes.String] = Field(
+        None,
+        description="Instructions for the patient - e.g., 'take with water'."
+    )
+    timing: Optional[Timing] = Field(
+        None,
+        description="When medication should be administered."
+    )
+    asNeededBoolean: Optional[fhirtypes.Boolean] = Field(
+        None,
+        description="Take 'as needed'."
+    )
+    asNeededCodeableConcept: Optional[CodeableConcept] = Field(
+        None,
+        description="Take 'as needed' for the specified reason."
+    )
+    site: Optional[CodeableConcept] = Field(
+        None,
+        description="Body site to administer to."
+    )
+    route: Optional[CodeableConcept] = Field(
+        None,
+        description="How drug should enter body."
+    )
+    method: Optional[CodeableConcept] = Field(
+        None,
+        description="Technique for administering medication."
+    )
+    doseAndRate: Optional[List[DosageDoseAndRate]] = Field(
+        default_factory=list,
+        description="Amount of medication per dose."
+    )
+    maxDosePerPeriod: Optional[Ratio] = Field(
+        None,
+        description="Upper limit on medication per unit of time."
+    )
+    maxDosePerAdministration: Optional[Quantity] = Field(
+        None,
+        description="Upper limit on medication per administration."
+    )
+    maxDosePerLifetime: Optional[Quantity] = Field(
+        None,
+        description="Upper limit on medication per lifetime."
+    )
+
 
 
 class Extension(Element):
