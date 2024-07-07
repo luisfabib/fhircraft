@@ -1,7 +1,12 @@
-from fhircraft.fhir.path import fhirpath
+import warnings
 
 def validate_element_constraint(cls, value, expression):
-    assert fhirpath.parse(expression).evaluate()
+    from fhircraft.fhir.path import fhirpath, FhirPathLexerError, FhirPathParserError
+    from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
+    try:
+        assert fhirpath.parse(expression).evaluate([FHIRPathCollectionItem(value=value)], create=False)
+    except (NotImplementedError, FhirPathLexerError, FhirPathParserError) as e:
+        warnings.warn(f"Warning: FHIRPath raised error for expression: {expression} \n {str(e)}")
     return value
 
 def validate_type_choice_element(instance, field_types, field_name_base):

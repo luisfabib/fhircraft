@@ -4,11 +4,13 @@ FHIR adds (compatible) functionality to the set of common FHIRPath functions. So
 are candidates for elevation to the base version of FHIRPath when the next version is released. 
 """
 
-from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathFunction, Invocation, Element, Operation, FHIRPath
-import operator
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathFunction, Invocation, Element, Operation, FHIRPath, FHIRPathError
 from fhircraft.fhir.path.engine.filtering import Where
-from fhircraft.utils import ensure_list
+from fhircraft.fhir.resources.primitive_types import Uri, Canonical, Url
+from fhircraft.fhir.resources.complex_types import Reference
+from fhircraft.utils import ensure_list, load_url
 from typing import List, Any, Optional
+import operator
 
 
 
@@ -79,3 +81,89 @@ class TypeChoice(FHIRPath):
 
     def __hash__(self):
         return hash((self.type_choice_name))
+
+
+
+
+class HasValue(FHIRPathFunction):
+    """
+    A representation of the FHIRPath [`hasValue()`](https://build.fhir.org/fhirpath.html#functions) function.
+    """
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
+        """
+        Returns true if the input collection contains a single value which is a FHIR primitive, and it has a primitive
+        value (e.g. as opposed to not having a value and just having extensions). Otherwise, the return value is empty. 
+
+        Args: 
+            collection (List[FHIRPathCollectionItem])): The input collection.
+        
+        Returns:
+            bool
+        """
+        collection = ensure_list(collection)
+        if len(collection) != 1:
+            return False
+        item = collection[0]
+        return item.value is not None
+
+
+
+class GetValue(FHIRPathFunction):
+    """
+    A representation of the FHIRPath [`getValue()`](https://build.fhir.org/fhirpath.html#functions) function.
+    """
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> Any:
+        """
+        Return the underlying system value for the FHIR primitive if the input collection contains a single
+        value which is a FHIR primitive, and it has a primitive value (see discussion for hasValue()). Otherwise the return value is empty.
+
+        Args: 
+            collection (List[FHIRPathCollectionItem])): The input collection.
+        
+        Returns:
+            Any: Value
+        """
+        collection = ensure_list(collection)
+        if not HasValue().evaluate(collection):
+            return []
+        item = collection[0]
+        return item.value
+
+
+class Resolve(FHIRPathFunction):
+    """
+    A representation of the FHIRPath [`resolve()`](https://build.fhir.org/fhirpath.html#functions) function.
+    """
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> List[FHIRPathCollectionItem]:
+        """
+        For each item in the collection, if it is a string that is a `uri` (or `canonical` or `url`), locate the target of the
+        reference, and add it to the resulting collection. If the item does not resolve to a resource, the item is ignored 
+        and nothing is added to the output collection.
+
+        The items in the collection may also represent a `Reference`, in which case the `Reference.reference` is resolved. 
+        If the input is empty, the output will be empty.
+
+        Args: 
+            collection (List[FHIRPathCollectionItem])): The input collection.
+        
+        Returns:
+            collection (List[FHIRPathCollectionItem])): The output collection.
+        """
+        from fhircraft.fhir.resources.factory import construct_resource_model
+
+        collection = ensure_list(collection)
+        output_collection = []
+        for item in collection:
+            if isinstance(item.value, (Uri, Canonical, Url)):
+                resource_url = item.value 
+            elif isinstance(item.value, Reference):
+                resource_url = item.value.reference
+            else:
+                raise FHIRPathError('The resolve() function requires either a collection of URIs, Canonicals, URLs or References.')
+            resource = load_url(resource_url)
+            profile_url = resource.get('meta',{}).get('profile',[None])[0]
+            if profile_url:
+                profile = construct_resource_model(profile_url)
+                resource = profile.model_validate(resource)
+            output_collection.append(resource)
+        return output_collection

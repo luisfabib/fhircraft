@@ -7,7 +7,7 @@ from fhircraft.fhir.path import fhirpath
 from fhircraft.utils import capitalize, load_env_variables, ensure_list, remove_none_dicts
 
 from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_origin, Literal
-from pydantic import Field, create_model, model_validator, BaseModel
+from pydantic import Field, create_model, model_validator, BaseModel, field_validator
 from functools import partial
 import requests
 import inspect
@@ -216,9 +216,9 @@ class ResourceFactory:
                 field_type = field_types[0]
 
             # TODO: Enable once all FHIRPath functions have been implemented
-            # if element['constraint']:
-                # for n,constraint in enumerate(element['constraint']):
-                    # validators[f'{name}_constraint_{n}_validator'] = field_validator(name)(partial(validate_element_constraint, expression=constraint['expression']))
+            if element.get('constraint'):
+                for n,constraint in enumerate(element['constraint']):
+                    validators[f'{name}_constraint_{n}_validator'] = field_validator(name)(partial(fhir_validators.validate_element_constraint, expression=constraint['expression']))
             
             # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
             if field_type is complex_types.BackboneElement and element.get('children'):

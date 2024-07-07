@@ -10,7 +10,7 @@ class Empty(FHIRPathFunction):
     """
     Representation of the FHIRPath [`empty()`](http://hl7.org/fhirpath/N1/#empty-boolean) function.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Returns `True` if the input collection is empty (`{}`) and `False` otherwise.
         
@@ -33,7 +33,7 @@ class Exists(FHIRPathFunction):
     def __init__(self, criteria: FHIRPath = None):
         self.criteria = criteria
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Returns `True` if the collection has any elements, and `False` otherwise. 
         This is the opposite of empty(), and as such is a shorthand for empty().not().
@@ -72,7 +72,7 @@ class All(FHIRPathFunction):
     def __init__(self, criteria: FHIRPath):
         self.criteria = criteria
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Returns `True` if for every element in the input collection, criteria evaluates to `True`.
         Otherwise, the result is `False`. If the input collection is empty (`{}`), the result is `True`.
@@ -116,7 +116,7 @@ class AllTrue(FHIRPathFunction):
     """
     Representation of the FHIRPath [`allTrue()`](https://hl7.org/fhirpath/N1/#alltrue-boolean) function.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Takes a collection of Boolean values and returns `True` if all the items are `True`. If any 
         items are `False`, the result is `False`. If the input is empty (`{}`), the result is `True`.
@@ -133,7 +133,7 @@ class AnyTrue(FHIRPathFunction):
     """
     Representation of the FHIRPath [`anyTrue()`](https://hl7.org/fhirpath/N1/#anytrue-boolean) function.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Takes a collection of Boolean values and returns `True` if any of the items are `True`. 
         If all the items are `False`, or if the input is empty (`{}`), the result is `False`.
@@ -150,7 +150,7 @@ class AllFalse(FHIRPathFunction):
     """
     Representation of the FHIRPath [`allFalse()`](https://hl7.org/fhirpath/N1/#allfalse-boolean) function.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Takes a collection of Boolean values and returns `True` if all the items are `False`. 
         If any items are `True`, the result is `False`. If the input is empty (`{}`), the result is `True`.
@@ -167,7 +167,7 @@ class AnyFalse(FHIRPathFunction):
     """
     Representation of the FHIRPath [`anyFalse()`](https://hl7.org/fhirpath/N1/#anyfalse-boolean) function.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Takes a collection of Boolean values and returns `True` if any of the items are `False`. If all 
         the items are `True`, or if the input is empty (`{}`), the result is `False`.
@@ -190,7 +190,7 @@ class SubsetOf(FHIRPathFunction):
     def __init__(self, other: Union[List[FHIRPathCollectionItem], FHIRPath] = None):
         self.other = other
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Returns `True` if all items in the input collection are members of the collection passed as the 
         other argument.
@@ -209,7 +209,7 @@ class SubsetOf(FHIRPathFunction):
         if len(collection) == 0:
             return True
         if isinstance(self.other, FHIRPath):
-            other_collection = self.other.evaluate()
+            other_collection = self.other.evaluate(**kwargs)
         else:
             other_collection = self.other
         if len(other_collection) == 0:
@@ -240,7 +240,7 @@ class SupersetOf(FHIRPathFunction):
     def __init__(self, other: Union[List[FHIRPathCollectionItem], FHIRPath] = None):
         self.other = other
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Returns true if all items in the collection passed as the other argument are 
         members of the input collection. Membership is determined using the = (Equals) (=) operation.
@@ -284,7 +284,7 @@ class Count(FHIRPathFunction):
     """
     Representation of the FHIRPath [`count()`](https://hl7.org/fhirpath/N1/#count-integer) function.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> int:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> int:
         """
         Returns the integer count of the number of items in the input collection. Returns 0 when the input collection is empty.
 
@@ -301,7 +301,7 @@ class Distinct(FHIRPathFunction):
     """
     Representation of the FHIRPath [`distinct()`](https://hl7.org/fhirpath/N1/#distinct-collection) function.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> List[FHIRPathCollectionItem]:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> List[FHIRPathCollectionItem]:
         """
         Returns a collection containing only the unique items in the input collection. If the input collection is empty (`[]`), the result is empty.
         Note that the order of elements in the input collection is not guaranteed to be preserved in the result.
@@ -319,7 +319,7 @@ class IsDistinct(FHIRPathFunction):
     """
     Representation of the FHIRPath [`isDistinct()`](https://hl7.org/fhirpath/N1/#isdistinct-boolean) function.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> bool:
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
         """
         Returns `True` if all the items in the input collection are distinct. 
         If the input collection is empty (`[]`), the result is `True`.

@@ -10,6 +10,8 @@ import fhircraft.fhir.path.engine.existence as existence
 import fhircraft.fhir.path.engine.filtering as filtering
 import fhircraft.fhir.path.engine.subsetting as subsetting
 import fhircraft.fhir.path.engine.combining as combining
+import fhircraft.fhir.path.engine.boolean as boolean
+import fhircraft.fhir.path.engine.navigation as navigation
 import fhircraft.fhir.path.engine.strings as strings
 import fhircraft.fhir.path.engine.additional as additional
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
@@ -94,13 +96,22 @@ class FhirPathParser:
 
     def p_fhirpath_binop(self, p):
         """fhirpath : fhirpath '.' fhirpath
-                    | fhirpath '|' fhirpath"""
+                    | fhirpath '|' fhirpath
+                    | fhirpath BOOLEAN_OPERATOR fhirpath"""
         op = p[2]
 
         if op == '.':
             p[0] = Invocation(p[1], p[3])
         elif op == '|':
             p[0] = combining.Union(p[1], p[3])
+        elif op == 'and':
+            p[0] = boolean.And(p[1], p[3])
+        elif op == 'or':
+            p[0] = boolean.Or(p[1], p[3])
+        elif op == 'xor':
+            p[0] = boolean.Xor(p[1], p[3])
+        elif op == 'implies':
+            p[0] = boolean.Implies(p[1], p[3])
 
     def p_fhirpath_base_resource_root(self, p):
         "fhirpath : ROOT_NODE"
@@ -132,6 +143,10 @@ class FhirPathParser:
         "fhirpath : IDENTIFIER"
         p[0] = Element(p[1])
         
+    def p_fhirpath_in_parenthesis(self, p):
+        "fhirpath : '(' fhirpath ')'"
+        p[0] = p[3]
+
     def p_fhirpath_idx(self, p):
         "fhirpath : '[' idx ']'"
         p[0] = p[2]
@@ -201,7 +216,11 @@ class FhirPathParser:
         elif check(p, 'extension', nargs=1):
             p[0] = additional.Extension(*p[3])        
         elif check(p, 'resolve', nargs=0):
-            raise NotImplementedError()
+            p[0] = additional.Resolve()  
+        elif check(p, 'hasValue', nargs=0):
+            p[0] = additional.HasValue() 
+        elif check(p, 'getValue', nargs=0):
+            p[0] = additional.GetValue() 
         # -------------------------------------------------------------------------------
         # Subsetting
         # -------------------------------------------------------------------------------
@@ -317,9 +336,14 @@ class FhirPathParser:
         # Tree navigation
         # -------------------------------------------------------------------------------   
         elif check(p, 'children', nargs=0):
-            raise NotImplementedError()     
+            p[0] = navigation.Children()     
         elif check(p, 'descendants', nargs=0):
-            raise NotImplementedError()     
+            p[0] = navigation.Descendants()     
+        # -------------------------------------------------------------------------------
+        # Boolean functions
+        # -------------------------------------------------------------------------------   
+        elif check(p, 'not', nargs=0):
+            raise boolean.Not()     
         # -------------------------------------------------------------------------------
         # Utility functions
         # -------------------------------------------------------------------------------   
