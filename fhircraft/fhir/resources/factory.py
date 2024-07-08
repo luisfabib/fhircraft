@@ -89,17 +89,13 @@ class ResourceFactory:
         is_list_type = not max_card or max_card>1
         if is_list_type:
             field_type = List[field_type]
-            default = list
         if min_card==0:
             field_type = Optional[field_type]
-            # if not is_list_type:
-            default = lambda: None
         return (    
             field_type, 
                 Field(
                     alias=alias,
-                    serialization_alias=alias,
-                    default_factory=default,
+                    default=default,
                     description=description,
                     min_length=min_card if is_list_type else None,
                     max_length=max_card if is_list_type else None
@@ -218,7 +214,7 @@ class ResourceFactory:
             # TODO: Enable once all FHIRPath functions have been implemented
             if element.get('constraint'):
                 for n,constraint in enumerate(element['constraint']):
-                    validators[f'{name}_constraint_{n}_validator'] = field_validator(name)(partial(fhir_validators.validate_element_constraint, expression=constraint['expression']))
+                    validators[f'{name}_constraint_{n}_validator'] = field_validator(name, mode='after')(partial(fhir_validators.validate_element_constraint, constraint=constraint))
             
             # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
             if field_type is complex_types.BackboneElement and element.get('children'):

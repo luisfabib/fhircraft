@@ -345,14 +345,15 @@ class Element(FHIRPath):
                 element_value = self.create_element(item.value)  
                 setattr(item.value, self.label, element_value)  
             for index, value in enumerate(ensure_list(element_value)):
-                element = FHIRPathCollectionItem(
-                    value, 
-                    path=Element(self.label), 
-                    parent=item, 
-                    setter=partial(self.setter, item=item, index=index, label=self.label)
-                )
-                # element.set_value(value)
-                element_collection.append(element)
+                if create or value is not None: 
+                    element = FHIRPathCollectionItem(
+                        value, 
+                        path=Element(self.label), 
+                        parent=item, 
+                        setter=partial(self.setter, item=item, index=index, label=self.label)
+                    )
+                    # element.set_value(value)
+                    element_collection.append(element)
         return element_collection
 
     def __str__(self):

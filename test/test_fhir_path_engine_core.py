@@ -90,6 +90,17 @@ observation = Observation(**{
         "value": "789",
     }],
     "valueInteger": 5,
+    "extension": [
+        {
+            "url": "http://domain.org/extension-1",
+            "extension": [
+                {
+                    "url": "http://domain.org/extension-2",
+                    "valueString": "extension-value-2"
+                }
+            ]
+        },
+    ],
     "component": [
         {
             "code": {
@@ -217,7 +228,6 @@ fhirpath_find_test_cases = (
     ("Observation.identifier.last().value", observation, "789"),
     ("Observation.identifier.skip(2).value", observation, "789"),
     ("Observation.identifier.take(1).value", observation, "123"),
-    ("Observation.extension('http://domain.org/extension-1').valueString", observation, "extension-value-1"),
     ("Observation.extension('http://domain.org/extension-1').extension('http://domain.org/extension-2').valueString", observation, "extension-value-2"),
     ("Observation.component.where(code.coding.code='component-1')[0].value[x]", observation, "component-1-value-1"),
     ("Observation.component.where(code.coding.code='component-1')[0].valueString", observation, "component-1-value-1"),

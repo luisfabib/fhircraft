@@ -899,6 +899,14 @@ class Extension(Element):
     valueUsageContext :  Optional[UsageContext] = None
     valueDosage :  Optional[Dosage] = None
 
+    @property
+    def value(self):
+        for field in self.model_fields:
+            if field.startswith('value'):
+                value = getattr(self, field)
+                if value is not None:
+                    return value
+        
     # @root_validator(pre=True)
     # def check_value_x(cls, values):
     #     value_fields = ['valueInteger', 'valueString', 'valueBoolean', 'valueDateTime', 'valueCode']
