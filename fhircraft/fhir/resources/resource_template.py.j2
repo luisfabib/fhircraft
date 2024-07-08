@@ -1,0 +1,43 @@
+from pydantic import Field, field_validator
+import fhircraft.fhir.resources.primitive_types as fhir_primitive
+import fhircraft.fhir.resources.complex_types as fhir_complex
+import fhircraft.fhir.resources.validators as fhir_validators
+import typing  
+
+{% for model, model_data in data.items() %} 
+class {{ model.__name__ }}(fhir_complex.{{ model.__base__.__name__ }}):
+    {% for field, info in model_data.items() %}
+    {{ field }}: {{ info.annotation}} = Field(
+        description={% if info.description %}"{{ info.description }}"{% else %}None{% endif %},
+        {% if info.default == None %}
+        default=None,
+        {% endif %}
+        {% if info.alias %}
+        alias="{{ info.alias }}",
+        {% endif %}
+    )
+    {% endfor %}
+
+    {% for name, validator in model.__pydantic_decorators__.field_validators.items() %}
+    @field_validator(*{{ validator.info.fields }}, mode="{{ validator.info.mode }}", check_fields={{ validator.info.check_fields }})
+    def {{ name }}(cls, value):
+        {% with validation_function = validator.func.__func__ %}
+        return fhir_validators.{{ validation_function.func.__name__ }}(cls, value, 
+            {% for arg, value in validation_function.keywords.items() %}
+            {{ arg }}="{{value}}",
+            {% endfor %}
+        )
+        {% endwith %}
+
+    {% endfor %}
+    {# {% for name, validator in model.__pydantic_decorators__.model_validators.items() %}
+    @model_validator(mode="{{ validator.info.mode }}")
+    def {{ name }}(instance):
+        return fhir_validators.{{ validator.func.__name__ }}(instance, 
+            {% for arg, value in validator.func.keywords.items() %}
+            {{ arg }}="{{value}}",
+            {% endfor %}
+        )
+
+    {% endfor %}     #}
+{% endfor %}

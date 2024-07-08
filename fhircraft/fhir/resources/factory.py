@@ -214,7 +214,15 @@ class ResourceFactory:
             # TODO: Enable once all FHIRPath functions have been implemented
             if element.get('constraint'):
                 for n,constraint in enumerate(element['constraint']):
-                    validators[f'{name}_constraint_{n}_validator'] = field_validator(name, mode='after')(partial(fhir_validators.validate_element_constraint, constraint=constraint))
+                    validators[f"{name}_invariant_constraint_{constraint['key'].replace('-','_')}_validator"] = field_validator(
+                        name, 
+                        mode='after'
+                    )(partial(
+                        fhir_validators.validate_element_constraint, 
+                        expression=constraint['expression'],
+                        human=constraint['human'],
+                        key=constraint['key'],
+                    ))
             
             # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
             if field_type is complex_types.BackboneElement and element.get('children'):
