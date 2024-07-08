@@ -66,6 +66,17 @@ class And(FHIRPath):
                 return []
         return left_boolean and right_boolean
     
+    def __str__(self):
+        return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.expression.__repr__()})'
+    
+    def __eq__(self, other):
+        return isinstance(other, And) and other.left == self.left and other.right == self.right
+
+    def __hash__(self):
+        return hash((self.left, self.right))
 
 class Or(FHIRPath):
     """
@@ -105,7 +116,18 @@ class Or(FHIRPath):
             elif left_boolean is None:
                 return []
         return left_boolean or right_boolean
+    
+    def __str__(self):
+        return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.expression.__repr__()})'
+    
+    def __eq__(self, other):
+        return isinstance(other, Or) and other.left == self.left and other.right == self.right
+
+    def __hash__(self):
+        return hash((self.left, self.right))
 
 
 class Xor(FHIRPath):
@@ -146,6 +168,19 @@ class Xor(FHIRPath):
             elif left_boolean is None:
                 return []
         return left_boolean ^ right_boolean
+        
+    def __str__(self):
+        return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.expression.__repr__()})'
+    
+    def __eq__(self, other):
+        return isinstance(other, Xor) and other.left == self.left and other.right == self.right
+
+    def __hash__(self):
+        return hash((self.left, self.right))
+    
     
     
 class Implies(FHIRPath):
@@ -199,7 +234,18 @@ class Implies(FHIRPath):
                 return True
         elif right_boolean is False and left_boolean is False:
             return True
-        
+    
+    def __str__(self):
+        return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.expression.__repr__()})'
+    
+    def __eq__(self, other):
+        return isinstance(other, Implies) and other.left == self.left and other.right == self.right
+
+    def __hash__(self):
+        return hash((self.left, self.right))
 
 
 class Not(FHIRPathFunction):

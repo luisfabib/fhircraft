@@ -2,14 +2,14 @@
 
 from pydantic import Field, AfterValidator, PlainSerializer, BaseModel
 from typing import Union
-from typing_extensions import Annotated, TypeAliasType
+from typing_extensions import Annotated, NewType
 import datetime as python_datetime
 import re 
 
 # VERSION: R4B
 # SOURCE: https://hl7.org/fhir/R4B/datatypes.html#string
 
-Boolean = TypeAliasType('Boolean', Union[
+Boolean = NewType('Boolean', Union[
     bool,
     Annotated[
         str,
@@ -18,7 +18,7 @@ Boolean = TypeAliasType('Boolean', Union[
     ]
 ])
 
-Integer = TypeAliasType('Integer', Union[
+Integer = NewType('Integer', Union[
     int,
     Annotated[
         str,
@@ -27,10 +27,10 @@ Integer = TypeAliasType('Integer', Union[
     ]
 ])
 
-String = TypeAliasType('String', str)
+String = NewType('String', str)
 
 
-Decimal = TypeAliasType('Decimal', Union[
+Decimal = NewType('Decimal', Union[
     float,
     Annotated[
         str,
@@ -40,19 +40,19 @@ Decimal = TypeAliasType('Decimal', Union[
 ])
 
 
-Uri = TypeAliasType('Uri', Annotated[
+Uri = NewType('Uri', Annotated[
     str,
     Field(pattern=r'\S*'),
 ])
 
 
-Url = TypeAliasType('Url', str)
+Url = NewType('Url', str)
 
 
-Canonical = TypeAliasType('Canonical', str)
+Canonical = NewType('Canonical', str)
 
 
-Base64Binary = TypeAliasType('Base64Binary', Annotated[
+Base64Binary = NewType('Base64Binary', Annotated[
     str,
     Field(pattern=r'(\s*([0-9a-zA-Z\+\=]){4}\s*)+')
 ])
@@ -66,53 +66,53 @@ MINUTES_REGEX = r'[0-5][0-9]'
 SECONDS_REGEX = r'([0-5][0-9]|60)(\.[0-9]+)'
 TIMEZONE_REGEX = r'(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?'    
    
-Instant = TypeAliasType('Instant', Annotated[
+Instant = NewType('Instant', Annotated[
     str,
     Field(pattern=fr'{YEAR_REGEX}-{MONTH_REGEX}-{DAY_REGEX}T{HOUR_REGEX}:{MINUTES_REGEX}:{SECONDS_REGEX}?{TIMEZONE_REGEX}'),
 ])
 
-Date = TypeAliasType('Date',
+Date = NewType('Date',
     Annotated[
         str,
         Field(pattern=fr'{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?'),
     ]
 )
 
-DateTime = TypeAliasType('DateTime',
+DateTime = NewType('DateTime',
     Annotated[
         str,
         Field(pattern=fr'{YEAR_REGEX}((-{MONTH_REGEX}(-{DAY_REGEX})?)?T{HOUR_REGEX}:{MINUTES_REGEX}:{SECONDS_REGEX}?{TIMEZONE_REGEX})?'),
     ]
 )
 
-Time = TypeAliasType('Time',
+Time = NewType('Time',
     Annotated[
         str,
         Field(pattern=fr'{HOUR_REGEX}:{MINUTES_REGEX}(:{SECONDS_REGEX}?{TIMEZONE_REGEX}?)?'),
     ]
 )
 
-Code = TypeAliasType('Code', Annotated[
+Code = NewType('Code', Annotated[
     str,
     Field(pattern=r'[^\s]+(\s[^\s]+)*'),
 ])
 
-Oid = TypeAliasType('Oid', Annotated[
+Oid = NewType('Oid', Annotated[
     str,
     Field(pattern=r'urn:oid:[0-2](\.(0|[1-9][0-9]*))+'),
 ])
 
-Id = TypeAliasType('Id', Annotated[
+Id = NewType('Id', Annotated[
     str,
     Field(pattern=r'[A-Za-z0-9\-\.]{1,64}'),
 ])
 
-Markdown = TypeAliasType('Markdown', Annotated[
+Markdown = NewType('Markdown', Annotated[
     str,
     Field(pattern=r'\s*(\S|\s)*'),
 ])
 
-UnsignedInt = TypeAliasType('UnsignedInt', Union[
+UnsignedInt = NewType('UnsignedInt', Union[
     int, 
     Annotated[
         str,
@@ -121,7 +121,7 @@ UnsignedInt = TypeAliasType('UnsignedInt', Union[
     ]
 ])
 
-PositiveInt = TypeAliasType('PositiveInt', Union[
+PositiveInt = NewType('PositiveInt', Union[
     int, 
     Annotated[
         str,
@@ -130,4 +130,4 @@ PositiveInt = TypeAliasType('PositiveInt', Union[
     ]
 ])
 
-Uuid = TypeAliasType('Uuid', str)
+Uuid = NewType('Uuid', str)

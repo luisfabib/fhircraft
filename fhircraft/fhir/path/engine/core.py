@@ -507,8 +507,14 @@ class Operation(FHIRPath):
         """
         collection = ensure_list(collection)
         return self.op(
-            [item.value for item in self.left.evaluate(collection, create)] if isinstance(self.left, FHIRPath) else ensure_list(self.left), 
-            [item.value for item in self.right.evaluate(collection, create)] if isinstance(self.right, FHIRPath) else ensure_list(self.right)
+            [
+                item.value if isinstance(item, FHIRPathCollectionItem) else item 
+                    for item in ensure_list(self.left.evaluate(collection, create))
+            ]  if isinstance(self.left, FHIRPath) else ensure_list(self.left), 
+            [ 
+                item.value if isinstance(item, FHIRPathCollectionItem) else item  
+                    for item in ensure_list(self.right.evaluate(collection, create))
+            ] if isinstance(self.right, FHIRPath) else ensure_list(self.right)
         )
 
     def __str__(self):

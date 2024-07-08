@@ -145,8 +145,12 @@ class FhirPathParser:
         
     def p_fhirpath_in_parenthesis(self, p):
         "fhirpath : '(' fhirpath ')'"
-        p[0] = p[3]
+        p[0] = p[2]
 
+    def p_fhirpath_as_operation(self, p):
+        "fhirpath : operation"
+        p[0] = p[1]
+        
     def p_fhirpath_idx(self, p):
         "fhirpath : '[' idx ']'"
         p[0] = p[2]
@@ -343,7 +347,7 @@ class FhirPathParser:
         # Boolean functions
         # -------------------------------------------------------------------------------   
         elif check(p, 'not', nargs=0):
-            raise boolean.Not()     
+            p[0] = boolean.Not()     
         # -------------------------------------------------------------------------------
         # Utility functions
         # -------------------------------------------------------------------------------   
@@ -406,7 +410,6 @@ class FhirPathParser:
                     | '<' 
                     | '<' '=' 
                     | '>' '=' 
-                    | BOOLEAN_OPERATOR
                     | TYPES_OPERATOR"""
         op = ''.join(p[1:])
         # Binary Operators
@@ -430,13 +433,6 @@ class FhirPathParser:
             p[0] = operator.mul
         elif op == '/':
             p[0] = operator.truediv 
-        # Boolean Operators
-        elif op == '|':
-            p[0] = operator.or_ 
-        elif op == '&':
-            p[0] = operator.and_ 
-        elif op == 'xor':
-            p[0] = operator.xor 
         # Types Operators
         elif op == 'is':
             p[0] = operator.eq 

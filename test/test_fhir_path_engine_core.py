@@ -90,18 +90,6 @@ observation = Observation(**{
         "value": "789",
     }],
     "valueInteger": 5,
-    "extension": [
-        {
-            "url": "http://domain.org/extension-1",
-            "valueString": "extension-value-1",
-            "extension": [
-                {
-                    "url": "http://domain.org/extension-2",
-                    "valueString": "extension-value-2"
-                }
-            ]
-        },
-    ],
     "component": [
         {
             "code": {

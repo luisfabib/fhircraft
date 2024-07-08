@@ -4,7 +4,7 @@ def validate_element_constraint(cls, value, expression):
     from fhircraft.fhir.path import fhirpath, FhirPathLexerError, FhirPathParserError
     from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
     try:
-        assert fhirpath.parse(expression).evaluate([FHIRPathCollectionItem(value=value)], create=False)
+        assert fhirpath.parse(expression).evaluate([FHIRPathCollectionItem(value=value)], create=False), f'Violated invariant: {expression}'
     except (NotImplementedError, FhirPathLexerError, FhirPathParserError) as e:
         warnings.warn(f"Warning: FHIRPath raised error for expression: {expression} \n {str(e)}")
     return value

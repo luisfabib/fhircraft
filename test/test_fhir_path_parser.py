@@ -4,9 +4,11 @@ from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.existence import *
 from fhircraft.fhir.path.engine.filtering import *
 from fhircraft.fhir.path.engine.subsetting import *
-from fhircraft.fhir.path.engine.combining import *
 from fhircraft.fhir.path.engine.strings import *
 from fhircraft.fhir.path.engine.additional import *
+from fhircraft.fhir.path.engine.boolean import *
+from fhircraft.fhir.path.engine.navigation import *
+from fhircraft.fhir.path.engine.combining import *
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 from fhircraft.fhir.path.parser import FhirPathParser, FhirPathParserError
 import operator
@@ -19,7 +21,8 @@ parser_test_cases = (
     ("$this", This()),
     ("%resource", Root()),
     ("%context", This()),
-    ("parent.child", Invocation(Element('parent'), Element("child"))),    
+    ("parent.child", Invocation(Element('parent'), Element("child"))),   
+    ("(parent.child)", Invocation(Element('parent'), Element("child"))),    
     ("parent.child[1]", Invocation(Invocation(Element('parent'), Element("child")), Index(1))),    
     ("parent.where(child='string')", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq, 'string')))),
     ("parent.where(child=1234)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq,1234)))),
@@ -27,7 +30,6 @@ parser_test_cases = (
     ("parent.where(child=@2024-12-01)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq ,'2024-12-01')))),
     ("parent.where(child=@T12:05)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq, '12:05')))),
     ("parent.where(child=@T12:05)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq,'12:05')))),
-    ("parent.where(child & daughter)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.and_, Element('daughter'))))),
     ("parent.extension('http://domain.org/extension')", Invocation(Element('parent'), Extension("http://domain.org/extension"))),
     ("parent.value[x]", Invocation(Element('parent'), TypeChoice('value'))),
     # ----------------------------------
@@ -81,6 +83,19 @@ parser_test_cases = (
     ("parent.replaceMatches('^(?:John)','James')", Invocation(Element('parent'), ReplaceMatches('^(?:John)','James'))),  
     ("parent.length()", Invocation(Element('parent'), Length())),  
     ("parent.toChars()", Invocation(Element('parent'), ToChars())),  
+    # ----------------------------------
+    # Operators
+    # ----------------------------------
+    ("parent and child", And(Element('parent'), Element('child'))),  
+    ("parent or child", Or(Element('parent'), Element('child'))),  
+    ("parent xor child", Xor(Element('parent'), Element('child'))),  
+    ("parent implies child", Implies(Element('parent'), Element('child'))),  
+    ("parent.not()", Invocation(Element('parent'), Not())),  
+    ("parent = child", Operation(Element('parent'), operator.eq, Element('child'))),  
+    ("parent >= child", Operation(Element('parent'), operator.ge, Element('child'))),  
+    ("parent <= child", Operation(Element('parent'), operator.le, Element('child'))),  
+    ("parent > child", Operation(Element('parent'), operator.gt, Element('child'))),  
+    ("parent < child", Operation(Element('parent'), operator.lt, Element('child'))),  
 )
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(string, expected_object):
