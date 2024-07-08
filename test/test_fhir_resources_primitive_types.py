@@ -1,7 +1,7 @@
 
 from pydantic import BaseModel, create_model, Field
 import fhircraft.fhir.resources.primitive_types as fhir_types
-import datetime
+from typeguard import check_type 
 import json 
 import pytest 
 
@@ -9,6 +9,7 @@ fhir_types_test_cases = (
     ('Boolean', True, True),
     ('Boolean', 'true', True),
     ('Boolean', 'false', False),
+    ('Boolean', False, False),
     ('Integer', 1234, 1234),
     ('Integer', '1234', 1234),
     ('String', 'stringTest', 'stringTest'),
@@ -41,12 +42,11 @@ fhir_types_test_cases = (
     ('Uuid', 'urn:uuid:c757873d-ec9a-4326-a141-556f43239520', 'urn:uuid:c757873d-ec9a-4326-a141-556f43239520'),
 )
 @pytest.mark.parametrize("fieldType, inputValue, expectedValue", fhir_types_test_cases)
-def test_fhir_primitive_type_casting(fieldType, inputValue, expectedValue):
+def test_fhir_primitive_type_implicit_type_casting(fieldType, inputValue, expectedValue):
     fhir_type = getattr(fhir_types, fieldType)        
     testModel = create_model('testModel', field=(fhir_type, Field()))
     instance = testModel(field = inputValue)
     assert instance.field == expectedValue
-
 
 fhir_types_serialization_test_cases = (
     ('Boolean', True, True),

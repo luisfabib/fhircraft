@@ -9,6 +9,7 @@ from fhircraft.fhir.path.engine.additional import *
 from fhircraft.fhir.path.engine.boolean import *
 from fhircraft.fhir.path.engine.navigation import *
 from fhircraft.fhir.path.engine.combining import *
+from fhircraft.fhir.path.engine.conversion import *
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 from fhircraft.fhir.path.parser import FhirPathParser, FhirPathParserError
 import operator
@@ -68,6 +69,26 @@ parser_test_cases = (
     # ----------------------------------
     ("parent.combine(mother)", Invocation(Element('parent'), Combine(Element('mother')))),  
     ("parent.union(mother)", Invocation(Element('parent'), Union(Element('mother')))),  
+    # ----------------------------------
+    # Type conversion functions
+    # ----------------------------------
+    ("parent.iif($this, 'value1', 'value2')", Invocation(Element('parent'), Iif(This(), 'value1', 'value2'))),  
+    ("parent.toBoolean()", Invocation(Element('parent'), ToBoolean())),  
+    ("parent.convertsToBoolean()", Invocation(Element('parent'), ConvertsToBoolean())), 
+    ("parent.toInteger()", Invocation(Element('parent'), ToInteger())), 
+    ("parent.convertsToInteger()", Invocation(Element('parent'), ConvertsToInteger())), 
+    ("parent.toDate()", Invocation(Element('parent'), ToDate())), 
+    ("parent.convertsToDate()", Invocation(Element('parent'), ConvertsToDate())), 
+    ("parent.toDateTime()", Invocation(Element('parent'), ToDateTime())), 
+    ("parent.convertsToDateTime()", Invocation(Element('parent'), ConvertsToDateTime())), 
+    ("parent.toDecimal()", Invocation(Element('parent'), ToDecimal())), 
+    ("parent.convertsToDecimal()", Invocation(Element('parent'), ConvertsToDecimal())), 
+    ("parent.toQuantity()", Invocation(Element('parent'), ToQuantity())), 
+    ("parent.convertsToQuantity()", Invocation(Element('parent'), ConvertsToQuantity())), 
+    ("parent.toString()", Invocation(Element('parent'), ToString())), 
+    ("parent.convertsToString()", Invocation(Element('parent'), ConvertsToString())), 
+    ("parent.toTime()", Invocation(Element('parent'), ToTime())), 
+    ("parent.convertsToTime()", Invocation(Element('parent'), ConvertsToTime())), 
     # ----------------------------------
     # String manipualtion functions
     # ----------------------------------

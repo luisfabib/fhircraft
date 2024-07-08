@@ -14,6 +14,7 @@ import fhircraft.fhir.path.engine.boolean as boolean
 import fhircraft.fhir.path.engine.navigation as navigation
 import fhircraft.fhir.path.engine.strings as strings
 import fhircraft.fhir.path.engine.additional as additional
+import fhircraft.fhir.path.engine.conversion as conversion
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.utils import ensure_list
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
@@ -254,38 +255,40 @@ class FhirPathParser:
         # -------------------------------------------------------------------------------
         # Conversion
         # -------------------------------------------------------------------------------
-        elif check(p, 'iif', nargs=0):
-            raise NotImplementedError()
+        elif check(p, 'iif', nargs=[2,3]):
+            p[0] = conversion.Iif(*p[3])
         elif check(p, 'toBoolean', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ToBoolean()
         elif check(p, 'convertsToBoolean', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ConvertsToBoolean()
         elif check(p, 'toInteger', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ToInteger()
         elif check(p, 'convertsToInteger', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ConvertsToInteger()
+        elif check(p, 'toDate', nargs=0):
+            p[0] = conversion.ToDate()
         elif check(p, 'convertsToDate', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ConvertsToDate()
         elif check(p, 'toDateTime', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ToDateTime()
         elif check(p, 'convertsToDateTime', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ConvertsToDateTime()
         elif check(p, 'toDecimal', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ToDecimal()
         elif check(p, 'convertsToDecimal', nargs=0):
-            raise NotImplementedError()
-        elif check(p, 'toQuantity', nargs=1):
-            raise NotImplementedError()
-        elif check(p, 'convertsToQuantity', nargs=1):
-            raise NotImplementedError()
+            p[0] = conversion.ConvertsToDecimal()
+        elif check(p, 'toQuantity', nargs=[0,1]):
+            p[0] = conversion.ToQuantity()
+        elif check(p, 'convertsToQuantity', nargs=[0,1]):
+            p[0] = conversion.ConvertsToQuantity()
         elif check(p, 'toString', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ToString()
         elif check(p, 'convertsToString', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ConvertsToString()
         elif check(p, 'toTime', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ToTime()
         elif check(p, 'convertsToTime', nargs=0):
-            raise NotImplementedError()
+            p[0] = conversion.ConvertsToTime()
         # -------------------------------------------------------------------------------
         # String manipulation
         # -------------------------------------------------------------------------------   
