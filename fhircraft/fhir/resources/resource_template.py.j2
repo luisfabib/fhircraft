@@ -1,14 +1,19 @@
-from pydantic import Field, field_validator, BaseModel
+from pydantic import Field, field_validator, model_validator, BaseModel
 from fhircraft.fhir.resources.datatypes.primitives import *
 import fhircraft.fhir.resources.validators as fhir_validators
 import typing  
-{% for import_statement in imports.before %} 
-{{ import_statement }}
+{% for module, objects in imports.items() %} 
+from {{ module }} import {{ objects|join(',')}}
 {% endfor %}
 
 {% for resource in data %} 
 {% for model, model_data in resource.items() %} 
 class {{ model.__name__ }}({{ model.__base__.__name__ }}):
+    {% if model.__doc__ %}
+    """
+    {{ model.__doc__ }}
+    """
+    {% endif %}
     {% for field, info in model_data.fields.items() %}
     {{ field }}: {{ info.annotation}} = Field(
         description={% if info.description %}{{ info.description|tojson }}{% else %}None{% endif %},
@@ -21,16 +26,36 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     )
     {% endfor %}
     {% for name, validator in model.__pydantic_decorators__.field_validators.items() %}
+    {% with validation_function = validator.func.__func__ %}
+    {% if validation_function|attr('func') %}
     @field_validator(*{{ validator.info.fields }}, mode="{{ validator.info.mode }}", check_fields={{ validator.info.check_fields }})
     @classmethod
     def {{ name }}(cls, value):
-        {% with validation_function = validator.func.__func__ %}
         return fhir_validators.{{ validation_function.func.__name__ }}(cls, value, 
             {% for arg, value in validation_function.keywords.items() %}
-            {{ arg }}="{{value}}",
+            {{ arg }}={% if value is string %}"{{value|escapequotes}}"{% else %}{{value}}{%endif%},
             {% endfor %}
         )
-        {% endwith %}
+    {% endif %}
+    {% endwith %}
+
+    {% endfor %}
+    {% for name, validator in model.__pydantic_decorators__.model_validators.items() %}
+    {% with validation_function = validator.func|attr('__func__')|default(validator.func) %}
+    {% if validation_function|attr('func') %}
+    @model_validator(mode="{{ validator.info.mode }}")
+    def {{ name }}(self):
+        return fhir_validators.{{ validation_function.func.__name__ }}( 
+            {% for arg in validation_function.args %}
+            {{ arg }},
+            {% endfor %}
+            self,
+            {% for arg, value in validation_function.keywords.items() %}
+            {{ arg }}={% if value is string %}"{{value|escapequotes}}"{% else %}{{value}}{%endif%},
+            {% endfor %}
+        )
+    {% endif %}
+    {% endwith %}
 
     {% endfor %}
     {% for property, property_getter in model_data.properties.items() %}
@@ -42,16 +67,7 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
             {% endfor %}
         )
     {% endfor %}
-    {# {% for name, validator in model.__pydantic_decorators__.model_validators.items() %}
-    @model_validator(mode="{{ validator.info.mode }}")
-    def {{ name }}(instance):
-        return fhir_validators.{{ validator.func.__name__ }}(instance, 
-            {% for arg, value in validator.func.keywords.items() %}
-            {{ arg }}="{{value}}",
-            {% endfor %}
-        )
 
-    {% endfor %}     #}
 {% endfor %}
 {% endfor %}
 

@@ -170,6 +170,42 @@ class ResourceFactory:
 
         return slicing, constraints
 
+    def _add_model_constraint_validator(self, constraint: dict, validators: dict) -> dict:
+        # Construct function name for validator
+        constraint_name = constraint['key'].replace('-','_')
+        validator_name = f"FHIR_{constraint_name}_constraint_model_validator"
+        # Add the current field to the list of validated fields
+        validators[validator_name] = model_validator(mode='after')(partial(
+            fhir_validators.validate_model_constraint, 
+            expression=constraint['expression'],
+            human=constraint['human'],
+            key=constraint['key'],
+            severity=constraint['severity'],
+        ))
+        return validators
+            
+    def _add_element_constraint_validator(self, field: str, constraint: dict, base: Any, validators: dict) -> dict:
+        # Construct function name for validator
+        constraint_name = constraint['key'].replace('-','_')
+        validator_name = f"FHIR_{constraint_name}_constraint_validator"
+        # Check if validator has already been constructed for another field
+        validate_fields = [field]
+        # Get the list of fields already being validated by this constraint
+        if validator_name in validators:
+            validate_fields.extend(validators.get(validator_name).decorator_info.fields)
+        # Get the list of fields already being validated by this constraint in base model
+        if base and validator_name in base.__pydantic_decorators__.field_validators:
+            validate_fields.extend(base.__pydantic_decorators__.field_validators[validator_name].info.fields) 
+        # Add the current field to the list of validated fields
+        validators[validator_name] = field_validator(*validate_fields, mode='after')(partial(
+            fhir_validators.validate_element_constraint, 
+            expression=constraint['expression'],
+            human=constraint['human'],
+            key=constraint['key'],
+            severity=constraint['severity'],
+        ))
+        return validators
+
     def _compile_complex_element_fields(self, structure, resourceName, base):
         fields = {}
         validators = {}
@@ -209,7 +245,7 @@ class ResourceFactory:
                         )
                     )
                     properties[name] = partial(fhir_validators.get_type_choice_value_by_base, base=name)
-
+                    continue
                 else:
                     if len(field_types) > 1:
                         # Accept all types 
@@ -221,17 +257,7 @@ class ResourceFactory:
                 continue
             if element.get('constraint'):
                 for constraint in element['constraint']:
-                    validator_name = f"FHIR_{constraint['key'].replace('-','_')}_constraint_validator"
-                    if validator_name in validators:
-                        validated_fields = validators[validator_name].decorator_info.fields 
-                        setattr(validators[validator_name].decorator_info, 'fields', [*validated_fields, name])
-                    else:                    
-                        validators[validator_name] = field_validator(name, mode='after')(partial(
-                            fhir_validators.validate_element_constraint, 
-                            expression=constraint['expression'],
-                            human=constraint['human'],
-                            key=constraint['key'],
-                        ))
+                    validators = self._add_element_constraint_validator(name, constraint, base, validators)
             
             # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
             if field_type is get_FHIR_type('BackboneElement') and element.get('children'):
@@ -269,7 +295,13 @@ class ResourceFactory:
         else:
             base = get_FHIR_type('Resource')
             fields, validators, properties = self._compile_complex_element_fields(structure, resourceName, get_FHIR_type('Resource'))
+        
+        for constraint in structure['constraint']:
+            validators = self._add_model_constraint_validator(constraint, validators)
+        
         slicing, constraints = self._compile_profile_constraints(elements)
+        
+        
         
         fields['meta'] = (Optional[get_FHIR_type('Meta')], get_FHIR_type('Meta')(profile=[structure_definition['url']], versionId=structure_definition['version']))
         fields['resourceType'] = (Literal[f'{resourceType}'], resourceType)
@@ -278,7 +310,7 @@ class ResourceFactory:
         fields['profile_constraints'] = (ClassVar[List[Constraint]], constraints)
 
         model = create_model(resourceName, **fields, __base__=base, __validators__=validators)
-
+        model.__doc__ = structure['short']
         for attribute, property_getter in properties.items():
             setattr(model, attribute, property(property_getter))
 
@@ -306,6 +338,10 @@ class ResourceFactory:
         else:
             base = BaseModel
         fields, validators, properties = self._compile_complex_element_fields(structure, resourceName, base)
+
+        for constraint in structure.get('constraint',[]):
+            validators = self._add_model_constraint_validator(constraint, validators)
+        
         # slicing, constraints = self._compile_profile_constraints(elements)
         
         # fields['meta'] = (Optional[complex_types.Meta], complex_types.Meta(profile=[structure_definition['url']], versionId=structure_definition['version']))
@@ -315,6 +351,7 @@ class ResourceFactory:
         # fields['profile_constraints'] = (ClassVar[List[Constraint]], constraints)
 
         model = create_model(resourceName, **fields, __base__=base, __validators__=validators)
+        model.__doc__ = structure['short']
 
         for attribute, property_getter in properties.items():
             setattr(model, attribute, property(property_getter))
