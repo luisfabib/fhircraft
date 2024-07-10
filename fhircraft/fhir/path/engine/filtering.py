@@ -72,7 +72,7 @@ class Select(FHIRPathFunction):
             List[FHIRPathCollectionItem]): The output collection.
         """    
         collection = ensure_list(collection)
-        return [projected_item for item in collection for projected_item in self.projection.evaluate(item, create)]
+        return [projected_item for item in collection for projected_item in ensure_list(self.projection.evaluate(item, create))]
 
     def __str__(self):
         return f'{self.__class__.__name__.lower()}({self.projection.__str__()})'

@@ -70,7 +70,7 @@ class And(FHIRPath):
         return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.expression.__repr__()})'
+        return f'{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})'
     
     def __eq__(self, other):
         return isinstance(other, And) and other.left == self.left and other.right == self.right
@@ -121,7 +121,7 @@ class Or(FHIRPath):
         return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.expression.__repr__()})'
+        return f'{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})'
     
     def __eq__(self, other):
         return isinstance(other, Or) and other.left == self.left and other.right == self.right
@@ -173,7 +173,7 @@ class Xor(FHIRPath):
         return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.expression.__repr__()})'
+        return f'{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})'
     
     def __eq__(self, other):
         return isinstance(other, Xor) and other.left == self.left and other.right == self.right
@@ -239,7 +239,7 @@ class Implies(FHIRPath):
         return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.expression.__repr__()})'
+        return f'{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})'
     
     def __eq__(self, other):
         return isinstance(other, Implies) and other.left == self.left and other.right == self.right

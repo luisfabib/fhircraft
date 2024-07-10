@@ -107,17 +107,26 @@ parser_test_cases = (
     # ----------------------------------
     # Operators
     # ----------------------------------
-    ("parent and child", And(Element('parent'), Element('child'))),  
-    ("parent or child", Or(Element('parent'), Element('child'))),  
-    ("parent xor child", Xor(Element('parent'), Element('child'))),  
-    ("parent implies child", Implies(Element('parent'), Element('child'))),  
+    ("parent.child and mother.child", And(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child or mother.child", Or(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child xor mother.child", Xor(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child implies mother.child", Implies(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
     ("parent.not()", Invocation(Element('parent'), Not())),  
-    ("parent = child", Operation(Element('parent'), operator.eq, Element('child'))),  
-    ("parent >= child", Operation(Element('parent'), operator.ge, Element('child'))),  
-    ("parent <= child", Operation(Element('parent'), operator.le, Element('child'))),  
-    ("parent > child", Operation(Element('parent'), operator.gt, Element('child'))),  
-    ("parent < child", Operation(Element('parent'), operator.lt, Element('child'))),  
-)
+    ("parent.child = mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.eq, Invocation(Element('mother'), Element('child')))),  
+    ("parent.child != mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.ne, Invocation(Element('mother'), Element('child')))),  
+    ("parent.child >= mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.ge, Invocation(Element('mother'), Element('child')))),  
+    ("parent.child <= mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.le, Invocation(Element('mother'), Element('child')))),  
+    ("parent.child > mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.gt, Invocation(Element('mother'), Element('child')))),  
+    ("parent.child < mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.lt, Invocation(Element('mother'), Element('child')))),  
+    # ----------------------------------
+    # Precedence
+    # ----------------------------------
+    ("parent.child and mother.child implies child.brother", Implies(And(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child'))), Invocation(Element('child'), Element('brother')))),  
+    ("parent.child implies child = brother", Implies(Invocation(Element('parent'), Element('child')), Operation(Element('child'), operator.eq, Element('brother')))),  
+    ("parent > mother = child", Operation(Operation(Element('parent'), operator.gt, Element('mother')), operator.eq, Element('child'))),  
+    ("(parent > mother) = child", Operation(Operation(Element('parent'), operator.gt, Element('mother')), operator.eq, Element('child'))),  
+    ("parent > (mother = child)", Operation(Element('parent'), operator.gt, Operation(Element('mother'), operator.eq, Element('child')))),  
+)   
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(string, expected_object):
     parser = FhirPathParser(lexer_class=lambda: FhirPathLexer())

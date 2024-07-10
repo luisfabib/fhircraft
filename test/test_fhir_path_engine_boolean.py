@@ -94,3 +94,4 @@ def test_implies_returns_correct_logic_boolean(left, right, expected):
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Implies(Invocation(Element('left'),GetValue()), Invocation(Element('right'), GetValue())).evaluate(collection)
     assert result == expected
+

@@ -360,7 +360,7 @@ class Element(FHIRPath):
         return self.label
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.label})'
+        return f'Element({self.label})'
 
     def __eq__(self, other):
         return isinstance(other, Element) and self.label == other.label
@@ -522,7 +522,7 @@ class Operation(FHIRPath):
         return f'{self.left}{self.op}{self.right}'
 
     def __repr__(self):
-        return f'Operation({self.left.__repr__()}{self.op}{self.right.__repr__()})'
+        return f'Operation({self.left.__repr__()},{self.op.__repr__()},{self.right.__repr__()})'
 
     def __eq__(self, other):
         return isinstance(other, Operation) and self.left == other.left and self.right == other.right and self.op == other.op

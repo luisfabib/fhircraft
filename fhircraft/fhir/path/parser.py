@@ -86,8 +86,20 @@ class FhirPathParser:
     # ===================== PLY Parser specification =====================
 
     precedence = [
+        ('left', '(', ')'),
+        ('left', 'BOOLEAN_OPERATOR',
+                 'TYPES_OPERATOR',
+        ),
+        ('left', '|',
+                 '=',
+                 '*',
+                 '+',
+                 '!',
+                 '>',
+                 '<',
+                 '/',
+        ),
         ('left', '.'),
-        ('left', '|'),
     ]
 
     def p_error(self, t):
