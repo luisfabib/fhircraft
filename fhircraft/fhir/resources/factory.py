@@ -1,5 +1,6 @@
-import fhircraft.fhir.resources.complex_types as complex_types
-import fhircraft.fhir.resources.primitive_types as primitive_types
+import fhircraft.fhir.resources.datatypes.primitives as primitives
+from fhircraft.fhir.resources.datatypes import get_FHIR_type
+
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.constraint import Constraint
 from fhircraft.fhir.resources.slicing import SlicingGroup, Slice, Discriminator
@@ -78,9 +79,11 @@ class ResourceFactory:
         field_type_name = field_type_name.replace('http://hl7.org/fhir/StructureDefinition/','')
         field_type_name = field_type_name.replace('http://hl7.org/fhirpath/System.','')
         field_type_name = capitalize(field_type_name)
-        field_type = getattr(primitive_types, field_type_name, None)
+        field_type = getattr(primitives, field_type_name, None)
         if not field_type:
-            field_type = getattr(complex_types, field_type_name, None)
+            field_type = get_FHIR_type(field_type_name)
+        if not field_type:
+            return field_type_name
         return field_type
 
 
@@ -170,8 +173,9 @@ class ResourceFactory:
     def _compile_complex_element_fields(self, structure, resourceName, base):
         fields = {}
         validators = {}
+        properties = {}
         for name, element in structure['children'].items():
-            if name in base.model_fields:
+            if base and name in base.model_fields:
                 continue 
 
             # Get cardinality of element
@@ -185,7 +189,7 @@ class ResourceFactory:
             # If has no type, skip element
             if not field_types:
                 continue 
-            
+
             # Handle multi-type cases
             if len(field_types) > 0:
                 # Handle type choice elements
@@ -194,7 +198,8 @@ class ResourceFactory:
                     name = name.replace('[x]','')
                     # Create a field for each type
                     for field_type in field_types:
-                        fields[name+field_type.__name__] = self._construct_Pydantic_field(field_type, min_card, max_card, description=element.get('short'))
+                        typed_field_name = name + (field_type if isinstance(field_type, str) else field_type.__name__)
+                        fields[typed_field_name] = self._construct_Pydantic_field(field_type, min_card, max_card, description=element.get('short'))
                     # Add validator to ensure only one of these fields is set                
                     validators[f'{name}_type_choice_validator'] = model_validator(mode='after')(
                         partial(
@@ -203,42 +208,49 @@ class ResourceFactory:
                             field_name_base=name
                         )
                     )
-                    continue
-                else:
-                    # Accept all types 
-                    field_type = Union[tuple(field_types)]                 
-            else:
-                # Get single type
-                field_type = field_types[0]
+                    properties[name] = partial(fhir_validators.get_type_choice_value_by_base, base=name)
 
-            # TODO: Enable once all FHIRPath functions have been implemented
+                else:
+                    if len(field_types) > 1:
+                        # Accept all types 
+                        field_type = Union[tuple(field_types)]                 
+                    else:
+                        # Get single type
+                        field_type = field_types[0]
+            else: 
+                continue
             if element.get('constraint'):
-                for n,constraint in enumerate(element['constraint']):
-                    validators[f"{name}_invariant_constraint_{constraint['key'].replace('-','_')}_validator"] = field_validator(
-                        name, 
-                        mode='after'
-                    )(partial(
-                        fhir_validators.validate_element_constraint, 
-                        expression=constraint['expression'],
-                        human=constraint['human'],
-                        key=constraint['key'],
-                    ))
+                for constraint in element['constraint']:
+                    validator_name = f"FHIR_{constraint['key'].replace('-','_')}_constraint_validator"
+                    if validator_name in validators:
+                        validated_fields = validators[validator_name].decorator_info.fields 
+                        setattr(validators[validator_name].decorator_info, 'fields', [*validated_fields, name])
+                    else:                    
+                        validators[validator_name] = field_validator(name, mode='after')(partial(
+                            fhir_validators.validate_element_constraint, 
+                            expression=constraint['expression'],
+                            human=constraint['human'],
+                            key=constraint['key'],
+                        ))
             
             # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
-            if field_type is complex_types.BackboneElement and element.get('children'):
-                field_subfields, subfield_validators = self._compile_complex_element_fields(element, capitalize(resourceName + capitalize(name)), field_type)
-                field_type = create_model(capitalize(resourceName + capitalize(name)), **field_subfields, __base__=field_type, __validators__=subfield_validators)
-            
+            if field_type is get_FHIR_type('BackboneElement') and element.get('children'):
+                field_subfields, subfield_validators, subfield_properties = self._compile_complex_element_fields(element, capitalize(resourceName + capitalize(name)), field_type)
+                field_type = create_model(capitalize(resourceName + capitalize(name)), **field_subfields, __base__=field_type, __validators__=subfield_validators)                
+                for attribute, property_getter in properties.items():
+                    setattr(field_type, attribute, property(property_getter))            
+
             # Create and add the Pydantic field for the FHIR element
             fields[name] = self._construct_Pydantic_field(field_type, min_card, max_card, description=element.get('short'))
-            if hasattr(primitive_types, field_type.__name__):
-                fields[f'{name}_ext'] = self._construct_Pydantic_field(complex_types.Element, 0, 1, alias=f'_{name}',description=f'Placeholder element for {name} extensions')
-        return fields, validators
+            if hasattr(primitives, str(field_type)):
+                fields[f'{name}_ext'] = self._construct_Pydantic_field(get_FHIR_type('Element'), 0, 1, alias=f'_{name}',description=f'Placeholder element for {name} extensions')
+        return fields, validators, properties
         
 
-    def construct_resource_model(self, canonical_url):
+    def construct_resource_model(self, canonical_url=None, structure_definition=None):
         
-        structure_definition = self.get_structure_definition(canonical_url)
+        if not structure_definition and canonical_url:
+            structure_definition = self.get_structure_definition(canonical_url)
         
         if 'snapshot' not in structure_definition or 'element' not in structure_definition['snapshot']:
             raise ValueError("Invalid StructureDefinition: Missing 'snapshot' or 'element' field")
@@ -251,25 +263,70 @@ class ResourceFactory:
         
         structure = tree['children'][resourceType]
         
-        if hasattr(complex_types, resourceType):
-            base = complex_types.Extension
-            fields, validators = {}, {}
+        if get_FHIR_type(resourceType):
+            base = get_FHIR_type('Extension')
+            fields, validators, properties = {}, {}, {}
         else:
-            base = complex_types.Resource
-            fields, validators = self._compile_complex_element_fields(structure, resourceName, complex_types.Resource)
+            base = get_FHIR_type('Resource')
+            fields, validators, properties = self._compile_complex_element_fields(structure, resourceName, get_FHIR_type('Resource'))
         slicing, constraints = self._compile_profile_constraints(elements)
         
-        fields['meta'] = (Optional[complex_types.Meta], complex_types.Meta(profile=[structure_definition['url']], versionId=structure_definition['version']))
+        fields['meta'] = (Optional[get_FHIR_type('Meta')], get_FHIR_type('Meta')(profile=[structure_definition['url']], versionId=structure_definition['version']))
         fields['resourceType'] = (Literal[f'{resourceType}'], resourceType)
         fields['profile_slicing'] = (ClassVar[List[SlicingGroup]], slicing)
         fields['canonical_url'] = (ClassVar[List[Constraint]], canonical_url)
         fields['profile_constraints'] = (ClassVar[List[Constraint]], constraints)
 
         model = create_model(resourceName, **fields, __base__=base, __validators__=validators)
+
+        for attribute, property_getter in properties.items():
+            setattr(model, attribute, property(property_getter))
+
         return model 
     
     def clear_chache(self):
         self.profiles = {}
+
+
+    def construct_dataelement_model(self, structure_definition):
+        
+        if 'snapshot' not in structure_definition or 'element' not in structure_definition['snapshot']:
+            raise ValueError("Invalid StructureDefinition: Missing 'snapshot' or 'element' field")
+        
+        elements = structure_definition['snapshot']['element']
+        tree = self.build_tree_structure(elements)
+
+        resourceType = structure_definition['type']
+        resourceName = structure_definition['name']
+        
+        structure = tree['children'][resourceType]
+        if 'baseDefinition' in structure_definition:
+            base_name = structure_definition['baseDefinition'].replace('http://hl7.org/fhir/StructureDefinition/','')
+            base = self.profiles.get(base_name)
+        else:
+            base = BaseModel
+        fields, validators, properties = self._compile_complex_element_fields(structure, resourceName, base)
+        # slicing, constraints = self._compile_profile_constraints(elements)
+        
+        # fields['meta'] = (Optional[complex_types.Meta], complex_types.Meta(profile=[structure_definition['url']], versionId=structure_definition['version']))
+        # fields['resourceType'] = (Literal[f'{resourceType}'], resourceType)
+        # fields['profile_slicing'] = (ClassVar[List[SlicingGroup]], slicing)
+        # fields['canonical_url'] = (ClassVar[List[Constraint]], canonical_url)
+        # fields['profile_constraints'] = (ClassVar[List[Constraint]], constraints)
+
+        model = create_model(resourceName, **fields, __base__=base, __validators__=validators)
+
+        for attribute, property_getter in properties.items():
+            setattr(model, attribute, property(property_getter))
+
+
+        self.profiles[resourceName] = model
+
+        return model 
+    
+    def clear_chache(self):
+        self.profiles = {}
+
 
 
 

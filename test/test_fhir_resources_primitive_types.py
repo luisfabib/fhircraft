@@ -1,7 +1,6 @@
 
 from pydantic import BaseModel, create_model, Field
-import fhircraft.fhir.resources.primitive_types as fhir_types
-from typeguard import check_type 
+import fhircraft.fhir.resources.datatypes.primitives as fhir_types
 import json 
 import pytest 
 

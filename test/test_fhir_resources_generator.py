@@ -1,4 +1,5 @@
 from fhircraft.fhir.resources.generator import generate_resource_model_code 
+from fhircraft.fhir.resources.factory import construct_resource_model
 import pytest 
 import os 
 import glob
@@ -29,7 +30,8 @@ def test_construct_core_resource(resource_label, filename):
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
         # Generate source code for Pydantic FHIR model
-        source_code = generate_resource_model_code(f'https://hl7.org/fhir/R4B/{resource_label}.profile.json')
+        resource = construct_resource_model(canonical_url=f'https://hl7.org/fhir/R4B/{resource_label}.profile.json')
+        source_code = generate_resource_model_code(resource)
         # Store source code in a file        
         temp_file_name = os.path.join(d, 'temp_test.py')    
         with open(temp_file_name, "w") as test_file:

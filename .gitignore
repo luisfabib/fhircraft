@@ -4,7 +4,7 @@
 pip-proxy.sh
 
 .codiumai.toml 
-
+.vscode/settings.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

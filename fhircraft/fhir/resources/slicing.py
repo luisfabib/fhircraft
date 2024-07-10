@@ -1,7 +1,7 @@
 from fhircraft.fhir.path import fhirpath, FHIRPathError, FhirPathParserError, FhirPathLexerError
 from fhircraft.fhir.path.utils import split_fhirpath, join_fhirpath
 from fhircraft.fhir.resources.constraint import Constraint
-from fhircraft.fhir.resources.complex_types import Extension
+from fhircraft.fhir.resources.datatypes import get_FHIR_type
 from fhircraft.utils import get_dict_paths, ensure_list, get_fhir_model_from_field
 from pydantic import create_model
 from typing import List, ClassVar, Optional
@@ -226,7 +226,7 @@ class Slice:
         base_path, element = self.slicing.path.rsplit('.',1)
         base = fhirpath.parse(base_path).get_value(resource)
         if element.lower() == 'extension':
-            model = Extension
+            model = get_FHIR_type('Extension')
         else:
             model = get_fhir_model_from_field(base.model_fields.get(element))
         
@@ -243,8 +243,10 @@ class Slice:
             @property
             def is_FHIR_complete(self):
                 BASE_ELEMENTS = ['text','extension', 'id', 'resourceType']
-                slice_available_elements = sorted(set([name for name in self.__class__.model_fields if '_ext' not in name and name not in BASE_ELEMENTS]))
-                slice_preset_elements = sorted(set([name for name, value in self.model_dump(by_alias=True, exclude_unset=True).items() if (value is not None or value!=[]) and '_ext' not in name and name not in BASE_ELEMENTS]))
+                slice_available_elements = sorted(set([name for name in self.__class__.model_fields if '_ext' not in name and not name.startswith('_') and name not in BASE_ELEMENTS]))
+                slice_preset_elements = sorted(set([name for name, value in self.model_dump(by_alias=True, exclude_unset=True).items() if (value is not None or value!=[]) and '_ext' not in name and not name.startswith('_')  and name not in BASE_ELEMENTS]))
+                print(slice_available_elements)
+                print(slice_preset_elements)
                 return slice_available_elements == slice_preset_elements
             
             @property

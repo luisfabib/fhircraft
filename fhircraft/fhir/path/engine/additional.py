@@ -6,8 +6,7 @@ are candidates for elevation to the base version of FHIRPath when the next versi
 
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathFunction, Invocation, Element, Operation, FHIRPath, FHIRPathError
 from fhircraft.fhir.path.engine.filtering import Where
-from fhircraft.fhir.resources.primitive_types import Uri, Canonical, Url
-from fhircraft.fhir.resources.complex_types import Reference
+from fhircraft.fhir.resources.datatypes.primitives import Uri, Canonical, Url
 from fhircraft.utils import ensure_list, load_url
 from typing import List, Any, Optional
 import operator
@@ -150,13 +149,14 @@ class Resolve(FHIRPathFunction):
             collection (List[FHIRPathCollectionItem])): The output collection.
         """
         from fhircraft.fhir.resources.factory import construct_resource_model
+        from fhircraft.fhir.resources.datatypes import get_FHIR_type
 
         collection = ensure_list(collection)
         output_collection = []
         for item in collection:
             if isinstance(item.value, (Uri, Canonical, Url)):
                 resource_url = item.value 
-            elif isinstance(item.value, Reference):
+            elif isinstance(item.value, get_FHIR_type('Reference')):
                 resource_url = item.value.reference
             else:
                 raise FHIRPathError('The resolve() function requires either a collection of URIs, Canonicals, URLs or References.')

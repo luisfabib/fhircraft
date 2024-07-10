@@ -1,10 +1,6 @@
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.navigation import *
-from fhircraft.fhir.resources.complex_types import Extension as ExtensionType
 from pydantic import BaseModel
-from collections import namedtuple
-import pytest 
-from unittest import TestCase
 
 
 #-------------

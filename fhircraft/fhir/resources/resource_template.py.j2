@@ -1,14 +1,17 @@
-from pydantic import Field, field_validator
-import fhircraft.fhir.resources.primitive_types as fhir_primitive
-import fhircraft.fhir.resources.complex_types as fhir_complex
+from pydantic import Field, field_validator, BaseModel
+from fhircraft.fhir.resources.datatypes.primitives import *
 import fhircraft.fhir.resources.validators as fhir_validators
 import typing  
+{% for import_statement in imports.before %} 
+{{ import_statement }}
+{% endfor %}
 
-{% for model, model_data in data.items() %} 
-class {{ model.__name__ }}(fhir_complex.{{ model.__base__.__name__ }}):
-    {% for field, info in model_data.items() %}
+{% for resource in data %} 
+{% for model, model_data in resource.items() %} 
+class {{ model.__name__ }}({{ model.__base__.__name__ }}):
+    {% for field, info in model_data.fields.items() %}
     {{ field }}: {{ info.annotation}} = Field(
-        description={% if info.description %}"{{ info.description }}"{% else %}None{% endif %},
+        description={% if info.description %}{{ info.description|tojson }}{% else %}None{% endif %},
         {% if info.default == None %}
         default=None,
         {% endif %}
@@ -17,9 +20,9 @@ class {{ model.__name__ }}(fhir_complex.{{ model.__base__.__name__ }}):
         {% endif %}
     )
     {% endfor %}
-
     {% for name, validator in model.__pydantic_decorators__.field_validators.items() %}
     @field_validator(*{{ validator.info.fields }}, mode="{{ validator.info.mode }}", check_fields={{ validator.info.check_fields }})
+    @classmethod
     def {{ name }}(cls, value):
         {% with validation_function = validator.func.__func__ %}
         return fhir_validators.{{ validation_function.func.__name__ }}(cls, value, 
@@ -29,6 +32,15 @@ class {{ model.__name__ }}(fhir_complex.{{ model.__base__.__name__ }}):
         )
         {% endwith %}
 
+    {% endfor %}
+    {% for property, property_getter in model_data.properties.items() %}
+    @property 
+    def {{ property }}(self):
+        return fhir_validators.{{ property_getter.func.__name__ }}(self, 
+            {% for arg, value in property_getter.keywords.items() %}
+            {{ arg }}="{{value}}",
+            {% endfor %}
+        )
     {% endfor %}
     {# {% for name, validator in model.__pydantic_decorators__.model_validators.items() %}
     @model_validator(mode="{{ validator.info.mode }}")
@@ -40,4 +52,13 @@ class {{ model.__name__ }}(fhir_complex.{{ model.__base__.__name__ }}):
         )
 
     {% endfor %}     #}
+{% endfor %}
+{% endfor %}
+
+
+{% for import_statement in imports.after %} 
+{{ import_statement }}
+{% endfor %}
+{% for reload_statement in reload %} 
+{{ reload_statement }}
 {% endfor %}
