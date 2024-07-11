@@ -49,7 +49,6 @@ class Iif(FHIRPathFunction):
         """ 
         collection = ensure_list(collection)
         criterion = self.criterion.evaluate(collection, **kwargs)
-        print(criterion)
         if criterion:
             if isinstance(self.true_result, FHIRPath):
                 return self.true_result.evaluate(collection, **kwargs)
@@ -461,7 +460,6 @@ class ToQuantity(FHIRTypeConversionFunction):
         elif isinstance(value, str):
             quantity_match = re.match(r"((\+|-)?\d+(\.\d+)?)\s*(('([^']+)'|([a-zA-Z]+))?)", value)
             if quantity_match:
-                print(quantity_match.groups())
                 return Quantity(value=quantity_match.group(1), unit=quantity_match.group(4))
             else:
                 return []

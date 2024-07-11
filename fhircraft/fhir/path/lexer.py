@@ -46,13 +46,13 @@ class FhirPathLexer:
     # Symbols provide structure to the language and allow symbolic invocation of common 
     # operators such as addition. FHIRPath defines the following symbols:
     literals = [
-        '*', '+', '-', ',', '.', '[', ']', '(', ')', ',', 
+        '*', '+', '-', ',', '.', '[', ']', '(', ')', ',', '~',
         ':', '|', '&', '=', '!', '>', '<', '{', '}', '/'
     ]
 
     reserved_words = { 
         
-        # Boolean logic (http://hl7.org/fhirpath/N1/#boolean-logic)
+        # Type operators (http://hl7.org/fhirpath/N1/#boolean-logic)
         # -------------------------------------------------------------------------------
         **{operator: 'TYPES_OPERATOR' for operator in ['is','as']},  
         
@@ -60,6 +60,14 @@ class FhirPathLexer:
         # -------------------------------------------------------------------------------
         **{operator: 'BOOLEAN_OPERATOR' for operator in ['and','or','xor','implies']},  
         
+        # Collection operators (https://hl7.org/fhirpath/N1/#collections-2)
+        # -------------------------------------------------------------------------------
+        **{operator: 'COLLECTION_OPERATOR' for operator in ['|','in','contains']},  
+
+        # Math operators (http://hl7.org/fhirpath/N1/#math)
+        # -------------------------------------------------------------------------------
+        **{operator: 'MATH_OPERATOR' for operator in ['mod','div']},  
+
         # Boolean (http://hl7.org/fhirpath/N1/#boolean)
         # -------------------------------------------------------------------------------
         **{operator: 'BOOLEAN' for operator in ['true','false']},  
@@ -109,6 +117,7 @@ class FhirPathLexer:
         'DECIMAL',
         'DATE',
         'TIME',
+        'DATETIME',
         'CHOICE_ELEMENT',
         'STRING',
         'CONTEXTUAL_OPERATOR',
@@ -160,6 +169,21 @@ class FhirPathLexer:
         r'\$(\w*)?'
         return t
     
+
+    def t_DATETIME(self, t):
+        # DateTime (http://hl7.org/fhirpath/N1/#datetime)
+        # -------------------------------------------------------------------------------
+        # The Date type represents date and partial date values.
+        # - The date literal is a subset of [ISO8601]:
+        # - A date being with a @
+        # - It uses the format YYYY-MM-DD format, though month and day parts are optional
+        # - Months must be present if a day is present
+        # The Time type represents time-of-day and partial time-of-day values.
+        # - A time begins with a @T
+        # - It uses the Thh:mm:ss.fff format
+        r'@\d{4}(?:-\d{2}(?:-\d{2})?)?T(?:\d{2}(?:\:\d{2}(?:\:\d{2}(?:.\d{3}(?:[\+|\-]\d{2}(?:\:\d{2})?)?)?)?)?)?'
+        return t    
+    
     def t_DATE(self, t):
         # Date (http://hl7.org/fhirpath/N1/#date)
         # -------------------------------------------------------------------------------
@@ -169,7 +193,6 @@ class FhirPathLexer:
         # - It uses the format YYYY-MM-DD format, though month and day parts are optional
         # - Months must be present if a day is present
         r'@\d{4}(?:-\d{2}(?:-\d{2})?)?'
-        t.value = t.value.replace('@','')
         return t
     
     def t_TIME(self, t):
@@ -178,8 +201,7 @@ class FhirPathLexer:
         # The Time type represents time-of-day and partial time-of-day values.
         # - A time begins with a @T
         # - It uses the Thh:mm:ss.fff format
-        r'@T\d{2}:\d{2}(?::\d{2}.\d{3}(.?))?'
-        t.value = t.value.replace('@T','')
+        r'\@T\d{2}(?:\:\d{2}(?:\:\d{2}(?:\.\d{3}(?:[+|-]\d{2}(?:\:\d{2})?)?)?)?)?'
         return t
     
     def t_NUMBER(self, t):

@@ -1,4 +1,5 @@
 import warnings
+import traceback
 from fhircraft.utils import ensure_list 
 
 def _validate_FHIR_element_constraint(value, expression, human, key, severity):
@@ -14,8 +15,8 @@ def _validate_FHIR_element_constraint(value, expression, human, key, severity):
                 warnings.warn(error_message)
             else:
                 assert valid, error_message
-        except (NotImplementedError, FhirPathLexerError, FhirPathParserError) as e:
-            warnings.warn(f"Warning: FHIRPath raised error for expression: {expression} \n {str(e)}")
+        except (ValueError, FhirPathLexerError, FhirPathParserError, AttributeError, NotImplementedError) as e:
+            warnings.warn(f"Warning: FHIRPath raised {e.__class__.__name__} for expression: {expression}. {traceback.format_exc()}")
     return value
 
 def validate_element_constraint(cls, value, expression, human, key, severity):

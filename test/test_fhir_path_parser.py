@@ -2,6 +2,7 @@ import pytest
 
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.existence import *
+from fhircraft.fhir.path.engine.literals import *
 from fhircraft.fhir.path.engine.filtering import *
 from fhircraft.fhir.path.engine.subsetting import *
 from fhircraft.fhir.path.engine.strings import *
@@ -10,6 +11,9 @@ from fhircraft.fhir.path.engine.boolean import *
 from fhircraft.fhir.path.engine.navigation import *
 from fhircraft.fhir.path.engine.combining import *
 from fhircraft.fhir.path.engine.conversion import *
+from fhircraft.fhir.path.engine.equality import *
+from fhircraft.fhir.path.engine.comparison import *
+import fhircraft.fhir.path.engine.collection as collection
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 from fhircraft.fhir.path.parser import FhirPathParser, FhirPathParserError
 import operator
@@ -17,20 +21,45 @@ import operator
 # Format: (string, expected_object)
 parser_test_cases = (
     ("foo", Element("foo")),
-    ("[1]", Index(1)),
+    ("`foo`", Element("foo")),
+    ("foo[1]", Invocation(Element("foo"), Index(1))),
+    # ----------------------------------
+    # Variables/Constants
+    # ----------------------------------
     ("$", Root()),
     ("$this", This()),
     ("%resource", Root()),
     ("%context", This()),
+    # ----------------------------------
+    # Literals
+    # ----------------------------------
+    ("12 'mg'", Quantity(12, 'mg')),
+    ("12.5 'kg'", Quantity(12.5, 'kg')),
+    ("5 days", Quantity(5, 'days')),
+    ("@2024-01-01", Date('@2024-01-01')),
+    ("@2024-01", Date('@2024-01')),
+    ("@2024", Date('@2024')),
+    ('@T12:15:20.345+02:30', Time('@T12:15:20.345+02:30')),
+    ('@T12:15:20.345', Time('@T12:15:20.345')),
+    ('@T12:15:20', Time('@T12:15:20')),
+    ('@T12:15', Time('@T12:15')),
+    ('@T12', Time('@T12')),
+    ('@2024-01-01T12:15:20.345+02:30', DateTime('@2024-01-01T12:15:20.345+02:30')),
+    ('@2024-01-01T12:15:20.345', DateTime('@2024-01-01T12:15:20.345')),
+    ('@2024-01-01T12:15', DateTime('@2024-01-01T12:15')),
+    ('@2024-01-01T12', DateTime('@2024-01-01T12')),
+    # ----------------------------------
+    # Invocations
+    # ----------------------------------
     ("parent.child", Invocation(Element('parent'), Element("child"))),   
     ("(parent.child)", Invocation(Element('parent'), Element("child"))),    
     ("parent.child[1]", Invocation(Invocation(Element('parent'), Element("child")), Index(1))),    
-    ("parent.where(child='string')", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq, 'string')))),
-    ("parent.where(child=1234)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq,1234)))),
-    ("parent.where(child>@2024)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.gt, '2024')))),
-    ("parent.where(child=@2024-12-01)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq ,'2024-12-01')))),
-    ("parent.where(child=@T12:05)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq, '12:05')))),
-    ("parent.where(child=@T12:05)", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq,'12:05')))),
+    ("parent.where(child = 'string')", Invocation(Element('parent'), Where(Equals(Element('child'), 'string')))),
+    ("parent.where(child = 1234)", Invocation(Element('parent'), Where(Equals(Element('child'), 1234)))),
+    ("parent.where(child > @2024)", Invocation(Element('parent'), Where(GreaterThan(Element('child'), Date('@2024'))))),
+    ("parent.where(child = @2024-12-01)", Invocation(Element('parent'), Where(Equals(Element('child'), Date('@2024-12-01'))))),
+    ("parent.where(child = @T12:05)", Invocation(Element('parent'), Where(Equals(Element('child'), Time('@T12:05'))))),
+    ("parent.where(child = @T12:05)", Invocation(Element('parent'), Where(Equals(Element('child'), Time('@T12:05'))))),
     ("parent.extension('http://domain.org/extension')", Invocation(Element('parent'), Extension("http://domain.org/extension"))),
     ("parent.value[x]", Invocation(Element('parent'), TypeChoice('value'))),
     # ----------------------------------
@@ -48,7 +77,7 @@ parser_test_cases = (
     ("parent.empty()", Invocation(Element('parent'), Empty())),
     ("parent.exists()", Invocation(Element('parent'), Exists())),
     ("parent.all(parent.children)", Invocation(Element('parent'), All(Invocation(Element('parent'), Element('children'))))),
-    ("parent.all($this = 'parent')", Invocation(Element('parent'), All(Operation(This(), operator.eq, 'parent')))),
+    ("parent.all($this = 'parent')", Invocation(Element('parent'), All(Equals(This(), 'parent')))),
     ("parent.allTrue()", Invocation(Element('parent'), AllTrue())),
     ("parent.anyTrue()", Invocation(Element('parent'), AnyTrue())),
     ("parent.allFalse()", Invocation(Element('parent'), AllFalse())),
@@ -61,7 +90,7 @@ parser_test_cases = (
     # ----------------------------------
     # Filtering & Projection functions
     # ----------------------------------
-    ("parent.where(child='name')", Invocation(Element('parent'), Where(Operation(Element('child'), operator.eq, 'name')))),
+    ("parent.where(child='name')", Invocation(Element('parent'), Where(Equals(Element('child'), 'name')))),
     ("parent.select($this.child)", Invocation(Element('parent'), Select(Invocation(This(), Element('child'))))),
     ("parent.repeat($this.child)", Invocation(Element('parent'), Repeat(Invocation(This(), Element('child'))))),
     # ----------------------------------
@@ -105,27 +134,42 @@ parser_test_cases = (
     ("parent.length()", Invocation(Element('parent'), Length())),  
     ("parent.toChars()", Invocation(Element('parent'), ToChars())),  
     # ----------------------------------
-    # Operators
+    # Boolean Operators
     # ----------------------------------
     ("parent.child and mother.child", And(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
     ("parent.child or mother.child", Or(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
     ("parent.child xor mother.child", Xor(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
     ("parent.child implies mother.child", Implies(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
     ("parent.not()", Invocation(Element('parent'), Not())),  
-    ("parent.child = mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.eq, Invocation(Element('mother'), Element('child')))),  
-    ("parent.child != mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.ne, Invocation(Element('mother'), Element('child')))),  
-    ("parent.child >= mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.ge, Invocation(Element('mother'), Element('child')))),  
-    ("parent.child <= mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.le, Invocation(Element('mother'), Element('child')))),  
-    ("parent.child > mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.gt, Invocation(Element('mother'), Element('child')))),  
-    ("parent.child < mother.child", Operation(Invocation(Element('parent'), Element('child')), operator.lt, Invocation(Element('mother'), Element('child')))),  
+    # ----------------------------------
+    # Equality Operators
+    # ----------------------------------
+    ("parent.child = mother.child", Equals(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child != mother.child", NotEquals(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child ~ mother.child", Equivalent(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child !~ mother.child", NotEquivalent(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    # ----------------------------------
+    # Comparison Operators
+    # ----------------------------------
+    ("parent.child >= mother.child", GreaterEqualThan(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child <= mother.child", LessEqualThan(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child > mother.child", GreaterThan(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child < mother.child", LessThan(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    # ----------------------------------
+    # Collection Operators
+    # ----------------------------------
+    ("parent.child | mother.child", collection.Union(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child in mother.child", collection.In(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("parent.child contains mother.child", collection.Contains(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
     # ----------------------------------
     # Precedence
     # ----------------------------------
-    ("parent.child and mother.child implies child.brother", Implies(And(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child'))), Invocation(Element('child'), Element('brother')))),  
-    ("parent.child implies child = brother", Implies(Invocation(Element('parent'), Element('child')), Operation(Element('child'), operator.eq, Element('brother')))),  
-    ("parent > mother = child", Operation(Operation(Element('parent'), operator.gt, Element('mother')), operator.eq, Element('child'))),  
-    ("(parent > mother) = child", Operation(Operation(Element('parent'), operator.gt, Element('mother')), operator.eq, Element('child'))),  
-    ("parent > (mother = child)", Operation(Element('parent'), operator.gt, Operation(Element('mother'), operator.eq, Element('child')))),  
+    ("parent and mother implies child", Implies(And(Element('parent'), Element('mother')), Element('child'))),  
+    ("parent and mother and child implies brother", Implies(And(And(Element('parent'), Element('mother')), Element('child')), Element('brother'))),  
+    ("parent implies mother = child", Equals(Implies(Element('parent'), Element('mother')), Element('child'))),  
+    ("parent > mother = child", Equals(GreaterThan(Element('parent'), Element('mother')), Element('child'))),  
+    ("(parent > mother) = child", Equals(GreaterThan(Element('parent'), Element('mother')), Element('child'))),  
+    ("parent > (mother = child)", GreaterThan(Element('parent'), Equals(Element('mother'), Element('child')))),  
 )   
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(string, expected_object):

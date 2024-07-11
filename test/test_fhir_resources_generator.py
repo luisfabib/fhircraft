@@ -32,7 +32,6 @@ def test_construct_core_resource(resource_label, filename):
         # Generate source code for Pydantic FHIR model
         resource = construct_resource_model(canonical_url=f'https://hl7.org/fhir/R4B/{resource_label}.profile.json')
         source_code = generate_resource_model_code(resource)
-        print(source_code)
         # Store source code in a file        
         temp_file_name = os.path.join(d, 'temp_test.py')    
         with open(temp_file_name, "w") as test_file:

@@ -13,7 +13,6 @@ from unittest import TestCase
 from fhircraft.fhir.resources.factory import construct_resource_model, clear_chache
 clear_chache()
 Observation = construct_resource_model(f'https://hl7.org/fhir/R4B/observation.profile.json')
-print(Observation.model_fields.get('component'))
 ObservationComponent = get_fhir_model_from_field(Observation.model_fields.get('component'))
 
 

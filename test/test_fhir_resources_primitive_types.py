@@ -83,7 +83,5 @@ def test_fhir_primitive_type_serialization(fieldType, inputValue, serializedValu
     fhir_type = getattr(fhir_types, fieldType)        
     testModel = create_model('testModel', field=(fhir_type, Field()))
     instance = testModel(field = inputValue)
-    
-    print(type(instance.field))
     assert json.loads(instance.model_dump_json()) == {"field":serializedValue}
     

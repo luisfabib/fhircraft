@@ -9,7 +9,7 @@ from fhircraft.utils import ensure_list
 from typing import List, Any, Optional
 
 def _evaluate_boolean_expressions(left, right, collection, create):
-    left_collection = left.evaluate(collection, create=create)
+    left_collection = left.evaluate(collection, create=create) if isinstance(left, FHIRPath) else ensure_list(left)
     if isinstance(left_collection, bool):
         left_boolean = left_collection
     else:
@@ -17,7 +17,7 @@ def _evaluate_boolean_expressions(left, right, collection, create):
             left_boolean = bool(left_collection)
         else:
             left_boolean = None
-    right_collection = right.evaluate(collection, create=create)
+    right_collection = right.evaluate(collection, create=create) if isinstance(right, FHIRPath) else ensure_list(right)
     if isinstance(right_collection, bool):
         right_boolean = right_collection
     else:
