@@ -54,7 +54,7 @@ class FhirPathParser:
         except:
             module_name = __name__
 
-        start_symbol = 'expression'
+        start_symbol = 'full_expression'
         parsing_table_module = '_'.join([module_name, start_symbol, 'parsetab'])
 
         # Generate the parse table
@@ -85,24 +85,29 @@ class FhirPathParser:
         return self.parser.parse(lexer = IteratorToTokenStream(token_iterator))
 
     # ===================== PLY Parser specification =====================
-
     precedence = [
-        ('right', '.'),
-        ('nonassoc', '[', ']'),
-        ('nonassoc', '+', '-'),
-        ('nonassoc', '*', '/', 'MATH_OPERATOR'),
-        ('nonassoc', 'TYPES_OPERATOR'),
-        ('nonassoc', '|'),
-        ('nonassoc', '>', '<', '='),
-        ('nonassoc', '~', '!'),
-        ('nonassoc', 'BOOLEAN_OPERATOR'),
+        ('left', '.'),
+        ('left', '[', ']'),
+        ('left', '+', '-'),
+        ('left', '*', '/', 'MATH_OPERATOR'),
+        ('left', 'TYPES_OPERATOR'),
+        ('left', '|'),
+        ('left', '>', '<', '='),
+        ('left', '~', '!'),
+        ('left', 'BOOLEAN_OPERATOR'),
     ]
 
     def p_error(self, t):
         if t is None:
             raise FhirPathParserError(f'FHIRPath parser error near the end of string "{self.string}"!')
         raise FhirPathParserError(f'FHIRPath parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col)}')
-           
+
+
+    def p_full_expression(self, p):
+        """ full_expression : expression
+                            | operation """
+        p[0] = p[1]
+
     def p_term_expression(self, p):
         "expression : term "
         p[0] = p[1]
@@ -115,9 +120,18 @@ class FhirPathParser:
         "expression : expression '[' expression ']'"
         p[0] = Invocation(p[1], subsetting.Index(p[3]))
         
-    def p_operator_expression(self, p):
-        """expression : expression operator expression """
+
+    def p_operation(self, p):
+        """operation : expression operator expression """
         p[0] = p[2](p[1], p[3])
+
+    def p_chained_operation(self, p):
+        """operation : operation operator expression """
+        p[0] = p[2](p[1], p[3])        
+
+    def p_parenthesized_operation(self, p):
+        "term : '(' operation ')'"
+        p[0] = p[2]
 
     def p_parenthesized_term(self, p):
         "term : '(' expression ')'"
@@ -138,8 +152,7 @@ class FhirPathParser:
         p[0] = p[1]
 
     def p_invocation(self, p):
-        """ invocation : identifier 
-                       | element
+        """ invocation : element 
                        | function 
                        | contextual """
         p[0] = p[1]
@@ -485,6 +498,7 @@ class FhirPathParser:
 
     def p_function_arguments(self, p):
         """arguments : expression
+                     | operation
                      | empty """
         p[0] = [p[1]]
 
