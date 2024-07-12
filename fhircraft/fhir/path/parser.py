@@ -54,7 +54,7 @@ class FhirPathParser:
         except:
             module_name = __name__
 
-        start_symbol = 'full_expression'
+        start_symbol = 'expression'
         parsing_table_module = '_'.join([module_name, start_symbol, 'parsetab'])
 
         # Generate the parse table
@@ -88,14 +88,18 @@ class FhirPathParser:
     precedence = [
         ('left', '.'),
         ('left', '[', ']'),
-        ('left', '+', '-'),
-        ('left', '*', '/', 'MATH_OPERATOR'),
-        ('left', 'TYPES_OPERATOR'),
+        ('left', '+', '-', '&'),
+        ('left', '*', '/', 'DIV', 'MOD'),
+        ('left', 'IS', 'AS'),
         ('left', '|'),
-        ('left', '>', '<', '='),
-        ('left', '~', '!'),
-        ('left', 'BOOLEAN_OPERATOR'),
+        ('left', 'INEQUALITY_OPERATOR'),
+        ('left', 'EQUALITY_OPERATOR'),
+        ('left', 'IN', 'CONTAINS'),
+        ('left', 'AND'),
+        ('left', 'OR', 'XOR'),
+        ('left', 'IMPLIES'),
     ]
+    precedence.reverse()
 
     def p_error(self, t):
         if t is None:
@@ -103,13 +107,8 @@ class FhirPathParser:
         raise FhirPathParserError(f'FHIRPath parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col)}')
 
 
-    def p_full_expression(self, p):
-        """ full_expression : expression
-                            | operation """
-        p[0] = p[1]
-
     def p_term_expression(self, p):
-        "expression : term "
+        """expression : term """
         p[0] = p[1]
 
     def p_invocation_expression(self, p):
@@ -120,47 +119,130 @@ class FhirPathParser:
         "expression : expression '[' expression ']'"
         p[0] = Invocation(p[1], subsetting.Index(p[3]))
         
+    def p_multiplicative_operation(self, p):
+        """expression : expression '*' expression
+                      | expression '/' expression  
+                      | expression DIV expression  
+                      | expression MOD expression """
+        op = p[2]
+        if op == '*':
+            raise NotImplementedError()
+        elif op == '/':
+            raise NotImplementedError()
+        elif op == 'div':
+            raise NotImplementedError()
+        elif op == 'mod':
+            raise NotImplementedError()        
 
-    def p_operation(self, p):
-        """operation : expression operator expression """
-        p[0] = p[2](p[1], p[3])
 
-    def p_chained_operation(self, p):
-        """operation : operation operator expression """
-        p[0] = p[2](p[1], p[3])        
+    def p_additive_operation(self, p):
+        """expression : expression '+' expression
+                      | expression '-' expression  
+                      | expression '&' expression """
+        op = p[2]
+        if op == '+':
+            raise NotImplementedError()
+        elif op == '-':
+            raise NotImplementedError()
+        elif op == '&':
+            raise NotImplementedError()        
 
-    def p_parenthesized_operation(self, p):
-        "term : '(' operation ')'"
+    def p_type_operation(self, p):
+        """expression : expression IS expression
+                     | expression AS expression  """
+        op = p[2]        
+        if op == 'is':
+            raise NotImplementedError()
+        elif op == 'as':
+            raise NotImplementedError()
+
+    def p_union_operation(self, p):
+        """expression : expression '|' expression """
+        p[0] = collection.Union(p[1], p[3])
+        
+    def p_inequality_operation(self, p):
+        """expression : expression INEQUALITY_OPERATOR expression """
+        op = p[2]
+        if op == '>':
+            p[0] = comparison.GreaterThan(p[1], p[3])
+        elif op == '>=':
+            p[0] = comparison.GreaterEqualThan(p[1], p[3])
+        elif op == '<':
+            p[0] = comparison.LessThan(p[1], p[3])
+        elif op == '<=':
+            p[0] = comparison.LessEqualThan(p[1], p[3])
+
+    def p_equality_operation(self, p):
+        """expression : expression EQUALITY_OPERATOR expression """
+        op = p[2]
+        if op == '=':
+            p[0] = equality.Equals(p[1], p[3])
+        elif op == '~':
+            p[0] = equality.Equivalent(p[1], p[3])
+        elif op == '!=':
+            p[0] = equality.NotEquals(p[1], p[3])
+        elif op == '!~':
+            p[0] = equality.NotEquivalent(p[1], p[3])
+
+    def p_membership_operation(self, p):
+        """expression : expression IN expression
+                      | expression CONTAINS expression  """
+        op = p[2]
+        if op == 'in':
+            p[0] = collection.In(p[1], p[3])
+        elif op == 'contains':
+            p[0] = collection.Contains(p[1], p[3])
+
+    def p_and_operation(self, p):
+        """expression : expression AND expression """
+        p[0] = boolean.And(p[1], p[3])
+
+    def p_or_operation(self, p):
+        """expression : expression OR expression
+                      | expression XOR expression  """
+        op = p[2]
+        if op == 'or':
+            p[0] = boolean.Or(p[1], p[3])
+        elif op == 'xor':
+            p[0] = boolean.Xor(p[1], p[3])
+
+    def p_implies_operation(self, p):
+        """expression : expression IMPLIES expression """
+        p[0] = boolean.Implies(p[1], p[3])    
+
+
+
+    def p_term(self, p):
+        """term : invocation
+                | literal  
+                | constant 
+                | parenthesized_expression """
+        p[0] = p[1]
+
+    def p_parenthesized_expression(self, p):
+        """parenthesized_expression : '(' expression ')' """
         p[0] = p[2]
 
-    def p_parenthesized_term(self, p):
-        "term : '(' expression ')'"
-        p[0] = p[2]
+    def p_invocation(self, p):
+        """invocation : element 
+                      | root
+                      | type_choice
+                      | function 
+                      | contextual """
+        p[0] = p[1]
 
-    def p_root_expression(self, p):
-        "expression : ROOT_NODE"
+
+    def p_root(self, p):
+        """ root : ROOT_NODE """
         p[0] = Root()
         
     def p_element(self, p):
-        """ element : identifier """
+        """element : identifier """
         p[0] = Element(p[1])
 
-    def p_term(self, p):
-        """ term : invocation
-                 | literal  
-                 | constant """
-        p[0] = p[1]
-
-    def p_invocation(self, p):
-        """ invocation : element 
-                       | function 
-                       | contextual """
-        p[0] = p[1]
-
     def p_typechoice_invocation(self, p):
-        "invocation : CHOICE_ELEMENT"
+        "type_choice : CHOICE_ELEMENT"
         p[0] = additional.TypeChoice(p[1])
-
 
     def p_constant(self, p):
         """constant : ENVIRONMENTAL_VARIABLE """
@@ -397,108 +479,15 @@ class FhirPathParser:
 
     def p_function_name(self, p):
         """ function_name : identifier 
-                          | COLLECTION_OPERATOR
+                          | CONTAINS
+                          | IN
+                          | AS
+                          | IS
                           """
         p[0] = p[1] 
 
-    def p_operator(self, p):
-        """operator : BOOLEAN_OPERATOR
-                    | TYPES_OPERATOR
-                    | COLLECTION_OPERATOR
-                    | MATH_OPERATOR
-                    | '*' 
-                    | '/' 
-                    | '+' 
-                    | '-'
-                    | '|' 
-                    | '&' 
-                    | '=' 
-                    | '~' 
-                    | '!' '=' 
-                    | '!' '~' 
-                    | '>' 
-                    | '<' 
-                    | '<' '=' 
-                    | '>' '=' """
-        op = ''.join(p[1:])
-            
-        # -------------------------------------------------------------------------------
-        # Equality operators
-        # -------------------------------------------------------------------------------   
-        if op == '=':
-            p[0] = equality.Equals
-        elif op == '~':
-            p[0] = equality.Equivalent
-        elif op == '!=':
-            p[0] = equality.NotEquals
-        elif op == '!~':
-            p[0] = equality.NotEquivalent
-        # -------------------------------------------------------------------------------
-        # Comparison operators
-        # -------------------------------------------------------------------------------  
-        elif op == '>':
-            p[0] = comparison.GreaterThan
-        elif op == '>=':
-            p[0] = comparison.GreaterEqualThan
-        elif op == '<':
-            p[0] = comparison.LessThan
-        elif op == '<=':
-            p[0] = comparison.LessEqualThan   
-        # -------------------------------------------------------------------------------
-        # Types operators
-        # -------------------------------------------------------------------------------  
-        elif op == 'is':
-            raise NotImplementedError()
-        elif op == 'as':
-            raise NotImplementedError()
-        # -------------------------------------------------------------------------------
-        # Collections operators
-        # -------------------------------------------------------------------------------  
-        elif op == '|':
-            p[0] = collection.Union
-        elif op == 'in':
-            p[0] = collection.In
-        elif op == 'contains':
-            p[0] = collection.Contains
-        # -------------------------------------------------------------------------------
-        # Boolean operators
-        # -------------------------------------------------------------------------------  
-        elif op == 'and':
-            p[0] = boolean.And
-        elif op == 'or':
-            p[0] = boolean.Or
-        elif op == 'xor':
-            p[0] = boolean.Xor
-        elif op == 'implies':
-            p[0] = boolean.Implies
-        # -------------------------------------------------------------------------------
-        # Math operators
-        # ------------------------------------------------------------------------------- 
-        elif op == '+':
-            raise NotImplementedError()
-        elif op == '-':
-            raise NotImplementedError()
-        elif op == '*':
-            raise NotImplementedError()
-        elif op == '/':
-            raise NotImplementedError()
-        elif op == 'div':
-            raise NotImplementedError()
-        elif op == 'mod':
-            raise NotImplementedError()
-        # -------------------------------------------------------------------------------
-        # String operators
-        # ------------------------------------------------------------------------------- 
-        # Types Operators
-        elif op == '&':
-            raise NotImplementedError()
-        else:
-            raise NotImplementedError(f'Operator "{op}" not implemented')
-    
-
     def p_function_arguments(self, p):
         """arguments : expression
-                     | operation
                      | empty """
         p[0] = [p[1]]
 
@@ -558,6 +547,8 @@ class FhirPathParser:
 
 
 class IteratorToTokenStream:
+
+
     def __init__(self, iterator):
         self.iterator = iterator
 

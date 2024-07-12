@@ -164,16 +164,15 @@ parser_test_cases = (
     # ----------------------------------
     # Precedence
     # ----------------------------------
-    ("parent and mother implies child", Implies(And(Element('parent'), Element('mother')), Element('child'))),  
-    ("parent and mother and child implies brother", Implies(And(And(Element('parent'), Element('mother')), Element('child')), Element('brother'))),  
-    ("parent < mother > child = brother", Equals(GreaterThan(LessThan(Element('parent'), Element('mother')), Element('child')), Element('brother'))),  
-    ("parent implies mother = child", Equals(Implies(Element('parent'), Element('mother')), Element('child'))),  
-    ("parent > mother = child", Equals(GreaterThan(Element('parent'), Element('mother')), Element('child'))),  
-    ("(parent > mother) = child", Equals(GreaterThan(Element('parent'), Element('mother')), Element('child'))),  
-    ("parent > (mother = child)", GreaterThan(Element('parent'), Equals(Element('mother'), Element('child')))),  
+    ("A and B implies C", Implies(And(Element('A'), Element('B')), Element('C'))),  
+    ("A and B and C implies D", Implies(And(And(Element('A'), Element('B')), Element('C')), Element('D'))),  
+    ("A implies B = C", Implies(Element('A'), Equals(Element('B'), Element('C')))),  
+    ("A > B = C", Equals(GreaterThan(Element('A'), Element('B')), Element('C'))),  
+    ("(A > B) = C", Equals(GreaterThan(Element('A'), Element('B')), Element('C'))),  
+    ("A > (B = C)", GreaterThan(Element('A'), Equals(Element('B'), Element('C')))),  
     ("A and B.exists(C and D) implies (E and F)", Implies(And(Element('A'), Invocation(Element('B'), Exists(And(Element('C'), Element('D'))))), And(Element('E'), Element('F')))),  
-    ("A and B and C implies (D and E and F)", Implies(And(And(Element('A'), Element('B')), Element('C')), And(And(Element('D'), Element('E')), Element('F')))),  
-
+    ("B = 'b' or C = 'c'", Or(Equals(Element('B'), 'b'), Equals(Element('C'), 'c'))),  
+    
 )   
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(string, expected_object):

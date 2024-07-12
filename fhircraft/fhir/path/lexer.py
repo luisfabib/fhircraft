@@ -46,28 +46,27 @@ class FhirPathLexer:
     # Symbols provide structure to the language and allow symbolic invocation of common 
     # operators such as addition. FHIRPath defines the following symbols:
     literals = [
-        '*', '+', '-', ',', '.', '[', ']', '(', ')', ',', '~',
-        ':', '|', '&', '=', '!', '>', '<', '{', '}', '/'
+        '.', ',', '[', ']', '(', ')', '{', '}', '+', '-', '*', '|', '/', '&'
     ]
 
     reserved_words = { 
         
-        # Type operators (http://hl7.org/fhirpath/N1/#boolean-logic)
+        # operators (http://hl7.org/fhirpath/N1/#operator-precedence)
         # -------------------------------------------------------------------------------
-        **{operator: 'TYPES_OPERATOR' for operator in ['is','as']},  
-        
-        # Boolean logic (http://hl7.org/fhirpath/N1/#boolean-logic)
-        # -------------------------------------------------------------------------------
-        **{operator: 'BOOLEAN_OPERATOR' for operator in ['and','or','xor','implies']},  
-        
-        # Collection operators (https://hl7.org/fhirpath/N1/#collections-2)
-        # -------------------------------------------------------------------------------
-        **{operator: 'COLLECTION_OPERATOR' for operator in ['|','in','contains']},  
-
-        # Math operators (http://hl7.org/fhirpath/N1/#math)
-        # -------------------------------------------------------------------------------
-        **{operator: 'MATH_OPERATOR' for operator in ['mod','div']},  
-
+        **{
+            'div': 'DIV', 
+            'mod': 'MOD',
+            'is': 'IS',
+            'as': 'AS',
+            'in': 'IN',
+            'contains' : 'CONTAINS',
+            'and': 'AND',
+            'xor': 'XOR',
+            'or': 'OR',
+            'implies': 'IMPLIES',
+        },   
+        **{operator: 'INEQUALITY_OPERATOR' for operator in ['>','<','>=', '<=']},
+        **{operator: 'EQUALITY_OPERATOR' for operator in ['=','~','!=', '!~']},
         # Boolean (http://hl7.org/fhirpath/N1/#boolean)
         # -------------------------------------------------------------------------------
         **{operator: 'BOOLEAN' for operator in ['true','false']},  
@@ -169,6 +168,13 @@ class FhirPathLexer:
         r'\$(\w*)?'
         return t
     
+    def t_INEQUALITY_OPERATOR(self, t):
+        r'>=|<=|>|<'
+        return t
+    
+    def t_EQUALITY_OPERATOR(self, t):
+        r'=|!=|~|!~'
+        return t
 
     def t_DATETIME(self, t):
         # DateTime (http://hl7.org/fhirpath/N1/#datetime)
