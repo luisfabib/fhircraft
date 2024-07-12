@@ -236,3 +236,23 @@ def test_tochars_returns_collection_of_characters():
     collection = [FHIRPathCollectionItem(value="ABC")]
     result = ToChars().evaluate(collection)
     assert [item.value for item in result] == ['A', 'B', 'C']
+
+
+#----------------
+# Concatenation
+#----------------
+
+def test_concatenation_returns_empty_string_if_empty():
+    collection = []
+    result = Concatenation([],[]).evaluate(collection)
+    assert result == ''
+
+def test_concatenation_returns_concatenated_string():
+    collection = []
+    result = Concatenation('A','B').evaluate(collection)
+    assert  result == 'AB'
+
+def test_concatenation_treats_empty_as_empty_string():
+    collection = []
+    result = Concatenation('A',[]).evaluate(collection)
+    assert  result == 'A'

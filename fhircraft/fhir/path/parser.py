@@ -8,6 +8,7 @@ import fhircraft.fhir.path.engine.filtering as filtering
 import fhircraft.fhir.path.engine.subsetting as subsetting
 import fhircraft.fhir.path.engine.combining as combining
 import fhircraft.fhir.path.engine.boolean as boolean
+import fhircraft.fhir.path.engine.math as math
 import fhircraft.fhir.path.engine.navigation as navigation
 import fhircraft.fhir.path.engine.strings as strings
 import fhircraft.fhir.path.engine.additional as additional
@@ -126,13 +127,13 @@ class FhirPathParser:
                       | expression MOD expression """
         op = p[2]
         if op == '*':
-            raise NotImplementedError()
+            p[0] = math.Multiplication(p[1], p[3])
         elif op == '/':
-            raise NotImplementedError()
+            p[0] = math.Division(p[1], p[3])
         elif op == 'div':
-            raise NotImplementedError()
+            p[0] = math.Div(p[1], p[3])
         elif op == 'mod':
-            raise NotImplementedError()        
+            p[0] = math.Mod(p[1], p[3])  
 
 
     def p_additive_operation(self, p):
@@ -141,11 +142,11 @@ class FhirPathParser:
                       | expression '&' expression """
         op = p[2]
         if op == '+':
-            raise NotImplementedError()
+            p[0] = math.Addition(p[1], p[3])
         elif op == '-':
-            raise NotImplementedError()
+            p[0] = math.Subtraction(p[1], p[3])
         elif op == '&':
-            raise NotImplementedError()        
+            p[0] = strings.Concatenation(p[1], p[3])  
 
     def p_type_operation(self, p):
         """expression : expression IS expression

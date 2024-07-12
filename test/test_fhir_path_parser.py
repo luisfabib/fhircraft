@@ -3,6 +3,7 @@ import pytest
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.existence import *
 from fhircraft.fhir.path.engine.literals import *
+from fhircraft.fhir.path.engine.math import *
 from fhircraft.fhir.path.engine.filtering import *
 from fhircraft.fhir.path.engine.subsetting import *
 from fhircraft.fhir.path.engine.strings import *
@@ -136,31 +137,40 @@ parser_test_cases = (
     # ----------------------------------
     # Boolean Operators
     # ----------------------------------
-    ("parent.child and mother.child", And(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child or mother.child", Or(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child xor mother.child", Xor(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child implies mother.child", Implies(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("A and B", And(Element('A'), Element('B'))),  
+    ("A or B", Or(Element('A'), Element('B'))),  
+    ("A xor B", Xor(Element('A'), Element('B'))),  
+    ("A implies B", Implies(Element('A'), Element('B'))),  
     ("parent.not()", Invocation(Element('parent'), Not())),  
     # ----------------------------------
     # Equality Operators
     # ----------------------------------
-    ("parent.child = mother.child", Equals(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child != mother.child", NotEquals(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child ~ mother.child", Equivalent(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child !~ mother.child", NotEquivalent(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("A = B", Equals(Element('A'), Element('B'))),  
+    ("A != B", NotEquals(Element('A'), Element('B'))),  
+    ("A ~ B", Equivalent(Element('A'), Element('B'))),  
+    ("A !~ B", NotEquivalent(Element('A'), Element('B'))),  
     # ----------------------------------
     # Comparison Operators
     # ----------------------------------
-    ("parent.child >= mother.child", GreaterEqualThan(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child <= mother.child", LessEqualThan(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child > mother.child", GreaterThan(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child < mother.child", LessThan(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("A >= B", GreaterEqualThan(Element('A'), Element('B'))),  
+    ("A <= B", LessEqualThan(Element('A'), Element('B'))),  
+    ("A > B", GreaterThan(Element('A'), Element('B'))),  
+    ("A < B", LessThan(Element('A'), Element('B'))),  
+    # ----------------------------------
+    # Math Operators
+    # ----------------------------------
+    ("A + B", Addition(Element('A'), Element('B'))),  
+    ("A - B", Subtraction(Element('A'), Element('B'))),  
+    ("A * B", Multiplication(Element('A'), Element('B'))),  
+    ("A / B", Division(Element('A'), Element('B'))),  
+    ("A div B", Div(Element('A'), Element('B'))),  
+    ("A mod B", Mod(Element('A'), Element('B'))),  
     # ----------------------------------
     # Collection Operators
     # ----------------------------------
-    ("parent.child | mother.child", collection.Union(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child in mother.child", collection.In(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
-    ("parent.child contains mother.child", collection.Contains(Invocation(Element('parent'), Element('child')), Invocation(Element('mother'), Element('child')))),  
+    ("A | B", collection.Union(Element('A'), Element('B'))),  
+    ("A in B", collection.In(Element('A'), Element('B'))),  
+    ("A contains B", collection.Contains(Element('A'), Element('B'))),  
     # ----------------------------------
     # Precedence
     # ----------------------------------

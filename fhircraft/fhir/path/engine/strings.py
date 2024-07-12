@@ -7,7 +7,7 @@ To use these functions over a collection with multiple items, one may use filter
     Patient.name.given.select(substring(0))
 """
 
-from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathFunction, FHIRPathError
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathFunction, FHIRPathError, FHIRPath
 from fhircraft.utils import ensure_list
 from typing import List, Any, Optional
 import re 
@@ -420,3 +420,66 @@ class ToChars(StringManipulationFunction):
         if not collection:
             return []
         return [FHIRPathCollectionItem(character, parent=collection[0]) for character in collection[0].value]
+
+
+class Concatenation(FHIRPath):
+    """
+    A representation of the FHIRPath [`&`](https://hl7.org/fhirpath/N1/#and) operator.
+
+    Attributes:
+        left (FHIRPath): Left operand.
+        right (FHIRPath): Right operand.
+    """
+    def __init__(self, left: FHIRPath, right:FHIRPath):
+        self.left = left
+        self.right = right
+        
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
+        """
+        For strings, will concatenate the strings, where an empty operand is taken to be the empty string.
+        This differs from + on two strings, which will result in an empty collection when one of the operands
+        is empty. This operator is specifically included to simplify treating an empty collection as an empty
+        string, a common use case in string manipulation.
+
+
+        Args: 
+            collection (List[FHIRPathCollectionItem])): The input collection.
+        
+        Returns:
+            result (str): Concatenated string
+
+        Raises:
+            FHIRPathError: If either expression evaluates to a non-singleton collection.
+        """
+        create = kwargs.get('create')
+        left_collection = [
+            item.value if isinstance(item, FHIRPathCollectionItem) else item 
+                for item in ensure_list(self.left.evaluate(collection, create))
+        ]  if isinstance(self.left, FHIRPath) else ensure_list(self.left)
+
+        right_collection = [ 
+            item.value if isinstance(item, FHIRPathCollectionItem) else item  
+                for item in ensure_list(self.right.evaluate(collection, create))
+        ] if isinstance(self.right, FHIRPath) else ensure_list(self.right)
+
+        if len(left_collection)>1:
+            raise FHIRPathError(f'FHIRPath operator {self.__str__()} expected a single-item collection for the left expression, instead got a {len(collection)}-items collection.')
+        if len(left_collection)>1:
+            raise FHIRPathError(f'FHIRPath operator {self.__str__()} expected a single-item collection for the right expression, instead got a {len(collection)}-items collection.')
+        
+        left =  left_collection[0] if len(left_collection) > 0 else '' 
+        right =  right_collection[0] if len(right_collection) > 0 else ''
+
+        return f'{left}{right}'
+
+    def __str__(self):
+        return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})'
+    
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and other.left == self.left and other.right == self.right
+
+    def __hash__(self):
+        return hash((self.left, self.right))
