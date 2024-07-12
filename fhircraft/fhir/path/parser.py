@@ -14,6 +14,7 @@ import fhircraft.fhir.path.engine.strings as strings
 import fhircraft.fhir.path.engine.additional as additional
 import fhircraft.fhir.path.engine.conversion as conversion
 import fhircraft.fhir.path.engine.equality as equality
+import fhircraft.fhir.path.engine.types as types
 import fhircraft.fhir.path.engine.comparison as comparison
 import fhircraft.fhir.path.engine.literals as literals
 import fhircraft.fhir.path.engine.collection as collection
@@ -149,14 +150,14 @@ class FhirPathParser:
             p[0] = strings.Concatenation(p[1], p[3])  
 
     def p_type_operation(self, p):
-        """expression : expression IS expression
-                     | expression AS expression  """
+        """expression : expression IS type_specifier
+                     | expression AS type_specifier  """
         op = p[2]        
         if op == 'is':
-            raise NotImplementedError()
+            p[0] = types.Is(p[1], p[3])
         elif op == 'as':
-            raise NotImplementedError()
-
+            p[0] = types.As(p[1], p[3])
+        
     def p_union_operation(self, p):
         """expression : expression '|' expression """
         p[0] = collection.Union(p[1], p[3])
@@ -265,8 +266,15 @@ class FhirPathParser:
         elif p[1] == '$total':
            raise NotImplementedError()
         else:
-            raise FhirPathParserError(f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Invalid contextual operator "{p[1]}".\n{_underline_error_in_fhir_path(self.string, p[1], p.lexpos(1))}')
-                                   
+            raise FhirPathParserError(f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Invalid contextual operator "{p[1]}".\n{_underline_error_in_fhir_path(self.string, p[1], p.lexpos(1))}')                           
+
+    def p_type_specifier(self, p):
+        """type_specifier : identifier """
+        p[0] = p[1]
+
+    def p_type_specifier_context(self, p):
+        """type_specifier : type_specifier '.' identifier """
+        p[0] = f'{p[1]}.{p[3]}'
 
     def p_function(self, p):
         """function : function_name '(' arguments ')' """
@@ -330,7 +338,7 @@ class FhirPathParser:
         elif check(p, 'getValue', nargs=0):
             p[0] = additional.GetValue() 
         elif check(p, 'htmlChecks', nargs=0):
-            raise NotImplementedError()
+            p[0] = additional.HtmlChecks()
         # -------------------------------------------------------------------------------
         # Subsetting
         # -------------------------------------------------------------------------------
@@ -471,9 +479,9 @@ class FhirPathParser:
         # Type functions
         # -------------------------------------------------------------------------------   
         elif check(p, 'is', nargs=1):
-            raise NotImplementedError()     
+            p[0] = types.LegacyIs(*p[3]) 
         elif check(p, 'as', nargs=1):
-            raise NotImplementedError()     
+            p[0] = types.LegacyAs(*p[3])  
         else:
             pos = self.string.find(str(p[1]))
             raise FhirPathParserError(f'FHIRPath parser error at {p.lineno(1)}:{pos}: Invalid function "{p[1]}".\n{_underline_error_in_fhir_path(self.string,p[1], pos)}')

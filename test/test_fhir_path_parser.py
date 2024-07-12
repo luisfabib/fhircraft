@@ -12,6 +12,7 @@ from fhircraft.fhir.path.engine.boolean import *
 from fhircraft.fhir.path.engine.navigation import *
 from fhircraft.fhir.path.engine.combining import *
 from fhircraft.fhir.path.engine.conversion import *
+from fhircraft.fhir.path.engine.types import *
 from fhircraft.fhir.path.engine.equality import *
 from fhircraft.fhir.path.engine.comparison import *
 import fhircraft.fhir.path.engine.collection as collection
@@ -134,6 +135,18 @@ parser_test_cases = (
     ("parent.replaceMatches('^(?:John)','James')", Invocation(Element('parent'), ReplaceMatches('^(?:John)','James'))),  
     ("parent.length()", Invocation(Element('parent'), Length())),  
     ("parent.toChars()", Invocation(Element('parent'), ToChars())),  
+    # ----------------------------------
+    # Types legacy functions
+    # ----------------------------------
+    ("parent.is(String)", Invocation(Element('parent'), LegacyIs('String'))),  
+    ("parent.as(String)", Invocation(Element('parent'), LegacyAs('String'))),  
+    # ----------------------------------
+    # Types Operators
+    # ----------------------------------
+    ("A is String", Is(Element('A'), 'String')),  
+    ("A is System.String", Is(Element('A'), 'System.String')),  
+    ("A as String", As(Element('A'), 'String')),  
+    ("A as System.String", As(Element('A'), 'System.String')),  
     # ----------------------------------
     # Boolean Operators
     # ----------------------------------

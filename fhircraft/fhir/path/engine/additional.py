@@ -167,3 +167,36 @@ class Resolve(FHIRPathFunction):
                 resource = profile.model_validate(resource)
             output_collection.append(resource)
         return output_collection
+    
+
+
+
+class HtmlChecks(FHIRPathFunction):
+    """
+    A representation of the FHIRPath [`htmlChecks()`](https://build.fhir.org/fhirpath.html#functions) function.
+    """
+    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
+        """
+        When invoked on a single xhtml element returns true if the rules around HTML usage are met, and false if they are not.
+        The return value is empty on any other kind of element, or a collection of xhtml elements. 
+
+        Args: 
+            collection (List[FHIRPathCollectionItem])): The input collection.
+        
+        Returns:
+            bool
+
+        Raises:
+            FHIRPathError: If the collection is not a single item.
+        """
+        from fhircraft.fhir.resources.factory import construct_resource_model
+        from fhircraft.fhir.resources.datatypes import get_FHIR_type
+
+        collection = ensure_list(collection)
+        
+        if len(collection)>1:
+            raise FHIRPathError(f'FHIRPath operator {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection.')
+        value = collection[0] 
+        # TODO: Implement HTML validity check
+        return True
+
