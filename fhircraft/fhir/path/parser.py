@@ -2,7 +2,7 @@ import logging
 import os.path
 import ply.yacc
 
-from fhircraft.fhir.path.engine.core import Element, Root, This, Invocation
+from fhircraft.fhir.path.engine.core import Element, Root, Parent, This, Invocation
 import fhircraft.fhir.path.engine.existence as existence
 import fhircraft.fhir.path.engine.filtering as filtering
 import fhircraft.fhir.path.engine.subsetting as subsetting
@@ -17,6 +17,7 @@ import fhircraft.fhir.path.engine.equality as equality
 import fhircraft.fhir.path.engine.types as types
 import fhircraft.fhir.path.engine.comparison as comparison
 import fhircraft.fhir.path.engine.literals as literals
+import fhircraft.fhir.path.engine.utility as utility
 import fhircraft.fhir.path.engine.collection as collection
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.utils import ensure_list
@@ -241,17 +242,19 @@ class FhirPathParser:
     def p_element(self, p):
         """element : identifier """
         p[0] = Element(p[1])
-
+        
     def p_typechoice_invocation(self, p):
         "type_choice : CHOICE_ELEMENT"
         p[0] = additional.TypeChoice(p[1])
 
     def p_constant(self, p):
         """constant : ENVIRONMENTAL_VARIABLE """
-        if p[1] == '%resource':
-            p[0] = Root()
-        elif p[1] == '%context':
+        if p[1] == '%context':
             p[0] = This()
+        elif p[1] == '%resource':
+            p[0] = Parent()
+        elif p[1] == '%rootResource':
+            p[0] = Root()
         else:
             p[0] = p[1]
 
@@ -468,13 +471,13 @@ class FhirPathParser:
         # Utility functions
         # -------------------------------------------------------------------------------   
         elif check(p, 'trace', nargs=[1,2]):
-            raise NotImplementedError()     
+            p[0] = utility.Trace(*p[3]) 
         elif check(p, 'now', nargs=0):
-            raise NotImplementedError()     
+            p[0] = utility.Now() 
         elif check(p, 'timeOfDay', nargs=0):
-            raise NotImplementedError()     
+            p[0] = utility.TimeOfDay() 
         elif check(p, 'today', nargs=0):
-            raise NotImplementedError()     
+            p[0] = utility.Today()  
         # -------------------------------------------------------------------------------
         # Type functions
         # -------------------------------------------------------------------------------   

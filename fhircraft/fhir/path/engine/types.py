@@ -77,7 +77,6 @@ class Is(FHIRTypesOperator):
         """
         # TODO: Implement propert type specifier handling
         value, type = super().evaluate(collection,  *args, **kwargs)
-        print(value, type)
         return isinstance(value, type) if type else []
 
 

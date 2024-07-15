@@ -54,6 +54,7 @@ token_test_cases = (
     ("_parent12", (("_parent12", "IDENTIFIER"),)),
     ("_12345", (("_12345", "IDENTIFIER"),)),
     ("`parent`", (("parent", "IDENTIFIER"),)),
+    ("`div`", (("div", "IDENTIFIER"),)),
     ("`parent name`", (("parent name", "IDENTIFIER"),)),
     ("parent.child", (("parent", "IDENTIFIER"), (".", "."), ("child", "IDENTIFIER"))),
     ("parent.*", (("parent", "IDENTIFIER"), (".", "."), ("*", "*"))),
@@ -112,6 +113,7 @@ invalid_token_test_cases = (
     "?",    
     "?",
     '"double quote string"',
+    '`non closed back tick"',
     "$.foo.bar.#",
 )
 

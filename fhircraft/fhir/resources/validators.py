@@ -10,6 +10,9 @@ def _validate_FHIR_element_constraint(value, expression, human, key, severity):
     for item in ensure_list(value):
         try:
             valid = fhirpath.parse(expression).evaluate([FHIRPathCollectionItem(value=item)], create=False)
+            print(valid, '<-', expression, value)
+            if valid == []:
+                valid = True
             error_message =  f'{human}. [{key}] -> "{expression}"'
             if severity == 'warning' and not valid:
                 warnings.warn(error_message)

@@ -95,3 +95,17 @@ def test_implies_returns_correct_logic_boolean(left, right, expected):
     result = Implies(Invocation(Element('left'),GetValue()), Invocation(Element('right'), GetValue())).evaluate(collection)
     assert result == expected
 
+
+#-------------
+# Not
+#-------------
+
+not_boolean_logic_cases = (
+    (True, False),
+    (False, True),
+)
+@pytest.mark.parametrize("value, expected", not_boolean_logic_cases)
+def test_not_returns_correct_logic_boolean(value, expected):    
+    result = Not().evaluate(value)
+    assert result == expected
+

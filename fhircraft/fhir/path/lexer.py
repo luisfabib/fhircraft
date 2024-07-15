@@ -244,8 +244,11 @@ class FhirPathLexer:
         #   any number of alpha-numeric characters or underscores
         # - A delimited identifier is any sequence of characters enclosed in backticks ( ` ):
         r'(?:\`[a-zA-Z][a-zA-Z0-9\-][^\`]*\`)|(?:(?:_|[a-zA-Z])[a-zA-Z0-9_]*)'
-        t.value = t.value.strip('`')
-        t.type = self.reserved_words.get(t.value, 'IDENTIFIER')
+        if t.value.startswith('`') and t.value.endswith('`'):        
+            t.value = t.value.strip('`') 
+            t.type = 'IDENTIFIER'
+        else:
+            t.type = self.reserved_words.get(t.value, 'IDENTIFIER')
         return t
 
     def t_error_invalid_function(self, t):

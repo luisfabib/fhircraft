@@ -6,7 +6,7 @@ The operators then use three-valued logic to propagate empty operands.
 
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPath, FHIRPathFunction
 from fhircraft.utils import ensure_list
-from typing import List, Any, Optional
+from typing import List, Any, Optional, Union
 
 def _evaluate_boolean_expressions(left, right, collection, create):
     left_collection = left.evaluate(collection, create=create) if isinstance(left, FHIRPath) else ensure_list(left)
@@ -252,7 +252,7 @@ class Not(FHIRPathFunction):
     """
     A representation of the FHIRPath [`not`](https://hl7.org/fhirpath/N1/#not) boolean logic function.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
+    def evaluate(self, collection: Union[List[FHIRPathCollectionItem], bool], *args, **kwargs) -> bool:
         """
         Returns `True` if the input collection evaluates to `False`, and `False` if it evaluates to `True`. Otherwise, the result is empty (`[]`):
 
@@ -263,10 +263,10 @@ class Not(FHIRPathFunction):
         Returns:
             bool
         """
-        collection = ensure_list(collection)
         if isinstance(collection, bool):
             boolean = collection
         else:
+            collection = ensure_list(collection)
             if len(collection) > 0:
                 boolean = bool(collection)
             else:

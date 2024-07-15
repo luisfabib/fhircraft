@@ -405,8 +405,40 @@ class Root(FHIRPath):
         return isinstance(other, Root)
 
     def __hash__(self):
-        return hash('$')
+        return hash('$rootResource')
 
+
+
+class Parent(FHIRPath):
+    """ 
+    A class representing the parent of a FHIRPath
+    """
+    def evaluate(self, collection, *args, **kwargs):
+        """
+        Evaluate the collection of parent resources in the input collection.
+
+        Args:
+            collection: The collection of items to be evaluated.
+
+        Returns:
+            list: A list of FHIRPathCollectionItem instances after evaluation.
+        """        
+        collection = ensure_list(collection)
+        return [
+            item.parent for item in collection
+        ]
+
+    def __str__(self):
+        return '$'
+
+    def __repr__(self):
+        return 'Parent()'
+
+    def __eq__(self, other):
+        return isinstance(other, Parent)
+
+    def __hash__(self):
+        return hash('$resource')
 
 class This(FHIRPath):
     """

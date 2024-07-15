@@ -26,7 +26,6 @@ def merge_schemas(schemas):
     merged_schema = {}
     aliases = []
     for schema in schemas:
-        print(aliases)
         fhir_resource = schema.get('x-fhir-resource')
         if fhir_resource and fhir_resource.get('alias'): 
                 aliases.append(fhir_resource.get('alias'))

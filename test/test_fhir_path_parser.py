@@ -13,6 +13,7 @@ from fhircraft.fhir.path.engine.navigation import *
 from fhircraft.fhir.path.engine.combining import *
 from fhircraft.fhir.path.engine.conversion import *
 from fhircraft.fhir.path.engine.types import *
+from fhircraft.fhir.path.engine.utility import *
 from fhircraft.fhir.path.engine.equality import *
 from fhircraft.fhir.path.engine.comparison import *
 import fhircraft.fhir.path.engine.collection as collection
@@ -24,13 +25,15 @@ import operator
 parser_test_cases = (
     ("foo", Element("foo")),
     ("`foo`", Element("foo")),
+    ("`div`", Element("div")),
     ("foo[1]", Invocation(Element("foo"), Index(1))),
     # ----------------------------------
     # Variables/Constants
     # ----------------------------------
     ("$", Root()),
     ("$this", This()),
-    ("%resource", Root()),
+    ("%rootResource", Root()),
+    ("%resource", Parent()),
     ("%context", This()),
     # ----------------------------------
     # Literals
@@ -140,6 +143,13 @@ parser_test_cases = (
     # ----------------------------------
     ("parent.is(String)", Invocation(Element('parent'), LegacyIs('String'))),  
     ("parent.as(String)", Invocation(Element('parent'), LegacyAs('String'))),  
+    # ----------------------------------
+    # Utility functions
+    # ----------------------------------
+    ("A.trace('id', id)", Invocation(Element('A'), Trace('id', Element('id')))),  
+    ("now()", Now()),  
+    ("timeOfDay()", TimeOfDay()),  
+    ("today()", Today()),  
     # ----------------------------------
     # Types Operators
     # ----------------------------------
