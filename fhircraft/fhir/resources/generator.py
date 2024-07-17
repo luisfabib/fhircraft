@@ -88,7 +88,7 @@ def generate_resource_model_code(resources):
     data = [serialize_model(resource, {}) for resource in ensure_list(resources)]
     source_code = template.render(data=data, imports=imports, reload=reload_models)
     for module in imports:
-        module = module.replace('.','\.')
+        module = module.replace('.',r'\.')
         for regex in [fr"(\<class \'{module}\.(\w*)\'\>)", r"(\<class \'(\w*)\'\>)"]:
             for match in re.finditer(regex, source_code):
                 source_code = source_code.replace(match.group(1), match.group(2))
