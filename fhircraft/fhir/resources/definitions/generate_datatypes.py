@@ -6,8 +6,9 @@ from fhircraft.utils import capitalize
 import os
 import json
 
-PATH = 'fhircraft/fhir/resources/definitions'
-DESTINATION = 'fhircraft/fhir/resources/datatypes/R4B'
+VERSION = 'STU3'
+PATH = f'fhircraft/fhir/resources/definitions/{VERSION}'
+DESTINATION = f'fhircraft/fhir/resources/datatypes/{VERSION}'
 
 structure_definitions = []
 with open(os.path.join(PATH,'profiles-types.json'), 'r', encoding='utf-8') as file: 

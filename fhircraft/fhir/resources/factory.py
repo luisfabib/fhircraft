@@ -73,7 +73,7 @@ class ResourceFactory:
                 current.update(element)
         return tree
 
-    def _parse_element_type(self, field_type_name):
+    def _parse_element_type(self, field_type_name, FHIR_release):
         if not field_type_name:
             return None
         field_type_name = field_type_name.replace('http://hl7.org/fhir/StructureDefinition/','')
@@ -81,7 +81,7 @@ class ResourceFactory:
         field_type_name = capitalize(field_type_name)
         field_type = getattr(primitives, field_type_name, None)
         if not field_type:
-            field_type = get_FHIR_type(field_type_name)
+            field_type = get_FHIR_type(field_type_name, FHIR_release)
         if not field_type:
             return field_type_name
         return field_type
@@ -105,7 +105,7 @@ class ResourceFactory:
             )
         )    
 
-    def _compile_profile_constraints(self, elements):
+    def _compile_profile_constraints(self, elements, FHIR_release):
         slicing = []
         constraints = []
         for element in elements: 
@@ -144,7 +144,7 @@ class ResourceFactory:
             pattern_attribute = next((attribute for attribute in element if attribute.startswith('pattern')), None)
             pattern_value = element.get(pattern_attribute)
             if pattern_value is not None:
-                pattern_type = self._parse_element_type(pattern_attribute.replace('pattern',''))
+                pattern_type = self._parse_element_type(pattern_attribute.replace('pattern',''), FHIR_release)
                 if inspect.isclass(pattern_type) and issubclass(pattern_type, BaseModel):
                     constraint.pattern = pattern_type.model_validate(pattern_value)
                 else:
@@ -153,7 +153,7 @@ class ResourceFactory:
             fixed_attribute = next((attribute for attribute in element if attribute.startswith('fixed')), None)
             fixed_value = element.get(fixed_attribute)
             if fixed_value is not None:
-                fixed_type = self._parse_element_type(fixed_attribute.replace('fixed',''))
+                fixed_type = self._parse_element_type(fixed_attribute.replace('fixed',''), FHIR_release)
                 if inspect.isclass(fixed_type) and issubclass(fixed_type, BaseModel):
                     constraint.fixedValue = fixed_type.model_validate(fixed_value)
                 else:
@@ -206,11 +206,11 @@ class ResourceFactory:
         ))
         return validators
 
-    def _compile_complex_element_fields(self, structure, resourceName, base):
+    def _compile_complex_element_fields(self, structure, resourceName, base, FHIR_release):
         fields = {}
         validators = {}
         properties = {}
-        for name, element in structure['children'].items():
+        for name, element in structure.get('children',{}).items():
             if base and name in base.model_fields:
                 continue 
 
@@ -219,7 +219,7 @@ class ResourceFactory:
             max_card = int(element['max']) if element['max'] != '*' else None
 
             # Parse the FHIR types of the element
-            field_types = [self._parse_element_type(field_type['code']) for field_type in element.get('type', [])]
+            field_types = [self._parse_element_type(field_type['code'], FHIR_release) for field_type in element.get('type', [])]
 
             # TODO: Handle more gracefully. 
             # If has no type, skip element
@@ -260,8 +260,8 @@ class ResourceFactory:
                     validators = self._add_element_constraint_validator(name, constraint, base, validators)
             
             # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
-            if field_type is get_FHIR_type('BackboneElement') and element.get('children'):
-                field_subfields, subfield_validators, subfield_properties = self._compile_complex_element_fields(element, capitalize(resourceName + capitalize(name)), field_type)
+            if field_type is get_FHIR_type('BackboneElement', FHIR_release) and element.get('children'):
+                field_subfields, subfield_validators, subfield_properties = self._compile_complex_element_fields(element, capitalize(resourceName + capitalize(name)), field_type, FHIR_release)
                 field_type = create_model(capitalize(resourceName + capitalize(name)), **field_subfields, __base__=field_type, __validators__=subfield_validators)                
                 for attribute, property_getter in properties.items():
                     setattr(field_type, attribute, property(property_getter))            
@@ -269,7 +269,7 @@ class ResourceFactory:
             # Create and add the Pydantic field for the FHIR element
             fields[name] = self._construct_Pydantic_field(field_type, min_card, max_card, description=element.get('short'))
             if hasattr(primitives, str(field_type)):
-                fields[f'{name}_ext'] = self._construct_Pydantic_field(get_FHIR_type('Element'), 0, 1, alias=f'_{name}',description=f'Placeholder element for {name} extensions')
+                fields[f'{name}_ext'] = self._construct_Pydantic_field(get_FHIR_type('Element', FHIR_release), 0, 1, alias=f'_{name}',description=f'Placeholder element for {name} extensions')
         return fields, validators, properties
         
 
@@ -284,26 +284,27 @@ class ResourceFactory:
         elements = structure_definition['snapshot']['element']
         tree = self.build_tree_structure(elements)
 
+        FHIR_release = get_FHIR_release_from_version(structure_definition['fhirVersion'])
         resourceType = structure_definition['type']
         resourceName = structure_definition['name']
         
         structure = tree['children'][resourceType]
         
-        if get_FHIR_type(resourceType):
-            base = get_FHIR_type('Extension')
+        if get_FHIR_type(resourceType, FHIR_release):
+            base = get_FHIR_type('Extension', FHIR_release)
             fields, validators, properties = {}, {}, {}
         else:
-            base = get_FHIR_type('Resource')
-            fields, validators, properties = self._compile_complex_element_fields(structure, resourceName, get_FHIR_type('Resource'))
+            base = get_FHIR_type('Resource', FHIR_release)
+            fields, validators, properties = self._compile_complex_element_fields(structure, resourceName, get_FHIR_type('Resource', FHIR_release), FHIR_release)
         
         for constraint in structure['constraint']:
             validators = self._add_model_constraint_validator(constraint, validators)
         
-        slicing, constraints = self._compile_profile_constraints(elements)
+        slicing, constraints = self._compile_profile_constraints(elements, FHIR_release)
         
         
-        
-        fields['meta'] = (Optional[get_FHIR_type('Meta')], get_FHIR_type('Meta')(profile=[structure_definition['url']], versionId=structure_definition['version']))
+        print(FHIR_release)
+        fields['meta'] = (Optional[get_FHIR_type('Meta', FHIR_release)], get_FHIR_type('Meta', FHIR_release)(profile=[structure_definition['url']], versionId=structure_definition['version']))
         fields['resourceType'] = (Literal[f'{resourceType}'], resourceType)
         fields['profile_slicing'] = (ClassVar[List[SlicingGroup]], slicing)
         fields['canonical_url'] = (ClassVar[List[Constraint]], canonical_url)
@@ -328,6 +329,7 @@ class ResourceFactory:
         elements = structure_definition['snapshot']['element']
         tree = self.build_tree_structure(elements)
 
+        FHIR_release = get_FHIR_release_from_version(structure_definition['fhirVersion'])
         resourceType = structure_definition['type']
         resourceName = structure_definition['name']
         
@@ -337,19 +339,11 @@ class ResourceFactory:
             base = self.profiles.get(base_name)
         else:
             base = BaseModel
-        fields, validators, properties = self._compile_complex_element_fields(structure, resourceName, base)
+        fields, validators, properties = self._compile_complex_element_fields(structure, resourceName, base, FHIR_release)
 
         for constraint in structure.get('constraint',[]):
             validators = self._add_model_constraint_validator(constraint, validators)
         
-        # slicing, constraints = self._compile_profile_constraints(elements)
-        
-        # fields['meta'] = (Optional[complex_types.Meta], complex_types.Meta(profile=[structure_definition['url']], versionId=structure_definition['version']))
-        # fields['resourceType'] = (Literal[f'{resourceType}'], resourceType)
-        # fields['profile_slicing'] = (ClassVar[List[SlicingGroup]], slicing)
-        # fields['canonical_url'] = (ClassVar[List[Constraint]], canonical_url)
-        # fields['profile_constraints'] = (ClassVar[List[Constraint]], constraints)
-
         model = create_model(resourceName, **fields, __base__=base, __validators__=validators)
         model.__doc__ = structure['short']
 
@@ -366,6 +360,21 @@ class ResourceFactory:
 
 
 
+def get_FHIR_release_from_version(version):
+    version = version.split('-')[0]
+    version = tuple([int(digit) for digit in version.split('.')])
+    if version >= (0,4,0) and version <= (1,0,2):
+        return 'DSTU2'
+    elif version >= (1,1,0) and version <= (3,0,2):
+        return 'STU3'
+    elif version >= (3,2,0) and version <= (4,0,1):
+        return 'R4'
+    elif version >= (4,1,0) and version <= (4,3,0):
+        return 'R4B'
+    elif version >= (4,2,0) and version <= (5,0,0):
+        return 'R5'
+    elif version >= (6,0,0):
+        return 'R6'
 
 
 

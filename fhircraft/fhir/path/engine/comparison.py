@@ -16,8 +16,7 @@ class FHIRComparisonOperator(FHIRPath):
         self.right = right
 
     def convert_to_fhirpath_types(self, item):
-        from fhircraft.fhir.resources.datatypes import get_FHIR_type
-        if isinstance(item, get_FHIR_type('Quantity')):
+        if 'Quantity' in type(item).__name__:
             return Quantity(item.value, item.code)
         else:
             return item 

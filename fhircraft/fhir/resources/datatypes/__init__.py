@@ -1,8 +1,8 @@
+from importlib import import_module 
 
-def get_FHIR_type(type_str, version='R4B'):
+def get_FHIR_type(type_str, release='R4B'):
     try:
-        import fhircraft.fhir.resources.datatypes.R4B.complex_types as R4B_types
+        FHIR_types = import_module(f'fhircraft.fhir.resources.datatypes.{release}.complex_types')
     except ModuleNotFoundError:
         return None
-    if version == 'R4B':
-        return getattr(R4B_types, type_str, None)
+    return getattr(FHIR_types, type_str, None)

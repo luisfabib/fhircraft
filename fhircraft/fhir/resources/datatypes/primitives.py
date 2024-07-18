@@ -27,6 +27,16 @@ Integer = TypeAliasType('Integer', Union[
     ]
 ])
 
+
+Integer64 = TypeAliasType('Integer64', Union[
+    int,
+    Annotated[
+        str,
+        Field(pattern=r'[0]|[-+]?[1-9][0-9]*'),
+        AfterValidator(int)
+    ]
+])
+
 String = TypeAliasType('String', str)
 
 

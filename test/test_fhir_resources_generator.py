@@ -8,29 +8,33 @@ import importlib
 import tempfile
 import sys
 
-EXAMPLES_DIRECTORY = 'test/static/fhir-core-examples/R4B'
+
+VERSIONS = ['R4B', 'R5']
+EXAMPLES_DIRECTORY = f'test/static/fhir-core-examples'
     
-def _get_example_filenames(prefix):
-    pattern = os.path.join(EXAMPLES_DIRECTORY, prefix)
+def _get_example_filenames(prefix, version):
+    pattern = os.path.join(f'{EXAMPLES_DIRECTORY}/{version}', prefix)
     example_files = [os.path.basename(f) for f in glob.glob(pattern)]
     return example_files
 
-fhir_resources_test_cases = [
-    [
-    (resource_label, filename)
-        for filename in _get_example_filenames(f'{resource_label}-*')
-    ] for resource_label in [
-        'observation',
-        'condition',
+fhir_resources_test_cases = {version: [
+    case for cases in  [[
+            (resource_label, filename)
+                for filename in _get_example_filenames(f'{resource_label}-*', version)
+            ] for resource_label in [
+                    'observation',
+                    'condition',
+                ]
     ]
-]
-fhir_resources_test_cases = [case for cases in fhir_resources_test_cases for case in cases]
-@pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases)
-def test_construct_core_resource(resource_label, filename):   
+    for case in cases
+] for version in VERSIONS}
+
+
+def _assert_construct_core_resource(version, resource_label, filename):
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
         # Generate source code for Pydantic FHIR model
-        resource = construct_resource_model(canonical_url=f'https://hl7.org/fhir/R4B/{resource_label}.profile.json')
+        resource = construct_resource_model(canonical_url=f'https://hl7.org/fhir/{version}/{resource_label}.profile.json')
         source_code = generate_resource_model_code(resource)
         # Store source code in a file        
         temp_file_name = os.path.join(d, 'temp_test.py')    
@@ -42,9 +46,20 @@ def test_construct_core_resource(resource_label, filename):
         sys.modules["module.name"] = module
         spec.loader.exec_module(module)
         # Use the auto-generated model to validate a FHIR resource
-        with open(os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), filename), encoding="utf8") as file:
+        with open(os.path.join(os.path.abspath(f'{EXAMPLES_DIRECTORY}/{version}'), filename), encoding="utf8") as file:
             fhir_resource = json.load(file)
             fhir_resource_instance = getattr(module, resource_label.capitalize()).model_validate(fhir_resource)
             assert json.loads(fhir_resource_instance.model_dump_json(exclude_unset=True, by_alias=True)) == fhir_resource
             
+
+
+@pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases['R4B'])
+def test_construct_R4B_core_resource(resource_label, filename):   
+    print(fhir_resources_test_cases)
+    _assert_construct_core_resource('R4B', resource_label, filename)
+
+
+@pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases['R5'])
+def test_construct_R5_core_resource(resource_label, filename):   
+    _assert_construct_core_resource('R5', resource_label, filename)
             
