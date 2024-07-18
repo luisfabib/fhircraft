@@ -49,7 +49,7 @@ def _assert_construct_core_resource(version, resource_label, filename):
         with open(os.path.join(os.path.abspath(f'{EXAMPLES_DIRECTORY}/{version}'), filename), encoding="utf8") as file:
             fhir_resource = json.load(file)
             fhir_resource_instance = getattr(module, resource_label.capitalize()).model_validate(fhir_resource)
-            assert json.loads(fhir_resource_instance.model_dump_json(exclude_unset=True, by_alias=True)) == fhir_resource
+            assert json.loads(fhir_resource_instance.model_dump_json()) == fhir_resource
             
 
 

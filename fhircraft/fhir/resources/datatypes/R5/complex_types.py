@@ -1,10 +1,25 @@
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, field_validator, model_validator
+from fhircraft.fhir.resources.base import FHIRBaseModel 
 from fhircraft.fhir.resources.datatypes.primitives import *
 import fhircraft.fhir.resources.validators as fhir_validators
 import typing  
  
  
-class Element(BaseModel):
+class Base(FHIRBaseModel):
+    """
+    Base for all types and resources
+    """
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="hasValue() or (children().count() > id.count())",
+            human="All FHIR elements must have a @value or children",
+            key="ele-1",
+            severity="error",
+        )
+ 
+class Element(Base):
     """
     Base for all elements
     """
@@ -141,23 +156,10 @@ class xhtml(Element):
 
  
  
-class Address(BaseModel):
+class Address(Element):
     """
     An address expressed using postal conventions (as opposed to GPS or other location definition formats)
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     use: typing.Optional[Code] = Field(
         description="home | work | temp | old | billing - purpose of this address",
         default=None,
@@ -272,142 +274,12 @@ class Address(BaseModel):
             key="ele-1",
             severity="error",
         )
-
-
  
  
-class Age(BaseModel):
-    """
-    A duration of time during which an organism (or a process) has existed
-    """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    value: typing.Optional[Decimal] = Field(
-        description="Numerical value (with implicit precision)",
-        default=None,
-    )
-    value_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-    comparator: typing.Optional[Code] = Field(
-        description="\u003c | \u003c= | \u003e= | \u003e | ad - how to understand the value",
-        default=None,
-    )
-    comparator_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for comparator extensions",
-        default=None,
-        alias="_comparator",
-    )
-    unit: typing.Optional[String] = Field(
-        description="Unit representation",
-        default=None,
-    )
-    unit_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for unit extensions",
-        default=None,
-        alias="_unit",
-    )
-    system: typing.Optional[Uri] = Field(
-        description="System that defines coded unit form",
-        default=None,
-    )
-    system_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
-    code: typing.Optional[Code] = Field(
-        description="Coded form of the unit",
-        default=None,
-    )
-    code_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension'), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @field_validator(*('extension',), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_age_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum) and (value.empty() or value.hasValue().not() or value > 0)",
-            human="There SHALL be a code if there is a value and it SHALL be an expression of time.  If system is present, it SHALL be UCUM.  If value is present, it SHALL be positive.",
-            key="age-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="code.empty() or system.exists()",
-            human="If a code for the unit is present, the system SHALL also be present",
-            key="qty-3",
-            severity="error",
-        )
-
-
- 
- 
-class Annotation(BaseModel):
+class Annotation(Element):
     """
     Text node with attribution
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     authorReference: typing.Optional["Reference"] = Field(
         description="Individual responsible for the annotation",
         default=None,
@@ -480,23 +352,10 @@ class Annotation(BaseModel):
 
  
  
-class Attachment(BaseModel):
+class Attachment(Element):
     """
     Content in a format defined elsewhere
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     contentType: typing.Optional[Code] = Field(
         description="Mime type of the content, with charset etc.",
         default=None,
@@ -657,23 +516,10 @@ class Attachment(BaseModel):
 
  
  
-class Availability(BaseModel):
+class Availability(Element):
     """
     Availability data for an {item}
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     availableTime: typing.Optional[typing.List["Element"]] = Field(
         description="Times the {item} is available",
         default=None,
@@ -725,23 +571,10 @@ class Availability(BaseModel):
 
  
  
-class BackboneType(BaseModel):
+class BackboneType(Element):
     """
     Base for datatypes that can carry modifier extensions
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     modifierExtension: typing.Optional[typing.List["Extension"]] = Field(
         description="Extensions that cannot be ignored even if unrecognized",
         default=None,
@@ -775,44 +608,11 @@ class BackboneType(BaseModel):
             key="ele-1",
             severity="error",
         )
-
-
  
- 
-class Base(BaseModel):
-    """
-    Base for all types and resources
-    """
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
- 
- 
-class CodeableConcept(BaseModel):
+class CodeableConcept(Element):
     """
     Concept - reference to a terminology or just  text
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     coding: typing.Optional[typing.List["Coding"]] = Field(
         description="Code defined by a terminology system",
         default=None,
@@ -859,23 +659,10 @@ class CodeableConcept(BaseModel):
 
  
  
-class CodeableReference(BaseModel):
+class CodeableReference(Element):
     """
     Reference to a resource or a concept
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     concept: typing.Optional[CodeableConcept] = Field(
         description="Reference to a concept (by class)",
         default=None,
@@ -917,23 +704,10 @@ class CodeableReference(BaseModel):
 
  
  
-class Coding(BaseModel):
+class Coding(Element):
     """
     A reference to a code defined by a terminology system
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     system: typing.Optional[Uri] = Field(
         description="Identity of the terminology system",
         default=None,
@@ -1022,23 +796,10 @@ class Coding(BaseModel):
 
  
  
-class ContactDetail(BaseModel):
+class ContactDetail(Element):
     """
     Contact information
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     name: typing.Optional[String] = Field(
         description="Name of an individual to contact",
         default=None,
@@ -1085,23 +846,10 @@ class ContactDetail(BaseModel):
 
  
  
-class ContactPoint(BaseModel):
+class ContactPoint(Element):
     """
     Details of a Technology mediated contact point (phone, fax, email, etc.)
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     system: typing.Optional[Code] = Field(
         description="phone | fax | email | pager | url | sms | other",
         default=None,
@@ -1185,23 +933,10 @@ class ContactPoint(BaseModel):
 
  
  
-class Contributor(BaseModel):
+class Contributor(Element):
     """
     Contributor information
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     type: Code = Field(
         description="author | editor | reviewer | endorser",
         default=None,
@@ -1257,138 +992,10 @@ class Contributor(BaseModel):
 
  
  
-class Count(BaseModel):
-    """
-    A measured or measurable amount
-    """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    value: typing.Optional[Decimal] = Field(
-        description="Numerical value (with implicit precision)",
-        default=None,
-    )
-    value_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-    comparator: typing.Optional[Code] = Field(
-        description="\u003c | \u003c= | \u003e= | \u003e | ad - how to understand the value",
-        default=None,
-    )
-    comparator_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for comparator extensions",
-        default=None,
-        alias="_comparator",
-    )
-    unit: typing.Optional[String] = Field(
-        description="Unit representation",
-        default=None,
-    )
-    unit_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for unit extensions",
-        default=None,
-        alias="_unit",
-    )
-    system: typing.Optional[Uri] = Field(
-        description="System that defines coded unit form",
-        default=None,
-    )
-    system_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
-    code: typing.Optional[Code] = Field(
-        description="Coded form of the unit",
-        default=None,
-    )
-    code_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension'), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @field_validator(*('extension',), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnt_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum) and (code.empty() or code = '1') and (value.empty() or value.hasValue().not() or value.toString().contains('.').not())",
-            human="There SHALL be a code with a value of \"1\" if there is a value. If system is present, it SHALL be UCUM.  If present, the value SHALL be a whole number.",
-            key="cnt-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="code.empty() or system.exists()",
-            human="If a code for the unit is present, the system SHALL also be present",
-            key="qty-3",
-            severity="error",
-        )
-
-
- 
- 
-class DataRequirement(BaseModel):
+class DataRequirement(Element):
     """
     Describes a required data item
     """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
     type: Code = Field(
         description="The type of the required data",
         default=None,
@@ -1456,16 +1063,6 @@ class DataRequirement(BaseModel):
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
-            severity="error",
-        )
-
-    @field_validator(*('extension',), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
             severity="error",
         )
 
@@ -1548,123 +1145,8 @@ class DataType(Element):
             key="ele-1",
             severity="error",
         )
-
-
  
  
-class Distance(BaseModel):
-    """
-    A length - a value with a unit that is a physical distance
-    """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    value: typing.Optional[Decimal] = Field(
-        description="Numerical value (with implicit precision)",
-        default=None,
-    )
-    value_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-    comparator: typing.Optional[Code] = Field(
-        description="\u003c | \u003c= | \u003e= | \u003e | ad - how to understand the value",
-        default=None,
-    )
-    comparator_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for comparator extensions",
-        default=None,
-        alias="_comparator",
-    )
-    unit: typing.Optional[String] = Field(
-        description="Unit representation",
-        default=None,
-    )
-    unit_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for unit extensions",
-        default=None,
-        alias="_unit",
-    )
-    system: typing.Optional[Uri] = Field(
-        description="System that defines coded unit form",
-        default=None,
-    )
-    system_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
-    code: typing.Optional[Code] = Field(
-        description="Coded form of the unit",
-        default=None,
-    )
-    code_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension'), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @field_validator(*('extension',), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dis_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum)",
-            human="There SHALL be a code if there is a value and it SHALL be an expression of length.  If system is present, it SHALL be UCUM.",
-            key="dis-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="code.empty() or system.exists()",
-            human="If a code for the unit is present, the system SHALL also be present",
-            key="qty-3",
-            severity="error",
-        )
-
-
  
  
 class Dosage(BackboneType):
@@ -1784,121 +1266,6 @@ class Dosage(BackboneType):
             expression="asNeededFor.empty() or asNeeded.empty() or asNeeded",
             human="AsNeededFor can only be set if AsNeeded is empty or true",
             key="dos-1",
-            severity="error",
-        )
-
-
- 
- 
-class Duration(BaseModel):
-    """
-    A length of time
-    """
-    id: typing.Optional[String] = Field(
-        description="Unique id for inter-element referencing",
-        default=None,
-    )
-    id_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    extension: typing.Optional[typing.List["Extension"]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    value: typing.Optional[Decimal] = Field(
-        description="Numerical value (with implicit precision)",
-        default=None,
-    )
-    value_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-    comparator: typing.Optional[Code] = Field(
-        description="\u003c | \u003c= | \u003e= | \u003e | ad - how to understand the value",
-        default=None,
-    )
-    comparator_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for comparator extensions",
-        default=None,
-        alias="_comparator",
-    )
-    unit: typing.Optional[String] = Field(
-        description="Unit representation",
-        default=None,
-    )
-    unit_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for unit extensions",
-        default=None,
-        alias="_unit",
-    )
-    system: typing.Optional[Uri] = Field(
-        description="System that defines coded unit form",
-        default=None,
-    )
-    system_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
-    code: typing.Optional[Code] = Field(
-        description="Coded form of the unit",
-        default=None,
-    )
-    code_ext: typing.Optional["Element"] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension'), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @field_validator(*('extension',), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_drt_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="code.exists() implies ((system = %ucum) and value.exists())",
-            human="There SHALL be a code if there is a value and it SHALL be an expression of time.  If system is present, it SHALL be UCUM.",
-            key="drt-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
-            self,
-            expression="code.empty() or system.exists()",
-            human="If a code for the unit is present, the system SHALL also be present",
-            key="qty-3",
             severity="error",
         )
 
@@ -2126,7 +1493,7 @@ class ElementDefinition(BackboneType):
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueAge: typing.Optional[Age] = Field(
+    defaultValueAge: typing.Optional["Age"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
@@ -2154,15 +1521,15 @@ class ElementDefinition(BackboneType):
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueCount: typing.Optional[Count] = Field(
+    defaultValueCount: typing.Optional["Count"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueDistance: typing.Optional[Distance] = Field(
+    defaultValueDistance: typing.Optional["Distance"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueDuration: typing.Optional[Duration] = Field(
+    defaultValueDuration: typing.Optional["Duration"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
@@ -2360,7 +1727,7 @@ class ElementDefinition(BackboneType):
         description="Value must be exactly this",
         default=None,
     )
-    fixedAge: typing.Optional[Age] = Field(
+    fixedAge: typing.Optional["Age"] = Field(
         description="Value must be exactly this",
         default=None,
     )
@@ -2388,15 +1755,15 @@ class ElementDefinition(BackboneType):
         description="Value must be exactly this",
         default=None,
     )
-    fixedCount: typing.Optional[Count] = Field(
+    fixedCount: typing.Optional["Count"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedDistance: typing.Optional[Distance] = Field(
+    fixedDistance: typing.Optional["Distance"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedDuration: typing.Optional[Duration] = Field(
+    fixedDuration: typing.Optional["Duration"] = Field(
         description="Value must be exactly this",
         default=None,
     )
@@ -2576,7 +1943,7 @@ class ElementDefinition(BackboneType):
         description="Value must have at least these property values",
         default=None,
     )
-    patternAge: typing.Optional[Age] = Field(
+    patternAge: typing.Optional["Age"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
@@ -2604,15 +1971,15 @@ class ElementDefinition(BackboneType):
         description="Value must have at least these property values",
         default=None,
     )
-    patternCount: typing.Optional[Count] = Field(
+    patternCount: typing.Optional["Count"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternDistance: typing.Optional[Distance] = Field(
+    patternDistance: typing.Optional["Distance"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternDuration: typing.Optional[Duration] = Field(
+    patternDuration: typing.Optional["Duration"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
@@ -3484,7 +2851,7 @@ class Extension(DataType):
         description="Value of extension",
         default=None,
     )
-    valueAge: typing.Optional[Age] = Field(
+    valueAge: typing.Optional["Age"] = Field(
         description="Value of extension",
         default=None,
     )
@@ -3512,15 +2879,15 @@ class Extension(DataType):
         description="Value of extension",
         default=None,
     )
-    valueCount: typing.Optional[Count] = Field(
+    valueCount: typing.Optional["Count"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueDistance: typing.Optional[Distance] = Field(
+    valueDistance: typing.Optional["Distance"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueDuration: typing.Optional[Duration] = Field(
+    valueDuration: typing.Optional["Duration"] = Field(
         description="Value of extension",
         default=None,
     )
@@ -4394,7 +3761,7 @@ class ProductShelfLife(BackboneType):
         description="This describes the shelf life, taking into account various scenarios such as shelf life of the packaged Medicinal Product itself, shelf life after transformation where necessary and shelf life after the first opening of a bottle, etc. The shelf life type shall be specified using an appropriate controlled vocabulary The controlled term and the controlled term identifier shall be specified",
         default=None,
     )
-    periodDuration: typing.Optional[Duration] = Field(
+    periodDuration: typing.Optional["Duration"] = Field(
         description="The shelf life time period can be specified using a numerical value for the period of time and its unit of time measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
@@ -4543,6 +3910,171 @@ class Quantity(DataType):
 
 
  
+ 
+class Count(Quantity):
+    """
+    A measured or measurable amount
+    """
+    @model_validator(mode="after")
+    def FHIR_cnt_3_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum) and (code.empty() or code = '1') and (value.empty() or value.hasValue().not() or value.toString().contains('.').not())",
+            human="There SHALL be a code with a value of \"1\" if there is a value. If system is present, it SHALL be UCUM.  If present, the value SHALL be a whole number.",
+            key="cnt-3",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="hasValue() or (children().count() > id.count())",
+            human="All FHIR elements must have a @value or children",
+            key="ele-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_qty_3_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="code.empty() or system.exists()",
+            human="If a code for the unit is present, the system SHALL also be present",
+            key="qty-3",
+            severity="error",
+        )
+
+ 
+class Age(Quantity):
+    """
+    A duration of time during which an organism (or a process) has existed
+    """
+    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension'), mode="after", check_fields=None)
+    @classmethod
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(cls, value, 
+            expression="hasValue() or (children().count() > id.count())",
+            human="All FHIR elements must have a @value or children",
+            key="ele-1",
+            severity="error",
+        )
+
+    @field_validator(*('extension',), mode="after", check_fields=None)
+    @classmethod
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(cls, value, 
+            expression="extension.exists() != value.exists()",
+            human="Must have either extensions or value[x], not both",
+            key="ext-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_age_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum) and (value.empty() or value.hasValue().not() or value > 0)",
+            human="There SHALL be a code if there is a value and it SHALL be an expression of time.  If system is present, it SHALL be UCUM.  If value is present, it SHALL be positive.",
+            key="age-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="hasValue() or (children().count() > id.count())",
+            human="All FHIR elements must have a @value or children",
+            key="ele-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_qty_3_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="code.empty() or system.exists()",
+            human="If a code for the unit is present, the system SHALL also be present",
+            key="qty-3",
+            severity="error",
+        )
+
+
+ 
+ 
+class Duration(Quantity):
+    """
+    A length of time
+    """
+    @model_validator(mode="after")
+    def FHIR_drt_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="code.exists() implies ((system = %ucum) and value.exists())",
+            human="There SHALL be a code if there is a value and it SHALL be an expression of time.  If system is present, it SHALL be UCUM.",
+            key="drt-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="hasValue() or (children().count() > id.count())",
+            human="All FHIR elements must have a @value or children",
+            key="ele-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_qty_3_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="code.empty() or system.exists()",
+            human="If a code for the unit is present, the system SHALL also be present",
+            key="qty-3",
+            severity="error",
+        )
+
+
+ 
+ 
+class Distance(Quantity):
+    """
+    A length - a value with a unit that is a physical distance
+    """
+    @model_validator(mode="after")
+    def FHIR_dis_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum)",
+            human="There SHALL be a code if there is a value and it SHALL be an expression of length.  If system is present, it SHALL be UCUM.",
+            key="dis-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="hasValue() or (children().count() > id.count())",
+            human="All FHIR elements must have a @value or children",
+            key="ele-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_qty_3_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint( 
+            self,
+            expression="code.empty() or system.exists()",
+            human="If a code for the unit is present, the system SHALL also be present",
+            key="qty-3",
+            severity="error",
+        )
+
+
  
 class Range(DataType):
     """

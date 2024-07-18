@@ -244,7 +244,7 @@ class Slice:
             def is_FHIR_complete(self):
                 BASE_ELEMENTS = ['text','extension', 'id', 'resourceType']
                 slice_available_elements = sorted(set([name for name in self.__class__.model_fields if '_ext' not in name and not name.startswith('_') and name not in BASE_ELEMENTS]))
-                slice_preset_elements = sorted(set([name for name, value in self.model_dump(by_alias=True, exclude_unset=True).items() if (value is not None or value!=[]) and '_ext' not in name and not name.startswith('_')  and name not in BASE_ELEMENTS]))
+                slice_preset_elements = sorted(set([name for name, value in self.model_dump().items() if (value is not None or value!=[]) and '_ext' not in name and not name.startswith('_')  and name not in BASE_ELEMENTS]))
                 return slice_available_elements == slice_preset_elements
             
             @property

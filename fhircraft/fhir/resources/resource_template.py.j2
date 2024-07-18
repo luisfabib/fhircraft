@@ -1,5 +1,6 @@
 from pydantic import Field, field_validator, model_validator, BaseModel
 from fhircraft.fhir.resources.datatypes.primitives import *
+from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 import typing  
 {% for module, objects in imports.items() %} 

@@ -1,6 +1,7 @@
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.datatypes import get_FHIR_type
 
+from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.constraint import Constraint
 from fhircraft.fhir.resources.slicing import SlicingGroup, Slice, Discriminator
@@ -16,15 +17,15 @@ import inspect
 class ResourceFactory:
     profiles : dict = {}
     
-    def get_structure_definition(self, profile_url: str) -> Dict[str, Any]:
+    def download_structure_definition(self, profile_url: str) -> Dict[str, Any]:
         """
-            Retrieves the structure definition of a FHIR resource from the provided profile URL.
+        Retrieves the structure definition of a FHIR resource from the provided profile URL.
+        
+        Parameters:
+            profile_url (str): The URL of the FHIR profile from which to retrieve the structure definition.
             
-            Parameters:
-                profile_url (str): The URL of the FHIR profile from which to retrieve the structure definition.
-                
-            Returns:
-                Dict[str, Any]: A dictionary representing the structure definition of the FHIR resource.
+        Returns:
+            Dict[str, Any]: A dictionary representing the structure definition of the FHIR resource.
         """       
         
         if not profile_url.endswith('.json'):
@@ -73,14 +74,18 @@ class ResourceFactory:
                 current.update(element)
         return tree
 
-    def _parse_element_type(self, field_type_name, FHIR_release):
-        if not field_type_name:
-            return None
-        field_type_name = field_type_name.replace('http://hl7.org/fhir/StructureDefinition/','')
-        field_type_name = field_type_name.replace('http://hl7.org/fhirpath/System.','')
+    def _parse_element_type(self, field_type_name: str, FHIR_release: str):      
+        FHIR_COMPLEX_TYPE_PREFIX = 'http://hl7.org/fhir/StructureDefinition/'
+        FHIRPATH_TYPE_PREFIX = 'http://hl7.org/fhirpath/System.'
+        field_type_name = str(field_type_name)
+        field_type_name = field_type_name.removeprefix(FHIR_COMPLEX_TYPE_PREFIX)
+        field_type_name = field_type_name.removeprefix(FHIR_COMPLEX_TYPE_PREFIX)
+        field_type_name = field_type_name.removeprefix(FHIRPATH_TYPE_PREFIX)
         field_type_name = capitalize(field_type_name)
+        # Check if type is a FHIR primitive datatype
         field_type = getattr(primitives, field_type_name, None)
         if not field_type:
+            # Check if type is a FHIR complex datatype
             field_type = get_FHIR_type(field_type_name, FHIR_release)
         if not field_type:
             return field_type_name
@@ -276,7 +281,7 @@ class ResourceFactory:
     def construct_resource_model(self, canonical_url=None, structure_definition=None):
         
         if not structure_definition and canonical_url:
-            structure_definition = self.get_structure_definition(canonical_url)
+            structure_definition = self.download_structure_definition(canonical_url)
         
         if 'snapshot' not in structure_definition or 'element' not in structure_definition['snapshot']:
             raise ValueError("Invalid StructureDefinition: Missing 'snapshot' or 'element' field")
@@ -303,18 +308,26 @@ class ResourceFactory:
         slicing, constraints = self._compile_profile_constraints(elements, FHIR_release)
         
         
-        print(FHIR_release)
-        fields['meta'] = (Optional[get_FHIR_type('Meta', FHIR_release)], get_FHIR_type('Meta', FHIR_release)(profile=[structure_definition['url']], versionId=structure_definition['version']))
-        fields['resourceType'] = (Literal[f'{resourceType}'], resourceType)
-        fields['profile_slicing'] = (ClassVar[List[SlicingGroup]], slicing)
-        fields['canonical_url'] = (ClassVar[List[Constraint]], canonical_url)
-        fields['profile_constraints'] = (ClassVar[List[Constraint]], constraints)
+        fields.update({
+            'meta': (Optional[get_FHIR_type('Meta', FHIR_release)], get_FHIR_type('Meta', FHIR_release)(profile=[structure_definition['url']], versionId=structure_definition['version'])),
+            'resourceType': (Literal[f'{resourceType}'], resourceType),
+            'profile_slicing': (ClassVar[List[SlicingGroup]], slicing),
+            'canonical_url': (ClassVar[List[Constraint]], canonical_url),
+            'profile_constraints': (ClassVar[List[Constraint]], constraints),
+        })
 
-        model = create_model(resourceName, **fields, __base__=base, __validators__=validators)
-        model.__doc__ = structure['short']
+        # Construct the Pydantic model 
+        model = create_model(
+            resourceName, **fields, 
+            __base__ = (base, FHIRBaseModel),
+            __validators__ = validators,
+            __doc__ = structure['short'],
+        )        
         for attribute, property_getter in properties.items():
             setattr(model, attribute, property(property_getter))
 
+        self.profiles['resourceName'] = model
+        
         return model 
     
     def clear_chache(self):
@@ -338,7 +351,7 @@ class ResourceFactory:
             base_name = structure_definition['baseDefinition'].replace('http://hl7.org/fhir/StructureDefinition/','')
             base = self.profiles.get(base_name)
         else:
-            base = BaseModel
+            base = FHIRBaseModel
         fields, validators, properties = self._compile_complex_element_fields(structure, resourceName, base, FHIR_release)
 
         for constraint in structure.get('constraint',[]):

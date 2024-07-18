@@ -35,6 +35,6 @@ def test_construct_core_resource(resource_label, filename):
     with open(os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), filename), encoding="utf8") as file:
         fhir_resource = json.load(file)
         fhir_resource_instance = resource_model.model_validate(fhir_resource)
-        assert json.loads(fhir_resource_instance.model_dump_json(exclude_unset=True, by_alias=True)) == fhir_resource
+        assert json.loads(fhir_resource_instance.model_dump_json()) == fhir_resource
             
             

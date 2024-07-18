@@ -1,9 +1,10 @@
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, field_validator, model_validator
+from fhircraft.fhir.resources.base import FHIRBaseModel 
 from fhircraft.fhir.resources.datatypes.primitives import *
 import fhircraft.fhir.resources.validators as fhir_validators
 import typing  
  
-class Element(BaseModel):
+class Element(FHIRBaseModel):
     """
     Base for all elements
     """
@@ -262,7 +263,7 @@ class Address(Element):
 
  
  
-class Age(BaseModel):
+class Age(FHIRBaseModel):
     """
     A duration of time during which an organism (or a process) has existed
     """
@@ -900,7 +901,7 @@ class Contributor(Element):
 
  
  
-class Count(BaseModel):
+class Count(FHIRBaseModel):
     """
     A measured or measurable amount
     """
@@ -1141,7 +1142,7 @@ class DataRequirement(Element):
 
  
  
-class Distance(BaseModel):
+class Distance(FHIRBaseModel):
     """
     A length - a value with a unit that is a physical distance
     """
@@ -1377,7 +1378,7 @@ class Dosage(BackboneElement):
 
  
  
-class Duration(BaseModel):
+class Duration(FHIRBaseModel):
     """
     A length of time
     """
@@ -4955,7 +4956,7 @@ class SimpleQuantity(Quantity):
 
  
  
-class Resource(BaseModel):
+class Resource(FHIRBaseModel):
     """
     Base Resource
     """
