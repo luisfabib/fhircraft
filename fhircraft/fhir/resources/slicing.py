@@ -211,7 +211,7 @@ class Slice:
                 
             elif discriminator.type is discriminator.DiscriminatorType.POSITION:
                 """
-                Discriminator - Existence
+                Discriminator - Position
                 The slices are differentiated by their index. This is only possible if all but the last 
                 slice have min=max cardinality, and the (optional) last slice contains other undifferentiated elements.
                 """
