@@ -40,6 +40,19 @@ class TestBuildTreeStructure:
         assert 'address' in tree_structure['children']['Patient']['children']
         assert 'city' in tree_structure['children']['Patient']['children']['address']['children']
 
+
+    def test_handles_slicing(self):
+        elements = [
+            {'path': 'component', 'id': 'component', 'type': [{'code': 'string'}]},
+            {'path': 'component', 'id': 'component:sliceA', 'type': [{'code': 'Address'}]},
+            {'path': 'component', 'id': 'component:sliceA.valueString', 'type': [{'code': 'string'}]}
+        ]
+        resource_factory = ResourceFactory()
+        tree_structure = resource_factory.build_tree_structure(elements)
+        assert 'component' in tree_structure['children']
+        assert 'sliceA' in tree_structure['children']['component']['slices']
+        assert 'valueString' in tree_structure['children']['component']['slices']['sliceA']['children']
+
     def test_handles_empty_list_of_elements(self):
         elements = []
         resource_factory = ResourceFactory()

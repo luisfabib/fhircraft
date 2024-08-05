@@ -60,18 +60,25 @@ class ResourceFactory:
         """Builds a tree from a list of ElementDefinitions."""
         tree = {}
         for element in elements:
-            path_parts = element['path'].split('.')
+            path_parts = element['id'].split('.')
             current = tree
             for part in path_parts:
-                if 'children' not in current:
-                    current['children'] = {}
-                if part not in current['children']:
-                    current['children'][part] = {}
-                current = current['children'][part]
-            
+                if ':' in part:
+                    part, sliceName = part.split(':')
+                    current = current['children'][part]
+                    if 'slices' not in current:
+                        current['slices'] = {}
+                    if sliceName not in current['slices']:
+                        current['slices'][sliceName] = {}
+                    current = current['slices'][sliceName]
+                else:
+                    if 'children' not in current:
+                        current['children'] = {}
+                    if part not in current['children']:
+                        current['children'][part] = {}
+                    current = current['children'][part]
             # Keep only the name and type, ignore slices
-            if ':' not in element['id']:  # Ignore slices
-                current.update(element)
+            current.update(element)
         return tree
 
     def _parse_element_type(self, field_type_name: str, FHIR_release: str):      
@@ -92,8 +99,7 @@ class ResourceFactory:
         return field_type
 
 
-    def _construct_Pydantic_field(self, field_type, min_card, max_card, description=None, alias=None):
-        default = None
+    def _construct_Pydantic_field(self, field_type, min_card, max_card, default=None, description=None, alias=None):
         is_list_type = not max_card or max_card>1
         if is_list_type:
             field_type = List[field_type]
@@ -109,6 +115,15 @@ class ResourceFactory:
                     max_length=max_card if is_list_type else None
             )
         )    
+    
+    def _process_pattern_or_fixed_values(self, element, constraint, FHIR_release):
+        constraint_attribute = next((attribute for attribute in element if attribute.startswith(constraint)), None)
+        if (constrained_value := element.get(constraint_attribute)) is not None:
+            cosntrained_type = self._parse_element_type(constraint_attribute.replace(constraint,''), FHIR_release)
+            constrained_value = cosntrained_type.model_validate(constrained_value) \
+                                if inspect.isclass(cosntrained_type) and issubclass(cosntrained_type, BaseModel) \
+                                    else constrained_value    
+        return constrained_value
 
     def _compile_profile_constraints(self, elements, FHIR_release):
         slicing = []
@@ -218,7 +233,7 @@ class ResourceFactory:
         for name, element in structure.get('children',{}).items():
             if base and name in base.model_fields:
                 continue 
-
+            
             # Get cardinality of element
             min_card = int(element['min'])
             max_card = int(element['max']) if element['max'] != '*' else None
@@ -260,21 +275,57 @@ class ResourceFactory:
                         field_type = field_types[0]
             else: 
                 continue
-            if element.get('constraint'):
-                for constraint in element['constraint']:
+            field_default = None 
+
+            # Check for pattern value constraints
+            if pattern_value := self._process_pattern_or_fixed_values(element, 'pattern', FHIR_release):
+                field_default = pattern_value
+                # Add the current field to the list of validated fields
+                validators[f'FHIR_{name}_pattern_constraint'] = field_validator(name, mode='after')(partial(
+                    fhir_validators.validate_FHIR_element_pattern, 
+                    pattern=pattern_value,
+                ))
+
+            # Check for fixed value constraints
+            fixed_value = self._process_pattern_or_fixed_values(element, 'fixed', FHIR_release)
+            if fixed_value := self._process_pattern_or_fixed_values(element, 'fixed', FHIR_release):
+                field_default = fixed_value 
+                field_type = fixed_value
+
+            if constraints := element.get('constraint'):
+                # Process FHIR constraint invariants on the element
+                for constraint in constraints:
                     validators = self._add_element_constraint_validator(name, constraint, base, validators)
-            
+
+            # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
+            if element.get('slices'):
+                print('SLICING on', name)
+                print('      path:', element['path'])
+                print('      discriminator:', element['slicing']['discriminator'])
+                print('      rules:', element['slicing']['rules'])
+                slice_types = []
+                for slice_name, slice_element in element['slices'].items():
+                    slice_model_name = capitalize(resourceName + capitalize(slice_name))
+                    slice_subfields, slice_validators, slice_properties = self._compile_complex_element_fields(slice_element, slice_model_name, FHIRBaseModel, FHIR_release)
+                    slice_field_type = create_model(slice_model_name, **slice_subfields, __base__=FHIRBaseModel, __validators__=slice_validators)                
+                    for attribute, property_getter in slice_properties.items():
+                        setattr(slice_field_type, attribute, property(property_getter))  
+                    slice_types.append(slice_field_type)    
+                    print(slice_name, '-> ', slice_field_type.model_construct())
+                field_type = Union[tuple([field_type, *slice_types])]
+
             # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
             if field_type is get_FHIR_type('BackboneElement', FHIR_release) and element.get('children'):
-                field_subfields, subfield_validators, subfield_properties = self._compile_complex_element_fields(element, capitalize(resourceName + capitalize(name)), field_type, FHIR_release)
-                field_type = create_model(capitalize(resourceName + capitalize(name)), **field_subfields, __base__=field_type, __validators__=subfield_validators)                
-                for attribute, property_getter in properties.items():
+                backbone_model_name = capitalize(resourceName + capitalize(name))
+                field_subfields, subfield_validators, subfield_properties = self._compile_complex_element_fields(element, backbone_model_name, field_type, FHIR_release)
+                field_type = create_model(backbone_model_name, **field_subfields, __base__=field_type, __validators__=subfield_validators)                
+                for attribute, property_getter in subfield_properties.items():
                     setattr(field_type, attribute, property(property_getter))            
 
             # Create and add the Pydantic field for the FHIR element
             fields[name] = self._construct_Pydantic_field(field_type, min_card, max_card, description=element.get('short'))
             if hasattr(primitives, str(field_type)):
-                fields[f'{name}_ext'] = self._construct_Pydantic_field(get_FHIR_type('Element', FHIR_release), 0, 1, alias=f'_{name}',description=f'Placeholder element for {name} extensions')
+                fields[f'{name}_ext'] = self._construct_Pydantic_field(get_FHIR_type('Element', FHIR_release), 0, 1, alias=f'_{name}', default=field_default, description=f'Placeholder element for {name} extensions')
         return fields, validators, properties
         
 
@@ -403,28 +454,7 @@ def construct_with_profiled_elements(profile):
     """    
     # Construct FHIR resource with empty structure 
     resource = profile.model_construct()
-    resource = set_constraints(resource)
     resource = initialize_slices(resource)
-    return resource
-
-
-def set_constraints(resource):
-    """
-    Sets preset values in the resource according to the constraints in the profile.
-
-    Parameters:
-        resource: The initialized FHIR resource
-        profile: The FHIR profile containing constraints.
-    Return:
-        resource: The FHIR resource
-    """
-    profile = resource.__class__
-    
-    for constraint in profile.profile_constraints:
-        if constraint.pattern:
-            fhirpath.parse(constraint.path).update_or_create(resource, constraint.pattern)
-        if constraint.fixedValue:
-            fhirpath.parse(constraint.path).update_or_create(resource, constraint.fixedValue)            
     return resource
 
 

@@ -1,6 +1,6 @@
 import warnings
 import traceback
-from fhircraft.utils import ensure_list 
+from fhircraft.utils import ensure_list, merge_dicts
 
 def _validate_FHIR_element_constraint(value, expression, human, key, severity):
     from fhircraft.fhir.path import fhirpath, FhirPathLexerError, FhirPathParserError
@@ -26,6 +26,11 @@ def validate_element_constraint(cls, value, expression, human, key, severity):
 
 def validate_model_constraint(instance, expression, human, key, severity):
     return _validate_FHIR_element_constraint(instance, expression, human, key, severity)
+
+def validate_FHIR_element_pattern(cls, element, pattern):
+    assert merge_dicts(element.model_dump(), pattern.model_dump()) == element.model_dump(), \
+            f'Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2)}'
+    return element
 
 def validate_type_choice_element(instance, field_types, field_name_base):
     assert sum(getattr(instance, field_name_base + field_type if isinstance(field_type, str) else field_type.__name__, None) is not None for field_type in field_types) <= 1, f'Type choice element {field_name_base}[x] can only have one value set.'
