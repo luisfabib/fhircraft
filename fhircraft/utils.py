@@ -247,21 +247,20 @@ def contains_list_type(tp: Any) -> bool:
     
     return False
 
+    
+def _get_deepest_args(tp: Any) -> list:
+    """Recursively get the deepest type arguments of nested typing constructs."""
+    args = get_args(tp)
+    if not args:
+        # Base case: no further nested types
+        return [tp]
+    # Recursively find the deepest types
+    deepest_args = []
+    for arg in args:
+        deepest_args.extend(_get_deepest_args(arg))
+    return deepest_args
 
 def get_fhir_model_from_field(field):
-    
-    def _get_deepest_args(tp: Any) -> list:
-        """Recursively get the deepest type arguments of nested typing constructs."""
-        args = get_args(tp)
-        if not args:
-            # Base case: no further nested types
-            return [tp]
-        
-        # Recursively find the deepest types
-        deepest_args = []
-        for arg in args:
-            deepest_args.extend(_get_deepest_args(arg))
-        return deepest_args
     results = _get_deepest_args(field.annotation)
     return next((arg for arg in results if inspect.isclass(arg) and issubclass(arg, BaseModel)), None)
 

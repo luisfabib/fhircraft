@@ -1,7 +1,4 @@
-from fhircraft.fhir.resources.factory import ResourceFactory, track_slice_changes, initialize_slices
-from fhircraft.fhir.resources.slicing import Slice, Discriminator, SlicingGroup, Constraint
-from unittest import TestCase
-from unittest.mock import MagicMock
+from fhircraft.fhir.resources.factory import ResourceFactory
 
 class TestBuildTreeStructure:
 

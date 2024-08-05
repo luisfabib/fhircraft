@@ -1,5 +1,5 @@
 from typing import Union, Any, Optional, Tuple, List, Dict
-from fhircraft.fhir.resources.factory import construct_resource_model, track_slice_changes, clean_elements_and_slices, construct_with_profiled_elements
+from fhircraft.fhir.resources.factory import construct_resource_model, track_slice_changes, clean_elements_and_slices
 from fhircraft.fhir.path import fhirpath
 from fhircraft.openapi.parser import load_openapi, traverse_and_replace_references, extract_json_schema
 from fhircraft.utils import remove_none_dicts, ensure_list, replace_nth
@@ -258,7 +258,7 @@ def convert_response_from_api_to_fhir(api_response: Any, openapi_file_location: 
             profile = construct_resource_model(profile_url)  
 
             # Construct FHIR resource with propulated fields according to the profile constraints 
-            resource = construct_with_profiled_elements(profile)
+            resource = profile.model_construct_with_slices()
 
             # Enable tracking of changes in slices (to determine which slices were given values)
             track_slice_changes(resource, True)
@@ -273,7 +273,7 @@ def convert_response_from_api_to_fhir(api_response: Any, openapi_file_location: 
             resource = clean_elements_and_slices(resource)
 
             # Cleanup the resource from empty structures to be valid
-            resource = profile.model_validate(remove_none_dicts(resource.model_dump(by_alias=True, exclude_unset=True)))
+            resource = profile.model_validate(remove_none_dicts(resource.model_dump()))
 
             resources.append(resource)
             

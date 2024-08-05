@@ -1,7 +1,7 @@
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.datatypes import get_FHIR_type
 
-from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.constraint import Constraint
 from fhircraft.fhir.resources.slicing import SlicingGroup, Slice, Discriminator
@@ -11,6 +11,8 @@ from fhircraft.utils import capitalize, load_env_variables, ensure_list, remove_
 from typing import List, Any, Tuple, Dict, Type, ClassVar, Union, Optional, get_origin, Literal
 from pydantic import Field, create_model, model_validator, BaseModel, field_validator
 from functools import partial
+from typing_extensions import Annotated 
+
 import requests
 import inspect
 
@@ -103,6 +105,7 @@ class ResourceFactory:
         is_list_type = not max_card or max_card>1
         if is_list_type:
             field_type = List[field_type]
+            default = [default] if default is not None and not isinstance(default, list) else default
         if min_card==0:
             field_type = Optional[field_type]
         return (    
@@ -297,25 +300,29 @@ class ResourceFactory:
                 for constraint in constraints:
                     validators = self._add_element_constraint_validator(name, constraint, base, validators)
 
-            # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
-            if element.get('slices'):
-                print('SLICING on', name)
-                print('      path:', element['path'])
-                print('      discriminator:', element['slicing']['discriminator'])
-                print('      rules:', element['slicing']['rules'])
-                slice_types = []
-                for slice_name, slice_element in element['slices'].items():
-                    slice_model_name = capitalize(resourceName + capitalize(slice_name))
-                    slice_subfields, slice_validators, slice_properties = self._compile_complex_element_fields(slice_element, slice_model_name, FHIRBaseModel, FHIR_release)
-                    slice_field_type = create_model(slice_model_name, **slice_subfields, __base__=FHIRBaseModel, __validators__=slice_validators)                
-                    for attribute, property_getter in slice_properties.items():
-                        setattr(slice_field_type, attribute, property(property_getter))  
-                    slice_types.append(slice_field_type)    
-                    print(slice_name, '-> ', slice_field_type.model_construct())
-                field_type = Union[tuple([field_type, *slice_types])]
+
 
             # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
-            if field_type is get_FHIR_type('BackboneElement', FHIR_release) and element.get('children'):
+            if element.get('slices'):
+                slice_types = []
+                for slice_name, slice_element in element['slices'].items():
+                    slice_name = ''.join([capitalize(word) for word in slice_name.split('-')])
+                    slice_model_name = capitalize(resourceName) + capitalize(slice_name)
+                    slice_subfields, slice_validators, slice_properties = self._compile_complex_element_fields(slice_element, slice_model_name, FHIRSliceModel, FHIR_release)
+                    slice_model = create_model(slice_model_name, **slice_subfields, __base__=FHIRSliceModel, __validators__=slice_validators)                                   
+                    slice_model.min_cardinality=int(slice_element['min']) if str(slice_element['min']).isnumeric() else None
+                    slice_model.max_cardinality=int(str(slice_element['max']).replace('*','99999')) if str(slice_element['max']).replace('*','99999').isnumeric() else None
+                    for attribute, property_getter in slice_properties.items():
+                        setattr(slice_model, attribute, property(property_getter))  
+                    slice_types.append(slice_model)    
+                # Create annotated type as union of slice models and original type (important, last in the definition) 
+                field_type = Annotated[
+                    Union[tuple([*slice_types, field_type])], 
+                    Field(union_mode='left_to_right')
+                ]
+
+            # If the element has child elements (e.g. BackboneElement) create the complex element and use it as a type
+            elif field_type is get_FHIR_type('BackboneElement', FHIR_release) and element.get('children'):
                 backbone_model_name = capitalize(resourceName + capitalize(name))
                 field_subfields, subfield_validators, subfield_properties = self._compile_complex_element_fields(element, backbone_model_name, field_type, FHIR_release)
                 field_type = create_model(backbone_model_name, **field_subfields, __base__=field_type, __validators__=subfield_validators)                
@@ -323,7 +330,7 @@ class ResourceFactory:
                     setattr(field_type, attribute, property(property_getter))            
 
             # Create and add the Pydantic field for the FHIR element
-            fields[name] = self._construct_Pydantic_field(field_type, min_card, max_card, description=element.get('short'))
+            fields[name] = self._construct_Pydantic_field(field_type, min_card, max_card, default=field_default, description=element.get('short'))
             if hasattr(primitives, str(field_type)):
                 fields[f'{name}_ext'] = self._construct_Pydantic_field(get_FHIR_type('Element', FHIR_release), 0, 1, alias=f'_{name}', default=field_default, description=f'Placeholder element for {name} extensions')
         return fields, validators, properties
@@ -442,132 +449,69 @@ def get_FHIR_release_from_version(version):
 
 
 
-def construct_with_profiled_elements(profile):
-    """
-    Constructs a FHIR resource with elements profiled by the given profile.
+# def process_slice_constraints(slice_resource, slice):
+#     """
+#     Processes and sets constraints within a slice.
 
-    Parameters:
-        profile: The FHIR profile containing constraints and slicing information.
-    
-    Returns:
-        The constructed FHIR resource with profiled elements.
-    """    
-    # Construct FHIR resource with empty structure 
-    resource = profile.model_construct()
-    resource = initialize_slices(resource)
-    return resource
-
-
-def initialize_slices(resource, slice_copies=9):
-    """
-    Initializes slices in the resource according to the slicing information in the profile.
-
-    Parameters:
-        resource: The FHIR resource
-    Return:
-        resource: The FHIR resource
-    """
-    profile = resource.__class__
-    # Go over all slices
-    for slicing in profile.profile_slicing:
-        if '[x]' in slicing.path: continue        
-        slices_resources = []
-        for slice in slicing.slices:  
-            # Construct empty instance of the slice
-            slice_resource = slice.get_pydantic_model(resource).model_construct()
-            # Go over its constraints and set any preset values given by the profile
-            slice_resource = process_slice_constraints(slice_resource, slice)
-            # Check if the slice is valid by the preset values and if more than one slice instance is allowed
-            if not slice_resource.is_FHIR_complete and slice.max_cardinality>1:
-                # Create multiple copies of the slice, unused copies will be deleted later
-                slices_resources.extend([
-                    slice_resource.model_copy(deep=True) 
-                        for _ in range(min(slice.max_cardinality, slice_copies))
-                ])
-            else:
-                # Otherwise just add the slice instance to the list of slices
-                slices_resources.append(slice_resource)
-        # Set the whole list of slices in the resource
-        collection = fhirpath.parse(slicing.path).find_or_create(resource)
-        for col in collection:
-            col.set_literal(slices_resources)
-
-    return resource
-
-
-def process_slice_constraints(slice_resource, slice):
-    """
-    Processes and sets constraints within a slice.
-
-    Parameters:
-        slice_resource: The FHIR resource of the corresponding slice
-        slice: The slice containing constraints.
-    Returns:
-        slice_resource: The FHIR resource of the corresponding slice    
-    """
-    for constraint in slice.constraints:
-        slice_element = constraint.path.replace(slice.slicing.path, '').lstrip('.')
-        if '[x]' in slice_element:
-            continue
+#     Parameters:
+#         slice_resource: The FHIR resource of the corresponding slice
+#         slice: The slice containing constraints.
+#     Returns:
+#         slice_resource: The FHIR resource of the corresponding slice    
+#     """
+#     for constraint in slice.constraints:
+#         slice_element = constraint.path.replace(slice.slicing.path, '').lstrip('.')
+#         if '[x]' in slice_element:
+#             continue
         
-        if constraint.profile:
-            for field, value in construct_with_profiled_elements(constraint.profile).__dict__.items():
-                if field in slice_resource.model_fields and value:
-                    setattr(slice_resource, field, value)
-            return slice_resource
+#         if constraint.profile:
+#             for field, value in construct_with_profiled_elements(constraint.profile).__dict__.items():
+#                 if field in slice_resource.model_fields and value:
+#                     setattr(slice_resource, field, value)
+#             return slice_resource
         
-        if constraint.fixedValue:
-            fhirpath.parse(slice_element).update_or_create(slice_resource, constraint.fixedValue)       
-        if constraint.pattern:
-            if slice_element == '':
-                for field, value in constraint.pattern.__dict__.items():
-                    setattr(slice_resource, field, value)
-            else:
-                fhirpath.parse(slice_element).update_or_create(slice_resource, constraint.pattern)       
+#         if constraint.fixedValue:
+#             fhirpath.parse(slice_element).update_or_create(slice_resource, constraint.fixedValue)       
+#         if constraint.pattern:
+#             if slice_element == '':
+#                 for field, value in constraint.pattern.__dict__.items():
+#                     setattr(slice_resource, field, value)
+#             else:
+#                 fhirpath.parse(slice_element).update_or_create(slice_resource, constraint.pattern)       
     
-    return slice_resource
+#     return slice_resource
 
 
 def track_slice_changes(resource, value):
     profile = resource.__class__
-    for slicing in profile.profile_slicing:
-        if '[x]' in slicing.path: continue
-        valid_elements = ensure_list(fhirpath.parse(slicing.path).get_value(resource))    
+    for element in profile.get_sliced_elements():
+        valid_elements = ensure_list(fhirpath.parse(element).get_value(resource))    
         for entry in valid_elements:
-            if entry:
-                if getattr(entry,'profile_slicing', None):
-                    track_slice_changes(entry, value)        
+            if isinstance(entry, FHIRSliceModel):
                 entry.__track_changes__ = value
+            elif hasattr(entry, 'get_sliced_elements'):
+                track_slice_changes(entry, value)        
 
 
 def clean_elements_and_slices(resource, depth=0):
     profile = resource.__class__
     profile.validate_assignment = False
     # Remove unused/incomplete slices
-    for slicing in profile.profile_slicing:
-        if '[x]' in slicing.path: continue
-        valid_elements = ensure_list(fhirpath.parse(slicing.path).get_value(resource))
-
+    for element, slices in profile.get_sliced_elements().items():
+        valid_elements = ensure_list(getattr(resource, element))
         valid_elements = [element for element in valid_elements if element or isinstance(element, bool)]
         if not valid_elements:
             continue
-        print("\t"*(depth)+f'↪ {slicing.path}: {len(valid_elements)} elements')
-        for slice in slicing.slices:
+        for slice in slices:
             # Get all the elements that conform to this slice's definition           
-            sliced_entries = ensure_list(fhirpath.parse(slice.full_fhir_path).get_value(resource))       
-            sliced_entries = [entry for entry in sliced_entries if entry is not None]
-            print("\t"*(depth+1)+f'↪ {slice.full_fhir_path}: {len(sliced_entries)} elements')
-            
-            for n,entry in enumerate(sliced_entries):
-                print("\t"*(depth+2)+f'↪ {slicing.path}:{slice.name}[{n}]  (Modified:{"✓" if entry.has_been_modified else "✗"} Complete:{"✓" if entry.is_FHIR_complete else "✗"}) {"-> DELETE" if (not entry.is_FHIR_complete and not entry.has_been_modified) and entry in valid_elements else ""}' )
+            sliced_entries = [entry for entry in valid_elements if isinstance(entry, slice)] 
+            for entry in sliced_entries:
                 if not entry.is_FHIR_complete and not entry.has_been_modified and entry in valid_elements:
                     valid_elements.remove(entry)                
-                elif entry.profile_slicing:
-                    clean_elements_and_slices(entry, depth=depth+3)                
+                elif entry.get_sliced_elements():
+                    clean_elements_and_slices(entry, depth=depth+3)  
         # Set the new list with only the valid slices
-        collection = fhirpath.parse(slicing.path).find_or_create(resource)
-        for col in collection:
-            col.set_literal(valid_elements)
+        setattr(resource, element, valid_elements)
     return resource
 
 

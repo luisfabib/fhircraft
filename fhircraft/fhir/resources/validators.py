@@ -28,7 +28,9 @@ def validate_model_constraint(instance, expression, human, key, severity):
     return _validate_FHIR_element_constraint(instance, expression, human, key, severity)
 
 def validate_FHIR_element_pattern(cls, element, pattern):
-    assert merge_dicts(element.model_dump(), pattern.model_dump()) == element.model_dump(), \
+    if isinstance(pattern, list): pattern = pattern[0]
+    _element = element[0] if isinstance(element, list) else element
+    assert merge_dicts(_element.model_dump(), pattern.model_dump()) == _element.model_dump(), \
             f'Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2)}'
     return element
 
