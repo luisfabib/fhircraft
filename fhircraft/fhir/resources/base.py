@@ -50,18 +50,35 @@ class FHIRBaseModel(BaseModel):
                     if inspect.isclass(arg) and issubclass(arg, FHIRSliceModel) 
             ]) 
         } 
+
+    @classmethod
+    def clean_unusued_slice_instances(cls, resource):
+        # Remove unused/incomplete slices
+        for element, slices in cls.get_sliced_elements().items():
+            valid_elements = [col.value for col in fhirpath.parse(element).find_or_create(resource) if col.value is not None]        
+            new_valid_elements = []
+            if not valid_elements:
+                continue
+            for slice in slices:
+                # Get all the elements that conform to this slice's definition           
+                sliced_entries = [entry for entry in valid_elements if isinstance(entry, slice)] 
+                for entry in sliced_entries:
+                    if slice.get_sliced_elements():
+                        entry = slice.clean_unusued_slice_instances(entry) 
+                    if (entry.is_FHIR_complete and entry.has_been_modified) \
+                        or (entry.is_FHIR_complete  and not entry.has_been_modified and slice.min_cardinality>0):
+                        if entry not in new_valid_elements:
+                            new_valid_elements.append(entry)                
+            # Set the new list with only the valid slices
+            collection = fhirpath.parse(element).find_or_create(resource)
+            [col.set_literal(new_valid_elements) for col in collection]
+        return resource
+        
     
 
 class FHIRSliceModel(FHIRBaseModel):
-    __track_changes__: bool = False 
-    __has_been_modified__: bool = False
     min_cardinality: ClassVar[int] = 0
     max_cardinality: ClassVar[int] = 1
-    
-    def __setattr__(self, name:str, value):
-        super().__setattr__(name, value)
-        if name not in ['__track_changes__','__has_been_modified__'] and self.__track_changes__:
-            super().__setattr__('__has_been_modified__', True)
     
     @property
     def is_FHIR_complete(self):
