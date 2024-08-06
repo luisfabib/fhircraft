@@ -1,6 +1,8 @@
-from pydantic import BaseModel 
+from pydantic import BaseModel , ValidationError
 from fhircraft.utils import _get_deepest_args, ensure_list
+from fhircraft.fhir.path import fhirpath
 from typing import ClassVar
+from copy import copy
 import inspect 
 
 class FHIRBaseModel(BaseModel):
@@ -21,18 +23,29 @@ class FHIRBaseModel(BaseModel):
             for slice in slices:
                 # Add empty slice instances
                 slice_resources.extend([
-                    slice.model_construct()
+                    slice.model_construct_with_slices()
                         for _ in range(min(slice.max_cardinality, slice_copies))
                 ])
             # Set the whole list of slices in the resource
-            setattr(instance, element, slice_resources)
+            collection = fhirpath.parse(element).find_or_create(instance)
+            [col.set_literal(slice_resources) for col in collection]
         return instance
     
     @classmethod 
     def get_sliced_elements(cls):
+        # Get model elements' fields
+        fields = copy(cls.model_fields)
+        # Get model elements' extension fields 
+        fields.update({ 
+            f'{field_name}.extension': next((arg.model_fields.get('extension')
+                    for arg in _get_deepest_args(field.annotation)
+                        if inspect.isclass(arg) and issubclass(arg, FHIRBaseModel) if arg.model_fields.get('extension'))
+            , None) for field_name, field in cls.model_fields.items()  if field_name != 'extension'
+        })
+        # Compile the sliced elements in the model
         return {
-            field_name: slices for field_name, field in cls.model_fields.items() 
-                if bool(slices := [arg
+            field_name: slices for field_name, field in fields.items() 
+                if field and bool(slices := [arg
                     for arg in _get_deepest_args(field.annotation)
                     if inspect.isclass(arg) and issubclass(arg, FHIRSliceModel) 
             ]) 
@@ -52,19 +65,13 @@ class FHIRSliceModel(FHIRBaseModel):
     
     @property
     def is_FHIR_complete(self):
-        BASE_ELEMENTS = ['text','extension', 'id', 'resourceType']
-        slice_available_elements = sorted(set([name for name in self.__class__.model_fields if '_ext' not in name and not name.startswith('_') and name not in BASE_ELEMENTS]))
-        slice_preset_elements = sorted(set([name for name, value in self.model_dump().items() if (value is not None or value!=[]) and '_ext' not in name and not name.startswith('_')  and name not in BASE_ELEMENTS]))
-        return slice_available_elements == slice_preset_elements
+        model = self.__class__ 
+        try:
+            model.model_validate(self.model_dump())
+            return True 
+        except ValidationError:
+            return False
     
     @property
     def has_been_modified(self):
-        if self.__has_been_modified__: 
-            return True
-        else:
-            for element in self.__dict__.values():
-                elements = ensure_list(element)
-                for _element in elements:
-                    if getattr(_element, 'has_been_modified', None):
-                        return True
-        return False
+        return self != self.__class__.model_construct_with_slices()

@@ -41,7 +41,7 @@ components:
       format: date
       pattern: '^\d{4}-\d{2}-\d{2}$'
     TestSchema:
-      title: Condition      
+      title: Patient      
       x-fhir-resource: 
         profile: http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient
         resourceType: Patient
@@ -76,7 +76,7 @@ components:
               x-fhirpath: null
             display:
               type: string
-              x-fhirpath: Patient.extension('http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity').extension('text').valueString
+              x-fhirpath: Patient.extension('http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity').extension('text')[0].valueString
             version:
               type: string
               x-fhirpath: null

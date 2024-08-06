@@ -52,6 +52,10 @@ components:
           $ref: '#/components/schemas/Coding'
           x-fhirpath: Condition.clinicalStatus.coding
           x-binding: http://hl7.org/fhir/ValueSet/condition-clinical
+        category: 
+          $ref: '#/components/schemas/Coding'
+          x-fhirpath: Condition.category.coding[0]
+          x-binding: http://hl7.org/fhir/us/core/ValueSet/us-core-problem-or-health-concern
         verification: 
           $ref: '#/components/schemas/Coding'
           x-fhirpath: Condition.verificationStatus.coding

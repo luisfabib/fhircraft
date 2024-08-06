@@ -10,6 +10,10 @@
       "code": "confirmed",
       "display": "Confirmed"
    },
+   "category": {
+      "system" : "http://terminology.hl7.org/CodeSystem/condition-category",
+      "code" : "problem-list-item"
+   },
    "condition": {
       "system": "http://snomed.info/sct",
       "code": "254637007",
