@@ -1,5 +1,5 @@
 from pydantic import BaseModel , ValidationError
-from fhircraft.utils import _get_deepest_args, ensure_list
+from fhircraft.utils import get_all_models_from_field
 from fhircraft.fhir.path import fhirpath
 from typing import ClassVar
 from copy import copy
@@ -38,17 +38,13 @@ class FHIRBaseModel(BaseModel):
         # Get model elements' extension fields 
         fields.update({ 
             f'{field_name}.extension': next((arg.model_fields.get('extension')
-                    for arg in _get_deepest_args(field.annotation)
-                        if inspect.isclass(arg) and issubclass(arg, FHIRBaseModel) if arg.model_fields.get('extension'))
+                    for arg in get_all_models_from_field(field) if arg.model_fields.get('extension'))
             , None) for field_name, field in cls.model_fields.items()  if field_name != 'extension'
         })
         # Compile the sliced elements in the model
         return {
             field_name: slices for field_name, field in fields.items() 
-                if field and bool(slices := [arg
-                    for arg in _get_deepest_args(field.annotation)
-                    if inspect.isclass(arg) and issubclass(arg, FHIRSliceModel) 
-            ]) 
+                if field and bool(slices := list(get_all_models_from_field(field, issubclass_of=FHIRSliceModel))) 
         } 
 
     @classmethod

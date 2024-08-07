@@ -6,7 +6,7 @@ from typing import List, Any, Dict, Union, get_args, get_origin, Optional
 from dotenv import dotenv_values
 import re
 from contextlib import contextmanager
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import inspect
 
 # URL regex pattern
@@ -260,9 +260,15 @@ def _get_deepest_args(tp: Any) -> list:
         deepest_args.extend(_get_deepest_args(arg))
     return deepest_args
 
+
+def get_all_models_from_field(field: Field, issubclass_of: type = BaseModel):
+    return (arg 
+            for arg in _get_deepest_args(field.annotation) 
+                if inspect.isclass(arg) and issubclass(arg, issubclass_of)
+    )
+
 def get_fhir_model_from_field(field):
-    results = _get_deepest_args(field.annotation)
-    return next((arg for arg in results if inspect.isclass(arg) and issubclass(arg, BaseModel)), None)
+    return next(get_all_models_from_field(field), None)
 
 
 

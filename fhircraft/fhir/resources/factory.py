@@ -150,19 +150,19 @@ class ResourceFactory:
         return constrained_value
 
 
-    def process_element_slices(self, element, field_type):
+    def _process_element_slices(self, element, field_type):
         slice_types = []
         for slice_name, slice_element in element['slices'].items():
             if (slice_element_types := slice_element.get('type')) and (slice_element_canonical_urls := slice_element_types[0].get('profile')):
                 # Construct the slice model from the canonical URL
                 slice_model = self.construct_resource_model(slice_element_canonical_urls[0])
                 # Re-build the model, mixing it with the FHIRSliceModel class for later identification
-                slice_model_name = capitalize(self.Config.resource_name) + capitalize(slice_model.__name__)
+                slice_model_name = capitalize(slice_model.__name__)
                 slice_model = create_model(slice_model_name, __base__=(slice_model, FHIRSliceModel))                                   
             else:
                 # Construct the slice model's name
                 slice_name = ''.join([capitalize(word) for word in slice_name.split('-')])
-                slice_model_name = capitalize(self.Config.resource_name) + capitalize(slice_name)
+                slice_model_name = capitalize(slice_name)
                 # Process and compile all subfields of the slice
                 slice_subfields, slice_validators, slice_properties = self._process_FHIR_structure_into_Pydantic_components(slice_element, FHIRSliceModel)
                 # Construct the slice model
@@ -171,8 +171,7 @@ class ResourceFactory:
                 for attribute, property_getter in slice_properties.items():
                     setattr(slice_model, attribute, property(property_getter))  
             # Store the specific slice cardinality
-            slice_model.min_cardinality=int(slice_element['min']) if str(slice_element['min']).isnumeric() else None
-            slice_model.max_cardinality=int(str(slice_element['max']).replace('*','99999')) if str(slice_element['max']).replace('*','99999').isnumeric() else None
+            slice_model.min_cardinality, slice_model.max_cardinality = self._process_cardinality_constraints(slice_element)
             # Store the slice model in the list of slices of the element
             slice_types.append(slice_model)    
         # Create annotated type as union of slice models and original type (important, last in the definition) 
@@ -180,6 +179,11 @@ class ResourceFactory:
             Union[tuple([*slice_types, field_type])], 
             Field(union_mode='left_to_right')
         ]
+        
+    def _process_cardinality_constraints(self, element):
+        min_card = int(element['min']) if str(element['min']).isnumeric() else None
+        max_card = int(max_string) if (max_string := str(element['max']).replace('*','99999')).isnumeric() else None
+        return min_card, max_card
 
     def _add_model_constraint_validator(self, constraint: dict, validators: dict) -> dict:
         # Construct function name for validator
@@ -224,11 +228,8 @@ class ResourceFactory:
         for name, element in structure.get('children',{}).items():
             if base and name in base.model_fields:
                 continue 
-            
             # Get cardinality of element
-            min_card = int(element['min'])
-            max_card = int(element['max']) if element['max'] != '*' else None
-
+            min_card, max_card = self._process_cardinality_constraints(element)
             # Parse the FHIR types of the element
             field_types = [self._parse_element_type(field_type['code']) for field_type in element.get('type', [])]
 
@@ -292,7 +293,11 @@ class ResourceFactory:
                     validators = self._add_element_constraint_validator(name, constraint, base, validators)
             # Process FHIR slicing on the element, if present
             if element.get('slices'):
-                field_type = self.process_element_slices(element, field_type)
+                field_type = self._process_element_slices(element, field_type)
+                # Add slicing cardinality validator for field
+                validators[f'{name}_slicing_cardinality_validator'] = field_validator(name, mode='after')(partial(
+                    fhir_validators.validate_slicing_cardinalities, field_name=name)
+                )                
             # Process element children, if present
             elif element.get('children'):
                 backbone_model_name = capitalize(self.Config.resource_name) + capitalize(name)
@@ -300,13 +305,15 @@ class ResourceFactory:
                 for attribute, property_getter in subfield_properties.items():
                     setattr(field_type, attribute, property(property_getter))      
                 if element['children']['extension'].get('slices'):
-                    extension_type = self.process_element_slices(element['children']['extension'], get_FHIR_type('Extension', self.Config.FHIR_release))
-                    extension_min_card = int(element['children']['extension']['min'])
-                    extension_max_card = int(element['children']['extension']['max']) if element['children']['extension']['max'] != '*' else None
+                    extension_type = self._process_element_slices(element['children']['extension'], get_FHIR_type('Extension', self.Config.FHIR_release))
+                    # Get cardinality of extension element
+                    extension_min_card, extension_max_card = self._process_cardinality_constraints(element['children']['extension'])
+                    # Add slicing cardinality validator for field
+                    subfield_validators[f'extension_slicing_cardinality_validator'] = field_validator('extension', mode='after')(partial(
+                        fhir_validators.validate_slicing_cardinalities, field_name='extension')
+                    )                               
                     field_subfields['extension'] = self._construct_Pydantic_field(extension_type, extension_min_card, extension_max_card)
                 field_type = create_model(backbone_model_name, **field_subfields, __base__=field_type, __validators__=subfield_validators)                
-      
-
             # Create and add the Pydantic field for the FHIR element
             fields[name] = self._construct_Pydantic_field(field_type, min_card, max_card, default=field_default, description=element.get('short'))
             if hasattr(primitives, str(field_type)):

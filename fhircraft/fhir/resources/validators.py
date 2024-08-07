@@ -1,6 +1,7 @@
 import warnings
 import traceback
-from fhircraft.utils import ensure_list, merge_dicts
+from fhircraft.utils import ensure_list, merge_dicts, get_all_models_from_field
+from fhircraft.fhir.resources.base import FHIRSliceModel 
 
 def _validate_FHIR_element_constraint(value, expression, human, key, severity):
     from fhircraft.fhir.path import fhirpath, FhirPathLexerError, FhirPathParserError
@@ -35,8 +36,24 @@ def validate_FHIR_element_pattern(cls, element, pattern):
     return element
 
 def validate_type_choice_element(instance, field_types, field_name_base):
-    assert sum(getattr(instance, field_name_base + field_type if isinstance(field_type, str) else field_type.__name__, None) is not None for field_type in field_types) <= 1, f'Type choice element {field_name_base}[x] can only have one value set.'
+    assert sum(
+        getattr(instance, field_name_base + field_type if isinstance(field_type, str) else field_type.__name__, None) is not None 
+            for field_type in field_types 
+    ) <= 1, f'Type choice element {field_name_base}[x] can only have one value set.'
     return instance
+
+
+def validate_slicing_cardinalities(cls, values, field_name):
+    slices =  get_all_models_from_field(cls.model_fields[field_name], issubclass_of=FHIRSliceModel)
+    for slice in slices:
+        slice_instances_count = sum([isinstance(value, slice) for value in values])
+        assert slice_instances_count >= slice.min_cardinality, \
+            f"Slice '{slice.__name__}' for field '{field_name}' violates its min. cardinality. Requires min. cardinality of {slice.min_cardinality}, but got {slice_instances_count}"
+        assert slice_instances_count <= slice.max_cardinality, \
+            f"Slice '{slice.__name__}' for field '{field_name}' violates its max. cardinality. Requires max. cardinality of {slice.max_cardinality}, but got {slice_instances_count}"
+    return values
+        
+
 
 def get_type_choice_value_by_base(instance, base):
     for field in instance.model_fields:
