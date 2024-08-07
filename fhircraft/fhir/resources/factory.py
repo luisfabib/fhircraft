@@ -155,7 +155,7 @@ class ResourceFactory:
         for slice_name, slice_element in element['slices'].items():
             if (slice_element_types := slice_element.get('type')) and (slice_element_canonical_urls := slice_element_types[0].get('profile')):
                 # Construct the slice model from the canonical URL
-                slice_model = self.construct_resource_model(slice_element_canonical_urls[0])
+                slice_model = ResourceFactory().construct_resource_model(slice_element_canonical_urls[0])
                 # Re-build the model, mixing it with the FHIRSliceModel class for later identification
                 slice_model_name = capitalize(slice_model.__name__)
                 slice_model = create_model(slice_model_name, __base__=(slice_model, FHIRSliceModel))                                   
@@ -300,7 +300,7 @@ class ResourceFactory:
                 )                
             # Process element children, if present
             elif element.get('children'):
-                backbone_model_name = capitalize(self.Config.resource_name) + capitalize(name)
+                backbone_model_name = capitalize(self.Config.resource_name).strip() + capitalize(name).strip()
                 field_subfields, subfield_validators, subfield_properties = self._process_FHIR_structure_into_Pydantic_components(element, field_type)
                 for attribute, property_getter in subfield_properties.items():
                     setattr(field_type, attribute, property(property_getter))      

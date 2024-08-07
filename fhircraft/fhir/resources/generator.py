@@ -1,67 +1,60 @@
 import inspect
 from fhircraft.fhir.resources.factory import ResourceFactory
 from fhircraft.utils import get_fhir_model_from_field, ensure_list
-
+from typing import Dict, List
 from jinja2 import Environment, FileSystemLoader
 import re 
+from pydantic import BaseModel
 from collections import defaultdict 
-def generate_resource_model_code(resources):
 
-    file_loader = FileSystemLoader('fhircraft/fhir/resources/')
-    env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)
-    env.filters['escapequotes'] = lambda s: s.replace('"','\\"')
-    template = env.get_template('resource_template.py.j2')
 
-    imports = defaultdict(list)
-    after_imports = []
-    reload_models = []
+FACTORY_MODULE = inspect.getmodule(ResourceFactory).__name__
 
-    def properties(cls):
-        return {
-            key: value.fget
-            for key, value in cls.__dict__.items()
-            if isinstance(value, property)
-        }
+class CodeGenerator:
+    
+    import_statements: Dict[str, List[str]]
+    model_reload_statements: List[str]
+    
+    def __init__(self):
+        # Prepare the templating engine environment
+        file_loader = FileSystemLoader('fhircraft/fhir/resources/')
+        env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)
+        env.filters['escapequotes'] = lambda s: s.replace('"','\\"')
+        self.template = env.get_template('resource_template.py.j2')
 
-    def generate_import_statement(obj):
-        if not obj: 
-            return
+    def add_import_statement(self, obj):
         # Get the module of the object
         module = inspect.getmodule(obj)
-        
         if module is None:
-            raise ValueError(f"The object {obj} does not belong to a module")
-        
+            raise ValueError(f"The object {obj} does not belong to a module")        
         # Get the name of the module and the object
         module_name = module.__name__
         object_name = obj.__name__
-
         # Generate the import statement
-        imports[module_name].append(object_name)
-        
-        return object_name
-        
-    def serialize_model(model, data):
-        base = model.__base__ 
-        if base.__name__!='BaseModel':
-            generate_import_statement(model.__base__)
-        subdata = {}
+        self.import_statements[module_name].append(object_name)
+            
+    def serialize_model(self, model, data):
+        model_base = model.__base__ 
+        # Add import statement for the base class the the model inherits
+        if model_base and model_base != BaseModel:
+            self.add_import_statement(model.__base__)
 
+        subdata = {}
         for field, info in model.model_fields.items():
             if model.__base__ and field in model.__base__.model_fields:
                 continue
             field_type = repr(info.annotation)
             
-            has_submodel = 'fhircraft.fhir.resources.factory' in field_type 
+            has_submodel = FACTORY_MODULE in field_type 
             
             if has_submodel:
-                field_type = field_type.replace('fhircraft.fhir.resources.factory.', '')
-                data = serialize_model(get_fhir_model_from_field(info), data)
+                field_type = field_type.replace(FACTORY_MODULE + '.', '')
+                data = self.serialize_model(get_fhir_model_from_field(info), data)
             else:
                 complex_type_model = get_fhir_model_from_field(info)
                 if complex_type_model:
-                    generate_import_statement(get_fhir_model_from_field(info))  
-                    for module in imports:
+                    self.add_import_statement(get_fhir_model_from_field(info))  
+                    for module in self.import_statements:
                         field_type = field_type.replace(f'{module}.','')
                 field_type = field_type.replace("<class '","").replace("'>","")
 
@@ -73,25 +66,36 @@ def generate_resource_model_code(resources):
                 if forward_ref_match:
                     field_type = field_type.replace('ForwardRef(', '').replace(')','')
                     statement = f'{model.__name__}.model_rebuild()'
-                    if statement not in reload_models:
-                        reload_models.append(statement)
+                    if statement not in self.model_reload_statements:
+                        self.model_reload_statements.append(statement)
             subdata[field] = {
                 'annotation': field_type,
                 'description': info.description, 
                 'alias': info.alias, 
                 'default': info.default,
             }
-        data.update({model: {'fields': subdata, 'properties': properties(model)}})
+        model_properties = {
+            key: value.fget
+            for key, value in model.__dict__.items()
+            if isinstance(value, property)
+        }
+        data.update({model: {'fields': subdata, 'properties': model_properties}})
         return data
 
+    def generate_resource_model_code(self, resources: type):
 
-    data = [serialize_model(resource, {}) for resource in ensure_list(resources)]
-    source_code = template.render(data=data, imports=imports, reload=reload_models)
-    for module in imports:
-        module = module.replace('.',r'\.')
-        for regex in [fr"(\<class \'{module}\.(\w*)\'\>)", r"(\<class \'(\w*)\'\>)"]:
-            for match in re.finditer(regex, source_code):
-                source_code = source_code.replace(match.group(1), match.group(2))
-
-
-    return source_code
+        self.import_statements = defaultdict(list)
+        self.model_reload_statements = []
+        
+        data = [self.serialize_model(resource, {}) for resource in ensure_list(resources)]
+        source_code = self.template.render(
+            data=data, 
+            imports=self.import_statements, 
+            reload=self.model_reload_statements
+        )
+        for module in self.import_statements:
+            module = module.replace('.',r'\.')
+            for regex in [fr"(\<class \'{module}\.(\w*)\'\>)", r"(\<class \'(\w*)\'\>)"]:
+                for match in re.finditer(regex, source_code):
+                    source_code = source_code.replace(match.group(1), match.group(2))
+        return source_code
