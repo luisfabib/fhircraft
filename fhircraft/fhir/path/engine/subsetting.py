@@ -48,7 +48,8 @@ class Index(FHIRPath):
             # if collection.parent:
             #     collection.extend([collection.construct_resource() for __ in range(pad)])   
             # else:
-            all_same_parent = all([item.parent.value == collection[0].parent.value if item.parent else True for item in collection])
+            print(collection)
+            all_same_parent = collection and all([item.parent.value in [subitem.parent.value for subitem in collection] if item.parent else True for item in collection])
             if all_same_parent:
                 parent_array = collection[0]
                 if parent_array.parent:

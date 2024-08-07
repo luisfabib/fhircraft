@@ -1,5 +1,5 @@
 
-from fhircraft.utils import ensure_list, get_dict_paths, load_file, load_url, contains_only_none, remove_none_dicts, load_env_variables  
+from fhircraft.utils import ensure_list, get_dict_paths, load_file, load_url, contains_only_none, remove_none_dicts, load_env_variables, merge_dicts, replace_nth
 import os 
 import json
 import pytest
@@ -293,3 +293,73 @@ class TestLoadEnvVariables:
         result = load_env_variables('nonexistent.env')
         mock_dotenv_values.assert_called_once_with('nonexistent.env')
         assert result == {}
+
+
+
+class TestMergeDicts:
+
+    # Merging two dictionaries with non-overlapping keys
+    def test_non_overlapping_keys(self):
+        dict1 = {'a': 1, 'b': 2}
+        dict2 = {'c': 3, 'd': 4}
+        result = merge_dicts(dict1, dict2)
+        expected = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+        assert result == expected
+
+    # Merging two dictionaries with overlapping keys and non-conflicting values
+    def test_overlapping_keys_non_conflicting_values(self):
+        dict1 = {'a': 1, 'b': {'x': 10}}
+        dict2 = {'b': {'y': 20}, 'c': 3}
+        result = merge_dicts(dict1, dict2)
+        expected = {'a': 1, 'b': {'x': 10, 'y': 20}, 'c': 3}
+        assert result == expected
+
+    # Merging dictionaries where values are lists of equal length
+    def test_lists_of_equal_length(self):
+        dict1 = {'a': [1, 2], 'b': [3, 4]}
+        dict2 = {'a': [5, 6], 'b': [7, 8]}
+        result = merge_dicts(dict1, dict2)
+        expected = {'a': [1, 2], 'b': [3, 4]}
+        assert result == expected
+
+    # Merging dictionaries where one dictionary is empty
+    def test_one_empty_dictionary(self):
+        dict1 = {}
+        dict2 = {'a': 1, 'b': 2}
+        result = merge_dicts(dict1, dict2)
+        expected = {'a': 1, 'b': 2}
+        assert result == expected
+
+    # Merging dictionaries where both dictionaries are empty
+    def test_both_empty_dictionaries(self):
+        dict1 = {}
+        dict2 = {}
+        result = merge_dicts(dict1, dict2)
+        expected = {}
+        assert result == expected
+
+    # Merging dictionaries with deeply nested structures
+    def test_deeply_nested_structures(self):
+        dict1 = {'a': {'b': {'c': 1}}}
+        dict2 = {'a': {'b': {'d': 2}}}
+        result = merge_dicts(dict1, dict2)
+        expected = {'a': {'b': {'c': 1, 'd': 2}}}
+        assert result == expected
+
+
+class TestReplaceNth:
+
+    # Replace the nth occurrence of a substring in a string correctly
+    def test_replace_nth_correctly(self):
+        result = replace_nth("hello world hello world", "world", "there", 2)
+        assert result == "hello world hello there"
+
+    # Handle cases where the substring appears exactly n times
+    def test_substring_appears_exactly_n_times(self):
+        result = replace_nth("abc abc abc", "abc", "xyz", 3)
+        assert result == "abc abc xyz"
+
+    # Return the modified string with the nth occurrence replaced
+    def test_return_modified_string(self):
+        result = replace_nth("one two three two one", "two", "four", 1)
+        assert result == "one four three two one"
