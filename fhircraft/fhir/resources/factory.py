@@ -8,7 +8,7 @@ import fhircraft.fhir.resources.validators as fhir_validators
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.datatypes import get_FHIR_type
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
-from fhircraft.utils import capitalize, load_env_variables
+from fhircraft.utils import capitalize, load_env_variables, ensure_list
 from fhircraft.fhir.path import fhirpath
 
 # Pydantic modules
@@ -21,6 +21,7 @@ from enum import Enum
 from functools import partial
 from typing import List, Any, Dict, Union, Optional, Literal
 from typing_extensions import Annotated 
+from collections import defaultdict
 import requests
 import inspect
 import re 
@@ -77,33 +78,45 @@ class ResourceFactory:
         
 
     def build_tree_structure(self, elements: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Builds a tree from a list of ElementDefinitions."""
-        tree = {}
+        """
+        Builds a tree from a list of ElementDefinitions.
+
+        Parameters:
+            elements (List[Dict[str, Any]]): A list of ElementDefinitions to build the tree from.
+
+        Returns:
+            Dict[str, Any]: A tree structure representing the ElementDefinitions.
+        """
+        tree = defaultdict(dict)
         for element in elements:
-            path_parts = element['id'].split('.')
             current = tree
-            for part in path_parts:
+            for part in element['id'].split('.'):
                 if ':' in part:
+                    # Handle slice definitions
                     part, sliceName = part.split(':')
                     current = current['children'][part]
-                    if 'slices' not in current:
-                        current['slices'] = {}
-                    if sliceName not in current['slices']:
-                        current['slices'][sliceName] = {}
-                    current = current['slices'][sliceName]
+                    current['slices'] = current.get('slices', {})
+                    current = current['slices'].setdefault(sliceName, {})
                 else:
-                    if 'children' not in current:
-                        current['children'] = {}
-                    if part not in current['children']:
-                        current['children'][part] = {}
-                    current = current['children'][part]
-            # Keep only the name and type, ignore slices
+                    # Handle children elements
+                    current['children'] = current.get('children', {})
+                    current = current['children'].setdefault(part, {})
             current.update(element)
         return tree
 
-    def _parse_element_type(self, field_type_name: str) -> Union[object,str]:      
+    def _get_FHIR_type(self, field_type_name: str) -> Union[type,str]:     
+        """
+        Parses and loads the FHIR element type based on the provided field type name.
+
+        Args:
+            field_type_name (str): The name of the field type to be parsed.
+
+        Returns:
+            Union[type, str]: The parsed FHIR element type, returns input string if type not found.
+        """         
         FHIR_COMPLEX_TYPE_PREFIX = 'http://hl7.org/fhir/StructureDefinition/'
         FHIRPATH_TYPE_PREFIX = 'http://hl7.org/fhirpath/System.'
+        # Pre-process the type string
         field_type_name = str(field_type_name)
         field_type_name = field_type_name.removeprefix(FHIR_COMPLEX_TYPE_PREFIX)
         field_type_name = field_type_name.removeprefix(FHIRPATH_TYPE_PREFIX)
@@ -118,31 +131,59 @@ class ResourceFactory:
         return field_type
 
 
-    def _construct_Pydantic_field(self, field_type, min_card, max_card, default=_Unset, description=None, alias=None):
+    def _construct_Pydantic_field(self, field_type: type, min_card: int, max_card: int, 
+                default: Any=_Unset, description: Optional[str]=None, alias: Optional[str]=None
+        ) -> Field:
+        """ 
+        Constructs a Pydantic field based on the provided parameters.
+
+        Args:
+            field_type (type): The type of the field.
+            min_card (int): The minimum cardinality of the field.
+            max_card (int): The maximum cardinality of the field.
+            default (Any, optional): The default value of the field. Defaults to _Unset.
+            description (str, optional): The description of the field. Defaults to None.
+            alias (str, optional): The alias of the field. Defaults to None.
+
+        Returns:
+            Field: The constructed Pydantic field.
+        """        
+        # Determine whether typing should be a list based on max. cardinality
         is_list_type = not max_card or max_card>1
         if is_list_type:
             field_type = List[field_type]
-            default = [default] if default is not _Unset and not isinstance(default, list) else default
+            default = ensure_list(default) if default is not _Unset else default
+        # Determine whether the field is optional
         if min_card==0:
             field_type = Optional[field_type]
             default = None
+        # Construct the Pydantic field
         return (    
-            field_type, 
-                Field(
-                    default,
-                    alias=alias,
-                    description=description,
-                    min_length=min_card if is_list_type else None,
-                    max_length=max_card if is_list_type else None
+            field_type, Field(
+                default,
+                alias=alias,
+                description=description,
+                min_length=min_card if is_list_type else None,
+                max_length=max_card if is_list_type else None
             )
         )    
     
-    def _process_pattern_or_fixed_values(self, element, constraint_prefix):
+    def _process_pattern_or_fixed_values(self, element: Dict[str, Any], constraint_prefix: str) -> Any:
+        """
+        Process the pattern or fixed values of a StructureDefinition element.
+
+        Parameters:
+            element (Dict[str, Any]): The element to process.
+            constraint_prefix (str): The prefix indicating pattern or fixed values.
+
+        Returns:
+            Any: The constrained value after processing.
+        """        
         # Determine the name of the StructureDefinition element's attribute that starts with either the prefix 'fixed[x]' or 'pattern[x]' 
         constraint_attribute = next((attribute for attribute in element if attribute.startswith(constraint_prefix)), None)
         if (constrained_value := element.get(constraint_attribute)) is not None:
             # Get the type of value that is constrained to a preset value
-            constrained_type = self._parse_element_type(constraint_attribute.replace(constraint_prefix,''))
+            constrained_type = self._get_FHIR_type(constraint_attribute.replace(constraint_prefix,''))
             # Parse the value
             constrained_value = constrained_type.model_validate(constrained_value) \
                                 if inspect.isclass(constrained_type) and issubclass(constrained_type, BaseModel) \
@@ -231,7 +272,7 @@ class ResourceFactory:
             # Get cardinality of element
             min_card, max_card = self._process_cardinality_constraints(element)
             # Parse the FHIR types of the element
-            field_types = [self._parse_element_type(field_type['code']) for field_type in element.get('type', [])]
+            field_types = [self._get_FHIR_type(field_type['code']) for field_type in element.get('type', [])]
 
             # TODO: Handle more gracefully. 
             # If has no type, skip element
