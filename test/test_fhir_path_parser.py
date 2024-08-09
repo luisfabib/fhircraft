@@ -154,6 +154,7 @@ parser_test_cases = (
     # Types Operators
     # ----------------------------------
     ("A is String", Is(Element('A'), 'String')),  
+    ("A is Observation", Is(Element('A'), 'Observation')),  
     ("A is System.String", Is(Element('A'), 'System.String')),  
     ("A as String", As(Element('A'), 'String')),  
     ("A as System.String", As(Element('A'), 'System.String')),  

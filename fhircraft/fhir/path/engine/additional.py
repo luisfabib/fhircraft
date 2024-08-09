@@ -154,12 +154,15 @@ class Resolve(FHIRPathFunction):
         collection = ensure_list(collection)
         output_collection = []
         for item in collection:
-            if isinstance(item.value, (Uri, Canonical, Url)):
-                resource_url = item.value 
-            elif isinstance(item.value, get_FHIR_type('Reference')):
+            print(item.value)
+            if 'Reference' in type(item.value).__name__:
                 resource_url = item.value.reference
+            elif isinstance(item.value, str):
+                resource_url = item.value 
             else:
                 raise FHIRPathError('The resolve() function requires either a collection of URIs, Canonicals, URLs or References.')
+            if not resource_url.startswith('http://') and not resource_url.startswith('https://'):
+                return []
             resource = load_url(resource_url)
             profile_url = resource.get('meta',{}).get('profile',[None])[0]
             if profile_url:

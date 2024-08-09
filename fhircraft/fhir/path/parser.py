@@ -272,7 +272,8 @@ class FhirPathParser:
             raise FhirPathParserError(f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Invalid contextual operator "{p[1]}".\n{_underline_error_in_fhir_path(self.string, p[1], p.lexpos(1))}')                           
 
     def p_type_specifier(self, p):
-        """type_specifier : identifier """
+        """type_specifier : identifier 
+                          | ROOT_NODE """
         p[0] = p[1]
 
     def p_type_specifier_context(self, p):
