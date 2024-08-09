@@ -1,0 +1,38 @@
+{
+  "resourceType" : "Practitioner",
+  "id" : "us-core-practitioner-peter-pathologist",
+  "meta" : {
+    "profile" : ["http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner"]
+  },
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Practitioner</b><a name=\"us-core-practitioner-peter-pathologist\"> </a><a name=\"hcus-core-practitioner-peter-pathologist\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Practitioner &quot;us-core-practitioner-peter-pathologist&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"http://hl7.org/fhir/us/core/STU5.0.1/StructureDefinition-us-core-practitioner.html\">US Core Practitioner Profile</a></p></div><p><b>identifier</b>: <a href=\"http://terminology.hl7.org/5.3.0/NamingSystem-npi.html\" title=\"National Provider Identifier\">United States National Provider Identifier</a>/1122334455</p><p><b>name</b>: Peter Pathologist </p><p><b>address</b>: 123 Corporate Drive Anytown MA 12345 US (work)</p><p><b>gender</b>: female</p><h3>Qualifications</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Code</b></td></tr><tr><td style=\"display: none\">*</td><td>Doctor of Medicine <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (degreeLicenseCertificate[2.7]#MD)</span></td></tr></table></div>"
+  },
+  "identifier" : [{
+    "system" : "http://hl7.org/fhir/sid/us-npi",
+    "value" : "1122334455"
+  }],
+  "name" : [{
+    "family" : "Pathologist",
+    "given" : ["Peter"],
+    "prefix" : ["Dr."]
+  }],
+  "address" : [{
+    "use" : "work",
+    "line" : ["123 Corporate Drive"],
+    "city" : "Anytown",
+    "state" : "MA",
+    "postalCode" : "12345",
+    "country" : "US"
+  }],
+  "gender" : "female",
+  "qualification" : [{
+    "code" : {
+      "coding" : [{
+        "system" : "http://terminology.hl7.org/CodeSystem/v2-0360",
+        "version" : "2.7",
+        "code" : "MD"
+      }]
+    }
+  }]
+}

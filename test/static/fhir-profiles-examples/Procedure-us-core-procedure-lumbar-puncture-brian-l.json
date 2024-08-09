@@ -1,0 +1,23 @@
+{
+  "resourceType" : "Procedure",
+  "id" : "us-core-procedure-lumbar-puncture-brian-l",
+  "meta" : {
+    "profile" : ["http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure"]
+  },
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Procedure</b><a name=\"us-core-procedure-lumbar-puncture-brian-l\"> </a><a name=\"hcus-core-procedure-lumbar-puncture-brian-l\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Procedure &quot;us-core-procedure-lumbar-puncture-brian-l&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"http://hl7.org/fhir/us/core/STU5.0.1/StructureDefinition-us-core-procedure.html\">US Core Procedure Profile</a></p></div><p><b>status</b>: completed</p><p><b>code</b>: Lumbar puncture (procedure) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#277762005)</span></p><p><b>subject</b>: <a href=\"Patient-cancer-patient-brian-l.html\">Patient/cancer-patient-brian-l</a> &quot; L&quot;</p><p><b>performed</b>: 2024-01-08</p></div>"
+  },
+  "status" : "completed",
+  "code" : {
+    "coding" : [{
+      "system" : "http://snomed.info/sct",
+      "code" : "277762005",
+      "display" : "Lumbar puncture (procedure)"
+    }]
+  },
+  "subject" : {
+    "reference" : "Patient/cancer-patient-brian-l"
+  },
+  "performedDateTime" : "2024-01-08"
+}

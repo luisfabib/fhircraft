@@ -109,8 +109,8 @@ class TestConvertResponseFromApiToFhir(TestCase):
             api_response_file='test/static/api-mixed-variant-patient-1.json', 
             openapi_spec_file='test/static/openapi-mixed-variant-and-patient.yaml', 
             fhir_response_file=[
-                'test/static/fhir-observation-genomic-variant-1.json', 
                 'test/static/fhir-patient-cancer-1.json',
+                'test/static/fhir-observation-genomic-variant-1.json', 
             ],
             endpoint='/endpoint'
         )

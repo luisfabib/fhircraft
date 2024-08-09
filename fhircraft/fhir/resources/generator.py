@@ -1,11 +1,15 @@
-import inspect
 from fhircraft.fhir.resources.factory import ResourceFactory
-from fhircraft.utils import get_fhir_model_from_field, ensure_list
-from typing import Dict, List
+from fhircraft.utils import get_all_models_from_field, get_fhir_model_from_field, ensure_list
+
 from jinja2 import Environment, FileSystemLoader
-import re 
 from pydantic import BaseModel
+
+from enum import EnumType
+
 from collections import defaultdict 
+from typing import Dict, List
+import inspect
+import re 
 
 
 FACTORY_MODULE = inspect.getmodule(ResourceFactory).__name__
@@ -31,7 +35,8 @@ class CodeGenerator:
         module_name = module.__name__
         object_name = obj.__name__
         # Generate the import statement
-        self.import_statements[module_name].append(object_name)
+        if module_name != FACTORY_MODULE and object_name not in self.import_statements[module_name]:
+            self.import_statements[module_name].append(object_name)
             
     def serialize_model(self, model, data):
         model_base = model.__base__ 
@@ -41,15 +46,20 @@ class CodeGenerator:
 
         subdata = {}
         for field, info in model.model_fields.items():
-            if model.__base__ and field in model.__base__.model_fields:
+            if model.__base__ and field in model.__base__.model_fields and all([getattr(info, slot) == getattr(model.__base__.model_fields[field], slot) for slot in info.__slots__ if not slot.startswith('_')]):
                 continue
             field_type = repr(info.annotation)
+            
+            if isinstance(info.annotation, EnumType):
+                field_type = info.annotation
+                field_type = f'''typing.Literal['{field_type['fixedValue'].value}']'''
             
             has_submodel = FACTORY_MODULE in field_type 
             
             if has_submodel:
                 field_type = field_type.replace(FACTORY_MODULE + '.', '')
-                data = self.serialize_model(get_fhir_model_from_field(info), data)
+                for submodel in get_all_models_from_field(info):
+                    data = self.serialize_model(submodel, data)
             else:
                 complex_type_model = get_fhir_model_from_field(info)
                 if complex_type_model:
@@ -58,10 +68,9 @@ class CodeGenerator:
                         field_type = field_type.replace(f'{module}.','')
                 field_type = field_type.replace("<class '","").replace("'>","")
 
-                
                 if "NoneType" in field_type:
                     field_type = field_type.replace("NoneType", 'typing.Optional["Element"]')
-
+                
                 forward_ref_match = re.match(r".*ForwardRef\(\'(.*)\'\).*", field_type, re.MULTILINE)
                 if forward_ref_match:
                     field_type = field_type.replace('ForwardRef(', '').replace(')','')
@@ -98,4 +107,8 @@ class CodeGenerator:
             for regex in [fr"(\<class \'{module}\.(\w*)\'\>)", r"(\<class \'(\w*)\'\>)"]:
                 for match in re.finditer(regex, source_code):
                     source_code = source_code.replace(match.group(1), match.group(2))
+
+        source_code = source_code.replace("FieldInfo(annotation=NoneType, required=True, metadata=[_PydanticGeneralMetadata(union_mode='left_to_right')])", "Field(union_mode='left_to_right')")
+
+
         return source_code

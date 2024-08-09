@@ -149,7 +149,7 @@ class ResourceFactory:
             Field: The constructed Pydantic field.
         """        
         # Determine whether typing should be a list based on max. cardinality
-        is_list_type = not max_card or max_card>1
+        is_list_type = max_card is None or max_card>1
         if is_list_type:
             field_type = List[field_type]
             default = ensure_list(default) if default is not _Unset else default
@@ -196,10 +196,7 @@ class ResourceFactory:
         for slice_name, slice_element in element['slices'].items():
             if (slice_element_types := slice_element.get('type')) and (slice_element_canonical_urls := slice_element_types[0].get('profile')):
                 # Construct the slice model from the canonical URL
-                slice_model = ResourceFactory().construct_resource_model(slice_element_canonical_urls[0])
-                # Re-build the model, mixing it with the FHIRSliceModel class for later identification
-                slice_model_name = capitalize(slice_model.__name__)
-                slice_model = create_model(slice_model_name, __base__=(slice_model, FHIRSliceModel))                                   
+                slice_model = ResourceFactory().construct_resource_model(slice_element_canonical_urls[0], base_model=FHIRSliceModel)
             else:
                 # Construct the slice model's name
                 slice_name = ''.join([capitalize(word) for word in slice_name.split('-')])
@@ -322,7 +319,7 @@ class ResourceFactory:
             if fixed_value := self._process_pattern_or_fixed_values(element, 'fixed'):
                 # Use enum with single choice since Literal definition does not work at runtime
                 singleChoice = Enum(
-                    f"{element}FixedValue",
+                    f"{name}FixedValue",
                     [('fixedValue',fixed_value)],
                     type=type(fixed_value),
                 )
@@ -363,7 +360,7 @@ class ResourceFactory:
         return fields, validators, properties
         
 
-    def construct_resource_model(self, canonical_url: str=None, structure_definition: dict=None) -> FHIRBaseModel:
+    def construct_resource_model(self, canonical_url: str=None, structure_definition: dict=None, base_model: type=FHIRBaseModel) -> FHIRBaseModel:
         # If the model has been constructed before, return the cached model
         if canonical_url in self.profiles:
             return self.profiles[canonical_url]
@@ -402,7 +399,7 @@ class ResourceFactory:
         # Construct the Pydantic model representing the FHIR resource
         model = create_model(
             self.Config.resource_name, **fields, 
-            __base__ = FHIRBaseModel,
+            __base__ = base_model,
             __validators__ = validators,
             __doc__ = structure['short'],
         )        

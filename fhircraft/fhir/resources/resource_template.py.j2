@@ -1,8 +1,16 @@
-from pydantic import Field, field_validator, model_validator, BaseModel
+# Fhircraft modules
+import fhircraft
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+# Pydantic modules
+from pydantic import Field, field_validator, model_validator, BaseModel
+# Standard modules
 import typing  
+from enum import Enum
+from types import NoneType
+
+# Dynamic modules 
 {% for module, objects in imports.items() %} 
 from {{ module }} import {{ objects|join(',')}}
 {% endfor %}
@@ -14,6 +22,9 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     """
     {{ model.__doc__ }}
     """
+    {% endif %}
+    {% if not model_data.fields %}
+    pass
     {% endif %}
     {% for field, info in model_data.fields.items() %}
     {{ field }}: {{ info.annotation}} = Field(
@@ -59,7 +70,7 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     {% endwith %}
 
     {% endfor %}
-    {% for property, property_getter in model_data.properties.items() %}
+    {# {% for property, property_getter in model_data.properties.items() %}
     @property 
     def {{ property }}(self):
         return fhir_validators.{{ property_getter.func.__name__ }}(self, 
@@ -67,7 +78,7 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
             {{ arg }}="{{value}}",
             {% endfor %}
         )
-    {% endfor %}
+    {% endfor %} #}
 
 {% endfor %}
 {% endfor %}

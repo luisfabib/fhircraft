@@ -1,0 +1,71 @@
+{
+  "resourceType" : "MedicationRequest",
+  "id" : "cancer-related-medication-request-cisplatin",
+  "meta" : {
+    "profile" : ["http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-medication-request"]
+  },
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: MedicationRequest</b><a name=\"cancer-related-medication-request-cisplatin\"> </a><a name=\"hccancer-related-medication-request-cisplatin\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource MedicationRequest &quot;cancer-related-medication-request-cisplatin&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-mcode-cancer-related-medication-request.html\">Cancer-Related Medication Request Profile</a></p></div><p><b>Procedure Intent Extension</b>: Curative - procedure intent <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#373808002)</span></p><p><b>status</b>: completed</p><p><b>intent</b>: order</p><p><b>medication</b>: CISplatin 50 MG per 50 ML Injectable Solution <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.3.0/CodeSystem-v3-rxNorm.html\">RxNorm</a>#309311)</span></p><p><b>subject</b>: <a href=\"Patient-cancer-patient-john-anyperson.html\">Patient/cancer-patient-john-anyperson</a> &quot; ANYPERSON&quot;</p><p><b>authoredOn</b>: 2019-04-01</p><p><b>requester</b>: <a href=\"Practitioner-us-core-practitioner-kyle-anydoc.html\">Practitioner/us-core-practitioner-kyle-anydoc</a> &quot; ANYDOC&quot;</p><p><b>reasonCode</b>: Non-small cell lung cancer (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#254637007)</span></p><p><b>note</b>: Day 1 of NSCLC regimen: Cisplatin 75 mg/m2 day 1; docetaxel 75 mg/m2 day 1 every 21 days for 4 cycles.</p><blockquote><p><b>dosageInstruction</b></p><p><b>text</b>: calculate absolute dose on day of administration.</p><p><b>timing</b>: Events: 2019-06-15, Count 1 times, Once</p><p><b>route</b>: Intravenous use <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#47625008)</span></p><blockquote><p><b>doseAndRate</b></p></blockquote></blockquote></div>"
+  },
+  "extension" : [{
+    "url" : "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-procedure-intent",
+    "valueCodeableConcept" : {
+      "coding" : [{
+        "system" : "http://snomed.info/sct",
+        "code" : "373808002",
+        "display" : "Curative - procedure intent"
+      }]
+    }
+  }],
+  "status" : "completed",
+  "intent" : "order",
+  "medicationCodeableConcept" : {
+    "coding" : [{
+      "system" : "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "code" : "309311",
+      "display" : "CISplatin 50 MG per 50 ML Injectable Solution"
+    }]
+  },
+  "subject" : {
+    "reference" : "Patient/cancer-patient-john-anyperson"
+  },
+  "authoredOn" : "2019-04-01",
+  "requester" : {
+    "reference" : "Practitioner/us-core-practitioner-kyle-anydoc"
+  },
+  "reasonCode" : [{
+    "coding" : [{
+      "system" : "http://snomed.info/sct",
+      "code" : "254637007",
+      "display" : "Non-small cell lung cancer (disorder)"
+    }]
+  }],
+  "note" : [{
+    "text" : "Day 1 of NSCLC regimen: Cisplatin 75 mg/m2 day 1; docetaxel 75 mg/m2 day 1 every 21 days for 4 cycles."
+  }],
+  "dosageInstruction" : [{
+    "text" : "calculate absolute dose on day of administration.",
+    "timing" : {
+      "event" : ["2019-06-15"],
+      "repeat" : {
+        "count" : 1
+      }
+    },
+    "route" : {
+      "coding" : [{
+        "system" : "http://snomed.info/sct",
+        "code" : "47625008",
+        "display" : "Intravenous use"
+      }]
+    },
+    "doseAndRate" : [{
+      "doseQuantity" : {
+        "value" : 75,
+        "unit" : "mg/m2",
+        "system" : "http://unitsofmeasure.org",
+        "code" : "mg/m2"
+      }
+    }]
+  }]
+}
