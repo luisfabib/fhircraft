@@ -1,23 +1,24 @@
+# Fhircraft package modules
 from fhircraft.fhir.resources.factory import ResourceFactory
-from fhircraft.utils import get_all_models_from_field, get_fhir_model_from_field, ensure_list
+from fhircraft.utils import ensure_list
 
+# 3rd party package modules
 from jinja2 import Environment, FileSystemLoader
 from pydantic import BaseModel
 
-from enum import EnumType
-
+# Standard modules
 from collections import defaultdict 
-from typing import Dict, List
+from typing import Dict, List, Any, Union, _UnionGenericAlias, get_args
+from enum import EnumType
 import inspect
 import re 
-
 
 FACTORY_MODULE = inspect.getmodule(ResourceFactory).__name__
 
 class CodeGenerator:
     
     import_statements: Dict[str, List[str]]
-    model_reload_statements: List[str]
+    data: Dict 
     
     def __init__(self):
         # Prepare the templating engine environment
@@ -26,7 +27,7 @@ class CodeGenerator:
         env.filters['escapequotes'] = lambda s: s.replace('"','\\"')
         self.template = env.get_template('resource_template.py.j2')
 
-    def add_import_statement(self, obj):
+    def add_import_statement(self, obj: Any) -> None:
         # Get the module of the object
         module = inspect.getmodule(obj)
         if module is None:
@@ -35,10 +36,28 @@ class CodeGenerator:
         module_name = module.__name__
         object_name = obj.__name__
         # Generate the import statement
-        if module_name != FACTORY_MODULE and object_name not in self.import_statements[module_name]:
+        if module_name not in [FACTORY_MODULE, 'builtins'] and object_name not in self.import_statements[module_name]:
             self.import_statements[module_name].append(object_name)
+    
+    def recursively_import_annotation_types(self, annotation: _UnionGenericAlias) -> None:
+        # Get the type object 
+        if hasattr(annotation, 'annotation'):
+            type_obj = annotation.annotation
+        else:
+            type_obj = annotation
+        # Ignore NoneType and strings
+        if type_obj is not None and not isinstance(type_obj, str):
+            if inspect.getmodule(type_obj).__name__ == FACTORY_MODULE and issubclass(type_obj, BaseModel):     
+                # If object was created by ResourceFactory, then serialize the model 
+                self.serialize_model(type_obj)
+            else:
+                # Otherwise, import the model's module
+                self.add_import_statement(type_obj)
+        # Repeat for any nested annotations
+        for nested_annotation in get_args(annotation): 
+            self.recursively_import_annotation_types(nested_annotation)
             
-    def serialize_model(self, model, data):
+    def serialize_model(self, model: BaseModel) -> None:
         model_base = model.__base__ 
         # Add import statement for the base class the the model inherits
         if model_base and model_base != BaseModel:
@@ -48,37 +67,16 @@ class CodeGenerator:
         for field, info in model.model_fields.items():
             if model.__base__ and field in model.__base__.model_fields and all([getattr(info, slot) == getattr(model.__base__.model_fields[field], slot) for slot in info.__slots__ if not slot.startswith('_')]):
                 continue
-            field_type = repr(info.annotation)
+            self.recursively_import_annotation_types(info.annotation)
+            annotation_string = repr(info.annotation)
             
             if isinstance(info.annotation, EnumType):
-                field_type = info.annotation
-                field_type = f'''typing.Literal['{field_type['fixedValue'].value}']'''
-            
-            has_submodel = FACTORY_MODULE in field_type 
-            
-            if has_submodel:
-                field_type = field_type.replace(FACTORY_MODULE + '.', '')
-                for submodel in get_all_models_from_field(info):
-                    data = self.serialize_model(submodel, data)
-            else:
-                complex_type_model = get_fhir_model_from_field(info)
-                if complex_type_model:
-                    self.add_import_statement(get_fhir_model_from_field(info))  
-                    for module in self.import_statements:
-                        field_type = field_type.replace(f'{module}.','')
-                field_type = field_type.replace("<class '","").replace("'>","")
-
-                if "NoneType" in field_type:
-                    field_type = field_type.replace("NoneType", 'typing.Optional["Element"]')
+                if 'Literal' not in self.import_statements['typing']:
+                    self.import_statements['typing'].append('Literal')
+                annotation_string = f"Literal['{info.annotation['fixedValue'].value}']"
                 
-                forward_ref_match = re.match(r".*ForwardRef\(\'(.*)\'\).*", field_type, re.MULTILINE)
-                if forward_ref_match:
-                    field_type = field_type.replace('ForwardRef(', '').replace(')','')
-                    statement = f'{model.__name__}.model_rebuild()'
-                    if statement not in self.model_reload_statements:
-                        self.model_reload_statements.append(statement)
             subdata[field] = {
-                'annotation': field_type,
+                'annotation': annotation_string,
                 'description': info.description, 
                 'alias': info.alias, 
                 'default': info.default,
@@ -88,26 +86,29 @@ class CodeGenerator:
             for key, value in model.__dict__.items()
             if isinstance(value, property)
         }
-        data.update({model: {'fields': subdata, 'properties': model_properties}})
-        return data
-
-    def generate_resource_model_code(self, resources: type):
-
+        self.data.update({model: {'fields': subdata, 'properties': model_properties}})
+    
+    def generate_resource_model_code(self, resources: Union[BaseModel, List[BaseModel]]) -> str:
+        # Reset the internal state of the generator
         self.import_statements = defaultdict(list)
-        self.model_reload_statements = []
-        
-        data = [self.serialize_model(resource, {}) for resource in ensure_list(resources)]
+        self.data = {}
+        # Serialize the model information of the input resources
+        for resource in ensure_list(resources):
+            self.serialize_model(resource)
+        # Render the source code using Jinja2
         source_code = self.template.render(
-            data=data, 
+            data=self.data, 
             imports=self.import_statements, 
-            reload=self.model_reload_statements
         )
-        for module in self.import_statements:
+        # Replace the full module specification for any modules imported
+        for module, objects in self.import_statements.items():
             module = module.replace('.',r'\.')
             for regex in [fr"(\<class \'{module}\.(\w*)\'\>)", r"(\<class \'(\w*)\'\>)"]:
                 for match in re.finditer(regex, source_code):
                     source_code = source_code.replace(match.group(1), match.group(2))
-
+            for match in re.finditer(fr"({module}\.)({'|'.join(objects)})", source_code):
+                source_code = source_code.replace(match.group(1), '')
+            source_code = source_code.replace(f'{FACTORY_MODULE}.', '')
         source_code = source_code.replace("FieldInfo(annotation=NoneType, required=True, metadata=[_PydanticGeneralMetadata(union_mode='left_to_right')])", "Field(union_mode='left_to_right')")
 
 

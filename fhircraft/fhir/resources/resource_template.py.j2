@@ -15,8 +15,7 @@ from types import NoneType
 from {{ module }} import {{ objects|join(',')}}
 {% endfor %}
 
-{% for resource in data %} 
-{% for model, model_data in resource.items() %} 
+{% for model, model_data in data.items() %} 
 class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     {% if model.__doc__ %}
     """
@@ -70,7 +69,8 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     {% endwith %}
 
     {% endfor %}
-    {# {% for property, property_getter in model_data.properties.items() %}
+    {% for property, property_getter in model_data.properties.items() %}
+    {% if property_getter.__class__.__name__ == 'partial'%}
     @property 
     def {{ property }}(self):
         return fhir_validators.{{ property_getter.func.__name__ }}(self, 
@@ -78,15 +78,6 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
             {{ arg }}="{{value}}",
             {% endfor %}
         )
-    {% endfor %} #}
-
-{% endfor %}
-{% endfor %}
-
-
-{% for import_statement in imports.after %} 
-{{ import_statement }}
-{% endfor %}
-{% for reload_statement in reload %} 
-{{ reload_statement }}
+    {% endif %}
+    {% endfor %}
 {% endfor %}
