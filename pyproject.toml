@@ -63,4 +63,4 @@ docs = [
 ]
 
 [tool.setuptools]
-packages = ["my_package"]
+packages = ["fhircraft"]
