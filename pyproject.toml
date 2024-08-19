@@ -1,7 +1,6 @@
-
 [build-system]
-requires = ["setuptools"] 
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = 'fhircraft'
@@ -45,6 +44,7 @@ dependencies = [
     'python-dotenv>=1.0',
     'jsonschema>4',
     'jsonpath-ng>1',
+    'jinja2>=3.1',
 ]
 
 [project.optional-dependencies]
@@ -54,11 +54,20 @@ dev = [
     "pytest-mock==3.14.0",
     "parameterized==0.9.0",
     "coverage==7.5.1",
+]
+docs = [
     "mkdocs-material==9.5.27",
     "mkdocstrings[python]==0.25.1",
     "mkdocs-gen-files==0.5.0",
     "mkdocs-literate-nav==0.6.1",
 ]
 
-[tool.setuptools.packages.find]
-include = ['fhircraft']
+[tool.hatch.build.targets.sdist]
+# limit which files are included in the sdist (.tar.gz) asset,
+# see https://github.com/pydantic/pydantic/pull/4542
+include = [
+    '/README.md',
+    '/HISTORY.md',
+    '/fhircraft',
+    '/test',
+]
