@@ -25,5 +25,5 @@ python -m pip install --upgrade pip
 To install Fhircraft's development environment use 
 
 ```bash
-pip install fhircraft[dev]
+pip install -e .[dev, docs]
 ```  
