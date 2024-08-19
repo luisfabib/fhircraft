@@ -1,36 +1,51 @@
-site_name: Fhircraft - FHIR x OAS Toolset
-site_url: https://mydomain.org/mysite
+site_name: Fhircraft
+site_url: https://mydomain.org/docs
+repo_url: https://github.com/luisfabib/fhircraft
+repo_name: luisfabib/fhircraft
+
 theme:
+
+  favicon: assets/images/favicon.png
+  logo: assets/logo_white.svg
   name: material
   features:
     - content.code.copy
-    - navigation.indexes 
+    - toc.integrate 
+    - navigation.path    
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
       scheme: slate
-      primary: indigo
+      primary: pink
+      accent: pink
       toggle:
         icon: material/brightness-auto
         name: Switch to light mode
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default 
-      primary: indigo
+      primary: pink
+      accent: pink
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: indigo
+      primary: pink
+      accent: pink
       toggle:
         icon: material/brightness-4
         name: Switch to system preference
 
+extra_css:
+  - stylesheets/extra.css
+
 markdown_extensions:
   - attr_list
   - admonition
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
@@ -44,6 +59,8 @@ markdown_extensions:
 
 plugins:
   - search
+  - literate-nav:
+      nav_file: SUMMARY.md
   - gen-files:
       scripts:
         - scripts/gen_ref_pages.py

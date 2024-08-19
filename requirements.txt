@@ -17,3 +17,4 @@ coverage==7.5.1
 mkdocs-material==9.5.27
 mkdocstrings[python]==0.25.1
 mkdocs-gen-files==0.5.0
+mkdocs-literate-nav==0.6.1

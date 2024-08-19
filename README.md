@@ -4,16 +4,14 @@
 <br />
 <div align="center">
   <a href="https://github.com/luisfabib/fhircraft">
-    <img src="https://github.com/luisfabib/fhircraft/blob/main/docs/static/logo.png" width="80">
+    <img src="docs/assets/images/logo-banner.png" width="50%">
   </a>
 
-  <h3 align="center">FHIR ⨯ OpenAPI Toolkit</h3>
-
   <p align="center">
-   A Python toolkit for FHIR (Fast Healthcare Interoperability Resources) profile construction, validation, and integration with OpenAPI specifications, allowing seamless mapping of FHIR resources to OpenAPI-conformed API responses and vice versa
+    Fhircraft is a Python package that dynamically generates Pydantic FHIR (Fast Healthcare Interoperability Resources) resource models from FHIR specifications, enabling comprehensive data structuring, validation, and typing within Python. It also offers a fully functional FHIRPath engine and code generation features to facilitate integration with other systems.
     <br />
     <br />
-    :construction:<i>This is an experimental package and is not ready for production. Major changes are to be expected.</i>:construction:
+    :construction:<i> This package is under active development. Major and/or breaking changes are to be expected in future updates.</i>:construction:
     <br />
     <br />
     <a href="https://github.com/luisfabib/fhircraft"><strong>Explore the docs »</strong></a>
@@ -25,27 +23,24 @@
   </p>
 </div>
 
-## Features
+## Why use Fhircraft?
 
- :star: **Dynamic FHIR profile models:** Build and manage FHIR profiles using Pydantic objects, enabling validation of profiled FHIR resources.
+- **Dynamic FHIR models** – Generate Pydantic FHIR resource models dynamically from FHIR specification; get all FHIR's data structuring, validation and typing in a pythonic way.
 
- :star: **OpenAPI x FHIR Validation:** Parse OpenAPI specifications with FHIR-related extensions to validate their integration with FHIR.
+- **Simple FHIR validation** – Perform complete parsing and validation of FHIR resources without leaving Python; avoid dealing with FHIR's often complex rules and constraints. 
 
- :star: **Pythonic FHIRPath:** A fully pythonic normative-compliant FHIRPath lexer and parser 
+- **Pydantic core** – Profit from Pydantic's validation and (de)-serialization capabilities which have made it the most widely used data validation library for Python.     
 
- :star: **FHIR<->OpenAPI Mapping:** Map FHIR resources to OpenAPI-conformed JSON responses and vice versa.
+- **Code generator** – Leverage the code generation features of Fhircraft to write static Pydantic/Python code that can be integrated into other systems. 
 
-<p align="center" width="100%">
-    <img width="60%" src="https://github.com/luisfabib/fhircraft/blob/main/docs/static/terminal.gif">
-</p>
+- **Pythonic FHIRPath** – Fhircraft provides a fully functional, pythonic and compliant FHIRPath engine to easily work with FHIR resources without leaving Python.  
 
 
-<!-- GETTING STARTED -->
-## Getting Started
+## Usage 
 
 ### Prerequisites
 
-A valid installation of Python 3.x is required.  
+A valid installation of Python >3.8 is required.  
 
 
 ### Installation
@@ -56,45 +51,53 @@ To install `fhircraft`, you can download and install the package via `pip`:
 pip install fhircraft
 ``` 
 
-## Usage 
+### Getting Started
 
-### CLI commands
+This is a quick reference on how to quickly accomplish the most common tasks with Fhircraft:
 
-The package provides a command-line interface (CLI) to conviniently access the core functionality of the package. Checkout the commands available by
-```
->> fhircraft --help
+- #### Constructing FHIR Pydantic models 
+
+  To generate a Pydantic model representation for a FHIR resource, use the `construct_resource_model` function. This function automatically creates a model based on the structure definition of the specified resource or profile.
+  For optimal control and security, it is recommended to manage FHIR structure definitions as local files. These files should be loaded into Python and parsed into dictionary objects.
+  
+  ``` python 
+      from fhircraft.utils import load_file
+      structure_definition = load_file('fhir/patient_r4b_structuredefinition.json') 
+  ``` 
+
+- #### Generating Pydantic FHIR models' source code
+
+  Fhircraft allows you to generate reusable source code for Pydantic FHIR models. By using the `generate_resource_model_code` function, you can obtain the source code (as a string) that defines the FHIR Pydantic model. This can be particularly useful for integrating the model into other projects or sharing it across different applications.
 
 
- Usage: fhircraft [OPTIONS] COMMAND [ARGS]...
+  ``` python
+  from fhircraft.fhir.resources import generate_resource_model_code
+  source_code = generate_resource_model_code(patient_model)
+  ```
 
-╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --install-completion          Install completion for the current shell.                                           │
-│ --show-completion             Show completion for the current shell, to copy it or customize the installation.    │
-│ --help                        Show this message and exit.                                                         │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Commands ────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ convert-api-to-fhir     Convert an API response into a FHIR resource based on the its OpenAPI specification       │
-│ convert-fhir-to-api     Convert FHIR resource into an API response based on the its OpenAPI specification         │
-│ get-fhir-path           Get the value in FHIR resource based on FHIRpath                                          │
-│ get-json-path           Get the value in API response based on JSONpath                                           │
-│ validate-openapi-spec   Validate OpenAPI specification                                                            │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-``` 
+  You can save the generated source code and reuse it as needed. Keep in mind that the code requires Fhircraft and its dependencies to be installed in order to function properly.
 
-### Package 
+- #### Validating FHIR payloads
 
-**Mapping module** (`fhircraft.mapping`)
+  The generated Pydantic models can be used to validate FHIR payloads, ensuring that they conform to the structure and constraints of the specified resource or profile.
 
-Provides the tools to convert API responses to FHIR resources based on its OpenAPI specification using the `x-fhirpath` and `x-fhirprofile` OAS extensions.  
+  ``` python
+  from fhicraft.utils import load_file
+  data = load_file('my_fhir_patient.json')
+  my_patient = patient_model.model_validate(data)
+  ```
 
-```python
-from fhircraft.mapping import convert_response_from_api_to_fhir, convert_response_from_fhir_to_api
-from fhircraft.utils import load_file
-# Load JSON API response 
-response = load_file(api_response_file)
-# Convert response to FHIR resource based on OpenAPI specification
-converted_response = convert_response_from_api_to_fhir(response, openapi_spec_file, '/endpoint', 'get', '200')
-```
+  If the input data does not conform to the expected FHIR resource or profile, the Pydantic model will raise a `ValidationError`. If no error is raised, the FHIR payload is valid and successfully loaded into the model.
+
+
+- #### Model manipulation using FHIRPath
+
+  You can specify the FHIRPath expression as a string in the standard notation to interact with the resource efficiently. This feature allows for complex queries and updates, enhancing your ability to work with FHIR data programmatically.
+
+  ``` python
+  from fhicraft.fhir.path import fhirpath
+  patient_surname = fhirpath.parse('Patient.name.surname').get_value(my_patient)
+  ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -114,18 +117,20 @@ If you have a suggestion that would make this better, please fork the repo and c
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
+## Support
 
-Several external packages have provided the foundation and/or have inspired components of this package: 
+This project has been supported by the following institutions:
 
-- `fhir.resources`: All FHIR profile models and base resources are managed using their object representation for the FHIR core resources.
-- `openapi-pydantic`: The Pydantic models for the extended OpenAPI specifications were derived from its models.
-- `jsonpath-ng`: USed for JSONPath functionality and inspired the implementation of the FHIRPath engine.
+- **University Hospital of Zurich**
+  
+  <a href="https://www.usz.ch/"><img src="docs/assets/images/usz-logo.png" width="20%"></a>
+
+
 
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See ![LICENSE](https://github.com/luisfabib/fhircraft?tab=MIT-1-ov-file#readme) for more information.
+Distributed under the MIT License. See ![LICENSE](https://github.com/luisfabib/fhircraft?tab=MIT-1-ov-file) for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
