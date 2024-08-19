@@ -1,6 +1,6 @@
 
 [build-system]
-requires = ["setuptools"] 
+requires = ["setuptools>=68.0"] 
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -63,4 +63,4 @@ docs = [
 ]
 
 [tool.setuptools.packages.find]
-where  = ["fhircraft"]
+include  = ["fhircraft*"]
