@@ -62,5 +62,5 @@ docs = [
     "mkdocs-literate-nav==0.6.1",
 ]
 
-[tool.setuptools.packages.find]
-include = ['fhircraft']
+[tool.setuptools]
+packages = ["my_package"]
