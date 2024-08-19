@@ -14,7 +14,7 @@
     :construction:<i> This package is under active development. Major and/or breaking changes are to be expected in future updates.</i>:construction:
     <br />
     <br />
-    <a href="https://github.com/luisfabib/fhircraft"><strong>Explore the docs »</strong></a>
+    <a href="https://luisfabib.github.io/fhircraft/docs "><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/luisfabib/fhircraft/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>

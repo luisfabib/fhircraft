@@ -5,5 +5,3 @@
     -  ./user-guide/*
   - API Reference
     -  ./reference/*
-  - Experimental
-    - ./experimental/*.md
