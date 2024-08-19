@@ -1,0 +1,64 @@
+
+[build-system]
+requires = ["setuptools"] 
+build-backend = "setuptools.build_meta"
+
+[project]
+name = 'fhircraft'
+version='0.1.0'
+description = 'Pydantic FHIR modeling'
+authors = [
+    {name = 'Luis Fábregas-Ibáñez', email = 'luisfabib@gmail.com'},
+]
+keywords = ["Pydantic", "FHIR", "healthcare", "modelling", "validation"]
+license = {'file' = 'LICENSE'}
+classifiers = [
+    'Development Status :: 3 - Alpha',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Information Technology',
+    'Intended Audience :: Healthcare Industry',
+    'Intended Audience :: System Administrators',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: Unix',
+    'Operating System :: POSIX :: Linux',
+    'Environment :: Console',
+    'Environment :: MacOS X',
+    'Framework :: Pydantic',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+]
+requires-python = '>=3.8'
+readme = "README.md"
+dependencies = [
+    'requests',
+    'pydantic>=2.7',
+    'ply>=3.11',
+    'pyyaml==6.0.1',
+    'python-dotenv>=1.0',
+    'jsonschema>4',
+    'jsonpath-ng>1',
+]
+
+[project.optional-dependencies]
+cli = ["typer==0.12.3"]
+dev = [
+    "pytest>=8.2",
+    "pytest-mock==3.14.0",
+    "parameterized==0.9.0",
+    "coverage==7.5.1",
+    "mkdocs-material==9.5.27",
+    "mkdocstrings[python]==0.25.1",
+    "mkdocs-gen-files==0.5.0",
+    "mkdocs-literate-nav==0.6.1",
+]
+
+[tool.setuptools.packages.find]
+include = ['fhircraft']
