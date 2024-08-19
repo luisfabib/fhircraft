@@ -1,9 +1,9 @@
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Invocation, Root, Element, This
 from fhircraft.fhir.path.engine.existence import Exists, Empty
 from fhircraft.fhir.path.engine.conversion import *
-from fhircraft.fhir.resources.datatypes import get_FHIR_type
+from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 import pytest
-Quantity = get_FHIR_type('Quantity')
+Quantity = get_complex_FHIR_type('Quantity')
         
 
 #---------------------------

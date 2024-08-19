@@ -74,23 +74,23 @@ class TestBuildTreeStructure(FactoryTestCase):
 class TestGetFhirType(FactoryTestCase):
 
     def test_parses_fhir_primitive_datatype(self):
-        result = self.factory._get_FHIR_type('string')
+        result = self.factory._get_complex_FHIR_type('string')
         assert result == primitives.String
 
     def test_parses_fhir_complex_datatype(self):
-        result = self.factory._get_FHIR_type('Coding')
+        result = self.factory._get_complex_FHIR_type('Coding')
         assert result == complex_types.Coding
 
     def test_parses_fhir_complex_datatype_from_canonical_url(self):
-        result = self.factory._get_FHIR_type('http://hl7.org/fhir/StructureDefinition/Extension')
+        result = self.factory._get_complex_FHIR_type('http://hl7.org/fhir/StructureDefinition/Extension')
         assert result == complex_types.Extension
 
     def test_parses_fhir_fhirpath_datatype(self):
-        result = self.factory._get_FHIR_type('http://hl7.org/fhirpath/System.String')
+        result = self.factory._get_complex_FHIR_type('http://hl7.org/fhirpath/System.String')
         assert result == primitives.String
 
     def test_returns_field_type_name_if_not_found(self):
-        result = self.factory._get_FHIR_type('UnknownType')
+        result = self.factory._get_complex_FHIR_type('UnknownType')
         assert result == 'UnknownType'
 
 

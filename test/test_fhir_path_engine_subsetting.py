@@ -1,13 +1,13 @@
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathError, Invocation, Root, Element
 from fhircraft.fhir.path.engine.subsetting import *
-from fhircraft.fhir.resources.datatypes import get_FHIR_type
+from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 from collections import namedtuple
 from unittest import TestCase
 import pytest 
         
 
-Coding = get_FHIR_type('Coding')
-CodeableConcept = get_FHIR_type('CodeableConcept')
+Coding = get_complex_FHIR_type('Coding')
+CodeableConcept = get_complex_FHIR_type('CodeableConcept')
 
 
 

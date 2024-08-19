@@ -21,7 +21,7 @@ def merge_schemas(schemas):
         schemas (list): List of schemas to be merged.
 
     Returns:
-        dict: Merged schema after combining all schemas.
+        schema (dict): Merged schema after combining all schemas.
     """
     merged_schema = {}
     aliases = []
@@ -60,7 +60,7 @@ def map_json_schema_to_fhir_paths(schema: dict, current_json_path: str='', curre
         resources (list): List of FHIR resources.
 
     Returns:
-        tuple: A tuple containing two dictionaries - paths and schemas. 
+        tuple (Tuple[dict,dict]): A tuple containing two dictionaries - paths and schemas. 
             - paths (dict): A dictionary mapping FHIR profiles to JSON paths.
             - schemas (dict): A dictionary mapping FHIR profiles to JSON schemas.
 

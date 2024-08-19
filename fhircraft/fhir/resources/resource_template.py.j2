@@ -5,10 +5,12 @@ from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic.fields import FieldInfo
+
 # Standard modules
-import typing  
+from typing import Optional, Literal, Union
 from enum import Enum
-from types import NoneType
+NoneType = type(None)
 
 # Dynamic modules 
 {% for module, objects in imports.items() %} 

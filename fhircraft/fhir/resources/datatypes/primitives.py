@@ -1,13 +1,8 @@
 
 
-from pydantic import Field, AfterValidator, PlainSerializer, BaseModel
+from pydantic import Field, AfterValidator
 from typing import Union
 from typing_extensions import Annotated, TypeAliasType
-import datetime as python_datetime
-import re 
-
-# VERSION: R4B
-# SOURCE: https://hl7.org/fhir/R4B/datatypes.html#string
 
 Boolean = TypeAliasType('Boolean', Union[
     bool,

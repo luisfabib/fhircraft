@@ -1,6 +1,5 @@
 from pydantic import BaseModel , ValidationError
 from fhircraft.utils import get_all_models_from_field
-from fhircraft.fhir.path import fhirpath
 from typing import ClassVar
 from copy import copy
 import inspect 
@@ -17,6 +16,7 @@ class FHIRBaseModel(BaseModel):
 
     @classmethod 
     def model_construct_with_slices(cls, slice_copies=9):
+        from fhircraft.fhir.path import fhirpath
         instance = super().model_construct()
         for element, slices in cls.get_sliced_elements().items():
             slice_resources = []
@@ -49,6 +49,7 @@ class FHIRBaseModel(BaseModel):
 
     @classmethod
     def clean_unusued_slice_instances(cls, resource):
+        from fhircraft.fhir.path import fhirpath
         # Remove unused/incomplete slices
         for element, slices in cls.get_sliced_elements().items():
             valid_elements = [col.value for col in fhirpath.parse(element).find_or_create(resource) if col.value is not None]        

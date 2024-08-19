@@ -6,7 +6,7 @@ that require a function in this section to be called explicitly.
 
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathFunction, FHIRPathError, FHIRPath
 import fhircraft.fhir.resources.datatypes.primitives as primitives 
-from fhircraft.fhir.resources.datatypes import get_FHIR_type 
+from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type 
 from fhircraft.utils import ensure_list
 from typing import List, Any, Optional, Type, Tuple
 import re 
@@ -451,7 +451,7 @@ class ToQuantity(FHIRTypeConversionFunction):
             FHIRPathError: If input collection has more than one item.
         """ 
         collection = super().validate_collection(collection)
-        Quantity = get_FHIR_type('Quantity')
+        Quantity = get_complex_FHIR_type('Quantity')
         if not collection:
             return []
         value = collection[0].value
@@ -529,7 +529,7 @@ class ToString(FHIRTypeConversionFunction):
             return 'true' if value else 'false'
         elif isinstance(value, (str, int, float)):
             return str(value)
-        elif isinstance(value, get_FHIR_type('Quantity')):
+        elif isinstance(value, get_complex_FHIR_type('Quantity')):
             return f'{value.value} {value.unit}'
         else: 
             return []

@@ -149,7 +149,7 @@ class Resolve(FHIRPathFunction):
             collection (List[FHIRPathCollectionItem])): The output collection.
         """
         from fhircraft.fhir.resources.factory import construct_resource_model
-        from fhircraft.fhir.resources.datatypes import get_FHIR_type
+        from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
         collection = ensure_list(collection)
         output_collection = []
@@ -193,7 +193,7 @@ class HtmlChecks(FHIRPathFunction):
             FHIRPathError: If the collection is not a single item.
         """
         from fhircraft.fhir.resources.factory import construct_resource_model
-        from fhircraft.fhir.resources.datatypes import get_FHIR_type
+        from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
         collection = ensure_list(collection)
         

@@ -4,7 +4,7 @@ from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathErro
 from fhircraft.fhir.path.engine.subsetting import Index
 from fhircraft.fhir.path.parser import parse
 from fhircraft.utils import ensure_list, get_fhir_model_from_field
-from fhircraft.fhir.resources.datatypes import get_FHIR_type
+from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
 
 from unittest import TestCase
@@ -19,7 +19,7 @@ ObservationComponent = get_fhir_model_from_field(Observation.model_fields.get('c
 class TestRoot(TestCase):
 
     def setUp(self):
-        self.resource = Observation.model_construct(status='final', identifier=[get_FHIR_type('Identifier')(value='A'), get_FHIR_type('Identifier')(value='B')])
+        self.resource = Observation.model_construct(status='final', identifier=[get_complex_FHIR_type('Identifier')(value='A'), get_complex_FHIR_type('Identifier')(value='B')])
         self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
     
     def test_element_evaluates_correctly(self):
@@ -32,7 +32,7 @@ class TestRoot(TestCase):
 class TestElement(TestCase):
 
     def setUp(self):
-        self.resource = Observation.model_construct(status='final', identifier=[get_FHIR_type('Identifier')(value='A'), get_FHIR_type('Identifier')(value='B')])
+        self.resource = Observation.model_construct(status='final', identifier=[get_complex_FHIR_type('Identifier')(value='A'), get_complex_FHIR_type('Identifier')(value='B')])
         self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
     
     def test_element_evaluates_correctly(self):
@@ -49,7 +49,7 @@ class TestElement(TestCase):
     def test_element_creates_missing_complex_element(self):
         result = Element('valueCodeableConcept').evaluate(self.collection, create=True)
         assert len(result) == 1
-        assert result[0].value == get_FHIR_type('CodeableConcept').model_construct()
+        assert result[0].value == get_complex_FHIR_type('CodeableConcept').model_construct()
         assert self.resource.valueCodeableConcept == result[0].value
         
     def test_element_creates_missing_complex_list_element(self):

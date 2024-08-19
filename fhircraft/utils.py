@@ -2,7 +2,7 @@ import yaml
 import json 
 import requests 
 import os
-from typing import List, Any, Dict, Union, get_args, get_origin, Optional
+from typing import List, Any, Dict, Union, get_args, get_origin, Optional, Tuple
 from dotenv import dotenv_values
 import re
 from contextlib import contextmanager
@@ -21,11 +21,27 @@ URL_PATTERNS = re.compile(
     r'(#[-a-zA-Z0-9@:%._\+~#=]*)?$'          # Optional fragment
 )
 
-# Function to check if a string is a URL
-def is_url(string):
+def is_url(string: str) -> bool:
+    """Check if the input string is a valid URL.
+
+    Args:
+        string (str): The input string to check.
+
+    Returns:
+        bool: True if the input string is a valid URL, False otherwise.
+    """    
     return re.match(URL_PATTERNS, string) is not None
 
-def capitalize(string):
+def capitalize(string: str) -> str:
+    '''
+    Capitalize the first letter of a given string.
+
+    Parameters:
+        string (str): The input string to capitalize.
+
+    Returns:
+        str: The string with the first letter capitalized.
+    '''    
     return string[0].upper() + string[1:]
 
 def load_env_variables(file_path: Optional[str]=None) -> dict:
@@ -34,7 +50,9 @@ def load_env_variables(file_path: Optional[str]=None) -> dict:
 
     Args:
         file_path (Optional[str]): Optional path to the .env file. If not provided, it looks for a .env file in the current directory.
-    :return: A dictionary containing the environment variables from the .env file.
+    
+    Returns: 
+        vars (dict): A dictionary containing the environment variables from the .env file.
     """
     # Determine the file path
     env_file = file_path if file_path else '.env'
@@ -44,7 +62,7 @@ def load_env_variables(file_path: Optional[str]=None) -> dict:
     
     return env_vars
 
-def ensure_list(item: Any) -> list:
+def ensure_list(variable: Any) -> list:
     """
     Ensure that the input variable is converted into a list if it is not already an iterable.
 
@@ -52,13 +70,13 @@ def ensure_list(item: Any) -> list:
         variable (any): The input variable that needs to be converted into a list if it is not already an iterable.
 
     Returns:
-        list: The input variable converted into a list, or the input variable itself if it was already an iterable.
+        variable (list): The input variable converted into a list, or the input variable itself if it was already an iterable.
     """
-    if not isinstance(item, list):
-        if isinstance(item, tuple):
-            return list(item)
-        return [item]
-    return item
+    if not isinstance(variable, list):
+        if isinstance(variable, tuple):
+            return list(variable)
+        return [variable]
+    return variable
 
 def load_file(file_path: str) -> Dict:
     """
@@ -68,7 +86,7 @@ def load_file(file_path: str) -> Dict:
         file_path (str): The path to the file to load.
 
     Returns:
-        dict: The data loaded from the file as a dictionary.
+        data (dict): The data loaded from the file as a dictionary.
 
     Raises:
         ValueError: If the file content is not a dictionary (for YAML files).
@@ -137,7 +155,7 @@ def contains_only_none(d: Any) -> bool:
         d (Any): The input dictionary or list to check for only None values.
 
     Returns:
-        bool: True if the input contains only None values, False otherwise.
+        result (bool): True if the input contains only None values, False otherwise.
     """    
     if isinstance(d, dict):
         return all(contains_only_none(v) for v in d.values())
@@ -224,7 +242,7 @@ def replace_nth(string, sub, wanted, n):
         n (int): The occurrence number of the substring to replace.
 
     Returns:
-        str: The updated string after replacing the nth occurrence of the substring.
+        string (str): The updated string after replacing the nth occurrence of the substring.
     """    
     pattern = re.compile(sub)
     where = [m for m in pattern.finditer(string)][n-1]
@@ -261,18 +279,18 @@ def _get_deepest_args(tp: Any) -> list:
     return deepest_args
 
 
-def get_all_models_from_field(field: Field, issubclass_of: type = BaseModel):
+def get_all_models_from_field(field: Field, issubclass_of: type = BaseModel) -> BaseModel:
     return (arg 
             for arg in _get_deepest_args(field.annotation) 
                 if inspect.isclass(arg) and issubclass(arg, issubclass_of)
     )
 
-def get_fhir_model_from_field(field):
+def get_fhir_model_from_field(field: Field) -> Optional[BaseModel]:
     return next(get_all_models_from_field(field), None)
 
 
 
-def merge_dicts(dict1, dict2):
+def merge_dicts(dict1: dict, dict2: dict) -> dict:
     """
     Merge two dictionaries recursively, merging lists element by element and dictionaries at the same index.
 
@@ -319,3 +337,25 @@ def merge_dicts(dict1, dict2):
         else:
             merged_dict[key] = value
     return merged_dict
+
+
+def get_FHIR_release_from_version(version: str) -> str:
+    # Check format of the version string
+    if not re.match(r'^\d+\.\d+\.\d+$', version):
+        raise ValueError(f'FHIR version must be in "x.y.z" format, got "{version}"')        
+    # Parse version string into a three-digit tuple
+    version = version.split('-')[0]
+    version = tuple([int(digit) for digit in version.split('.')])
+    # Assign FHIR release based on version number (Referece: http://hl7.org/fhir/directory.html)
+    if version >= (0,4,0) and version <= (1,0,2):
+        return 'DSTU2'
+    elif version >= (1,1,0) and version <= (3,0,2):
+        return 'STU3'
+    elif version >= (3,2,0) and version <= (4,0,1):
+        return 'R4'
+    elif version >= (4,1,0) and version <= (4,3,0):
+        return 'R4B'
+    elif version >= (4,2,0) and version <= (5,0,0):
+        return 'R5'
+    elif version >= (6,0,0):
+        return 'R6'

@@ -4,12 +4,12 @@ from fhircraft.utils import ensure_list
 
 # 3rd party package modules
 from jinja2 import Environment, FileSystemLoader
-from pydantic import BaseModel
+from pydantic import BaseModel 
 
 # Standard modules
 from collections import defaultdict 
 from typing import Dict, List, Any, Union, _UnionGenericAlias, get_args
-from enum import EnumType
+from enum import Enum
 import inspect
 import re 
 
@@ -34,7 +34,9 @@ class CodeGenerator:
             raise ValueError(f"The object {obj} does not belong to a module")        
         # Get the name of the module and the object
         module_name = module.__name__
-        object_name = obj.__name__
+        if (object_name := getattr(obj,'__name__', None)) is None:
+            if (object_name := getattr(obj,'_name', None)) is None:
+                return
         # Generate the import statement
         if module_name not in [FACTORY_MODULE, 'builtins'] and object_name not in self.import_statements[module_name]:
             self.import_statements[module_name].append(object_name)
@@ -70,7 +72,7 @@ class CodeGenerator:
             self.recursively_import_annotation_types(info.annotation)
             annotation_string = repr(info.annotation)
             
-            if isinstance(info.annotation, EnumType):
+            if isinstance(info.annotation, type(Enum)):
                 if 'Literal' not in self.import_statements['typing']:
                     self.import_statements['typing'].append('Literal')
                 annotation_string = f"Literal['{info.annotation['fixedValue'].value}']"
@@ -111,5 +113,8 @@ class CodeGenerator:
             source_code = source_code.replace(f'{FACTORY_MODULE}.', '')
         source_code = source_code.replace("FieldInfo(annotation=NoneType, required=True, metadata=[_PydanticGeneralMetadata(union_mode='left_to_right')])", "Field(union_mode='left_to_right')")
 
-
         return source_code
+
+
+generator = CodeGenerator()
+generate_resource_model_code = generator.generate_resource_model_code

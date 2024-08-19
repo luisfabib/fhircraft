@@ -1,6 +1,6 @@
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.additional import *
-from fhircraft.fhir.resources.datatypes import get_FHIR_type
+from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 import operator 
 from collections import namedtuple
 import pytest 
@@ -18,9 +18,9 @@ def test_extension_returns_empty_for_empty_collection():
 
 def test_extension_selects_correct_extension_by_url():
     resource = namedtuple('Resource', 'extension')(extension=[
-        get_FHIR_type('Extension')(url='http://domain.org/extension1', valueInteger=1),
-        get_FHIR_type('Extension')(url='http://domain.org/extension2', valueInteger=2),
-        get_FHIR_type('Extension')(url='http://domain.org/extension3', valueInteger=3),
+        get_complex_FHIR_type('Extension')(url='http://domain.org/extension1', valueInteger=1),
+        get_complex_FHIR_type('Extension')(url='http://domain.org/extension2', valueInteger=2),
+        get_complex_FHIR_type('Extension')(url='http://domain.org/extension3', valueInteger=3),
     ])
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Extension('http://domain.org/extension2').evaluate(collection)

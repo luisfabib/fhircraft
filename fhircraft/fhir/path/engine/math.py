@@ -14,8 +14,8 @@ class FHIRMathOperator(FHIRPath):
         self.right = right
 
     def convert_to_fhirpath_types(self, item):
-        from fhircraft.fhir.resources.datatypes import get_FHIR_type
-        if isinstance(item, get_FHIR_type('Quantity')):
+        from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
+        if isinstance(item, get_complex_FHIR_type('Quantity')):
             return Quantity(item.value, item.code)
         else:
             return item 
