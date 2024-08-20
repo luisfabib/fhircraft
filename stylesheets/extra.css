@@ -1,0 +1,7 @@
+
+/* Use a milder dark theme background color */
+@media screen {
+  [data-md-color-scheme="slate"] {
+    --md-default-bg-color: hsl(232.5, 14.8%, 21.2%);
+  }
+}
