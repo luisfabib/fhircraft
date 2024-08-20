@@ -205,6 +205,7 @@ class FHIRPath(ABC):
             return None
         return values        
 
+
     def find(self, collection: typing.Any) -> List[FHIRPathCollectionItem]:
         """
         Finds and returns a collection of FHIRPathCollectionItem instances from the input collection.
@@ -559,56 +560,3 @@ class Invocation(FHIRPath):
 
     def __hash__(self):
         return hash((self.left, self.right))
-
-
-
-class Operation(FHIRPath):
-    """
-    A class representing an operation in FHIRPath expressions.
-
-    Attributes:
-        left (Union[str, FHIRPath]): The left operand of the operation.
-        op (callable): The operation to be performed.
-        right (Union[str, FHIRPath]): The right operand of the operation.
-    """
-    def __init__(self, left : typing.Union[str,FHIRPath], op : callable,right : typing.Union[str,FHIRPath]):
-        self.left = left
-        self.op = op
-        self.right = right
-        
-    def evaluate(self, collection: List[FHIRPathCollectionItem], create: bool) -> bool:
-        """ 
-        Evaluates the operation on the given collection.
-
-        Args:
-            collection (List[FHIRPathCollectionItem]): The collection of FHIRPathCollectionItem instances to evaluate.
-            create (bool): Flag indicating whether to create new items if they do not exist.
-
-        Returns:
-            bool: The result of the operation evaluation.
-        """
-        collection = ensure_list(collection)
-        return self.op(
-            [
-                item.value if isinstance(item, FHIRPathCollectionItem) else item 
-                    for item in ensure_list(self.left.evaluate(collection, create))
-            ]  if isinstance(self.left, FHIRPath) else ensure_list(self.left), 
-            [ 
-                item.value if isinstance(item, FHIRPathCollectionItem) else item  
-                    for item in ensure_list(self.right.evaluate(collection, create))
-            ] if isinstance(self.right, FHIRPath) else ensure_list(self.right)
-        )
-
-    def __str__(self):
-        return f'{self.left}{self.op}{self.right}'
-
-    def __repr__(self):
-        return f'Operation({self.left.__repr__()},{self.op.__repr__()},{self.right.__repr__()})'
-
-    def __eq__(self, other):
-        return isinstance(other, Operation) and self.left == other.left and self.right == other.right and self.op == other.op
-
-    def __hash__(self):
-        return hash((self.left, self.op, self.right))
-        
-    
