@@ -10,7 +10,6 @@ theme:
   name: material
   features:
     - content.code.copy
-    - toc.integrate 
     - navigation.path    
   palette:
     # Palette toggle for automatic mode
