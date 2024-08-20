@@ -128,12 +128,12 @@ def validate_type_choice_element(instance: object, field_types: List[str], field
     return instance
 
 
-def validate_slicing_cardinalities(model:FHIRBaseModel, values:List[Any], field_name:str) -> List[FHIRSliceModel]:
+def validate_slicing_cardinalities(cls:Any, values:List[Any], field_name:str) -> List[FHIRSliceModel]:
     """
     Validates the cardinalities of FHIR slices for a specific field within a FHIR resource.
 
     Args:
-        model(FHIRBaseModel): The Pydantic FHIR model class.
+        cls(Any): The Pydantic FHIR model class.
         values (List[Any]): List of values for the field.
         field_name (str): The name of the field to validate.
 
@@ -143,7 +143,7 @@ def validate_slicing_cardinalities(model:FHIRBaseModel, values:List[Any], field_
     Raises:
         AssertionError: If cardinality constraints are violated for any slice.
     """    
-    slices =  get_all_models_from_field(model.model_fields[field_name], issubclass_of=FHIRSliceModel)
+    slices =  get_all_models_from_field(cls.model_fields[field_name], issubclass_of=FHIRSliceModel)
     for slice in slices:
         slice_instances_count = sum([isinstance(value, slice) for value in values])
         assert slice_instances_count >= slice.min_cardinality, \
