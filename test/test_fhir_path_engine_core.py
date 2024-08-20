@@ -246,6 +246,14 @@ def test_fhirpath_find(path_string, data_object, expected_value):
         assert value == expected
 
         
+@pytest.mark.parametrize("path_string, data_object, expected_value", fhirpath_find_test_cases)
+def test_fhirpath_mixin_get_fhirpath(path_string, data_object, expected_value):
+    expected_values = ensure_list(expected_value)
+    found_values = ensure_list(data_object.get_fhirpath(path_string))
+    assert len(found_values) == len(expected_values)
+    for value, expected in zip(found_values, expected_values):
+        assert value == expected
+
 
 
 fhirpath_update_test_cases = (
@@ -262,4 +270,10 @@ fhirpath_update_test_cases = (
 def test_fhirpath_update_existing(path_string, update_value, getattr_fcn):
     _observation = observation.model_copy(deep=True)
     parse(path_string).update_or_create(_observation, update_value)
+    assert getattr_fcn(_observation) == update_value
+
+@pytest.mark.parametrize("path_string, update_value, getattr_fcn", fhirpath_update_test_cases)
+def test_fhirpath_mixin_replace_fhirpath(path_string, update_value, getattr_fcn):
+    _observation = observation.model_copy(deep=True)
+    _observation.replace_fhirpath(path_string, update_value)
     assert getattr_fcn(_observation) == update_value

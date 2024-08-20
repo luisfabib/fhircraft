@@ -4,8 +4,9 @@ FHIR adds (compatible) functionality to the set of common FHIRPath functions. So
 are candidates for elevation to the base version of FHIRPath when the next version is released. 
 """
 
-from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathFunction, Invocation, Element, Operation, FHIRPath, FHIRPathError
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPathFunction, Invocation, Element, FHIRPath, FHIRPathError
 from fhircraft.fhir.path.engine.filtering import Where
+from fhircraft.fhir.path.engine.equality import Equals
 from fhircraft.fhir.resources.datatypes.primitives import Uri, Canonical, Url
 from fhircraft.utils import ensure_list, load_url
 from typing import List, Any, Optional
@@ -23,7 +24,7 @@ class Extension(FHIRPathFunction):
     Note:
         This class is a syntactical shortcut equivalent to:
 
-            Invocation(Element('extension'), Where(Operation(Element('url'), operator.eq, url))) 
+            Invocation(Element('extension'), Where(Equals(Element('url'), url))) 
     """
     def __init__(self, url: str):
         self.url = url
@@ -40,7 +41,7 @@ class Extension(FHIRPathFunction):
             List[FHIRPathCollectionItem]): The indexed collection item.
         """
         collection = ensure_list(collection)
-        return Invocation(Element('extension'), Where(Operation(Element('url'), operator.eq, self.url))).evaluate(collection, create=False) 
+        return Invocation(Element('extension'), Where(Equals(Element('url'), self.url))).evaluate(collection, create=False) 
 
     def __str__(self):
         return f'Extension("{self.url}")'
@@ -192,8 +193,6 @@ class HtmlChecks(FHIRPathFunction):
         Raises:
             FHIRPathError: If the collection is not a single item.
         """
-        from fhircraft.fhir.resources.factory import construct_resource_model
-        from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
         collection = ensure_list(collection)
         

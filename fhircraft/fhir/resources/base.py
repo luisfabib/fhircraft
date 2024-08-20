@@ -1,15 +1,15 @@
 from pydantic import BaseModel , ValidationError
 from fhircraft.utils import get_all_models_from_field
+from fhircraft.fhir.path import FHIRPathMixin
 from typing import ClassVar
 from copy import copy
-import inspect 
 
-class FHIRBaseModel(BaseModel):
+class FHIRBaseModel(BaseModel, FHIRPathMixin):
     """
     Base class for representation of FHIR resources as Pydantic objects. 
 
     Expands the Pydantic [BaseModel](https://docs.pydantic.dev/latest/api/base_model/) class with FHIR-specific methods.    
-    """
+    """    
     def model_dump(self, *args, **kwargs):
         kwargs.update({'by_alias': True, 'exclude_none': True})
         return super().model_dump(*args, **kwargs)

@@ -1,9 +1,7 @@
 from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.path.engine.comparison import *
 from fhircraft.fhir.path.engine.filtering import *
-import operator 
 from collections import namedtuple
-import pytest 
-from unittest import TestCase
 
 
 #-------------
@@ -12,12 +10,12 @@ from unittest import TestCase
 
 def test_where_returns_empty_for_empty_collection():
     collection = []
-    result = Where(Operation(This(), operator.lt, 3)).evaluate(collection)
+    result = Where(LessThan(This(), 3)).evaluate(collection)
     assert result == []
 
 def test_where_returns_valid_items_in_collection_where_true():
     collection = [FHIRPathCollectionItem(value=4), FHIRPathCollectionItem(value=1)]
-    result = Where(Operation(This(), operator.lt, 3)).evaluate(collection)
+    result = Where(LessThan(This(), 3)).evaluate(collection)
     assert result == [collection[1]]
 
 
