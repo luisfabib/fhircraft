@@ -1,15 +1,16 @@
 # Welcome to
 
 <!-- PROJECT LOGO -->
-<div>
-  <img src="assets/images/logo-banner.png" width="50%">
+<img src="assets/images/logo-banner.png" width="75%">
 
-  <p align="left">
-    Fhircraft is a Python package that dynamically generates Pydantic FHIR (Fast Healthcare Interoperability Resources) resource models from FHIR specifications, enabling comprehensive data structuring, validation, and typing within Python. It also offers a fully functional FHIRPath engine and code generation features to facilitate integration with other systems.
-    <br />
-    <br />
-  </p>
-</div>
+[![CI](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml/badge.svg?branch=main&event=push)](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml)
+[![releases](https://img.shields.io/github/v/release/luisfabib/fhircraft)](https://github.com/luisfabib/fhircraft)
+[![versions](https://img.shields.io/pypi/pyversions/fhircraft.svg)](https://github.com/luisfabib/fhircraft)
+[![license](https://img.shields.io/github/license/luisfabib/fhircraft.svg)](https://github.com/luisfabib/fhircraft/blob/main/LICENSE)
+[![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
+![FHIR Releases](https://img.shields.io/badge/FHIR-R4_R4B_R5-blue?style=flat&logo=fireship&logoColor=red&labelColor=%231e293b)
+
+Fhircraft is a Python package that dynamically generates Pydantic FHIR (Fast Healthcare Interoperability Resources) resource models from FHIR specifications, enabling comprehensive data structuring, validation, and typing within Python. It also offers a fully functional FHIRPath engine and code generation features to facilitate integration with other systems.
 
 !!! important "Active development"
 

@@ -3,11 +3,17 @@
 
 ## Installation
 
-If you've got Python 3.8+ and `pip>24.1` installed, installing `fhircraft` is as simply as:
+If you've got Python 3.8+ and `pip>24.1` installed, installing `fhircraft` is as simple as:
 
 ```bash
 pip install fhircraft
 ``` 
+
+or install it from the source via:
+
+```bash
+pip install git+https://github.com/luisfabib/fhircraft.git
+```
 
 Fhircraft has a few dependencies:
 
@@ -25,5 +31,5 @@ python -m pip install --upgrade pip
 To install Fhircraft's development environment use 
 
 ```bash
-pip install fhircraft[dev]
+pip install -e .[dev, docs]
 ```  

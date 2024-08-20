@@ -1,11 +1,19 @@
 <a name="readme-top"></a>
 
 <!-- PROJECT LOGO -->
+
 <br />
 <div align="center">
   <a href="https://github.com/luisfabib/fhircraft">
     <img src="docs/assets/images/logo-banner.png" width="50%">
   </a>
+
+  [![CI](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml/badge.svg?branch=main&event=push)](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml)
+  [![releases](https://img.shields.io/github/v/release/luisfabib/fhircraft)](https://github.com/luisfabib/fhircraft)
+  [![versions](https://img.shields.io/pypi/pyversions/fhircraft.svg)](https://github.com/luisfabib/fhircraft)
+  [![license](https://img.shields.io/github/license/luisfabib/fhircraft.svg)](https://github.com/luisfabib/fhircraft/blob/main/LICENSE)
+  [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
+  ![FHIR Releases](https://img.shields.io/badge/FHIR-R4_R4B_R5-blue?style=flat&logo=fireship&logoColor=red&labelColor=%231e293b)
 
   <p align="center">
     Fhircraft is a Python package that dynamically generates Pydantic FHIR (Fast Healthcare Interoperability Resources) resource models from FHIR specifications, enabling comprehensive data structuring, validation, and typing within Python. It also offers a fully functional FHIRPath engine and code generation features to facilitate integration with other systems.
@@ -14,7 +22,7 @@
     :construction:<i> This package is under active development. Major and/or breaking changes are to be expected in future updates.</i>:construction:
     <br />
     <br />
-    <a href="https://luisfabib.github.io/fhircraft/docs "><strong>Explore the docs »</strong></a>
+    <a href="https://luisfabib.github.io/fhircraft "><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/luisfabib/fhircraft/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
@@ -45,11 +53,17 @@ A valid installation of Python >3.8 is required.
 
 ### Installation
 
-To install `fhircraft`, you can download and install the package via `pip`:
+To install `fhircraft`, you can download and install the package via `pip` (requires `pip` > 24.1):
 
 ```bash
 pip install fhircraft
 ``` 
+
+or install it from the source 
+
+```bash
+pip install git+https://github.com/luisfabib/fhircraft.git
+```
 
 ### Getting Started
 
@@ -61,8 +75,11 @@ This is a quick reference on how to quickly accomplish the most common tasks wit
   For optimal control and security, it is recommended to manage FHIR structure definitions as local files. These files should be loaded into Python and parsed into dictionary objects.
   
   ``` python 
-      from fhircraft.utils import load_file
-      structure_definition = load_file('fhir/patient_r4b_structuredefinition.json') 
+    from fhircraft.fhir.resources.factory import construct_resource_model
+    from fhicraft.utils import load_file
+    patient_model = construct_resource_model(
+        structure_definition=load_file('FHIR_StructureDefinition_Patient.json')
+    )
   ``` 
 
 - #### Generating Pydantic FHIR models' source code
@@ -71,7 +88,7 @@ This is a quick reference on how to quickly accomplish the most common tasks wit
 
 
   ``` python
-  from fhircraft.fhir.resources import generate_resource_model_code
+  from fhircraft.fhir.resources.generator import generate_resource_model_code
   source_code = generate_resource_model_code(patient_model)
   ```
 
