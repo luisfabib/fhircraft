@@ -14,6 +14,8 @@ import inspect
 import re 
 
 FACTORY_MODULE = inspect.getmodule(ResourceFactory).__name__
+LEFT_TO_RIGHT_COMPLEX = "FieldInfo(annotation=NoneType, required=True, metadata=[_PydanticGeneralMetadata(union_mode='left_to_right')])"
+LEFT_TO_RIGHT_SIMPLE = "Field(union_mode='left_to_right')"
 
 class CodeGenerator:
     
@@ -27,7 +29,20 @@ class CodeGenerator:
         env.filters['escapequotes'] = lambda s: s.replace('"','\\"')
         self.template = env.get_template('resource_template.py.j2')
 
-    def add_import_statement(self, obj: Any) -> None:
+    def _add_import_statement(self, obj: Any) -> None:
+        """
+        Adds an import statement for the given object.
+
+        This method inspects the module of the given object and adds an import 
+        statement to the `import_statements` dictionary if the module is not 
+        already present and the object is not a built-in.
+
+        Args:
+            obj (Any): The object for which to add an import statement.
+
+        Raises:
+            ValueError: If the object does not belong to a module.
+        """        
         # Get the module of the object
         module = inspect.getmodule(obj)
         if module is None:
@@ -41,7 +56,16 @@ class CodeGenerator:
         if module_name not in [FACTORY_MODULE, 'builtins'] and object_name not in self.import_statements[module_name]:
             self.import_statements[module_name].append(object_name)
     
-    def recursively_import_annotation_types(self, annotation: _UnionGenericAlias) -> None:
+    def _recursively_import_annotation_types(self, annotation: _UnionGenericAlias) -> None:
+        '''
+        Recursively imports annotation types and their modules for serialization or import statements.
+
+        Args:
+            annotation (_UnionGenericAlias): The annotation type to process.
+
+        Raises:
+            ValueError: If the object does not belong to a module.
+        '''        
         # Get the type object 
         if hasattr(annotation, 'annotation'):
             type_obj = annotation.annotation
@@ -51,25 +75,31 @@ class CodeGenerator:
         if type_obj is not None and not isinstance(type_obj, str):
             if inspect.getmodule(type_obj).__name__ == FACTORY_MODULE and issubclass(type_obj, BaseModel):     
                 # If object was created by ResourceFactory, then serialize the model 
-                self.serialize_model(type_obj)
+                self._serialize_model(type_obj)
             else:
                 # Otherwise, import the model's module
-                self.add_import_statement(type_obj)
+                self._add_import_statement(type_obj)
         # Repeat for any nested annotations
         for nested_annotation in get_args(annotation): 
-            self.recursively_import_annotation_types(nested_annotation)
+            self._recursively_import_annotation_types(nested_annotation)
             
-    def serialize_model(self, model: BaseModel) -> None:
+    def _serialize_model(self, model: BaseModel) -> None:
+        '''
+        Serialize the model by extracting information about its fields and properties.
+
+        Args:
+            model (BaseModel): The model to be serialized.
+        '''         
         model_base = model.__base__ 
         # Add import statement for the base class the the model inherits
         if model_base and model_base != BaseModel:
-            self.add_import_statement(model.__base__)
+            self._add_import_statement(model.__base__)
 
         subdata = {}
         for field, info in model.model_fields.items():
             if model.__base__ and field in model.__base__.model_fields and all([getattr(info, slot) == getattr(model.__base__.model_fields[field], slot) for slot in info.__slots__ if not slot.startswith('_')]):
                 continue
-            self.recursively_import_annotation_types(info.annotation)
+            self._recursively_import_annotation_types(info.annotation)
             annotation_string = repr(info.annotation)
             
             if isinstance(info.annotation, type(Enum)):
@@ -91,12 +121,21 @@ class CodeGenerator:
         self.data.update({model: {'fields': subdata, 'properties': model_properties}})
     
     def generate_resource_model_code(self, resources: Union[BaseModel, List[BaseModel]]) -> str:
+        '''
+        Generate the source code for resource model(s) based on the input resources.
+
+        Args:
+            resources (Union[BaseModel, List[BaseModel]]): The resource(s) to generate the model code for.
+
+        Returns:
+            str: The generated source code for the resource model(s).
+        '''         
         # Reset the internal state of the generator
         self.import_statements = defaultdict(list)
         self.data = {}
         # Serialize the model information of the input resources
         for resource in ensure_list(resources):
-            self.serialize_model(resource)
+            self._serialize_model(resource)
         # Render the source code using Jinja2
         source_code = self.template.render(
             data=self.data, 
@@ -111,7 +150,7 @@ class CodeGenerator:
             for match in re.finditer(fr"({module}\.)({'|'.join(objects)})", source_code):
                 source_code = source_code.replace(match.group(1), '')
             source_code = source_code.replace(f'{FACTORY_MODULE}.', '')
-        source_code = source_code.replace("FieldInfo(annotation=NoneType, required=True, metadata=[_PydanticGeneralMetadata(union_mode='left_to_right')])", "Field(union_mode='left_to_right')")
+        source_code = source_code.replace(LEFT_TO_RIGHT_COMPLEX, LEFT_TO_RIGHT_SIMPLE)
 
         return source_code
 

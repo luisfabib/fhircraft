@@ -2,6 +2,7 @@
   - [Quickstart](quickstart.md)
   - [Installation](installation.md)
   - User Guide
-    -  ./user-guide/*
+    - [Pydantic FHIR models](user-guide/fhir-resources.md)
+    - [FHIRPath](user-guide/fhirpath.md)
   - API Reference
     -  ./reference/*

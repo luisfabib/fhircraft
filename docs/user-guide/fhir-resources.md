@@ -27,7 +27,7 @@ For optimal control and security, it is recommended to manage FHIR structure def
 The `construct_resource_model` function takes this dictionary containing the FHIR structure definition and constructs the corresponding model.
 
 ```python
-from fhircraft.fhir.resources import construct_resource_model
+from fhircraft.fhir.resources.factory import construct_resource_model
 resource_model = construct_resource_model(structure_definition=structure_definition)
 ```
 
@@ -36,7 +36,7 @@ resource_model = construct_resource_model(structure_definition=structure_definit
 A canonical URL is a globally unique identifier for FHIR conformance resources. Fhircraft includes a limited canonical URL resolver that can locate and download a FHIR resource's structure definition via HTTP.
 
 ```python
-from fhircraft.fhir.resources import construct_resource_model
+from fhircraft.fhir.resources.factory import construct_resource_model
 resource_model = construct_resource_model(canonical_url=url)
 ```
 
@@ -49,7 +49,7 @@ resource_model = construct_resource_model(canonical_url=url)
 Fhircraft caches the model created based on the structure definition of FHIR resource. Subsequent calls to `construct_resource_model` will not trigger any model constructer and will instead return the cached model. 
 The cache can be reset by simply calling:
 ```python
-from fhircraft.fhir.resources import clear_cache
+from fhircraft.fhir.resources.factory import clear_cache
 clear_cache()
 ```
 
@@ -166,7 +166,7 @@ For example, for a fictional simplified FHIR resource `mycustomresource.json`
 constructing a Pydantic FHIR model via 
 
 ```python
-from fhircraft.fhir.resources import construct_resource_model
+from fhircraft.fhir.resources.factory import construct_resource_model
 from fhircraft.fhir.utils import load_file
 mycustomresource_model = construct_resource_model(structure_definition=load_file('mycustomresource.json'))
 ```
@@ -345,7 +345,7 @@ Invariant constraints are logical expressions that specify conditions that must 
 
 In Fhircraft, invariant constraints are typically expressed using FHIRPath, a specialized expression language for querying and validating FHIR data. Fhircraft processes these constraints into Pydantic field or model validators that leverage its built-in FHIRPath engine to perform the necessary validation.
 
-If a resource violates an invariant constraint, the Fhircraft model will raise a `ValidationError`, indicating that the resource does not conform to the FHIR specification. The `ValidationError` will reference invariant's identifier as well as the evaluated FHIRPath expression, for reference.
+If a resource violates an invariant constraint, the Fhircraft model will raise a [`ValidationError`](https://docs.pydantic.dev/latest/api/pydantic_core/#pydantic_core.ValidationError), indicating that the resource does not conform to the FHIR specification. The [`ValidationError`](https://docs.pydantic.dev/latest/api/pydantic_core/#pydantic_core.ValidationError) will reference invariant's identifier as well as the evaluated FHIRPath expression, for reference.
 
 For example, if a `Quantity` resource is specified with unit `code` but without its coding `system`, the invariant `[qty-3]` will violated and the validation fails:
 

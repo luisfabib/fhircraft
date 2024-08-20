@@ -3,10 +3,13 @@ from fhircraft.utils import get_all_models_from_field
 from fhircraft.fhir.path import FHIRPathMixin
 from typing import ClassVar
 from copy import copy
-import inspect 
 
 class FHIRBaseModel(BaseModel, FHIRPathMixin):
-    
+    """
+    Base class for representation of FHIR resources as Pydantic objects. 
+
+    Expands the Pydantic [BaseModel](https://docs.pydantic.dev/latest/api/base_model/) class with FHIR-specific methods.    
+    """    
     def model_dump(self, *args, **kwargs):
         kwargs.update({'by_alias': True, 'exclude_none': True})
         return super().model_dump(*args, **kwargs)
@@ -16,7 +19,17 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return super().model_dump_json(*args, **kwargs)
 
     @classmethod 
-    def model_construct_with_slices(cls, slice_copies=9):
+    def model_construct_with_slices(cls, slice_copies:int=9) -> object:
+        '''
+        Constructs a model with sliced elements by creating empty slice instances based on the specified number of slice copies. 
+        The method iterates over the sliced elements of the class, generates slice resources, and sets them in the resource collection. 
+
+        Args:
+            slice_copies (int): Optional, an integer specifying the number of copies for each slice (default is 9).
+
+        Returns:
+            instance (Self): An instance of the model with the sliced elements constructed.
+        ''' 
         from fhircraft.fhir.path import fhirpath
         instance = super().model_construct()
         for element, slices in cls.get_sliced_elements().items():
@@ -34,6 +47,13 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     
     @classmethod 
     def get_sliced_elements(cls):
+        '''
+        Get the sliced elements from the model fields and their extension fields.
+        Sliced elements are filtered based on being instances of `FHIRSliceModel`.
+    
+        Returns:
+            slices (dict): A dictionary with field names as keys and corresponding sliced elements as values.
+        '''        
         # Get model elements' fields
         fields = copy(cls.model_fields)
         # Get model elements' extension fields 
@@ -50,6 +70,10 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     @classmethod
     def clean_unusued_slice_instances(cls, resource):
+        '''
+        Cleans up unused or incomplete slice instances within the given FHIR resource by iterating through the 
+        sliced elements of the class, identifying valid elements, and updating the resource with only the valid slices. 
+        '''
         from fhircraft.fhir.path import fhirpath
         # Remove unused/incomplete slices
         for element, slices in cls.get_sliced_elements().items():
@@ -75,11 +99,20 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     
 
 class FHIRSliceModel(FHIRBaseModel):
+    """
+    Base class for representation of FHIR profiled slices as Pydantic objects. 
+
+    Expands the `FHIRBaseModel` class with slice-specific methods.    
+    """
     min_cardinality: ClassVar[int] = 0
     max_cardinality: ClassVar[int] = 1
     
     @property
     def is_FHIR_complete(self):
+        """
+        Validates if the FHIR model is complete by attempting to validate the model dump.
+        Returns `True` if the model is complete, `False` otherwise.
+        """        
         model = self.__class__ 
         try:
             model.model_validate(self.model_dump())
@@ -89,4 +122,8 @@ class FHIRSliceModel(FHIRBaseModel):
     
     @property
     def has_been_modified(self):
+        """
+        Checks if the FHIRSliceModel instance has been modified by comparing it with a new instance constructed with slices.
+        Returns `True` if the instance has been modified, `False` otherwise.
+        """        
         return self != self.__class__.model_construct_with_slices()

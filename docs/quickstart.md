@@ -3,7 +3,7 @@ Welcome to the Fhircraft Quickstart Guide! Here, you'll learn how to easily inst
 
 ## Installation
 
-If you've got Python 3.8+ and `pip` installed, installing `fhircraft` is as simply as:
+If you've got Python 3.8+ and `pip` installed, installing `fhircraft` is as simple as:
 
 ```bash
 pip install fhircraft
@@ -26,7 +26,7 @@ For instance, to generate a Pydantic model for the core FHIR `Patient` resource:
 === "Canonical URL"
 
     ``` python
-    from fhircraft.fhir.resources import construct_resource_model
+    from fhircraft.fhir.resources.factory import construct_resource_model
     patient_model = construct_resource_model(
         canonical_url='http://hl7.org/fhir/StructureDefinition/Patient'
     )
@@ -40,7 +40,7 @@ For instance, to generate a Pydantic model for the core FHIR `Patient` resource:
 === "Local file"
 
     ``` python
-    from fhircraft.fhir.resources import construct_resource_model
+    from fhircraft.fhir.resources.factory import construct_resource_model
     from fhicraft.utils import load_file
     patient_model = construct_resource_model(
         structure_definition=load_file('FHIR_StructureDefinition_Patient.json')
@@ -57,7 +57,7 @@ Fhircraft allows you to generate reusable source code for Pydantic FHIR models. 
 
 
 ``` python
-from fhircraft.fhir.resources import generate_resource_model_code
+from fhircraft.fhir.resources.generator import generate_resource_model_code
 source_code = generate_resource_model_code(patient_model)
 ```
 
@@ -87,14 +87,14 @@ Fhircraft includes a powerful FHIRPath engine that enables you to query and mani
 
     ``` python
     from fhicraft.fhir.path import fhirpath
-    patient_surname = fhirpath.parse('Patient.name.surname').get_value(my_patient)
+    patient_surname = my_patient.get_fhirpath('Patient.name.surname')
     ```
 
 === "Update value"
 
     ``` python
     from fhicraft.fhir.path import fhirpath
-    fhirpath.parse('Patient.name.surname').update(my_patient, 'John')
+    patient_surname = my_patient.replace_fhirpath('Patient.name.surname', 'John')
     ```
 
 ------------------
