@@ -1,6 +1,6 @@
 from .parser import FhirPathParser, FhirPathParserError
-from .engine.core import FHIRPathError 
-from .lexer import FhirPathLexerError 
+from .engine.core import FHIRPathError, FHIRPathMixin 
+from .lexer import FhirPathLexerError  
 import traceback
 
 try:

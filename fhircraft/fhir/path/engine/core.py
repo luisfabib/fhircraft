@@ -1,6 +1,7 @@
 import logging
 from itertools import *  # noqa
 from fhircraft.utils import ensure_list, contains_list_type, get_fhir_model_from_field
+from fhircraft.fhir.path.utils import import_fhirpath_engine 
 
 import typing
 from typing import List, Optional
@@ -16,6 +17,54 @@ class FHIRPathError(Exception):
     An exception related to FHIRPath specific syntax or runtime criteria.
     """
     pass
+
+class FHIRPathMixin:
+    """ 
+    Mixin class to incorporate a simple FHIRPath interface to the child class.
+    """
+
+    @property
+    def fhirpath(self) -> typing.Callable:
+        """ 
+        Initialized FHIRPath engine instance
+        """
+        return import_fhirpath_engine()
+
+    def get_fhirpath(self, expression:str) -> typing.Union[None,typing.Any, typing.List[typing.Any]]:
+        """
+        Evaluates and retrieves the value(s) of a FHIRPath expression        
+
+        Args:
+            expression (str): FHIRPath expression to evaluate
+
+        Returns:
+            (Union[NoneType,Any, List[Any]): The extracted value(s), or None if no values are found.
+        """
+        # Evaluate the FHIRPath expression
+        collection = self.fhirpath.parse(expression).find(self)
+        # Get the values of the collection items
+        values = [
+            item.value for item in collection 
+                if item.value and not isinstance(item.value, bool)
+        ]
+        if len(values) == 1:
+            return values[0]
+        elif len(values) == 0:
+            return None
+        else:
+            return values    
+
+    def replace_fhirpath(self, expression:str, new_value:typing.Any) -> None:
+        """
+        Evaluates and replaces the value given by a FHIRPath expression        
+
+        Args:
+            expression (str): FHIRPath expression to evaluate
+        """
+        # Evaluate the FHIRPath expression
+        self.fhirpath.parse(expression).update_or_create(self, new_value)
+
+
 
 @dataclass
 class FHIRPathCollectionItem(object):
