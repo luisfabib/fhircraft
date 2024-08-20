@@ -3,7 +3,7 @@ Welcome to the Fhircraft Quickstart Guide! Here, you'll learn how to easily inst
 
 ## Installation
 
-If you've got Python 3.8+ and `pip` installed, installing `fhircraft` is as simply as:
+If you've got Python 3.8+ and `pip` installed, installing `fhircraft` is as simple as:
 
 ```bash
 pip install fhircraft
@@ -87,14 +87,14 @@ Fhircraft includes a powerful FHIRPath engine that enables you to query and mani
 
     ``` python
     from fhicraft.fhir.path import fhirpath
-    patient_surname = fhirpath.parse('Patient.name.surname').get_value(my_patient)
+    patient_surname = my_patient.get_fhirpath('Patient.name.surname')
     ```
 
 === "Update value"
 
     ``` python
     from fhicraft.fhir.path import fhirpath
-    fhirpath.parse('Patient.name.surname').update(my_patient, 'John')
+    patient_surname = my_patient.replace_fhirpath('Patient.name.surname', 'John')
     ```
 
 ------------------

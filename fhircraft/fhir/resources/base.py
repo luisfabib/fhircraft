@@ -25,10 +25,10 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         The method iterates over the sliced elements of the class, generates slice resources, and sets them in the resource collection. 
 
         Args:
-            slice_copies(int): Optional, an integer specifying the number of copies for each slice (default is 9).
+            slice_copies (int): Optional, an integer specifying the number of copies for each slice (default is 9).
 
         Returns:
-            instance(Self): An instance of the model with the sliced elements constructed.
+            instance (Self): An instance of the model with the sliced elements constructed.
         ''' 
         from fhircraft.fhir.path import fhirpath
         instance = super().model_construct()
@@ -52,7 +52,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         Sliced elements are filtered based on being instances of `FHIRSliceModel`.
     
         Returns:
-            slices(dict): A dictionary with field names as keys and corresponding sliced elements as values.
+            slices (dict): A dictionary with field names as keys and corresponding sliced elements as values.
         '''        
         # Get model elements' fields
         fields = copy(cls.model_fields)

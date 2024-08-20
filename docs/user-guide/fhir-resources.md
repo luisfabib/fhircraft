@@ -345,7 +345,7 @@ Invariant constraints are logical expressions that specify conditions that must 
 
 In Fhircraft, invariant constraints are typically expressed using FHIRPath, a specialized expression language for querying and validating FHIR data. Fhircraft processes these constraints into Pydantic field or model validators that leverage its built-in FHIRPath engine to perform the necessary validation.
 
-If a resource violates an invariant constraint, the Fhircraft model will raise a `ValidationError`, indicating that the resource does not conform to the FHIR specification. The `ValidationError` will reference invariant's identifier as well as the evaluated FHIRPath expression, for reference.
+If a resource violates an invariant constraint, the Fhircraft model will raise a [`ValidationError`](https://docs.pydantic.dev/latest/api/pydantic_core/#pydantic_core.ValidationError), indicating that the resource does not conform to the FHIR specification. The [`ValidationError`](https://docs.pydantic.dev/latest/api/pydantic_core/#pydantic_core.ValidationError) will reference invariant's identifier as well as the evaluated FHIRPath expression, for reference.
 
 For example, if a `Quantity` resource is specified with unit `code` but without its coding `system`, the invariant `[qty-3]` will violated and the validation fails:
 

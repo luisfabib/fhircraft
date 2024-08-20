@@ -85,7 +85,7 @@ def validate_model_constraint(instance:object, expression:str, human:str, key:st
     """       
     return _validate_FHIR_element_constraint(instance, expression, human, key, severity)
 
-def validate_FHIR_element_pattern(cls:Any, element:Union[FHIRBaseModel,List[FHIRBaseModel]], pattern:Union[FHIRBaseModel,List[FHIRBaseModel]]):
+def validate_FHIR_element_pattern(cls:Any, element:Union[FHIRBaseModel,List[FHIRBaseModel]], pattern:Union[FHIRBaseModel,List[FHIRBaseModel]]) -> Union[FHIRBaseModel, List[FHIRBaseModel]]:
     '''
     Validate the FHIR element against a specified pattern and return the element if it fulfills the pattern.
 
@@ -133,7 +133,7 @@ def validate_slicing_cardinalities(cls:Any, values:List[Any], field_name:str) ->
     Validates the cardinalities of FHIR slices for a specific field within a FHIR resource.
 
     Args:
-        cls(Any): The Pydantic FHIR model class.
+        cls (Any): The Pydantic FHIR model class.
         values (List[Any]): List of values for the field.
         field_name (str): The name of the field to validate.
 
@@ -162,11 +162,11 @@ def get_type_choice_value_by_base(instance:object, base:str) -> Any:
     name starting with a specific base string.
 
     Args:
-        instance(object): The instance object to retrieve the value from.
-        base(str): The base string that the field name should start with.
+        instance (object): The instance object to retrieve the value from.
+        base (str): The base string that the field name should start with.
 
     Returns:
-        value(Any): The value of the first field found in the instance that starts with the specified base string,
+        value (Any): The value of the first field found in the instance that starts with the specified base string,
                     or `None` if no such field exists or the value is `None`.
     '''
     for field in instance.model_fields:

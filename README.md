@@ -7,10 +7,13 @@
   <a href="https://github.com/luisfabib/fhircraft">
     <img src="docs/assets/images/logo-banner.png" width="50%">
   </a>
-  
+
+  [![CI](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml/badge.svg?branch=main&event=push)](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml)
+  [![releases](https://img.shields.io/github/v/release/luisfabib/fhircraft)](https://github.com/luisfabib/fhircraft)
   [![versions](https://img.shields.io/pypi/pyversions/fhircraft.svg)](https://github.com/luisfabib/fhircraft)
   [![license](https://img.shields.io/github/license/luisfabib/fhircraft.svg)](https://github.com/luisfabib/fhircraft/blob/main/LICENSE)
   [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
+  ![FHIR Releases](https://img.shields.io/badge/FHIR-R4_R4B_R5-blue?style=flat&logo=fireship&logoColor=red&labelColor=%231e293b)
 
   <p align="center">
     Fhircraft is a Python package that dynamically generates Pydantic FHIR (Fast Healthcare Interoperability Resources) resource models from FHIR specifications, enabling comprehensive data structuring, validation, and typing within Python. It also offers a fully functional FHIRPath engine and code generation features to facilitate integration with other systems.
@@ -50,11 +53,17 @@ A valid installation of Python >3.8 is required.
 
 ### Installation
 
-To install `fhircraft`, you can download and install the package via `pip`:
+To install `fhircraft`, you can download and install the package via `pip` (requires `pip` > 24.1):
 
 ```bash
 pip install fhircraft
 ``` 
+
+or install it from the source 
+
+```bash
+pip install git+https://github.com/luisfabib/fhircraft.git
+```
 
 ### Getting Started
 

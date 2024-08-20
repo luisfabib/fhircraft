@@ -67,3 +67,11 @@ plugins:
       handlers:
         python:
           docstring_section_style: google
+          docstring_options:
+            ignore_init_summary: true
+          merge_init_into_class: true
+          separate_signature: true
+          signature_crossrefs: true
+          import:
+            - https://docs.python.org/3/objects.inv
+            - https://docs.pydantic.dev/latest/objects.inv
