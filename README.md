@@ -113,7 +113,7 @@ This is a quick reference on how to quickly accomplish the most common tasks wit
 
   ``` python
   from fhicraft.fhir.path import fhirpath
-  patient_surname = fhirpath.parse('Patient.name.surname').get_value(my_patient)
+  patient_surname = my_patient.get_fhirpath('Patient.name.surname')
   ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

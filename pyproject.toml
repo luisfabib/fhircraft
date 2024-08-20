@@ -71,3 +71,8 @@ include = [
     '/fhircraft',
     '/test',
 ]
+
+[project.urls]
+Homepage = "https://github.com/luisfabib/fhircraft"
+Issues = "https://github.com/luisfabib/fhircraft/issues"
+Documentation = "https://luisfabib.github.io/fhircraft/"
