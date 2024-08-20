@@ -1,10 +1,11 @@
 from pydantic import BaseModel , ValidationError
 from fhircraft.utils import get_all_models_from_field
+from fhircraft.fhir.path import FHIRPathMixin
 from typing import ClassVar
 from copy import copy
 import inspect 
 
-class FHIRBaseModel(BaseModel):
+class FHIRBaseModel(BaseModel, FHIRPathMixin):
     
     def model_dump(self, *args, **kwargs):
         kwargs.update({'by_alias': True, 'exclude_none': True})

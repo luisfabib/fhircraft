@@ -53,3 +53,8 @@ def join_fhirpath(*segments: str) -> str:
 
 def _underline_error_in_fhir_path(fhir_path, error, error_position):
     return f'{fhir_path[:error_position+len(str(error))+15]}...\n{" "*error_position}{"—"*len(str(error))}'
+    
+
+def import_fhirpath_engine():
+    from fhircraft.fhir.path import fhirpath
+    return fhirpath
