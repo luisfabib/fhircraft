@@ -41,7 +41,7 @@ For instance, to generate a Pydantic model for the core FHIR `Patient` resource:
 
     ``` python
     from fhircraft.fhir.resources.factory import construct_resource_model
-    from fhicraft.utils import load_file
+    from fhircraft.utils import load_file
     patient_model = construct_resource_model(
         structure_definition=load_file('FHIR_StructureDefinition_Patient.json')
     )
@@ -70,7 +70,7 @@ You can save the generated source code and reuse it as needed. Keep in mind that
 The generated Pydantic models can be used to validate FHIR payloads, ensuring that they conform to the structure and constraints of the specified resource or profile.
 
 ``` python
-from fhicraft.utils import load_file
+from fhircraft.utils import load_file
 data = load_file('my_fhir_patient.json')
 my_patient = patient_model.model_validate(data)
 ```
@@ -86,14 +86,14 @@ Fhircraft includes a powerful FHIRPath engine that enables you to query and mani
 === "Get value"
 
     ``` python
-    from fhicraft.fhir.path import fhirpath
+    from fhircraft.fhir.path import fhirpath
     patient_surname = my_patient.get_fhirpath('Patient.name.surname')
     ```
 
 === "Update value"
 
     ``` python
-    from fhicraft.fhir.path import fhirpath
+    from fhircraft.fhir.path import fhirpath
     patient_surname = my_patient.replace_fhirpath('Patient.name.surname', 'John')
     ```
 
