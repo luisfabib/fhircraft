@@ -12,6 +12,7 @@ from typing import Dict, List, Any, Union, _UnionGenericAlias, get_args
 from enum import Enum
 import inspect
 import re 
+import os
 
 FACTORY_MODULE = inspect.getmodule(ResourceFactory).__name__
 LEFT_TO_RIGHT_COMPLEX = "FieldInfo(annotation=NoneType, required=True, metadata=[_PydanticGeneralMetadata(union_mode='left_to_right')])"
@@ -24,7 +25,7 @@ class CodeGenerator:
     
     def __init__(self):
         # Prepare the templating engine environment
-        file_loader = FileSystemLoader('fhircraft/fhir/resources/')
+        file_loader = FileSystemLoader(os.path.dirname(os.path.abspath(__file__)))
         env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)
         env.filters['escapequotes'] = lambda s: s.replace('"','\\"')
         self.template = env.get_template('resource_template.py.j2')

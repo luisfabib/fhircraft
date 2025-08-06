@@ -169,7 +169,7 @@ def get_type_choice_value_by_base(instance:object, base:str) -> Any:
         value (Any): The value of the first field found in the instance that starts with the specified base string,
                     or `None` if no such field exists or the value is `None`.
     '''
-    for field in instance.model_fields:
+    for field in instance.__class__.model_fields:
         if field.startswith(base):
             value = getattr(instance, field)
             if value is not None:
