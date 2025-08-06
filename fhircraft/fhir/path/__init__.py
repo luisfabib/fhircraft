@@ -2,6 +2,10 @@ from .parser import FhirPathParser, FhirPathParserError
 from .engine.core import FHIRPathError, FHIRPathMixin 
 from .lexer import FhirPathLexerError  
 import traceback
+import warnings 
+
+class FhirPathWwarning(Warning):
+    pass
 
 try:
     fhirpath = FhirPathParser()

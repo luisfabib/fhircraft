@@ -461,13 +461,13 @@ class ResourceFactory:
         return fields, validators, properties
         
 
-    def construct_resource_model(self, canonical_url: str=None, structure_definition: dict=None, base_model: type=FHIRBaseModel) -> FHIRBaseModel:
+    def construct_resource_model(self, canonical_url: str=None, structure_definition: Union[str,dict]=None, base_model: type=FHIRBaseModel) -> FHIRBaseModel:
         """
         Constructs a Pydantic model based on the provided FHIR structure definition.
 
         Args:
             canonical_url (dict): The FHIR resource's or profile's canonical URL from which to download the StructureDefinition.
-            structure_definition (dict): The FHIR StructureDefinition to build the model from.
+            structure_definition (Union[str,dict]): The FHIR StructureDefinition to build the model from specified as a filename or as a dictionary.
 
         Returns:
             model (BaseModel): The constructed Pydantic model representing the FHIR resource.
@@ -476,6 +476,10 @@ class ResourceFactory:
         if canonical_url in self.construction_cache:
             return self.construction_cache[canonical_url]
         # Download the FHIR structure definition if the canonical URL has been specified        
+        if isinstance(structure_definition, str):
+            with open(structure_definition) as file:
+                import json 
+                structure_definition = json.load(file)
         if not structure_definition and canonical_url:
             structure_definition = self.download_structure_definition(canonical_url)
         # Check that the snapshot is available in the FHIR structure definition

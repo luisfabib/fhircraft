@@ -26,7 +26,7 @@ def _validate_FHIR_element_constraint(value:Any, expression:str, human:str, key:
         AssertionError: If the validation fails and severity is not 'warning'.
         Warning: If the validation fails and severity is 'warning'.
     ''' 
-    from fhircraft.fhir.path import fhirpath, FhirPathLexerError, FhirPathParserError
+    from fhircraft.fhir.path import fhirpath, FhirPathLexerError, FhirPathParserError, FhirPathWwarning
     from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
     if value is None:
         return value
@@ -37,7 +37,7 @@ def _validate_FHIR_element_constraint(value:Any, expression:str, human:str, key:
                 valid = True
             error_message =  f'{human}. [{key}] -> "{expression}"'
             if severity == 'warning' and not valid:
-                warnings.warn(error_message)
+                warnings.warn(error_message, FhirPathWwarning)
             else:
                 assert valid, error_message
         except (ValueError, FhirPathLexerError, FhirPathParserError, AttributeError, NotImplementedError) as e:
