@@ -3,20 +3,21 @@ FHIR adds (compatible) functionality to the set of common FHIRPath functions. So
 are candidates for elevation to the base version of FHIRPath when the next version is released.
 """
 
+import operator
+from typing import Any, List, Optional
+
 from fhircraft.fhir.path.engine.core import (
-    FHIRPathCollectionItem,
-    FHIRPathFunction,
-    Invocation,
     Element,
     FHIRPath,
+    FHIRPathCollectionItem,
     FHIRPathError,
+    FHIRPathFunction,
+    Invocation,
 )
-from fhircraft.fhir.path.engine.filtering import Where
 from fhircraft.fhir.path.engine.equality import Equals
-from fhircraft.fhir.resources.datatypes.primitives import Uri, Canonical, Url
+from fhircraft.fhir.path.engine.filtering import Where
+from fhircraft.fhir.resources.datatypes.primitives import Canonical, Uri, Url
 from fhircraft.utils import ensure_list, load_url
-from typing import List, Any, Optional
-import operator
 
 
 class Extension(FHIRPathFunction):
@@ -171,7 +172,6 @@ class Resolve(FHIRPathFunction):
             collection (List[FHIRPathCollectionItem])): The output collection.
         """
         from fhircraft.fhir.resources.factory import construct_resource_model
-        from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
         collection = ensure_list(collection)
         output_collection = []
@@ -228,4 +228,5 @@ class HtmlChecks(FHIRPathFunction):
             )
         value = collection[0]
         # TODO: Implement HTML validity check
+        return True
         return True

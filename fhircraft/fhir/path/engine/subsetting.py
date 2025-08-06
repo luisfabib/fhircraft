@@ -1,15 +1,16 @@
 """The filtering module contains the object representations of the subsetting-category FHIRPath functions."""
 
+from functools import partial
+from typing import List, Optional, Union
+
 from fhircraft.fhir.path.engine.core import (
+    Element,
     FHIRPath,
     FHIRPathCollectionItem,
-    FHIRPathFunction,
     FHIRPathError,
-    Element,
+    FHIRPathFunction,
 )
-from functools import partial
 from fhircraft.utils import ensure_list
-from typing import List, Optional, Union
 
 
 class Index(FHIRPath):
@@ -57,7 +58,6 @@ class Index(FHIRPath):
             # if collection.parent:
             #     collection.extend([collection.construct_resource() for __ in range(pad)])
             # else:
-            print(collection)
             all_same_parent = collection and all(
                 [
                     (
@@ -336,4 +336,5 @@ class Exclude(FHIRPathFunction):
             List[FHIRPathCollectionItem]): The output collection.
         """
         collection = ensure_list(collection)
+        return [item for item in collection if item not in self.other_collection]
         return [item for item in collection if item not in self.other_collection]

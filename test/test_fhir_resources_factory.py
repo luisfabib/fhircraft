@@ -161,7 +161,7 @@ class TestConstructPydanticField(FactoryTestCase):
     def test_constructs_required_list_field(self):
         field_type = primitives.String
         result = self.factory._construct_Pydantic_field(
-            field_type, min_card=1, max_card=None
+            field_type, min_card=1, max_card=99999
         )
         assert result[0] == List[field_type]
         assert result[1].is_required() == True
@@ -169,7 +169,7 @@ class TestConstructPydanticField(FactoryTestCase):
     def test_constructs_optional_list_field(self):
         field_type = primitives.String
         result = self.factory._construct_Pydantic_field(
-            field_type, min_card=0, max_card=None
+            field_type, min_card=0, max_card=99999
         )
         assert result[0] == Optional[List[field_type]]
         assert result[1].is_required() == False
@@ -194,8 +194,8 @@ class TestProcessPatternOrFixedValues(FactoryTestCase):
     def test_processes_value_constraint_on_primitive(
         self, attribute, expected_type, expected_value
     ):
-        element = {f"{self.prefix}{attribute}": expected_value}
-        result = self.factory._process_pattern_or_fixed_values(element, self.prefix)
+        element = {f"{self.prefix}{attribute}": expected_value}  # type: ignore
+        result = self.factory._process_pattern_or_fixed_values(element, self.prefix)  # type: ignore
         assert (
             type(result) in get_args(expected_type.__value__)
             or type(result) is expected_type.__value__
@@ -229,14 +229,14 @@ class TestProcessPatternOrFixedValues(FactoryTestCase):
     def test_processes_value_constraint_on_complex_type(
         self, attribute, expected_type, expected_value
     ):
-        element = {f"{self.prefix}{attribute}": expected_value}
-        result = self.factory._process_pattern_or_fixed_values(element, self.prefix)
+        element = {f"{self.prefix}{attribute}": expected_value}  # type: ignore
+        result = self.factory._process_pattern_or_fixed_values(element, self.prefix)  # type: ignore
         assert isinstance(result, expected_type)
         assert result == expected_type.model_validate(expected_value)
 
     def test_processes_no_constraints(self):
         element = {}
-        result = self.factory._process_pattern_or_fixed_values(element, self.prefix)
+        result = self.factory._process_pattern_or_fixed_values(element, self.prefix)  # type: ignore
         assert result is None
 
 

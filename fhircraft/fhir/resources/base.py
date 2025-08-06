@@ -50,7 +50,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 )
             # Set the whole list of slices in the resource
             collection = fhirpath.parse(element).find_or_create(instance)
-            [col.set_literal(slice_resources) for col in collection]
+            [item.set_literal(slice_resources) for item in collection]
         return instance
 
     @classmethod

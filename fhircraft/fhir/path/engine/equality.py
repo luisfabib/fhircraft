@@ -1,13 +1,14 @@
 """The equality module contains the object representations of the equality FHIRPath operators."""
 
+from math import isclose
+from typing import Any, List, Optional
+
 from fhircraft.fhir.path.engine.core import (
-    FHIRPathCollectionItem,
     FHIRPath,
+    FHIRPathCollectionItem,
     FHIRPathFunction,
 )
 from fhircraft.utils import ensure_list
-from typing import List, Any, Optional
-from math import isclose
 
 
 def _evaluate_expressions(left, right, collection, create):
@@ -46,7 +47,7 @@ class Equals(FHIRPath):
         self.right = right
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
+        self, collection: List[FHIRPathCollectionItem], create: bool = False
     ) -> bool:
         """
         Returns true if the left collection is equal to the right collection:
@@ -74,7 +75,7 @@ class Equals(FHIRPath):
             bool
         """
         left_collection, right_collection = _evaluate_expressions(
-            self.left, self.right, collection, create=kwargs.get("create", False)
+            self.left, self.right, collection, create=create
         )
         if len(left_collection) == 0 or len(right_collection) == 0:
             return []
@@ -268,4 +269,5 @@ class NotEquivalent(FHIRPath):
         )
 
     def __hash__(self):
+        return hash((self.left, self.right))
         return hash((self.left, self.right))

@@ -99,7 +99,8 @@ class ResourceFactory:
         )
         headers = {
             "Content-Type": "application/json",
-            "Accept": "application/json",
+            "Accept": "application/json, application/json+fhir, text/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
         }
         # Download the StructureDefinition JSON
         response = requests.get(
@@ -107,6 +108,7 @@ class ResourceFactory:
             proxies=proxies,
             verify=settings.get("CERTIFICATE_BUNDLE_PATH"),
             headers=headers,
+            allow_redirects=True,
         )
         response.raise_for_status()
         return response.json()
@@ -138,7 +140,7 @@ class ResourceFactory:
             current.update(element)
         return tree
 
-    def _get_complex_FHIR_type(self, field_type_name: str) -> Union[type, str]:
+    def _get_complex_FHIR_type(self, field_type_name: str) -> type | str:
         """
         Parses and loads the FHIR element type based on the provided field type name.
 
@@ -157,14 +159,13 @@ class ResourceFactory:
         field_type_name = capitalize(field_type_name)
         # Check if type is a FHIR primitive datatype
         field_type = getattr(primitives, field_type_name, None)
-        if not field_type:
+        if field_type:
+            return field_type
+        try:
             # Check if type is a FHIR complex datatype
-            field_type = get_complex_FHIR_type(
-                field_type_name, self.Config.FHIR_release
-            )
-        if not field_type:
+            return get_complex_FHIR_type(field_type_name, self.Config.FHIR_release)
+        except (ModuleNotFoundError, AttributeError):
             return field_type_name
-        return field_type
 
     def _create_model_with_properties(
         self,
@@ -226,7 +227,7 @@ class ResourceFactory:
             default = ensure_list(default) if default is not _Unset else default
         # Determine whether the field is optional
         if min_card == 0:
-            actual_field_type = actual_field_type | None
+            actual_field_type = Optional[actual_field_type]
             default = None
         # Construct the Pydantic field
         return (
@@ -735,7 +736,6 @@ class ResourceFactory:
         # If the resource has metadata, prefill the information
         if "meta" in fields:
             Meta = get_complex_FHIR_type("Meta", self.Config.FHIR_release)
-            assert Meta is not None, "Meta type could not be determined"
             fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
             fields["meta"] = (
                 Optional[Meta],

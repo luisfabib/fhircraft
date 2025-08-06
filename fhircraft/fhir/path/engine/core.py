@@ -1,13 +1,15 @@
 import logging
-from itertools import *  # noqa
-from fhircraft.utils import ensure_list, contains_list_type, get_fhir_model_from_field
-from fhircraft.fhir.path.utils import import_fhirpath_engine
-
 import typing
-from typing import List, Optional
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial
+from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Optional, TypeVar
+
+from fhircraft.fhir.path.utils import import_fhirpath_engine
+from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
+
+if TYPE_CHECKING:
+    from fhircraft.fhir.path.parser import FhirPathParser
 
 # Get logger name
 logger = logging.getLogger(__name__)
@@ -27,7 +29,7 @@ class FHIRPathMixin:
     """
 
     @property
-    def fhirpath(self) -> typing.Callable:
+    def fhirpath(self) -> "FhirPathParser":
         """
         Initialized FHIRPath engine instance
         """
@@ -91,15 +93,15 @@ class FHIRPathCollectionItem(object):
     element: Optional[str] = None
     index: Optional[int] = None
     parent: Optional["FHIRPathCollectionItem"] = None
-    setter: Optional[callable] = None
+    setter: Optional[Callable] = None
 
     @classmethod
-    def wrap(cls, data: typing.Union["FHIRPathCollectionItem"]):
+    def wrap(cls, data: Any) -> "FHIRPathCollectionItem":
         """
         Wraps data in a FHIRPathCollectionItem instance.
 
         Args:
-            data (Union[FHIRPathCollectionItem): The data to be wrapped.
+            data (Any): The data to be wrapped.
 
         Returns:
             item (FHIRPathCollectionItem): The wrapped FHIRPathCollectionItem instance.
@@ -110,6 +112,8 @@ class FHIRPathCollectionItem(object):
             return cls(data)
 
     def set_literal(self, value):
+        if not self.parent:
+            raise RuntimeError("There is no parent to set the value on")
         setattr(self.parent.value, self.path.label, value)
 
     def set_value(self, value):
@@ -138,6 +142,10 @@ class FHIRPathCollectionItem(object):
         Returns:
            (Any): The field information, or None if not available.
         """
+        if not self.parent:
+            raise RuntimeError(
+                "There is no parent to retrieve the field information from"
+            )
         parent = self.parent.value
         if isinstance(parent, list):
             parent = parent[0]
@@ -166,6 +174,10 @@ class FHIRPathCollectionItem(object):
         """
         if self.field_info:
             model = get_fhir_model_from_field(self.field_info)
+            if not model:
+                raise ValueError(
+                    f"Could not construct resource from field information: {self.field_info}"
+                )
             return model.model_construct()
 
     @property
@@ -280,7 +292,9 @@ class FHIRPath(ABC):
         for item in self.evaluate(collection, create=True):
             item.set_value(value)
 
-    def evaluate(self, collection, create: bool) -> List[FHIRPathCollectionItem]:
+    def evaluate(
+        self, collection: List[FHIRPathCollectionItem], create: bool
+    ) -> List[FHIRPathCollectionItem]:
         """
         Evaluates the collection and returns a list of FHIRPathCollectionItem instances.
 
@@ -361,11 +375,11 @@ class Element(FHIRPath):
         if not hasattr(parent.__class__, "model_fields"):
             return None
         field_info = parent.__class__.model_fields.get(self.label)
-        try:
-            model = get_fhir_model_from_field(field_info)
-            new_element = model.model_construct()
-        except (KeyError, AttributeError):
+        model = get_fhir_model_from_field(field_info)
+        if not model:
             new_element = None
+        else:
+            new_element = model.model_construct()
         if field_info and contains_list_type(field_info.annotation):
             new_element = ensure_list(new_element)
         return new_element
@@ -505,7 +519,7 @@ class Parent(FHIRPath):
             collection (List[FHIRPathCollectionItem]): A list of FHIRPathCollectionItem instances after evaluation.
         """
         collection = ensure_list(collection)
-        return [item.parent for item in collection]
+        return [item.parent for item in collection if item.parent is not None]
 
     def __str__(self):
         return "$"
