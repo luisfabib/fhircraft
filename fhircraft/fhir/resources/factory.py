@@ -3,31 +3,39 @@
 Pydantic FHIR Model Factory
 """
 
-# Internal modules
-import fhircraft.fhir.resources.validators as fhir_validators
-import fhircraft.fhir.resources.datatypes.primitives as primitives
-from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
-from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
-from fhircraft.utils import (
-    capitalize,
-    load_env_variables,
-    ensure_list,
-    get_FHIR_release_from_version,
-)
-
-# Pydantic modules
-from pydantic import Field, create_model, model_validator, BaseModel, field_validator
-from pydantic_core import PydanticUndefined
-from pydantic.dataclasses import dataclass
+import inspect
+import json
+from collections import defaultdict
 
 # Standard modules
 from enum import Enum
 from functools import partial
-from typing import List, Any, Dict, Union, Optional, Literal, Tuple
-from typing_extensions import Annotated
-from collections import defaultdict
+from typing import Any, Dict, List, Literal, Optional, Tuple, TypeVar, Union
+
 import requests
-import inspect
+
+# Pydantic modules
+from pydantic import BaseModel, Field, create_model, field_validator, model_validator
+from pydantic.dataclasses import dataclass
+from pydantic.fields import FieldInfo
+from pydantic_core import PydanticUndefined
+from typing_extensions import Annotated
+
+import fhircraft.fhir.resources.datatypes.primitives as primitives
+
+# Internal modules
+import fhircraft.fhir.resources.validators as fhir_validators
+from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
+from fhircraft.utils import (
+    capitalize,
+    ensure_list,
+    get_FHIR_release_from_version,
+    load_env_variables,
+)
+
+ModelT = TypeVar("ModelT", bound="BaseModel")
+SlicedModelT = TypeVar("SlicedModelT", bound="FHIRSliceModel")
 
 _Unset: Any = PydanticUndefined
 
@@ -46,8 +54,8 @@ class ResourceFactory:
         FHIR_release: str
         resource_name: str
 
-    Config: Optional[FactoryConfig]
-    construction_cache: Dict[str, BaseModel] = {}
+    Config: FactoryConfig
+    construction_cache: Dict[str, type[BaseModel]] = {}
 
     def download_structure_definition(self, profile_url: str) -> Dict[str, Any]:
         """
@@ -79,8 +87,12 @@ class ResourceFactory:
         settings = load_env_variables()
         proxies = (
             {
-                "https": settings.get("PROXY_URL_HTTPS"),
-                "http": settings.get("PROXY_URL_HTTP"),
+                k: v
+                for k, v in {
+                    "https": settings.get("PROXY_URL_HTTPS"),
+                    "http": settings.get("PROXY_URL_HTTP"),
+                }.items()
+                if v is not None
             }
             if settings.get("PROXY_URL_HTTPS") or settings.get("PROXY_URL_HTTP")
             else None
@@ -158,10 +170,10 @@ class ResourceFactory:
         self,
         name: str,
         fields: dict,
-        base: Union[Tuple[type], type],
+        base: Tuple[type[ModelT], ...],
         validators: dict,
         properties: dict,
-    ) -> BaseModel:
+    ) -> type[ModelT]:
         """
         Constructs a Pydantic model with specified fields, base, validators, and properties.
 
@@ -184,14 +196,15 @@ class ResourceFactory:
 
     def _construct_Pydantic_field(
         self,
-        field_type: type,
+        field_type: Any,
         min_card: int,
         max_card: int,
         default: Any = _Unset,
         description: Optional[str] = None,
         alias: Optional[str] = None,
-    ) -> Field:
+    ) -> Tuple[Any, FieldInfo]:
         """
+        Constructs a Pydantic field based on the provided parameters.
         Constructs a Pydantic field based on the provided parameters.
 
         Args:
@@ -203,20 +216,21 @@ class ResourceFactory:
             alias (str, optional): The alias of the field. Defaults to None.
 
         Returns:
-            Field: The constructed Pydantic field.
+            Tuple[Any, FieldInfo]: The constructed Pydantic field type and Field instance.
         """
         # Determine whether typing should be a list based on max. cardinality
         is_list_type = max_card is None or max_card > 1
+        actual_field_type = field_type
         if is_list_type:
-            field_type = List[field_type]
+            actual_field_type = List[actual_field_type]
             default = ensure_list(default) if default is not _Unset else default
         # Determine whether the field is optional
         if min_card == 0:
-            field_type = Optional[field_type]
+            actual_field_type = actual_field_type | None
             default = None
         # Construct the Pydantic field
         return (
-            field_type,
+            actual_field_type,
             Field(
                 default,
                 alias=alias,
@@ -240,13 +254,16 @@ class ResourceFactory:
             Any: The constrained value after processing.
         """
         # Determine the name of the StructureDefinition element's attribute that starts with either the prefix 'fixed[x]' or 'pattern[x]'
-        constraint_attribute = next(
-            (
-                attribute
-                for attribute in element
-                if attribute.startswith(constraint_prefix)
-            ),
-            None,
+        constraint_attribute = (
+            next(
+                (
+                    attribute
+                    for attribute in element
+                    if attribute.startswith(constraint_prefix)
+                ),
+                None,
+            )
+            or ""
         )
         if (constrained_value := element.get(constraint_attribute)) is not None:
             # Get the type of value that is constrained to a preset value
@@ -310,16 +327,26 @@ class ResourceFactory:
         )
         return fields, validators, properties
 
-    def _process_element_slices(self, element: dict, field_type: type) -> Annotated:
+    def _build_element_slice_models(
+        self, element: dict, slice_base: Any
+    ) -> List[type[FHIRSliceModel]]:
         """
-        Process the FHIR element slices to construct Pydantic models.
+        Constructs and returns a list of FHIR slice model classes for a given element definition.
+
+        This method processes the "slices" defined within the provided element dictionary,
+        generating a Pydantic model class for each slice. If a canonical profile URL is specified
+        for a slice, the corresponding resource model is constructed using that profile. Otherwise,
+        a new model is dynamically created based on the slice's structure and properties.
+
+        Each generated slice model is ensured to be a subclass of `FHIRSliceModel`, and its
+        cardinality constraints (min and max) are set according to the slice definition.
 
         Args:
-            element (dict): The element containing slice information.
-            field_type (type): The type of the field.
+            element (dict): The element definition containing slice information.
+            slice_base (type[BaseModel]): The base model class to use for the generated slice models.
 
         Returns:
-            Annotated:  A union of slice models and the original type.
+            List[type[FHIRSliceModel]]: A list of dynamically constructed FHIR slice model classes.
         """
         slice_types = []
         for slice_name, slice_element in element["slices"].items():
@@ -343,40 +370,55 @@ class ResourceFactory:
                     )
                 )
                 # Construct the slice model
+                bases = (
+                    (slice_base,)
+                    if slice_base is FHIRSliceModel
+                    else (slice_base, FHIRSliceModel)
+                )
                 slice_model = self._create_model_with_properties(
                     slice_model_name,
                     fields=slice_subfields,
-                    base=(field_type, FHIRSliceModel),
+                    base=bases,
                     validators=slice_validators,
                     properties=slice_properties,
                 )
+            assert issubclass(
+                slice_model, FHIRSliceModel
+            ), f"Slice model {slice_model} is not a subclass of FHIRSliceModel"
             # Store the specific slice cardinality
             slice_model.min_cardinality, slice_model.max_cardinality = (
-                self._process_cardinality_constraints(slice_element)
+                self._parse_element_cardinality(slice_element)
             )
             # Store the slice model in the list of slices of the element
             slice_types.append(slice_model)
         # Create annotated type as union of slice models and original type (important, last in the definition)
-        return Annotated[
-            Union[tuple([*slice_types, field_type])], Field(union_mode="left_to_right")
-        ]
+        return slice_types
 
-    def _process_cardinality_constraints(self, element):
+    def _parse_element_cardinality(self, element: Dict[str, Any]) -> Tuple[int, int]:
         """
-        Process the cardinality constraints of a FHIR element.
+        Parses the cardinality constraints from a FHIR element definition.
 
         Args:
-            element (Dict[str, Any]): The element containing cardinality information.
+            element (dict): A dictionary representing a FHIR element, expected to contain
+                "min" and "max" keys indicating the minimum and maximum cardinality.
 
         Returns:
-            Tuple[int, int]: A tuple containing the minimum and maximum cardinality values.
+            tuple: A tuple (min_card, max_card) where:
+                - min_card (int): The minimum allowed occurrences of the element.
+                - max_card (int): The maximum allowed occurrences of the element.
+        Notes:
+            - If "min" is not numeric, defaults to 0.
+            - If "max" is "*", uses 99999 as a stand-in for unbounded.
+            - If "max" is not numeric or "*", attempts to convert to infinity.
         """
-        min_card = int(element["min"]) if str(element["min"]).isnumeric() else None
-        max_card = (
-            int(max_string)
-            if (max_string := str(element["max"]).replace("*", "99999")).isnumeric()
-            else None
-        )
+        min_card = int(element["min"]) if str(element["min"]).isnumeric() else 0
+        max_string = str(element["max"])
+        if max_string == "*":
+            max_card = 99999
+        elif max_string.isnumeric():
+            max_card = int(max_string)
+        else:
+            max_card = int(float("inf"))
         return min_card, max_card
 
     def _add_model_constraint_validator(
@@ -429,7 +471,9 @@ class ResourceFactory:
         validate_fields = [field]
         # Get the list of fields already being validated by this constraint
         if validator_name in validators:
-            validate_fields.extend(validators.get(validator_name).decorator_info.fields)
+            validator = validators.get(validator_name)
+            if validator:
+                validate_fields.extend(validator.decorator_info.fields)
         # Get the list of fields already being validated by this constraint in base model
         if base and validator_name in base.__pydantic_decorators__.field_validators:
             validate_fields.extend(
@@ -450,14 +494,14 @@ class ResourceFactory:
         return validators
 
     def _process_FHIR_structure_into_Pydantic_components(
-        self, structure: dict, base: BaseModel = None
+        self, structure: dict, base: Any | None = None
     ):
         """
         Processes the FHIR structure elements into Pydantic components.
 
         Args:
             structure (dict): The structure containing FHIR elements.
-            base (BaseModel, optional): The base model to check for existing validators. Defaults to None.
+            base (type[BaseModel], optional): The base model to check for existing validators. Defaults to None.
 
         Returns:
             Tuple[dict, dict, dict]: A tuple containing fields, validators, and properties.
@@ -469,7 +513,7 @@ class ResourceFactory:
             if base and name in base.model_fields:
                 continue
             # Get cardinality of element
-            min_card, max_card = self._process_cardinality_constraints(element)
+            min_card, max_card = self._parse_element_cardinality(element)
             # Parse the FHIR types of the element
             field_types = [
                 self._get_complex_FHIR_type(field_type["code"])
@@ -521,7 +565,7 @@ class ResourceFactory:
                     [("fixedValue", fixed_value)],
                     type=type(fixed_value),
                 )
-                field_default = singleChoice.fixedValue
+                field_default = fixed_value
                 field_type = singleChoice
             # Process FHIR constraint invariants on the element
             if constraints := element.get("constraint"):
@@ -531,7 +575,17 @@ class ResourceFactory:
                     )
             # Process FHIR slicing on the element, if present
             if element.get("slices"):
-                field_type = self._process_element_slices(element, field_type)
+                field_type = Annotated[
+                    Union[
+                        tuple(
+                            [
+                                *self._build_element_slice_models(element, field_type),
+                                field_type,
+                            ]
+                        )
+                    ],
+                    Field(union_mode="left_to_right"),
+                ]
                 # Add slicing cardinality validator for field
                 validators[f"{name}_slicing_cardinality_validator"] = field_validator(
                     name, mode="after"
@@ -554,13 +608,31 @@ class ResourceFactory:
                 for attribute, property_getter in subfield_properties.items():
                     setattr(field_type, attribute, property(property_getter))
                 if element["children"]["extension"].get("slices"):
-                    extension_type = self._process_element_slices(
+                    extension_slice_base_type = get_complex_FHIR_type(
+                        "Extension", self.Config.FHIR_release
+                    )
+                    extension_type = Annotated[
+                        Union[
+                            tuple(
+                                [
+                                    *self._build_element_slice_models(
+                                        element["children"]["extension"],
+                                        extension_slice_base_type,
+                                    ),
+                                    extension_slice_base_type,
+                                ]
+                            )
+                        ],
+                        Field(union_mode="left_to_right"),
+                    ]
+
+                    self._build_element_slice_models(
                         element["children"]["extension"],
                         get_complex_FHIR_type("Extension", self.Config.FHIR_release),
                     )
                     # Get cardinality of extension element
                     extension_min_card, extension_max_card = (
-                        self._process_cardinality_constraints(
+                        self._parse_element_cardinality(
                             element["children"]["extension"]
                         )
                     )
@@ -579,7 +651,7 @@ class ResourceFactory:
                 field_type = create_model(
                     backbone_model_name,
                     **field_subfields,
-                    __base__=field_type,
+                    __base__=(field_type,),  # type: ignore
                     __validators__=subfield_validators,
                 )
             # Create and add the Pydantic field for the FHIR element
@@ -604,10 +676,10 @@ class ResourceFactory:
 
     def construct_resource_model(
         self,
-        canonical_url: str = None,
-        structure_definition: Union[str, dict] = None,
-        base_model: type = FHIRBaseModel,
-    ) -> FHIRBaseModel:
+        canonical_url: str | None = None,
+        structure_definition: Union[str, dict] | None = None,
+        base_model: type[ModelT] = FHIRBaseModel,
+    ) -> type[ModelT | BaseModel]:
         """
         Constructs a Pydantic model based on the provided FHIR structure definition.
 
@@ -622,31 +694,36 @@ class ResourceFactory:
         if canonical_url in self.construction_cache:
             return self.construction_cache[canonical_url]
         # Download the FHIR structure definition if the canonical URL has been specified
+        _structure_definition = None
         if isinstance(structure_definition, str):
             with open(structure_definition) as file:
-                import json
-
-                structure_definition = json.load(file)
-        if not structure_definition and canonical_url:
-            structure_definition = self.download_structure_definition(canonical_url)
+                _structure_definition = json.load(file)
+        elif isinstance(structure_definition, dict):
+            _structure_definition = structure_definition
+        elif canonical_url:
+            _structure_definition = self.download_structure_definition(canonical_url)
+        if not _structure_definition:
+            raise ValueError(
+                "No StructureDefinition provided or downloaded. Please provide a valid StructureDefinition."
+            )
         # Check that the snapshot is available in the FHIR structure definition
         if (
-            "snapshot" not in structure_definition
-            or "element" not in structure_definition["snapshot"]
+            "snapshot" not in _structure_definition
+            or "element" not in _structure_definition["snapshot"]
         ):
             raise ValueError(
                 "Invalid StructureDefinition: Missing 'snapshot' or 'element' field"
             )
         # Pre-process the snapshort elements into a tree structure to simplify model construction later
-        tree = self.build_tree_structure(structure_definition["snapshot"]["element"])
-        resource_type = structure_definition["type"]
+        tree = self.build_tree_structure(_structure_definition["snapshot"]["element"])
+        resource_type = _structure_definition["type"]
         structure = tree["children"][resource_type]
         # Configure the factory for the current FHIR environment
         self.Config = self.FactoryConfig(
             FHIR_release=get_FHIR_release_from_version(
-                structure_definition["fhirVersion"]
+                _structure_definition["fhirVersion"]
             ),
-            resource_name=structure_definition["name"],
+            resource_name=_structure_definition["name"],
         )
         # Process the FHIR resource's elements & constraints into Pydantic fields & validators
         fields, validators, properties = (
@@ -657,24 +734,26 @@ class ResourceFactory:
             validators = self._add_model_constraint_validator(constraint, validators)
         # If the resource has metadata, prefill the information
         if "meta" in fields:
+            Meta = get_complex_FHIR_type("Meta", self.Config.FHIR_release)
+            assert Meta is not None, "Meta type could not be determined"
             fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
             fields["meta"] = (
-                Optional[get_complex_FHIR_type("Meta", self.Config.FHIR_release)],
-                get_complex_FHIR_type("Meta", self.Config.FHIR_release)(
-                    profile=[structure_definition["url"]],
-                    versionId=structure_definition["version"],
+                Optional[Meta],
+                Meta(
+                    profile=[_structure_definition["url"]],
+                    versionId=_structure_definition["version"],
                 ),
             )
         # Construct the Pydantic model representing the FHIR resource
         model = self._create_model_with_properties(
             self.Config.resource_name,
             fields=fields,
-            base=base_model,
+            base=(base_model,),
             validators=validators,
             properties=properties,
         )
         # Add the current model to the cache
-        self.construction_cache[canonical_url] = model
+        self.construction_cache[_structure_definition["url"]] = model
         return model
 
     def construct_dataelement_model(self, structure_definition):
@@ -726,6 +805,9 @@ class ResourceFactory:
         self.construction_cache = {}
 
 
+factory = ResourceFactory()
+construct_resource_model = factory.construct_resource_model
+clear_chache = factory.clear_chache
 factory = ResourceFactory()
 construct_resource_model = factory.construct_resource_model
 clear_chache = factory.clear_chache

@@ -1,11 +1,14 @@
 # Fhircraft modules
-from fhircraft.utils import ensure_list, merge_dicts, get_all_models_from_field
-from fhircraft.fhir.resources.base import FHIRSliceModel, FHIRBaseModel
+import traceback
+import warnings
 
 # Standard modules
 from typing import Any, List, Union
-import warnings
-import traceback
+
+from pydantic import BaseModel
+
+from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
 
 
 def _validate_FHIR_element_constraint(
@@ -29,10 +32,10 @@ def _validate_FHIR_element_constraint(
         Warning: If the validation fails and severity is 'warning'.
     """
     from fhircraft.fhir.path import (
-        fhirpath,
         FhirPathLexerError,
         FhirPathParserError,
         FhirPathWwarning,
+        fhirpath,
     )
     from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 
@@ -208,7 +211,7 @@ def validate_slicing_cardinalities(
     return values
 
 
-def get_type_choice_value_by_base(instance: object, base: str) -> Any:
+def get_type_choice_value_by_base(instance: BaseModel, base: str) -> Any:
     """
     Retrieve the value of a type-choice field in an instance based on the field
     name starting with a specific base string.
@@ -225,4 +228,6 @@ def get_type_choice_value_by_base(instance: object, base: str) -> Any:
         if field.startswith(base):
             value = getattr(instance, field)
             if value is not None:
+                return value
+                return value
                 return value

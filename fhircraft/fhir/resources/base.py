@@ -1,8 +1,11 @@
-from pydantic import BaseModel, ValidationError
-from fhircraft.utils import get_all_models_from_field
-from fhircraft.fhir.path import FHIRPathMixin
-from typing import ClassVar
 from copy import copy
+from typing import ClassVar
+
+from pydantic import BaseModel, ValidationError
+from pydantic.fields import FieldInfo
+
+from fhircraft.fhir.path import FHIRPathMixin
+from fhircraft.utils import get_all_models_from_field
 
 
 class FHIRBaseModel(BaseModel, FHIRPathMixin):
@@ -51,7 +54,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return instance
 
     @classmethod
-    def get_sliced_elements(cls):
+    def get_sliced_elements(cls) -> dict[str, list[type["FHIRSliceModel"]]]:
         """
         Get the sliced elements from the model fields and their extension fields.
         Sliced elements are filtered based on being instances of `FHIRSliceModel`.
@@ -59,23 +62,23 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         Returns:
             slices (dict): A dictionary with field names as keys and corresponding sliced elements as values.
         """
-        # Get model elements' fields
-        fields = copy(cls.model_fields)
         # Get model elements' extension fields
-        fields.update(
-            {
-                f"{field_name}.extension": next(
-                    (
-                        arg.model_fields.get("extension")
-                        for arg in get_all_models_from_field(field)
-                        if arg.model_fields.get("extension")
-                    ),
-                    None,
-                )
-                for field_name, field in cls.model_fields.items()
-                if field_name != "extension"
-            }
-        )
+        extensions = {
+            f"{field_name}.extension": next(
+                (
+                    arg.model_fields.get("extension")
+                    for arg in get_all_models_from_field(field)
+                    if arg.model_fields.get("extension")
+                ),
+                None,
+            )
+            for field_name, field in cls.model_fields.items()
+            if field_name != "extension"
+        }
+        fields = {
+            **cls.model_fields,
+            **extensions,
+        }
         # Compile the sliced elements in the model
         return {
             field_name: slices
@@ -156,4 +159,5 @@ class FHIRSliceModel(FHIRBaseModel):
         Checks if the FHIRSliceModel instance has been modified by comparing it with a new instance constructed with slices.
         Returns `True` if the instance has been modified, `False` otherwise.
         """
+        return self != self.__class__.model_construct_with_slices()
         return self != self.__class__.model_construct_with_slices()

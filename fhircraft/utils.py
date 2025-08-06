@@ -1,13 +1,29 @@
-import yaml
+import inspect
 import json
-import requests
 import os
-from typing import List, Any, Dict, Union, get_args, get_origin, Optional, Tuple
-from dotenv import dotenv_values
 import re
 from contextlib import contextmanager
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    Iterator,
+    List,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+    get_args,
+    get_origin,
+)
+
+T = TypeVar("T")
+
+import requests
+import yaml
+from dotenv import dotenv_values
 from pydantic import BaseModel, Field
-import inspect
+from pydantic.fields import FieldInfo
 
 # URL regex pattern
 URL_PATTERNS = re.compile(
@@ -135,14 +151,16 @@ def load_url(url: str) -> Dict:
     # Add a timeout to the requests.get call
     # Configure proxy if needed
     settings = load_env_variables()
-    proxies = (
-        {
-            "https": settings.get("PROXY_URL_HTTPS"),
-            "http": settings.get("PROXY_URL_HTTP"),
-        }
-        if settings.get("PROXY_URL_HTTPS") or settings.get("PROXY_URL_HTTP")
-        else None
-    )
+    proxies = None
+    if settings.get("PROXY_URL_HTTPS") or settings.get("PROXY_URL_HTTP"):
+        # Only include keys with non-None string values
+        proxies = {}
+        if settings.get("PROXY_URL_HTTPS") is not None:
+            proxies["https"] = str(settings.get("PROXY_URL_HTTPS"))
+        if settings.get("PROXY_URL_HTTP") is not None:
+            proxies["http"] = str(settings.get("PROXY_URL_HTTP"))
+        if not proxies:
+            proxies = None
     # Download the StructureDefinition JSON
     response = requests.get(
         url, proxies=proxies, verify=settings.get("CERTIFICATE_BUNDLE_PATH"), timeout=10
@@ -305,9 +323,12 @@ def _get_deepest_args(tp: Any) -> list:
     return deepest_args
 
 
+T_ = TypeVar("T_")
+
+
 def get_all_models_from_field(
-    field: Field, issubclass_of: type = BaseModel
-) -> BaseModel:
+    field: FieldInfo, issubclass_of: type[T_] = BaseModel
+) -> Generator[Type[T_], None, None]:
     return (
         arg
         for arg in _get_deepest_args(field.annotation)
@@ -315,7 +336,7 @@ def get_all_models_from_field(
     )
 
 
-def get_fhir_model_from_field(field: Field) -> Optional[BaseModel]:
+def get_fhir_model_from_field(field: FieldInfo) -> type[BaseModel] | None:
     return next(get_all_models_from_field(field), None)
 
 
@@ -376,17 +397,30 @@ def get_FHIR_release_from_version(version: str) -> str:
         raise ValueError(f'FHIR version must be in "x.y.z" format, got "{version}"')
     # Parse version string into a three-digit tuple
     version = version.split("-")[0]
-    version = tuple([int(digit) for digit in version.split(".")])
+    version_tuple = tuple([int(digit) for digit in version.split(".")])
     # Assign FHIR release based on version number (Referece: http://hl7.org/fhir/directory.html)
-    if version >= (0, 4, 0) and version <= (1, 0, 2):
+    if version_tuple >= (0, 4, 0) and version_tuple <= (1, 0, 2):
         return "DSTU2"
-    elif version >= (1, 1, 0) and version <= (3, 0, 2):
+    elif version_tuple >= (1, 1, 0) and version_tuple <= (3, 0, 2):
         return "STU3"
-    elif version >= (3, 2, 0) and version <= (4, 0, 1):
+    elif version_tuple >= (3, 2, 0) and version_tuple <= (4, 0, 1):
         return "R4"
-    elif version >= (4, 1, 0) and version <= (4, 3, 0):
+    elif version_tuple >= (4, 1, 0) and version_tuple <= (4, 3, 0):
         return "R4B"
-    elif version >= (4, 2, 0) and version <= (5, 0, 0):
+    elif version_tuple >= (4, 2, 0) and version_tuple <= (5, 0, 0):
         return "R5"
-    elif version >= (6, 0, 0):
+    elif version_tuple >= (6, 0, 0):
         return "R6"
+    elif version_tuple >= (3, 2, 0) and version_tuple <= (4, 0, 1):
+        return "R4"
+    elif version_tuple >= (4, 1, 0) and version_tuple <= (4, 3, 0):
+        return "R4B"
+    elif version_tuple >= (4, 2, 0) and version_tuple <= (5, 0, 0):
+        return "R5"
+    elif version_tuple >= (6, 0, 0):
+        return "R6"
+    else:
+        raise ValueError(
+            f"FHIR version {version} is not supported. Supported versions are: "
+            "DSTU2, STU3, R4, R4B, R5, and R6."
+        )

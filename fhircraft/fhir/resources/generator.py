@@ -1,20 +1,29 @@
 # Fhircraft package modules
-from fhircraft.fhir.resources.factory import ResourceFactory
-from fhircraft.utils import ensure_list
+import inspect
+import os
+import re
+
+# Standard modules
+from collections import defaultdict
+from enum import Enum
+from typing import Any, Dict, List, Union, get_args
 
 # 3rd party package modules
 from jinja2 import Environment, FileSystemLoader
 from pydantic import BaseModel
 
-# Standard modules
-from collections import defaultdict
-from typing import Dict, List, Any, Union, _UnionGenericAlias, get_args
-from enum import Enum
-import inspect
-import re
-import os
+from fhircraft.fhir.resources.factory import ResourceFactory
+from fhircraft.utils import ensure_list
 
-FACTORY_MODULE = inspect.getmodule(ResourceFactory).__name__
+
+def get_module_name(obj: Any) -> str:
+    module = inspect.getmodule(obj)
+    if module is None:
+        raise ValueError(f"The object {obj} does not belong to a module")
+    return module.__name__
+
+
+FACTORY_MODULE = get_module_name(ResourceFactory)
 LEFT_TO_RIGHT_COMPLEX = "FieldInfo(annotation=NoneType, required=True, metadata=[_PydanticGeneralMetadata(union_mode='left_to_right')])"
 LEFT_TO_RIGHT_SIMPLE = "Field(union_mode='left_to_right')"
 
@@ -45,12 +54,8 @@ class CodeGenerator:
         Raises:
             ValueError: If the object does not belong to a module.
         """
-        # Get the module of the object
-        module = inspect.getmodule(obj)
-        if module is None:
-            raise ValueError(f"The object {obj} does not belong to a module")
         # Get the name of the module and the object
-        module_name = module.__name__
+        module_name = get_module_name(obj)
         if (object_name := getattr(obj, "__name__", None)) is None:
             if (object_name := getattr(obj, "_name", None)) is None:
                 return
@@ -61,9 +66,7 @@ class CodeGenerator:
         ):
             self.import_statements[module_name].append(object_name)
 
-    def _recursively_import_annotation_types(
-        self, annotation: _UnionGenericAlias
-    ) -> None:
+    def _recursively_import_annotation_types(self, annotation: Any) -> None:
         """
         Recursively imports annotation types and their modules for serialization or import statements.
 
@@ -80,7 +83,7 @@ class CodeGenerator:
             type_obj = annotation
         # Ignore NoneType and strings
         if type_obj is not None and not isinstance(type_obj, str):
-            if inspect.getmodule(type_obj).__name__ == FACTORY_MODULE and issubclass(
+            if get_module_name(type_obj) == FACTORY_MODULE and issubclass(
                 type_obj, BaseModel
             ):
                 # If object was created by ResourceFactory, then serialize the model
@@ -92,7 +95,7 @@ class CodeGenerator:
         for nested_annotation in get_args(annotation):
             self._recursively_import_annotation_types(nested_annotation)
 
-    def _serialize_model(self, model: BaseModel) -> None:
+    def _serialize_model(self, model: type[BaseModel]) -> None:
         """
         Serialize the model by extracting information about its fields and properties.
 
@@ -183,4 +186,6 @@ class CodeGenerator:
 
 
 generator = CodeGenerator()
+generate_resource_model_code = generator.generate_resource_model_code
+generate_resource_model_code = generator.generate_resource_model_code
 generate_resource_model_code = generator.generate_resource_model_code
