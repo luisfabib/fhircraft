@@ -3,12 +3,14 @@ import traceback
 import warnings
 
 # Standard modules
-from typing import Any, List, Union
+from typing import Any, List, TypeVar, Union
 
 from pydantic import BaseModel
 
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
+
+T = TypeVar("T", bound=BaseModel)
 
 
 def _validate_FHIR_element_constraint(
@@ -91,20 +93,20 @@ def validate_element_constraint(
 
 
 def validate_model_constraint(
-    instance: object, expression: str, human: str, key: str, severity: str
-) -> object:
+    instance: T, expression: str, human: str, key: str, severity: str
+) -> T:
     """
     Validates a FHIR model constraint based on a FHIRPath expression.
 
     Args:
-        instance (object): Instance of the model to be validated.
+        instance (T): Instance of the model to be validated.
         expression (str): The FHIRPath expression to evaluate.
         human (str): A human-readable description of the constraint.
         key (str): The key associated with the constraint.
         severity (str): The severity level of the constraint ('warning' or 'error').
 
     Returns:
-        instance (object): The validated model instance.
+        instance (type[T]): The validated model instance.
 
     Raises:
         AssertionError: If the validation fails and severity is not `warning`.
@@ -143,18 +145,18 @@ def validate_FHIR_element_pattern(
 
 
 def validate_type_choice_element(
-    instance: object, field_types: List[str], field_name_base: str
-) -> object:
+    instance: T, field_types: List[Any], field_name_base: str
+) -> T:
     """
     Validate the type choice element for a given instance.
 
     Args:
-        instance (object): The instance to validate.
-        field_types (List[str]): List of field types to check.
+        instance (T): The instance to validate.
+        field_types (List[Any]): List of field types to check.
         field_name_base (str): Base name of the field.
 
     Returns:
-        object: The validated instance.
+        T: The validated instance.
 
     Raises:
         AssertionError: If more than one value is set for the type choice element.

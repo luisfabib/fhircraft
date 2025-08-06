@@ -1,8 +1,10 @@
+import typing
+
 from pydantic import Field, field_validator, model_validator
+
+import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import *
-import fhircraft.fhir.resources.validators as fhir_validators
-import typing
 
 
 class Element(FHIRBaseModel):
@@ -115,7 +117,7 @@ class xhtml(Element):
 
     value: String = Field(
         description="Actual xhtml",
-        default=None,
+        default=...,
     )
     value_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for value extensions",
@@ -333,7 +335,7 @@ class Annotation(Element):
     )
     text: Markdown = Field(
         description="The annotation  - text content (as markdown)",
-        default=None,
+        default=...,
     )
     text_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for text extensions",
@@ -916,7 +918,7 @@ class Contributor(Element):
 
     type: Code = Field(
         description="author | editor | reviewer | endorser",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -925,7 +927,7 @@ class Contributor(Element):
     )
     name: String = Field(
         description="Who contributed the content",
-        default=None,
+        default=...,
     )
     name_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for name extensions",
@@ -983,7 +985,7 @@ class DataRequirement(Element):
 
     type: Code = Field(
         description="The type of the required data",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -1308,7 +1310,7 @@ class ElementDefinition(BackboneElement):
 
     path: String = Field(
         description="Path of the element in the hierarchy of elements",
-        default=None,
+        default=...,
     )
     path_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for path extensions",
@@ -2829,7 +2831,7 @@ class Expression(Element):
     )
     language: Code = Field(
         description="text/cql | text/fhirpath | application/x-fhir-query | text/cql-identifier | text/cql-expression | etc.",
-        default=None,
+        default=...,
     )
     language_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for language extensions",
@@ -2922,7 +2924,7 @@ class Extension(Element):
 
     url: String = Field(
         description="identifies the meaning of the extension",
-        default=None,
+        default=...,
     )
     url_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for url extensions",
@@ -3476,7 +3478,7 @@ class MarketingStatus(BackboneElement):
     )
     status: "CodeableConcept" = Field(
         description="This attribute provides information on the status of the marketing of the medicinal product See ISO/TS 20443 for more information and examples",
-        default=None,
+        default=...,
     )
     dateRange: typing.Optional["Period"] = Field(
         description="The date when the Medicinal Product is placed on the market by the Marketing Authorisation Holder (or where applicable, the manufacturer/distributor) in a country and/or jurisdiction shall be provided A complete date consisting of day, month and year shall be specified using the ISO 8601 date format NOTE \u201cPlaced on the market\u201d refers to the release of the Medicinal Product into the distribution chain",
@@ -3721,7 +3723,7 @@ class Narrative(Element):
 
     status: Code = Field(
         description="generated | extensions | additional | empty",
-        default=None,
+        default=...,
     )
     status_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for status extensions",
@@ -3730,7 +3732,7 @@ class Narrative(Element):
     )
     div: str = Field(
         description="Limited xhtml content",
-        default=None,
+        default=...,
     )
 
     @field_validator(
@@ -3810,7 +3812,7 @@ class ParameterDefinition(Element):
     )
     use: Code = Field(
         description="in | out",
-        default=None,
+        default=...,
     )
     use_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for use extensions",
@@ -3846,7 +3848,7 @@ class ParameterDefinition(Element):
     )
     type: Code = Field(
         description="What type of value",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -4231,11 +4233,11 @@ class ProductShelfLife(BackboneElement):
     )
     type: "CodeableConcept" = Field(
         description="This describes the shelf life, taking into account various scenarios such as shelf life of the packaged Medicinal Product itself, shelf life after transformation where necessary and shelf life after the first opening of a bottle, etc. The shelf life type shall be specified using an appropriate controlled vocabulary The controlled term and the controlled term identifier shall be specified",
-        default=None,
+        default=...,
     )
     period: "Quantity" = Field(
         description="The shelf life time period can be specified using a numerical value for the period of time and its unit of time measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
-        default=None,
+        default=...,
     )
     specialPrecautionsForStorage: typing.Optional[typing.List["CodeableConcept"]] = (
         Field(
@@ -4975,7 +4977,7 @@ class RelatedArtifact(Element):
 
     type: Code = Field(
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -5093,11 +5095,11 @@ class SampledData(Element):
 
     origin: "Quantity" = Field(
         description="Zero value and units",
-        default=None,
+        default=...,
     )
     period: Decimal = Field(
         description="Number of milliseconds between samples",
-        default=None,
+        default=...,
     )
     period_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for period extensions",
@@ -5133,7 +5135,7 @@ class SampledData(Element):
     )
     dimensions: PositiveInt = Field(
         description="Number of sample points at each time point",
-        default=None,
+        default=...,
     )
     dimensions_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for dimensions extensions",
@@ -5211,11 +5213,11 @@ class Signature(Element):
 
     type: typing.List["Coding"] = Field(
         description="Indication of the reason the entity signed the object(s)",
-        default=None,
+        default=...,
     )
     when: Instant = Field(
         description="When the signature was created",
-        default=None,
+        default=...,
     )
     when_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for when extensions",
@@ -5224,7 +5226,7 @@ class Signature(Element):
     )
     who: "Reference" = Field(
         description="Who signed",
-        default=None,
+        default=...,
     )
     onBehalfOf: typing.Optional["Reference"] = Field(
         description="The party represented",
@@ -5501,7 +5503,7 @@ class TriggerDefinition(Element):
 
     type: Code = Field(
         description="named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -5642,23 +5644,23 @@ class UsageContext(Element):
 
     code: "Coding" = Field(
         description="Type of context being specified",
-        default=None,
+        default=...,
     )
     valueCodeableConcept: "CodeableConcept" = Field(
         description="Value that defines the context",
-        default=None,
+        default=...,
     )
     valueQuantity: "Quantity" = Field(
         description="Value that defines the context",
-        default=None,
+        default=...,
     )
     valueRange: "Range" = Field(
         description="Value that defines the context",
-        default=None,
+        default=...,
     )
     valueReference: "Reference" = Field(
         description="Value that defines the context",
-        default=None,
+        default=...,
     )
 
     @field_validator(*("code", "extension"), mode="after", check_fields=None)
@@ -6112,5 +6114,7 @@ TriggerDefinition.model_rebuild()
 UsageContext.model_rebuild()
 
 Resource.model_rebuild()
+
+DomainResource.model_rebuild()
 
 DomainResource.model_rebuild()
