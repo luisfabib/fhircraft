@@ -1,7 +1,7 @@
 import logging
 from itertools import *  # noqa
 from fhircraft.utils import ensure_list, contains_list_type, get_fhir_model_from_field
-from fhircraft.fhir.path.utils import import_fhirpath_engine 
+from fhircraft.fhir.path.utils import import_fhirpath_engine
 
 import typing
 from typing import List, Optional
@@ -12,27 +12,32 @@ from functools import partial
 # Get logger name
 logger = logging.getLogger(__name__)
 
+
 class FHIRPathError(Exception):
     """
     An exception related to FHIRPath specific syntax or runtime criteria.
     """
+
     pass
 
+
 class FHIRPathMixin:
-    """ 
+    """
     Mixin class to incorporate a simple FHIRPath interface to the child class.
     """
 
     @property
     def fhirpath(self) -> typing.Callable:
-        """ 
+        """
         Initialized FHIRPath engine instance
         """
         return import_fhirpath_engine()
 
-    def get_fhirpath(self, expression:str) -> typing.Union[None,typing.Any, typing.List[typing.Any]]:
+    def get_fhirpath(
+        self, expression: str
+    ) -> typing.Union[None, typing.Any, typing.List[typing.Any]]:
         """
-        Evaluates and retrieves the value(s) of a FHIRPath expression        
+        Evaluates and retrieves the value(s) of a FHIRPath expression
 
         Args:
             expression (str): FHIRPath expression to evaluate
@@ -44,26 +49,26 @@ class FHIRPathMixin:
         collection = self.fhirpath.parse(expression).find(self)
         # Get the values of the collection items
         values = [
-            item.value for item in collection 
-                if item.value and not isinstance(item.value, bool)
+            item.value
+            for item in collection
+            if item.value and not isinstance(item.value, bool)
         ]
         if len(values) == 1:
             return values[0]
         elif len(values) == 0:
             return None
         else:
-            return values    
+            return values
 
-    def replace_fhirpath(self, expression:str, new_value:typing.Any) -> None:
+    def replace_fhirpath(self, expression: str, new_value: typing.Any) -> None:
         """
-        Evaluates and replaces the value given by a FHIRPath expression        
+        Evaluates and replaces the value given by a FHIRPath expression
 
         Args:
             expression (str): FHIRPath expression to evaluate
         """
         # Evaluate the FHIRPath expression
         self.fhirpath.parse(expression).update_or_create(self, new_value)
-
 
 
 @dataclass
@@ -80,6 +85,7 @@ class FHIRPathCollectionItem(object):
     parent (Optional[FHIRPathCollectionItem]): The item of the parent collection from which this item was derived, by default None.
     setter (Optional[callable]): The setter function for the collection item, by default None.
     """
+
     value: typing.Any
     path: typing.Any = field(default_factory=lambda: This())
     element: Optional[str] = None
@@ -103,10 +109,10 @@ class FHIRPathCollectionItem(object):
         else:
             return cls(data)
 
-    def set_literal(self,value):
+    def set_literal(self, value):
         setattr(self.parent.value, self.path.label, value)
-        
-    def set_value(self,value):
+
+    def set_value(self, value):
         """
         Sets the value of the item using the setter function.
 
@@ -116,14 +122,13 @@ class FHIRPathCollectionItem(object):
         Raises:
             ValueError: If the value is a list.
             RuntimeError: If there is no setter function associated with this item.
-        """        
+        """
         if self.setter:
             if isinstance(value, list):
-                raise ValueError('Only single value is accepted')
+                raise ValueError("Only single value is accepted")
             self.setter(value)
         else:
-            raise RuntimeError('There is not setter function associated with this item')
-    
+            raise RuntimeError("There is not setter function associated with this item")
 
     @property
     def field_info(self):
@@ -132,14 +137,14 @@ class FHIRPathCollectionItem(object):
 
         Returns:
            (Any): The field information, or None if not available.
-        """        
+        """
         parent = self.parent.value
         if isinstance(parent, list):
             parent = parent[0]
-        if hasattr(parent.__class__, 'model_fields') and hasattr(self.path, 'label'):
+        if hasattr(parent.__class__, "model_fields") and hasattr(self.path, "label"):
             return parent.__class__.model_fields.get(self.path.label)
         return None
-    
+
     @property
     def is_list_type(self):
         """
@@ -147,7 +152,7 @@ class FHIRPathCollectionItem(object):
 
         Returns:
             (bool): True if the field information indicates a list type, False otherwise.
-        """        
+        """
         if not self.field_info:
             return False
         return contains_list_type(self.field_info.annotation)
@@ -158,11 +163,11 @@ class FHIRPathCollectionItem(object):
 
         Returns:
             (Any): The constructed FHIR resource, or None if construction fails.
-        """        
+        """
         if self.field_info:
             model = get_fhir_model_from_field(self.field_info)
-            return model.model_construct()    
-                
+            return model.model_construct()
+
     @property
     def full_path(self):
         """
@@ -170,15 +175,16 @@ class FHIRPathCollectionItem(object):
 
         Returns:
             (str): The full path of the item.
-        """        
-        return self.path if self.parent is None else self.parent.full_path.child(self.path)
+        """
+        return (
+            self.path if self.parent is None else self.parent.full_path.child(self.path)
+        )
 
     def __repr__(self):
-        return f'FHIRPathCollectionItem(value={self.value.__repr__()[:10]}, element={self.element.__repr__()[:10]}..., index={self.index}, parent={self.parent.full_path if self.parent else None})'
+        return f"FHIRPathCollectionItem(value={self.value.__repr__()[:10]}, element={self.element.__repr__()[:10]}..., index={self.index}, parent={self.parent.full_path if self.parent else None})"
 
     def __hash__(self):
         return hash((self.value, self.path, self.parent))
-        
 
 
 class FHIRPath(ABC):
@@ -186,7 +192,7 @@ class FHIRPath(ABC):
     Abstract base class representing a FHIRPath, used for navigating and manipulating
     FHIR resources.
     """
-    
+
     def get_value(self, data):
         """
         Extracts the value(s) from the given data.
@@ -198,13 +204,16 @@ class FHIRPath(ABC):
             (Any): The extracted value(s), or None if no values are found.
         """
         collection = self.find(data)
-        values = [item.value for item in collection if item.value and not isinstance(item.value, bool)]
+        values = [
+            item.value
+            for item in collection
+            if item.value and not isinstance(item.value, bool)
+        ]
         if len(values) == 1:
             values = values[0]
         elif len(values) == 0:
             return None
-        return values        
-
+        return values
 
     def find(self, collection: typing.Any) -> List[FHIRPathCollectionItem]:
         """
@@ -217,7 +226,9 @@ class FHIRPath(ABC):
             List[FHIRPathCollectionItem]: A list of FHIRPathCollectionItem instances.
         """
         # Ensure that entrypoint is a FHIRPathCollectionItem instance
-        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
+        collection = [
+            FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)
+        ]
         return self.evaluate(collection, create=False)
 
     def find_or_create(self, collection) -> List[FHIRPathCollectionItem]:
@@ -229,9 +240,11 @@ class FHIRPath(ABC):
 
         Returns:
             List[FHIRPathCollectionItem]: A list of FHIRPathCollectionItem instances.
-        """        
+        """
         # Ensure that entrypoint is a FHIRPathCollectionItem instance
-        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
+        collection = [
+            FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)
+        ]
         return self.evaluate(collection, create=True)
 
     def update(self, collection, value) -> None:
@@ -241,24 +254,28 @@ class FHIRPath(ABC):
         Args:
             collection (Any): The input collection to update.
             value (Any): The value to set in the collection.
-        """        
+        """
         # Ensure that entrypoint is a FHIRPathCollectionItem instance
-        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
+        collection = [
+            FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)
+        ]
         # Collect the elements and set the values for each of them
         new_collection = self.evaluate(collection, create=False)
         for item in new_collection:
             item.set_value(value)
 
-    def update_or_create(self, collection, value) -> None:     
+    def update_or_create(self, collection, value) -> None:
         """
         Updates or creates the input collection with the given value.
 
         Args:
             collection (Any): The input collection to update or create items in.
             value (Any): The value to set in the collection.
-        """         
+        """
         # Ensure that entrypoint is a FHIRPathCollectionItem instance
-        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)]
+        collection = [
+            FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)
+        ]
         # Collect the elements and set the values for each of them
         for item in self.evaluate(collection, create=True):
             item.set_value(value)
@@ -273,11 +290,11 @@ class FHIRPath(ABC):
 
         Returns:
             List[FHIRPathCollectionItem]: A list of FHIRPathCollectionItem instances.
-            
+
         Raises:
             NotImplementedError: If the method is not implemented by a subclass.
         """
-        raise NotImplementedError()        
+        raise NotImplementedError()
 
     def child(self, child):
         """
@@ -303,15 +320,15 @@ class FHIRPathFunction(FHIRPath):
     """
     Abstract base class representing a FHIRPath function, used for functional evaluation of collections.
     """
+
     def __str__(self):
-        return f'{self.__class__.__name__.lower()}()'
+        return f"{self.__class__.__name__.lower()}()"
 
     def __repr__(self):
-        return f'{self.__class__.__name__}()'
+        return f"{self.__class__.__name__}()"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)
-
 
 
 class Element(FHIRPath):
@@ -321,11 +338,12 @@ class Element(FHIRPath):
     Attributes:
         label (str): The name of the element.
     """
+
     def __init__(self, label: str):
         self.label = label
 
     def create_element(self, parent: typing.Any) -> typing.Any:
-        """ 
+        """
         Ensure that the input parent object has the necessary field information to create a new element based on the label provided.
 
         Args:
@@ -340,21 +358,23 @@ class Element(FHIRPath):
         """
         if not parent:
             return None
-        if not hasattr(parent.__class__, 'model_fields'):
-            return None 
+        if not hasattr(parent.__class__, "model_fields"):
+            return None
         field_info = parent.__class__.model_fields.get(self.label)
         try:
             model = get_fhir_model_from_field(field_info)
-            new_element = model.model_construct()    
+            new_element = model.model_construct()
         except (KeyError, AttributeError):
-            new_element = None 
+            new_element = None
         if field_info and contains_list_type(field_info.annotation):
             new_element = ensure_list(new_element)
         return new_element
 
     @staticmethod
-    def setter(value: typing.Any, item: FHIRPathCollectionItem, index: int, label: str) -> None:
-        """ 
+    def setter(
+        value: typing.Any, item: FHIRPathCollectionItem, index: int, label: str
+    ) -> None:
+        """
         Sets the value of the specified element in the parent object.
 
         Args:
@@ -368,14 +388,15 @@ class Element(FHIRPath):
         if not isinstance(parents, list):
             setattr(parent, label, value)
         else:
-            if len(parents)<=index:
+            if len(parents) <= index:
                 parents.insert(index, value)
-            else:                
+            else:
                 parents[index] = value
-        
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem], create: bool) -> List[FHIRPathCollectionItem]:
-        """ 
+    def evaluate(
+        self, collection: List[FHIRPathCollectionItem], create: bool
+    ) -> List[FHIRPathCollectionItem]:
+        """
         Evaluate the collection of FHIRPathCollectionItems and create new elements if necessary.
 
         Args:
@@ -390,17 +411,19 @@ class Element(FHIRPath):
         for item in collection:
             if not item.value:
                 continue
-            element_value = getattr(item.value, self.label, None)         
+            element_value = getattr(item.value, self.label, None)
             if not element_value and not isinstance(element_value, bool) and create:
-                element_value = self.create_element(item.value)  
-                setattr(item.value, self.label, element_value)  
+                element_value = self.create_element(item.value)
+                setattr(item.value, self.label, element_value)
             for index, value in enumerate(ensure_list(element_value)):
-                if create or value is not None: 
+                if create or value is not None:
                     element = FHIRPathCollectionItem(
-                        value, 
-                        path=Element(self.label), 
-                        parent=item, 
-                        setter=partial(self.setter, item=item, index=index, label=self.label)
+                        value,
+                        path=Element(self.label),
+                        parent=item,
+                        setter=partial(
+                            self.setter, item=item, index=index, label=self.label
+                        ),
                     )
                     # element.set_value(value)
                     element_collection.append(element)
@@ -410,7 +433,7 @@ class Element(FHIRPath):
         return self.label
 
     def __repr__(self):
-        return f'Element({self.label})'
+        return f"Element({self.label})"
 
     def __eq__(self, other):
         return isinstance(other, Element) and self.label == other.label
@@ -419,14 +442,15 @@ class Element(FHIRPath):
         return hash(self.label)
 
 
-
-
 class Root(FHIRPath):
-    """ 
-    A class representing the root of a FHIRPath, i.e. the top-most segment of the FHIRPath 
+    """
+    A class representing the root of a FHIRPath, i.e. the top-most segment of the FHIRPath
     whose collection has no parent associated.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> List[FHIRPathCollectionItem]:
+
+    def evaluate(
+        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
+    ) -> List[FHIRPathCollectionItem]:
         """
         Evaluate the collection of top-most resources in the input collection.
 
@@ -435,35 +459,42 @@ class Root(FHIRPath):
 
         Returns:
             collection (List[FHIRPathCollectionItem]): A list of FHIRPathCollectionItem instances after evaluation.
-        """        
+        """
         collection = ensure_list(collection)
         return [
-            FHIRPathCollectionItem(item, path=Root(), parent=None)
+            (
+                FHIRPathCollectionItem(item, path=Root(), parent=None)
                 if not isinstance(item, FHIRPathCollectionItem)
-                else FHIRPathCollectionItem(item.value, parent=None, path=Root())
-                    if item.parent is None else Root().find(item.parent)[0]
-                        for item in collection
+                else (
+                    FHIRPathCollectionItem(item.value, parent=None, path=Root())
+                    if item.parent is None
+                    else Root().find(item.parent)[0]
+                )
+            )
+            for item in collection
         ]
 
     def __str__(self):
-        return '$'
+        return "$"
 
     def __repr__(self):
-        return 'Root()'
+        return "Root()"
 
     def __eq__(self, other):
         return isinstance(other, Root)
 
     def __hash__(self):
-        return hash('$rootResource')
-
+        return hash("$rootResource")
 
 
 class Parent(FHIRPath):
-    """ 
+    """
     A class representing the parent of a FHIRPath
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> List[FHIRPathCollectionItem]:
+
+    def evaluate(
+        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
+    ) -> List[FHIRPathCollectionItem]:
         """
         Evaluate the collection of parent resources in the input collection.
 
@@ -472,32 +503,34 @@ class Parent(FHIRPath):
 
         Returns:
             collection (List[FHIRPathCollectionItem]): A list of FHIRPathCollectionItem instances after evaluation.
-        """        
+        """
         collection = ensure_list(collection)
-        return [
-            item.parent for item in collection
-        ]
+        return [item.parent for item in collection]
 
     def __str__(self):
-        return '$'
+        return "$"
 
     def __repr__(self):
-        return 'Parent()'
+        return "Parent()"
 
     def __eq__(self, other):
         return isinstance(other, Parent)
 
     def __hash__(self):
-        return hash('$resource')
+        return hash("$resource")
+
 
 class This(FHIRPath):
     """
     A class representation of the FHIRPath `$this` operator used to represent
     the item from the input collection currently under evaluation.
     """
-    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> List[FHIRPathCollectionItem]:
+
+    def evaluate(
+        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
+    ) -> List[FHIRPathCollectionItem]:
         """
-        Simply returns the input collection. 
+        Simply returns the input collection.
 
         Args:
             collection (List[FHIRPathCollectionItem]): The collection of items to be evaluated.
@@ -508,34 +541,37 @@ class This(FHIRPath):
         return ensure_list(collection)
 
     def __str__(self):
-        return '`this`'
+        return "`this`"
 
     def __repr__(self):
-        return 'This()'
+        return "This()"
 
     def __eq__(self, other):
         return isinstance(other, This)
 
     def __hash__(self):
-        return hash('this')
+        return hash("this")
 
 
 class Invocation(FHIRPath):
     """
-    A class representing an invocation in the context of FHIRPath evaluation 
+    A class representing an invocation in the context of FHIRPath evaluation
     indicated by two dot-separated identifiers `<left>.<right>`.
 
     Attributes:
         left (FHIRPath): The left-hand side FHIRPath segment of the invocation.
         right (FHIRPath): The right-hand side  FHIRPath segment of the invocation.
     """
-    def __init__(self, left:FHIRPath, right:FHIRPath):
+
+    def __init__(self, left: FHIRPath, right: FHIRPath):
         self.left = left
         self.right = right
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem], create: bool) -> List[FHIRPathCollectionItem]:
+    def evaluate(
+        self, collection: List[FHIRPathCollectionItem], create: bool
+    ) -> List[FHIRPathCollectionItem]:
         """
-        Performs the evaluation of the Invocation by applying the left-hand side FHIRPath segment on the given collection to obtain a parent collection. 
+        Performs the evaluation of the Invocation by applying the left-hand side FHIRPath segment on the given collection to obtain a parent collection.
         Then, the right-hand side FHIRPath segment is applied on the parent collection to derive the child collection.
 
         Args:
@@ -544,19 +580,23 @@ class Invocation(FHIRPath):
 
         Returns:
             List[FHIRPathCollectionItem]: The resulting child collection after the evaluation process.
-        """        
+        """
         parent_collection = self.left.evaluate(collection, create)
         child_collection = self.right.evaluate(parent_collection, create)
         return child_collection
 
     def __eq__(self, other):
-        return isinstance(other, Invocation) and self.left == other.left and self.right == other.right
+        return (
+            isinstance(other, Invocation)
+            and self.left == other.left
+            and self.right == other.right
+        )
 
     def __str__(self):
-        return '%s.%s' % (self.left, self.right)
+        return "%s.%s" % (self.left, self.right)
 
     def __repr__(self):
-        return '%s(%r, %r)' % (self.__class__.__name__, self.left, self.right)
+        return "%s(%r, %r)" % (self.__class__.__name__, self.left, self.right)
 
     def __hash__(self):
         return hash((self.left, self.right))
