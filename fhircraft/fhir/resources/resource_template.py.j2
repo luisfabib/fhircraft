@@ -83,3 +83,8 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     {% endif %}
     {% endfor %}
 {% endfor %}
+
+
+{% for model, model_data in data.items() %} 
+{{ model.__name__ }}.model_rebuild()
+{% endfor %}
