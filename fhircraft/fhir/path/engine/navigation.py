@@ -25,7 +25,7 @@ class Children(FHIRPathFunction):
         children_collection = []
         for item in collection:
             if isinstance(item.value, BaseModel):
-                fields = item.value.model_fields
+                fields = item.value.__class__.model_fields
             elif isinstance(item.value, dict):
                 fields = list(item.value.keys())
             else:

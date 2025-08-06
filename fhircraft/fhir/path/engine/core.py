@@ -136,8 +136,8 @@ class FHIRPathCollectionItem(object):
         parent = self.parent.value
         if isinstance(parent, list):
             parent = parent[0]
-        if hasattr(parent, 'model_fields') and hasattr(self.path, 'label'):
-            return parent.model_fields.get(self.path.label)
+        if hasattr(parent.__class__, 'model_fields') and hasattr(self.path, 'label'):
+            return parent.__class__.model_fields.get(self.path.label)
         return None
     
     @property
@@ -340,9 +340,9 @@ class Element(FHIRPath):
         """
         if not parent:
             return None
-        if not hasattr(parent, 'model_fields'):
+        if not hasattr(parent.__class__, 'model_fields'):
             return None 
-        field_info = parent.model_fields.get(self.label)
+        field_info = parent.__class__.model_fields.get(self.label)
         try:
             model = get_fhir_model_from_field(field_info)
             new_element = model.model_construct()    
