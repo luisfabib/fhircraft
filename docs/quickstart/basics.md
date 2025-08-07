@@ -151,7 +151,7 @@ print(f"Updated family name: {my_patient.get_fhirpath('Patient.name.family')}")
 
 **📚 Documentation**
 
-- [:material-link-variant: User Guide](user-guide/fhir-resources.md) - Complete documentation of all Fhircraft features
+- [:material-link-variant: User Guide](../user-guide/fhir-models.md) - Complete documentation of all Fhircraft features
 
 - [:material-book-open-variant: Pydantic Documentation](https://docs.pydantic.dev/latest/) - Learn more about Pydantic's powerful features
 
@@ -167,8 +167,9 @@ print(f"Updated family name: {my_patient.get_fhirpath('Patient.name.family')}")
 
 Ready to dive deeper? Explore these advanced topics:
 
-1. [Working with FHIR Resources](user-guide/fhir-resources.md) - Advanced model construction and validation
+1. [Pydantic representation of FHIR](../user-guide/pydantic-representation.md) - Detailed description of how Fhircraft represents FHIR within Pydantic
 
-2. [FHIRPath Guide](user-guide/fhirpath.md) - Master the FHIRPath expression language
+2. [Working with Fhircraft Models](../user-guide/fhir-models.md) - Advanced model construction and validation
 
-3. [Code Generation](user-guide/fhir-resources.md#generating-source-code) - Generate reusable Python code from your models
+3. [FHIRPath Guide](../user-guide/fhirpath.md) - Master the FHIRPath expression language
+

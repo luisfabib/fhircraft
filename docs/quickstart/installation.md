@@ -62,7 +62,7 @@ pip install -e .
 # Install development dependencies
 pip install -e ".[dev]"
 ```
-For detailed instructions on developing and contributing to Fhircraft, see the [:octicons-devices-16: Contributing Guide](community/contributing.md).
+For detailed instructions on developing and contributing to Fhircraft, see the [:octicons-devices-16: Contributing Guide](../community/contributing.md).
 
 
 ------------

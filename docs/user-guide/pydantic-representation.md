@@ -77,9 +77,9 @@ CodeableConcept = get_complex_FHIR_type('CodeableConcept', release='R4B')
 
 For a comprehensive list of Fhircraft's complex data types and additional details, please refer to the Fhircraft FHIR-release-specific documentation:
 
-- [FHIR Release R4 complex types](/docs/reference/fhircraft/fhir/resources/datatypes/R4/complex_types/)
-- [FHIR Release R4B complex types](/docs/reference/fhircraft/fhir/resources/datatypes/R4B/complex_types/)
-- [FHIR Release R5 complex types](/docs/reference/fhircraft/fhir/resources/datatypes/R5/complex_types/)
+- [FHIR Release R4 complex types](../reference/fhircraft/fhir/resources/datatypes/R4/complex_types.md)
+- [FHIR Release R4B complex types](../reference/fhircraft/fhir/resources/datatypes/R4B/complex_types.md)
+- [FHIR Release R5 complex types](../reference/fhircraft/fhir/resources/datatypes/R5/complex_types.md)
 
 
 ## FHIR resources 

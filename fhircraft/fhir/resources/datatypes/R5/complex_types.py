@@ -5120,7 +5120,7 @@ class VirtualServiceDetail(DataType):
  
 class MoneyQuantity(Quantity):
     """
-    An amount of money. With regard to precision, see [Decimal Precision](datatypes.html#precision)
+    An amount of money.
     """
     @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
     @classmethod
