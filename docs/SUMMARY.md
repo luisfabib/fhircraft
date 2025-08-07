@@ -4,5 +4,6 @@
   - User Guide
     - [Pydantic FHIR models](user-guide/fhir-resources.md)
     - [FHIRPath](user-guide/fhirpath.md)
+  - [Contributing](contributing.md)
   - API Reference
     -  ./reference/*
