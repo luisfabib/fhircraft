@@ -7,6 +7,7 @@
         - [License](quickstart/license.md)
     - Community
         - [Contributing](community/contributing.md)
+        - [Credits](community/credits.md)
   - User Guide
     - [Pydantic FHIR models](user-guide/fhir-resources.md)
     - [FHIRPath](user-guide/fhirpath.md)
