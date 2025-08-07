@@ -7,7 +7,6 @@ src = root / ""
 
 def print_file_contents(filename, file=None):
     if os.path.isfile(filename):
-        print(f"--- {filename} ---")
         with open(filename, 'r', encoding='utf-8') as f:
             print(f.read(), file=file)
     else:

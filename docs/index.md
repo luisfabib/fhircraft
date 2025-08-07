@@ -1,7 +1,13 @@
-# Welcome to
+---
+hide:
+  - navigation
+  - toc
+---
+
+# Welcome
 
 <!-- PROJECT LOGO -->
-<img src="assets/images/logo-banner.png" width="75%">
+<img src="assets/images/logo-banner.png" style="width:35vw">
 
 [![CI](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml/badge.svg?branch=main&event=push)](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml)
 ![PyPI - Version](https://img.shields.io/pypi/v/fhircraft)
@@ -12,7 +18,10 @@
 
 Fhircraft is a Python package that dynamically generates Pydantic FHIR (Fast Healthcare Interoperability Resources) resource models from FHIR specifications, enabling comprehensive data structuring, validation, and typing within Python. It also offers a fully functional FHIRPath engine and code generation features to facilitate integration with other systems.
 
-!!! important "Active development"
+[Installation :fontawesome-solid-paper-plane:](quickstart/installation/){ .md-button }
+[Tutorial :fontawesome-solid-play:](quickstart/basics/){ .md-button }
+
+!!! warning "Active development"
 
     This package is under active development. Major and/or breaking changes are to be expected in future updates.
 

@@ -1,62 +1,20 @@
 
-## Constructing FHIR Pydantic models 
+# Pydantic Representation of FHIR
 
-To generate a Pydantic model representation for a FHIR resource, use the `construct_resource_model` function. This function automatically creates a model based on the structure definition of the specified resource or profile.
+Fhircraft provides a comprehensive Pydantic-based representation of FHIR (Fast Healthcare Interoperability Resources) that combines the flexibility and validation power of Pydantic with the rich data modeling capabilities of FHIR. This approach ensures type safety, automatic validation, and seamless integration with Python applications while maintaining full compatibility with FHIR specifications.
 
-!!! important "Snapshot required"
+## Overview
 
-    Fhircraft requires the resource's structure definition to be in `snapshot` form. Models cannot be constructed from definitions that only include a `differential`. If the `snapshot` attribute is missing, Fhircraft will raise an error.
+This guide covers how Fhircraft represents FHIR concepts using Pydantic models, including:
 
-!!! important "FHIR versions"
+- **Data Types**: Primitive and complex FHIR types as Python type aliases and Pydantic models
+- **FHIR Resources**: Complete resource models with validation and constraints
+- **FHIR Elements**: Detailed representation of cardinality, backbone elements, slicing, and choice types
+- **Extensions**: Support for standard and custom FHIR extensions
+- **Validation**: Invariant constraints, pattern matching, and fixed values
+- **Profiling**: Custom resources and profiles for specialized use cases
 
-    Fhircraft automatically handles differences between official FHIR releases. It uses the appropriate complex types based on the FHIR version specified in the resource's structure definition, ensuring that the constructed model conforms to the correct release.
-
-#### Via local files (recommended)
-
-For optimal control and security, it is recommended to manage FHIR structure definitions as local files. These files should be loaded into Python and parsed into dictionary objects.
-
-!!! note "Loading utilities"
-
-    Fhircraft provides utility functions to load JSON or YAML files (XML currently not supported) into Python dictionaries. 
-    
-    ``` python 
-        from fhircraft.utils import load_file
-        structure_definition = load_file('fhir/patient_r4b_structuredefinition.json') 
-    ``` 
-
-The `construct_resource_model` function takes this dictionary containing the FHIR structure definition and constructs the corresponding model.
-
-```python
-from fhircraft.fhir.resources.factory import construct_resource_model
-resource_model = construct_resource_model(structure_definition=structure_definition)
-```
-
-#### Via canonical URL 
-
-A canonical URL is a globally unique identifier for FHIR conformance resources. Fhircraft includes a limited canonical URL resolver that can locate and download a FHIR resource's structure definition via HTTP.
-
-```python
-from fhircraft.fhir.resources.factory import construct_resource_model
-resource_model = construct_resource_model(canonical_url=url)
-```
-
-!!! note "Release version" 
-
-    Most canonical URLs will resolve to the latest normative release of the FHIR resource.
-
-#### Cached models
-
-Fhircraft caches the model created based on the structure definition of FHIR resource. Subsequent calls to `construct_resource_model` will not trigger any model constructer and will instead return the cached model. 
-The cache can be reset by simply calling:
-```python
-from fhircraft.fhir.resources.factory import clear_cache
-clear_cache()
-```
-
-
-## Pydantic representation
-
-### Data types 
+## Data types 
 
 Fhircraft introduces a set of data types that align with the FHIR data type classification. These types serve as foundational elements for constructing Pydantic models that accurately reflect FHIR specifications. While rooted in primitive Python types, these Fhircraft data types maintain the FHIR flavor, ensuring that models are both Pythonic and compatible with other Pydantic models. The classification of data types into primitive and complex categories mirrors FHIR’s own structure, representing the fundamental components used to define FHIR resources.
 
@@ -71,11 +29,11 @@ All primitive types can be handled as strings and are parsed using appropriate r
 | boolean | `Boolean` | `bool`, `str`  | `true|false` |
 | integer | `Integer` | `int`, `str`  | `[0]|[-+]?[1-9][0-9]*` |
 | integer64 | `Integer64` | `int`, `str`  | `[0]|[-+]?[1-9][0-9]*` |
-| string | `String` | `str`  |  |
+| string | `String` | `str`  | `.*` |
 | decimal | `Decimal` | `float`, `str`  | `-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?` |
 | uri | `Uri` | `str`  | `\S*` |
-| url | `Url` | `str`  | |
-| canonical | `Canonical` | `str`  | |
+| url | `Url` | `str`  | `\S*` |
+| canonical | `Canonical` | `str`  | `\S*` |
 | base64Binary | `Base64Binary` | `str`  | `(\s*([0-9a-zA-Z\+\=]){4}\s*)+` |
 | instant | `Instant` | `str`  | `([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?` |
 | date | `Date` | `str`  | `([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?` |
@@ -87,14 +45,30 @@ All primitive types can be handled as strings and are parsed using appropriate r
 | markdown | `Markdown` | `str`  | `\s*(\S|\s)*` |
 | unsignedInt | `UnsignedInt` | `int`,`str`  | `[0]|([1-9][0-9]*)` |
 | positiveInt | `PositiveInt` | `int`,`str`  | `\+?[1-9][0-9]*` |
-| uuid | `Uuid` | `str`  | `` |
+| uuid | `Uuid` | `str`  | `[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}` |
 
 #### Complex Types
 
 Complex types, are composed of multiple elements, each of which can be either primitive or other complex types. They are used to represent more sophisticated data structures. In Fhircraft all [FHIR complex types](https://hl7.org/fhir/datatypes.html#complex) are represented as built-in Pydantic models, which are auto-generated from their respective FHIR structure definitions. Each complex type includes all fields specified in the release-specific FHIR definitions and incorporates validators to enforce FHIR constraints.
 
+You can import complex types directly for a specific FHIR release:
 
-To import a complex type for a specific FHIR release, use the `get_complex_FHIR_type` utility function. For example, to import the `CodeableConcept` complex type from the FHIR R4B release:
+```python
+# Direct import for R5
+from fhircraft.fhir.resources.datatypes.R5.complex_types import CodeableConcept, Quantity, Period
+
+# Create instances with validation
+concept = CodeableConcept(
+    coding=[{
+        "system": "http://loinc.org",
+        "code": "29463-7",
+        "display": "Body weight"
+    }],
+    text="Body weight"
+)
+```
+
+Alternatively, to import a complex type for a specific FHIR release dynamically, use the `get_complex_FHIR_type` utility function. For example, to import the `CodeableConcept` complex type from the FHIR R4B release:
 
 ```python 
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
@@ -108,7 +82,7 @@ For a comprehensive list of Fhircraft's complex data types and additional detail
 - [FHIR Release R5 complex types](/docs/reference/fhircraft/fhir/resources/datatypes/R5/complex_types/)
 
 
-### FHIR resources 
+## FHIR resources 
 
 Each FHIR resource (be it a core resource, complex type, or profiled resource) is represented as a Pydantic `FHIRBaseModel` with the following structure:
 
@@ -182,7 +156,7 @@ class MyResource(FHIRBaseModel):
     exampleElement: String = Field(description="An example element")
 ```
 
-### FHIR elements
+## FHIR elements
 
 The following section will describe how Fhircraft represents certain aspects of FHIR resource elements. This is purely informative, as Fhircraft automatically accounts for all rules and representation described here when constructing models. 
 
@@ -232,10 +206,12 @@ Fhircraft represents each slice as an independent model, based on `FHIRSliceMode
 
 The sliced element can accept any value that matches any of the slices or the original element. This is achieved via an ordered `Union` of the slices and the original element type. 
 
-For example, for an `Observation.component` element in the profile `ProfiledObservation` that has been sliced into the slices
-- `'string-component'`: An `Observation.component` where `Observation.component.value` only accepts `str`
-- `'integer-component'`: An `Observation.component` where `Observation.component.value` only accepts `int`    
-from which Fhircraft will automatically generate the following model structure:
+For example, for an `Observation.component` element in the profile `ProfiledObservation` that has been sliced into the slices:
+
+- `'string-component'`: An `Observation.component` where `Observation.component.value[x]` only accepts `string` values
+- `'integer-component'`: An `Observation.component` where `Observation.component.value[x]` only accepts `integer` values    
+
+Fhircraft will automatically generate the following model structure:
 
 ```python
 class ObservationComponent(BackboneElement):
@@ -273,12 +249,12 @@ myobs = ProfiledObservation(component=[
             valueString='value,
         }
     ],
-    ...
+    # ... other required fields
 )
-type(myobs.component[0])
-# IntegerComponent
-type(myobs.component[1])
-# StringComponent
+
+# Check the actual types assigned
+print(type(myobs.component[0]))  # <class 'IntegerComponent'>
+print(type(myobs.component[1]))  # <class 'StringComponent'>
 ```
 
 FHIR profiles can also enforce individual cardinality rules on the slices. Fhircraft accounts for these via model validators that ensure that the correct number of slices of each type are present in the model. 
@@ -316,9 +292,20 @@ class Observation(FHIRBaseModel):
 Additionally, if the chosen type for an instance is not known, you can access the value via a property  `<elementName>` (without the `[x]`) that returns the value of the type that has been set.
 
 ```python
->>> obs = Observation(effectiveDate='01/01/2000')
->>> obs.effective
-'01/01/2000'
+# Create an observation with effective date
+obs = Observation(
+    status="final",
+    code={"text": "Blood Pressure"},
+    effectiveDateTime="2023-12-25T10:30:00Z"
+)
+
+# Access the value through the base property
+print(obs.effective)  # "2023-12-25T10:30:00Z"
+
+# Only one type can be set at a time
+obs.effectiveDate = "2023-12-25"  # This will clear effectiveDateTime
+print(obs.effective)  # "2023-12-25"
+print(obs.effectiveDateTime)  # None
 ```
 
 
@@ -359,7 +346,223 @@ weight = Quantity(value=10, unit='miligrams', code='mg')
 
 #### Fixed values & Pattern constraints 
 
-!!! warning
-    Under construction, TBA
+In FHIR, elements can be constrained using fixed values or pattern constraints to enforce specific requirements on the data:
+
+- **Fixed values** specify that an element must have exactly the specified value
+- **Pattern constraints** specify that an element must conform to a specific pattern or structure
+
+Fhircraft automatically processes both types of constraints when constructing Pydantic models from FHIR structure definitions.
+
+##### Fixed Values
+
+When a FHIR element has a fixed value constraint, Fhircraft creates an enumeration with a single value and sets it as both the field type and default value. This ensures that the field can only accept the predefined value.
+
+```python
+# Example: Element with fixed string value
+from fhircraft.fhir.resources.factory import construct_resource_model
+
+# Assuming a structure definition with fixedString: "active"
+MyResource = construct_resource_model(structure_definition=structure_def)
+
+# The resulting model will have:
+# status: StatusFixedValue = StatusFixedValue.fixedValue
+# where StatusFixedValue is an Enum with only one value: "active"
+
+instance = MyResource()
+print(instance.status)  # "active" - automatically set
+```
+
+##### Pattern Constraints
+
+Pattern constraints require that an element's value conforms to a specified pattern while allowing additional properties or values. Fhircraft implements pattern validation using field validators that check whether the provided value fulfills the pattern requirements.
+
+```python
+# Example: CodeableConcept with pattern constraint
+from fhircraft.fhir.resources.datatypes.R5.complex_types import CodeableConcept
+
+# If a profile requires a CodeableConcept to have a specific coding system
+# The generated model will include a pattern validator
+instance = CodeableConcept(
+    coding=[{
+        "system": "http://required-system.org",
+        "code": "example-code"
+    }]
+)
+# This will pass validation if it matches the pattern
+
+# Attempting to use a different system may fail validation
+# depending on the specific pattern requirements
+```
+
+The pattern validation works by:
+
+1. **Extracting the pattern** from the FHIR structure definition during model construction
+2. **Creating a field validator** that compares the element value against the pattern
+3. **Merging dictionaries** to ensure the provided value contains all required pattern properties
+4. **Raising validation errors** if the pattern is not satisfied
+
+For complex types, pattern validation ensures that all specified fields in the pattern are present with the correct values, while allowing additional fields that are not part of the pattern constraint.
+
+```python
+# Pattern validation error example
+try:
+    instance = CodeableConcept(
+        coding=[{
+            "system": "http://wrong-system.org",  # Doesn't match pattern
+            "code": "example-code"
+        }]
+    )
+except ValidationError as e:
+    print(f"Pattern validation failed: {e}")
+    # Output shows which pattern was expected
+```
+
+Both fixed values and pattern constraints are processed automatically by Fhircraft's `ResourceFactory` during model construction, ensuring that your Pydantic models enforce the same constraints defined in the original FHIR specification or profile.
+
+#### Extensions
+
+Extensions in FHIR provide a mechanism to add additional data elements that are not part of the base resource definition. Fhircraft fully supports FHIR extensions through its `Extension` complex type and the `Element` base model.
+
+##### Standard Extensions
+
+Every FHIR element in Fhircraft inherits from the `Element` base model, which includes an `extension` field that can contain a list of `Extension` objects:
+
+```python
+from fhircraft.fhir.resources.datatypes.R5.complex_types import Extension, Patient
+
+# Create an extension
+my_extension = Extension(
+    url="http://example.org/fhir/StructureDefinition/patient-nickname",
+    valueString="Johnny"
+)
+
+# Add it to a patient
+patient = Patient(
+    name=[{
+        "given": ["John"],
+        "family": "Doe"
+    }],
+    extension=[my_extension]
+)
+```
+
+##### Modifier Extensions
+
+Some elements also support modifier extensions, which can change the meaning or interpretation of the element. These are represented through the `modifierExtension` field in backbone elements:
+
+```python
+from fhircraft.fhir.resources.datatypes.R5.complex_types import Extension
+
+# Modifier extension (changes the meaning of the parent element)
+modifier_ext = Extension(
+    url="http://example.org/fhir/StructureDefinition/data-absent-reason",
+    valueCode="unknown"
+)
+
+# Add to a backbone element that supports modifier extensions
+observation_component = ObservationComponent(
+    code={"text": "Blood Pressure"},
+    modifierExtension=[modifier_ext]
+)
+```
+
+##### Extension Value Types
+
+Extensions use a choice-type element `value[x]` that can accept various data types. Fhircraft represents this through multiple `value{Type}` fields:
+
+```python
+# Different value types for extensions
+string_ext = Extension(
+    url="http://example.org/extension/note",
+    valueString="Patient prefers morning appointments"
+)
+
+boolean_ext = Extension(
+    url="http://example.org/extension/high-risk",
+    valueBoolean=True
+)
+
+coding_ext = Extension(
+    url="http://example.org/extension/priority",
+    valueCoding={
+        "system": "http://example.org/priority",
+        "code": "high",
+        "display": "High Priority"
+    }
+)
+```
+
+##### Extension Validation
+
+Fhircraft automatically validates extensions according to FHIR rules:
+
+- An extension must have either a value or nested extensions, but not both
+- The URL field is required and identifies the meaning of the extension
+- Only one value type can be specified per extension
+
+```python
+# This will raise a validation error - both value and nested extension
+try:
+    invalid_ext = Extension(
+        url="http://example.org/extension/invalid",
+        valueString="some value",
+        extension=[Extension(url="http://nested", valueString="nested")]
+    )
+except ValidationError as e:
+    print("Extension validation failed:", e)
+```
+
+The extension mechanism allows FHIR resources to be extended while maintaining type safety and validation through Fhircraft's Pydantic-based approach.
+
+#### Profiling and Custom Resources
+
+Fhircraft supports the creation of custom FHIR resources and profiles through its flexible resource factory system. This allows you to define specialized versions of standard FHIR resources or create entirely new resource types.
+
+##### Creating Custom Profiles
+
+You can create custom profiles by providing a FHIR structure definition that constrains or extends an existing resource:
+
+```python
+from fhircraft.fhir.resources.factory import construct_resource_model
+
+# Load a custom profile structure definition
+profile_structure = {
+    "resourceType": "StructureDefinition",
+    "url": "http://example.org/fhir/StructureDefinition/MyPatientProfile",
+    "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+    "derivation": "constraint",
+    # ... additional constraints
+}
+
+# Construct the profiled model
+MyPatientProfile = construct_resource_model(structure_definition=profile_structure)
+
+# Use the profiled model with enhanced validation
+patient = MyPatientProfile(
+    # Patient data that must conform to the profile constraints
+)
+```
+
+##### Working with Multiple FHIR Releases
+
+Fhircraft supports multiple FHIR releases (R4, R4B, R5) simultaneously. You can specify which release to use when constructing models:
+
+```python
+from fhircraft.fhir.resources.factory import construct_resource_model
+
+# Construct a model for a specific FHIR release
+PatientR4 = construct_resource_model(
+    structure_definition=structure_def,
+    fhir_release="R4"
+)
+
+PatientR5 = construct_resource_model(
+    structure_definition=structure_def,
+    fhir_release="R5"
+)
+```
+
+This flexibility ensures that your applications can work with different FHIR versions and gradually migrate between releases as needed.
+
 
 

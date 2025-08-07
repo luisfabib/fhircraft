@@ -1,5 +1,5 @@
   - [Home](index.md)
-  - Getting Started:
+  - Getting Started
     - Introduction
         - [Installation](quickstart/installation.md)
         - [Basics](quickstart/basics.md)
@@ -10,7 +10,9 @@
         - [Credits](community/credits.md)
         - [License](community/license.md)
   - User Guide
-    - [Pydantic FHIR models](user-guide/fhir-resources.md)
+    - FHIR Resources
+        - [Pydantic Representation](user-guide/pydantic-representation.md)
+        - [Working with Fhircraft Models](user-guide/fhir-models.md)
     - [FHIRPath](user-guide/fhirpath.md)
-  - API Reference
+  - Reference
     -  ./reference/*
