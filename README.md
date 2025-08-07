@@ -9,7 +9,7 @@
   </a>
 
   [![CI](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml/badge.svg?branch=main&event=push)](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml)
-  [![releases](https://img.shields.io/github/v/release/luisfabib/fhircraft)](https://github.com/luisfabib/fhircraft)
+  ![PyPI - Version](https://img.shields.io/pypi/v/fhircraft)
   [![versions](https://img.shields.io/pypi/pyversions/fhircraft.svg)](https://github.com/luisfabib/fhircraft)
   [![license](https://img.shields.io/github/license/luisfabib/fhircraft.svg)](https://github.com/luisfabib/fhircraft/blob/main/LICENSE)
   [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
