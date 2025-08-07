@@ -72,6 +72,7 @@ plugins:
       scripts:
         - scripts/gen_ref_pages.py
         - scripts/gen_credits_page.py
+        - scripts/gen_repo_pages.py
   - mkdocstrings:
       handlers:
         python:

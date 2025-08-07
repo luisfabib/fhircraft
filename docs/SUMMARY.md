@@ -4,10 +4,11 @@
         - [Installation](quickstart/installation.md)
         - [Basics](quickstart/basics.md)
         - [Tips & Tricks](quickstart/tips.md)
-        - [License](quickstart/license.md)
     - Community
         - [Contributing](community/contributing.md)
+        - [Code of Conduct](community/code_of_conduct.md)
         - [Credits](community/credits.md)
+        - [License](community/license.md)
   - User Guide
     - [Pydantic FHIR models](user-guide/fhir-resources.md)
     - [FHIRPath](user-guide/fhirpath.md)
