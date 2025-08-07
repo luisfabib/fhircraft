@@ -1,16 +1,24 @@
 site_name: Fhircraft
-site_url: https://mydomain.org/docs
+site_url: https://luisfabib.github.io/fhircraft
 repo_url: https://github.com/luisfabib/fhircraft
 repo_name: luisfabib/fhircraft
 
 theme:
 
+  icon:
+    repo: fontawesome/brands/github
   favicon: assets/images/favicon.png
   logo: assets/logo_white.svg
   name: material
   features:
     - content.code.copy
-    - navigation.path    
+    - content.code.annotate
+    - navigation.expand
+    - navigation.path   
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.sections 
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"

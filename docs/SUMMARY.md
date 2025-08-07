@@ -1,9 +1,14 @@
   - [Home](index.md)
-  - [Quickstart](quickstart.md)
-  - [Installation](installation.md)
+  - Getting Started:
+    - Introduction
+        - [Installation](quickstart/installation.md)
+        - [Basics](quickstart/basics.md)
+        - [Tips & Tricks](quickstart/tips.md)
+        - [License](quickstart/license.md)
+    - Community
+        - [Contributing](community/contributing.md)
   - User Guide
     - [Pydantic FHIR models](user-guide/fhir-resources.md)
     - [FHIRPath](user-guide/fhirpath.md)
-  - [Contributing](contributing.md)
   - API Reference
     -  ./reference/*
