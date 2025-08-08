@@ -3,17 +3,17 @@ FHIRPath defines both implicit and explicit conversion. Implicit conversions occ
 that require a function in this section to be called explicitly.
 """
 
+import re
+
+import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.path.engine.core import (
+    FHIRPath,
+    FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
-    FHIRPathError,
-    FHIRPath,
+    FHIRPathRuntimeError,
 )
-import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
-from fhircraft.utils import ensure_list
-from typing import List, Any, Optional, Type, Tuple
-import re
 
 
 class Iif(FHIRPathFunction):
@@ -26,16 +26,21 @@ class Iif(FHIRPathFunction):
         otherwise_result (Optional[Union[FHIRPath, Any]]): Value to be returned if `criterion` evaluates to `False`. Defaults to an empty collection.
     """
 
-    def __init__(self, criterion, true_result, otherwise_result=None):
+    def __init__(
+        self,
+        criterion: FHIRPath,
+        true_result: FHIRPath | FHIRPathCollection,
+        otherwise_result: FHIRPath | FHIRPathCollection = list(),
+    ):
         self.criterion = criterion
         self.true_result = true_result
         self.otherwise_result = otherwise_result
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
-        Thif function acts as an immediate if, also known as a conditional operator.
+        This function acts as an immediate if, also known as a conditional operator.
 
         If `criterion` evaluates to `True`, the function returns the value of the `true_result` argument.
         If `true_result` is a FHIRPath expression it is evaluated.
@@ -45,26 +50,30 @@ class Iif(FHIRPathFunction):
         If `otherwise_result` is a FHIRPath expression it is evaluated.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool: Converted value
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
 
         """
-        collection = ensure_list(collection)
-        criterion = self.criterion.evaluate(collection, **kwargs)
+        criterion_collection = self.criterion.evaluate(collection, create=create)
+        if not criterion_collection:
+            criterion = False
+        else:
+            criterion = criterion_collection[0].value
+
         if criterion:
             if isinstance(self.true_result, FHIRPath):
-                return self.true_result.evaluate(collection, **kwargs)
+                return self.true_result.evaluate(collection, create=create)
             else:
                 return self.true_result
         else:
             if self.otherwise_result:
                 if isinstance(self.otherwise_result, FHIRPath):
-                    return self.otherwise_result.evaluate(collection, **kwargs)
+                    return self.otherwise_result.evaluate(collection, create=create)
                 else:
                     return self.otherwise_result
             else:
@@ -76,27 +85,20 @@ class FHIRTypeConversionFunction(FHIRPathFunction):
     Abstract class definition for the category of type conversion FHIRPath functions.
     """
 
-    def validate_collection(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> List[FHIRPathCollectionItem]:
+    def validate_collection(self, collection: FHIRPathCollection):
         """
         Validates the input collection of a FHIRPath type conversion function.
 
         Args:
-            collection (List[FHIRPathCollectionItem]): Collection to be validated.
-
-        Returns:
-            collection (List[FHIRPathCollectionItem]): Validated collection.
+            collection (FHIRPathCollection): Collection to be validated.
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = ensure_list(collection)
         if len(collection) > 1:
-            raise FHIRPathError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath function {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection."
             )
-        return collection
 
 
 class ToBoolean(FHIRTypeConversionFunction):
@@ -105,8 +107,8 @@ class ToBoolean(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single `Boolean` if:
             - the item is a `Boolean`
@@ -118,28 +120,28 @@ class ToBoolean(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty ('[]').
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool: Converted value
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
 
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
         if isinstance(value, str):
             if value.lower() in ["true", "t", "yes", "y", "1", "1.0"]:
-                return True
+                return [FHIRPathCollectionItem.wrap(True)]
             elif value.lower() in ["false", "f", "no", "n", "0", "0.0"]:
-                return False
+                return [FHIRPathCollectionItem.wrap(False)]
             else:
                 return []
         elif isinstance(value, (int, float)):
-            return bool(value)
+            return [FHIRPathCollectionItem.wrap(bool(value))]
         else:
             return []
 
@@ -150,8 +152,8 @@ class ConvertsToBoolean(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
             - the item is a `Boolean`
@@ -164,18 +166,18 @@ class ConvertsToBoolean(FHIRTypeConversionFunction):
 
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
-        return ToBoolean().evaluate(collection) != []
+        return [FHIRPathCollectionItem.wrap(ToBoolean().evaluate(collection) != [])]
 
 
 class ToInteger(FHIRTypeConversionFunction):
@@ -184,8 +186,8 @@ class ToInteger(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single `Integer` if:
             - the item is an `Integer`
@@ -194,23 +196,23 @@ class ToInteger(FHIRTypeConversionFunction):
         If the item is not one the above types, the result is empty (`[]`).
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            int: Converted value
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
         if isinstance(value, (int, bool)):
-            return int(value)
+            return [FHIRPathCollectionItem.wrap(int(value))]
         elif isinstance(value, str):
             if re.match(r"[+-]?\d", value):
-                return int(value)
+                return [FHIRPathCollectionItem.wrap(int(value))]
             else:
                 return []
         else:
@@ -223,8 +225,8 @@ class ConvertsToInteger(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
             - the item is an `Integer`
@@ -234,19 +236,19 @@ class ConvertsToInteger(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty ('[]').
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
 
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
-        return ToInteger().evaluate(collection) != []
+        return [FHIRPathCollectionItem.wrap(ToInteger().evaluate(collection) != [])]
 
 
 class ToDate(FHIRTypeConversionFunction):
@@ -255,8 +257,8 @@ class ToDate(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single date if:
             - the item is a `Date`
@@ -267,15 +269,15 @@ class ToDate(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            str: Converted value
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
@@ -289,9 +291,9 @@ class ToDate(FHIRTypeConversionFunction):
                 value,
             )
             if date_match:
-                return value
+                return [FHIRPathCollectionItem.wrap(value)]
             elif datetime_match:
-                return datetime_match.group(1)
+                return [FHIRPathCollectionItem.wrap(datetime_match.group(1))]
             else:
                 return []
         else:
@@ -304,8 +306,8 @@ class ConvertsToDate(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
             - the item is a `Date`
@@ -316,18 +318,18 @@ class ConvertsToDate(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
-        return ToDate().evaluate(collection) != []
+        return [FHIRPathCollectionItem.wrap(ToDate().evaluate(collection) != [])]
 
 
 class ToDateTime(FHIRTypeConversionFunction):
@@ -336,8 +338,8 @@ class ToDateTime(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single datetime if:
             - the item is a `DateTime`
@@ -348,15 +350,15 @@ class ToDateTime(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            str: Converted value
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
@@ -370,7 +372,7 @@ class ToDateTime(FHIRTypeConversionFunction):
                 value,
             )
             if date_match or datetime_match:
-                return value
+                return [FHIRPathCollectionItem.wrap(value)]
             else:
                 return []
         else:
@@ -383,8 +385,8 @@ class ConvertsToDateTime(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
             - the item is a `DateTime`
@@ -395,18 +397,18 @@ class ConvertsToDateTime(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
-        return ToDateTime().evaluate(collection) != []
+        return [FHIRPathCollectionItem.wrap(ToDateTime().evaluate(collection) != [])]
 
 
 class ToDecimal(FHIRTypeConversionFunction):
@@ -415,8 +417,8 @@ class ToDecimal(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single decimal if:
             - the item is an `Integer` or `Decimal`
@@ -426,23 +428,23 @@ class ToDecimal(FHIRTypeConversionFunction):
         If the item is a `String`, but the string is not convertible to a `Decimal`, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            float: Converted value
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
         if isinstance(value, (int, float, bool)):
-            return float(value)
+            return [FHIRPathCollectionItem.wrap(float(value))]
         elif isinstance(value, str):
             if re.match(r"(\\+|-)?\d+(\.\d+)?", value):
-                return float(value)
+                return [FHIRPathCollectionItem.wrap(float(value))]
             else:
                 return []
         else:
@@ -455,8 +457,8 @@ class ConvertsToDecimal(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
             - the item is an `Integer` or `Decimal`
@@ -466,18 +468,18 @@ class ConvertsToDecimal(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty ('[]').
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
-        return ToDecimal().evaluate(collection) != []
+        return [FHIRPathCollectionItem.wrap(ToDecimal().evaluate(collection) != [])]
 
 
 class ToQuantity(FHIRTypeConversionFunction):
@@ -486,8 +488,8 @@ class ToQuantity(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single quantity if:
             - the item is an `Integer`, or `Decimal`, where the resulting quantity will have the default unit (`'1'`)
@@ -498,33 +500,37 @@ class ToQuantity(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            Quantity: Converted value
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         Quantity = get_complex_FHIR_type("Quantity")
         if not collection:
             return []
         value = collection[0].value
         if isinstance(value, (bool, int, float)):
-            return Quantity(value=float(value), unit="1")
+            return [FHIRPathCollectionItem.wrap(Quantity(value=float(value), unit="1"))]
         elif isinstance(value, str):
             quantity_match = re.match(
                 r"((\+|-)?\d+(\.\d+)?)\s*(('([^']+)'|([a-zA-Z]+))?)", value
             )
             if quantity_match:
-                return Quantity(
-                    value=quantity_match.group(1), unit=quantity_match.group(4)
-                )
+                return [
+                    FHIRPathCollectionItem.wrap(
+                        Quantity(
+                            value=quantity_match.group(1), unit=quantity_match.group(4)
+                        )
+                    )
+                ]
             else:
                 return []
         elif isinstance(value, Quantity):
-            return value
+            return [FHIRPathCollectionItem.wrap(value)]
         else:
             return []
 
@@ -535,8 +541,8 @@ class ConvertsToQuantity(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
             - the item is an `Integer`, or `Decimal`, where the resulting quantity will have the default unit (`'1'`)
@@ -547,18 +553,18 @@ class ConvertsToQuantity(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
-        return ToQuantity().evaluate(collection) != []
+        return [FHIRPathCollectionItem.wrap(ToQuantity().evaluate(collection) != [])]
 
 
 class ToString(FHIRTypeConversionFunction):
@@ -567,8 +573,8 @@ class ToString(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single string if:
             - the item in the input collection is a `String`
@@ -578,24 +584,24 @@ class ToString(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            str: Converted value
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
         if isinstance(value, bool):
-            return "true" if value else "false"
+            return [FHIRPathCollectionItem.wrap("true" if value else "false")]
         elif isinstance(value, (str, int, float)):
-            return str(value)
+            return [FHIRPathCollectionItem.wrap(str(value))]
         elif isinstance(value, get_complex_FHIR_type("Quantity")):
-            return f"{value.value} {value.unit}"
+            return [FHIRPathCollectionItem.wrap(f"{value.value} {value.unit}")]
         else:
             return []
 
@@ -606,8 +612,8 @@ class ConvertsToString(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
             - the item in the input collection is a `String`
@@ -617,18 +623,18 @@ class ConvertsToString(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
-        return ToString().evaluate(collection) != []
+        return [FHIRPathCollectionItem.wrap(ToString().evaluate(collection) != [])]
 
 
 class ToTime(FHIRTypeConversionFunction):
@@ -637,8 +643,8 @@ class ToTime(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return a single time if:
             - the item is a `Time`
@@ -648,15 +654,15 @@ class ToTime(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            str: Converted value
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
         value = collection[0].value
@@ -666,7 +672,7 @@ class ToTime(FHIRTypeConversionFunction):
                 value,
             )
             if time_match:
-                return value
+                return [FHIRPathCollectionItem.wrap(value)]
             else:
                 return []
         else:
@@ -679,8 +685,8 @@ class ConvertsToTime(FHIRTypeConversionFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> int:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the input collection contains a single item, this function will return `True` if:
             - the item is a `Time`
@@ -690,15 +696,15 @@ class ConvertsToTime(FHIRTypeConversionFunction):
         If the input collection is empty, the result is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection
 
         Raises:
-            FHIRPathError: If input collection has more than one item.
+            FHIRPathRuntimeError: If input collection has more than one item.
         """
-        collection = super().validate_collection(collection)
+        self.validate_collection(collection)
         if not collection:
             return []
-        return ToTime().evaluate(collection) != []
+        return [FHIRPathCollectionItem.wrap(ToTime().evaluate(collection) != [])]

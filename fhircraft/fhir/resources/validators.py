@@ -36,7 +36,7 @@ def _validate_FHIR_element_constraint(
     from fhircraft.fhir.path import (
         FhirPathLexerError,
         FhirPathParserError,
-        FhirPathWwarning,
+        FhirPathWarning,
         fhirpath,
     )
     from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
@@ -52,7 +52,7 @@ def _validate_FHIR_element_constraint(
                 valid = True
             error_message = f'{human}. [{key}] -> "{expression}"'
             if severity == "warning" and not valid:
-                warnings.warn(error_message, FhirPathWwarning)
+                warnings.warn(error_message, FhirPathWarning)
             else:
                 assert valid, error_message
         except (

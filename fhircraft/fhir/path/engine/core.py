@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial
 from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Optional, TypeVar
+from venv import create
 
 from fhircraft.fhir.path.utils import import_fhirpath_engine
 from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
@@ -11,8 +12,16 @@ from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from
 if TYPE_CHECKING:
     from fhircraft.fhir.path.parser import FhirPathParser
 
+from typing import List
+
 # Get logger name
 logger = logging.getLogger(__name__)
+
+FHIRPathCollection = List["FHIRPathCollectionItem"]
+
+
+class FHIRPathRuntimeError(RuntimeError):
+    pass
 
 
 class FHIRPathError(Exception):
@@ -48,7 +57,7 @@ class FHIRPathMixin:
             (Union[NoneType,Any, List[Any]): The extracted value(s), or None if no values are found.
         """
         # Evaluate the FHIRPath expression
-        collection = self.fhirpath.parse(expression).find(self)
+        collection = self.fhirpath.parse(expression).evaluate_for(self)
         # Get the values of the collection items
         values = [
             item.value
@@ -70,7 +79,7 @@ class FHIRPathMixin:
             expression (str): FHIRPath expression to evaluate
         """
         # Evaluate the FHIRPath expression
-        self.fhirpath.parse(expression).update_or_create(self, new_value)
+        self.fhirpath.parse(expression).evaluate_and_replace(self, new_value)
 
 
 @dataclass
@@ -192,11 +201,21 @@ class FHIRPathCollectionItem(object):
             self.path if self.parent is None else self.parent.full_path.child(self.path)
         )
 
+    def __eq__(self, value: Any) -> bool:
+        if isinstance(value, FHIRPathCollectionItem):
+            return (
+                self.value == value.value
+                and self.element == value.element
+                and self.index == value.index
+            )
+        else:
+            return self.value == value
+
     def __repr__(self):
         return f"FHIRPathCollectionItem(value={self.value.__repr__()[:10]}, element={self.element.__repr__()[:10]}..., index={self.index}, parent={self.parent.full_path if self.parent else None})"
 
     def __hash__(self):
-        return hash((self.path, self.parent))
+        return hash((self.path, self.parent, self.value.__repr__()))
 
 
 class FHIRPath(ABC):
@@ -205,98 +224,28 @@ class FHIRPath(ABC):
     FHIR resources.
     """
 
-    def get_value(self, data):
-        """
-        Extracts the value(s) from the given data.
-
-        Args:
-            data (Any): The data from which to extract values.
-
-        Returns:
-            (Any): The extracted value(s), or None if no values are found.
-        """
-        collection = [
-            FHIRPathCollectionItem.wrap(item) for item in ensure_list(self.find(data))
-        ]
-        values = [
-            item.value
-            for item in collection
-            if item.value or isinstance(item.value, bool)
-        ]
+    def evaluate_for(self, data):
+        collection = self._evaluate_wrapped(data)
+        values = [item.value for item in collection]
         if len(values) == 1:
             values = values[0]
         elif len(values) == 0:
             return None
         return values
 
-    def find(self, collection: typing.Any) -> List[FHIRPathCollectionItem]:
-        """
-        Finds and returns a collection of FHIRPathCollectionItem instances from the input collection.
-
-        Args:
-            collection (Any): The input collection to search.
-
-        Returns:
-            List[FHIRPathCollectionItem]: A list of FHIRPathCollectionItem instances.
-        """
-        # Ensure that entrypoint is a FHIRPathCollectionItem instance
-        collection = [
-            FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)
-        ]
-        return self.evaluate(collection, create=False)
-
-    def find_or_create(self, collection) -> List[FHIRPathCollectionItem]:
-        """
-        Finds or creates and returns a collection of FHIRPathCollectionItem instances from the input collection.
-
-        Args:
-            collection (Any): The input collection to search or create items in.
-
-        Returns:
-            List[FHIRPathCollectionItem]: A list of FHIRPathCollectionItem instances.
-        """
-        # Ensure that entrypoint is a FHIRPathCollectionItem instance
-        collection = [
-            FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)
-        ]
-        return self.evaluate(collection, create=True)
-
-    def update(self, collection, value) -> None:
-        """
-        Updates the input collection with the given value.
-
-        Args:
-            collection (Any): The input collection to update.
-            value (Any): The value to set in the collection.
-        """
-        # Ensure that entrypoint is a FHIRPathCollectionItem instance
-        collection = [
-            FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)
-        ]
-        # Collect the elements and set the values for each of them
-        new_collection = self.evaluate(collection, create=False)
+    def evaluate_and_replace(self, data, value):
+        new_collection = self._evaluate_wrapped(data, create=True)
         for item in new_collection:
             item.set_value(value)
 
-    def update_or_create(self, collection, value) -> None:
-        """
-        Updates or creates the input collection with the given value.
-
-        Args:
-            collection (Any): The input collection to update or create items in.
-            value (Any): The value to set in the collection.
-        """
-        # Ensure that entrypoint is a FHIRPathCollectionItem instance
-        collection = [
-            FHIRPathCollectionItem.wrap(item) for item in ensure_list(collection)
-        ]
-        # Collect the elements and set the values for each of them
-        for item in self.evaluate(collection, create=True):
-            item.set_value(value)
+    def _evaluate_wrapped(self, data: typing.Any, create=False) -> FHIRPathCollection:
+        # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
+        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
+        return self.evaluate(collection, create=create)
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], create: bool
-    ) -> List[FHIRPathCollectionItem]:
+        self, collection: FHIRPathCollection, create: bool
+    ) -> FHIRPathCollection:
         """
         Evaluates the collection and returns a list of FHIRPathCollectionItem instances.
 
@@ -305,7 +254,7 @@ class FHIRPath(ABC):
             create (bool): Flag indicating whether to create new items if they do not exist.
 
         Returns:
-            List[FHIRPathCollectionItem]: A list of FHIRPathCollectionItem instances.
+            FHIRPathCollection: A list of FHIRPathCollectionItem instances.
 
         Raises:
             NotImplementedError: If the method is not implemented by a subclass.
@@ -347,6 +296,44 @@ class FHIRPathFunction(FHIRPath):
         return isinstance(other, self.__class__)
 
 
+class Literal(FHIRPath):
+    """
+    A class representation of a constant literal value in the FHIRPath.
+
+    Attributes:
+        value (Any): The literal value to be represented.
+    """
+
+    def __init__(self, value: Any):
+        self.value = value
+
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
+        """
+        Simply returns the input collection.
+
+        Args:
+            collection (FHIRPathCollection): The collection of items to be evaluated.
+
+        Returns:
+            collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
+        """
+        return [FHIRPathCollectionItem(self.value, parent=None, path=None)]
+
+    def __str__(self):
+        return str(self.value)
+
+    def __repr__(self):
+        return "Literal(%r)" % (self.value,)
+
+    def __eq__(self, other):
+        return isinstance(other, Literal) and self.value == other.value
+
+    def __hash__(self):
+        return hash(("literal", self.value))
+
+
 class Element(FHIRPath):
     """
     A class representing an element in a FHIRPath, used for navigating and manipulating FHIR resources.
@@ -355,7 +342,11 @@ class Element(FHIRPath):
         label (str): The name of the element.
     """
 
-    def __init__(self, label: str):
+    def __init__(self, label: str | Literal):
+        if isinstance(label, Literal):
+            label = label.value
+        if not isinstance(label, str):
+            raise FHIRPathError("Element() argument must be a string.")
         self.label = label
 
     def create_element(self, parent: typing.Any) -> typing.Any:
@@ -410,27 +401,17 @@ class Element(FHIRPath):
                 parents[index] = value
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], create: bool
-    ) -> List[FHIRPathCollectionItem]:
-        """
-        Evaluate the collection of FHIRPathCollectionItems and create new elements if necessary.
-
-        Args:
-            collection (List[FHIRPathCollectionItem]): A list of FHIRPathCollectionItems to evaluate.
-            create (bool): A flag indicating whether to create new elements if they do not exist.
-
-        Returns:
-            List[FHIRPathCollectionItem]: A list of FHIRPathCollectionItems after evaluation.
-        """
-        collection = ensure_list(collection)
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         element_collection = []
         for item in collection:
-            if not item.value:
+            if item.value is None:
                 continue
             element_value = getattr(item.value, self.label, None)
             if not element_value and not isinstance(element_value, bool) and create:
                 element_value = self.create_element(item.value)
                 setattr(item.value, self.label, element_value)
+
             for index, value in enumerate(ensure_list(element_value)):
                 if create or value is not None:
                     element = FHIRPathCollectionItem(
@@ -441,7 +422,6 @@ class Element(FHIRPath):
                             self.setter, item=item, index=index, label=self.label
                         ),
                     )
-                    # element.set_value(value)
                     element_collection.append(element)
         return element_collection
 
@@ -465,27 +445,22 @@ class Root(FHIRPath):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> List[FHIRPathCollectionItem]:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         Evaluate the collection of top-most resources in the input collection.
 
         Args:
-            collection (List[FHIRPathCollectionItem]): The collection of items to be evaluated.
+            collection (Collection): The collection of items to be evaluated.
 
         Returns:
-            collection (List[FHIRPathCollectionItem]): A list of FHIRPathCollectionItem instances after evaluation.
+            collection (Collection): A list of FHIRPathCollectionItem instances after evaluation.
         """
-        collection = ensure_list(collection)
         return [
             (
-                FHIRPathCollectionItem(item, path=Root(), parent=None)
-                if not isinstance(item, FHIRPathCollectionItem)
-                else (
-                    FHIRPathCollectionItem(item.value, parent=None, path=Root())
-                    if item.parent is None
-                    else Root().find(item.parent)[0]
-                )
+                FHIRPathCollectionItem(item.value, parent=None, path=Root())
+                if item.parent is None
+                else Root().evaluate([item.parent])[0]
             )
             for item in collection
         ]
@@ -509,18 +484,17 @@ class Parent(FHIRPath):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> List[FHIRPathCollectionItem]:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         Evaluate the collection of parent resources in the input collection.
 
         Args:
-            collection (List[FHIRPathCollectionItem]): The collection of items to be evaluated.
+            collection (FHIRPathCollection): The collection of items to be evaluated.
 
         Returns:
-            collection (List[FHIRPathCollectionItem]): A list of FHIRPathCollectionItem instances after evaluation.
+            FHIRPathCollection: The output collection.
         """
-        collection = ensure_list(collection)
         return [item.parent for item in collection if item.parent is not None]
 
     def __str__(self):
@@ -543,18 +517,18 @@ class This(FHIRPath):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> List[FHIRPathCollectionItem]:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         Simply returns the input collection.
 
         Args:
-            collection (List[FHIRPathCollectionItem]): The collection of items to be evaluated.
+            collection (FHIRPathCollection): The collection of items to be evaluated.
 
         Returns:
-            collection (List[FHIRPathCollectionItem]): A list of FHIRPathCollectionItem instances after evaluation.
+            collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
         """
-        return ensure_list(collection)
+        return collection
 
     def __str__(self):
         return "`this`"
@@ -584,24 +558,26 @@ class Invocation(FHIRPath):
         self.right = right
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], create: bool
-    ) -> List[FHIRPathCollectionItem]:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         Performs the evaluation of the Invocation by applying the left-hand side FHIRPath segment on the given collection to obtain a parent collection.
         Then, the right-hand side FHIRPath segment is applied on the parent collection to derive the child collection.
 
         Args:
-            collection (List[FHIRPathCollectionItem]): The collection on which the evaluation is performed.
+            collection (FHIRPathCollection): The collection on which the evaluation is performed.
             create (bool): A boolean flag indicating whether to create any missing elements.
 
         Returns:
-            List[FHIRPathCollectionItem]: The resulting child collection after the evaluation process.
+            FHIRPathCollection: The resulting child collection after the evaluation process.
         """
         parent_collection = self.left.evaluate(collection, create)
-        child_collection = self.right.evaluate(parent_collection, create)
-        return child_collection
+        return self.right.evaluate(parent_collection, create)
 
     def __eq__(self, other):
+        print(f"Comparing {self} with {other}")
+        print(f"A: {self.left}, B: {other.left}", self.left == other.left)
+        print(f"A: {self.right}, B: {other.right}", self.right == other.right)
         return (
             isinstance(other, Invocation)
             and self.left == other.left

@@ -1,26 +1,26 @@
-from fhircraft.fhir.path.engine.core import *
-from fhircraft.fhir.path.engine.navigation import *
 from pydantic import BaseModel
 
+from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.path.engine.navigation import *
 
-#-------------
+# -------------
 # Children
-#-------------
+# -------------
+
 
 def test_children_returns_empty_for_empty_collection():
     collection = []
     result = Children().evaluate(collection)
     assert result == []
 
+
 def test_children_returns_correct_elements():
     class Resource(BaseModel):
-        fieldA: int 
-        fieldB: int 
-        fieldC: int 
+        fieldA: int
+        fieldB: int
+        fieldC: int
 
-    resource = Resource(
-        fieldA=1, fieldB=2, fieldC=3
-    )
+    resource = Resource(fieldA=1, fieldB=2, fieldC=3)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Children().evaluate(collection)
     assert result[0].value == 1
@@ -28,28 +28,26 @@ def test_children_returns_correct_elements():
     assert result[2].value == 3
 
 
-
-
-#-------------
+# -------------
 # Descendants
-#-------------
+# -------------
+
 
 def test_decendants_returns_empty_for_empty_collection():
     collection = []
     result = Descendants().evaluate(collection)
     assert result == []
 
+
 def test_descendants_returns_correct_elements():
     class Resource(BaseModel):
-        fieldA: int 
-        fieldB: int 
-        fieldC: int 
-        subfield: "Resource" = None
+        fieldA: int
+        fieldB: int
+        fieldC: int
+        subfield: Union["Resource", None] = None
 
     resource = Resource(
-        fieldA=1, fieldB=2, fieldC=3, subfield=Resource(
-            fieldA=4, fieldB=5, fieldC=6
-        )
+        fieldA=1, fieldB=2, fieldC=3, subfield=Resource(fieldA=4, fieldB=5, fieldC=6)
     )
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Descendants().evaluate(collection)

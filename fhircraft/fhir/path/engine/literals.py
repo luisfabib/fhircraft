@@ -1,10 +1,12 @@
-from decimal import Decimal as PythonDecimal
-from dataclasses import dataclass
-from typing import Union, Optional
 import operator
-from abc import ABC
 import re
-from datetime import date, time, datetime
+import warnings
+from abc import ABC
+from dataclasses import dataclass
+from datetime import date, datetime, time
+from decimal import Decimal as PythonDecimal
+from logging import warning
+from typing import Optional, Union
 
 
 class FHIRPathLiteralType(ABC):
@@ -20,13 +22,13 @@ class Quantity(FHIRPathLiteralType):
         if self.unit == other.unit:
             return op(self.value, other.value)
         else:
+            warnings.warn(
+                f"Cannot perform operation {op.__name__} on quantities with different units: {self.unit} and {other.unit}. Returning empty collection."
+            )
             return []
 
-    def __math__(self, other, op):
-        if self.unit == other.unit:
-            return Quantity(op(self.value, other.value), self.unit)
-        else:
-            return []
+    def __math__(self, other, op) -> "Quantity":
+        return Quantity(op(self.value, other.value), self.unit)
 
     def __abs__(self):
         return Quantity(abs(self.value), self.unit)
@@ -44,16 +46,40 @@ class Quantity(FHIRPathLiteralType):
         return self.__comparison__(other, operator.ge)
 
     def __add__(self, other):
+        if not self.unit == other.unit:
+            raise ValueError(
+                f"Cannot perform addition on quantities with different units: {self.unit} and {other.unit}."
+            )
         return self.__math__(other, operator.add)
 
     def __sub__(self, other):
+        if not self.unit == other.unit:
+            raise ValueError(
+                f"Cannot perform subtraction on quantities with different units: {self.unit} and {other.unit}."
+            )
         return self.__math__(other, operator.sub)
 
     def __mul__(self, other):
-        return self.__math__(other, operator.mul)
+        result = self.__math__(other, operator.mul)
+        result.unit = f"{self.unit}*{other.unit}"
+        return result
 
     def __truediv__(self, other):
-        return self.__math__(other, operator.truediv)
+        result = self.__math__(other, operator.truediv)
+        if self.unit == other.unit:
+            result.unit = "1"
+        else:
+            result.unit = f"{self.unit}/{other.unit}"
+        return result
+
+    def __floordiv__(self, other):
+        result = self.__math__(other, operator.floordiv)
+        if self.unit == other.unit:
+            result.unit = "1"
+        else:
+            result.unit = f"{self.unit}/{other.unit}"
+
+        return result
 
 
 @dataclass
@@ -62,16 +88,21 @@ class Date(FHIRPathLiteralType):
     month: Optional[int]
     day: Optional[int]
 
-    def __init__(self, valuestring):
-        match = re.match(r"\@(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?", valuestring)
-        if match:
-            groups = match.groups()
-            self.year, self.month, self.day = [
-                int(group) if group else None
-                for group in list(groups) + [None for _ in range(3 - len(groups))]
-            ]
-        else:
-            raise ValueError(f'Invalid string format "{valuestring}" for Date type')
+    def __init__(self, valuestring=None, value_date=None):
+        if valuestring:
+            match = re.match(r"\@(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?", valuestring)
+            if match:
+                groups = match.groups()
+                self.year, self.month, self.day = [  # type: ignore
+                    int(group) if group else None
+                    for group in list(groups) + [None for _ in range(3 - len(groups))]
+                ]
+            else:
+                raise ValueError(f'Invalid string format "{valuestring}" for Date type')
+        elif value_date:
+            self.year = value_date.year
+            self.month = value_date.month
+            self.day = value_date.day
 
     def to_date(self):
         return date(self.year, self.month or 1, self.day or 1)
@@ -119,26 +150,36 @@ class Time(FHIRPathLiteralType):
     hour_shift: Optional[int]
     minute_shift: Optional[int]
 
-    def __init__(self, valuestring):
-        match = re.match(
-            r"\@T(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?",
-            valuestring,
-        )
-        if match:
-            groups = match.groups()
-            (
-                self.hour,
-                self.minute,
-                self.second,
-                self.millisecond,
-                self.hour_shift,
-                self.minute_shift,
-            ) = [
-                int(group) if group else None
-                for group in list(groups) + [None for _ in range(6 - len(groups))]
-            ]
-        else:
-            raise ValueError(f'Invalid string format "{valuestring}" for Time type')
+    def __init__(
+        self, valuestring: str | None = None, value_time: datetime | None = None
+    ):
+        if valuestring:
+            match = re.match(
+                r"\@T(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?",
+                valuestring,
+            )
+            if match:
+                groups = match.groups()
+                (
+                    self.hour,  # type: ignore
+                    self.minute,
+                    self.second,
+                    self.millisecond,
+                    self.hour_shift,
+                    self.minute_shift,
+                ) = [
+                    int(group) if group else None
+                    for group in list(groups) + [None for _ in range(6 - len(groups))]
+                ]
+            else:
+                raise ValueError(f'Invalid string format "{valuestring}" for Time type')
+        elif value_time:
+            self.hour = value_time.hour
+            self.minute = value_time.minute
+            self.second = value_time.second
+            self.millisecond = value_time.microsecond // 1000
+            self.hour_shift = None
+            self.minute_shift = None
 
     def to_time(self):
         return time(
@@ -198,29 +239,44 @@ class DateTime(FHIRPathLiteralType):
     hour_shift: Optional[int]
     minute_shift: Optional[int]
 
-    def __init__(self, valuestring):
-        match = re.match(
-            r"\@([0-9]{4})(?:-([0-9]{2})(?:-?([0-9]{2})T(?:(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?)?)?)?",
-            valuestring,
-        )
-        if match:
-            groups = match.groups()
-            (
-                self.year,
-                self.month,
-                self.day,
-                self.hour,
-                self.minute,
-                self.second,
-                self.millisecond,
-                self.hour_shift,
-                self.minute_shift,
-            ) = [
-                int(group) if group else None
-                for group in list(groups) + [None for _ in range(9 - len(groups))]
-            ]
-        else:
-            raise ValueError(f'Invalid string format "{valuestring}" for DateTime type')
+    def __init__(
+        self, valuestring: str | None = None, value_datetime: datetime | None = None
+    ):
+        if valuestring:
+            match = re.match(
+                r"\@([0-9]{4})(?:-([0-9]{2})(?:-?([0-9]{2})T(?:(\d{2})(?:\:(\d{2})(?:\:(\d{2})(?:\.(\d{3})(?:([+|-]\d{2})(?:\:(\d{2}))?)?)?)?)?)?)?)?",
+                valuestring,
+            )
+            if match:
+                groups = match.groups()
+                (
+                    self.year,  # type: ignore
+                    self.month,
+                    self.day,
+                    self.hour,
+                    self.minute,
+                    self.second,
+                    self.millisecond,
+                    self.hour_shift,
+                    self.minute_shift,
+                ) = [
+                    int(group) if group else None
+                    for group in list(groups) + [None for _ in range(9 - len(groups))]
+                ]
+            else:
+                raise ValueError(
+                    f'Invalid string format "{valuestring}" for DateTime type'
+                )
+        elif value_datetime:
+            self.year = value_datetime.year
+            self.month = value_datetime.month
+            self.day = value_datetime.day
+            self.hour = value_datetime.hour
+            self.minute = value_datetime.minute
+            self.second = value_datetime.second
+            self.millisecond = value_datetime.microsecond // 1000
+            self.hour_shift = None
+            self.minute_shift = None
 
     def to_datetime(self):
         return datetime(

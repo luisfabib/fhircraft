@@ -121,7 +121,6 @@ class TestBuildElementTreeStructure(FactoryTestCase):
             ),
         ]
         nodes = self.factory._build_element_tree_structure(elements)
-        print([node.model_dump(exclude_unset=True) for node in nodes])
         assert "component" == nodes[0].node_label
         assert "sliceA" == nodes[0].slices["sliceA"].node_label
         assert (

@@ -1,27 +1,35 @@
 import logging
 import os.path
+
 import ply.yacc
 
-from fhircraft.fhir.path.engine.core import Element, Root, Parent, This, Invocation
+import fhircraft.fhir.path.engine.additional as additional
+import fhircraft.fhir.path.engine.boolean as boolean
+import fhircraft.fhir.path.engine.collection as collection
+import fhircraft.fhir.path.engine.combining as combining
+import fhircraft.fhir.path.engine.comparison as comparison
+import fhircraft.fhir.path.engine.conversion as conversion
+import fhircraft.fhir.path.engine.equality as equality
 import fhircraft.fhir.path.engine.existence as existence
 import fhircraft.fhir.path.engine.filtering as filtering
-import fhircraft.fhir.path.engine.subsetting as subsetting
-import fhircraft.fhir.path.engine.combining as combining
-import fhircraft.fhir.path.engine.boolean as boolean
+import fhircraft.fhir.path.engine.literals as literals
 import fhircraft.fhir.path.engine.math as math
 import fhircraft.fhir.path.engine.navigation as navigation
 import fhircraft.fhir.path.engine.strings as strings
-import fhircraft.fhir.path.engine.additional as additional
-import fhircraft.fhir.path.engine.conversion as conversion
-import fhircraft.fhir.path.engine.equality as equality
+import fhircraft.fhir.path.engine.subsetting as subsetting
 import fhircraft.fhir.path.engine.types as types
-import fhircraft.fhir.path.engine.comparison as comparison
-import fhircraft.fhir.path.engine.literals as literals
 import fhircraft.fhir.path.engine.utility as utility
-import fhircraft.fhir.path.engine.collection as collection
+from fhircraft.fhir.path.engine.core import (
+    Element,
+    Invocation,
+    Literal,
+    Parent,
+    Root,
+    This,
+)
+from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.utils import ensure_list
-from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +77,7 @@ class FhirPathParser:
             debug=self.debug,
             tabmodule=parsing_table_module,
             outputdir=output_directory,
-            write_tables=0,
+            write_tables=False,
             start=start_symbol,
             errorlog=logger,
         )
@@ -420,7 +428,7 @@ class FhirPathParser:
         # -------------------------------------------------------------------------------
         elif check(p, "indexOf", nargs=1):
             p[0] = strings.IndexOf(*p[3])
-        elif check(p, "substring", nargs=(1, 2)):
+        elif check(p, "substring", nargs=[1, 2]):
             p[0] = strings.Substring(*p[3])
         elif check(p, "startsWith", nargs=1):
             p[0] = strings.StartsWith(*p[3])
@@ -524,19 +532,19 @@ class FhirPathParser:
         p[0] = p[1]
 
     def p_literal(self, p):
-        """literal : STRING
+        """literal : number
+        | STRING
         | BOOLEAN
         | date
         | time
         | datetime
-        | number
         | quantity
         """
-        p[0] = p[1]
+        p[0] = Literal(p[1])
 
     def p_literal_empty(self, p):
         """literal : '{' '}'"""
-        p[0] = []
+        p[0] = Literal([])
 
     def p_datetime(self, p):
         "datetime : DATETIME"

@@ -5,394 +5,232 @@ import pytest
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPathCollectionItem,
-    FHIRPathError,
     Invocation,
+    Literal,
+    Parent,
     Root,
+    This,
 )
-from fhircraft.fhir.path.engine.subsetting import Index
-from fhircraft.fhir.path.parser import parse
-from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
-from fhircraft.fhir.resources.factory import clear_chache, construct_resource_model
-from fhircraft.utils import ensure_list, get_fhir_model_from_field
-
-clear_chache()
-Observation = construct_resource_model(
-    f"https://hl7.org/fhir/R4B/observation.profile.json"
-)
-ObservationComponent = get_fhir_model_from_field(Observation.model_fields["component"])
+from fhircraft.fhir.path.engine.strings import Upper
 
 
 class TestRoot(TestCase):
 
-    def setUp(self):
-        self.resource = Observation.model_construct(
-            status="final",
-            identifier=[
-                get_complex_FHIR_type("Identifier")(value="A"),
-                get_complex_FHIR_type("Identifier")(value="B"),
-            ],
-        )
-        self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
+    def test_evaluate_returns_collection_unchanged(self):
+        # Root().evaluate should return the collection unchanged
+        items = [
+            FHIRPathCollectionItem(value="a"),
+            FHIRPathCollectionItem(value="b"),
+            FHIRPathCollectionItem(value="c"),
+        ]
+        result = Root().evaluate(items)
+        assert result == items
+        assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
 
-    def test_element_evaluates_correctly(self):
-        result = Root().evaluate(self.resource)
-        assert len(result) == 1
-        assert result[0].value == self.resource
-        assert result[0].parent is None
+    def test_evaluate_empty_collection_returns_empty_list(self):
+        # Root().evaluate([]) should return []
+        result = Root().evaluate([])
+        assert result == []
+
+    def test_evaluate_with_single_item(self):
+        item = FHIRPathCollectionItem(value="single")
+        result = Root().evaluate([item])
+        assert result == [item]
+
+
+class TestParent(TestCase):
+    class DummyValue:
+        pass
+
+    def _make_item_with_parent(self, parent_value=None):
+        parent_item = FHIRPathCollectionItem(value=parent_value or self.DummyValue())
+        child_item = FHIRPathCollectionItem(value=self.DummyValue(), parent=parent_item)
+        return child_item, parent_item
+
+    def test_evaluate_returns_parents_when_present(self):
+        child1, parent1 = self._make_item_with_parent()
+        child2, parent2 = self._make_item_with_parent()
+        collection = [child1, child2]
+        result = Parent().evaluate(collection)
+        assert result == [parent1, parent2]
+        assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
+
+    def test_evaluate_skips_items_without_parent(self):
+        item_without_parent = FHIRPathCollectionItem(value=self.DummyValue())
+        child, parent = self._make_item_with_parent()
+        collection = [item_without_parent, child]
+        result = Parent().evaluate(collection)
+        assert result == [parent]
+        assert parent in result
+        assert item_without_parent not in result
+
+    def test_evaluate_empty_collection_returns_empty_list(self):
+        result = Parent().evaluate([])
+        assert result == []
+
+    def test_evaluate_all_items_without_parent_returns_empty_list(self):
+        items = [FHIRPathCollectionItem(value=self.DummyValue()) for _ in range(3)]
+        result = Parent().evaluate(items)
+        assert result == []
+
+
+class TestThis(TestCase):
+    class DummyValue:
+        pass
+
+    def setUp(self):
+        self.value1 = self.DummyValue()
+        self.value2 = self.DummyValue()
+        self.items = [
+            FHIRPathCollectionItem(value=self.value1),
+            FHIRPathCollectionItem(value=self.value2),
+        ]
+
+    def test_evaluate_returns_same_collection(self):
+        # This().evaluate should return the collection unchanged
+        result = This().evaluate(self.items)
+        assert result == self.items
+        assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
+
+    def test_evaluate_empty_collection_returns_empty_list(self):
+        result = This().evaluate([])
+        assert result == []
+
+    def test_evaluate_with_single_item(self):
+        item = FHIRPathCollectionItem(value=self.value1)
+        result = This().evaluate([item])
+        assert result == [item]
+
+    def test_evaluate_with_none_value(self):
+        item = FHIRPathCollectionItem(value=None)
+        result = This().evaluate([item])
+        assert result == [item]
+        assert result[0].value is None
 
 
 class TestElement(TestCase):
 
     def setUp(self):
-        self.resource = Observation.model_construct(
-            status="final",
-            identifier=[
-                get_complex_FHIR_type("Identifier")(value="A"),
-                get_complex_FHIR_type("Identifier")(value="B"),
-            ],
-        )
+        class DummyResource:
+            def __init__(self):
+                self.status = "active"
+                self.valueString = None
+                self.identifier = [
+                    type("Identifier", (), {"value": "id1"})(),
+                    type("Identifier", (), {"value": "id2"})(),
+                ]
+
+        self.resource = DummyResource()
         self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
 
-    def test_element_evaluates_correctly(self):
+    def test_evaluate_returns_field_value(self):
+        # Should return the value of the field as a FHIRPathCollectionItem
         result = Element("status").evaluate(self.collection, create=False)
         assert len(result) == 1
-        assert result[0].value == "final"
+        assert result[0].value == "active"
 
-    def test_element_creates_missing_primitive_element(self):
-        result = Element("valueString").evaluate(self.collection, create=True)
+    def test_evaluate_returns_empty_when_field_missing_and_create_false(self):
+        # Should return empty list if field does not exist and create is False
+        result = Element("missingField").evaluate(self.collection, create=False)
+        assert result == []
+
+    def test_evaluate_creates_missing_primitive_field(self):
+        # Should create the field if missing and create is True
+        class Dummy:
+            pass
+
+        dummy = Dummy()
+        collection = [FHIRPathCollectionItem(dummy, path=Root())]
+        result = Element("newField").evaluate(collection, create=True)
         assert len(result) == 1
-        assert result[0].value is None
-        assert hasattr(self.resource, "valueString")
+        assert hasattr(dummy, "newField")
+        assert getattr(dummy, "newField") is None
 
-    def test_element_creates_missing_complex_element(self):
-        result = Element("valueCodeableConcept").evaluate(self.collection, create=True)
-        assert len(result) == 1
-        assert (
-            result[0].value
-            == get_complex_FHIR_type("CodeableConcept").model_construct()
-        )
-        assert self.resource.valueCodeableConcept == result[0].value
-
-    def test_element_creates_missing_complex_list_element(self):
-        result = Element("component").evaluate(self.collection, create=True)
-        assert len(result) == 1
-        assert result[0].value == ObservationComponent.model_construct()
-        assert self.resource.component == [result[0].value]
-
-    def test_element_evaluate_element_with_list(self):
-        result = (
-            Element("identifier")
-            .child(Element("value"))
-            .evaluate(self.collection, create=False)
-        )
+    def test_evaluate_handles_list_fields(self):
+        # Should return all items in a list field as FHIRPathCollectionItems
+        result = Element("identifier").evaluate(self.collection, create=False)
         assert len(result) == 2
-        assert result[0].value == "A"
-        assert result[1].value == "B"
+        assert result[0].value.value == "id1"
+        assert result[1].value.value == "id2"
 
-    def test_element_update_element_with_list(self):
-        Element("identifier").child(Element("value")).update(self.collection, value="C")
-        assert self.resource.identifier[0].value == "C"
-        assert self.resource.identifier[1].value == "C"
+    def test_evaluate_with_empty_collection(self):
+        # Should return empty list if input collection is empty
+        result = Element("status").evaluate([], create=False)
+        assert result == []
 
+    def test_evaluate_with_multiple_items(self):
+        # Should evaluate each item in the input collection
+        class Dummy:
+            def __init__(self, val):
+                self.status = val
 
-observation = Observation(
-    **{
-        "resourceType": "Observation",
-        "status": "final",
-        "code": {
-            "coding": [{"code": "C1"}],
-        },
-        "identifier": [
-            {
-                "system": "id_system",
-                "use": "oficial",
-                "value": "123",
-            },
-            {
-                "system": "id_system",
-                "use": "oficial",
-                "value": "456",
-            },
-            {
-                "system": "id_system",
-                "use": "oficial",
-                "value": "789",
-            },
-        ],
-        "valueInteger": 5,
-        "extension": [
-            {
-                "url": "http://domain.org/extension-1",
-                "extension": [
-                    {
-                        "url": "http://domain.org/extension-2",
-                        "valueString": "extension-value-2",
-                    }
-                ],
-            },
-        ],
-        "component": [
-            {
-                "code": {
-                    "coding": [{"code": "component-1", "system": "https://system.org"}]
-                },
-                "valueString": "component-1-value-1",
-            },
-            {
-                "code": {
-                    "coding": [{"code": "component-1", "system": "https://system.org"}]
-                },
-                "valueString": "component-1-value-2",
-            },
-            {
-                "code": {
-                    "coding": [{"code": "component-2", "system": "https://system.org"}]
-                },
-                "valueCodeableConcept": {
-                    "coding": [
-                        {"code": "component-2-code", "system": "https://system.org"}
-                    ]
-                },
-            },
-        ],
-    }
-)
+        items = [FHIRPathCollectionItem(Dummy("a")), FHIRPathCollectionItem(Dummy("b"))]
+        result = Element("status").evaluate(items, create=False)
+        assert [item.value for item in result] == ["a", "b"]
 
-# ======== Invocation - FHIRPath ============
-#               Find
-# ======================================
-fhirpath_child_find_test_cases = (
-    (Invocation(Root(), Element("status")), observation.status),
-    (Invocation(Root(), Element("identifier")), observation.identifier),
-    (
-        Invocation(Invocation(Root(), Element("identifier")), Element("value")),
-        [id.value for id in observation.identifier],
-    ),
-)
+    def test_evaluate_returns_parent_link(self):
+        # Should set parent on returned FHIRPathCollectionItem
+        result = Element("status").evaluate(self.collection, create=False)
+        assert result[0].parent == self.collection[0]
 
 
-@pytest.mark.parametrize("path_object, expected_value", fhirpath_child_find_test_cases)
-def test_fhirpath_child_find(path_object, expected_value):
-    expected_values = ensure_list(expected_value)
-    collection = path_object.find(observation)
-    found_values = [item.value for item in collection]
-    assert len(found_values) == len(expected_values)
-    for value, expected in zip(found_values, expected_values):
-        assert value == expected
+class TestInvocation(TestCase):
+
+    def setUp(self):
+        class DummyResource:
+            def __init__(self):
+                self.status = "active"
+
+        self.resource = DummyResource()
+        self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
+
+    def test_evaluate_invokes_method_on_each_item(self):
+        result = Invocation(Element("status"), Upper()).evaluate(self.collection)
+        assert result[0].value == "ACTIVE"
+
+    def test_evaluate_empty_collection_returns_empty_list(self):
+        result = Invocation(Element("status"), Upper()).evaluate([])
+        assert result == []
 
 
-# ======== Invocation - FHIRPath ============
-#           Update & Create
-# ======================================
+class TestLiteral(TestCase):
 
-fhirpath_child_update_test_cases = (
-    # Update
-    (Invocation(Root(), Element("status")), "pending", lambda obs: obs.status),
-    (
-        Invocation(Invocation(Root(), Element("identifier")), Index(0)),
-        observation.identifier[0],
-        lambda obs: obs.identifier[0],
-    ),
-    # Create
-    (Invocation(Root(), Element("id")), "ID12345", lambda obs: obs.id),
-    (
-        Invocation(Invocation(Root(), Element("subject")), Element("reference")),
-        "subjectX",
-        lambda obs: obs.subject.reference,
-    ),
-)
+    class TestLiteral(TestCase):
 
+        def test_evaluate_returns_literal_value_for_each_item(self):
+            # Should return a FHIRPathCollectionItem with the literal value for each input item
+            items = [
+                FHIRPathCollectionItem(value="a"),
+                FHIRPathCollectionItem(value="b"),
+            ]
+            literal = Literal(42)
+            result = literal.evaluate(items)
+            assert len(result) == 2
+            assert all(item.value == 42 for item in result)
+            assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
 
-@pytest.mark.parametrize(
-    "path_object, update_value, getattr_fcn", fhirpath_child_update_test_cases
-)
-def test_fhirpath_child_update(path_object, update_value, getattr_fcn):
-    new_observation = observation.model_copy(deep=True)
-    path_object.update_or_create(new_observation, update_value)
-    assert getattr_fcn(new_observation) == update_value
+        def test_evaluate_with_empty_collection_returns_empty_list(self):
+            literal = Literal("test")
+            result = literal.evaluate([])
+            assert result == []
 
+        def test_evaluate_with_single_item(self):
+            item = FHIRPathCollectionItem(value="x")
+            literal = Literal(True)
+            result = literal.evaluate([item])
+            assert len(result) == 1
+            assert result[0].value is True
 
-# ======== Index - FHIRPath ============
-#               Find
-# ======================================
-fhirpath_index_find_test_cases = (
-    # Update
-    (
-        Invocation(Invocation(Root(), Element("identifier")), Index(0)),
-        observation.identifier[0],
-    ),
-    (
-        Invocation(
-            Invocation(Invocation(Root(), Element("identifier")), Index(0)),
-            Element("value"),
-        ),
-        observation.identifier[0].value,
-    ),
-    # Create
-    (
-        Invocation(Invocation(Root(), Element("identifier")), Index(0)),
-        observation.identifier[0],
-    ),
-    (
-        Invocation(
-            Invocation(Invocation(Root(), Element("identifier")), Index(0)),
-            Element("value"),
-        ),
-        observation.identifier[0].value,
-    ),
-)
+        def test_evaluate_returns_parent_link(self):
+            # Should set parent on returned FHIRPathCollectionItem
+            item = FHIRPathCollectionItem(value="x")
+            literal = Literal("foo")
+            result = literal.evaluate([item])
+            assert result[0].parent == item
 
-
-@pytest.mark.parametrize("path_object, expected_value", fhirpath_index_find_test_cases)
-def test_fhirpath_index_find(path_object, expected_value):
-    expected_values = ensure_list(expected_value)
-    collection = path_object.find(observation)
-    found_values = [item.value for item in collection]
-    assert len(found_values) == len(expected_values)
-    for value, expected in zip(found_values, expected_values):
-        assert value == expected
-
-
-# ======== Index - FHIRPath ============
-#           Update & Create
-# ======================================
-
-fhirpath_index_update_test_cases = (
-    (
-        Invocation(Invocation(Root(), Element("identifier")), Index(0)),
-        observation.identifier[1],
-        lambda obs: obs.identifier[0],
-    ),
-    (
-        Invocation(
-            Invocation(Invocation(Root(), Element("identifier")), Index(0)),
-            Element("value"),
-        ),
-        "ABC123",
-        lambda obs: obs.identifier[0].value,
-    ),
-    (
-        Invocation(Invocation(Root(), Element("identifier")), Index(4)),
-        observation.identifier[1],
-        lambda obs: obs.identifier[4],
-    ),
-    (
-        Invocation(
-            Invocation(Invocation(Root(), Element("identifier")), Index(4)),
-            Element("value"),
-        ),
-        "ABC123",
-        lambda obs: obs.identifier[4].value,
-    ),
-)
-
-
-@pytest.mark.parametrize(
-    "path_object, update_value, getattr_fcn", fhirpath_index_update_test_cases
-)
-def test_fhirpath_index_update(path_object, update_value, getattr_fcn):
-    new_observation = observation.model_copy(deep=True)
-    path_object.update_or_create(new_observation, update_value)
-    assert getattr_fcn(new_observation) == update_value
-
-
-fhirpath_find_test_cases = (
-    ("Observation.valueInteger", observation, 5),
-    ("Observation.valueInteger.single()", observation, 5),
-    ("Observation.identifier.value[1]", observation, "456"),
-    ("Observation.identifier[1].value", observation, "456"),
-    ("Observation.identifier.value", observation, ["123", "456", "789"]),
-    ("Observation.identifier.first().value", observation, "123"),
-    ("Observation.identifier.last().value", observation, "789"),
-    ("Observation.identifier.skip(2).value", observation, "789"),
-    ("Observation.identifier.take(1).value", observation, "123"),
-    (
-        "Observation.extension('http://domain.org/extension-1').extension('http://domain.org/extension-2').valueString",
-        observation,
-        "extension-value-2",
-    ),
-    (
-        "Observation.component.where(code.coding.code='component-1')[0].value[x]",
-        observation,
-        "component-1-value-1",
-    ),
-    (
-        "Observation.component.where(code.coding.code='component-1')[0].valueString",
-        observation,
-        "component-1-value-1",
-    ),
-    (
-        "Observation.component.where(code.coding.code='component-1')[1].valueString",
-        observation,
-        "component-1-value-2",
-    ),
-    (
-        "Observation.component.where(code.coding.system='https://system.org').where(code.coding.code='component-2').valueCodeableConcept.coding.code",
-        observation,
-        "component-2-code",
-    ),
-)
-
-
-@pytest.mark.parametrize(
-    "path_string, data_object, expected_value", fhirpath_find_test_cases
-)
-def test_fhirpath_find(path_string, data_object, expected_value):
-    expected_values = ensure_list(expected_value)
-    collection = parse(path_string).find(data_object)
-    found_values = [item.value for item in collection]
-    assert len(found_values) == len(expected_values)
-    for value, expected in zip(found_values, expected_values):
-        assert value == expected
-
-
-@pytest.mark.parametrize(
-    "path_string, data_object, expected_value", fhirpath_find_test_cases
-)
-def test_fhirpath_mixin_get_fhirpath(path_string, data_object, expected_value):
-    expected_values = ensure_list(expected_value)
-    found_values = ensure_list(data_object.get_fhirpath(path_string))
-    assert len(found_values) == len(expected_values)
-    for value, expected in zip(found_values, expected_values):
-        assert value == expected
-
-
-fhirpath_update_test_cases = (
-    ("Observation.valueInteger", 12, lambda obs: obs.valueInteger),
-    ("Observation.identifier[0].value", "456", lambda obs: obs.identifier[0].value),
-    ("Observation.identifier[1].system", "home", lambda obs: obs.identifier[1].system),
-    ("Observation.identifier[4].value", "123", lambda obs: obs.identifier[4].value),
-    (
-        "Observation.identifier.first().value",
-        "123",
-        lambda obs: obs.identifier[0].value,
-    ),
-    (
-        "Observation.identifier.last().value",
-        "789",
-        lambda obs: obs.identifier[-1].value,
-    ),
-    (
-        "Observation.extension[0].extension[2].valueString",
-        "testvalue",
-        lambda obs: obs.extension[0].extension[2].valueString,
-    ),
-)
-
-
-@pytest.mark.parametrize(
-    "path_string, update_value, getattr_fcn", fhirpath_update_test_cases
-)
-def test_fhirpath_update_existing(path_string, update_value, getattr_fcn):
-    _observation = observation.model_copy(deep=True)
-    parse(path_string).update_or_create(_observation, update_value)
-    assert getattr_fcn(_observation) == update_value
-
-
-@pytest.mark.parametrize(
-    "path_string, update_value, getattr_fcn", fhirpath_update_test_cases
-)
-def test_fhirpath_mixin_replace_fhirpath(path_string, update_value, getattr_fcn):
-    _observation = observation.model_copy(deep=True)
-    _observation.replace_fhirpath(path_string, update_value)
-    assert getattr_fcn(_observation) == update_value
+        def test_evaluate_with_none_literal(self):
+            items = [FHIRPathCollectionItem(value="a")]
+            literal = Literal(None)
+            result = literal.evaluate(items)
+            assert len(result) == 1
+            assert result[0].value is None

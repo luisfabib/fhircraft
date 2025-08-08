@@ -1,15 +1,20 @@
 """The tree navigation module contains the object representations of the types category FHIRPath operators/functions."""
 
+from typing import Any
+
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
+    FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathError,
     FHIRPathFunction,
+    FHIRPathRuntimeError,
+    Literal,
     This,
 )
+from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
+from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
 from fhircraft.utils import ensure_list
-from fhircraft.fhir.path.engine.literals import Quantity, DateTime, Date, Time
-from typing import List
 
 
 class FHIRTypesOperator(FHIRPath):
@@ -17,25 +22,16 @@ class FHIRTypesOperator(FHIRPath):
     Abstract class definition for the category of types FHIRPath operators.
     """
 
-    def __init__(self, left: FHIRPath, type_specifier: str):
+    def __init__(self, left: FHIRPath | FHIRPathCollection, type_specifier: str):
         self.left = left
         self.type_specifier = type_specifier
 
-    def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> bool:
-        create = kwargs.get("create")
-        left_collection = (
-            [
-                item.value if isinstance(item, FHIRPathCollectionItem) else item
-                for item in ensure_list(self.left.evaluate(collection, create))
-            ]
-            if isinstance(self.left, FHIRPath)
-            else ensure_list(self.left)
-        )
-
+    def _get_collection_type(
+        self, collection: FHIRPathCollection, create=False
+    ) -> tuple[Any, Any | None]:
+        left_collection = evaluate_fhirpath_collection(self.left, collection, create)
         if len(left_collection) > 1:
-            raise FHIRPathError(
+            raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} expected a single-item collection for the left expression, instead got a {len(collection)}-items collection."
             )
 
@@ -50,7 +46,7 @@ class FHIRTypesOperator(FHIRPath):
             "Date": Date,
         }.get(self.type_specifier)
 
-        return left_collection[0], type
+        return left_collection[0].value, type
 
     def __str__(self):
         return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.type_specifier.__str__()})"
@@ -74,13 +70,13 @@ class Is(FHIRTypesOperator):
     A representation of the FHIRPath [`is`](https://hl7.org/fhirpath/N1/#is) operator.
 
     Attributes:
-        left (FHIRPath): Left operand.
+        left (FHIRPath | FHIRPathCollection): Left operand.
         type_specifier (str): Type specifier.
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> bool:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the left operand is a collection with a single item and the second operand is a type identifier,
         this operator returns true if the type of the left operand is the type specified in the second operand,
@@ -89,17 +85,17 @@ class Is(FHIRTypesOperator):
         contains more than one item, the evaluator will throw an error. In all other cases this operator returns the empty collection.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection.
 
         Raises:
-            FHIRPathError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         # TODO: Implement propert type specifier handling
-        value, type = super().evaluate(collection, *args, **kwargs)
-        return isinstance(value, type) if type else []
+        value, type = self._get_collection_type(collection, create=create)
+        return [FHIRPathCollectionItem.wrap(isinstance(value, type) if type else [])]
 
 
 class LegacyIs(FHIRPathFunction):
@@ -107,14 +103,18 @@ class LegacyIs(FHIRPathFunction):
     The is() function is supported for backwards compatibility with previous implementations of FHIRPath.
     Just as with the is keyword, the type argument is an identifier that must resolve to the name of a type
     in a model.
+
+    Attributes:
+        left (FHIRPath | FHIRPathCollection): Left operand.
+        type_specifier (str): Type specifier.
     """
 
     def __init__(self, type_specifier: str):
         self.type_specifier = type_specifier
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> bool:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         return Is(This(), self.type_specifier).evaluate(collection)
 
 
@@ -123,13 +123,13 @@ class As(FHIRTypesOperator):
     A representation of the FHIRPath [`as`](https://hl7.org/fhirpath/N1/#as) operator.
 
     Attributes:
-        left (FHIRPath): Left operand.
+        left (FHIRPath | FHIRPathCollection): Left operand.
         type_specifier (str): Type specifier.
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> bool:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         If the left operand is a collection with a single item and the second operand is an identifier,
         this operator returns the value of the left operand if it is of the type specified in the second
@@ -138,17 +138,21 @@ class As(FHIRTypesOperator):
         evaluator will throw an error. Otherwise, this operator returns the empty collection.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            FHIRPathCollection: The output collection.
 
         Raises:
-            FHIRPathError: If either expression evaluates to a non-singleton collection.
+            FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         # TODO: Implement propert type specifier handling
-        value, type = super().evaluate(collection, *args, **kwargs)
-        return value if type is not None and isinstance(value, type) else []
+        value, type = self._get_collection_type(collection, create=create)
+        return (
+            [FHIRPathCollectionItem.wrap(value)]
+            if type is not None and isinstance(value, type)
+            else []
+        )
 
 
 class LegacyAs(FHIRPathFunction):
@@ -156,12 +160,20 @@ class LegacyAs(FHIRPathFunction):
     The as() function is supported for backwards compatibility with previous implementations of FHIRPath.
     Just as with the as keyword, the type argument is an identifier that must resolve to the name of a type
     in a model.
+
+    Attributes:
+        left (FHIRPath | FHIRPathCollection): Left operand.
+        type_specifier (str): Type specifier.
     """
 
-    def __init__(self, type_specifier: str):
-        self.type_specifier = type_specifier
+    def __init__(self, type_specifier: str | Literal):
+        self.type_specifier: str = (
+            type_specifier.value
+            if isinstance(type_specifier, Literal)
+            else type_specifier
+        )
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> bool:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         return As(This(), self.type_specifier).evaluate(collection)

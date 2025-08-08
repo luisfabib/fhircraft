@@ -3,20 +3,18 @@ FHIR adds (compatible) functionality to the set of common FHIRPath functions. So
 are candidates for elevation to the base version of FHIRPath when the next version is released.
 """
 
-import operator
-from typing import Any, List, Optional
-
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPath,
+    FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathError,
     FHIRPathFunction,
     Invocation,
+    Literal,
 )
 from fhircraft.fhir.path.engine.equality import Equals
 from fhircraft.fhir.path.engine.filtering import Where
-from fhircraft.fhir.resources.datatypes.primitives import Canonical, Uri, Url
 from fhircraft.utils import ensure_list, load_url
 
 
@@ -33,26 +31,30 @@ class Extension(FHIRPathFunction):
             Invocation(Element('extension'), Where(Equals(Element('url'), url)))
     """
 
-    def __init__(self, url: str):
+    def __init__(self, url: str | Literal):
+        if isinstance(url, Literal):
+            url = url.value
+        if not isinstance(url, str):
+            raise FHIRPathError("Extension() argument must be a string.")
         self.url = url
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> List[FHIRPathCollectionItem]:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         Filters the input collection for items named `extension` with the given `url`.
         Will return an empty collection if the input collection is empty or the url is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            List[FHIRPathCollectionItem]): The indexed collection item.
+            FHIRPathCollection): The indexed collection item.
         """
-        collection = ensure_list(collection)
         return Invocation(
-            Element("extension"), Where(Equals(Element("url"), self.url))
-        ).evaluate(collection, create=False)
+            Element("extension"),
+            Where(Equals(Element("url"), [FHIRPathCollectionItem.wrap(self.url)])),
+        ).evaluate(collection, create=create)
 
     def __str__(self):
         return f'Extension("{self.url}")'
@@ -61,7 +63,7 @@ class Extension(FHIRPathFunction):
         return f'Extension("{self.url}")'
 
     def __eq__(self, other):
-        return isinstance(other, Extension) and other.url == self.url
+        return isinstance(other, Extension) and str(other.url) == str(self.url)
 
     def __hash__(self):
         return hash((self.url))
@@ -69,11 +71,16 @@ class Extension(FHIRPathFunction):
 
 class TypeChoice(FHIRPath):
 
-    def __init__(self, type_choice_name):
+    def __init__(self, type_choice_name: str | Literal):
+        if isinstance(type_choice_name, Literal):
+            type_choice_name = type_choice_name.value
+        if not isinstance(type_choice_name, str):
+            raise FHIRPathError("TypeChoice() argument must be a string.")
         self.type_choice_name = type_choice_name
 
-    def evaluate(self, collection, *args, **kwargs):
-        collection = ensure_list(collection)
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         return [
             FHIRPathCollectionItem(
                 getattr(item.value, field), path=Element(field), parent=item
@@ -105,23 +112,25 @@ class HasValue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> bool:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         Returns true if the input collection contains a single value which is a FHIR primitive, and it has a primitive
         value (e.g. as opposed to not having a value and just having extensions). Otherwise, the return value is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
             bool
         """
-        collection = ensure_list(collection)
         if len(collection) != 1:
-            return False
-        item = collection[0]
-        return item.value is not None
+            has_value = False
+        else:
+            # TODO: add check for primitive
+            item = collection[0]
+            has_value = item.value is not None
+        return [FHIRPathCollectionItem.wrap(has_value)]
 
 
 class GetValue(FHIRPathFunction):
@@ -130,23 +139,23 @@ class GetValue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> Any:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         Return the underlying system value for the FHIR primitive if the input collection contains a single
         value which is a FHIR primitive, and it has a primitive value (see discussion for hasValue()). Otherwise the return value is empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
             Any: Value
         """
-        collection = ensure_list(collection)
-        if not HasValue().evaluate(collection):
+        if not HasValue().evaluate(collection, create=create):
             return []
-        item = collection[0]
-        return item.value
+        if len(collection) != 1:
+            return []
+        return [collection[0]]
 
 
 class Resolve(FHIRPathFunction):
@@ -155,8 +164,8 @@ class Resolve(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> List[FHIRPathCollectionItem]:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         For each item in the collection, if it is a string that is a `uri` (or `canonical` or `url`), locate the target of the
         reference, and add it to the resulting collection. If the item does not resolve to a resource, the item is ignored
@@ -166,17 +175,15 @@ class Resolve(FHIRPathFunction):
         If the input is empty, the output will be empty.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            collection (List[FHIRPathCollectionItem])): The output collection.
+            collection (FHIRPathCollection): The output collection.
         """
         from fhircraft.fhir.resources.factory import construct_resource_model
 
-        collection = ensure_list(collection)
         output_collection = []
         for item in collection:
-            print(item.value)
             if "Reference" in type(item.value).__name__:
                 resource_url = item.value.reference
             elif isinstance(item.value, str):
@@ -204,14 +211,14 @@ class HtmlChecks(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], *args, **kwargs
-    ) -> bool:
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         When invoked on a single xhtml element returns true if the rules around HTML usage are met, and false if they are not.
         The return value is empty on any other kind of element, or a collection of xhtml elements.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
             bool
@@ -228,5 +235,4 @@ class HtmlChecks(FHIRPathFunction):
             )
         value = collection[0]
         # TODO: Implement HTML validity check
-        return True
-        return True
+        return [FHIRPathCollectionItem.wrap(True)]

@@ -81,7 +81,6 @@ def _assert_construct_core_resource(version, resource_label, filename):
 
 @pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases["R4B"])
 def test_construct_R4B_core_resource(resource_label, filename):
-    print(fhir_resources_test_cases)
     _assert_construct_core_resource("R4B", resource_label, filename)
 
 

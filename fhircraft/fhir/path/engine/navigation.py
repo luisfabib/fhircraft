@@ -1,14 +1,17 @@
 """The tree navigation module contains the object representations of the tree-navigation category FHIRPath functions."""
 
+from typing import List, Optional, Union
+
+from pydantic import BaseModel
+
 from fhircraft.fhir.path.engine.core import (
     Element,
+    FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
 )
 from fhircraft.fhir.path.engine.filtering import Repeat
 from fhircraft.utils import ensure_list
-from pydantic import BaseModel
-from typing import List, Optional, Union
 
 
 class Children(FHIRPathFunction):
@@ -17,16 +20,16 @@ class Children(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], create: bool = False
-    ) -> List[FHIRPathCollectionItem]:
+        self, collection: FHIRPathCollection, create: bool = False
+    ) -> FHIRPathCollection:
         """
         Returns a collection with all immediate child nodes of all items in the input collection.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            List[FHIRPathCollectionItem]): The collection of child items.
+            FHIRPathCollection: The output collection.
         """
         collection = ensure_list(collection)
         children_collection = []
@@ -38,7 +41,7 @@ class Children(FHIRPathFunction):
             else:
                 fields = []
             for field in fields:
-                children_collection.extend(Element(field).evaluate(item, create))
+                children_collection.extend(Element(field).evaluate([item], create))
         return children_collection
 
 
@@ -48,17 +51,17 @@ class Descendants(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: List[FHIRPathCollectionItem], create: bool = False
-    ) -> List[FHIRPathCollectionItem]:
+        self, collection: FHIRPathCollection, create: bool = False
+    ) -> FHIRPathCollection:
         """
         Returns a collection with all descendant nodes of all items in the input collection. The result does not include
         the nodes in the input collection themselves.
 
         Args:
-            collection (List[FHIRPathCollectionItem])): The input collection.
+            collection (FHIRPathCollection): The input collection.
 
         Returns:
-            List[FHIRPathCollectionItem]): The collection of descendant items.
+            FHIRPathCollection: The output collection.
 
         Note:
             This function is a shorthand for `repeat(children())`.
