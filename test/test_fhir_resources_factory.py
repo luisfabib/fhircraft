@@ -7,6 +7,7 @@ from pydantic.fields import FieldInfo
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 import fhircraft.fhir.resources.datatypes.R4B.complex_types as complex_types
+from fhircraft.fhir.resources.definitions.element_definition import ElementDefinition
 from fhircraft.fhir.resources.factory import ResourceFactory, _Unset
 
 
@@ -21,89 +22,117 @@ class FactoryTestCase(TestCase):
         )
 
 
-class TestBuildTreeStructure(FactoryTestCase):
+class TestBuildElementTreeStructure(FactoryTestCase):
 
     def test_correctly_builds_tree_structure(self):
         elements = [
-            {
-                "path": "Patient.name",
-                "id": "Patient.name",
-                "type": [{"code": "string"}],
-            },
-            {
-                "path": "Patient.address",
-                "id": "Patient.address",
-                "type": [{"code": "Address"}],
-            },
-            {
-                "path": "Patient.identifier",
-                "id": "Patient.identifier",
-                "type": [{"code": "Identifier"}],
-            },
+            ElementDefinition(
+                **{
+                    "path": "Patient.name",
+                    "id": "Patient.name",
+                    "type": [{"code": "string"}],
+                }
+            ),
+            ElementDefinition(
+                **{
+                    "path": "Patient.address",
+                    "id": "Patient.address",
+                    "type": [{"code": "Address"}],
+                }
+            ),
+            ElementDefinition(
+                **{
+                    "path": "Patient.identifier",
+                    "id": "Patient.identifier",
+                    "type": [{"code": "Identifier"}],
+                }
+            ),
         ]
-        tree_structure = self.factory.build_tree_structure(elements)
-        assert "Patient" in tree_structure["children"]
-        assert "name" in tree_structure["children"]["Patient"]["children"]
-        assert "address" in tree_structure["children"]["Patient"]["children"]
-        assert "identifier" in tree_structure["children"]["Patient"]["children"]
+        nodes = self.factory._build_element_tree_structure(elements)
+        node = nodes[0]
+        assert "Patient" == node.node_label
+        assert "name" in node.children
+        assert "Patient.name" == node.children["name"].id
+        assert node.children["name"].type is not None
+        assert "string" == node.children["name"].type[0].code
+        assert "address" in node.children
+        assert "Patient.address" == node.children["address"].id
+        assert node.children["address"].type is not None
+        assert "Address" == node.children["address"].type[0].code
+        assert "identifier" in node.children
+        assert "Patient.identifier" == node.children["identifier"].id
+        assert node.children["identifier"].type is not None
+        assert "Identifier" == node.children["identifier"].type[0].code
 
     def test_handles_single_level_paths(self):
         elements = [
-            {"path": "name", "id": "name", "type": [{"code": "string"}]},
-            {"path": "address", "id": "address", "type": [{"code": "Address"}]},
+            ElementDefinition(
+                **{"path": "name", "id": "name", "type": [{"code": "string"}]}
+            ),
+            ElementDefinition(
+                **{"path": "address", "id": "address", "type": [{"code": "Address"}]}
+            ),
         ]
-        tree_structure = self.factory.build_tree_structure(elements)
-        assert "name" in tree_structure["children"]
-        assert "address" in tree_structure["children"]
+        nodes = self.factory._build_element_tree_structure(elements)
+        assert "name" in [node.node_label for node in nodes]
+        assert "address" in [node.node_label for node in nodes]
 
     def test_processes_multiple_elements_with_different_paths(self):
         elements = [
-            {
-                "path": "Patient.name",
-                "id": "Patient.name",
-                "type": [{"code": "string"}],
-            },
-            {
-                "path": "Patient.address.city",
-                "id": "Patient.address.city",
-                "type": [{"code": "string"}],
-            },
+            ElementDefinition(
+                **{
+                    "path": "Patient.name",
+                    "id": "Patient.name",
+                    "type": [{"code": "string"}],
+                }
+            ),
+            ElementDefinition(
+                **{
+                    "path": "Patient.address.city",
+                    "id": "Patient.address.city",
+                    "type": [{"code": "string"}],
+                }
+            ),
         ]
-        tree_structure = self.factory.build_tree_structure(elements)
-        assert "Patient" in tree_structure["children"]
-        assert "name" in tree_structure["children"]["Patient"]["children"]
-        assert "address" in tree_structure["children"]["Patient"]["children"]
-        assert (
-            "city"
-            in tree_structure["children"]["Patient"]["children"]["address"]["children"]
-        )
+        nodes = self.factory._build_element_tree_structure(elements)
+        assert "Patient" == nodes[0].node_label
+        assert "name" in nodes[0].children
+        assert "address" in nodes[0].children
+        assert "city" in nodes[0].children["address"].children
 
     def test_handles_slicing(self):
         elements = [
-            {"path": "component", "id": "component", "type": [{"code": "string"}]},
-            {
-                "path": "component",
-                "id": "component:sliceA",
-                "type": [{"code": "Address"}],
-            },
-            {
-                "path": "component",
-                "id": "component:sliceA.valueString",
-                "type": [{"code": "string"}],
-            },
+            ElementDefinition(
+                **{"path": "component", "id": "component", "type": [{"code": "string"}]}
+            ),
+            ElementDefinition(
+                **{
+                    "path": "component",
+                    "id": "component:sliceA",
+                    "type": [{"code": "Address"}],
+                }
+            ),
+            ElementDefinition(
+                **{
+                    "path": "component",
+                    "id": "component:sliceA.valueString",
+                    "type": [{"code": "string"}],
+                }
+            ),
         ]
-        tree_structure = self.factory.build_tree_structure(elements)
-        assert "component" in tree_structure["children"]
-        assert "sliceA" in tree_structure["children"]["component"]["slices"]
+        nodes = self.factory._build_element_tree_structure(elements)
+        print([node.model_dump(exclude_unset=True) for node in nodes])
+        assert "component" == nodes[0].node_label
+        assert "sliceA" == nodes[0].slices["sliceA"].node_label
         assert (
             "valueString"
-            in tree_structure["children"]["component"]["slices"]["sliceA"]["children"]
+            == nodes[0].slices["sliceA"].children["valueString"].node_label
         )
 
     def test_handles_empty_list_of_elements(self):
         elements = []
-        tree_structure = self.factory.build_tree_structure(elements)
-        assert tree_structure == {}
+        nodes = self.factory._build_element_tree_structure(elements)
+        assert nodes == []
 
 
 class TestGetFhirType(FactoryTestCase):
@@ -194,7 +223,7 @@ class TestProcessPatternOrFixedValues(FactoryTestCase):
     def test_processes_value_constraint_on_primitive(
         self, attribute, expected_type, expected_value
     ):
-        element = {f"{self.prefix}{attribute}": expected_value}  # type: ignore
+        element = ElementDefinition.model_construct(**{f"{self.prefix}{attribute}": expected_value})  # type: ignore
         result = self.factory._process_pattern_or_fixed_values(element, self.prefix)  # type: ignore
         assert (
             type(result) in get_args(expected_type.__value__)
@@ -229,13 +258,13 @@ class TestProcessPatternOrFixedValues(FactoryTestCase):
     def test_processes_value_constraint_on_complex_type(
         self, attribute, expected_type, expected_value
     ):
-        element = {f"{self.prefix}{attribute}": expected_value}  # type: ignore
+        element = ElementDefinition.model_construct(**{f"{self.prefix}{attribute}": expected_value})  # type: ignore
         result = self.factory._process_pattern_or_fixed_values(element, self.prefix)  # type: ignore
         assert isinstance(result, expected_type)
         assert result == expected_type.model_validate(expected_value)
 
     def test_processes_no_constraints(self):
-        element = {}
+        element = ElementDefinition.model_construct()
         result = self.factory._process_pattern_or_fixed_values(element, self.prefix)  # type: ignore
         assert result is None
 
@@ -244,9 +273,9 @@ class TestProcessCardinalityConstraints(FactoryTestCase):
 
     @parameterized.expand(
         [
-            ({"min": "0", "max": "1"}, 0, 1),
-            ({"min": "1", "max": "2"}, 1, 2),
-            ({"min": "0", "max": "*"}, 0, 99999),
+            (ElementDefinition.model_construct(min=0, max="1"), 0, 1),
+            (ElementDefinition.model_construct(min=1, max="2"), 1, 2),
+            (ElementDefinition.model_construct(min=0, max="*"), 0, 99999),
         ]
     )
     def test_cardinality_constraints(self, element, expected_min, expected_max):

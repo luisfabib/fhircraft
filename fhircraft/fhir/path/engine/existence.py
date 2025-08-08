@@ -1,5 +1,7 @@
 """The filtering module contains the object representations of the existence-category FHIRPath functions."""
 
+from typing import List, Optional, Union
+
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollectionItem,
@@ -7,7 +9,6 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
 )
 from fhircraft.fhir.path.engine.filtering import Where
-from typing import List, Optional, Union
 
 
 class Empty(FHIRPathFunction):
@@ -380,4 +381,5 @@ class IsDistinct(FHIRPathFunction):
         Returns:
             bool
         """
+        return len(list(set(collection))) == len(collection)
         return len(list(set(collection))) == len(collection)

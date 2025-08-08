@@ -6,15 +6,16 @@ To use these functions over a collection with multiple items, one may use filter
     Patient.name.given.select(substring(0))
 """
 
+import re
+from typing import Any, List, Optional
+
 from fhircraft.fhir.path.engine.core import (
-    FHIRPathCollectionItem,
-    FHIRPathFunction,
-    FHIRPathError,
     FHIRPath,
+    FHIRPathCollectionItem,
+    FHIRPathError,
+    FHIRPathFunction,
 )
 from fhircraft.utils import ensure_list
-from typing import List, Any, Optional
-import re
 
 
 class StringManipulationFunction(FHIRPathFunction):
@@ -165,6 +166,11 @@ class StartsWith(StringManipulationFunction):
         collection = super().validate_collection(collection)
         if not collection or not self.prefix:
             return []
+        if not isinstance(self.prefix, str):
+            evaluation = self.prefix.evaluate(collection, create=False)
+            if not evaluation:
+                return []
+            self.prefix = evaluation[0].value
         return collection[0].value.startswith(self.prefix)
 
 

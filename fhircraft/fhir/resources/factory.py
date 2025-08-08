@@ -5,12 +5,13 @@ Pydantic FHIR Model Factory
 
 import inspect
 import json
+import warnings
 from collections import defaultdict
 
 # Standard modules
 from enum import Enum
 from functools import partial
-from typing import Any, Dict, List, Literal, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypeVar, Union
 
 import requests
 
@@ -18,6 +19,7 @@ import requests
 from pydantic import BaseModel, Field, create_model, field_validator, model_validator
 from pydantic.dataclasses import dataclass
 from pydantic.fields import FieldInfo
+from pydantic.functional_validators import _decorators as _validators
 from pydantic_core import PydanticUndefined
 from typing_extensions import Annotated
 
@@ -27,6 +29,11 @@ import fhircraft.fhir.resources.datatypes.primitives as primitives
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
+from fhircraft.fhir.resources.definitions import (
+    ElementDefinition,
+    ElementDefinitionConstraint,
+    StructureDefinition,
+)
 from fhircraft.utils import (
     capitalize,
     ensure_list,
@@ -38,6 +45,14 @@ ModelT = TypeVar("ModelT", bound="BaseModel")
 SlicedModelT = TypeVar("SlicedModelT", bound="FHIRSliceModel")
 
 _Unset: Any = PydanticUndefined
+
+
+class ElementDefinitionNode(ElementDefinition):
+    """A node in the ElementDefinition tree structure."""
+
+    node_label: str = Field(...)
+    children: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
+    slices: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
 
 
 class ResourceFactory:
@@ -113,32 +128,76 @@ class ResourceFactory:
         response.raise_for_status()
         return response.json()
 
-    def build_tree_structure(self, elements: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _build_element_tree_structure(
+        self, elements: List[ElementDefinition]
+    ) -> List[ElementDefinitionNode]:
         """
-        Builds a tree from a list of ElementDefinitions.
+        Builds a hierarchical tree structure of ElementDefinitionNode objects from a flat list of ElementDefinition elements.
 
-        Parameters:
-            elements (List[Dict[str, Any]]): A list of ElementDefinitions to build the tree from.
+        This method organizes the provided FHIR ElementDefinition elements into a nested tree based on their dot-separated IDs,
+        handling both regular child elements and slice definitions (denoted by a colon in the ID part).
+
+        Args:
+            elements (List[ElementDefinition]):
+                A list of ElementDefinition objects representing the structure to be organized.
 
         Returns:
-            Dict[str, Any]: A tree structure representing the ElementDefinitions.
+            List[ElementDefinitionNode]:
+                A list of top-level ElementDefinitionNode objects representing the root children of the constructed tree.
+
+        Notes:
+            - Slice definitions (e.g., "element:sliceName") are handled by creating separate nodes under the appropriate parent.
+            - Each node in the tree is an instance of ElementDefinitionNode, with children and slices populated as needed.
+            - The root node is a synthetic node and is not included in the returned list.
         """
-        tree = defaultdict(dict)
+        root = ElementDefinitionNode(
+            id="__root__",
+            path="__root__",
+            node_label="__root__",
+            children={},
+            slices={},
+        )
         for element in elements:
-            current = tree
-            for part in element["id"].split("."):
+            current = root
+            id_parts = (element.id or "").split(".")
+            for index, part in enumerate(id_parts):
                 if ":" in part:
                     # Handle slice definitions
                     part, sliceName = part.split(":")
-                    current = current["children"][part]
-                    current["slices"] = current.get("slices", {})
-                    current = current["slices"].setdefault(sliceName, {})
+                    current = current.children[part]
+                    current.slices = current.slices or {}
+                    current = current.slices.setdefault(
+                        sliceName,
+                        ElementDefinitionNode.model_validate(
+                            {
+                                "node_label": sliceName,
+                                "path": "__root__",
+                                **(
+                                    element.model_dump(exclude_unset=True)
+                                    if index == len(id_parts) - 1
+                                    else {}
+                                ),
+                            }
+                        ),
+                    )
                 else:
                     # Handle children elements
-                    current["children"] = current.get("children", {})
-                    current = current["children"].setdefault(part, {})
-            current.update(element)
-        return tree
+                    current.children = current.children or {}
+                    current = current.children.setdefault(
+                        part,
+                        ElementDefinitionNode.model_validate(
+                            {
+                                "node_label": part,
+                                "path": "__root__",
+                                **(
+                                    element.model_dump(exclude_unset=True)
+                                    if index == len(id_parts) - 1
+                                    else {}
+                                ),
+                            }
+                        ),
+                    )
+        return list(root.children.values())
 
     def _get_complex_FHIR_type(self, field_type_name: str) -> type | str:
         """
@@ -242,7 +301,7 @@ class ResourceFactory:
         )
 
     def _process_pattern_or_fixed_values(
-        self, element: Dict[str, Any], constraint_prefix: str
+        self, element: ElementDefinition, constraint_prefix: str
     ) -> Any:
         """
         Process the pattern or fixed values of a StructureDefinition element.
@@ -255,18 +314,16 @@ class ResourceFactory:
             Any: The constrained value after processing.
         """
         # Determine the name of the StructureDefinition element's attribute that starts with either the prefix 'fixed[x]' or 'pattern[x]'
-        constraint_attribute = (
-            next(
-                (
-                    attribute
-                    for attribute in element
-                    if attribute.startswith(constraint_prefix)
-                ),
-                None,
-            )
-            or ""
+        constraint_attribute, constrained_value = next(
+            (
+                (attribute, getattr(element, attribute))
+                for attribute in element.__class__.model_fields
+                if attribute.startswith(constraint_prefix)
+                and getattr(element, attribute) is not None
+            ),
+            ("", None),
         )
-        if (constrained_value := element.get(constraint_attribute)) is not None:
+        if constrained_value:
             # Get the type of value that is constrained to a preset value
             constrained_type = self._get_complex_FHIR_type(
                 constraint_attribute.replace(constraint_prefix, "")
@@ -329,7 +386,7 @@ class ResourceFactory:
         return fields, validators, properties
 
     def _build_element_slice_models(
-        self, element: dict, slice_base: Any
+        self, element: ElementDefinitionNode, slice_base: Any
     ) -> List[type[FHIRSliceModel]]:
         """
         Constructs and returns a list of FHIR slice model classes for a given element definition.
@@ -350,9 +407,9 @@ class ResourceFactory:
             List[type[FHIRSliceModel]]: A list of dynamically constructed FHIR slice model classes.
         """
         slice_types = []
-        for slice_name, slice_element in element["slices"].items():
-            if (slice_element_types := slice_element.get("type")) and (
-                slice_element_canonical_urls := slice_element_types[0].get("profile")
+        for slice_name, slice_element in element.slices.items():
+            if (slice_element_types := slice_element.type) and (
+                slice_element_canonical_urls := slice_element_types[0].profile
             ):
                 # Construct the slice model from the canonical URL
                 slice_model = ResourceFactory().construct_resource_model(
@@ -395,7 +452,7 @@ class ResourceFactory:
         # Create annotated type as union of slice models and original type (important, last in the definition)
         return slice_types
 
-    def _parse_element_cardinality(self, element: Dict[str, Any]) -> Tuple[int, int]:
+    def _parse_element_cardinality(self, element: ElementDefinition) -> Tuple[int, int]:
         """
         Parses the cardinality constraints from a FHIR element definition.
 
@@ -412,18 +469,18 @@ class ResourceFactory:
             - If "max" is "*", uses 99999 as a stand-in for unbounded.
             - If "max" is not numeric or "*", attempts to convert to infinity.
         """
-        min_card = int(element["min"]) if str(element["min"]).isnumeric() else 0
-        max_string = str(element["max"])
+        min_card = int(element.min) if element.min else 0
+        max_string = str(element.max)
         if max_string == "*":
             max_card = 99999
         elif max_string.isnumeric():
             max_card = int(max_string)
         else:
-            max_card = int(float("inf"))
+            max_card = 99999
         return min_card, max_card
 
     def _add_model_constraint_validator(
-        self, constraint: dict, validators: dict
+        self, constraint: ElementDefinitionConstraint, validators: dict
     ) -> dict:
         """
         Adds a model constraint validator based on the provided constraint.
@@ -436,22 +493,27 @@ class ResourceFactory:
             dict: The updated dictionary of validators.
         """
         # Construct function name for validator
-        constraint_name = constraint["key"].replace("-", "_")
+        constraint_name = constraint.key.replace("-", "_")
         validator_name = f"FHIR_{constraint_name}_constraint_model_validator"
         # Add the current field to the list of validated fields
-        validators[validator_name] = model_validator(mode="after")(
-            partial(
-                fhir_validators.validate_model_constraint,
-                expression=constraint["expression"],
-                human=constraint["human"],
-                key=constraint["key"],
-                severity=constraint["severity"],
+        if constraint.expression:
+            validators[validator_name] = model_validator(mode="after")(
+                partial(
+                    fhir_validators.validate_model_constraint,
+                    expression=constraint.expression,
+                    human=constraint.human,
+                    key=constraint.key,
+                    severity=constraint.severity,
+                )
             )
-        )
         return validators
 
     def _add_element_constraint_validator(
-        self, field: str, constraint: dict, base: Any, validators: dict
+        self,
+        field: str,
+        constraint: ElementDefinitionConstraint,
+        base: Any,
+        validators: dict,
     ) -> dict:
         """
         Adds a validator for a specific element constraint to the validators dictionary.
@@ -466,7 +528,7 @@ class ResourceFactory:
             dict: The updated dictionary of validators.
         """
         # Construct function name for validator
-        constraint_name = constraint["key"].replace("-", "_")
+        constraint_name = constraint.key.replace("-", "_")
         validator_name = f"FHIR_{constraint_name}_constraint_validator"
         # Check if validator has already been constructed for another field
         validate_fields = [field]
@@ -483,20 +545,27 @@ class ResourceFactory:
                 ].info.fields
             )
         # Add the current field to the list of validated fields
-        validators[validator_name] = field_validator(*validate_fields, mode="after")(
-            partial(
-                fhir_validators.validate_element_constraint,
-                expression=constraint["expression"],
-                human=constraint["human"],
-                key=constraint["key"],
-                severity=constraint["severity"],
+        if constraint.expression:
+            validators[validator_name] = field_validator(
+                *validate_fields, mode="after"
+            )(
+                partial(
+                    fhir_validators.validate_element_constraint,
+                    expression=constraint.expression,
+                    human=constraint.human,
+                    key=constraint.key,
+                    severity=constraint.severity,
+                )
             )
-        )
         return validators
 
     def _process_FHIR_structure_into_Pydantic_components(
-        self, structure: dict, base: Any | None = None
-    ):
+        self, structure: ElementDefinitionNode, base: Any | None = None
+    ) -> Tuple[
+        Dict[str, Any],
+        Dict[str, Callable],
+        Dict[str, Callable[..., Any]],
+    ]:
         """
         Processes the FHIR structure elements into Pydantic components.
 
@@ -510,16 +579,20 @@ class ResourceFactory:
         fields = {}
         validators = {}
         properties = {}
-        for name, element in structure.get("children", {}).items():
+        for name, element in structure.children.items():
             if base and name in base.model_fields:
                 continue
             # Get cardinality of element
             min_card, max_card = self._parse_element_cardinality(element)
             # Parse the FHIR types of the element
-            field_types = [
-                self._get_complex_FHIR_type(field_type["code"])
-                for field_type in element.get("type", [])
-            ]
+            field_types = (
+                [
+                    self._get_complex_FHIR_type(field_type.code)
+                    for field_type in element.type
+                ]
+                if element.type
+                else []
+            )
             # If has no type, skip element
             if not field_types:
                 continue
@@ -532,7 +605,7 @@ class ResourceFactory:
                     fields,
                     validators,
                     properties,
-                    description=element.get("short"),
+                    description=element.short,
                 )
                 continue
             # Handle number of element types
@@ -569,13 +642,13 @@ class ResourceFactory:
                 field_default = fixed_value
                 field_type = singleChoice
             # Process FHIR constraint invariants on the element
-            if constraints := element.get("constraint"):
+            if constraints := element.constraint:
                 for constraint in constraints:
                     validators = self._add_element_constraint_validator(
                         name, constraint, base, validators
                     )
             # Process FHIR slicing on the element, if present
-            if element.get("slices"):
+            if element.slices:
                 field_type = Annotated[
                     Union[
                         tuple(
@@ -596,7 +669,7 @@ class ResourceFactory:
                     )
                 )
             # Process element children, if present
-            elif element.get("children"):
+            elif element.children:
                 backbone_model_name = (
                     capitalize(self.Config.resource_name).strip()
                     + capitalize(name).strip()
@@ -608,7 +681,7 @@ class ResourceFactory:
                 )
                 for attribute, property_getter in subfield_properties.items():
                     setattr(field_type, attribute, property(property_getter))
-                if element["children"]["extension"].get("slices"):
+                if element.children["extension"].slices:
                     extension_slice_base_type = get_complex_FHIR_type(
                         "Extension", self.Config.FHIR_release
                     )
@@ -617,7 +690,7 @@ class ResourceFactory:
                             tuple(
                                 [
                                     *self._build_element_slice_models(
-                                        element["children"]["extension"],
+                                        element.children["extension"],
                                         extension_slice_base_type,
                                     ),
                                     extension_slice_base_type,
@@ -628,14 +701,12 @@ class ResourceFactory:
                     ]
 
                     self._build_element_slice_models(
-                        element["children"]["extension"],
+                        element.children["extension"],
                         get_complex_FHIR_type("Extension", self.Config.FHIR_release),
                     )
                     # Get cardinality of extension element
                     extension_min_card, extension_max_card = (
-                        self._parse_element_cardinality(
-                            element["children"]["extension"]
-                        )
+                        self._parse_element_cardinality(element.children["extension"])
                     )
                     # Add slicing cardinality validator for field
                     subfield_validators[
@@ -661,7 +732,7 @@ class ResourceFactory:
                 min_card,
                 max_card,
                 default=field_default,
-                description=element.get("short"),
+                description=element.short,
             )
             # IF the field is of primitive type, add aliased field to accomodate their extensions
             if hasattr(primitives, str(field_type)):
@@ -678,7 +749,7 @@ class ResourceFactory:
     def construct_resource_model(
         self,
         canonical_url: str | None = None,
-        structure_definition: Union[str, dict] | None = None,
+        structure_definition: Union[str, dict, StructureDefinition] | None = None,
         base_model: type[ModelT] = FHIRBaseModel,
     ) -> type[ModelT | BaseModel]:
         """
@@ -694,6 +765,7 @@ class ResourceFactory:
         # If the model has been constructed before, return the cached model
         if canonical_url in self.construction_cache:
             return self.construction_cache[canonical_url]
+
         # Download the FHIR structure definition if the canonical URL has been specified
         _structure_definition = None
         if isinstance(structure_definition, str):
@@ -707,31 +779,44 @@ class ResourceFactory:
             raise ValueError(
                 "No StructureDefinition provided or downloaded. Please provide a valid StructureDefinition."
             )
+        # Parse and validate the StructureDefinition
+        _structure_definition = StructureDefinition.model_validate(
+            _structure_definition
+        )
         # Check that the snapshot is available in the FHIR structure definition
         if (
-            "snapshot" not in _structure_definition
-            or "element" not in _structure_definition["snapshot"]
+            not _structure_definition.snapshot
+            or not _structure_definition.snapshot.element
         ):
             raise ValueError(
                 "Invalid StructureDefinition: Missing 'snapshot' or 'element' field"
             )
-        # Pre-process the snapshort elements into a tree structure to simplify model construction later
-        tree = self.build_tree_structure(_structure_definition["snapshot"]["element"])
-        resource_type = _structure_definition["type"]
-        structure = tree["children"][resource_type]
+        # Pre-process the snapshot elements into a tree structure to simplify model construction later
+        nodes = self._build_element_tree_structure(
+            _structure_definition.snapshot.element
+        )
+        assert (
+            len(nodes) == 1
+        ), "StructureDefinition snapshot must have exactly one root element."
+        structure = nodes[0]
+        resource_type = _structure_definition.type
         # Configure the factory for the current FHIR environment
+        if not _structure_definition.fhirVersion:
+            warnings.warn(
+                "StructureDefinition does not specify FHIR version, defaulting to R4B."
+            )
         self.Config = self.FactoryConfig(
             FHIR_release=get_FHIR_release_from_version(
-                _structure_definition["fhirVersion"]
+                _structure_definition.fhirVersion or "R4B"
             ),
-            resource_name=_structure_definition["name"],
+            resource_name=_structure_definition.name,
         )
         # Process the FHIR resource's elements & constraints into Pydantic fields & validators
         fields, validators, properties = (
             self._process_FHIR_structure_into_Pydantic_components(structure)
         )
         # Process resource-level constraints
-        for constraint in structure["constraint"]:
+        for constraint in structure.constraint or []:
             validators = self._add_model_constraint_validator(constraint, validators)
         # If the resource has metadata, prefill the information
         if "meta" in fields:
@@ -740,8 +825,8 @@ class ResourceFactory:
             fields["meta"] = (
                 Optional[Meta],
                 Meta(
-                    profile=[_structure_definition["url"]],
-                    versionId=_structure_definition["version"],
+                    profile=[_structure_definition.url],
+                    versionId=_structure_definition.version,
                 ),
             )
         # Construct the Pydantic model representing the FHIR resource
@@ -753,7 +838,7 @@ class ResourceFactory:
             properties=properties,
         )
         # Add the current model to the cache
-        self.construction_cache[_structure_definition["url"]] = model
+        self.construction_cache[_structure_definition.url] = model
         return model
 
     def construct_dataelement_model(self, structure_definition):
@@ -764,9 +849,12 @@ class ResourceFactory:
             raise ValueError(
                 "Invalid StructureDefinition: Missing 'snapshot' or 'element' field"
             )
-        resource_type = structure_definition["type"]
         elements = structure_definition["snapshot"]["element"]
-        tree = self.build_tree_structure(elements)
+        nodes = self._build_element_tree_structure(elements)
+        assert (
+            len(nodes) == 1
+        ), "StructureDefinition snapshot must have exactly one root element."
+        structure = nodes[0]
         # Configure the factory for the current FHIR environment
         self.Config = self.FactoryConfig(
             FHIR_release=get_FHIR_release_from_version(
@@ -774,7 +862,6 @@ class ResourceFactory:
             ),
             resource_name=structure_definition["name"],
         )
-        structure = tree["children"][resource_type]
         if "baseDefinition" in structure_definition:
             base_name = structure_definition["baseDefinition"].replace(
                 "http://hl7.org/fhir/StructureDefinition/", ""
@@ -785,7 +872,7 @@ class ResourceFactory:
         fields, validators, properties = (
             self._process_FHIR_structure_into_Pydantic_components(structure, base)
         )
-        for constraint in structure.get("constraint", []):
+        for constraint in structure.constraint or []:
             validators = self._add_model_constraint_validator(constraint, validators)
         model = create_model(
             self.Config.resource_name,
@@ -793,7 +880,7 @@ class ResourceFactory:
             __base__=base,
             __validators__=validators,
         )
-        model.__doc__ = structure["short"]
+        model.__doc__ = structure.short
         for attribute, property_getter in properties.items():
             setattr(model, attribute, property(property_getter))
         return model
@@ -805,9 +892,6 @@ class ResourceFactory:
         self.construction_cache = {}
 
 
-factory = ResourceFactory()
-construct_resource_model = factory.construct_resource_model
-clear_chache = factory.clear_chache
 factory = ResourceFactory()
 construct_resource_model = factory.construct_resource_model
 clear_chache = factory.clear_chache

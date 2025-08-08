@@ -196,7 +196,7 @@ class FHIRPathCollectionItem(object):
         return f"FHIRPathCollectionItem(value={self.value.__repr__()[:10]}, element={self.element.__repr__()[:10]}..., index={self.index}, parent={self.parent.full_path if self.parent else None})"
 
     def __hash__(self):
-        return hash((self.value, self.path, self.parent))
+        return hash((self.path, self.parent))
 
 
 class FHIRPath(ABC):
@@ -215,11 +215,13 @@ class FHIRPath(ABC):
         Returns:
             (Any): The extracted value(s), or None if no values are found.
         """
-        collection = self.find(data)
+        collection = [
+            FHIRPathCollectionItem.wrap(item) for item in ensure_list(self.find(data))
+        ]
         values = [
             item.value
             for item in collection
-            if item.value and not isinstance(item.value, bool)
+            if item.value or isinstance(item.value, bool)
         ]
         if len(values) == 1:
             values = values[0]

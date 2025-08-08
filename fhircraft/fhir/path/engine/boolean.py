@@ -3,13 +3,14 @@ For all boolean operators, the collections passed as operands are first evaluate
 The operators then use three-valued logic to propagate empty operands.
 """
 
+from typing import Any, List, Optional, Union
+
 from fhircraft.fhir.path.engine.core import (
-    FHIRPathCollectionItem,
     FHIRPath,
+    FHIRPathCollectionItem,
     FHIRPathFunction,
 )
 from fhircraft.utils import ensure_list
-from typing import List, Any, Optional, Union
 
 
 def _evaluate_boolean_expressions(left, right, collection, create):
@@ -22,7 +23,7 @@ def _evaluate_boolean_expressions(left, right, collection, create):
         left_boolean = left_collection
     else:
         if len(left_collection) > 0:
-            left_boolean = bool(left_collection)
+            left_boolean = bool(left_collection[0].value)
         else:
             left_boolean = None
     right_collection = (
@@ -34,7 +35,7 @@ def _evaluate_boolean_expressions(left, right, collection, create):
         right_boolean = right_collection
     else:
         if len(right_collection) > 0:
-            right_boolean = bool(right_collection)
+            right_boolean = bool(right_collection[0].value)
         else:
             right_boolean = None
     return left_boolean, right_boolean
@@ -331,4 +332,5 @@ class Not(FHIRPathFunction):
                 boolean = bool(collection)
             else:
                 return []
+        return not boolean
         return not boolean
