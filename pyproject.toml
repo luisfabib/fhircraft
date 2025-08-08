@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = 'fhircraft'
-version='0.1.0'
+version='0.1.1'
 description = 'Pydantic FHIR modeling'
 authors = [
     {name = 'Luis Fábregas-Ibáñez', email = 'luisfabib@gmail.com'},
@@ -57,7 +57,7 @@ dev = [
 ]
 docs = [
     "mkdocs-material==9.5.27",
-    "mkdocstrings[python]==0.25.1",
+    "mkdocstrings[python]==0.26.1",
     "mkdocs-gen-files==0.5.0",
     "mkdocs-literate-nav==0.6.1",
 ]
