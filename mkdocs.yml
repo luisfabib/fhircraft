@@ -1,22 +1,27 @@
 site_name: Fhircraft
-site_url: https://mydomain.org/docs
+site_url: https://github.com/luisfabib/fhircraft
 repo_url: https://github.com/luisfabib/fhircraft
 repo_name: luisfabib/fhircraft
+copyright: Copyright &copy; 2024 - 2025 Luis Fábregas-Ibáñez and contributors
 
 theme:
-
+  icon:
+    repo: fontawesome/brands/github
   favicon: assets/images/favicon.png
   logo: assets/logo_white.svg
   name: material
   features:
     - content.code.copy
-    - navigation.path    
+    - content.code.annotate
+    - navigation.expand
+    - navigation.path   
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.sections 
   palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
-      scheme: slate
-      primary: pink
-      accent: pink
       toggle:
         icon: material/brightness-auto
         name: Switch to light mode
@@ -31,7 +36,7 @@ theme:
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: pink
+      primary: black
       accent: pink
       toggle:
         icon: material/brightness-4
@@ -40,8 +45,16 @@ theme:
 extra_css:
   - stylesheets/extra.css
 
+extra:
+  social:
+    - icon: fontawesome/brands/github 
+      link: https://github.com/luisfabib/fhircraft
+    - icon: fontawesome/brands/python 
+      link: https://pypi.org/project/fhircraft/
+
 markdown_extensions:
   - attr_list
+  - md_in_html
   - admonition
   - pymdownx.tabbed:
       alternate_style: true
@@ -63,6 +76,8 @@ plugins:
   - gen-files:
       scripts:
         - scripts/gen_ref_pages.py
+        - scripts/gen_credits_page.py
+        - scripts/gen_repo_pages.py
   - mkdocstrings:
       handlers:
         python:
