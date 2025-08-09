@@ -1,6 +1,9 @@
 {"SUMMARY.md": {"created": "2024-08-19T12:40:26"}}
+{"community/contributing.md": {"created": "2025-08-09T13:51:46.266668"}}
 {"index.md": {"created": "2024-06-27T17:10:46"}}
-{"installation.md": {"created": "2024-06-27T17:10:46"}}
-{"quickstart.md": {"created": "2024-08-19T12:40:26"}}
-{"user-guide/fhir-resources.md": {"created": "2024-08-20T07:56:14"}}
+{"quickstart/basics.md": {"created": "2025-08-09T13:51:46.267668"}}
+{"quickstart/installation.md": {"created": "2025-08-09T13:53:38.069332"}}
+{"quickstart/tips.md": {"created": "2025-08-09T13:51:46.267668"}}
+{"user-guide/fhir-models.md": {"created": "2025-08-09T13:51:46.267668"}}
 {"user-guide/fhirpath.md": {"created": "2024-08-20T07:56:14"}}
+{"user-guide/pydantic-representation.md": {"created": "2025-08-09T13:51:46.267668"}}

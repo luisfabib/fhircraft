@@ -187,7 +187,7 @@ class OfType(FHIRPathFunction):
             FHIRPathCollection): The output collection.
         """
         collection = ensure_list(collection)
-        return [item for item in collection if isinstance(item.value, self.type)]
+        return [item for item in collection if isinstance(item.value, self.type)]  # type: ignore
 
     def __str__(self):
         return f"{self.__class__.__name__.lower()}({self.type.__str__()})"
