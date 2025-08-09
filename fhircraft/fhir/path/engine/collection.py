@@ -5,8 +5,8 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
-    FHIRPathRuntimeError,
 )
+from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_left_right_expressions
 
 
@@ -155,4 +155,5 @@ class Contains(FHIRCollectionOperator):
             item.value if isinstance(item, FHIRPathCollectionItem) else item
             for item in left_collection
         ]
+        return [FHIRPathCollectionItem.wrap(value in check_collection)]
         return [FHIRPathCollectionItem.wrap(value in check_collection)]

@@ -11,8 +11,8 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
-    FHIRPathRuntimeError,
 )
+from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
 

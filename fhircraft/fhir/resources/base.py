@@ -4,7 +4,7 @@ from typing import ClassVar
 from pydantic import BaseModel, ValidationError
 from pydantic.fields import FieldInfo
 
-from fhircraft.fhir.path import FHIRPathMixin
+from fhircraft.fhir.path.engine.core import FHIRPathMixin
 from fhircraft.utils import get_all_models_from_field
 
 

@@ -6,10 +6,10 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
-    FHIRPathError,
     FHIRPathFunction,
 )
 from fhircraft.fhir.path.engine.filtering import Where
+from fhircraft.fhir.path.exceptions import FHIRPathError
 
 
 class Empty(FHIRPathFunction):

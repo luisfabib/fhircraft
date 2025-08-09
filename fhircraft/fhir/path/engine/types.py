@@ -6,15 +6,13 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
-    FHIRPathError,
     FHIRPathFunction,
-    FHIRPathRuntimeError,
     Literal,
     This,
 )
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
+from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
-from fhircraft.utils import ensure_list
 
 
 class FHIRTypesOperator(FHIRPath):

@@ -8,10 +8,10 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
-    FHIRPathError,
     FHIRPathFunction,
     Literal,
 )
+from fhircraft.fhir.path.exceptions import FHIRPathError
 from fhircraft.utils import ensure_list
 
 

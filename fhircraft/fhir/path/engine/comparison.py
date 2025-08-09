@@ -1,19 +1,13 @@
 """The comparison module contains the object representations of the comparison FHIRPath operators."""
 
 from abc import ABC
-from typing import Any
 
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
-    FHIRPathRuntimeError,
 )
-from fhircraft.fhir.path.engine.literals import Quantity
-from fhircraft.fhir.path.utils import (
-    evaluate_and_prepare_collection_values,
-    evaluate_left_right_expressions,
-)
+from fhircraft.fhir.path.utils import evaluate_and_prepare_collection_values
 
 
 class FHIRComparisonOperator(FHIRPath, ABC):

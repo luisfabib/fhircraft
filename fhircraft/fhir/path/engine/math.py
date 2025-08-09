@@ -4,9 +4,9 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
-    FHIRPathRuntimeError,
 )
 from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_and_prepare_collection_values
 
 

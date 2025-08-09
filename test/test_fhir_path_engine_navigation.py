@@ -1,3 +1,5 @@
+from typing import Union
+
 from pydantic import BaseModel
 
 from fhircraft.fhir.path.engine.core import *
@@ -56,5 +58,7 @@ def test_descendants_returns_correct_elements():
     assert result[2].value == 3
     assert result[3].value == resource.subfield
     assert result[4].value == 4
+    assert result[5].value == 5
+    assert result[6].value == 6
     assert result[5].value == 5
     assert result[6].value == 6

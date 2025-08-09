@@ -8,8 +8,8 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
-    FHIRPathRuntimeError,
 )
+from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
 
 def _evaluate_boolean_expressions(

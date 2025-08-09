@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection
 
 from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
 
 def split_fhirpath(fhir_path: str) -> list[str]:
@@ -111,7 +112,6 @@ def evaluate_and_prepare_collection_values(
     create=False,
     prevent_all_empty: bool = True,
 ) -> tuple[Any | None, Any | None]:
-    from fhircraft.fhir.path.engine.core import FHIRPathRuntimeError
 
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
         return [

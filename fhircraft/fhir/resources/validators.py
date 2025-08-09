@@ -33,13 +33,13 @@ def _validate_FHIR_element_constraint(
         AssertionError: If the validation fails and severity is not 'warning'.
         Warning: If the validation fails and severity is 'warning'.
     """
-    from fhircraft.fhir.path import (
+    from fhircraft.fhir.path import fhirpath
+    from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
+    from fhircraft.fhir.path.exceptions import (
         FhirPathLexerError,
         FhirPathParserError,
         FhirPathWarning,
-        fhirpath,
     )
-    from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 
     if value is None:
         return value
@@ -230,6 +230,4 @@ def get_type_choice_value_by_base(instance: BaseModel, base: str) -> Any:
         if field.startswith(base):
             value = getattr(instance, field)
             if value is not None:
-                return value
-                return value
                 return value

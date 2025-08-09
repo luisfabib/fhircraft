@@ -5,8 +5,6 @@ from typing import List, Optional, Union
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
-    FHIRPathCollectionItem,
-    FHIRPathError,
     FHIRPathFunction,
     Literal,
 )

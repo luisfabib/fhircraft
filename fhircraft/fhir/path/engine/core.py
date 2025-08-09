@@ -14,22 +14,12 @@ if TYPE_CHECKING:
 
 from typing import List
 
+from fhircraft.fhir.path.exceptions import FHIRPathError
+
 # Get logger name
 logger = logging.getLogger(__name__)
 
 FHIRPathCollection = List["FHIRPathCollectionItem"]
-
-
-class FHIRPathRuntimeError(RuntimeError):
-    pass
-
-
-class FHIRPathError(Exception):
-    """
-    An exception related to FHIRPath specific syntax or runtime criteria.
-    """
-
-    pass
 
 
 class FHIRPathMixin:
@@ -591,4 +581,5 @@ class Invocation(FHIRPath):
         return "%s(%r, %r)" % (self.__class__.__name__, self.left, self.right)
 
     def __hash__(self):
+        return hash((self.left, self.right))
         return hash((self.left, self.right))

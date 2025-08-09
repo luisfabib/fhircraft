@@ -27,7 +27,8 @@ from fhircraft.fhir.path.engine.core import (
     Root,
     This,
 )
-from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
+from fhircraft.fhir.path.exceptions import FhirPathLexerError, FhirPathParserError
+from fhircraft.fhir.path.lexer import FhirPathLexer
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.utils import ensure_list
 
@@ -36,10 +37,6 @@ logger = logging.getLogger(__name__)
 
 def parse(string):
     return FhirPathParser().parse(string)
-
-
-class FhirPathParserError(Exception):
-    pass
 
 
 class FhirPathParser:

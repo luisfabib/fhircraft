@@ -13,10 +13,10 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
-    FHIRPathError,
     FHIRPathFunction,
     Literal,
 )
+from fhircraft.fhir.path.exceptions import FHIRPathError
 from fhircraft.fhir.path.utils import evaluate_and_prepare_collection_values
 
 

@@ -1,13 +1,10 @@
 """The tree navigation module contains the object representations of the tree-navigation category FHIRPath functions."""
 
-from typing import List, Optional, Union
-
 from pydantic import BaseModel
 
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPathCollection,
-    FHIRPathCollectionItem,
     FHIRPathFunction,
 )
 from fhircraft.fhir.path.engine.filtering import Repeat

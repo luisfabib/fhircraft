@@ -1,9 +1,7 @@
-from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 import ply.lex
 
-
-class FhirPathLexerError(Exception):
-    pass
+from fhircraft.fhir.path.exceptions import FhirPathLexerError
+from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 
 
 class FhirPathLexer:
