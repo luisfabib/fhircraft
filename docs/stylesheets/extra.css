@@ -1,7 +1,22 @@
 
-/* Use a milder dark theme background color */
 @media screen {
   [data-md-color-scheme="slate"] {
-    --md-default-bg-color: hsl(232.5, 14.8%, 21.2%);
+      .md-header__button.md-logo img, .md-header__button.md-logo svg {
+        filter: grayscale(1);
+      }
   }
 }
+@media only screen and (min-width: 76.25em) {
+    .md-main__inner {
+      max-width: 85vw;
+    }
+    .md-sidebar--primary {
+      left: 0;
+    }
+    .md-sidebar--secondary {
+      right: 0;
+      margin-left: 0;
+      -webkit-transform: none;
+      transform: none;   
+    }
+  }

@@ -35369,7 +35369,7 @@
       },
       "text" : {
         "status" : "generated",
-        "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h2>Datatype MoneyQuantity</h2><p>An amount of money. With regard to precision, see [Decimal Precision](datatypes.html#precision)</p><h3>Rule</h3><p>There SHALL be a code if there is a value and it SHALL be an expression of currency.  If system is present, it SHALL be ISO 4217 (system = &quot;urn:iso:std:iso:4217&quot; - currency).</p><p>Expression:</p><blockquote><pre>(code.exists() or value.empty()) and (system.empty() or system = 'urn:iso:std:iso:4217')</pre></blockquote></div>"
+        "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h2>Datatype MoneyQuantity</h2><p>An amount of money.</p><h3>Rule</h3><p>There SHALL be a code if there is a value and it SHALL be an expression of currency.  If system is present, it SHALL be ISO 4217 (system = &quot;urn:iso:std:iso:4217&quot; - currency).</p><p>Expression:</p><blockquote><pre>(code.exists() or value.empty()) and (system.empty() or system = 'urn:iso:std:iso:4217')</pre></blockquote></div>"
       },
       "extension" : [{
         "url" : "http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status",
@@ -35408,7 +35408,7 @@
           "value" : "http://hl7.org/fhir"
         }]
       }],
-      "description" : "An amount of money. With regard to precision, see [Decimal Precision](datatypes.html#precision)",
+      "description" : "An amount of money.",
       "jurisdiction" : [{
         "coding" : [{
           "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
@@ -35436,7 +35436,7 @@
         "element" : [{
           "id" : "Quantity",
           "path" : "Quantity",
-          "short" : "An amount of money. With regard to precision, see [Decimal Precision](datatypes.html#precision)",
+          "short" : "An amount of money.",
           "definition" : "There SHALL be a code if there is a value and it SHALL be an expression of currency.  If system is present, it SHALL be ISO 4217 (system = \"urn:iso:std:iso:4217\" - currency).",
           "comment" : "The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator.",
           "min" : 0,
@@ -35757,7 +35757,7 @@
         "element" : [{
           "id" : "Quantity",
           "path" : "Quantity",
-          "short" : "An amount of money. With regard to precision, see [Decimal Precision](datatypes.html#precision)",
+          "short" : "An amount of money.",
           "definition" : "There SHALL be a code if there is a value and it SHALL be an expression of currency.  If system is present, it SHALL be ISO 4217 (system = \"urn:iso:std:iso:4217\" - currency).",
           "min" : 0,
           "max" : "*",

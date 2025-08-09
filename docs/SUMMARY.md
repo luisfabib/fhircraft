@@ -1,8 +1,18 @@
   - [Home](index.md)
-  - [Quickstart](quickstart.md)
-  - [Installation](installation.md)
+  - Getting Started
+    - Introduction
+        - [Installation](quickstart/installation.md)
+        - [Basics](quickstart/basics.md)
+        - [Tips & Tricks](quickstart/tips.md)
+    - Community
+        - [Contributing](community/contributing.md)
+        - [Code of Conduct](community/code_of_conduct.md)
+        - [Credits](community/credits.md)
+        - [License](community/license.md)
   - User Guide
-    - [Pydantic FHIR models](user-guide/fhir-resources.md)
+    - FHIR Resources
+        - [Pydantic Representation](user-guide/pydantic-representation.md)
+        - [Working with Fhircraft Models](user-guide/fhir-models.md)
     - [FHIRPath](user-guide/fhirpath.md)
-  - API Reference
+  - Reference
     -  ./reference/*
