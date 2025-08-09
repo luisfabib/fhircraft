@@ -1,8 +1,14 @@
 """The filtering module contains the object representations of the filtering-category FHIRPath functions."""
 
-from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollectionItem, FHIRPathFunction
+from typing import List, Optional, Union
+
+from fhircraft.fhir.path.engine.core import (
+    FHIRPath,
+    FHIRPathCollection,
+    FHIRPathFunction,
+    Literal,
+)
 from fhircraft.utils import ensure_list
-from typing import List, Optional,Union
 
 
 class Where(FHIRPathFunction):
@@ -10,34 +16,44 @@ class Where(FHIRPathFunction):
     Representation of the FHIRPath [`where()`](http://hl7.org/fhirpath/N1/#wherecriteria-expression-collection) function.
 
     Attributes:
-        expression (FHIRPath): Expression to evaluate for each collection item. 
+        expression (FHIRPath): Expression to evaluate for each collection item.
     """
+
     def __init__(self, expression: FHIRPath):
         self.expression = expression
-        
-    def evaluate(self, collection: List[FHIRPathCollectionItem], create: bool = False) -> List[FHIRPathCollectionItem]:
+
+    def evaluate(
+        self, collection: FHIRPathCollection, create: bool = False
+    ) -> FHIRPathCollection:
         """
         Returns a collection containing only those elements in the input collection for which
         the stated criteria expression evaluates to `True`. Elements for which the expression
         evaluates to false or empty (`[]`) are not included in the result.
         If the input collection is empty (`[]`), the result is empty.
 
-        Args: 
-            collection (List[FHIRPathCollectionItem])): The input collection.
+        Args:
+            collection (FHIRPathCollection): The input collection.
             create (bool): Whether to auto-generate missing path segments.
-        
+
         Returns:
-            List[FHIRPathCollectionItem]): The output collection.
-        """    
+            FHIRPathCollection): The output collection.
+        """
         collection = ensure_list(collection)
-        return [item for item in collection if self.expression.evaluate(item, create)]
+        expression_collection = [
+            self.expression.evaluate([item], create) for item in collection
+        ]
+        checks = [
+            bool(collection[0].value) if len(collection) > 0 else False
+            for collection in expression_collection
+        ]
+        return [item for item, check in zip(collection, checks) if check]
 
     def __str__(self):
-        return f'{self.__class__.__name__.lower()}({self.expression.__str__()})'
+        return f"{self.__class__.__name__.lower()}({self.expression.__str__()})"
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.expression.__repr__()})'
-    
+        return f"{self.__class__.__name__}({self.expression.__repr__()})"
+
     def __eq__(self, other):
         return isinstance(other, Where) and other.expression == self.expression
 
@@ -48,38 +64,45 @@ class Where(FHIRPathFunction):
 class Select(FHIRPathFunction):
     """
     Representation of the FHIRPath [`select()`](http://hl7.org/fhirpath/N1/#selectprojection-expression-collection) function.
-    
+
     Attributes:
-        projection (FHIRPath): Expression to evaluate for each collection item. 
+        projection (FHIRPath): Expression to evaluate for each collection item.
     """
+
     def __init__(self, projection: FHIRPath):
         self.projection = projection
-        
-    def evaluate(self, collection: List[FHIRPathCollectionItem], create: bool = False) -> List[FHIRPathCollectionItem]:
+
+    def evaluate(
+        self, collection: FHIRPathCollection, create: bool = False
+    ) -> FHIRPathCollection:
         """
         Evaluates the projection expression for each item in the input collection. The result of each
         evaluation is added to the output collection. If the evaluation results in a collection with
-        multiple items, all items are added to the output collection (collections resulting from 
-        evaluation of projection are flattened). This means that if the evaluation for an element 
-        results in the empty collection (`[]`), no element is added to the result, and that if the 
+        multiple items, all items are added to the output collection (collections resulting from
+        evaluation of projection are flattened). This means that if the evaluation for an element
+        results in the empty collection (`[]`), no element is added to the result, and that if the
         input collection is empty (`[]`), the result is empty as well.
 
-        Args: 
-            collection (List[FHIRPathCollectionItem])): The input collection.
+        Args:
+            collection (FHIRPathCollection): The input collection.
             create (bool): Whether to auto-generate missing path segments.
-        
+
         Returns:
-            List[FHIRPathCollectionItem]): The output collection.
-        """    
+            FHIRPathCollection): The output collection.
+        """
         collection = ensure_list(collection)
-        return [projected_item for item in collection for projected_item in ensure_list(self.projection.evaluate(item, create))]
+        return [
+            projected_item
+            for item in collection
+            for projected_item in ensure_list(self.projection.evaluate([item], create))
+        ]
 
     def __str__(self):
-        return f'{self.__class__.__name__.lower()}({self.projection.__str__()})'
+        return f"{self.__class__.__name__.lower()}({self.projection.__str__()})"
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.projection.__repr__()})'
-    
+        return f"{self.__class__.__name__}({self.projection.__repr__()})"
+
     def __eq__(self, other):
         return isinstance(other, Select) and other.projection == self.projection
 
@@ -90,42 +113,46 @@ class Select(FHIRPathFunction):
 class Repeat(FHIRPathFunction):
     """
     Representation of the FHIRPath [`repeat()`](http://hl7.org/fhirpath/N1/#repeatprojection-expression-collection) function.
-    
+
     Attributes:
-        projection (FHIRPath): Expression to evaluate for each collection item. 
+        projection (FHIRPath): Expression to evaluate for each collection item.
     """
+
     def __init__(self, projection: FHIRPath):
         self.projection = projection
-        
-    def evaluate(self, collection: List[FHIRPathCollectionItem], create: bool = False) -> List[FHIRPathCollectionItem]:
+
+    def evaluate(
+        self, collection: FHIRPathCollection, create: bool = False
+    ) -> FHIRPathCollection:
         """
         A version of select that will repeat the projection and add it to the output collection, as
         long as the projection yields new items (as determined by the = (Equals) (=) operator).
 
-        Args: 
-            collection (List[FHIRPathCollectionItem])): The input collection.
+        Args:
+            collection (FHIRPathCollection): The input collection.
             create (bool): Whether to auto-generate missing path segments.
-        
+
         Returns:
-            List[FHIRPathCollectionItem]): The output collection.
-        """ 
-        collection = ensure_list(collection)
+            FHIRPathCollection): The output collection.
+        """
+
         def project_recursively(input_collection):
             output_collection = []
             for item in input_collection:
-                new_collection = self.projection.evaluate(item, create)
+                new_collection = self.projection.evaluate([item], create)
                 output_collection.extend(new_collection)
-                if len(new_collection)>0:
+                if len(new_collection) > 0:
                     output_collection.extend(project_recursively(new_collection))
             return output_collection
+
         return project_recursively(collection)
 
     def __str__(self):
-        return f'{self.__class__.__name__.lower()}({self.projection.__str__()})'
+        return f"{self.__class__.__name__.lower()}({self.projection.__str__()})"
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.projection.__repr__()})'
-    
+        return f"{self.__class__.__name__}({self.projection.__repr__()})"
+
     def __eq__(self, other):
         return isinstance(other, Repeat) and other.projection == self.projection
 
@@ -133,38 +160,39 @@ class Repeat(FHIRPathFunction):
         return hash((self.projection))
 
 
-
-
 class OfType(FHIRPathFunction):
     """
     Representation of the FHIRPath [`ofType()`](http://hl7.org/fhirpath/N1/#oftypetype-type-specifier-collection) function.
-    
+
     Attributes:
-        type (class): Type class 
+        type (class): Type class
     """
-    def __init__(self, type: FHIRPath):
-        self.type = type
-        
-    def evaluate(self, collection: List[FHIRPathCollectionItem]) -> List[FHIRPathCollectionItem]:
+
+    def __init__(self, _type: type | Literal):
+        if isinstance(_type, Literal):
+            _type = _type.value
+        self.type = _type
+
+    def evaluate(self, collection: FHIRPathCollection) -> FHIRPathCollection:
         """
         Returns a collection that contains all items in the input collection that are of the given type
         or a subclass thereof. If the input collection is empty (`[]`), the result is empty.
 
-        Args: 
-            collection (List[FHIRPathCollectionItem])): The input collection.
-        
+        Args:
+            collection (FHIRPathCollection): The input collection.
+
         Returns:
-            List[FHIRPathCollectionItem]): The output collection.
-        """ 
+            FHIRPathCollection): The output collection.
+        """
         collection = ensure_list(collection)
-        return [item for item in collection if isinstance(item.value, self.type)]
+        return [item for item in collection if isinstance(item.value, self.type)]  # type: ignore
 
     def __str__(self):
-        return f'{self.__class__.__name__.lower()}({self.type.__str__()})'
+        return f"{self.__class__.__name__.lower()}({self.type.__str__()})"
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.type.__repr__()})'
-    
+        return f"{self.__class__.__name__}({self.type.__repr__()})"
+
     def __eq__(self, other):
         return isinstance(other, OfType) and other.type == self.type
 

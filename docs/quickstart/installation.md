@@ -5,7 +5,7 @@ These instructions will walk you through the steps to quickly install Fhircraft,
 
 ## Quick Installation
 
-If you've got Python 3.8+ and `pip>24.1` installed, installing `fhircraft` is as simple as:
+If you've got Python 3.10+ and `pip>24.1` installed, installing `fhircraft` is as simple as:
 
 ```bash
 pip install fhircraft
@@ -19,7 +19,7 @@ pip install git+https://github.com/luisfabib/fhircraft.git
 
 ## Requirements
 
-- Python 3.8 or newer
+- Python 3.10 or newer
 - `pip` package manager
 
 Optional (for advanced features):

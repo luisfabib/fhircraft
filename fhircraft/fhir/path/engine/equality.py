@@ -1,37 +1,31 @@
 """The equality module contains the object representations of the equality FHIRPath operators."""
 
+from fhircraft.fhir.path.engine.core import (
+    FHIRPath,
+    FHIRPathCollection,
+    FHIRPathCollectionItem,
+)
+from fhircraft.fhir.path.utils import evaluate_left_right_expressions
 
-from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, FHIRPath, FHIRPathFunction
-from fhircraft.utils import ensure_list
-from typing import List, Any, Optional
-from math import isclose
-
-def _evaluate_expressions(left, right, collection, create):
-    left_collection = [
-        item.value if isinstance(item, FHIRPathCollectionItem) else item 
-            for item in ensure_list(left.evaluate(collection, create))
-    ]  if isinstance(left, FHIRPath) else ensure_list(left)
-    
-    right_collection = [ 
-        item.value if isinstance(item, FHIRPathCollectionItem) else item  
-            for item in ensure_list(right.evaluate(collection, create))
-    ] if isinstance(right, FHIRPath) else ensure_list(right)
-
-    return left_collection, right_collection
 
 class Equals(FHIRPath):
     """
-    A representation of the FHIRPath [`=`](https://hl7.org/fhirpath/N1/#and) operator.
+    A representation of the FHIRPath [`=`](https://hl7.org/fhirpath/N1/#equals) operator.
 
     Attributes:
-        left (FHIRPath): Left operand.
-        right (FHIRPath): Right operand.
+        left (FHIRPath | FHIRPathCollection): Left operand.
+        right (FHIRPath | FHIRPathCollection): Right operand.
     """
-    def __init__(self, left: FHIRPath, right:FHIRPath):
+
+    def __init__(
+        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+    ):
         self.left = left
         self.right = right
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
+    def evaluate(
+        self, collection: FHIRPathCollection, create: bool = False
+    ) -> FHIRPathCollection:
         """
         Returns true if the left collection is equal to the right collection:
         As noted above, if either operand is an empty collection, the result is an empty collection. Otherwise:
@@ -51,44 +45,62 @@ class Equals(FHIRPath):
         Otherwise, equals returns false.
         Note that this implies that if the collections have a different number of items to compare, the result will be false.
 
-        Args: 
-            collection (List[FHIRPathCollectionItem])): The input collection.
-        
+        Args:
+            collection (FHIRPathCollection): The input collection.
+
         Returns:
-            bool
+            FHIRPathCollection: The output collection.
         """
-        left_collection, right_collection = _evaluate_expressions(self.left, self.right, collection, create=kwargs.get('create', False))
-        if len(left_collection)==0 or len(right_collection)==0:
-            return []
-        if len(left_collection)==1 and len(right_collection)==1:
-            return left_collection[0] == right_collection[0]
-        return left_collection == right_collection
-    
+        left_collection, right_collection = evaluate_left_right_expressions(
+            self.left, self.right, collection, create=create
+        )
+        if len(left_collection) == 0 or len(right_collection) == 0:
+            equals = []
+        elif len(left_collection) == 1 and len(right_collection) == 1:
+            equals = left_collection[0] == right_collection[0]
+        elif len(left_collection) != len(right_collection):
+            equals = False
+        else:
+            equals = all(l == r for l, r in zip(left_collection, right_collection))
+        return [FHIRPathCollectionItem.wrap(equals)]
+
     def __str__(self):
-        return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
+        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})'
-    
+        return (
+            f"{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})"
+        )
+
     def __eq__(self, other):
-        return isinstance(other, Equals) and other.left == self.left and other.right == self.right
+        return (
+            isinstance(other, Equals)
+            and other.left == self.left
+            and other.right == self.right
+        )
 
     def __hash__(self):
         return hash((self.left, self.right))
+
 
 class Equivalent(FHIRPath):
     """
     A representation of the FHIRPath [`~`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath): Left operand.
-        right (FHIRPath): Right operand.
+        left (FHIRPath | FHIRPathCollection): Left operand.
+        right (FHIRPath | FHIRPathCollection): Right operand.
     """
-    def __init__(self, left: FHIRPath, right:FHIRPath):
+
+    def __init__(
+        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+    ):
         self.left = left
         self.right = right
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
         Returns true if the collections are the same. In particular, comparing empty collections for equivalence { } ~ { } will result in true.
         If both operands are collections with a single item, they must be of the same type (or implicitly convertible to the same type), and:
@@ -104,37 +116,49 @@ class Equivalent(FHIRPath):
             - Comparison is not order dependent
         Note that this implies that if the collections have a different number of items to compare, or if one input is a value and the other is empty ({ }), the result will be false.
 
-        Args: 
-            collection (List[FHIRPathCollectionItem])): The input collection.
-        
+        Args:
+            collection (FHIRPathCollection): The input collection.
+
         Returns:
-            bool
+            FHIRPathCollection: The output collection.
         """
-        left_collection, right_collection = _evaluate_expressions(self.left, self.right, collection, create=kwargs.get('create', False))
-        if len(left_collection)==0 and len(right_collection)==0:
-            return True
-        elif len(left_collection)==0 or len(right_collection)==0:
-            return False
-        def handle_types(value):
-            if isinstance(value,str):
+
+        def _handle_types(value):
+            if isinstance(value, str):
                 return value.lower().strip()
             else:
-                return value 
-            
-        return [handle_types(item) for item in left_collection] == [handle_types(item) for item in right_collection]
-    
+                return value
+
+        left_collection, right_collection = evaluate_left_right_expressions(
+            self.left, self.right, collection, create=create
+        )
+        if len(left_collection) == 0 and len(right_collection) == 0:
+            equivalent = True
+        elif len(left_collection) == 0 or len(right_collection) == 0:
+            equivalent = False
+        else:
+            equivalent = [_handle_types(item.value) for item in left_collection] == [
+                _handle_types(item.value) for item in right_collection
+            ]
+        return [FHIRPathCollectionItem.wrap(equivalent)]
+
     def __str__(self):
-        return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
+        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})'
-    
+        return (
+            f"{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})"
+        )
+
     def __eq__(self, other):
-        return isinstance(other, Equivalent) and other.left == self.left and other.right == self.right
+        return (
+            isinstance(other, Equivalent)
+            and other.left == self.left
+            and other.right == self.right
+        )
 
     def __hash__(self):
         return hash((self.left, self.right))
-    
 
 
 class NotEquals(FHIRPath):
@@ -142,35 +166,52 @@ class NotEquals(FHIRPath):
     A representation of the FHIRPath [`!=`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath): Left operand.
-        right (FHIRPath): Right operand.
+        left (FHIRPath | FHIRPathCollection): Left operand.
+        right (FHIRPath | FHIRPathCollection): Right operand.
     """
-    def __init__(self, left: FHIRPath, right:FHIRPath):
+
+    def __init__(
+        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+    ):
         self.left = left
         self.right = right
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
-        The converse of the equals operator, returning true if equal returns false; false if equal 
+        The converse of the equals operator, returning true if equal returns false; false if equal
         returns true; and empty ({ }) if equal returns empty. In other words, A != B is short-hand for (A = B).not().
 
 
-        Args: 
-            collection (List[FHIRPathCollectionItem])): The input collection.
-        
+        Args:
+            collection (FHIRPathCollection): The input collection.
+
         Returns:
-            bool
+            FHIRPathCollection: The output collection
         """
-        return not Equals(self.left, self.right).evaluate(collection, **kwargs)
-    
+        return [
+            FHIRPathCollectionItem.wrap(
+                not Equals(self.left, self.right)
+                .evaluate(collection, create=create)[0]
+                .value
+            )
+        ]
+
     def __str__(self):
-        return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
+        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})'
-    
+        return (
+            f"{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})"
+        )
+
     def __eq__(self, other):
-        return isinstance(other, NotEquals) and other.left == self.left and other.right == self.right
+        return (
+            isinstance(other, NotEquals)
+            and other.left == self.left
+            and other.right == self.right
+        )
 
     def __hash__(self):
         return hash((self.left, self.right))
@@ -181,35 +222,52 @@ class NotEquivalent(FHIRPath):
     A representation of the FHIRPath [`!~`](https://hl7.org/fhirpath/N1/#and) operator.
 
     Attributes:
-        left (FHIRPath): Left operand.
-        right (FHIRPath): Right operand.
+        left (FHIRPath | FHIRPathCollection): Left operand.
+        right (FHIRPath | FHIRPathCollection): Right operand.
     """
-    def __init__(self, left: FHIRPath, right:FHIRPath):
+
+    def __init__(
+        self, left: FHIRPath | FHIRPathCollection, right: FHIRPath | FHIRPathCollection
+    ):
         self.left = left
         self.right = right
 
-    def evaluate(self, collection: List[FHIRPathCollectionItem], *args, **kwargs) -> bool:
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
         """
-        The converse of the equivalent operator, returning true if equivalent returns 
+        The converse of the equivalent operator, returning true if equivalent returns
         false and false is equivalent returns true. In other words, A !~ B is short-hand for (A ~ B).not().
 
 
-        Args: 
-            collection (List[FHIRPathCollectionItem])): The input collection.
-        
-        Returns:
-            bool
+        Args:
+            collection (FHIRPathCollection): The input collection.
+
+        Args:
+            FHIRPathCollection): The output collection.
         """
-        return not Equivalent(self.left, self.right).evaluate(collection, **kwargs)
-    
+        return [
+            FHIRPathCollectionItem.wrap(
+                not Equivalent(self.left, self.right)
+                .evaluate(collection, create=create)[0]
+                .value
+            )
+        ]
+
     def __str__(self):
-        return f'{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})'
+        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})'
-    
+        return (
+            f"{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})"
+        )
+
     def __eq__(self, other):
-        return isinstance(other, NotEquivalent) and other.left == self.left and other.right == self.right
+        return (
+            isinstance(other, NotEquivalent)
+            and other.left == self.left
+            and other.right == self.right
+        )
 
     def __hash__(self):
         return hash((self.left, self.right))

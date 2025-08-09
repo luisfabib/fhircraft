@@ -76,7 +76,7 @@ This is a quick reference on how to quickly accomplish the most common tasks wit
   
   ``` python 
     from fhircraft.fhir.resources.factory import construct_resource_model
-    from fhicraft.utils import load_file
+    from fhircraft.utils import load_file
     patient_model = construct_resource_model(
         structure_definition=load_file('FHIR_StructureDefinition_Patient.json')
     )
@@ -99,7 +99,7 @@ This is a quick reference on how to quickly accomplish the most common tasks wit
   The generated Pydantic models can be used to validate FHIR payloads, ensuring that they conform to the structure and constraints of the specified resource or profile.
 
   ``` python
-  from fhicraft.utils import load_file
+  from fhircraft.utils import load_file
   data = load_file('my_fhir_patient.json')
   my_patient = patient_model.model_validate(data)
   ```
@@ -109,11 +109,31 @@ This is a quick reference on how to quickly accomplish the most common tasks wit
 
 - #### Model manipulation using FHIRPath
 
-  You can specify the FHIRPath expression as a string in the standard notation to interact with the resource efficiently. This feature allows for complex queries and updates, enhancing your ability to work with FHIR data programmatically.
+  Fhircraft provides a powerful FHIRPath engine with an enhanced interface for querying and modifying FHIR resources. You can parse FHIRPath expressions and use various methods to retrieve or update values based on your specific needs.
 
   ``` python
-  from fhicraft.fhir.path import fhirpath
-  patient_surname = my_patient.get_fhirpath('Patient.name.surname')
+  from fhircraft.fhir.path import fhirpath
+  
+  # Parse the FHIRPath expression
+  name_path = fhirpath.parse('Patient.name.family')
+  
+  # Get all family names as a list
+  all_names = name_path.values(my_patient)
+  
+  # Get the first family name safely
+  first_name = name_path.first(my_patient, default='Unknown')
+  
+  # Get exactly one family name (raises error if multiple)
+  single_name = name_path.single(my_patient)
+  
+  # Check if family names exist
+  has_name = name_path.exists(my_patient)
+  
+  # Count family names
+  name_count = name_path.count(my_patient)
+  
+  # Update family names
+  name_path.update_values(my_patient, 'NewFamilyName')
   ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

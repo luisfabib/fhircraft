@@ -1,25 +1,42 @@
-import yaml
-import json 
-import requests 
+import inspect
+import json
 import os
-from typing import List, Any, Dict, Union, get_args, get_origin, Optional, Tuple
-from dotenv import dotenv_values
 import re
 from contextlib import contextmanager
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    Iterator,
+    List,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+    get_args,
+    get_origin,
+)
+
+T = TypeVar("T")
+
+import requests
+import yaml
+from dotenv import dotenv_values
 from pydantic import BaseModel, Field
-import inspect
+from pydantic.fields import FieldInfo
 
 # URL regex pattern
 URL_PATTERNS = re.compile(
-    r'^(https?|ftp)://'                      # Scheme (HTTP, HTTPS, FTP)
-    r'(?:(?:[a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}|' # Domain name
-    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'   # OR IPv4 address
-    r'\[?[a-fA-F0-9:]+\]?)'                  # OR IPv6 address
-    r'(:\d+)?'                               # Optional port
-    r'(\/[a-zA-Z0-9@:%._\+~#=\/-]*)?'        # Optional path
-    r'(\?[a-zA-Z0-9@:%._\+~#&=\/-]*)?'       # Optional query
-    r'(#[-a-zA-Z0-9@:%._\+~#=]*)?$'          # Optional fragment
+    r"^(https?|ftp)://"  # Scheme (HTTP, HTTPS, FTP)
+    r"(?:(?:[a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}|"  # Domain name
+    r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|"  # OR IPv4 address
+    r"\[?[a-fA-F0-9:]+\]?)"  # OR IPv6 address
+    r"(:\d+)?"  # Optional port
+    r"(\/[a-zA-Z0-9@:%._\+~#=\/-]*)?"  # Optional path
+    r"(\?[a-zA-Z0-9@:%._\+~#&=\/-]*)?"  # Optional query
+    r"(#[-a-zA-Z0-9@:%._\+~#=]*)?$"  # Optional fragment
 )
+
 
 def is_url(string: str) -> bool:
     """Check if the input string is a valid URL.
@@ -29,11 +46,12 @@ def is_url(string: str) -> bool:
 
     Returns:
         bool: True if the input string is a valid URL, False otherwise.
-    """    
+    """
     return re.match(URL_PATTERNS, string) is not None
 
+
 def capitalize(string: str) -> str:
-    '''
+    """
     Capitalize the first letter of a given string.
 
     Parameters:
@@ -41,26 +59,28 @@ def capitalize(string: str) -> str:
 
     Returns:
         str: The string with the first letter capitalized.
-    '''    
+    """
     return string[0].upper() + string[1:]
 
-def load_env_variables(file_path: Optional[str]=None) -> dict:
+
+def load_env_variables(file_path: Optional[str] = None) -> dict:
     """
     Loads environment variables from a .env file into a dictionary without changing the global environment variables.
 
     Args:
         file_path (Optional[str]): Optional path to the .env file. If not provided, it looks for a .env file in the current directory.
-    
-    Returns: 
+
+    Returns:
         vars (dict): A dictionary containing the environment variables from the .env file.
     """
     # Determine the file path
-    env_file = file_path if file_path else '.env'
-    
+    env_file = file_path if file_path else ".env"
+
     # Load the .env file into a dictionary
     env_vars = dotenv_values(env_file)
-    
+
     return env_vars
+
 
 def ensure_list(variable: Any) -> list:
     """
@@ -78,6 +98,7 @@ def ensure_list(variable: Any) -> list:
         return [variable]
     return variable
 
+
 def load_file(file_path: str) -> Dict:
     """
     Load data from a file based on its extension.
@@ -90,18 +111,23 @@ def load_file(file_path: str) -> Dict:
 
     Raises:
         ValueError: If the file content is not a dictionary (for YAML files).
-    """    
-    with open(file_path, 'r') as file:
+    """
+    with open(file_path, "r") as file:
         file_extension = os.path.splitext(file_path)[1]
-        if file_extension == '.yaml' or file_extension == '.yml':
+        if file_extension == ".yaml" or file_extension == ".yml":
             data = yaml.safe_load(file)
             if not isinstance(data, dict):
-                raise ValueError("Invalid file content. File content must be a dictionary.")
+                raise ValueError(
+                    "Invalid file content. File content must be a dictionary."
+                )
             return data
-        elif file_extension == '.json':
+        elif file_extension == ".json":
             return json.load(file)
         else:
-            raise ValueError("Unsupported file format. Please provide a .yaml, .yml, or .json file.")
+            raise ValueError(
+                "Unsupported file format. Please provide a .yaml, .yml, or .json file."
+            )
+
 
 def load_url(url: str) -> Dict:
     """
@@ -115,37 +141,50 @@ def load_url(url: str) -> Dict:
 
     Raises:
         ValueError: If the URL format is invalid or the content type is not supported.
-    """    
+    """
     # Validate the URL format
-    if not url.startswith('http://') and not url.startswith('https://'):
-        raise ValueError("Invalid URL format. Please provide a valid URL starting with 'http://' or 'https://'.")
-    
+    if not url.startswith("http://") and not url.startswith("https://"):
+        raise ValueError(
+            "Invalid URL format. Please provide a valid URL starting with 'http://' or 'https://'."
+        )
+
     # Add a timeout to the requests.get call
     # Configure proxy if needed
     settings = load_env_variables()
-    proxies = {
-        'https': settings.get('PROXY_URL_HTTPS'), 
-        'http': settings.get('PROXY_URL_HTTP')
-    } if settings.get('PROXY_URL_HTTPS') or settings.get('PROXY_URL_HTTP') else None
-    # Download the StructureDefinition JSON            
-    response = requests.get(url, proxies=proxies, verify=settings.get('CERTIFICATE_BUNDLE_PATH'), timeout=10)
-    
+    proxies = None
+    if settings.get("PROXY_URL_HTTPS") or settings.get("PROXY_URL_HTTP"):
+        # Only include keys with non-None string values
+        proxies = {}
+        if settings.get("PROXY_URL_HTTPS") is not None:
+            proxies["https"] = str(settings.get("PROXY_URL_HTTPS"))
+        if settings.get("PROXY_URL_HTTP") is not None:
+            proxies["http"] = str(settings.get("PROXY_URL_HTTP"))
+        if not proxies:
+            proxies = None
+    # Download the StructureDefinition JSON
+    response = requests.get(
+        url, proxies=proxies, verify=settings.get("CERTIFICATE_BUNDLE_PATH"), timeout=10
+    )
+
     response.raise_for_status()
-    content_type = response.headers['Content-Type']
-    
+    content_type = response.headers["Content-Type"]
+
     # Use content_type.lower() to make the content type check case-insensitive
-    if 'yaml' in content_type.lower():
+    if "yaml" in content_type.lower():
         try:
             return yaml.safe_load(response.text)
         except yaml.YAMLError as e:
             raise ValueError(f"Error loading YAML: {e}")
-    elif 'json' in content_type.lower():
+    elif "json" in content_type.lower():
         try:
             return response.json()
         except json.JSONDecodeError as e:
             raise ValueError(f"Error loading JSON: {e}")
     else:
-        raise ValueError("Unsupported content type. Please provide a URL that returns .yaml, .yml, or .json content.")
+        raise ValueError(
+            "Unsupported content type. Please provide a URL that returns .yaml, .yml, or .json content."
+        )
+
 
 def contains_only_none(d: Any) -> bool:
     """
@@ -156,7 +195,7 @@ def contains_only_none(d: Any) -> bool:
 
     Returns:
         result (bool): True if the input contains only None values, False otherwise.
-    """    
+    """
     if isinstance(d, dict):
         return all(contains_only_none(v) for v in d.values())
     elif isinstance(d, list):
@@ -164,7 +203,10 @@ def contains_only_none(d: Any) -> bool:
     else:
         return d is None
 
-def remove_none_dicts(d: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[str, Any], List[Any], Any]:
+
+def remove_none_dicts(
+    d: Union[Dict[str, Any], List[Any], Any],
+) -> Union[Dict[str, Any], List[Any], Any]:
     """
     Remove any dictionaries with all values being None from the input dictionary recursively.
 
@@ -175,7 +217,7 @@ def remove_none_dicts(d: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[st
         Union[Dict[str, Any], List[Any], Any]: The dictionary or list with None values removed.
     """
     if not isinstance(d, dict):
-        return d    
+        return d
     new_dict = {}
     for k, v in d.items():
         if isinstance(v, dict):
@@ -198,7 +240,9 @@ def remove_none_dicts(d: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[st
     return new_dict
 
 
-def get_dict_paths(nested_dict: Union[Dict[str, Any], List[Dict[str, Any]]], prefix: str = '') -> Dict[str, Any]:
+def get_dict_paths(
+    nested_dict: Union[Dict[str, Any], List[Dict[str, Any]]], prefix: str = ""
+) -> Dict[str, Any]:
     """
     Get all paths in a nested dictionary with their corresponding values.
 
@@ -243,17 +287,17 @@ def replace_nth(string, sub, wanted, n):
 
     Returns:
         string (str): The updated string after replacing the nth occurrence of the substring.
-    """    
+    """
     pattern = re.compile(sub)
-    where = [m for m in pattern.finditer(string)][n-1]
-    before = string[:where.start()]
-    after = string[where.end():]
+    where = [m for m in pattern.finditer(string)][n - 1]
+    before = string[: where.start()]
+    after = string[where.end() :]
     newString = before + wanted + after
     return newString
 
 
 def contains_list_type(tp: Any) -> bool:
-    """Recursively check if List is anywhere in the variable's typing."""   
+    """Recursively check if List is anywhere in the variable's typing."""
     # Check if the current type is a List
     if get_origin(tp) in [List, list]:
         return True
@@ -262,10 +306,10 @@ def contains_list_type(tp: Any) -> bool:
     for arg in get_args(tp):
         if contains_list_type(arg):
             return True
-    
+
     return False
 
-    
+
 def _get_deepest_args(tp: Any) -> list:
     """Recursively get the deepest type arguments of nested typing constructs."""
     args = get_args(tp)
@@ -279,15 +323,21 @@ def _get_deepest_args(tp: Any) -> list:
     return deepest_args
 
 
-def get_all_models_from_field(field: Field, issubclass_of: type = BaseModel) -> BaseModel:
-    return (arg 
-            for arg in _get_deepest_args(field.annotation) 
-                if inspect.isclass(arg) and issubclass(arg, issubclass_of)
+T_ = TypeVar("T_")
+
+
+def get_all_models_from_field(
+    field: FieldInfo, issubclass_of: type[T_] = BaseModel
+) -> Generator[Type[T_], None, None]:
+    return (
+        arg
+        for arg in _get_deepest_args(field.annotation)
+        if inspect.isclass(arg) and issubclass(arg, issubclass_of)
     )
 
-def get_fhir_model_from_field(field: Field) -> Optional[BaseModel]:
-    return next(get_all_models_from_field(field), None)
 
+def get_fhir_model_from_field(field: FieldInfo) -> type[BaseModel] | None:
+    return next(get_all_models_from_field(field), None)
 
 
 def merge_dicts(dict1: dict, dict2: dict) -> dict:
@@ -309,6 +359,7 @@ def merge_dicts(dict1: dict, dict2: dict) -> dict:
         >>> merge_dicts(dict1, dict2)
         {'a': 1, 'b': {'c': 3, 'd': [3, 4, 5]}, 'e': [5, 6, 7], 'f': 8}
     """
+
     def merge_lists(list1, list2):
         # Merge two lists element by element
         merged_list = []
@@ -325,6 +376,7 @@ def merge_dicts(dict1: dict, dict2: dict) -> dict:
             else:
                 merged_list.append(list2[idx])
         return merged_list
+
     merged_dict = dict1.copy()
     for key, value in dict2.items():
         if key in merged_dict:
@@ -341,21 +393,34 @@ def merge_dicts(dict1: dict, dict2: dict) -> dict:
 
 def get_FHIR_release_from_version(version: str) -> str:
     # Check format of the version string
-    if not re.match(r'^\d+\.\d+\.\d+$', version):
-        raise ValueError(f'FHIR version must be in "x.y.z" format, got "{version}"')        
+    if not re.match(r"^\d+\.\d+\.\d+$", version):
+        raise ValueError(f'FHIR version must be in "x.y.z" format, got "{version}"')
     # Parse version string into a three-digit tuple
-    version = version.split('-')[0]
-    version = tuple([int(digit) for digit in version.split('.')])
+    version = version.split("-")[0]
+    version_tuple = tuple([int(digit) for digit in version.split(".")])
     # Assign FHIR release based on version number (Referece: http://hl7.org/fhir/directory.html)
-    if version >= (0,4,0) and version <= (1,0,2):
-        return 'DSTU2'
-    elif version >= (1,1,0) and version <= (3,0,2):
-        return 'STU3'
-    elif version >= (3,2,0) and version <= (4,0,1):
-        return 'R4'
-    elif version >= (4,1,0) and version <= (4,3,0):
-        return 'R4B'
-    elif version >= (4,2,0) and version <= (5,0,0):
-        return 'R5'
-    elif version >= (6,0,0):
-        return 'R6'
+    if version_tuple >= (0, 4, 0) and version_tuple <= (1, 0, 2):
+        return "DSTU2"
+    elif version_tuple >= (1, 1, 0) and version_tuple <= (3, 0, 2):
+        return "STU3"
+    elif version_tuple >= (3, 2, 0) and version_tuple <= (4, 0, 1):
+        return "R4"
+    elif version_tuple >= (4, 1, 0) and version_tuple <= (4, 3, 0):
+        return "R4B"
+    elif version_tuple >= (4, 2, 0) and version_tuple <= (5, 0, 0):
+        return "R5"
+    elif version_tuple >= (6, 0, 0):
+        return "R6"
+    elif version_tuple >= (3, 2, 0) and version_tuple <= (4, 0, 1):
+        return "R4"
+    elif version_tuple >= (4, 1, 0) and version_tuple <= (4, 3, 0):
+        return "R4B"
+    elif version_tuple >= (4, 2, 0) and version_tuple <= (5, 0, 0):
+        return "R5"
+    elif version_tuple >= (6, 0, 0):
+        return "R6"
+    else:
+        raise ValueError(
+            f"FHIR version {version} is not supported. Supported versions are: "
+            "DSTU2, STU3, R4, R4B, R5, and R6."
+        )

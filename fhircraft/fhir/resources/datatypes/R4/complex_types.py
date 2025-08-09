@@ -1,13 +1,17 @@
+import typing
+
 from pydantic import Field, field_validator, model_validator
-from fhircraft.fhir.resources.base import FHIRBaseModel 
-from fhircraft.fhir.resources.datatypes.primitives import *
+
 import fhircraft.fhir.resources.validators as fhir_validators
-import typing  
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft.fhir.resources.datatypes.primitives import *
+
+
 class Element(FHIRBaseModel):
     """
     Base for all elements
     """
+
     id: typing.Optional[String] = Field(
         description="Unique id for inter-element referencing",
         default=None,
@@ -17,24 +21,29 @@ class Element(FHIRBaseModel):
         default=None,
         alias="_id",
     )
-    extension: typing.Optional[typing.List['Extension']] = Field(
+    extension: typing.Optional[typing.List["Extension"]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    @field_validator(*('extension',), mode="after", check_fields=None)
+
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -43,7 +52,7 @@ class Element(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -52,30 +61,38 @@ class Element(FHIRBaseModel):
         )
 
 
- 
- 
 class BackboneElement(Element):
     """
     Base for elements defined inside a resource
     """
-    modifierExtension: typing.Optional[typing.List['Extension']] = Field(
+
+    modifierExtension: typing.Optional[typing.List["Extension"]] = Field(
         description="Extensions that cannot be ignored even if unrecognized",
         default=None,
     )
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -84,7 +101,7 @@ class BackboneElement(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -93,35 +110,39 @@ class BackboneElement(Element):
         )
 
 
- 
- 
 class xhtml(Element):
     """
     Primitive Type xhtml
     """
+
     value: String = Field(
         description="Actual xhtml",
-        default=None,
+        default=...,
     )
     value_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for value extensions",
         default=None,
         alias="_value",
     )
-    @field_validator(*('extension',), mode="after", check_fields=None)
+
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -130,7 +151,7 @@ class xhtml(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -139,12 +160,11 @@ class xhtml(Element):
         )
 
 
- 
- 
 class Address(Element):
     """
     An address expressed using postal conventions (as opposed to GPS or other location definition formats)
     """
+
     use: typing.Optional[Code] = Field(
         description="home | work | temp | old | billing - purpose of this address",
         default=None,
@@ -226,24 +246,54 @@ class Address(Element):
         default=None,
         alias="_country",
     )
-    period: typing.Optional['Period'] = Field(
+    period: typing.Optional["Period"] = Field(
         description="Time period when address was/is in use",
         default=None,
     )
-    @field_validator(*('period', 'country', 'postalCode', 'state', 'district', 'city', 'line', 'text', 'type', 'use', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "period",
+            "country",
+            "postalCode",
+            "state",
+            "district",
+            "city",
+            "line",
+            "text",
+            "type",
+            "use",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -252,7 +302,7 @@ class Address(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -261,12 +311,11 @@ class Address(Element):
         )
 
 
- 
- 
 class Age(FHIRBaseModel):
     """
     A duration of time during which an organism (or a process) has existed
     """
+
     id: typing.Optional[String] = Field(
         description="Unique id for inter-element referencing",
         default=None,
@@ -276,7 +325,7 @@ class Age(FHIRBaseModel):
         default=None,
         alias="_id",
     )
-    extension: typing.Optional[typing.List['Extension']] = Field(
+    extension: typing.Optional[typing.List["Extension"]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
@@ -325,20 +374,29 @@ class Age(FHIRBaseModel):
         default=None,
         alias="_code",
     )
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("code", "system", "unit", "comparator", "value", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -347,7 +405,7 @@ class Age(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_age_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum) and (value.empty() or value.hasValue().not() or value > 0)",
             human="There SHALL be a code if there is a value and it SHALL be an expression of time.  If system is present, it SHALL be UCUM.  If value is present, it SHALL be positive.",
@@ -357,7 +415,7 @@ class Age(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -367,7 +425,7 @@ class Age(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="code.empty() or system.exists()",
             human="If a code for the unit is present, the system SHALL also be present",
@@ -376,13 +434,12 @@ class Age(FHIRBaseModel):
         )
 
 
- 
- 
 class Annotation(Element):
     """
     Text node with attribution
     """
-    authorReference: typing.Optional['Reference'] = Field(
+
+    authorReference: typing.Optional["Reference"] = Field(
         description="Individual responsible for the annotation",
         default=None,
     )
@@ -401,27 +458,34 @@ class Annotation(Element):
     )
     text: Markdown = Field(
         description="The annotation  - text content (as markdown)",
-        default=None,
+        default=...,
     )
     text_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for text extensions",
         default=None,
         alias="_text",
     )
-    @field_validator(*('text', 'time', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("text", "time", "extension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -430,7 +494,7 @@ class Annotation(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -440,24 +504,25 @@ class Annotation(Element):
 
     @model_validator(mode="after")
     def author_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=['Reference', String],
+            field_types=["Reference", String],
             field_name_base="author",
         )
 
-    @property 
+    @property
     def author(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="author",
         )
 
- 
- 
+
 class Attachment(Element):
     """
     Content in a format defined elsewhere
     """
+
     contentType: typing.Optional[Code] = Field(
         description="Mime type of the content, with charset etc.",
         default=None,
@@ -530,20 +595,46 @@ class Attachment(Element):
         default=None,
         alias="_creation",
     )
-    @field_validator(*('creation', 'title', 'hash', 'size', 'url', 'data', 'language', 'contentType', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "creation",
+            "title",
+            "hash",
+            "size",
+            "url",
+            "data",
+            "language",
+            "contentType",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -552,7 +643,7 @@ class Attachment(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -562,7 +653,7 @@ class Attachment(Element):
 
     @model_validator(mode="after")
     def FHIR_att_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="data.empty() or contentType.exists()",
             human="If the Attachment has data, it SHALL have a contentType",
@@ -571,13 +662,12 @@ class Attachment(Element):
         )
 
 
- 
- 
 class CodeableConcept(Element):
     """
     Concept - reference to a terminology or just  text
     """
-    coding: typing.Optional[typing.List['Coding']] = Field(
+
+    coding: typing.Optional[typing.List["Coding"]] = Field(
         description="Code defined by a terminology system",
         default=None,
     )
@@ -590,20 +680,27 @@ class CodeableConcept(Element):
         default=None,
         alias="_text",
     )
-    @field_validator(*('text', 'coding', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("text", "coding", "extension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -612,7 +709,7 @@ class CodeableConcept(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -621,12 +718,11 @@ class CodeableConcept(Element):
         )
 
 
- 
- 
 class Coding(Element):
     """
     A reference to a code defined by a terminology system
     """
+
     system: typing.Optional[Uri] = Field(
         description="Identity of the terminology system",
         default=None,
@@ -672,20 +768,40 @@ class Coding(Element):
         default=None,
         alias="_userSelected",
     )
-    @field_validator(*('userSelected', 'display', 'code', 'version', 'system', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "userSelected",
+            "display",
+            "code",
+            "version",
+            "system",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -694,7 +810,7 @@ class Coding(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -703,12 +819,11 @@ class Coding(Element):
         )
 
 
- 
- 
 class ContactDetail(Element):
     """
     Contact information
     """
+
     name: typing.Optional[String] = Field(
         description="Name of an individual to contact",
         default=None,
@@ -718,24 +833,31 @@ class ContactDetail(Element):
         default=None,
         alias="_name",
     )
-    telecom: typing.Optional[typing.List['ContactPoint']] = Field(
+    telecom: typing.Optional[typing.List["ContactPoint"]] = Field(
         description="Contact details for individual or organization",
         default=None,
     )
-    @field_validator(*('telecom', 'name', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("telecom", "name", "extension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -744,7 +866,7 @@ class ContactDetail(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -753,12 +875,11 @@ class ContactDetail(Element):
         )
 
 
- 
- 
 class ContactPoint(Element):
     """
     Details of a Technology mediated contact point (phone, fax, email, etc.)
     """
+
     system: typing.Optional[Code] = Field(
         description="phone | fax | email | pager | url | sms | other",
         default=None,
@@ -795,24 +916,44 @@ class ContactPoint(Element):
         default=None,
         alias="_rank",
     )
-    period: typing.Optional['Period'] = Field(
+    period: typing.Optional["Period"] = Field(
         description="Time period when the contact point was/is in use",
         default=None,
     )
-    @field_validator(*('period', 'rank', 'use', 'value', 'system', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "period",
+            "rank",
+            "use",
+            "value",
+            "system",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -821,7 +962,7 @@ class ContactPoint(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -831,7 +972,7 @@ class ContactPoint(Element):
 
     @model_validator(mode="after")
     def FHIR_cpt_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="value.empty() or system.exists()",
             human="A system is required if a value is provided.",
@@ -840,15 +981,14 @@ class ContactPoint(Element):
         )
 
 
- 
- 
 class Contributor(Element):
     """
     Contributor information
     """
+
     type: Code = Field(
         description="author | editor | reviewer | endorser",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -857,31 +997,40 @@ class Contributor(Element):
     )
     name: String = Field(
         description="Who contributed the content",
-        default=None,
+        default=...,
     )
     name_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for name extensions",
         default=None,
         alias="_name",
     )
-    contact: typing.Optional[typing.List['ContactDetail']] = Field(
+    contact: typing.Optional[typing.List["ContactDetail"]] = Field(
         description="Contact details of the contributor",
         default=None,
     )
-    @field_validator(*('contact', 'name', 'type', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("contact", "name", "type", "extension", "extension", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -890,7 +1039,7 @@ class Contributor(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -899,12 +1048,11 @@ class Contributor(Element):
         )
 
 
- 
- 
 class Count(FHIRBaseModel):
     """
     A measured or measurable amount
     """
+
     id: typing.Optional[String] = Field(
         description="Unique id for inter-element referencing",
         default=None,
@@ -914,7 +1062,7 @@ class Count(FHIRBaseModel):
         default=None,
         alias="_id",
     )
-    extension: typing.Optional[typing.List['Extension']] = Field(
+    extension: typing.Optional[typing.List["Extension"]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
@@ -963,20 +1111,29 @@ class Count(FHIRBaseModel):
         default=None,
         alias="_code",
     )
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("code", "system", "unit", "comparator", "value", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -985,17 +1142,17 @@ class Count(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_cnt_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum) and (code.empty() or code = '1') and (value.empty() or value.hasValue().not() or value.toString().contains('.').not())",
-            human="There SHALL be a code with a value of \"1\" if there is a value. If system is present, it SHALL be UCUM.  If present, the value SHALL be a whole number.",
+            human='There SHALL be a code with a value of "1" if there is a value. If system is present, it SHALL be UCUM.  If present, the value SHALL be a whole number.',
             key="cnt-3",
             severity="error",
         )
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1005,7 +1162,7 @@ class Count(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="code.empty() or system.exists()",
             human="If a code for the unit is present, the system SHALL also be present",
@@ -1014,15 +1171,14 @@ class Count(FHIRBaseModel):
         )
 
 
- 
- 
 class DataRequirement(Element):
     """
     Describes a required data item
     """
+
     type: Code = Field(
         description="The type of the required data",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -1038,11 +1194,11 @@ class DataRequirement(Element):
         default=None,
         alias="_profile",
     )
-    subjectCodeableConcept: typing.Optional['CodeableConcept'] = Field(
+    subjectCodeableConcept: typing.Optional["CodeableConcept"] = Field(
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
-    subjectReference: typing.Optional['Reference'] = Field(
+    subjectReference: typing.Optional["Reference"] = Field(
         description="E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device",
         default=None,
     )
@@ -1055,11 +1211,11 @@ class DataRequirement(Element):
         default=None,
         alias="_mustSupport",
     )
-    codeFilter: typing.Optional[typing.List['Element']] = Field(
+    codeFilter: typing.Optional[typing.List["Element"]] = Field(
         description="What codes are expected",
         default=None,
     )
-    dateFilter: typing.Optional[typing.List['Element']] = Field(
+    dateFilter: typing.Optional[typing.List["Element"]] = Field(
         description="What dates/date ranges are expected",
         default=None,
     )
@@ -1072,44 +1228,72 @@ class DataRequirement(Element):
         default=None,
         alias="_limit",
     )
-    sort: typing.Optional[typing.List['Element']] = Field(
+    sort: typing.Optional[typing.List["Element"]] = Field(
         description="Order of the results",
         default=None,
     )
-    @field_validator(*('sort', 'limit', 'dateFilter', 'codeFilter', 'mustSupport', 'profile', 'type', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "sort",
+            "limit",
+            "dateFilter",
+            "codeFilter",
+            "mustSupport",
+            "profile",
+            "type",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('codeFilter',), mode="after", check_fields=None)
+    @field_validator(*("codeFilter",), mode="after", check_fields=None)
     @classmethod
     def FHIR_drq_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="path.exists() xor searchParam.exists()",
             human="Either a path or a searchParam must be provided, but not both",
             key="drq-1",
             severity="error",
         )
 
-    @field_validator(*('dateFilter',), mode="after", check_fields=None)
+    @field_validator(*("dateFilter",), mode="after", check_fields=None)
     @classmethod
     def FHIR_drq_2_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="path.exists() xor searchParam.exists()",
             human="Either a path or a searchParam must be provided, but not both",
             key="drq-2",
@@ -1118,7 +1302,7 @@ class DataRequirement(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1128,24 +1312,25 @@ class DataRequirement(Element):
 
     @model_validator(mode="after")
     def subject_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=['CodeableConcept', 'Reference'],
+            field_types=["CodeableConcept", "Reference"],
             field_name_base="subject",
         )
 
-    @property 
+    @property
     def subject(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="subject",
         )
 
- 
- 
+
 class Distance(FHIRBaseModel):
     """
     A length - a value with a unit that is a physical distance
     """
+
     id: typing.Optional[String] = Field(
         description="Unique id for inter-element referencing",
         default=None,
@@ -1155,7 +1340,7 @@ class Distance(FHIRBaseModel):
         default=None,
         alias="_id",
     )
-    extension: typing.Optional[typing.List['Extension']] = Field(
+    extension: typing.Optional[typing.List["Extension"]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
@@ -1204,20 +1389,29 @@ class Distance(FHIRBaseModel):
         default=None,
         alias="_code",
     )
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("code", "system", "unit", "comparator", "value", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -1226,7 +1420,7 @@ class Distance(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dis_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(code.exists() or value.empty()) and (system.empty() or system = %ucum)",
             human="There SHALL be a code if there is a value and it SHALL be an expression of length.  If system is present, it SHALL be UCUM.",
@@ -1236,7 +1430,7 @@ class Distance(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1246,7 +1440,7 @@ class Distance(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="code.empty() or system.exists()",
             human="If a code for the unit is present, the system SHALL also be present",
@@ -1255,12 +1449,11 @@ class Distance(FHIRBaseModel):
         )
 
 
- 
- 
 class Dosage(BackboneElement):
     """
     How the medication is/was taken or should be taken
     """
+
     sequence: typing.Optional[Integer] = Field(
         description="The order of the dosage instructions",
         default=None,
@@ -1279,8 +1472,8 @@ class Dosage(BackboneElement):
         default=None,
         alias="_text",
     )
-    additionalInstruction: typing.Optional[typing.List['CodeableConcept']] = Field(
-        description="Supplemental instruction or warnings to the patient - e.g. \"with meals\", \"may cause drowsiness\"",
+    additionalInstruction: typing.Optional[typing.List["CodeableConcept"]] = Field(
+        description='Supplemental instruction or warnings to the patient - e.g. "with meals", "may cause drowsiness"',
         default=None,
     )
     patientInstruction: typing.Optional[String] = Field(
@@ -1292,60 +1485,108 @@ class Dosage(BackboneElement):
         default=None,
         alias="_patientInstruction",
     )
-    timing: typing.Optional['Timing'] = Field(
+    timing: typing.Optional["Timing"] = Field(
         description="When medication should be administered",
         default=None,
     )
     asNeededBoolean: typing.Optional[Boolean] = Field(
-        description="Take \"as needed\" (for x)",
+        description='Take "as needed" (for x)',
         default=None,
     )
-    asNeededCodeableConcept: typing.Optional['CodeableConcept'] = Field(
-        description="Take \"as needed\" (for x)",
+    asNeededCodeableConcept: typing.Optional["CodeableConcept"] = Field(
+        description='Take "as needed" (for x)',
         default=None,
     )
-    site: typing.Optional['CodeableConcept'] = Field(
+    site: typing.Optional["CodeableConcept"] = Field(
         description="Body site to administer to",
         default=None,
     )
-    route: typing.Optional['CodeableConcept'] = Field(
+    route: typing.Optional["CodeableConcept"] = Field(
         description="How drug should enter body",
         default=None,
     )
-    method: typing.Optional['CodeableConcept'] = Field(
+    method: typing.Optional["CodeableConcept"] = Field(
         description="Technique for administering medication",
         default=None,
     )
-    doseAndRate: typing.Optional[typing.List['Element']] = Field(
+    doseAndRate: typing.Optional[typing.List["Element"]] = Field(
         description="Amount of medication administered",
         default=None,
     )
-    maxDosePerPeriod: typing.Optional['Ratio'] = Field(
+    maxDosePerPeriod: typing.Optional["Ratio"] = Field(
         description="Upper limit on medication per unit of time",
         default=None,
     )
-    maxDosePerAdministration: typing.Optional['Quantity'] = Field(
+    maxDosePerAdministration: typing.Optional["Quantity"] = Field(
         description="Upper limit on medication per administration",
         default=None,
     )
-    maxDosePerLifetime: typing.Optional['Quantity'] = Field(
+    maxDosePerLifetime: typing.Optional["Quantity"] = Field(
         description="Upper limit on medication per lifetime of the patient",
         default=None,
     )
-    @field_validator(*('maxDosePerLifetime', 'maxDosePerAdministration', 'maxDosePerPeriod', 'doseAndRate', 'method', 'route', 'site', 'timing', 'patientInstruction', 'additionalInstruction', 'text', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "maxDosePerLifetime",
+            "maxDosePerAdministration",
+            "maxDosePerPeriod",
+            "doseAndRate",
+            "method",
+            "route",
+            "site",
+            "timing",
+            "patientInstruction",
+            "additionalInstruction",
+            "text",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -1354,7 +1595,7 @@ class Dosage(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1364,24 +1605,25 @@ class Dosage(BackboneElement):
 
     @model_validator(mode="after")
     def asNeeded_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, 'CodeableConcept'],
+            field_types=[Boolean, "CodeableConcept"],
             field_name_base="asNeeded",
         )
 
-    @property 
+    @property
     def asNeeded(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="asNeeded",
         )
 
- 
- 
+
 class Duration(FHIRBaseModel):
     """
     A length of time
     """
+
     id: typing.Optional[String] = Field(
         description="Unique id for inter-element referencing",
         default=None,
@@ -1391,7 +1633,7 @@ class Duration(FHIRBaseModel):
         default=None,
         alias="_id",
     )
-    extension: typing.Optional[typing.List['Extension']] = Field(
+    extension: typing.Optional[typing.List["Extension"]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
@@ -1440,20 +1682,29 @@ class Duration(FHIRBaseModel):
         default=None,
         alias="_code",
     )
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("code", "system", "unit", "comparator", "value", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -1462,7 +1713,7 @@ class Duration(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_drt_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="code.exists() implies ((system = %ucum) and value.exists())",
             human="There SHALL be a code if there is a value and it SHALL be an expression of time.  If system is present, it SHALL be UCUM.",
@@ -1472,7 +1723,7 @@ class Duration(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1482,7 +1733,7 @@ class Duration(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="code.empty() or system.exists()",
             human="If a code for the unit is present, the system SHALL also be present",
@@ -1491,15 +1742,14 @@ class Duration(FHIRBaseModel):
         )
 
 
- 
- 
 class ElementDefinition(BackboneElement):
     """
     Definition of an element in a resource or extension
     """
+
     path: String = Field(
         description="Path of the element in the hierarchy of elements",
-        default=None,
+        default=...,
     )
     path_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for path extensions",
@@ -1542,11 +1792,11 @@ class ElementDefinition(BackboneElement):
         default=None,
         alias="_label",
     )
-    code: typing.Optional[typing.List['Coding']] = Field(
+    code: typing.Optional[typing.List["Coding"]] = Field(
         description="Corresponding codes in terminologies",
         default=None,
     )
-    slicing: typing.Optional['Element'] = Field(
+    slicing: typing.Optional["Element"] = Field(
         description="This element is sliced - slices follow",
         default=None,
     )
@@ -1613,7 +1863,7 @@ class ElementDefinition(BackboneElement):
         default=None,
         alias="_max",
     )
-    base: typing.Optional['Element'] = Field(
+    base: typing.Optional["Element"] = Field(
         description="Base definition information for tools",
         default=None,
     )
@@ -1626,7 +1876,7 @@ class ElementDefinition(BackboneElement):
         default=None,
         alias="_contentReference",
     )
-    type: typing.Optional[typing.List['Element']] = Field(
+    type: typing.Optional[typing.List["Element"]] = Field(
         description="Data type and Profile for this element",
         default=None,
     )
@@ -1706,127 +1956,127 @@ class ElementDefinition(BackboneElement):
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueAddress: typing.Optional['Address'] = Field(
+    defaultValueAddress: typing.Optional["Address"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueAge: typing.Optional['Age'] = Field(
+    defaultValueAge: typing.Optional["Age"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueAnnotation: typing.Optional['Annotation'] = Field(
+    defaultValueAnnotation: typing.Optional["Annotation"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueAttachment: typing.Optional['Attachment'] = Field(
+    defaultValueAttachment: typing.Optional["Attachment"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueCodeableConcept: typing.Optional['CodeableConcept'] = Field(
+    defaultValueCodeableConcept: typing.Optional["CodeableConcept"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueCoding: typing.Optional['Coding'] = Field(
+    defaultValueCoding: typing.Optional["Coding"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueContactPoint: typing.Optional['ContactPoint'] = Field(
+    defaultValueContactPoint: typing.Optional["ContactPoint"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueCount: typing.Optional['Count'] = Field(
+    defaultValueCount: typing.Optional["Count"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueDistance: typing.Optional['Distance'] = Field(
+    defaultValueDistance: typing.Optional["Distance"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueDuration: typing.Optional['Duration'] = Field(
+    defaultValueDuration: typing.Optional["Duration"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueHumanName: typing.Optional['HumanName'] = Field(
+    defaultValueHumanName: typing.Optional["HumanName"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueIdentifier: typing.Optional['Identifier'] = Field(
+    defaultValueIdentifier: typing.Optional["Identifier"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueMoney: typing.Optional['Money'] = Field(
+    defaultValueMoney: typing.Optional["Money"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValuePeriod: typing.Optional['Period'] = Field(
+    defaultValuePeriod: typing.Optional["Period"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueQuantity: typing.Optional['Quantity'] = Field(
+    defaultValueQuantity: typing.Optional["Quantity"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueRange: typing.Optional['Range'] = Field(
+    defaultValueRange: typing.Optional["Range"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueRatio: typing.Optional['Ratio'] = Field(
+    defaultValueRatio: typing.Optional["Ratio"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueReference: typing.Optional['Reference'] = Field(
+    defaultValueReference: typing.Optional["Reference"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueSampledData: typing.Optional['SampledData'] = Field(
+    defaultValueSampledData: typing.Optional["SampledData"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueSignature: typing.Optional['Signature'] = Field(
+    defaultValueSignature: typing.Optional["Signature"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueTiming: typing.Optional['Timing'] = Field(
+    defaultValueTiming: typing.Optional["Timing"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueContactDetail: typing.Optional['ContactDetail'] = Field(
+    defaultValueContactDetail: typing.Optional["ContactDetail"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueContributor: typing.Optional['Contributor'] = Field(
+    defaultValueContributor: typing.Optional["Contributor"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueDataRequirement: typing.Optional['DataRequirement'] = Field(
+    defaultValueDataRequirement: typing.Optional["DataRequirement"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueExpression: typing.Optional['Expression'] = Field(
+    defaultValueExpression: typing.Optional["Expression"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueParameterDefinition: typing.Optional['ParameterDefinition'] = Field(
+    defaultValueParameterDefinition: typing.Optional["ParameterDefinition"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueRelatedArtifact: typing.Optional['RelatedArtifact'] = Field(
+    defaultValueRelatedArtifact: typing.Optional["RelatedArtifact"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueTriggerDefinition: typing.Optional['TriggerDefinition'] = Field(
+    defaultValueTriggerDefinition: typing.Optional["TriggerDefinition"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueUsageContext: typing.Optional['UsageContext'] = Field(
+    defaultValueUsageContext: typing.Optional["UsageContext"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueDosage: typing.Optional['Dosage'] = Field(
+    defaultValueDosage: typing.Optional["Dosage"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
-    defaultValueMeta: typing.Optional['Meta'] = Field(
+    defaultValueMeta: typing.Optional["Meta"] = Field(
         description="Specified value if missing from instance",
         default=None,
     )
@@ -1924,127 +2174,127 @@ class ElementDefinition(BackboneElement):
         description="Value must be exactly this",
         default=None,
     )
-    fixedAddress: typing.Optional['Address'] = Field(
+    fixedAddress: typing.Optional["Address"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedAge: typing.Optional['Age'] = Field(
+    fixedAge: typing.Optional["Age"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedAnnotation: typing.Optional['Annotation'] = Field(
+    fixedAnnotation: typing.Optional["Annotation"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedAttachment: typing.Optional['Attachment'] = Field(
+    fixedAttachment: typing.Optional["Attachment"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedCodeableConcept: typing.Optional['CodeableConcept'] = Field(
+    fixedCodeableConcept: typing.Optional["CodeableConcept"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedCoding: typing.Optional['Coding'] = Field(
+    fixedCoding: typing.Optional["Coding"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedContactPoint: typing.Optional['ContactPoint'] = Field(
+    fixedContactPoint: typing.Optional["ContactPoint"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedCount: typing.Optional['Count'] = Field(
+    fixedCount: typing.Optional["Count"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedDistance: typing.Optional['Distance'] = Field(
+    fixedDistance: typing.Optional["Distance"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedDuration: typing.Optional['Duration'] = Field(
+    fixedDuration: typing.Optional["Duration"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedHumanName: typing.Optional['HumanName'] = Field(
+    fixedHumanName: typing.Optional["HumanName"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedIdentifier: typing.Optional['Identifier'] = Field(
+    fixedIdentifier: typing.Optional["Identifier"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedMoney: typing.Optional['Money'] = Field(
+    fixedMoney: typing.Optional["Money"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedPeriod: typing.Optional['Period'] = Field(
+    fixedPeriod: typing.Optional["Period"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedQuantity: typing.Optional['Quantity'] = Field(
+    fixedQuantity: typing.Optional["Quantity"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedRange: typing.Optional['Range'] = Field(
+    fixedRange: typing.Optional["Range"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedRatio: typing.Optional['Ratio'] = Field(
+    fixedRatio: typing.Optional["Ratio"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedReference: typing.Optional['Reference'] = Field(
+    fixedReference: typing.Optional["Reference"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedSampledData: typing.Optional['SampledData'] = Field(
+    fixedSampledData: typing.Optional["SampledData"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedSignature: typing.Optional['Signature'] = Field(
+    fixedSignature: typing.Optional["Signature"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedTiming: typing.Optional['Timing'] = Field(
+    fixedTiming: typing.Optional["Timing"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedContactDetail: typing.Optional['ContactDetail'] = Field(
+    fixedContactDetail: typing.Optional["ContactDetail"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedContributor: typing.Optional['Contributor'] = Field(
+    fixedContributor: typing.Optional["Contributor"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedDataRequirement: typing.Optional['DataRequirement'] = Field(
+    fixedDataRequirement: typing.Optional["DataRequirement"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedExpression: typing.Optional['Expression'] = Field(
+    fixedExpression: typing.Optional["Expression"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedParameterDefinition: typing.Optional['ParameterDefinition'] = Field(
+    fixedParameterDefinition: typing.Optional["ParameterDefinition"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedRelatedArtifact: typing.Optional['RelatedArtifact'] = Field(
+    fixedRelatedArtifact: typing.Optional["RelatedArtifact"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedTriggerDefinition: typing.Optional['TriggerDefinition'] = Field(
+    fixedTriggerDefinition: typing.Optional["TriggerDefinition"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedUsageContext: typing.Optional['UsageContext'] = Field(
+    fixedUsageContext: typing.Optional["UsageContext"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedDosage: typing.Optional['Dosage'] = Field(
+    fixedDosage: typing.Optional["Dosage"] = Field(
         description="Value must be exactly this",
         default=None,
     )
-    fixedMeta: typing.Optional['Meta'] = Field(
+    fixedMeta: typing.Optional["Meta"] = Field(
         description="Value must be exactly this",
         default=None,
     )
@@ -2124,131 +2374,131 @@ class ElementDefinition(BackboneElement):
         description="Value must have at least these property values",
         default=None,
     )
-    patternAddress: typing.Optional['Address'] = Field(
+    patternAddress: typing.Optional["Address"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternAge: typing.Optional['Age'] = Field(
+    patternAge: typing.Optional["Age"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternAnnotation: typing.Optional['Annotation'] = Field(
+    patternAnnotation: typing.Optional["Annotation"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternAttachment: typing.Optional['Attachment'] = Field(
+    patternAttachment: typing.Optional["Attachment"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternCodeableConcept: typing.Optional['CodeableConcept'] = Field(
+    patternCodeableConcept: typing.Optional["CodeableConcept"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternCoding: typing.Optional['Coding'] = Field(
+    patternCoding: typing.Optional["Coding"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternContactPoint: typing.Optional['ContactPoint'] = Field(
+    patternContactPoint: typing.Optional["ContactPoint"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternCount: typing.Optional['Count'] = Field(
+    patternCount: typing.Optional["Count"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternDistance: typing.Optional['Distance'] = Field(
+    patternDistance: typing.Optional["Distance"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternDuration: typing.Optional['Duration'] = Field(
+    patternDuration: typing.Optional["Duration"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternHumanName: typing.Optional['HumanName'] = Field(
+    patternHumanName: typing.Optional["HumanName"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternIdentifier: typing.Optional['Identifier'] = Field(
+    patternIdentifier: typing.Optional["Identifier"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternMoney: typing.Optional['Money'] = Field(
+    patternMoney: typing.Optional["Money"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternPeriod: typing.Optional['Period'] = Field(
+    patternPeriod: typing.Optional["Period"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternQuantity: typing.Optional['Quantity'] = Field(
+    patternQuantity: typing.Optional["Quantity"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternRange: typing.Optional['Range'] = Field(
+    patternRange: typing.Optional["Range"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternRatio: typing.Optional['Ratio'] = Field(
+    patternRatio: typing.Optional["Ratio"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternReference: typing.Optional['Reference'] = Field(
+    patternReference: typing.Optional["Reference"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternSampledData: typing.Optional['SampledData'] = Field(
+    patternSampledData: typing.Optional["SampledData"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternSignature: typing.Optional['Signature'] = Field(
+    patternSignature: typing.Optional["Signature"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternTiming: typing.Optional['Timing'] = Field(
+    patternTiming: typing.Optional["Timing"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternContactDetail: typing.Optional['ContactDetail'] = Field(
+    patternContactDetail: typing.Optional["ContactDetail"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternContributor: typing.Optional['Contributor'] = Field(
+    patternContributor: typing.Optional["Contributor"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternDataRequirement: typing.Optional['DataRequirement'] = Field(
+    patternDataRequirement: typing.Optional["DataRequirement"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternExpression: typing.Optional['Expression'] = Field(
+    patternExpression: typing.Optional["Expression"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternParameterDefinition: typing.Optional['ParameterDefinition'] = Field(
+    patternParameterDefinition: typing.Optional["ParameterDefinition"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternRelatedArtifact: typing.Optional['RelatedArtifact'] = Field(
+    patternRelatedArtifact: typing.Optional["RelatedArtifact"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternTriggerDefinition: typing.Optional['TriggerDefinition'] = Field(
+    patternTriggerDefinition: typing.Optional["TriggerDefinition"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternUsageContext: typing.Optional['UsageContext'] = Field(
+    patternUsageContext: typing.Optional["UsageContext"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternDosage: typing.Optional['Dosage'] = Field(
+    patternDosage: typing.Optional["Dosage"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    patternMeta: typing.Optional['Meta'] = Field(
+    patternMeta: typing.Optional["Meta"] = Field(
         description="Value must have at least these property values",
         default=None,
     )
-    example: typing.Optional[typing.List['Element']] = Field(
+    example: typing.Optional[typing.List["Element"]] = Field(
         description="Example value (as defined for type)",
         default=None,
     )
@@ -2284,7 +2534,7 @@ class ElementDefinition(BackboneElement):
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
-    minValueQuantity: typing.Optional['Quantity'] = Field(
+    minValueQuantity: typing.Optional["Quantity"] = Field(
         description="Minimum Allowed Value (for some types)",
         default=None,
     )
@@ -2320,7 +2570,7 @@ class ElementDefinition(BackboneElement):
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
-    maxValueQuantity: typing.Optional['Quantity'] = Field(
+    maxValueQuantity: typing.Optional["Quantity"] = Field(
         description="Maximum Allowed Value (for some types)",
         default=None,
     )
@@ -2342,7 +2592,7 @@ class ElementDefinition(BackboneElement):
         default=None,
         alias="_condition",
     )
-    constraint: typing.Optional[typing.List['Element']] = Field(
+    constraint: typing.Optional[typing.List["Element"]] = Field(
         description="Condition that must evaluate to true",
         default=None,
     )
@@ -2382,88 +2632,199 @@ class ElementDefinition(BackboneElement):
         default=None,
         alias="_isSummary",
     )
-    binding: typing.Optional['Element'] = Field(
+    binding: typing.Optional["Element"] = Field(
         description="ValueSet details if this is coded",
         default=None,
     )
-    mapping: typing.Optional[typing.List['Element']] = Field(
+    mapping: typing.Optional[typing.List["Element"]] = Field(
         description="Map element to another set of definitions",
         default=None,
     )
-    @field_validator(*('mapping', 'binding', 'isSummary', 'isModifierReason', 'isModifier', 'mustSupport', 'constraint', 'condition', 'maxLength', 'example', 'orderMeaning', 'meaningWhenMissing', 'type', 'contentReference', 'base', 'max', 'min', 'alias', 'requirements', 'comment', 'definition', 'short', 'slicing', 'code', 'label', 'sliceIsConstraining', 'sliceName', 'representation', 'path', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "mapping",
+            "binding",
+            "isSummary",
+            "isModifierReason",
+            "isModifier",
+            "mustSupport",
+            "constraint",
+            "condition",
+            "maxLength",
+            "example",
+            "orderMeaning",
+            "meaningWhenMissing",
+            "type",
+            "contentReference",
+            "base",
+            "max",
+            "min",
+            "alias",
+            "requirements",
+            "comment",
+            "definition",
+            "short",
+            "slicing",
+            "code",
+            "label",
+            "sliceIsConstraining",
+            "sliceName",
+            "representation",
+            "path",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('slicing',), mode="after", check_fields=None)
+    @field_validator(*("slicing",), mode="after", check_fields=None)
     @classmethod
     def FHIR_eld_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="discriminator.exists() or description.exists()",
             human="If there are no discriminators, there must be a definition",
             key="eld-1",
             severity="error",
         )
 
-    @field_validator(*('max',), mode="after", check_fields=None)
+    @field_validator(*("max",), mode="after", check_fields=None)
     @classmethod
     def FHIR_eld_3_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="empty() or ($this = '*') or (toInteger() >= 0)",
-            human="Max SHALL be a number or \"*\"",
+            human='Max SHALL be a number or "*"',
             key="eld-3",
             severity="error",
         )
 
-    @field_validator(*('type',), mode="after", check_fields=None)
+    @field_validator(*("type",), mode="after", check_fields=None)
     @classmethod
     def FHIR_eld_4_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="aggregation.empty() or (code = 'Reference') or (code = 'canonical')",
             human="Aggregation may only be specified if one of the allowed types for the element is a reference",
             key="eld-4",
             severity="error",
         )
 
-    @field_validator(*('type',), mode="after", check_fields=None)
+    @field_validator(*("type",), mode="after", check_fields=None)
     @classmethod
     def FHIR_eld_17_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(code='Reference' or code = 'canonical') or targetProfile.empty()",
             human="targetProfile is only allowed if the type is Reference or canonical",
             key="eld-17",
             severity="error",
         )
 
-    @field_validator(*('constraint',), mode="after", check_fields=None)
+    @field_validator(*("constraint",), mode="after", check_fields=None)
     @classmethod
     def FHIR_eld_21_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="expression.exists()",
             human="Constraints should have an expression or else validators will not be able to enforce them",
             key="eld-21",
             severity="warning",
         )
 
-    @field_validator(*('binding',), mode="after", check_fields=None)
+    @field_validator(*("binding",), mode="after", check_fields=None)
     @classmethod
     def FHIR_eld_12_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="valueSet.exists() implies (valueSet.startsWith('http:') or valueSet.startsWith('https') or valueSet.startsWith('urn:'))",
             human="ValueSet SHALL start with http:// or https:// or urn:",
             key="eld-12",
@@ -2472,7 +2833,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -2482,47 +2843,220 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def defaultValue_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Base64Binary, Boolean, Canonical, Code, Date, DateTime, Decimal, Id, Instant, Integer, Markdown, Oid, PositiveInt, String, Time, UnsignedInt, Uri, Url, Uuid, 'Address', 'Age', 'Annotation', 'Attachment', 'CodeableConcept', 'Coding', 'ContactPoint', 'Count', 'Distance', 'Duration', 'HumanName', 'Identifier', 'Money', 'Period', 'Quantity', 'Range', 'Ratio', 'Reference', 'SampledData', 'Signature', 'Timing', 'ContactDetail', 'Contributor', 'DataRequirement', 'Expression', 'ParameterDefinition', 'RelatedArtifact', 'TriggerDefinition', 'UsageContext', 'Dosage', 'Meta'],
+            field_types=[
+                Base64Binary,
+                Boolean,
+                Canonical,
+                Code,
+                Date,
+                DateTime,
+                Decimal,
+                Id,
+                Instant,
+                Integer,
+                Markdown,
+                Oid,
+                PositiveInt,
+                String,
+                Time,
+                UnsignedInt,
+                Uri,
+                Url,
+                Uuid,
+                "Address",
+                "Age",
+                "Annotation",
+                "Attachment",
+                "CodeableConcept",
+                "Coding",
+                "ContactPoint",
+                "Count",
+                "Distance",
+                "Duration",
+                "HumanName",
+                "Identifier",
+                "Money",
+                "Period",
+                "Quantity",
+                "Range",
+                "Ratio",
+                "Reference",
+                "SampledData",
+                "Signature",
+                "Timing",
+                "ContactDetail",
+                "Contributor",
+                "DataRequirement",
+                "Expression",
+                "ParameterDefinition",
+                "RelatedArtifact",
+                "TriggerDefinition",
+                "UsageContext",
+                "Dosage",
+                "Meta",
+            ],
             field_name_base="defaultValue",
         )
 
     @model_validator(mode="after")
     def fixed_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Base64Binary, Boolean, Canonical, Code, Date, DateTime, Decimal, Id, Instant, Integer, Markdown, Oid, PositiveInt, String, Time, UnsignedInt, Uri, Url, Uuid, 'Address', 'Age', 'Annotation', 'Attachment', 'CodeableConcept', 'Coding', 'ContactPoint', 'Count', 'Distance', 'Duration', 'HumanName', 'Identifier', 'Money', 'Period', 'Quantity', 'Range', 'Ratio', 'Reference', 'SampledData', 'Signature', 'Timing', 'ContactDetail', 'Contributor', 'DataRequirement', 'Expression', 'ParameterDefinition', 'RelatedArtifact', 'TriggerDefinition', 'UsageContext', 'Dosage', 'Meta'],
+            field_types=[
+                Base64Binary,
+                Boolean,
+                Canonical,
+                Code,
+                Date,
+                DateTime,
+                Decimal,
+                Id,
+                Instant,
+                Integer,
+                Markdown,
+                Oid,
+                PositiveInt,
+                String,
+                Time,
+                UnsignedInt,
+                Uri,
+                Url,
+                Uuid,
+                "Address",
+                "Age",
+                "Annotation",
+                "Attachment",
+                "CodeableConcept",
+                "Coding",
+                "ContactPoint",
+                "Count",
+                "Distance",
+                "Duration",
+                "HumanName",
+                "Identifier",
+                "Money",
+                "Period",
+                "Quantity",
+                "Range",
+                "Ratio",
+                "Reference",
+                "SampledData",
+                "Signature",
+                "Timing",
+                "ContactDetail",
+                "Contributor",
+                "DataRequirement",
+                "Expression",
+                "ParameterDefinition",
+                "RelatedArtifact",
+                "TriggerDefinition",
+                "UsageContext",
+                "Dosage",
+                "Meta",
+            ],
             field_name_base="fixed",
         )
 
     @model_validator(mode="after")
     def pattern_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Base64Binary, Boolean, Canonical, Code, Date, DateTime, Decimal, Id, Instant, Integer, Markdown, Oid, PositiveInt, String, Time, UnsignedInt, Uri, Url, Uuid, 'Address', 'Age', 'Annotation', 'Attachment', 'CodeableConcept', 'Coding', 'ContactPoint', 'Count', 'Distance', 'Duration', 'HumanName', 'Identifier', 'Money', 'Period', 'Quantity', 'Range', 'Ratio', 'Reference', 'SampledData', 'Signature', 'Timing', 'ContactDetail', 'Contributor', 'DataRequirement', 'Expression', 'ParameterDefinition', 'RelatedArtifact', 'TriggerDefinition', 'UsageContext', 'Dosage', 'Meta'],
+            field_types=[
+                Base64Binary,
+                Boolean,
+                Canonical,
+                Code,
+                Date,
+                DateTime,
+                Decimal,
+                Id,
+                Instant,
+                Integer,
+                Markdown,
+                Oid,
+                PositiveInt,
+                String,
+                Time,
+                UnsignedInt,
+                Uri,
+                Url,
+                Uuid,
+                "Address",
+                "Age",
+                "Annotation",
+                "Attachment",
+                "CodeableConcept",
+                "Coding",
+                "ContactPoint",
+                "Count",
+                "Distance",
+                "Duration",
+                "HumanName",
+                "Identifier",
+                "Money",
+                "Period",
+                "Quantity",
+                "Range",
+                "Ratio",
+                "Reference",
+                "SampledData",
+                "Signature",
+                "Timing",
+                "ContactDetail",
+                "Contributor",
+                "DataRequirement",
+                "Expression",
+                "ParameterDefinition",
+                "RelatedArtifact",
+                "TriggerDefinition",
+                "UsageContext",
+                "Dosage",
+                "Meta",
+            ],
             field_name_base="pattern",
         )
 
     @model_validator(mode="after")
     def minValue_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, DateTime, Instant, Time, Decimal, Integer, PositiveInt, UnsignedInt, 'Quantity'],
+            field_types=[
+                Date,
+                DateTime,
+                Instant,
+                Time,
+                Decimal,
+                Integer,
+                PositiveInt,
+                UnsignedInt,
+                "Quantity",
+            ],
             field_name_base="minValue",
         )
 
     @model_validator(mode="after")
     def maxValue_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Date, DateTime, Instant, Time, Decimal, Integer, PositiveInt, UnsignedInt, 'Quantity'],
+            field_types=[
+                Date,
+                DateTime,
+                Instant,
+                Time,
+                Decimal,
+                Integer,
+                PositiveInt,
+                UnsignedInt,
+                "Quantity",
+            ],
             field_name_base="maxValue",
         )
 
     @model_validator(mode="after")
     def FHIR_eld_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="min.empty() or max.empty() or (max = '*') or iif(max != '*', min <= max.toInteger())",
             human="Min <= Max",
@@ -2532,7 +3066,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contentReference.empty() or (type.empty() and defaultValue.empty() and fixed.empty() and pattern.empty() and example.empty() and minValue.empty() and maxValue.empty() and maxLength.empty() and binding.empty())",
             human="if the element definition has a contentReference, it cannot have type, defaultValue, fixed, pattern, example, minValue, maxValue, maxLength, or binding",
@@ -2542,7 +3076,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="fixed.empty() or (type.count()  <= 1)",
             human="Fixed value may only be specified if there is one type",
@@ -2552,7 +3086,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_7_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="pattern.empty() or (type.count() <= 1)",
             human="Pattern may only be specified if there is one type",
@@ -2562,7 +3096,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_8_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="pattern.empty() or fixed.empty()",
             human="Pattern and fixed are mutually exclusive",
@@ -2572,7 +3106,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_11_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="binding.empty() or type.code.empty() or type.select((code = 'code') or (code = 'Coding') or (code='CodeableConcept') or (code = 'Quantity') or (code = 'string') or (code = 'uri')).exists()",
             human="Binding can only be present for coded elements, string, and uri",
@@ -2582,7 +3116,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_13_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="type.select(code).isDistinct()",
             human="Types must be unique by code",
@@ -2592,7 +3126,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_14_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="constraint.select(key).isDistinct()",
             human="Constraints must be unique by key",
@@ -2602,7 +3136,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_15_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="defaultValue.empty() or meaningWhenMissing.empty()",
             human="default value and meaningWhenMissing are mutually exclusive",
@@ -2612,17 +3146,17 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_16_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="sliceName.empty() or sliceName.matches('^[a-zA-Z0-9\\/\\-_\\[\\]\\@]+$')",
-            human="sliceName must be composed of proper tokens separated by \"/\"",
+            human='sliceName must be composed of proper tokens separated by "/"',
             key="eld-16",
             severity="error",
         )
 
     @model_validator(mode="after")
     def FHIR_eld_18_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(isModifier.exists() and isModifier) implies isModifierReason.exists()",
             human="Must have a modifier reason if isModifier = true",
@@ -2632,9 +3166,9 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_19_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
-            expression="path.matches('[^\\s\\.,:;\\\'\"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\.[^\\s\\.,:;\\\'\"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\[x\\])?(\\:[^\\s\\.]+)?)*')",
+            expression="path.matches('[^\\s\\.,:;\\'\"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\.[^\\s\\.,:;\\'\"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\[x\\])?(\\:[^\\s\\.]+)?)*')",
             human="Element names cannot include some special characters",
             key="eld-19",
             severity="error",
@@ -2642,7 +3176,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_20_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="path.matches('[A-Za-z][A-Za-z0-9]*(\\.[a-z][A-Za-z0-9]*(\\[x])?)*')",
             human="Element names should be simple alphanumerics with a max of 64 characters, or code generation tools may be broken",
@@ -2652,7 +3186,7 @@ class ElementDefinition(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_eld_22_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="sliceIsConstraining.exists() implies sliceName.exists()",
             human="sliceIsConstraining can only appear if slicename is present",
@@ -2660,38 +3194,47 @@ class ElementDefinition(BackboneElement):
             severity="error",
         )
 
-    @property 
+    @property
     def defaultValue(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="defaultValue",
         )
-    @property 
+
+    @property
     def fixed(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="fixed",
         )
-    @property 
+
+    @property
     def pattern(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="pattern",
         )
-    @property 
+
+    @property
     def minValue(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="minValue",
         )
-    @property 
+
+    @property
     def maxValue(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="maxValue",
         )
 
- 
- 
+
 class Expression(Element):
     """
     An expression that can be used to generate a value
     """
+
     description: typing.Optional[String] = Field(
         description="Natural language description of the condition",
         default=None,
@@ -2712,7 +3255,7 @@ class Expression(Element):
     )
     language: Code = Field(
         description="text/cql | text/fhirpath | application/x-fhir-query | etc.",
-        default=None,
+        default=...,
     )
     language_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for language extensions",
@@ -2737,20 +3280,40 @@ class Expression(Element):
         default=None,
         alias="_reference",
     )
-    @field_validator(*('reference', 'expression', 'language', 'name', 'description', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "reference",
+            "expression",
+            "language",
+            "name",
+            "description",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -2759,7 +3322,7 @@ class Expression(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -2769,7 +3332,7 @@ class Expression(Element):
 
     @model_validator(mode="after")
     def FHIR_exp_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="expression.exists() or reference.exists()",
             human="An expression or a reference must be provided",
@@ -2778,15 +3341,14 @@ class Expression(Element):
         )
 
 
- 
- 
 class Extension(Element):
     """
     Optional Extensions Element
     """
+
     url: String = Field(
         description="identifies the meaning of the extension",
-        default=None,
+        default=...,
     )
     url_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for url extensions",
@@ -2869,144 +3431,149 @@ class Extension(Element):
         description="Value of extension",
         default=None,
     )
-    valueAddress: typing.Optional['Address'] = Field(
+    valueAddress: typing.Optional["Address"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueAge: typing.Optional['Age'] = Field(
+    valueAge: typing.Optional["Age"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueAnnotation: typing.Optional['Annotation'] = Field(
+    valueAnnotation: typing.Optional["Annotation"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueAttachment: typing.Optional['Attachment'] = Field(
+    valueAttachment: typing.Optional["Attachment"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueCodeableConcept: typing.Optional['CodeableConcept'] = Field(
+    valueCodeableConcept: typing.Optional["CodeableConcept"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueCoding: typing.Optional['Coding'] = Field(
+    valueCoding: typing.Optional["Coding"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueContactPoint: typing.Optional['ContactPoint'] = Field(
+    valueContactPoint: typing.Optional["ContactPoint"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueCount: typing.Optional['Count'] = Field(
+    valueCount: typing.Optional["Count"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueDistance: typing.Optional['Distance'] = Field(
+    valueDistance: typing.Optional["Distance"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueDuration: typing.Optional['Duration'] = Field(
+    valueDuration: typing.Optional["Duration"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueHumanName: typing.Optional['HumanName'] = Field(
+    valueHumanName: typing.Optional["HumanName"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueIdentifier: typing.Optional['Identifier'] = Field(
+    valueIdentifier: typing.Optional["Identifier"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueMoney: typing.Optional['Money'] = Field(
+    valueMoney: typing.Optional["Money"] = Field(
         description="Value of extension",
         default=None,
     )
-    valuePeriod: typing.Optional['Period'] = Field(
+    valuePeriod: typing.Optional["Period"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueQuantity: typing.Optional['Quantity'] = Field(
+    valueQuantity: typing.Optional["Quantity"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueRange: typing.Optional['Range'] = Field(
+    valueRange: typing.Optional["Range"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueRatio: typing.Optional['Ratio'] = Field(
+    valueRatio: typing.Optional["Ratio"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueReference: typing.Optional['Reference'] = Field(
+    valueReference: typing.Optional["Reference"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueSampledData: typing.Optional['SampledData'] = Field(
+    valueSampledData: typing.Optional["SampledData"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueSignature: typing.Optional['Signature'] = Field(
+    valueSignature: typing.Optional["Signature"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueTiming: typing.Optional['Timing'] = Field(
+    valueTiming: typing.Optional["Timing"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueContactDetail: typing.Optional['ContactDetail'] = Field(
+    valueContactDetail: typing.Optional["ContactDetail"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueContributor: typing.Optional['Contributor'] = Field(
+    valueContributor: typing.Optional["Contributor"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueDataRequirement: typing.Optional['DataRequirement'] = Field(
+    valueDataRequirement: typing.Optional["DataRequirement"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueExpression: typing.Optional['Expression'] = Field(
+    valueExpression: typing.Optional["Expression"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueParameterDefinition: typing.Optional['ParameterDefinition'] = Field(
+    valueParameterDefinition: typing.Optional["ParameterDefinition"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueRelatedArtifact: typing.Optional['RelatedArtifact'] = Field(
+    valueRelatedArtifact: typing.Optional["RelatedArtifact"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueTriggerDefinition: typing.Optional['TriggerDefinition'] = Field(
+    valueTriggerDefinition: typing.Optional["TriggerDefinition"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueUsageContext: typing.Optional['UsageContext'] = Field(
+    valueUsageContext: typing.Optional["UsageContext"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueDosage: typing.Optional['Dosage'] = Field(
+    valueDosage: typing.Optional["Dosage"] = Field(
         description="Value of extension",
         default=None,
     )
-    valueMeta: typing.Optional['Meta'] = Field(
+    valueMeta: typing.Optional["Meta"] = Field(
         description="Value of extension",
         default=None,
     )
-    @field_validator(*('extension',), mode="after", check_fields=None)
+
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3015,7 +3582,7 @@ class Extension(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3025,15 +3592,66 @@ class Extension(Element):
 
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Base64Binary, Boolean, Canonical, Code, Date, DateTime, Decimal, Id, Instant, Integer, Markdown, Oid, PositiveInt, String, Time, UnsignedInt, Uri, Url, Uuid, 'Address', 'Age', 'Annotation', 'Attachment', 'CodeableConcept', 'Coding', 'ContactPoint', 'Count', 'Distance', 'Duration', 'HumanName', 'Identifier', 'Money', 'Period', 'Quantity', 'Range', 'Ratio', 'Reference', 'SampledData', 'Signature', 'Timing', 'ContactDetail', 'Contributor', 'DataRequirement', 'Expression', 'ParameterDefinition', 'RelatedArtifact', 'TriggerDefinition', 'UsageContext', 'Dosage', 'Meta'],
+            field_types=[
+                Base64Binary,
+                Boolean,
+                Canonical,
+                Code,
+                Date,
+                DateTime,
+                Decimal,
+                Id,
+                Instant,
+                Integer,
+                Markdown,
+                Oid,
+                PositiveInt,
+                String,
+                Time,
+                UnsignedInt,
+                Uri,
+                Url,
+                Uuid,
+                "Address",
+                "Age",
+                "Annotation",
+                "Attachment",
+                "CodeableConcept",
+                "Coding",
+                "ContactPoint",
+                "Count",
+                "Distance",
+                "Duration",
+                "HumanName",
+                "Identifier",
+                "Money",
+                "Period",
+                "Quantity",
+                "Range",
+                "Ratio",
+                "Reference",
+                "SampledData",
+                "Signature",
+                "Timing",
+                "ContactDetail",
+                "Contributor",
+                "DataRequirement",
+                "Expression",
+                "ParameterDefinition",
+                "RelatedArtifact",
+                "TriggerDefinition",
+                "UsageContext",
+                "Dosage",
+                "Meta",
+            ],
             field_name_base="value",
         )
 
     @model_validator(mode="after")
     def FHIR_ext_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
@@ -3041,18 +3659,19 @@ class Extension(Element):
             severity="error",
         )
 
-    @property 
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
 
- 
- 
+
 class HumanName(Element):
     """
     Name of a human - parts and usage
     """
+
     use: typing.Optional[Code] = Field(
         description="usual | official | temp | nickname | anonymous | old | maiden",
         default=None,
@@ -3107,24 +3726,48 @@ class HumanName(Element):
         default=None,
         alias="_suffix",
     )
-    period: typing.Optional['Period'] = Field(
+    period: typing.Optional["Period"] = Field(
         description="Time period when name was/is in use",
         default=None,
     )
-    @field_validator(*('period', 'suffix', 'prefix', 'given', 'family', 'text', 'use', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "period",
+            "suffix",
+            "prefix",
+            "given",
+            "family",
+            "text",
+            "use",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3133,7 +3776,7 @@ class HumanName(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3142,12 +3785,11 @@ class HumanName(Element):
         )
 
 
- 
- 
 class Identifier(Element):
     """
     An identifier intended for computation
     """
+
     use: typing.Optional[Code] = Field(
         description="usual | official | temp | secondary | old (If known)",
         default=None,
@@ -3157,7 +3799,7 @@ class Identifier(Element):
         default=None,
         alias="_use",
     )
-    type: typing.Optional['CodeableConcept'] = Field(
+    type: typing.Optional["CodeableConcept"] = Field(
         description="Description of identifier",
         default=None,
     )
@@ -3179,28 +3821,50 @@ class Identifier(Element):
         default=None,
         alias="_value",
     )
-    period: typing.Optional['Period'] = Field(
+    period: typing.Optional["Period"] = Field(
         description="Time period when id is/was valid for use",
         default=None,
     )
-    assigner: typing.Optional['Reference'] = Field(
+    assigner: typing.Optional["Reference"] = Field(
         description="Organization that issued id (may be just text)",
         default=None,
     )
-    @field_validator(*('assigner', 'period', 'value', 'system', 'type', 'use', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "assigner",
+            "period",
+            "value",
+            "system",
+            "type",
+            "use",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3209,7 +3873,7 @@ class Identifier(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3218,27 +3882,26 @@ class Identifier(Element):
         )
 
 
- 
- 
 class MarketingStatus(BackboneElement):
     """
     The marketing status describes the date when a medicinal product is actually put on the market or the date as of which it is no longer available
     """
-    country: 'CodeableConcept' = Field(
+
+    country: "CodeableConcept" = Field(
         description="The country in which the marketing authorisation has been granted shall be specified It should be specified using the ISO 3166 \u2011 1 alpha-2 code elements",
-        default=None,
+        default=...,
     )
-    jurisdiction: typing.Optional['CodeableConcept'] = Field(
+    jurisdiction: typing.Optional["CodeableConcept"] = Field(
         description="Where a Medicines Regulatory Agency has granted a marketing authorisation for which specific provisions within a jurisdiction apply, the jurisdiction can be specified using an appropriate controlled terminology The controlled term and the controlled term identifier shall be specified",
         default=None,
     )
-    status: 'CodeableConcept' = Field(
+    status: "CodeableConcept" = Field(
         description="This attribute provides information on the status of the marketing of the medicinal product See ISO/TS 20443 for more information and examples",
-        default=None,
+        default=...,
     )
-    dateRange: 'Period' = Field(
+    dateRange: "Period" = Field(
         description="The date when the Medicinal Product is placed on the market by the Marketing Authorisation Holder (or where applicable, the manufacturer/distributor) in a country and/or jurisdiction shall be provided A complete date consisting of day, month and year shall be specified using the ISO 8601 date format NOTE \u201cPlaced on the market\u201d refers to the release of the Medicinal Product into the distribution chain",
-        default=None,
+        default=...,
     )
     restoreDate: typing.Optional[DateTime] = Field(
         description="The date when the Medicinal Product is placed on the market by the Marketing Authorisation Holder (or where applicable, the manufacturer/distributor) in a country and/or jurisdiction shall be provided A complete date consisting of day, month and year shall be specified using the ISO 8601 date format NOTE \u201cPlaced on the market\u201d refers to the release of the Medicinal Product into the distribution chain",
@@ -3249,20 +3912,47 @@ class MarketingStatus(BackboneElement):
         default=None,
         alias="_restoreDate",
     )
-    @field_validator(*('restoreDate', 'dateRange', 'status', 'jurisdiction', 'country', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "restoreDate",
+            "dateRange",
+            "status",
+            "jurisdiction",
+            "country",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3271,7 +3961,7 @@ class MarketingStatus(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3280,12 +3970,11 @@ class MarketingStatus(BackboneElement):
         )
 
 
- 
- 
 class Meta(Element):
     """
     Metadata about a resource
     """
+
     versionId: typing.Optional[Id] = Field(
         description="Version specific identifier",
         default=None,
@@ -3322,28 +4011,50 @@ class Meta(Element):
         default=None,
         alias="_profile",
     )
-    security: typing.Optional[typing.List['Coding']] = Field(
+    security: typing.Optional[typing.List["Coding"]] = Field(
         description="Security Labels applied to this resource",
         default=None,
     )
-    tag: typing.Optional[typing.List['Coding']] = Field(
+    tag: typing.Optional[typing.List["Coding"]] = Field(
         description="Tags applied to this resource",
         default=None,
     )
-    @field_validator(*('tag', 'security', 'profile', 'source', 'lastUpdated', 'versionId', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "tag",
+            "security",
+            "profile",
+            "source",
+            "lastUpdated",
+            "versionId",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3352,7 +4063,7 @@ class Meta(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3361,12 +4072,11 @@ class Meta(Element):
         )
 
 
- 
- 
 class Money(Element):
     """
     An amount of economic utility in some recognized currency
     """
+
     value: typing.Optional[Decimal] = Field(
         description="Numerical value (with implicit precision)",
         default=None,
@@ -3385,20 +4095,29 @@ class Money(Element):
         default=None,
         alias="_currency",
     )
-    @field_validator(*('currency', 'value', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("currency", "value", "extension", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3407,7 +4126,7 @@ class Money(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3416,15 +4135,14 @@ class Money(Element):
         )
 
 
- 
- 
 class Narrative(Element):
     """
     Human-readable summary of the resource (essential clinical and business information)
     """
+
     status: Code = Field(
         description="generated | extensions | additional | empty",
-        default=None,
+        default=...,
     )
     status_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for status extensions",
@@ -3433,42 +4151,53 @@ class Narrative(Element):
     )
     div: str = Field(
         description="Limited xhtml content",
-        default=None,
+        default=...,
     )
-    @field_validator(*('div', 'status', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("div", "status", "extension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('div',), mode="after", check_fields=None)
+    @field_validator(*("div",), mode="after", check_fields=None)
     @classmethod
     def FHIR_txt_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="htmlChecks()",
             human="The narrative SHALL contain only the basic html formatting elements and attributes described in chapters 7-11 (except section 4 of chapter 9) and 15 of the HTML 4.0 standard, <a> elements (either name or href), images and internally contained style attributes",
             key="txt-1",
             severity="error",
         )
 
-    @field_validator(*('div',), mode="after", check_fields=None)
+    @field_validator(*("div",), mode="after", check_fields=None)
     @classmethod
     def FHIR_txt_2_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="htmlChecks()",
             human="The narrative SHALL have some non-whitespace content",
             key="txt-2",
@@ -3477,7 +4206,7 @@ class Narrative(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3486,12 +4215,11 @@ class Narrative(Element):
         )
 
 
- 
- 
 class ParameterDefinition(Element):
     """
     Definition of a parameter to a module
     """
+
     name: typing.Optional[Code] = Field(
         description="Name used to access the parameter value",
         default=None,
@@ -3503,7 +4231,7 @@ class ParameterDefinition(Element):
     )
     use: Code = Field(
         description="in | out",
-        default=None,
+        default=...,
     )
     use_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for use extensions",
@@ -3539,7 +4267,7 @@ class ParameterDefinition(Element):
     )
     type: Code = Field(
         description="What type of value",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -3555,20 +4283,44 @@ class ParameterDefinition(Element):
         default=None,
         alias="_profile",
     )
-    @field_validator(*('profile', 'type', 'documentation', 'max', 'min', 'use', 'name', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "profile",
+            "type",
+            "documentation",
+            "max",
+            "min",
+            "use",
+            "name",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3577,7 +4329,7 @@ class ParameterDefinition(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3586,12 +4338,11 @@ class ParameterDefinition(Element):
         )
 
 
- 
- 
 class Period(Element):
     """
     Time range defined by start and end date/time
     """
+
     start: typing.Optional[DateTime] = Field(
         description="Starting time with inclusive boundary",
         default=None,
@@ -3610,20 +4361,27 @@ class Period(Element):
         default=None,
         alias="_end",
     )
-    @field_validator(*('end', 'start', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("end", "start", "extension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3632,7 +4390,7 @@ class Period(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3642,7 +4400,7 @@ class Period(Element):
 
     @model_validator(mode="after")
     def FHIR_per_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="start.hasValue().not() or end.hasValue().not() or (start <= end)",
             human="If present, start SHALL have a lower value than end",
@@ -3651,46 +4409,66 @@ class Period(Element):
         )
 
 
- 
- 
 class Population(BackboneElement):
     """
     A definition of a set of people that apply to some clinically related context, for example people contraindicated for a certain medication
     """
-    ageRange: typing.Optional['Range'] = Field(
+
+    ageRange: typing.Optional["Range"] = Field(
         description="The age of the specific population",
         default=None,
     )
-    ageCodeableConcept: typing.Optional['CodeableConcept'] = Field(
+    ageCodeableConcept: typing.Optional["CodeableConcept"] = Field(
         description="The age of the specific population",
         default=None,
     )
-    gender: typing.Optional['CodeableConcept'] = Field(
+    gender: typing.Optional["CodeableConcept"] = Field(
         description="The gender of the specific population",
         default=None,
     )
-    race: typing.Optional['CodeableConcept'] = Field(
+    race: typing.Optional["CodeableConcept"] = Field(
         description="Race of the specific population",
         default=None,
     )
-    physiologicalCondition: typing.Optional['CodeableConcept'] = Field(
+    physiologicalCondition: typing.Optional["CodeableConcept"] = Field(
         description="The existing physiological conditions of the specific population to which this applies",
         default=None,
     )
-    @field_validator(*('physiologicalCondition', 'race', 'gender', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "physiologicalCondition",
+            "race",
+            "gender",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3699,7 +4477,7 @@ class Population(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3709,45 +4487,46 @@ class Population(BackboneElement):
 
     @model_validator(mode="after")
     def age_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=['Range', 'CodeableConcept'],
+            field_types=["Range", "CodeableConcept"],
             field_name_base="age",
         )
 
-    @property 
+    @property
     def age(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="age",
         )
 
- 
- 
+
 class ProdCharacteristic(BackboneElement):
     """
     The marketing status describes the date when a medicinal product is actually put on the market or the date as of which it is no longer available
     """
-    height: typing.Optional['Quantity'] = Field(
+
+    height: typing.Optional["Quantity"] = Field(
         description="Where applicable, the height can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
-    width: typing.Optional['Quantity'] = Field(
+    width: typing.Optional["Quantity"] = Field(
         description="Where applicable, the width can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
-    depth: typing.Optional['Quantity'] = Field(
+    depth: typing.Optional["Quantity"] = Field(
         description="Where applicable, the depth can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
-    weight: typing.Optional['Quantity'] = Field(
+    weight: typing.Optional["Quantity"] = Field(
         description="Where applicable, the weight can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
-    nominalVolume: typing.Optional['Quantity'] = Field(
+    nominalVolume: typing.Optional["Quantity"] = Field(
         description="Where applicable, the nominal volume can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
-    externalDiameter: typing.Optional['Quantity'] = Field(
+    externalDiameter: typing.Optional["Quantity"] = Field(
         description="Where applicable, the external diameter can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
@@ -3778,28 +4557,73 @@ class ProdCharacteristic(BackboneElement):
         default=None,
         alias="_imprint",
     )
-    image: typing.Optional[typing.List['Attachment']] = Field(
+    image: typing.Optional[typing.List["Attachment"]] = Field(
         description="Where applicable, the image can be provided The format of the image attachment shall be specified by regional implementations",
         default=None,
     )
-    scoring: typing.Optional['CodeableConcept'] = Field(
+    scoring: typing.Optional["CodeableConcept"] = Field(
         description="Where applicable, the scoring can be specified An appropriate controlled vocabulary shall be used The term and the term identifier shall be used",
         default=None,
     )
-    @field_validator(*('scoring', 'image', 'imprint', 'color', 'shape', 'externalDiameter', 'nominalVolume', 'weight', 'depth', 'width', 'height', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "scoring",
+            "image",
+            "imprint",
+            "color",
+            "shape",
+            "externalDiameter",
+            "nominalVolume",
+            "weight",
+            "depth",
+            "width",
+            "height",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3808,7 +4632,7 @@ class ProdCharacteristic(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3817,42 +4641,67 @@ class ProdCharacteristic(BackboneElement):
         )
 
 
- 
- 
 class ProductShelfLife(BackboneElement):
     """
     The shelf-life and storage information for a medicinal product item or container can be described using this class
     """
-    identifier: typing.Optional['Identifier'] = Field(
+
+    identifier: typing.Optional["Identifier"] = Field(
         description="Unique identifier for the packaged Medicinal Product",
         default=None,
     )
-    type: 'CodeableConcept' = Field(
+    type: "CodeableConcept" = Field(
         description="This describes the shelf life, taking into account various scenarios such as shelf life of the packaged Medicinal Product itself, shelf life after transformation where necessary and shelf life after the first opening of a bottle, etc. The shelf life type shall be specified using an appropriate controlled vocabulary The controlled term and the controlled term identifier shall be specified",
-        default=None,
+        default=...,
     )
-    period: 'Quantity' = Field(
+    period: "Quantity" = Field(
         description="The shelf life time period can be specified using a numerical value for the period of time and its unit of time measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
-        default=None,
+        default=...,
     )
-    specialPrecautionsForStorage: typing.Optional[typing.List['CodeableConcept']] = Field(
-        description="Special precautions for storage, if any, can be specified using an appropriate controlled vocabulary The controlled term and the controlled term identifier shall be specified",
-        default=None,
+    specialPrecautionsForStorage: typing.Optional[typing.List["CodeableConcept"]] = (
+        Field(
+            description="Special precautions for storage, if any, can be specified using an appropriate controlled vocabulary The controlled term and the controlled term identifier shall be specified",
+            default=None,
+        )
     )
-    @field_validator(*('specialPrecautionsForStorage', 'period', 'type', 'identifier', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "specialPrecautionsForStorage",
+            "period",
+            "type",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3861,7 +4710,7 @@ class ProductShelfLife(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3870,12 +4719,11 @@ class ProductShelfLife(BackboneElement):
         )
 
 
- 
- 
 class Quantity(Element):
     """
     A measured or measurable amount
     """
+
     value: typing.Optional[Decimal] = Field(
         description="Numerical value (with implicit precision)",
         default=None,
@@ -3921,20 +4769,40 @@ class Quantity(Element):
         default=None,
         alias="_code",
     )
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "code",
+            "system",
+            "unit",
+            "comparator",
+            "value",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3943,7 +4811,7 @@ class Quantity(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -3953,7 +4821,7 @@ class Quantity(Element):
 
     @model_validator(mode="after")
     def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="code.empty() or system.exists()",
             human="If a code for the unit is present, the system SHALL also be present",
@@ -3962,34 +4830,40 @@ class Quantity(Element):
         )
 
 
- 
- 
 class Range(Element):
     """
     Set of values bounded by low and high
     """
-    low: typing.Optional['Quantity'] = Field(
+
+    low: typing.Optional["Quantity"] = Field(
         description="Low limit",
         default=None,
     )
-    high: typing.Optional['Quantity'] = Field(
+    high: typing.Optional["Quantity"] = Field(
         description="High limit",
         default=None,
     )
-    @field_validator(*('high', 'low', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("high", "low", "extension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -3998,7 +4872,7 @@ class Range(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4008,7 +4882,7 @@ class Range(Element):
 
     @model_validator(mode="after")
     def FHIR_rng_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="low.empty() or high.empty() or (low <= high)",
             human="If present, low SHALL have a lower value than high",
@@ -4017,34 +4891,42 @@ class Range(Element):
         )
 
 
- 
- 
 class Ratio(Element):
     """
     A ratio of two Quantity values - a numerator and a denominator
     """
-    numerator: typing.Optional['Quantity'] = Field(
+
+    numerator: typing.Optional["Quantity"] = Field(
         description="Numerator value",
         default=None,
     )
-    denominator: typing.Optional['Quantity'] = Field(
+    denominator: typing.Optional["Quantity"] = Field(
         description="Denominator value",
         default=None,
     )
-    @field_validator(*('denominator', 'numerator', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("denominator", "numerator", "extension", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4053,7 +4935,7 @@ class Ratio(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4063,7 +4945,7 @@ class Ratio(Element):
 
     @model_validator(mode="after")
     def FHIR_rat_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(numerator.empty() xor denominator.exists()) and (numerator.exists() or extension.exists())",
             human="Numerator and denominator SHALL both be present, or both are absent. If both are absent, there SHALL be some extension present",
@@ -4072,12 +4954,11 @@ class Ratio(Element):
         )
 
 
- 
- 
 class Reference(Element):
     """
     A reference from one resource to another
     """
+
     reference: typing.Optional[String] = Field(
         description="Literal reference, Relative, internal or absolute URL",
         default=None,
@@ -4088,7 +4969,7 @@ class Reference(Element):
         alias="_reference",
     )
     type: typing.Optional[Uri] = Field(
-        description="Type the reference refers to (e.g. \"Patient\")",
+        description='Type the reference refers to (e.g. "Patient")',
         default=None,
     )
     type_ext: typing.Optional["Element"] = Field(
@@ -4096,7 +4977,7 @@ class Reference(Element):
         default=None,
         alias="_type",
     )
-    identifier: typing.Optional['Identifier'] = Field(
+    identifier: typing.Optional["Identifier"] = Field(
         description="Logical reference, when literal reference is not known",
         default=None,
     )
@@ -4109,20 +4990,38 @@ class Reference(Element):
         default=None,
         alias="_display",
     )
-    @field_validator(*('display', 'identifier', 'type', 'reference', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "display",
+            "identifier",
+            "type",
+            "reference",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4131,7 +5030,7 @@ class Reference(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4141,7 +5040,7 @@ class Reference(Element):
 
     @model_validator(mode="after")
     def FHIR_ref_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="reference.startsWith('#').not() or (reference.substring(1).trace('url') in %rootResource.contained.id.trace('ids'))",
             human="SHALL have a contained resource if a local reference is provided",
@@ -4150,15 +5049,14 @@ class Reference(Element):
         )
 
 
- 
- 
 class RelatedArtifact(Element):
     """
     Related artifacts for a knowledge resource
     """
+
     type: Code = Field(
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -4201,7 +5099,7 @@ class RelatedArtifact(Element):
         default=None,
         alias="_url",
     )
-    document: typing.Optional['Attachment'] = Field(
+    document: typing.Optional["Attachment"] = Field(
         description="What document is being referenced",
         default=None,
     )
@@ -4214,20 +5112,44 @@ class RelatedArtifact(Element):
         default=None,
         alias="_resource",
     )
-    @field_validator(*('resource', 'document', 'url', 'citation', 'display', 'label', 'type', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "resource",
+            "document",
+            "url",
+            "citation",
+            "display",
+            "label",
+            "type",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4236,7 +5158,7 @@ class RelatedArtifact(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4245,19 +5167,18 @@ class RelatedArtifact(Element):
         )
 
 
- 
- 
 class SampledData(Element):
     """
     A series of measurements taken by a device
     """
-    origin: 'Quantity' = Field(
+
+    origin: "Quantity" = Field(
         description="Zero value and units",
-        default=None,
+        default=...,
     )
     period: Decimal = Field(
         description="Number of milliseconds between samples",
-        default=None,
+        default=...,
     )
     period_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for period extensions",
@@ -4293,7 +5214,7 @@ class SampledData(Element):
     )
     dimensions: PositiveInt = Field(
         description="Number of sample points at each time point",
-        default=None,
+        default=...,
     )
     dimensions_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for dimensions extensions",
@@ -4301,7 +5222,7 @@ class SampledData(Element):
         alias="_dimensions",
     )
     data: typing.Optional[String] = Field(
-        description="Decimal values with spaces, or \"E\" | \"U\" | \"L\"",
+        description='Decimal values with spaces, or "E" | "U" | "L"',
         default=None,
     )
     data_ext: typing.Optional["Element"] = Field(
@@ -4309,20 +5230,44 @@ class SampledData(Element):
         default=None,
         alias="_data",
     )
-    @field_validator(*('data', 'dimensions', 'upperLimit', 'lowerLimit', 'factor', 'period', 'origin', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "data",
+            "dimensions",
+            "upperLimit",
+            "lowerLimit",
+            "factor",
+            "period",
+            "origin",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4331,7 +5276,7 @@ class SampledData(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4340,30 +5285,29 @@ class SampledData(Element):
         )
 
 
- 
- 
 class Signature(Element):
     """
     A Signature - XML DigSig, JWS, Graphical image of signature, etc.
     """
-    type: typing.List['Coding'] = Field(
+
+    type: typing.List["Coding"] = Field(
         description="Indication of the reason the entity signed the object(s)",
-        default=None,
+        default=...,
     )
     when: Instant = Field(
         description="When the signature was created",
-        default=None,
+        default=...,
     )
     when_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for when extensions",
         default=None,
         alias="_when",
     )
-    who: 'Reference' = Field(
+    who: "Reference" = Field(
         description="Who signed",
-        default=None,
+        default=...,
     )
-    onBehalfOf: typing.Optional['Reference'] = Field(
+    onBehalfOf: typing.Optional["Reference"] = Field(
         description="The party represented",
         default=None,
     )
@@ -4394,20 +5338,44 @@ class Signature(Element):
         default=None,
         alias="_data",
     )
-    @field_validator(*('data', 'sigFormat', 'targetFormat', 'onBehalfOf', 'who', 'when', 'type', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "data",
+            "sigFormat",
+            "targetFormat",
+            "onBehalfOf",
+            "who",
+            "when",
+            "type",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4416,7 +5384,7 @@ class Signature(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4425,17 +5393,16 @@ class Signature(Element):
         )
 
 
- 
- 
 class SubstanceAmount(BackboneElement):
     """
     Chemical substances are a single substance type whose primary defining element is the molecular structure. Chemical substances shall be defined on the basis of their complete covalent molecular structure; the presence of a salt (counter-ion) and/or solvates (water, alcohols) is also captured. Purity, grade, physical form or particle size are not taken into account in the definition of a chemical substance or in the assignment of a Substance ID
     """
-    amountQuantity: typing.Optional['Quantity'] = Field(
+
+    amountQuantity: typing.Optional["Quantity"] = Field(
         description="Used to capture quantitative values for a variety of elements. If only limits are given, the arithmetic mean would be the average. If only a single definite value for a given element is given, it would be captured in this field",
         default=None,
     )
-    amountRange: typing.Optional['Range'] = Field(
+    amountRange: typing.Optional["Range"] = Field(
         description="Used to capture quantitative values for a variety of elements. If only limits are given, the arithmetic mean would be the average. If only a single definite value for a given element is given, it would be captured in this field",
         default=None,
     )
@@ -4443,7 +5410,7 @@ class SubstanceAmount(BackboneElement):
         description="Used to capture quantitative values for a variety of elements. If only limits are given, the arithmetic mean would be the average. If only a single definite value for a given element is given, it would be captured in this field",
         default=None,
     )
-    amountType: typing.Optional['CodeableConcept'] = Field(
+    amountType: typing.Optional["CodeableConcept"] = Field(
         description="Most elements that require a quantitative value will also have a field called amount type. Amount type should always be specified because the actual value of the amount is often dependent on it. EXAMPLE: In capturing the actual relative amounts of substances or molecular fragments it is essential to indicate whether the amount refers to a mole ratio or weight ratio. For any given element an effort should be made to use same the amount type for all related definitional elements",
         default=None,
     )
@@ -4456,24 +5423,45 @@ class SubstanceAmount(BackboneElement):
         default=None,
         alias="_amountText",
     )
-    referenceRange: typing.Optional['Element'] = Field(
+    referenceRange: typing.Optional["Element"] = Field(
         description="Reference range of possible or expected values",
         default=None,
     )
-    @field_validator(*('referenceRange', 'amountText', 'amountType', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "referenceRange",
+            "amountText",
+            "amountType",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4482,7 +5470,7 @@ class SubstanceAmount(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4492,24 +5480,25 @@ class SubstanceAmount(BackboneElement):
 
     @model_validator(mode="after")
     def amount_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=['Quantity', 'Range', String],
+            field_types=["Quantity", "Range", String],
             field_name_base="amount",
         )
 
-    @property 
+    @property
     def amount(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="amount",
         )
 
- 
- 
+
 class Timing(BackboneElement):
     """
     A timing schedule that specifies an event that may occur multiple times
     """
+
     event: typing.Optional[typing.List[DateTime]] = Field(
         description="When the event occurs",
         default=None,
@@ -4519,118 +5508,157 @@ class Timing(BackboneElement):
         default=None,
         alias="_event",
     )
-    repeat: typing.Optional['Element'] = Field(
+    repeat: typing.Optional["Element"] = Field(
         description="When the event is to occur",
         default=None,
     )
-    code: typing.Optional['CodeableConcept'] = Field(
+    code: typing.Optional["CodeableConcept"] = Field(
         description="BID | TID | QID | AM | PM | QD | QOD | +",
         default=None,
     )
-    @field_validator(*('code', 'repeat', 'event', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "code",
+            "repeat",
+            "event",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('repeat',), mode="after", check_fields=None)
+    @field_validator(*("repeat",), mode="after", check_fields=None)
     @classmethod
     def FHIR_tim_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="duration.empty() or durationUnit.exists()",
             human="if there's a duration, there needs to be duration units",
             key="tim-1",
             severity="error",
         )
 
-    @field_validator(*('repeat',), mode="after", check_fields=None)
+    @field_validator(*("repeat",), mode="after", check_fields=None)
     @classmethod
     def FHIR_tim_2_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="period.empty() or periodUnit.exists()",
             human="if there's a period, there needs to be period units",
             key="tim-2",
             severity="error",
         )
 
-    @field_validator(*('repeat',), mode="after", check_fields=None)
+    @field_validator(*("repeat",), mode="after", check_fields=None)
     @classmethod
     def FHIR_tim_4_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="duration.exists() implies duration >= 0",
             human="duration SHALL be a non-negative value",
             key="tim-4",
             severity="error",
         )
 
-    @field_validator(*('repeat',), mode="after", check_fields=None)
+    @field_validator(*("repeat",), mode="after", check_fields=None)
     @classmethod
     def FHIR_tim_5_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="period.exists() implies period >= 0",
             human="period SHALL be a non-negative value",
             key="tim-5",
             severity="error",
         )
 
-    @field_validator(*('repeat',), mode="after", check_fields=None)
+    @field_validator(*("repeat",), mode="after", check_fields=None)
     @classmethod
     def FHIR_tim_6_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="periodMax.empty() or period.exists()",
             human="If there's a periodMax, there must be a period",
             key="tim-6",
             severity="error",
         )
 
-    @field_validator(*('repeat',), mode="after", check_fields=None)
+    @field_validator(*("repeat",), mode="after", check_fields=None)
     @classmethod
     def FHIR_tim_7_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="durationMax.empty() or duration.exists()",
             human="If there's a durationMax, there must be a duration",
             key="tim-7",
             severity="error",
         )
 
-    @field_validator(*('repeat',), mode="after", check_fields=None)
+    @field_validator(*("repeat",), mode="after", check_fields=None)
     @classmethod
     def FHIR_tim_8_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="countMax.empty() or count.exists()",
             human="If there's a countMax, there must be a count",
             key="tim-8",
             severity="error",
         )
 
-    @field_validator(*('repeat',), mode="after", check_fields=None)
+    @field_validator(*("repeat",), mode="after", check_fields=None)
     @classmethod
     def FHIR_tim_9_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="offset.empty() or (when.exists() and ((when in ('C' | 'CM' | 'CD' | 'CV')).not()))",
             human="If there's an offset, there must be a when (and not C, CM, CD, CV)",
             key="tim-9",
             severity="error",
         )
 
-    @field_validator(*('repeat',), mode="after", check_fields=None)
+    @field_validator(*("repeat",), mode="after", check_fields=None)
     @classmethod
     def FHIR_tim_10_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="timeOfDay.empty() or when.empty()",
             human="If there's a timeOfDay, there cannot be a when, or vice versa",
             key="tim-10",
@@ -4639,7 +5667,7 @@ class Timing(BackboneElement):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4648,15 +5676,14 @@ class Timing(BackboneElement):
         )
 
 
- 
- 
 class TriggerDefinition(Element):
     """
     Defines an expected trigger for a module
     """
+
     type: Code = Field(
         description="named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended",
-        default=None,
+        default=...,
     )
     type_ext: typing.Optional["Element"] = Field(
         description="Placeholder element for type extensions",
@@ -4672,11 +5699,11 @@ class TriggerDefinition(Element):
         default=None,
         alias="_name",
     )
-    timingTiming: typing.Optional['Timing'] = Field(
+    timingTiming: typing.Optional["Timing"] = Field(
         description="Timing of the event",
         default=None,
     )
-    timingReference: typing.Optional['Reference'] = Field(
+    timingReference: typing.Optional["Reference"] = Field(
         description="Timing of the event",
         default=None,
     )
@@ -4688,28 +5715,46 @@ class TriggerDefinition(Element):
         description="Timing of the event",
         default=None,
     )
-    data: typing.Optional[typing.List['DataRequirement']] = Field(
+    data: typing.Optional[typing.List["DataRequirement"]] = Field(
         description="Triggering data of the event (multiple = \u0027and\u0027)",
         default=None,
     )
-    condition: typing.Optional['Expression'] = Field(
+    condition: typing.Optional["Expression"] = Field(
         description="Whether the event triggers (boolean expression)",
         default=None,
     )
-    @field_validator(*('condition', 'data', 'name', 'type', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "condition",
+            "data",
+            "name",
+            "type",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4718,7 +5763,7 @@ class TriggerDefinition(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4728,15 +5773,15 @@ class TriggerDefinition(Element):
 
     @model_validator(mode="after")
     def timing_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=['Timing', 'Reference', Date, DateTime],
+            field_types=["Timing", "Reference", Date, DateTime],
             field_name_base="timing",
         )
 
     @model_validator(mode="after")
     def FHIR_trd_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="data.empty() or timing.empty()",
             human="Either timing, or a data requirement, but not both",
@@ -4746,7 +5791,7 @@ class TriggerDefinition(Element):
 
     @model_validator(mode="after")
     def FHIR_trd_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="condition.exists() implies data.exists()",
             human="A condition only if there is a data requirement",
@@ -4756,7 +5801,7 @@ class TriggerDefinition(Element):
 
     @model_validator(mode="after")
     def FHIR_trd_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'named-event' implies name.exists()) and (type = 'periodic' implies timing.exists()) and (type.startsWith('data-') implies data.exists())",
             human="A named event requires a name, a periodic event requires timing, and a data event requires data",
@@ -4764,52 +5809,58 @@ class TriggerDefinition(Element):
             severity="error",
         )
 
-    @property 
+    @property
     def timing(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="timing",
         )
 
- 
- 
+
 class UsageContext(Element):
     """
     Describes the context of use for a conformance or knowledge resource
     """
-    code: 'Coding' = Field(
+
+    code: "Coding" = Field(
         description="Type of context being specified",
-        default=None,
+        default=...,
     )
-    valueCodeableConcept: 'CodeableConcept' = Field(
+    valueCodeableConcept: "CodeableConcept" = Field(
         description="Value that defines the context",
-        default=None,
+        default=...,
     )
-    valueQuantity: 'Quantity' = Field(
+    valueQuantity: "Quantity" = Field(
         description="Value that defines the context",
-        default=None,
+        default=...,
     )
-    valueRange: 'Range' = Field(
+    valueRange: "Range" = Field(
         description="Value that defines the context",
-        default=None,
+        default=...,
     )
-    valueReference: 'Reference' = Field(
+    valueReference: "Reference" = Field(
         description="Value that defines the context",
-        default=None,
+        default=...,
     )
-    @field_validator(*('code', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(*("code", "extension"), mode="after", check_fields=None)
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4818,7 +5869,7 @@ class UsageContext(Element):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4828,38 +5879,58 @@ class UsageContext(Element):
 
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=['CodeableConcept', 'Quantity', 'Range', 'Reference'],
+            field_types=["CodeableConcept", "Quantity", "Range", "Reference"],
             field_name_base="value",
         )
 
-    @property 
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
 
- 
- 
+
 class MoneyQuantity(Quantity):
     """
     An amount of money.
     """
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "code",
+            "system",
+            "unit",
+            "comparator",
+            "value",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4868,7 +5939,7 @@ class MoneyQuantity(Quantity):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4878,7 +5949,7 @@ class MoneyQuantity(Quantity):
 
     @model_validator(mode="after")
     def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="code.empty() or system.exists()",
             human="If a code for the unit is present, the system SHALL also be present",
@@ -4888,35 +5959,53 @@ class MoneyQuantity(Quantity):
 
     @model_validator(mode="after")
     def FHIR_mqty_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(code.exists() or value.empty()) and (system.empty() or system = 'urn:iso:std:iso:4217')",
-            human="There SHALL be a code if there is a value and it SHALL be an expression of currency.  If system is present, it SHALL be ISO 4217 (system = \"urn:iso:std:iso:4217\" - currency).",
+            human='There SHALL be a code if there is a value and it SHALL be an expression of currency.  If system is present, it SHALL be ISO 4217 (system = "urn:iso:std:iso:4217" - currency).',
             key="mqty-1",
             severity="error",
         )
 
 
- 
- 
 class SimpleQuantity(Quantity):
     """
     A fixed quantity (no comparator)
     """
-    @field_validator(*('code', 'system', 'unit', 'comparator', 'value', 'extension', 'extension', 'extension', 'extension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "code",
+            "system",
+            "unit",
+            "comparator",
+            "value",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('extension',), mode="after", check_fields=None)
+    @field_validator(*("extension",), mode="after", check_fields=None)
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -4925,7 +6014,7 @@ class SimpleQuantity(Quantity):
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -4935,7 +6024,7 @@ class SimpleQuantity(Quantity):
 
     @model_validator(mode="after")
     def FHIR_qty_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="code.empty() or system.exists()",
             human="If a code for the unit is present, the system SHALL also be present",
@@ -4945,7 +6034,7 @@ class SimpleQuantity(Quantity):
 
     @model_validator(mode="after")
     def FHIR_sqty_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="comparator.empty()",
             human="The comparator is not used on a SimpleQuantity",
@@ -4954,12 +6043,11 @@ class SimpleQuantity(Quantity):
         )
 
 
- 
- 
 class Resource(FHIRBaseModel):
     """
     Base Resource
     """
+
     id: typing.Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -4969,7 +6057,7 @@ class Resource(FHIRBaseModel):
         default=None,
         alias="_id",
     )
-    meta: typing.Optional['Meta'] = Field(
+    meta: typing.Optional["Meta"] = Field(
         description="Metadata about the resource",
         default=None,
     )
@@ -4991,10 +6079,15 @@ class Resource(FHIRBaseModel):
         default=None,
         alias="_language",
     )
-    @field_validator(*('language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("language", "implicitRules", "meta"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -5002,42 +6095,65 @@ class Resource(FHIRBaseModel):
         )
 
 
- 
- 
 class DomainResource(Resource):
     """
     A resource with narrative, extensions, and contained resources
     """
-    text: typing.Optional['Narrative'] = Field(
+
+    text: typing.Optional["Narrative"] = Field(
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: typing.Optional[typing.List['Resource']] = Field(
+    contained: typing.Optional[typing.List["Resource"]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: typing.Optional[typing.List['Extension']] = Field(
+    extension: typing.Optional[typing.List["Extension"]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: typing.Optional[typing.List['Extension']] = Field(
+    modifierExtension: typing.Optional[typing.List["Extension"]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    @field_validator(*('modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta', 'language', 'implicitRules', 'meta', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+            "language",
+            "implicitRules",
+            "meta",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
     def FHIR_ext_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(cls, value, 
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
@@ -5046,7 +6162,7 @@ class DomainResource(Resource):
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -5056,7 +6172,7 @@ class DomainResource(Resource):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -5066,7 +6182,7 @@ class DomainResource(Resource):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -5076,7 +6192,7 @@ class DomainResource(Resource):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -5086,7 +6202,7 @@ class DomainResource(Resource):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
@@ -5095,77 +6211,76 @@ class DomainResource(Resource):
         )
 
 
-
-
- 
 Element.model_rebuild()
- 
+
 BackboneElement.model_rebuild()
- 
+
 Address.model_rebuild()
- 
+
 Age.model_rebuild()
- 
+
 Annotation.model_rebuild()
- 
+
 CodeableConcept.model_rebuild()
- 
+
 ContactDetail.model_rebuild()
- 
+
 ContactPoint.model_rebuild()
- 
+
 Contributor.model_rebuild()
- 
+
 Count.model_rebuild()
- 
+
 DataRequirement.model_rebuild()
- 
+
 Distance.model_rebuild()
- 
+
 Dosage.model_rebuild()
- 
+
 Duration.model_rebuild()
- 
+
 ElementDefinition.model_rebuild()
- 
+
 Extension.model_rebuild()
- 
+
 HumanName.model_rebuild()
- 
+
 Identifier.model_rebuild()
- 
+
 MarketingStatus.model_rebuild()
- 
+
 Meta.model_rebuild()
- 
+
 Narrative.model_rebuild()
- 
+
 Population.model_rebuild()
- 
+
 ProdCharacteristic.model_rebuild()
- 
+
 ProductShelfLife.model_rebuild()
- 
+
 Range.model_rebuild()
- 
+
 Ratio.model_rebuild()
- 
+
 Reference.model_rebuild()
- 
+
 RelatedArtifact.model_rebuild()
- 
+
 SampledData.model_rebuild()
- 
+
 Signature.model_rebuild()
- 
+
 SubstanceAmount.model_rebuild()
- 
+
 Timing.model_rebuild()
- 
+
 TriggerDefinition.model_rebuild()
- 
+
 UsageContext.model_rebuild()
- 
+
 Resource.model_rebuild()
- 
+
+DomainResource.model_rebuild()
+
 DomainResource.model_rebuild()

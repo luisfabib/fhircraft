@@ -82,20 +82,72 @@ This validation step helps catch errors early, enforce FHIR compliance, and main
 ---------------
 ### Manipulating Models with FHIRPath
 
-Fhircraft provides a robust FHIRPath engine, allowing you to query and modify FHIR resources using standard FHIRPath expressions directly in Python. This enables expressive, standards-compliant access to deeply nested data and supports both retrieval and update operations.
+Fhircraft provides a robust FHIRPath engine with an enhanced interface, allowing you to query and modify FHIR resources using standard FHIRPath expressions directly in Python. This enables expressive, standards-compliant access to deeply nested data and supports both retrieval and update operations.
 
 **Example: Accessing Values with FHIRPath**
 
+The enhanced interface provides multiple methods for retrieving values based on your specific needs:
+
 ```python
-# Retrieve the patient's family name using a FHIRPath expression
-patient_surname = my_patient.get_fhirpath('Patient.name.family')
+from fhircraft.fhir.path import fhirpath
+
+# Parse the FHIRPath expression
+name_path = fhirpath.parse('Patient.name.family')
+
+# Get all matching values as a list (always returns a list)
+all_family_names = name_path.values(my_patient)
+# Returns: ['Doe', 'Smith'] if patient has multiple names
+
+# Get a single value (raises error if multiple values found)
+family_name = name_path.single(my_patient)
+# Returns: 'Doe' or raises FHIRPathRuntimeError if multiple names exist
+
+# Get the first value (safe for multiple values)
+first_family_name = name_path.first(my_patient)
+# Returns: 'Doe' (first family name) or None if no names
+
+# Get the last value
+last_family_name = name_path.last(my_patient)
+# Returns: 'Smith' (last family name) or None if no names
+
+# Check if values exist
+has_family_name = name_path.exists(my_patient)
+# Returns: True if patient has any family names
+
+# Count matching values
+name_count = name_path.count(my_patient)
+# Returns: 2 if patient has 2 family names
+
+# Check if path is empty
+is_empty = name_path.is_empty(my_patient)
+# Returns: True if patient has no family names
 ```
 
 **Example: Updating Values with FHIRPath**
 
 ```python
-# Update the patient's family name using a FHIRPath expression
-my_patient.replace_fhirpath('Patient.name.family', 'Smith')
+# Update all matching values
+name_path.update_values(my_patient, 'NewFamilyName')
+# Sets all family names to 'NewFamilyName'
+
+# Update a single value (safer for single-value fields)
+gender_path = fhirpath.parse('Patient.gender')
+gender_path.update_single(my_patient, 'female')
+# Sets gender to 'female', raises error if multiple gender values exist
+```
+
+**Example: Using Default Values**
+
+```python
+# Get values with fallback defaults
+birth_date = fhirpath.parse('Patient.birthDate').first(my_patient, default='1900-01-01')
+# Returns actual birth date or '1900-01-01' if not set
+
+phone = fhirpath.parse('Patient.telecom.where(system="phone").value').single(
+    my_patient, 
+    default='No phone number'
+)
+# Returns phone number or default message if not found
 ```
 
 With these methods, you can efficiently navigate and manipulate FHIR resources, making complex data operations straightforward and Pythonic.
@@ -108,6 +160,7 @@ Here's a complete example that demonstrates the entire workflow from constructin
 
 ```python
 from fhircraft.fhir.resources.factory import construct_resource_model
+from fhircraft.fhir.path import fhirpath
 from fhircraft.utils import load_file
 
 # Step 1: Construct the Patient model
@@ -137,12 +190,27 @@ except Exception as e:
     print(f"❌ Validation error: {e}")
 
 # Step 4: Use FHIRPath to query and modify
-family_name = my_patient.get_fhirpath('Patient.name.family')
+family_name_path = fhirpath.parse('Patient.name.family')
+
+# Get the family name
+family_name = family_name_path.first(my_patient)
 print(f"Family name: {family_name}")
 
 # Update the family name
-my_patient.replace_fhirpath('Patient.name.family', 'Smith')
-print(f"Updated family name: {my_patient.get_fhirpath('Patient.name.family')}")
+family_name_path.update_values(my_patient, 'Smith')
+updated_name = family_name_path.first(my_patient)
+print(f"Updated family name: {updated_name}")
+
+# Check other information
+gender_path = fhirpath.parse('Patient.gender')
+if gender_path.exists(my_patient):
+    gender = gender_path.single(my_patient)
+    print(f"Patient gender: {gender}")
+
+# Count given names
+given_names_path = fhirpath.parse('Patient.name.given')
+given_count = given_names_path.count(my_patient)
+print(f"Number of given names: {given_count}")
 ```
 
 --------------------

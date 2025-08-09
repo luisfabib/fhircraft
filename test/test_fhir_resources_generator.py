@@ -81,7 +81,6 @@ def _assert_construct_core_resource(version, resource_label, filename):
 
 @pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases["R4B"])
 def test_construct_R4B_core_resource(resource_label, filename):
-    print(fhir_resources_test_cases)
     _assert_construct_core_resource("R4B", resource_label, filename)
 
 
@@ -157,7 +156,6 @@ def test_construct_profiled_resource(filename):
         temp_file_name = os.path.join(d, f"temp_test_{resource.__name__}.py")
         with open(temp_file_name, "w") as test_file:
             test_file.write(source_code)
-        # print(source_code)
         # Load the Pydantic FHIR model
         spec = importlib.util.spec_from_file_location("module", temp_file_name)
         module = importlib.util.module_from_spec(spec)
