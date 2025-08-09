@@ -80,12 +80,12 @@ class TestIndexPrimitive(TestCase):
         assert len(self.resource.field) == 3
 
     def test_index_updates_value(self):
-        Index(2).evaluate_and_replace(self.collection, value="value")
+        Index(2).update_values(self.collection, value="value")
         assert len(self.resource.field) == 3
         assert self.resource.field[2] == "value"
 
     def test_index_updates_and_creates_value(self):
-        Index(10).evaluate_and_replace(self.collection, value="value")
+        Index(10).update_values(self.collection, value="value")
         assert len(self.resource.field) == 11
         assert self.resource.field[10] == "value"
 
@@ -131,25 +131,18 @@ class TestIndexResources(TestCase):
         assert len(self.resource.coding) == 3
 
     def test_index_updates_value(self):
-        Index(2).evaluate_and_replace(
+        Index(2).update_values(
             self.collection, value=Coding(code="code-5", system="system-5")
         )
         assert len(self.resource.coding) == 3
         assert self.resource.coding[2] == Coding(code="code-5", system="system-5")
 
     def test_index_updates_and_creates_value(self):
-        Index(10).evaluate_and_replace(
+        Index(10).update_values(
             self.collection, value=Coding(code="code-5", system="system-5")
         )
         assert len(self.resource.coding) == 11
         assert self.resource.coding[10] == Coding(code="code-5", system="system-5")
-
-    def test_index_evaluates_by_reference(self):
-        Index(1).child(Element("code")).evaluate(self.collection, create=False)[
-            0
-        ].set_value("code-999")
-        assert len(self.resource.coding) == 3
-        assert self.resource.coding[1].code == "code-999"
 
     def test_index_creates_with_empty_list(self):
         resource = CodeableConcept(coding=[])

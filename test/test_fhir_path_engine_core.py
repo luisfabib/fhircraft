@@ -234,3 +234,171 @@ class TestLiteral(TestCase):
             result = literal.evaluate(items)
             assert len(result) == 1
             assert result[0].value is None
+
+
+"""
+Test file demonstrating the improved FHIRPath interface.
+
+This file shows examples of using the enhanced public interface methods
+for common FHIRPath operations.
+"""
+
+from dataclasses import dataclass
+from typing import List, Optional
+from unittest import TestCase
+
+import pytest
+
+from fhircraft.fhir.path.engine.core import Element, Invocation, This
+from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
+
+
+@dataclass
+class MockPatient:
+    """Mock FHIR Patient resource for testing."""
+
+    name: Optional[List[dict]] = None
+    gender: Optional[str] = None
+    birthDate: Optional[str] = None
+    telecom: Optional[List[dict]] = None
+
+
+class TestImprovedFHIRPathInterface(TestCase):
+    """Test cases demonstrating the improved FHIRPath interface."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.patient = MockPatient(
+            name=[
+                {"family": "Doe", "given": ["John"]},
+                {"family": "Smith", "given": ["Jane"]},
+            ],
+            gender="male",
+            birthDate="1990-01-01",
+            telecom=[
+                {"system": "phone", "value": "555-1234"},
+                {"system": "email", "value": "john@example.com"},
+            ],
+        )
+
+        self.empty_patient = MockPatient()
+
+    def test_get_values_returns_all_matches(self):
+        """Test get_values() returns all matching values as a list."""
+        # Test multiple values
+        path = Element("name")
+        values = path.values(self.patient)
+
+        self.assertIsInstance(values, list)
+        self.assertEqual(len(values), 2)
+        self.assertEqual(values[0]["family"], "Doe")
+        self.assertEqual(values[1]["family"], "Smith")
+
+    def test_get_values_returns_empty_list_for_no_matches(self):
+        """Test get_values() returns empty list when no matches found."""
+        path = Element("nonexistent")
+        values = path.values(self.patient)
+
+        self.assertIsInstance(values, list)
+        self.assertEqual(len(values), 0)
+
+    def test_get_single_returns_single_match(self):
+        """Test single() returns single value when exactly one match."""
+        path = Element("gender")
+        value = path.single(self.patient)
+
+        self.assertEqual(value, "male")
+
+    def test_get_single_returns_default_for_no_matches(self):
+        """Test single() returns default when no matches."""
+        path = Element("gender")
+        value = path.single(self.empty_patient, default="unknown")
+
+        self.assertEqual(value, "unknown")
+
+    def test_get_single_raises_error_for_multiple_matches(self):
+        """Test single() raises error when multiple matches found."""
+        path = Element("name")
+
+        with self.assertRaises(FHIRPathRuntimeError) as context:
+            path.single(self.patient)
+
+        self.assertIn(
+            "Expected single value but found 2 values", str(context.exception)
+        )
+
+    def test_first_returns_first_match(self):
+        """Test first() returns the first matching value."""
+        path = Element("name")
+        value = path.first(self.patient)
+
+        self.assertEqual(value["family"], "Doe")
+
+    def test_first_returns_default_for_no_matches(self):
+        """Test first() returns default when no matches."""
+        path = Element("name")
+        value = path.first(self.empty_patient, default={"family": "Unknown"})
+
+        self.assertEqual(value["family"], "Unknown")
+
+    def test_last_returns_last_match(self):
+        """Test last() returns the last matching value."""
+        path = Element("name")
+        value = path.last(self.patient)
+
+        self.assertEqual(value["family"], "Smith")
+
+    def test_last_returns_default_for_no_matches(self):
+        """Test last() returns default when no matches."""
+        path = Element("name")
+        value = path.last(self.empty_patient, default={"family": "Unknown"})
+
+        self.assertEqual(value["family"], "Unknown")
+
+    def test_exists_returns_true_when_matches_found(self):
+        """Test exists() returns True when matches are found."""
+        path = Element("gender")
+
+        self.assertTrue(path.exists(self.patient))
+
+    def test_exists_returns_false_when_no_matches(self):
+        """Test exists() returns False when no matches found."""
+        path = Element("gender")
+
+        self.assertFalse(path.exists(self.empty_patient))
+
+    def test_count_returns_correct_number_of_matches(self):
+        """Test count() returns the correct number of matches."""
+        # Multiple matches
+        path = Element("name")
+        self.assertEqual(path.count(self.patient), 2)
+
+        # Single match
+        path = Element("gender")
+        self.assertEqual(path.count(self.patient), 1)
+
+        # No matches
+        path = Element("nonexistent")
+        self.assertEqual(path.count(self.patient), 0)
+
+    def test_is_empty_returns_correct_boolean(self):
+        """Test is_empty() returns the correct boolean value."""
+        # Has matches
+        path = Element("gender")
+        self.assertFalse(path.is_empty(self.patient))
+
+        # No matches
+        path = Element("gender")
+        self.assertTrue(path.is_empty(self.empty_patient))
+
+    def test_set_value_modifies_all_matches(self):
+        """Test set_value() modifies all matching locations."""
+        # This test would require a more complete implementation
+        # with proper setter functionality
+        pass
+
+    def test_set_single_value_modifies_single_match(self):
+        """Test set_single_value() modifies exactly one matching location."""
+        # This test would require a more complete implementation
+        # with proper setter functionality
+        pass

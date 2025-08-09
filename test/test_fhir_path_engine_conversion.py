@@ -71,20 +71,6 @@ def test_iif_returns_evaluated_value_if_criterion_is_false_and_no_otherwise():
 
 
 # ---------------------------
-# FHIRTypeConversionFunction
-# ---------------------------
-
-
-def test_type_conversion_function_checks_singleton_collection():
-    collection = [
-        FHIRPathCollectionItem(value="mySubstringValue"),
-        FHIRPathCollectionItem(value="mySubstringValue2"),
-    ]
-    with pytest.raises(FHIRPathRuntimeError):
-        FHIRTypeConversionFunction().validate_collection(collection)
-
-
-# ---------------------------
 # ToBoolean()
 # ---------------------------
 

@@ -1,20 +1,13 @@
+import inspect
 import logging
 import typing
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial
-from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Optional, TypeVar
-from venv import create
+from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
-from fhircraft.fhir.path.utils import import_fhirpath_engine
+from fhircraft.fhir.path.exceptions import FHIRPathError, FHIRPathRuntimeError
 from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
-
-if TYPE_CHECKING:
-    from fhircraft.fhir.path.parser import FhirPathParser
-
-from typing import List
-
-from fhircraft.fhir.path.exceptions import FHIRPathError
 
 # Get logger name
 logger = logging.getLogger(__name__)
@@ -22,54 +15,374 @@ logger = logging.getLogger(__name__)
 FHIRPathCollection = List["FHIRPathCollectionItem"]
 
 
-class FHIRPathMixin:
-    """
-    Mixin class to incorporate a simple FHIRPath interface to the child class.
-    """
+class FHIRPath(ABC):
+    """Abstract base class for FHIRPath expressions."""
 
-    @property
-    def fhirpath(self) -> "FhirPathParser":
+    def values(self, data) -> List[Any]:
         """
-        Initialized FHIRPath engine instance
-        """
-        return import_fhirpath_engine()
-
-    def get_fhirpath(
-        self, expression: str
-    ) -> typing.Union[None, typing.Any, typing.List[typing.Any]]:
-        """
-        Evaluates and retrieves the value(s) of a FHIRPath expression
+        Evaluates the FHIRPath expression and returns all resulting values as a list.
 
         Args:
-            expression (str): FHIRPath expression to evaluate
+            data: The data to evaluate the FHIRPath expression against.
 
         Returns:
-            (Union[NoneType,Any, List[Any]): The extracted value(s), or None if no values are found.
+            List[Any]: A list of all values that match the FHIRPath expression. Returns an empty list if no matches are found.
         """
-        # Evaluate the FHIRPath expression
-        collection = self.fhirpath.parse(expression).evaluate_for(self)
-        # Get the values of the collection items
-        values = [
-            item.value
-            for item in collection
-            if item.value and not isinstance(item.value, bool)
-        ]
-        if len(values) == 1:
-            return values[0]
-        elif len(values) == 0:
-            return None
-        else:
-            return values
+        collection = self.__evaluate_wrapped(data)
+        return [item.value for item in collection]
 
-    def replace_fhirpath(self, expression: str, new_value: typing.Any) -> None:
+    def single(self, data, default=None) -> Any:
         """
-        Evaluates and replaces the value given by a FHIRPath expression
+        Evaluates the FHIRPath expression and returns a single value.
 
         Args:
-            expression (str): FHIRPath expression to evaluate
+            data: The data to evaluate the FHIRPath expression against.
+            default: The default value to return if no matches are found.
+
+        Returns:
+            Any: The single matching value.
+
+        Raises:
+            FHIRPathError: If more than one value is found.
         """
-        # Evaluate the FHIRPath expression
-        self.fhirpath.parse(expression).evaluate_and_replace(self, new_value)
+        values = self.values(data)
+        if len(values) == 0:
+            return default
+        elif len(values) == 1:
+            return values[0]
+        else:
+            raise FHIRPathRuntimeError(
+                f"Expected single value but found {len(values)} values. "
+                f"Use values() to retrieve multiple values or first() to get the first one."
+            )
+
+    def first(self, data, default=None) -> Any:
+        """
+        Evaluates the FHIRPath expression and returns the first value.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+            default: The default value to return if no matches are found.
+
+        Returns:
+            Any: The first matching value, or the default if no matches.
+        """
+        values = self.values(data)
+        return values[0] if values else default
+
+    def last(self, data, default=None) -> Any:
+        """
+        Evaluates the FHIRPath expression and returns the last value.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+            default: The default value to return if no matches are found.
+
+        Returns:
+            Any: The last matching value, or the default if no matches.
+        """
+        values = self.values(data)
+        return values[-1] if values else default
+
+    def exists(self, data) -> bool:
+        """
+        Checks if the FHIRPath expression matches any values in the data.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+
+        Returns:
+            bool: True if at least one value matches, False otherwise.
+        """
+        return len(self.values(data)) > 0
+
+    def count(self, data) -> int:
+        """
+        Returns the number of values that match the FHIRPath expression.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+
+        Returns:
+            int: The number of matching values.
+        """
+        return len(self.values(data))
+
+    def is_empty(self, data) -> bool:
+        """
+        Checks if the FHIRPath expression matches no values in the data.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+
+        Returns:
+            bool: True if no values match, False otherwise.
+        """
+        return not self.exists(data)
+
+    def update_values(self, data, value) -> None:
+        """
+        Evaluates the FHIRPath expression and sets all matching locations to the given value.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+            value: The value to set at all matching locations.
+
+        Raises:
+            RuntimeError: If no matching locations are found or if locations cannot be set.
+        """
+        collection = self.__evaluate_wrapped(data, create=True)
+        if not collection:
+            raise RuntimeError(
+                "No matching locations found. Cannot set value on empty result."
+            )
+        for item in collection:
+            item.set_value(value)
+
+    def update_single(self, data, value) -> None:
+        """
+        Evaluates the FHIRPath expression and sets a single matching location to the given value.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+            value: The value to set at the matching location.
+
+        Raises:
+            FHIRPathError: If zero or more than one matching locations are found.
+            RuntimeError: If the location cannot be set.
+        """
+        collection = self.__evaluate_wrapped(data, create=True)
+        if len(collection) == 0:
+            raise FHIRPathError(
+                "No matching locations found. Cannot set value on empty result."
+            )
+        elif len(collection) > 1:
+            raise FHIRPathError(
+                f"Expected single location but found {len(collection)} locations. "
+                f"Use update_values() to set all locations."
+            )
+        collection[0].set_value(value)
+
+    def trace(self, data, verbose: bool = False) -> List[str]:
+        """
+        Returns a trace of evaluation steps for debugging purposes.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+            verbose: If True, includes detailed information about each step.
+
+        Returns:
+            List[str]: A list of trace messages showing the evaluation steps.
+        """
+        trace_messages = []
+
+        def trace_step(message: str, level: int = 0):
+            indent = "  " * level
+            trace_messages.append(f"{indent}{message}")
+
+        try:
+            # Start tracing
+            trace_step(f"Starting evaluation of: {self}")
+            trace_step(f"Input data type: {type(data).__name__}")
+
+            if verbose:
+                trace_step(f"Input data: {repr(data)[:100]}...")
+
+            # Wrap data and trace collection creation
+            wrapped_data = [
+                FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)
+            ]
+            trace_step(f"Created collection with {len(wrapped_data)} items")
+
+            if verbose:
+                for i, item in enumerate(wrapped_data):
+                    trace_step(
+                        f"  Item {i}: {type(item.value).__name__} = {repr(item.value)[:50]}...",
+                        1,
+                    )
+
+            # Evaluate and trace results
+            result_collection = self.evaluate(wrapped_data, create=False)
+            trace_step(f"Evaluation completed: {len(result_collection)} results")
+
+            if verbose:
+                for i, item in enumerate(result_collection):
+                    trace_step(
+                        f"  Result {i}: {type(item.value).__name__} = {repr(item.value)[:50]}...",
+                        1,
+                    )
+                    if item.path:
+                        trace_step(f"    Path: {item.path}", 2)
+                    if item.parent:
+                        trace_step(f"    Parent: {type(item.parent.value).__name__}", 2)
+
+            # Extract values for final result
+            values = [item.value for item in result_collection]
+            trace_step(f"Final result: {len(values)} values")
+
+        except Exception as e:
+            trace_step(f"ERROR during evaluation: {type(e).__name__}: {str(e)}")
+            trace_step(f"Expression: {self}")
+
+        return trace_messages
+
+    def debug_info(self, data) -> dict:
+        """
+        Returns debugging information about the evaluation.
+
+        Args:
+            data: The data to evaluate the FHIRPath expression against.
+
+        Returns:
+            dict: A dictionary containing debugging information including:
+                - expression: String representation of the FHIRPath expression
+                - expression_type: Type of the FHIRPath expression
+                - input_data_type: Type of the input data
+                - input_data_size: Size/length of input data if applicable
+                - result_count: Number of results from evaluation
+                - result_types: Types of result values
+                - evaluation_success: Whether evaluation completed successfully
+                - error: Error information if evaluation failed
+                - collection_items: Information about FHIRPathCollectionItem objects
+        """
+        debug_data = {
+            "expression": str(self),
+            "expression_type": type(self).__name__,
+            "expression_repr": repr(self),
+            "input_data_type": type(data).__name__,
+            "input_data_size": None,
+            "result_count": 0,
+            "result_types": [],
+            "result_values": [],
+            "evaluation_success": False,
+            "error": None,
+            "collection_items": [],
+            "trace": [],
+        }
+
+        try:
+            # Analyze input data
+            if hasattr(data, "__len__") and not isinstance(data, str):
+                debug_data["input_data_size"] = len(data)
+
+            # Get trace information
+            debug_data["trace"] = self.trace(data, verbose=True)
+
+            # Perform evaluation
+            wrapped_data = [
+                FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)
+            ]
+            result_collection = self.evaluate(wrapped_data, create=False)
+
+            # Analyze results
+            debug_data["result_count"] = len(result_collection)
+            debug_data["evaluation_success"] = True
+
+            for item in result_collection:
+                debug_data["result_types"].append(type(item.value).__name__)
+                debug_data["result_values"].append(repr(item.value)[:100])
+
+                # Collection item details
+                item_info = {
+                    "value_type": type(item.value).__name__,
+                    "value_repr": repr(item.value)[:100],
+                    "path": str(item.path) if item.path else None,
+                    "path_type": type(item.path).__name__ if item.path else None,
+                    "has_parent": item.parent is not None,
+                    "has_setter": item.setter is not None,
+                    "element": item.element,
+                    "index": item.index,
+                }
+                debug_data["collection_items"].append(item_info)
+
+            # Remove duplicates from result_types
+            debug_data["result_types"] = list(set(debug_data["result_types"]))
+
+        except Exception as e:
+            debug_data["evaluation_success"] = False
+            debug_data["error"] = {
+                "type": type(e).__name__,
+                "message": str(e),
+                "expression": str(self),
+            }
+
+            # Still try to get trace even if evaluation failed
+            try:
+                debug_data["trace"] = self.trace(data, verbose=True)
+            except:
+                debug_data["trace"] = [
+                    f"Failed to generate trace for expression: {self}"
+                ]
+
+        return debug_data
+
+    @abstractmethod
+    def evaluate(
+        self, collection: FHIRPathCollection, create: bool
+    ) -> FHIRPathCollection:
+        """
+        Evaluates the current object against the provided FHIRPathCollection.
+
+        Args:
+            collection (FHIRPathCollection): The collection of FHIRPath elements to evaluate.
+            create (bool): Whether to create new elements during evaluation if necessary.
+
+        Returns:
+            FHIRPathCollection: The result of the evaluation as a FHIRPathCollection.
+
+        Raises:
+            NotImplementedError: This method must be implemented by subclasses.
+        """
+        raise NotImplementedError()
+
+    def __init_subclass__(cls, **kwargs):
+        """
+        Called when a class is subclassed. Ensures that any non-abstract subclass of `FHIRPath`
+        overrides the `evaluate` method. Raises a TypeError if the subclass does not provide its own
+        implementation of `evaluate`.
+
+        Args:
+            **kwargs: Arbitrary keyword arguments passed to the superclass.
+
+        Raises:
+            TypeError: If a non-abstract subclass does not override the `evaluate` method.
+        """
+        if not inspect.isabstract(cls) and cls.evaluate == FHIRPath.evaluate:
+            raise TypeError(
+                "Subclasses of `FHIRPath` must override the `evaluate` method"
+            )
+        super().__init_subclass__(**kwargs)
+
+    def __evaluate_wrapped(self, data: typing.Any, create=False) -> FHIRPathCollection:
+        # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
+        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
+        return self.evaluate(collection, create=create)
+
+    def __get_child(self, child):
+        """
+        Determines and returns the appropriate child node in a path expression tree.
+
+        Args:
+            child: The child node to be evaluated, which can be an instance of This, Root, or another node type.
+
+        Returns:
+            The resulting node based on the following logic:
+                - If the current node is an instance of This or Root, returns the child node.
+                - If the child node is an instance of This, returns the current node.
+                - If the child node is an instance of Root, returns the child node.
+                - Otherwise, returns a new Invocation node combining the current node and the child.
+
+        Note:
+            This method is used internally to manage navigation and invocation logic within the path engine.
+        """
+        if isinstance(self, This) or isinstance(self, Root):
+            return child
+        elif isinstance(child, This):
+            return self
+        elif isinstance(child, Root):
+            return child
+        else:
+            return Invocation(self, child)
 
 
 @dataclass
@@ -188,7 +501,9 @@ class FHIRPathCollectionItem(object):
             (str): The full path of the item.
         """
         return (
-            self.path if self.parent is None else self.parent.full_path.child(self.path)
+            self.path
+            if self.parent is None
+            else self.parent.full_path.__get_child(self.path)
         )
 
     def __eq__(self, value: Any) -> bool:
@@ -208,70 +523,7 @@ class FHIRPathCollectionItem(object):
         return hash((self.path, self.parent, self.value.__repr__()))
 
 
-class FHIRPath(ABC):
-    """
-    Abstract base class representing a FHIRPath, used for navigating and manipulating
-    FHIR resources.
-    """
-
-    def evaluate_for(self, data):
-        collection = self._evaluate_wrapped(data)
-        values = [item.value for item in collection]
-        if len(values) == 1:
-            values = values[0]
-        elif len(values) == 0:
-            return None
-        return values
-
-    def evaluate_and_replace(self, data, value):
-        new_collection = self._evaluate_wrapped(data, create=True)
-        for item in new_collection:
-            item.set_value(value)
-
-    def _evaluate_wrapped(self, data: typing.Any, create=False) -> FHIRPathCollection:
-        # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
-        collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
-        return self.evaluate(collection, create=create)
-
-    def evaluate(
-        self, collection: FHIRPathCollection, create: bool
-    ) -> FHIRPathCollection:
-        """
-        Evaluates the collection and returns a list of FHIRPathCollectionItem instances.
-
-        Args:
-            collection (Any): The input collection to evaluate.
-            create (bool): Flag indicating whether to create new items if they do not exist.
-
-        Returns:
-            FHIRPathCollection: A list of FHIRPathCollectionItem instances.
-
-        Raises:
-            NotImplementedError: If the method is not implemented by a subclass.
-        """
-        raise NotImplementedError()
-
-    def child(self, child):
-        """
-        Returns the child of this FHIRPath instance with some canonicalization.
-
-        Args:
-            child (Any): The child element.
-
-        Returns:
-            (Any): The canonicalized child element.
-        """
-        if isinstance(self, This) or isinstance(self, Root):
-            return child
-        elif isinstance(child, This):
-            return self
-        elif isinstance(child, Root):
-            return child
-        else:
-            return Invocation(self, child)
-
-
-class FHIRPathFunction(FHIRPath):
+class FHIRPathFunction(FHIRPath, ABC):
     """
     Abstract base class representing a FHIRPath function, used for functional evaluation of collections.
     """
