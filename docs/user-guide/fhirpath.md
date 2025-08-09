@@ -19,83 +19,142 @@ The `expression` object represents the parsed FHIRPath expression in Python, whi
 !!! info "FHIRPath Expressions"
     For a comprehensive guide on constructing FHIRPath expressions, refer to the official [FHIRPath documentation](https://hl7.org/fhirpath/N1/). 
 
+## Using FHIRPath with Resource Objects
+
+### FHIRPathMixin Interface
+
+For convenience when working with FHIR resource objects, Fhircraft provides a `FHIRPathMixin` class that adds FHIRPath methods directly to your resource instances. This is the recommended approach for most use cases as it provides a cleaner, more intuitive interface.
+
+When your resource classes inherit from `FHIRPathMixin`, you can call FHIRPath methods directly on resource instances:
+
+```python
+# Assuming your Patient class inherits from FHIRPathMixin
+my_patient = Patient(...)
+
+# Get all family names
+family_names = my_patient.fhirpath_values("Patient.name.family")
+
+# Get a single gender value
+gender = my_patient.fhirpath_single("Patient.gender", default="unknown")
+
+# Get the first family name
+first_name = my_patient.fhirpath_first("Patient.name.family")
+
+# Check if patient has any phone numbers
+has_phone = my_patient.fhirpath_exists("Patient.telecom.where(system='phone')")
+
+# Update gender
+my_patient.fhirpath_update_single("Patient.gender", "other")
+```
+
+The mixin provides all the same methods as the engine interface, but with a more convenient syntax. All examples in this guide can be adapted to use the mixin by replacing:
+
+```python
+# Engine interface
+expression = fhirpath.parse('Patient.name.family')
+result = expression.values(my_patient)
+
+# Mixin interface (more convenient)
+result = my_patient.fhirpath_values("Patient.name.family")
+```
+
+### Engine Interface (Advanced)
+
+For advanced use cases, performance optimization, or when you need more control over expression parsing, you can use the engine interface directly:
+
 ### Evaluating expressions
 
 FHIRPath expressions operate on [collections](https://hl7.org/fhirpath/#collections), meaning that the result of every expression is a collection—even when the expression yields a single element. Fhircraft provides an enhanced interface with multiple methods to handle different scenarios when working with these collections.
 
 #### Value Retrieval Methods
 
-**`values(data) -> List[Any]`**
+**Getting All Values**
 
 Returns all matching values as a list. This is the most basic method and always returns a list, even for single or no matches:
 
 ```python
-# Get all family names (returns a list)
-family_names = expression.values(my_patient)
+# Mixin interface (recommended)
+family_names = my_patient.fhirpath_values("Patient.name.family")
+
+# Engine interface (advanced)
+family_names = fhirpath.parse('Patient.name.family').values(my_patient)
+
 # Result: ['Doe', 'Smith'] or [] if no matches
 ```
 
-**`single(data, default=None) -> Any`**
+**Getting a Single Value**
 
 Returns exactly one value. Raises `FHIRPathRuntimeError` if multiple values are found:
 
 ```python
-# Get a single gender value (expects exactly one)
-gender = fhirpath.parse('Patient.gender').single(my_patient)
-# Result: 'male' or raises error if multiple values
+# Mixin interface (recommended)
+gender = my_patient.fhirpath_single("Patient.gender", default="unknown")
 
-# With default value
-gender = fhirpath.parse('Patient.gender').single(my_patient, default='unknown')
+# Engine interface (advanced)
+gender = fhirpath.parse('Patient.gender').single(my_patient, default="unknown")
+
 # Result: 'male' or 'unknown' if no gender specified
 ```
 
-**`first(data, default=None) -> Any`**
+**Getting the First Value**
 
 Returns the first matching value, safe for multiple values:
 
 ```python
-# Get the first family name
-first_name = fhirpath.parse('Patient.name.family').first(my_patient)
-# Result: 'Doe' (first family name) or None if no names
+# Mixin interface (recommended)
+first_name = my_patient.fhirpath_first("Patient.name.family", default="Unknown")
 
-# With default value
-first_name = fhirpath.parse('Patient.name.family').first(my_patient, default='Unknown')
-# Result: 'Doe' or 'Unknown' if no family names
+# Engine interface (advanced)
+first_name = fhirpath.parse('Patient.name.family').first(my_patient, default="Unknown")
+
+# Result: 'Doe' (first family name) or 'Unknown' if no names
 ```
 
-**`last(data, default=None) -> Any`**
+**Getting the Last Value**
 
 Returns the last matching value:
 
 ```python
-# Get the last family name
+# Mixin interface (recommended)
+last_name = my_patient.fhirpath_last("Patient.name.family")
+
+# Engine interface (advanced)
 last_name = fhirpath.parse('Patient.name.family').last(my_patient)
+
 # Result: 'Smith' (last family name) or None if no names
 ```
 
 #### Existence and Count Methods
 
-**`exists(data) -> bool`**
+**Checking if Values Exist**
 
 Checks if any values match the FHIRPath expression:
 
 ```python
-# Check if patient has any family names
+# Mixin interface (recommended)
+has_family_name = my_patient.fhirpath_exists("Patient.name.family")
+
+# Engine interface (advanced)
 has_family_name = fhirpath.parse('Patient.name.family').exists(my_patient)
+
 # Result: True if at least one family name exists
 ```
 
-**`is_empty(data) -> bool`**
+**Checking if No Values Exist**
 
 Checks if no values match the FHIRPath expression:
 
 ```python
-# Check if patient has no phone numbers
+# Mixin interface (recommended)
+no_phone = my_patient.fhirpath_is_empty("Patient.telecom.where(system='phone')")
+
+# Engine interface (advanced)
 no_phone = fhirpath.parse('Patient.telecom.where(system="phone")').is_empty(my_patient)
+
 # Result: True if no phone numbers found
 ```
 
-**`count(data) -> int`**
+**Counting Values**
 
 Returns the number of matching values:
 
