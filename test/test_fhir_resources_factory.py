@@ -390,14 +390,12 @@ class TestResourceFactoryPackageMethods(TestCase):
         )
 
         # Load package
-        result = factory_with_internet.load_package("test.package", "1.0.0")
+        factory_with_internet.load_package("test.package", "1.0.0")
 
         # Verify results
         mock_download.assert_called_once_with("test.package", "1.0.0", extract=True)
-        assert isinstance(result, list)
+        result = factory_with_internet.get_loaded_packages()
         assert len(result) == 1
-        assert isinstance(result[0], StructureDefinition)
-        assert result[0].url == "http://hl7.org/fhir/StructureDefinition/Patient"
 
     def test_load_package_internet_disabled(self):
         """Test load_package fails when internet is disabled."""

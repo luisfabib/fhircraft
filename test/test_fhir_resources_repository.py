@@ -807,15 +807,20 @@ class TestCompositeRepositoryPackageIntegration:
         mock_download.return_value = mock_tar
 
         # Load package
-        loaded_definitions = repo.load_package("test.package", "1.0.0")
+        repo.load_package("test.package", "1.0.0")
 
         # Verify results
-        assert len(loaded_definitions) == 1
+        loaded_packages = [
+            repo._package_repository.get(
+                "http://hl7.org/fhir/StructureDefinition/Patient"
+            )
+        ]
+        print(loaded_packages)
+        assert len(loaded_packages) == 1
         assert (
-            loaded_definitions[0].url
-            == "http://hl7.org/fhir/StructureDefinition/Patient"
+            loaded_packages[0].url == "http://hl7.org/fhir/StructureDefinition/Patient"
         )
-        assert loaded_definitions[0].version == "4.0.0"
+        assert loaded_packages[0].version == "4.0.0"
 
         # Verify structure definition is available in main repository
         assert repo.has("http://hl7.org/fhir/StructureDefinition/Patient", "4.0.0")

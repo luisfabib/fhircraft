@@ -786,9 +786,7 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
             return StructureDefinition.model_validate(json.load(file))
 
     # Package-specific convenience methods
-    def load_package(
-        self, package_name: str, version: Optional[str] = None
-    ) -> List[StructureDefinition]:
+    def load_package(self, package_name: str, version: Optional[str] = None) -> None:
         """Load a FHIR package and return loaded structure definitions."""
         if not self._package_repository:
             raise RuntimeError("Package support is not enabled for this repository")
@@ -813,8 +811,6 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
                 ):
                     self.add(structure_def)
                     loaded_definitions.append(structure_def)
-
-        return loaded_definitions
 
     def get_loaded_packages(self) -> Dict[str, str]:
         """Get dictionary of loaded FHIR packages (name -> version)."""
