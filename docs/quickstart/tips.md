@@ -34,17 +34,25 @@ except FhirPathParserError as e:
 
 **Network Issues with Canonical URLs**
 ```python
-import requests
+from fhircraft.fhir.resources.factory import factory, construct_resource_model
+
+# Best practice: Pre-configure repository for local-first operation
+factory.configure_repository(
+    directory="/path/to/local/definitions",
+    internet_enabled=False  # Disable for production
+)
 
 try:
+    # This will use local definitions first
     model = construct_resource_model(
         canonical_url='http://hl7.org/fhir/StructureDefinition/Patient'
     )
-except requests.RequestException as e:
-    print(f"Failed to fetch structure definition: {e}")
-    # Fallback to local file
+except ValueError as e:
+    print(f"Definition not found locally: {e}")
+    # Enable internet as fallback if needed
+    factory.enable_internet_access()
     model = construct_resource_model(
-        structure_definition=load_file('local_patient_definition.json')
+        canonical_url='http://hl7.org/fhir/StructureDefinition/Patient'
     )
 ```
 
@@ -52,25 +60,98 @@ except requests.RequestException as e:
 
 ### Performance Tips
 
-**Model Caching**
-Fhircraft automatically caches constructed models. Subsequent calls with the same structure definition return the cached model instantly:
+**Repository and Model Caching**
+Fhircraft automatically caches both structure definitions and constructed models for optimal performance:
 
 ```python
-# First call constructs and caches the model
+from fhircraft.fhir.resources.factory import factory, construct_resource_model
+
+# Repository caches structure definitions
+factory.configure_repository(directory="/path/to/definitions")
+
+# First call loads definition into repository cache and constructs model
 patient_model_1 = construct_resource_model(canonical_url='...')
 
-# Second call returns cached model (very fast)
+# Second call uses cached definition and cached model (very fast)
 patient_model_2 = construct_resource_model(canonical_url='...')
 
-# Clear cache if needed
-from fhircraft.fhir.resources.factory import clear_cache
-clear_cache()
+# Clear model cache if needed (repository cache remains)
+factory.clear_chache()
+
+# Clear everything and reconfigure if needed
+factory.configure_repository(directory="/new/path", internet_enabled=False)
 ```
 
-**Local Files vs Canonical URLs**
-- **Use local files** for production environments and when you need specific versions
-- **Use canonical URLs** for quick prototyping and testing
-- **Local files** are faster and don't require internet connectivity
+**Local-First Strategy**
+- **Pre-load definitions**: Use `factory.configure_repository()` at startup
+- **Disable internet**: Use `factory.disable_internet_access()` for production
+- **Version pinning**: Use versioned canonical URLs like `url|4.0.1` for reproducible builds
+- **Bulk loading**: Load entire directories rather than individual files
+
+```python
+# Optimal production setup
+factory.configure_repository(
+    directory="/app/fhir/definitions",
+    internet_enabled=False  # Prevent unexpected network calls
+)
+
+# All subsequent model construction will be fast and offline
+patient_model = construct_resource_model(
+    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient|4.0.1"
+)
+```
+
+------------------
+
+### API Patterns and Best Practices
+
+**Simple Usage Pattern**
+For basic use cases, the simplified API provides everything you need:
+
+```python
+from fhircraft.fhir.resources.factory import construct_resource_model
+
+# Simple - uses default repository with internet fallback
+Patient = construct_resource_model(
+    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
+)
+```
+
+**Advanced Configuration Pattern**
+For production or complex scenarios, use the factory instance directly:
+
+```python
+from fhircraft.fhir.resources.factory import factory
+
+# One-time setup at application startup
+factory.configure_repository(
+    directory="/app/resources/fhir/definitions",
+    files=["/app/custom/profiles.json"],
+    internet_enabled=False
+)
+
+# Use throughout application
+Patient = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
+)
+CustomProfile = factory.construct_resource_model(
+    canonical_url="http://example.org/fhir/StructureDefinition/CustomProfile"
+)
+```
+
+**Development vs Production**
+```python
+# Development - flexible with internet fallback
+if development_mode:
+    factory.configure_repository(internet_enabled=True)
+
+# Production - strict local-only operation
+else:
+    factory.configure_repository(
+        directory="/app/fhir/definitions",
+        internet_enabled=False
+    )
+```
 
 ------------------
 

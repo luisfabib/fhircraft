@@ -11,6 +11,7 @@ from collections import defaultdict
 # Standard modules
 from enum import Enum
 from functools import partial
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypeVar, Union
 
 import requests
@@ -33,6 +34,10 @@ from fhircraft.fhir.resources.definitions import (
     ElementDefinition,
     ElementDefinitionConstraint,
     StructureDefinition,
+)
+from fhircraft.fhir.resources.repository import (
+    CompositeStructureDefinitionRepository,
+    StructureDefinitionRepository,
 )
 from fhircraft.utils import (
     capitalize,
@@ -69,64 +74,71 @@ class ResourceFactory:
         FHIR_release: str
         resource_name: str
 
-    Config: FactoryConfig
-    construction_cache: Dict[str, type[BaseModel]] = {}
+    def __init__(
+        self, repository: Optional[CompositeStructureDefinitionRepository] = None
+    ):
+        self.repository = repository or CompositeStructureDefinitionRepository()
+        self.construction_cache: Dict[str, type[BaseModel]] = {}
+        self.Config: Optional[ResourceFactory.FactoryConfig] = None
 
-    def download_structure_definition(self, profile_url: str) -> Dict[str, Any]:
-        """
-        Retrieves the structure definition of a FHIR resource from the provided profile URL.
+    # Convenience functions for easy configuration
+    def configure_repository(
+        self,
+        directory: Optional[Union[str, Path]] = None,
+        files: Optional[List[Union[str, Path]]] = None,
+        definitions: Optional[List[Dict[str, Any]]] = None,
+        internet_enabled: bool = True,
+    ) -> None:
+        """Configure the factory repository with various sources."""
+        self.repository.set_internet_enabled(internet_enabled)
 
-        Parameters:
-            profile_url (str): The URL of the FHIR profile from which to retrieve the structure definition.
+        if directory:
+            self.load_definitions_from_directory(directory)
 
-        Returns:
-            Dict[str, Any]: A dictionary representing the structure definition of the FHIR resource.
-        """
+        if files:
+            self.load_definitions_from_files(*files)
 
-        if not profile_url.endswith(".json"):
-            # Construct endpoint URL for the StructureDefinition JSON
-            if profile_url.startswith("http://hl7.org/fhir/StructureDefinition"):
-                domain, resource = profile_url.rsplit("/", 1)
-                domain = domain.replace(
-                    "http://hl7.org/fhir/StructureDefinition",
-                    "https://hl7.org/fhir/R4/extension",
-                )
-                resource = resource.lower()
-            else:
-                domain, resource = profile_url.rsplit("/", 1)
-            json_url = f"{domain}-{resource}.json"
+        if definitions:
+            self.load_definitions_from_list(*definitions)
+
+    def disable_internet_access(self) -> None:
+        """Toggle offline mode (disable internet access) to avoid external requests."""
+        self.repository.set_internet_enabled(False)
+
+    def enable_internet_access(self) -> None:
+        """Toggle online mode (enable internet access) to allow external requests."""
+        self.repository.set_internet_enabled(True)
+
+    def load_definitions_from_directory(self, directory_path: Union[str, Path]) -> None:
+        """Load structure definitions from a directory."""
+        if hasattr(self.repository, "load_from_directory"):
+            self.repository.load_from_directory(directory_path)
         else:
-            json_url = profile_url
+            raise NotImplementedError(
+                "Repository does not support loading from directory"
+            )
 
-        # Configure proxy if needed
-        settings = load_env_variables()
-        proxies = (
-            {
-                k: v
-                for k, v in {
-                    "https": settings.get("PROXY_URL_HTTPS"),
-                    "http": settings.get("PROXY_URL_HTTP"),
-                }.items()
-                if v is not None
-            }
-            if settings.get("PROXY_URL_HTTPS") or settings.get("PROXY_URL_HTTP")
-            else None
-        )
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json, application/json+fhir, text/json",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
-        }
-        # Download the StructureDefinition JSON
-        response = requests.get(
-            json_url,
-            proxies=proxies,
-            verify=settings.get("CERTIFICATE_BUNDLE_PATH"),
-            headers=headers,
-            allow_redirects=True,
-        )
-        response.raise_for_status()
-        return response.json()
+    def load_definitions_from_files(self, *file_paths: Union[str, Path]) -> None:
+        """Load structure definitions from individual files."""
+        if hasattr(self.repository, "load_from_files"):
+            self.repository.load_from_files(*file_paths)
+        else:
+            raise NotImplementedError("Repository does not support loading from files")
+
+    def load_definitions_from_list(self, *definitions: Dict[str, Any]) -> None:
+        """Load structure definitions from pre-loaded dictionaries."""
+        if hasattr(self.repository, "load_from_definitions"):
+            self.repository.load_from_definitions(*definitions)
+        else:
+            raise NotImplementedError(
+                "Repository does not support loading from definitions"
+            )
+
+    def resolve_structure_definition(self, canonical_url: str) -> StructureDefinition:
+        """Resolve structure definition using the repository."""
+        if structure_def := self.repository.get(canonical_url):
+            return structure_def
+        raise ValueError(f"Could not resolve structure definition: {canonical_url}")
 
     def _build_element_tree_structure(
         self, elements: List[ElementDefinition]
@@ -222,7 +234,9 @@ class ResourceFactory:
             return field_type
         try:
             # Check if type is a FHIR complex datatype
-            return get_complex_FHIR_type(field_type_name, self.Config.FHIR_release)
+            return get_complex_FHIR_type(
+                field_type_name, self.Config.FHIR_release if self.Config else "R4B"
+            )
         except (ModuleNotFoundError, AttributeError):
             return field_type_name
 
@@ -412,7 +426,7 @@ class ResourceFactory:
                 slice_element_canonical_urls := slice_element_types[0].profile
             ):
                 # Construct the slice model from the canonical URL
-                slice_model = ResourceFactory().construct_resource_model(
+                slice_model = self.construct_resource_model(
                     slice_element_canonical_urls[0], base_model=FHIRSliceModel
                 )
             else:
@@ -671,7 +685,9 @@ class ResourceFactory:
             # Process element children, if present
             elif element.children:
                 backbone_model_name = (
-                    capitalize(self.Config.resource_name).strip()
+                    capitalize(
+                        self.Config.resource_name if self.Config else "Unknown"
+                    ).strip()
                     + capitalize(name).strip()
                 )
                 field_subfields, subfield_validators, subfield_properties = (
@@ -683,7 +699,7 @@ class ResourceFactory:
                     setattr(field_type, attribute, property(property_getter))
                 if element.children["extension"].slices:
                     extension_slice_base_type = get_complex_FHIR_type(
-                        "Extension", self.Config.FHIR_release
+                        "Extension", self.Config.FHIR_release if self.Config else "R4B"
                     )
                     extension_type = Annotated[
                         Union[
@@ -702,7 +718,10 @@ class ResourceFactory:
 
                     self._build_element_slice_models(
                         element.children["extension"],
-                        get_complex_FHIR_type("Extension", self.Config.FHIR_release),
+                        get_complex_FHIR_type(
+                            "Extension",
+                            self.Config.FHIR_release if self.Config else "R4B",
+                        ),
                     )
                     # Get cardinality of extension element
                     extension_min_card, extension_max_card = (
@@ -766,15 +785,18 @@ class ResourceFactory:
         if canonical_url in self.construction_cache:
             return self.construction_cache[canonical_url]
 
-        # Download the FHIR structure definition if the canonical URL has been specified
+        # Resolve the FHIR structure definition
         _structure_definition = None
         if isinstance(structure_definition, str):
-            with open(structure_definition) as file:
-                _structure_definition = json.load(file)
+            _structure_definition = self.repository.__load_json_structure_definition(
+                Path(structure_definition)
+            )
         elif isinstance(structure_definition, dict):
-            _structure_definition = structure_definition
+            _structure_definition = StructureDefinition.model_validate(
+                structure_definition
+            )
         elif canonical_url:
-            _structure_definition = self.download_structure_definition(canonical_url)
+            _structure_definition = self.resolve_structure_definition(canonical_url)
         if not _structure_definition:
             raise ValueError(
                 "No StructureDefinition provided or downloaded. Please provide a valid StructureDefinition."
@@ -820,7 +842,9 @@ class ResourceFactory:
             validators = self._add_model_constraint_validator(constraint, validators)
         # If the resource has metadata, prefill the information
         if "meta" in fields:
-            Meta = get_complex_FHIR_type("Meta", self.Config.FHIR_release)
+            Meta = get_complex_FHIR_type(
+                "Meta", self.Config.FHIR_release if self.Config else "R4B"
+            )
             fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
             fields["meta"] = (
                 Optional[Meta],
@@ -831,7 +855,7 @@ class ResourceFactory:
             )
         # Construct the Pydantic model representing the FHIR resource
         model = self._create_model_with_properties(
-            self.Config.resource_name,
+            self.Config.resource_name if self.Config else _structure_definition.name,
             fields=fields,
             base=(base_model,),
             validators=validators,
@@ -875,7 +899,7 @@ class ResourceFactory:
         for constraint in structure.constraint or []:
             validators = self._add_model_constraint_validator(constraint, validators)
         model = create_model(
-            self.Config.resource_name,
+            self.Config.resource_name if self.Config else structure_definition["name"],
             **fields,
             __base__=base,
             __validators__=validators,
@@ -892,6 +916,8 @@ class ResourceFactory:
         self.construction_cache = {}
 
 
+# Create default factory instance
 factory = ResourceFactory()
+
+# Public API
 construct_resource_model = factory.construct_resource_model
-clear_chache = factory.clear_chache

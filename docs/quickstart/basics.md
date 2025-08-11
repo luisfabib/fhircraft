@@ -10,9 +10,9 @@ Fhircraft makes it simple to generate Pydantic models for any FHIR resource or p
 
 **Example: Creating a Pydantic Model for the FHIR `Patient` Resource**
 
-You can construct a model for the core FHIR `Patient` resource in two ways:
+You can construct a model for the core FHIR `Patient` resource in multiple ways:
 
-=== "Canonical URL"
+=== "Canonical URL (Recommended)"
 
     ```python
     from fhircraft.fhir.resources.factory import construct_resource_model
@@ -21,8 +21,8 @@ You can construct a model for the core FHIR `Patient` resource in two ways:
     )
     ```
 
-    !!! warning "Internet Access Required"
-        When using a canonical URL, Fhircraft fetches the StructureDefinition via HTTP. Ensure your environment has internet access, as the definition will be downloaded from an external FHIR server.
+    !!! tip "Local-first approach"
+        Fhircraft's repository system first checks for locally loaded definitions, then falls back to downloading from the internet. This provides the best of both worlds: offline capability when possible, with internet fallback when needed.
 
 === "Local File"
 
@@ -31,6 +31,23 @@ You can construct a model for the core FHIR `Patient` resource in two ways:
     from fhircraft.utils import load_file
     patient_model = construct_resource_model(
         structure_definition=load_file('FHIR_StructureDefinition_Patient.json')
+    )
+    ```
+
+=== "Repository Configuration"
+
+    ```python
+    from fhircraft.fhir.resources.factory import factory
+    
+    # Pre-load definitions from local sources
+    factory.configure_repository(
+        directory='/path/to/structure/definitions',
+        internet_enabled=True  # Allow fallback to internet
+    )
+    
+    # Now use canonical URLs with local-first lookup
+    patient_model = factory.construct_resource_model(
+        canonical_url='http://hl7.org/fhir/StructureDefinition/Patient'
     )
     ```
 
