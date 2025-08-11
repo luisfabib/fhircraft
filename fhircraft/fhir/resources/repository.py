@@ -6,9 +6,10 @@ Structure Definition Repository
 import json
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
+from packaging import version
 from pydantic_core import ValidationError
 
 from fhircraft.fhir.resources.definitions import StructureDefinition
@@ -19,8 +20,10 @@ class StructureDefinitionRepository(ABC):
     """Abstract base class for structure definition repositories."""
 
     @abstractmethod
-    def get(self, canonical_url: str) -> StructureDefinition:
-        """Retrieve a structure definition by canonical URL."""
+    def get(
+        self, canonical_url: str, version: Optional[str] = None
+    ) -> StructureDefinition:
+        """Retrieve a structure definition by canonical URL and optional version."""
         pass
 
     @abstractmethod
@@ -29,14 +32,39 @@ class StructureDefinitionRepository(ABC):
         pass
 
     @abstractmethod
-    def has(self, canonical_url: str) -> bool:
+    def has(self, canonical_url: str, version: Optional[str] = None) -> bool:
         """Check if a structure definition exists in the repository."""
+        pass
+
+    @abstractmethod
+    def get_versions(self, canonical_url: str) -> List[str]:
+        """Get all available versions for a canonical URL."""
+        pass
+
+    @abstractmethod
+    def get_latest_version(self, canonical_url: str) -> Optional[str]:
+        """Get the latest version for a canonical URL."""
         pass
 
     @abstractmethod
     def set_internet_enabled(self, enabled: bool) -> None:
         """Enable or disable internet access for this repository."""
         pass
+
+    @staticmethod
+    def parse_canonical_url(canonical_url: str) -> Tuple[str, Optional[str]]:
+        """Parse a canonical URL to extract base URL and version."""
+        if "|" in canonical_url:
+            base_url, version = canonical_url.split("|", 1)
+            return base_url.strip(), version.strip()
+        return canonical_url.strip(), None
+
+    @staticmethod
+    def format_canonical_url(base_url: str, version: Optional[str] = None) -> str:
+        """Format a canonical URL with optional version."""
+        if version:
+            return f"{base_url}|{version}"
+        return base_url
 
 
 class HttpStructureDefinitionRepository(StructureDefinitionRepository):
@@ -45,21 +73,35 @@ class HttpStructureDefinitionRepository(StructureDefinitionRepository):
     def __init__(self):
         self._internet_enabled = True
 
-    def get(self, canonical_url: str) -> StructureDefinition:
+    def get(
+        self, canonical_url: str, version: Optional[str] = None
+    ) -> StructureDefinition:
         """Download structure definition from the internet."""
         if not self._internet_enabled:
             raise RuntimeError(
                 f"Attempted to get {canonical_url} while internet access is disabled. Either enable internet access or use a local repository."
             )
+
+        # Parse URL to handle versioned URLs
+        base_url, parsed_version = self.parse_canonical_url(canonical_url)
+        target_version = version or parsed_version
+
+        # Format the URL for download (with version if specified)
+        download_url = (
+            self.format_canonical_url(base_url, target_version)
+            if target_version
+            else base_url
+        )
+
         try:
-            return self.__download_structure_definition(canonical_url)
+            return self.__download_structure_definition(download_url)
         except ValidationError as ve:
             raise ValidationError(
-                f"Validation error for structure definition from {canonical_url}: {ve}"
+                f"Validation error for structure definition from {download_url}: {ve}"
             )
         except Exception as e:
             raise RuntimeError(
-                f"Failed to download structure definition from {canonical_url}: {e}"
+                f"Failed to download structure definition from {download_url}: {e}"
             )
 
     def add(self, structure_def: StructureDefinition) -> None:
@@ -68,10 +110,21 @@ class HttpStructureDefinitionRepository(StructureDefinitionRepository):
             "HttpStructureDefinitionRepository doesn't support adding definitions"
         )
 
-    def has(self, canonical_url: str) -> bool:
+    def has(self, canonical_url: str, version: Optional[str] = None) -> bool:
         """Check if URL can potentially be resolved."""
-        return self._internet_enabled and canonical_url.startswith(
-            ("http://", "https://")
+        base_url, parsed_version = self.parse_canonical_url(canonical_url)
+        return self._internet_enabled and base_url.startswith(("http://", "https://"))
+
+    def get_versions(self, canonical_url: str) -> List[str]:
+        """HTTP repository can't list versions without downloading."""
+        raise NotImplementedError(
+            "HttpStructureDefinitionRepository doesn't support getting versions"
+        )
+
+    def get_latest_version(self, canonical_url: str) -> Optional[str]:
+        """HTTP repository can't determine latest version without downloading."""
+        raise NotImplementedError(
+            "HttpStructureDefinitionRepository doesn't support getting latest version"
         )
 
     def set_internet_enabled(self, enabled: bool) -> None:
@@ -138,43 +191,136 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
     """Repository that manages local storage and optional internet fallback."""
 
     def __init__(self, internet_enabled: bool = True):
-        self._local_definitions: Dict[str, StructureDefinition] = {}
+        # Structure: {base_url: {version: StructureDefinition}}
+        self._local_definitions: Dict[str, Dict[str, StructureDefinition]] = {}
+        # Track latest versions: {base_url: latest_version}
+        self._latest_versions: Dict[str, str] = {}
         self._internet_enabled = internet_enabled
         self._http_repository = HttpStructureDefinitionRepository()
 
-    def get(self, canonical_url: str) -> StructureDefinition:
+    def get(
+        self, canonical_url: str, version: Optional[str] = None
+    ) -> StructureDefinition:
         """Get structure definition with local-first, internet fallback strategy."""
+        base_url, parsed_version = self.parse_canonical_url(canonical_url)
+        target_version = version or parsed_version
+
         # First try local repository
-        if canonical_url in self._local_definitions:
-            return self._local_definitions[canonical_url]
+        if base_url in self._local_definitions:
+            if target_version:
+                # Look for specific version
+                if target_version in self._local_definitions[base_url]:
+                    return self._local_definitions[base_url][target_version]
+            else:
+                # Get latest version if no version specified
+                latest_version = self.get_latest_version(base_url)
+                if (
+                    latest_version
+                    and latest_version in self._local_definitions[base_url]
+                ):
+                    return self._local_definitions[base_url][latest_version]
 
         # Fall back to internet if enabled
         if self._internet_enabled:
-            structure_definition = self._http_repository.get(canonical_url)
+            structure_definition = self._http_repository.get(canonical_url, version)
             if structure_definition:
                 # Cache it locally for future use
                 self.add(structure_definition)
                 return structure_definition
 
-        raise RuntimeError(f"Structure definition not found for {canonical_url}")
+        version_info = f" version {target_version}" if target_version else ""
+        raise RuntimeError(
+            f"Structure definition not found for {base_url}{version_info}"
+        )
 
     def add(self, structure_definition: StructureDefinition) -> None:
         """Add a structure definition to local storage."""
-        if (canonical_url := structure_definition.url) in self._local_definitions:
-            raise ValueError(
-                f"Attempted to load structure definition with duplicated URL {canonical_url} in local repository."
-            )
         if not structure_definition.url:
             raise ValueError(
                 "StructureDefinition must have a 'url' field to be added to the repository."
             )
-        self._local_definitions[canonical_url] = structure_definition
 
-    def has(self, canonical_url: str) -> bool:
+        base_url, version = self.parse_canonical_url(structure_definition.url)
+
+        # Use the structure definition's version field if no version in URL
+        if not version and structure_definition.version:
+            version = structure_definition.version
+
+        if not version:
+            raise ValueError(
+                f"StructureDefinition for {base_url} must have a version (either in URL or version field)."
+            )
+
+        # Initialize base URL storage if needed
+        if base_url not in self._local_definitions:
+            self._local_definitions[base_url] = {}
+
+        # Check for duplicates
+        if version in self._local_definitions[base_url]:
+            raise ValueError(
+                f"Attempted to load structure definition with duplicated URL {base_url} version {version} in local repository."
+            )
+
+        # Store the definition
+        self._local_definitions[base_url][version] = structure_definition
+
+        # Update latest version tracking
+        self._update_latest_version(base_url, version)
+
+    def has(self, canonical_url: str, version: Optional[str] = None) -> bool:
         """Check if structure definition exists locally or can be downloaded."""
-        return canonical_url in self._local_definitions or (
-            self._internet_enabled and self._http_repository.has(canonical_url)
+        base_url, parsed_version = self.parse_canonical_url(canonical_url)
+        target_version = version or parsed_version
+
+        # Check local storage
+        if base_url in self._local_definitions:
+            if target_version:
+                return target_version in self._local_definitions[base_url]
+            else:
+                # Has any version locally
+                return bool(self._local_definitions[base_url])
+
+        # Check if can be downloaded
+        return self._internet_enabled and self._http_repository.has(
+            canonical_url, version
         )
+
+    def get_versions(self, canonical_url: str) -> List[str]:
+        """Get all available versions for a canonical URL."""
+        base_url, _ = self.parse_canonical_url(canonical_url)
+
+        if base_url in self._local_definitions:
+            # Sort versions using semantic versioning
+            versions = list(self._local_definitions[base_url].keys())
+            try:
+                return sorted(versions, key=lambda v: version.parse(v))
+            except version.InvalidVersion:
+                # Fall back to string sorting if not semantic versions
+                return sorted(versions)
+
+        return []
+
+    def get_latest_version(self, canonical_url: str) -> Optional[str]:
+        """Get the latest version for a canonical URL."""
+        base_url, _ = self.parse_canonical_url(canonical_url)
+        return self._latest_versions.get(base_url)
+
+    def _update_latest_version(self, base_url: str, new_version: str) -> None:
+        """Update the latest version tracking for a base URL."""
+        current_latest = self._latest_versions.get(base_url)
+
+        if not current_latest:
+            self._latest_versions[base_url] = new_version
+            return
+
+        try:
+            # Use semantic versioning comparison
+            if version.parse(new_version) > version.parse(current_latest):
+                self._latest_versions[base_url] = new_version
+        except version.InvalidVersion:
+            # Fall back to string comparison if not semantic versions
+            if new_version > current_latest:
+                self._latest_versions[base_url] = new_version
 
     def load_from_directory(self, directory_path: Union[str, Path]) -> None:
         """Load all structure definitions from a directory."""
@@ -212,12 +358,50 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
         self._http_repository.set_internet_enabled(enabled)
 
     def get_loaded_urls(self) -> List[str]:
-        """Get a list of all locally loaded canonical URLs."""
+        """Get a list of all locally loaded canonical URLs (base URLs)."""
         return list(self._local_definitions.keys())
+
+    def get_all_loaded_urls_with_versions(self) -> Dict[str, List[str]]:
+        """Get all loaded URLs with their available versions."""
+        return {
+            base_url: self.get_versions(base_url)
+            for base_url in self._local_definitions.keys()
+        }
 
     def clear_local_cache(self) -> None:
         """Clear all locally cached structure definitions."""
         self._local_definitions.clear()
+        self._latest_versions.clear()
+
+    def remove_version(self, canonical_url: str, version: Optional[str] = None) -> None:
+        """Remove a specific version or all versions of a structure definition."""
+        base_url, parsed_version = self.parse_canonical_url(canonical_url)
+        target_version = version or parsed_version
+
+        if base_url not in self._local_definitions:
+            return
+
+        if target_version:
+            # Remove specific version
+            self._local_definitions[base_url].pop(target_version, None)
+
+            # Update latest version if we removed it
+            if self._latest_versions.get(base_url) == target_version:
+                remaining_versions = self.get_versions(base_url)
+                if remaining_versions:
+                    self._latest_versions[base_url] = remaining_versions[
+                        -1
+                    ]  # Last in sorted list
+                else:
+                    self._latest_versions.pop(base_url, None)
+
+            # Clean up empty base URL entries
+            if not self._local_definitions[base_url]:
+                del self._local_definitions[base_url]
+        else:
+            # Remove all versions
+            del self._local_definitions[base_url]
+            self._latest_versions.pop(base_url, None)
 
     def __load_json_structure_definition(self, file_path: Path) -> StructureDefinition:
         """Load and parse a JSON file."""

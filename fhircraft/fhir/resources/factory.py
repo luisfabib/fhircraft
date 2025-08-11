@@ -90,7 +90,7 @@ class ResourceFactory:
         internet_enabled: bool = True,
     ) -> None:
         """Configure the factory repository with various sources."""
-        self.set_internet_enabled(internet_enabled)
+        self.repository.set_internet_enabled(internet_enabled)
 
         if directory:
             self.load_definitions_from_directory(directory)
@@ -103,11 +103,11 @@ class ResourceFactory:
 
     def disable_internet_access(self) -> None:
         """Toggle offline mode (disable internet access) to avoid external requests."""
-        self.set_internet_enabled(False)
+        self.repository.set_internet_enabled(False)
 
     def enable_internet_access(self) -> None:
         """Toggle online mode (enable internet access) to allow external requests."""
-        self.set_internet_enabled(True)
+        self.repository.set_internet_enabled(True)
 
     def load_definitions_from_directory(self, directory_path: Union[str, Path]) -> None:
         """Load structure definitions from a directory."""
@@ -134,71 +134,11 @@ class ResourceFactory:
                 "Repository does not support loading from definitions"
             )
 
-    def set_internet_enabled(self, enabled: bool) -> None:
-        """Enable or disable internet access for structure definition resolution."""
-        self.repository.set_internet_enabled(enabled)
-
     def resolve_structure_definition(self, canonical_url: str) -> StructureDefinition:
         """Resolve structure definition using the repository."""
         if structure_def := self.repository.get(canonical_url):
             return structure_def
         raise ValueError(f"Could not resolve structure definition: {canonical_url}")
-
-    def download_structure_definition(self, profile_url: str) -> Dict[str, Any]:
-        """
-        Retrieves the structure definition of a FHIR resource from the provided profile URL.
-
-        Parameters:
-            profile_url (str): The URL of the FHIR profile from which to retrieve the structure definition.
-
-        Returns:
-            Dict[str, Any]: A dictionary representing the structure definition of the FHIR resource.
-        """
-
-        if not profile_url.endswith(".json"):
-            # Construct endpoint URL for the StructureDefinition JSON
-            if profile_url.startswith("http://hl7.org/fhir/StructureDefinition"):
-                domain, resource = profile_url.rsplit("/", 1)
-                domain = domain.replace(
-                    "http://hl7.org/fhir/StructureDefinition",
-                    "https://hl7.org/fhir/R4/extension",
-                )
-                resource = resource.lower()
-            else:
-                domain, resource = profile_url.rsplit("/", 1)
-            json_url = f"{domain}-{resource}.json"
-        else:
-            json_url = profile_url
-
-        # Configure proxy if needed
-        settings = load_env_variables()
-        proxies = (
-            {
-                k: v
-                for k, v in {
-                    "https": settings.get("PROXY_URL_HTTPS"),
-                    "http": settings.get("PROXY_URL_HTTP"),
-                }.items()
-                if v is not None
-            }
-            if settings.get("PROXY_URL_HTTPS") or settings.get("PROXY_URL_HTTP")
-            else None
-        )
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json, application/json+fhir, text/json",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
-        }
-        # Download the StructureDefinition JSON
-        response = requests.get(
-            json_url,
-            proxies=proxies,
-            verify=settings.get("CERTIFICATE_BUNDLE_PATH"),
-            headers=headers,
-            allow_redirects=True,
-        )
-        response.raise_for_status()
-        return response.json()
 
     def _build_element_tree_structure(
         self, elements: List[ElementDefinition]
