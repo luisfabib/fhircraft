@@ -788,11 +788,11 @@ class ResourceFactory:
         # Resolve the FHIR structure definition
         _structure_definition = None
         if isinstance(structure_definition, str):
-            _structure_definition = self.repository.load_from_files(
-                structure_definition
+            _structure_definition = self.repository.__load_json_structure_definition(
+                Path(structure_definition)
             )
         elif isinstance(structure_definition, dict):
-            _structure_definition = self.repository.load_from_definitions(
+            _structure_definition = StructureDefinition.model_validate(
                 structure_definition
             )
         elif canonical_url:
@@ -919,3 +919,8 @@ class ResourceFactory:
 factory = ResourceFactory()
 construct_resource_model = factory.construct_resource_model
 clear_chache = factory.clear_chache
+disable_internet_access = factory.disable_internet_access
+enable_internet_access = factory.enable_internet_access
+load_from_definitions = factory.repository.load_from_definitions
+load_from_directory = factory.repository.load_from_directory
+load_from_files = factory.repository.load_from_files

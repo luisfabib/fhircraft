@@ -198,7 +198,7 @@ class TestStructureDefinitionRepository:
         repo = empty_repository
         patient = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
 
-        repo.add(patient)
+        repo.add(patient, fail_if_exists=True)
 
         # Adding same version should raise error
         with pytest.raises(ValueError, match="duplicated URL"):

@@ -230,10 +230,12 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
 
         version_info = f" version {target_version}" if target_version else ""
         raise RuntimeError(
-            f"Structure definition not found for {base_url}{version_info}"
+            f"Structure definition not found for {base_url}{version_info}. Either load it locally or enable internet access to download it."
         )
 
-    def add(self, structure_definition: StructureDefinition) -> None:
+    def add(
+        self, structure_definition: StructureDefinition, fail_if_exists: bool = False
+    ) -> None:
         """Add a structure definition to local storage."""
         if not structure_definition.url:
             raise ValueError(
@@ -256,7 +258,7 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
             self._local_definitions[base_url] = {}
 
         # Check for duplicates
-        if version in self._local_definitions[base_url]:
+        if version in self._local_definitions[base_url] and fail_if_exists:
             raise ValueError(
                 f"Attempted to load structure definition with duplicated URL {base_url} version {version} in local repository."
             )

@@ -121,7 +121,7 @@ class ElementDefinitionSlicing(Element):
         description="Text description of how slicing works (or not)",
         default=None,
     )
-    description_ext: Optional[Element] = Field(
+    description_ext: Optional[Extension] = Field(
         description="Placeholder element for description extensions",
         default=None,
         alias="_description",
@@ -130,7 +130,7 @@ class ElementDefinitionSlicing(Element):
         description="If elements must be in same order as slices",
         default=None,
     )
-    ordered_ext: Optional[Element] = Field(
+    ordered_ext: Optional[Extension] = Field(
         description="Placeholder element for ordered extensions",
         default=None,
         alias="_ordered",
@@ -138,7 +138,7 @@ class ElementDefinitionSlicing(Element):
     rules: Code = Field(
         description="closed | open | openAtEnd",
     )
-    rules_ext: Optional[Element] = Field(
+    rules_ext: Optional[Extension] = Field(
         description="Placeholder element for rules extensions",
         default=None,
         alias="_rules",
@@ -217,46 +217,21 @@ class ElementDefinitionType(Element):
     code: Uri = Field(
         description="Data type or Resource (reference to definition)",
     )
-    code_ext: Optional[Element] = Field(
-        description="Placeholder element for code extensions",
-        default=None,
-        alias="_code",
-    )
     profile: Optional[List[Canonical]] = Field(
         description="Profiles (StructureDefinition or IG) - one must apply",
         default=None,
-    )
-    profile_ext: Optional[Element] = Field(
-        description="Placeholder element for profile extensions",
-        default=None,
-        alias="_profile",
     )
     targetProfile: Optional[List[Canonical]] = Field(
         description="Profile (StructureDefinition or IG) on the Reference/canonical target - one must apply",
         default=None,
     )
-    targetProfile_ext: Optional[Element] = Field(
-        description="Placeholder element for targetProfile extensions",
-        default=None,
-        alias="_targetProfile",
-    )
     aggregation: Optional[List[Code]] = Field(
         description="contained | referenced | bundled - how aggregated",
         default=None,
     )
-    aggregation_ext: Optional[Element] = Field(
-        description="Placeholder element for aggregation extensions",
-        default=None,
-        alias="_aggregation",
-    )
     versioning: Optional[Code] = Field(
         description="either | independent | specific",
         default=None,
-    )
-    versioning_ext: Optional[Element] = Field(
-        description="Placeholder element for versioning extensions",
-        default=None,
-        alias="_versioning",
     )
 
     # @field_validator(
@@ -729,7 +704,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Unique id for inter-element referencing",
         default=None,
     )
-    id_ext: Optional[Element] = Field(
+    id_ext: Optional[Extension] = Field(
         description="Placeholder element for id extensions",
         default=None,
         alias="_id",
@@ -745,7 +720,7 @@ class ElementDefinition(FHIRBaseModel):
     path: String = Field(
         description="Path of the element in the hierarchy of elements",
     )
-    path_ext: Optional[Element] = Field(
+    path_ext: Optional[Extension] = Field(
         description="Placeholder element for path extensions",
         default=None,
         alias="_path",
@@ -754,7 +729,7 @@ class ElementDefinition(FHIRBaseModel):
         description="xmlAttr | xmlText | typeAttr | cdaText | xhtml",
         default=None,
     )
-    representation_ext: Optional[Element] = Field(
+    representation_ext: Optional[Extension] = Field(
         description="Placeholder element for representation extensions",
         default=None,
         alias="_representation",
@@ -763,7 +738,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Name for this particular element (in a set of slices)",
         default=None,
     )
-    sliceName_ext: Optional[Element] = Field(
+    sliceName_ext: Optional[Extension] = Field(
         description="Placeholder element for sliceName extensions",
         default=None,
         alias="_sliceName",
@@ -772,7 +747,7 @@ class ElementDefinition(FHIRBaseModel):
         description="If this slice definition constrains an inherited slice definition (or not)",
         default=None,
     )
-    sliceIsConstraining_ext: Optional[Element] = Field(
+    sliceIsConstraining_ext: Optional[Extension] = Field(
         description="Placeholder element for sliceIsConstraining extensions",
         default=None,
         alias="_sliceIsConstraining",
@@ -781,7 +756,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Name for element to display with or prompt for element",
         default=None,
     )
-    label_ext: Optional[Element] = Field(
+    label_ext: Optional[Extension] = Field(
         description="Placeholder element for label extensions",
         default=None,
         alias="_label",
@@ -798,7 +773,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Concise definition for space-constrained presentation",
         default=None,
     )
-    short_ext: Optional[Element] = Field(
+    short_ext: Optional[Extension] = Field(
         description="Placeholder element for short extensions",
         default=None,
         alias="_short",
@@ -807,7 +782,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Full formal definition as narrative text",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
+    definition_ext: Optional[Extension] = Field(
         description="Placeholder element for definition extensions",
         default=None,
         alias="_definition",
@@ -816,7 +791,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Comments about the use of this element",
         default=None,
     )
-    comment_ext: Optional[Element] = Field(
+    comment_ext: Optional[Extension] = Field(
         description="Placeholder element for comment extensions",
         default=None,
         alias="_comment",
@@ -825,7 +800,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Why this resource has been created",
         default=None,
     )
-    requirements_ext: Optional[Element] = Field(
+    requirements_ext: Optional[Extension] = Field(
         description="Placeholder element for requirements extensions",
         default=None,
         alias="_requirements",
@@ -834,7 +809,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Other names",
         default=None,
     )
-    alias_ext: Optional[Element] = Field(
+    alias_ext: Optional[Extension] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",
@@ -843,7 +818,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Minimum Cardinality",
         default=None,
     )
-    min_ext: Optional[Element] = Field(
+    min_ext: Optional[Extension] = Field(
         description="Placeholder element for min extensions",
         default=None,
         alias="_min",
@@ -852,7 +827,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Maximum Cardinality (a number or *)",
         default=None,
     )
-    max_ext: Optional[Element] = Field(
+    max_ext: Optional[Extension] = Field(
         description="Placeholder element for max extensions",
         default=None,
         alias="_max",
@@ -865,7 +840,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Reference to definition of content for the element",
         default=None,
     )
-    contentReference_ext: Optional[Element] = Field(
+    contentReference_ext: Optional[Extension] = Field(
         description="Placeholder element for contentReference extensions",
         default=None,
         alias="_contentReference",
@@ -1584,7 +1559,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Max length for strings",
         default=None,
     )
-    maxLength_ext: Optional[Element] = Field(
+    maxLength_ext: Optional[Extension] = Field(
         description="Placeholder element for maxLength extensions",
         default=None,
         alias="_maxLength",
@@ -1593,7 +1568,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Reference to invariant about presence",
         default=None,
     )
-    condition_ext: Optional[Element] = Field(
+    condition_ext: Optional[Extension] = Field(
         description="Placeholder element for condition extensions",
         default=None,
         alias="_condition",
@@ -1606,7 +1581,7 @@ class ElementDefinition(FHIRBaseModel):
         description="If the element must be supported",
         default=None,
     )
-    mustSupport_ext: Optional[Element] = Field(
+    mustSupport_ext: Optional[Extension] = Field(
         description="Placeholder element for mustSupport extensions",
         default=None,
         alias="_mustSupport",
@@ -1615,7 +1590,7 @@ class ElementDefinition(FHIRBaseModel):
         description="If this modifies the meaning of other elements",
         default=None,
     )
-    isModifier_ext: Optional[Element] = Field(
+    isModifier_ext: Optional[Extension] = Field(
         description="Placeholder element for isModifier extensions",
         default=None,
         alias="_isModifier",
@@ -1624,7 +1599,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Reason that this element is marked as a modifier",
         default=None,
     )
-    isModifierReason_ext: Optional[Element] = Field(
+    isModifierReason_ext: Optional[Extension] = Field(
         description="Placeholder element for isModifierReason extensions",
         default=None,
         alias="_isModifierReason",
@@ -1633,7 +1608,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Include when _summary = true?",
         default=None,
     )
-    isSummary_ext: Optional[Element] = Field(
+    isSummary_ext: Optional[Extension] = Field(
         description="Placeholder element for isSummary extensions",
         default=None,
         alias="_isSummary",
