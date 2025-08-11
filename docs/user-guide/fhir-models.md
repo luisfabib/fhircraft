@@ -17,7 +17,7 @@ Working with Fhircraft models involves several key activities:
 
 ## Constructing FHIR Pydantic models 
 
-To generate a Pydantic model representation for a FHIR resource, use the `construct_resource_model` function. This function automatically creates a model based on the structure definition of the specified resource or profile.
+To generate a Pydantic model representation for a FHIR resource, use the `construct_resource_model` function. This function automatically creates a model based on the structure definition of the specified resource or profile using Fhircraft's built-in repository system for local-first, internet-fallback structure definition management.
 
 !!! important "Snapshot required"
 
@@ -25,11 +25,11 @@ To generate a Pydantic model representation for a FHIR resource, use the `constr
 
 !!! important "FHIR versions"
 
-    Fhircraft automatically handles differences between official FHIR releases. It uses the appropriate complex types based on the FHIR version specified in the resource's structure definition, ensuring that the constructed model conforms to the correct release.
+    Fhircraft automatically handles differences between official FHIR releases. It uses the appropriate complex types based on the FHIR version specified in the resource's structure definition, ensuring that the constructed model conforms to the correct release. The repository system supports versioned structure definitions with semantic versioning.
 
 #### Via local files (recommended)
 
-For optimal control and security, it is recommended to manage FHIR structure definitions as local files. These files should be loaded into Python and parsed into dictionary objects.
+For optimal control and security, it is recommended to manage FHIR structure definitions as local files. Fhircraft's repository system provides multiple ways to work with local definitions.
 
 !!! note "Loading utilities"
 
@@ -40,7 +40,9 @@ For optimal control and security, it is recommended to manage FHIR structure def
         structure_definition = load_file('fhir/patient_r4b_structuredefinition.json') 
     ``` 
 
-The `construct_resource_model` function takes this dictionary containing the FHIR structure definition and constructs the corresponding model.
+**Option 1: Direct structure definition**
+
+The `construct_resource_model` function takes a dictionary containing the FHIR structure definition and constructs the corresponding model.
 
 ```python
 from fhircraft.fhir.resources.factory import construct_resource_model
@@ -49,6 +51,26 @@ resource_model = construct_resource_model(structure_definition=structure_definit
 # Example: Create an instance of the constructed model
 resource_instance = resource_model(
     # Add your resource data here
+)
+```
+
+**Option 2: Using the factory repository system**
+
+For better organization and reusability, you can use the factory's repository system to pre-load structure definitions and then reference them by canonical URL:
+
+```python
+from fhircraft.fhir.resources.factory import factory
+
+# Configure the repository with local definitions
+factory.configure_repository(
+    directory="/path/to/structure/definitions",  # Load all JSON files from directory
+    files=["/path/to/custom/profile.json"],      # Load specific files
+    internet_enabled=True                        # Allow fallback to internet
+)
+
+# Now use canonical URLs - will use local definitions first, then internet fallback
+CustomPatient = factory.construct_resource_model(
+    canonical_url="http://example.org/fhir/StructureDefinition/CustomPatient"
 )
 ```
 
@@ -78,7 +100,7 @@ patient = CustomPatient(
 
 #### Via canonical URL 
 
-A canonical URL is a globally unique identifier for FHIR conformance resources. Fhircraft includes a limited canonical URL resolver that can locate and download a FHIR resource's structure definition via HTTP.
+A canonical URL is a globally unique identifier for FHIR conformance resources. Fhircraft includes a repository system with local-first, internet-fallback strategy that can locate structure definitions locally or download them via HTTP when needed.
 
 ```python
 from fhircraft.fhir.resources.factory import construct_resource_model
@@ -97,22 +119,36 @@ custom_profile_model = construct_resource_model(
 us_core_patient = construct_resource_model(
     canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
 )
+
+# You can also specify versions using the canonical URL format
+versioned_patient = construct_resource_model(
+    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient|4.3.0"
+)
 ```
+
+!!! tip "Local-first strategy"
+
+    Fhircraft's repository system follows a local-first approach:
+    
+    1. **Local lookup**: First checks for locally loaded structure definitions
+    2. **Internet fallback**: Downloads from the canonical URL if not found locally
+    3. **Version support**: Handles semantic versioning with latest version tracking
+    4. **Caching**: Automatically caches downloaded definitions for better performance
 
 !!! warning "Network dependency"
 
-    When using canonical URLs, ensure you have internet connectivity as Fhircraft will download the structure definition from the specified URL. For production environments, consider downloading and storing structure definitions locally.
+    When using canonical URLs for definitions not available locally, ensure you have internet connectivity. For production environments, consider pre-loading all required structure definitions locally.
 
-!!! note "Release version" 
+!!! note "Versioning support" 
 
-    Most canonical URLs will resolve to the latest normative release of the FHIR resource.
+    The repository system supports FHIR versioning using the canonical URL format `url|version`. If no version is specified, the latest available version will be used. The system uses semantic versioning for proper version comparison and selection.
 
 #### Cached models
 
 Fhircraft automatically caches constructed models based on their canonical URLs to improve performance. Subsequent calls to `construct_resource_model` with the same canonical URL will return the cached model without re-processing the structure definition.
 
 ```python
-from fhircraft.fhir.resources.factory import construct_resource_model, clear_cache
+from fhircraft.fhir.resources.factory import construct_resource_model, factory
 
 # First call - downloads and constructs the model
 patient_model_1 = construct_resource_model(
@@ -127,7 +163,7 @@ patient_model_2 = construct_resource_model(
 assert patient_model_1 is patient_model_2  # Same cached instance
 
 # Clear the cache when needed (e.g., during testing or when structure definitions change)
-clear_cache()
+factory.clear_chache()
 
 # This will now reconstruct the model
 patient_model_3 = construct_resource_model(
@@ -143,6 +179,24 @@ patient_model_3 = construct_resource_model(
     - You want to ensure fresh model construction
     - Running unit tests that depend on model construction
     - Memory usage becomes a concern
+
+!!! note "Advanced configuration"
+
+    For advanced use cases, you can access the full factory instance to configure the repository system:
+    
+    ```python
+    from fhircraft.fhir.resources.factory import factory
+    
+    # Disable internet access for offline operation
+    factory.disable_internet_access()
+    
+    # Load definitions from multiple sources
+    factory.load_definitions_from_directory("/path/to/definitions")
+    factory.load_definitions_from_files("profile1.json", "profile2.json")
+    
+    # Re-enable internet access
+    factory.enable_internet_access()
+    ```
 
 #### Working with different FHIR releases
 
@@ -183,6 +237,102 @@ from fhircraft.fhir.resources.datatypes.R5.complex_types import Patient as Patie
 patient_r4 = PatientR4(name=[{"family": "Smith"}])
 patient_r5 = PatientR5(name=[{"family": "Smith"}])
 ```
+
+## Repository System
+
+Fhircraft includes a repository system for managing FHIR structure definitions with local-first, internet-fallback strategy. This system provides efficient storage, versioning, and retrieval of structure definitions while minimizing network dependencies.
+
+### Repository Features
+
+- **Local-first approach**: Prioritizes locally stored definitions over internet downloads
+- **Internet fallback**: Automatically downloads missing definitions when internet is available
+- **Version management**: Supports semantic versioning with latest version tracking
+- **Multiple sources**: Load from directories, individual files, or pre-loaded dictionaries
+- **Caching**: Efficient caching of both structure definitions and constructed models
+- **Offline support**: Complete offline operation when all required definitions are pre-loaded
+
+### Basic Repository Configuration
+
+```python
+from fhircraft.fhir.resources.factory import factory
+
+# Configure repository with multiple sources
+factory.configure_repository(
+    directory="/path/to/structure/definitions",    # Load all JSON files from directory
+    files=[                                        # Load specific files
+        "/path/to/custom/profile1.json",
+        "/path/to/custom/profile2.json"
+    ],
+    definitions=[structure_def_dict],              # Load from pre-loaded dictionaries
+    internet_enabled=True                          # Allow internet fallback
+)
+
+# Use canonical URLs - will check local first, then internet
+Patient = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
+)
+```
+
+### Advanced Repository Operations
+
+```python
+from fhircraft.fhir.resources.factory import factory
+
+# Load definitions incrementally
+factory.load_definitions_from_directory("/path/to/core/definitions")
+factory.load_definitions_from_files("/path/to/custom/profile.json")
+
+# Control internet access
+factory.disable_internet_access()  # Offline mode
+factory.enable_internet_access()   # Online mode
+
+# Check repository status
+repository = factory.repository
+has_definition = repository.has("http://hl7.org/fhir/StructureDefinition/Patient")
+available_versions = repository.get_versions("http://hl7.org/fhir/StructureDefinition/Patient")
+latest_version = repository.get_latest_version("http://hl7.org/fhir/StructureDefinition/Patient")
+```
+
+### Versioned Structure Definitions
+
+The repository system supports FHIR versioning using the canonical URL format `url|version`:
+
+```python
+from fhircraft.fhir.resources.factory import factory
+
+# Load specific version
+patient_v401 = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient|4.0.1"
+)
+
+# Load latest version (default behavior)
+patient_latest = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
+)
+
+# Check available versions
+versions = factory.repository.get_versions("http://hl7.org/fhir/StructureDefinition/Patient")
+print(f"Available versions: {versions}")
+```
+
+### Repository Best Practices
+
+!!! tip "Production deployment"
+    
+    For production environments:
+    
+    1. **Pre-load all definitions**: Load all required structure definitions at startup
+    2. **Disable internet access**: Use `factory.disable_internet_access()` to prevent unexpected network calls
+    3. **Version pinning**: Use specific versions in canonical URLs for reproducible builds
+    4. **Local storage**: Store structure definitions in your application's resources
+
+!!! warning "Memory considerations"
+    
+    The repository keeps structure definitions in memory for fast access. For applications with many definitions, monitor memory usage and consider loading definitions on-demand if needed.
+
+!!! note "Thread safety"
+    
+    The repository system is designed to be thread-safe for read operations. However, avoid concurrent modification operations (loading new definitions) from multiple threads.
 
 ## Model Instantiation and Usage
 
@@ -501,21 +651,21 @@ def validate_patients_batch(patient_data_list: list[dict]) -> list[Patient]:
 
 When working with large numbers of FHIR profiles or dynamically generating many models, memory usage can increase due to model caching and Python's object retention. To avoid excessive memory consumption:
 
-- Periodically clear the Fhircraft model cache using `clear_cache()` if you are processing thousands of unique structure definitions.
+- Periodically clear the Fhircraft model cache using `factory.clear_chache()` if you are processing thousands of unique structure definitions.
 - Release references to unused models and instances so Python's garbage collector can reclaim memory.
 - For long-running processes, monitor memory usage and adjust cache-clearing frequency as needed.
 - Consider batching your processing and restarting the process for very large workloads to ensure a clean memory state.
 
 ```python
 # Clear cache when working with many different profiles
-from fhircraft.fhir.resources.factory import clear_cache
+from fhircraft.fhir.resources.factory import factory
 
 def process_large_dataset(structure_definitions: list[dict]):
     """Process large datasets efficiently."""
     for i, structure_def in enumerate(structure_definitions):
         # Clear cache periodically to manage memory
         if i % 100 == 0:
-            clear_cache()
+            factory.clear_chache()
         
         model = construct_resource_model(structure_definition=structure_def)
         # Process model...
@@ -531,9 +681,9 @@ FHIR resources typically have many constraint. Their Pydantic field validators c
 These techniques help maintain high throughput and responsiveness in production systems that process large FHIR datasets.
 
 ```python
-from fhircraft.fhir.resources.factory import clear_cache
+from fhircraft.fhir.resources.factory import factory
 
-model = construct_resource_model(structure_definition=structure_def)
+model = factory.construct_resource_model(structure_definition=structure_def)
 def process_large_dataset_without_validation(structure_definitions: list[dict]):
     """Process large datasets efficiently."""
     for data in dataset:
