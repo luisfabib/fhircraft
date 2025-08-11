@@ -20,7 +20,7 @@ class TestFHIRPackageRegistryClient:
         """Test client initialization with default and custom parameters."""
         # Default initialization
         client = FHIRPackageRegistryClient()
-        assert client.base_url == FHIRPackageRegistryClient.SIMPLIFIER_BASE_URL
+        assert client.base_url == FHIRPackageRegistryClient.FHIR_ORG_BASE_URL
         assert client.timeout == 30.0
 
         # Custom initialization

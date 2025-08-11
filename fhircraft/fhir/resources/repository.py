@@ -4,14 +4,20 @@ Structure Definition Repository
 """
 
 import json
+import tarfile
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import requests
 from packaging import version
 from pydantic_core import ValidationError
 
+from fhircraft.fhir.packages import (
+    FHIRPackageRegistryClient,
+    FHIRPackageRegistryError,
+    PackageNotFoundError,
+)
 from fhircraft.fhir.resources.definitions import StructureDefinition
 from fhircraft.utils import load_env_variables
 
@@ -187,10 +193,347 @@ class HttpStructureDefinitionRepository(StructureDefinitionRepository):
         return StructureDefinition.model_validate(response.json())
 
 
+class PackageStructureDefinitionRepository(StructureDefinitionRepository):
+    """Repository that can load FHIR packages from package registries."""
+
+    def __init__(
+        self,
+        internet_enabled: bool = True,
+        registry_base_url: Optional[str] = None,
+        timeout: float = 30.0,
+    ):
+        """
+        Initialize the package repository.
+
+        Args:
+            internet_enabled: Whether to enable internet access
+            registry_base_url: Base URL for package registry (defaults to packages.fhir.org)
+            timeout: Request timeout in seconds
+        """
+        self._internet_enabled = internet_enabled
+        self._package_client = FHIRPackageRegistryClient(
+            base_url=registry_base_url, timeout=timeout
+        )
+        # Structure: {base_url: {version: StructureDefinition}}
+        self._local_definitions: Dict[str, Dict[str, StructureDefinition]] = {}
+        # Track latest versions: {base_url: latest_version}
+        self._latest_versions: Dict[str, str] = {}
+        # Track loaded packages to avoid duplicate loading
+        self._loaded_packages: Dict[str, str] = {}  # {package_name: version}
+
+    def get(
+        self, canonical_url: str, version: Optional[str] = None
+    ) -> StructureDefinition:
+        """Get structure definition from loaded packages."""
+        base_url, parsed_version = self.parse_canonical_url(canonical_url)
+        target_version = version or parsed_version
+
+        # Check local storage
+        if base_url in self._local_definitions:
+            if target_version:
+                # Look for specific version
+                if target_version in self._local_definitions[base_url]:
+                    return self._local_definitions[base_url][target_version]
+            else:
+                # Get latest version if no version specified
+                latest_version = self.get_latest_version(base_url)
+                if (
+                    latest_version
+                    and latest_version in self._local_definitions[base_url]
+                ):
+                    return self._local_definitions[base_url][latest_version]
+
+        version_info = f" version {target_version}" if target_version else ""
+        raise RuntimeError(
+            f"Structure definition not found for {base_url}{version_info}. "
+            f"Load the appropriate package first using load_package()."
+        )
+
+    def add(self, structure_def: StructureDefinition) -> None:
+        """Add a structure definition to the repository."""
+        if not structure_def.url:
+            raise ValueError(
+                "StructureDefinition must have a 'url' field to be added to the repository."
+            )
+
+        base_url, version = self.parse_canonical_url(structure_def.url)
+
+        # Use the structure definition's version field if no version in URL
+        if not version and structure_def.version:
+            version = structure_def.version
+
+        if not version:
+            raise ValueError(
+                f"StructureDefinition for {base_url} must have a version (either in URL or version field)."
+            )
+
+        # Initialize base URL storage if needed
+        if base_url not in self._local_definitions:
+            self._local_definitions[base_url] = {}
+
+        # Store the definition
+        self._local_definitions[base_url][version] = structure_def
+
+        # Update latest version tracking
+        self._update_latest_version(base_url, version)
+
+    def has(self, canonical_url: str, version: Optional[str] = None) -> bool:
+        """Check if structure definition exists in loaded packages."""
+        base_url, parsed_version = self.parse_canonical_url(canonical_url)
+        target_version = version or parsed_version
+
+        # Check local storage
+        if base_url in self._local_definitions:
+            if target_version:
+                return target_version in self._local_definitions[base_url]
+            else:
+                # Has any version locally
+                return bool(self._local_definitions[base_url])
+
+        return False
+
+    def get_versions(self, canonical_url: str) -> List[str]:
+        """Get all available versions for a canonical URL."""
+        base_url, _ = self.parse_canonical_url(canonical_url)
+
+        if base_url in self._local_definitions:
+            # Sort versions using semantic versioning
+            versions = list(self._local_definitions[base_url].keys())
+            try:
+                return sorted(versions, key=lambda v: version.parse(v))
+            except version.InvalidVersion:
+                # Fall back to string sorting if not semantic versions
+                return sorted(versions)
+
+        return []
+
+    def get_latest_version(self, canonical_url: str) -> Optional[str]:
+        """Get the latest version for a canonical URL."""
+        base_url, _ = self.parse_canonical_url(canonical_url)
+        return self._latest_versions.get(base_url)
+
+    def _update_latest_version(self, base_url: str, new_version: str) -> None:
+        """Update the latest version tracking for a base URL."""
+        current_latest = self._latest_versions.get(base_url)
+
+        if not current_latest:
+            self._latest_versions[base_url] = new_version
+            return
+
+        try:
+            # Use semantic versioning comparison
+            if version.parse(new_version) > version.parse(current_latest):
+                self._latest_versions[base_url] = new_version
+        except version.InvalidVersion:
+            # Fall back to string comparison if not semantic versions
+            if new_version > current_latest:
+                self._latest_versions[base_url] = new_version
+
+    def set_internet_enabled(self, enabled: bool) -> None:
+        """Enable or disable internet access."""
+        self._internet_enabled = enabled
+
+    def load_package(
+        self,
+        package_name: str,
+        package_version: Optional[str] = None,
+        fail_if_exists: bool = False,
+    ) -> None:
+        """
+        Load a FHIR package from the registry and add all structure definitions.
+
+        Args:
+            package_name: Name of the package (e.g., "hl7.fhir.us.core")
+            package_version: Version of the package (defaults to latest)
+            fail_if_exists: If True, raise error if package already loaded
+
+        Raises:
+            PackageNotFoundError: If package or version not found
+            FHIRPackageRegistryError: If download fails
+            RuntimeError: If package processing fails
+        """
+        if not self._internet_enabled:
+            raise RuntimeError(
+                f"Cannot load package {package_name} while internet access is disabled"
+            )
+
+        # Determine version to load
+        target_version = package_version
+        if not target_version:
+            try:
+                target_version = self._package_client.get_latest_version(package_name)
+            except (PackageNotFoundError, FHIRPackageRegistryError) as e:
+                raise PackageNotFoundError(
+                    f"Failed to get latest version for package {package_name}: {e}"
+                )
+
+        if not target_version:
+            raise PackageNotFoundError(
+                f"No latest version found for package {package_name}"
+            )
+
+        # Check if already loaded
+        package_key = f"{package_name}@{target_version}"
+        if package_key in self._loaded_packages and fail_if_exists:
+            raise ValueError(f"Package {package_key} is already loaded")
+
+        try:
+            # Download and extract package
+            result = self._package_client.download_package(
+                package_name, target_version, extract=True
+            )
+
+            # Ensure we got a TarFile object (should be guaranteed when extract=True)
+            if not isinstance(result, tarfile.TarFile):
+                raise RuntimeError(
+                    f"Expected TarFile object but got {type(result)} when downloading package"
+                )
+
+            try:
+                self._process_package_tar(result, package_name, target_version)
+            finally:
+                result.close()
+
+            # Track loaded package
+            self._loaded_packages[package_key] = target_version
+
+        except (PackageNotFoundError, FHIRPackageRegistryError) as e:
+            raise e
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to process package {package_name}@{target_version}: {e}"
+            )
+
+    def _process_package_tar(
+        self, tar_file: tarfile.TarFile, package_name: str, package_version: str
+    ) -> None:
+        """
+        Process a tar file and extract structure definitions.
+
+        Args:
+            tar_file: Opened tar file containing the package
+            package_name: Name of the package for error reporting
+            package_version: Version of the package for error reporting
+        """
+        structure_def_count = 0
+        errors = []
+
+        for member in tar_file.getmembers():
+            if not member.isfile():
+                continue
+
+            # Look for StructureDefinition JSON files
+            # Common patterns: package/StructureDefinition-*.json, package/profiles/*.json, etc.
+            if member.name.endswith(".json") and (
+                "StructureDefinition" in member.name
+                or "/profiles/" in member.name
+                or "/extensions/" in member.name
+                or "/types/" in member.name
+            ):
+                try:
+                    # Extract and parse the file
+                    file_obj = tar_file.extractfile(member)
+                    if file_obj:
+                        content = file_obj.read().decode("utf-8")
+                        json_data = json.loads(content)
+
+                        # Check if it's a StructureDefinition resource
+                        if json_data.get("resourceType") == "StructureDefinition":
+                            structure_def = StructureDefinition.model_validate(
+                                json_data
+                            )
+                            self.add(structure_def)
+                            structure_def_count += 1
+
+                except Exception as e:
+                    errors.append(f"Error processing {member.name}: {e}")
+
+        if structure_def_count == 0:
+            raise RuntimeError(
+                f"No StructureDefinition resources found in package {package_name}@{package_version}"
+            )
+
+        if errors:
+            # Log errors but don't fail if we got some definitions
+            error_summary = f"Loaded {structure_def_count} StructureDefinitions with {len(errors)} errors"
+            print(f"Warning: {error_summary}")
+            for error in errors[:5]:  # Show first 5 errors
+                print(f"  - {error}")
+            if len(errors) > 5:
+                print(f"  ... and {len(errors) - 5} more errors")
+
+    def get_loaded_packages(self) -> Dict[str, str]:
+        """Get a dictionary of loaded packages and their versions."""
+        return self._loaded_packages.copy()
+
+    def has_package(
+        self, package_name: str, package_version: Optional[str] = None
+    ) -> bool:
+        """
+        Check if a package is loaded.
+
+        Args:
+            package_name: Name of the package
+            package_version: Version of the package (if None, checks any version)
+
+        Returns:
+            True if package is loaded
+        """
+        if package_version:
+            return f"{package_name}@{package_version}" in self._loaded_packages
+        else:
+            return any(
+                key.startswith(f"{package_name}@") for key in self._loaded_packages
+            )
+
+    def remove_package(
+        self, package_name: str, package_version: Optional[str] = None
+    ) -> None:
+        """
+        Remove a loaded package and all its structure definitions.
+
+        Args:
+            package_name: Name of the package
+            package_version: Version of the package (if None, removes all versions)
+        """
+        if package_version:
+            package_key = f"{package_name}@{package_version}"
+            if package_key in self._loaded_packages:
+                del self._loaded_packages[package_key]
+        else:
+            # Remove all versions of the package
+            keys_to_remove = [
+                key
+                for key in self._loaded_packages
+                if key.startswith(f"{package_name}@")
+            ]
+            for key in keys_to_remove:
+                del self._loaded_packages[key]
+
+        # Note: This doesn't remove the actual structure definitions from the local cache
+        # as they might be used by other packages or loaded separately.
+
+    def set_registry_base_url(self, base_url: str) -> None:
+        """Change the package registry base URL."""
+        self._package_client.base_url = base_url
+
+    def clear_local_cache(self) -> None:
+        """Clear all locally cached structure definitions."""
+        self._local_definitions.clear()
+        self._latest_versions.clear()
+        self._loaded_packages.clear()
+
+
 class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
     """Repository that manages local storage and optional internet fallback."""
 
-    def __init__(self, internet_enabled: bool = True):
+    def __init__(
+        self,
+        internet_enabled: bool = True,
+        enable_packages: bool = True,
+        registry_base_url: Optional[str] = None,
+        timeout: float = 30.0,
+    ):
         # Structure: {base_url: {version: StructureDefinition}}
         self._local_definitions: Dict[str, Dict[str, StructureDefinition]] = {}
         # Track latest versions: {base_url: latest_version}
@@ -198,10 +541,19 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
         self._internet_enabled = internet_enabled
         self._http_repository = HttpStructureDefinitionRepository()
 
+        # Optional package repository
+        self._package_repository: Optional[PackageStructureDefinitionRepository] = None
+        if enable_packages:
+            self._package_repository = PackageStructureDefinitionRepository(
+                internet_enabled=internet_enabled,
+                registry_base_url=registry_base_url,
+                timeout=timeout,
+            )
+
     def get(
         self, canonical_url: str, version: Optional[str] = None
     ) -> StructureDefinition:
-        """Get structure definition with local-first, internet fallback strategy."""
+        """Get structure definition with local-first, package, then internet fallback strategy."""
         base_url, parsed_version = self.parse_canonical_url(canonical_url)
         target_version = version or parsed_version
 
@@ -220,6 +572,21 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
                 ):
                     return self._local_definitions[base_url][latest_version]
 
+        # Try package repository if available
+        if self._package_repository and self._package_repository.has(
+            canonical_url, version
+        ):
+            try:
+                structure_definition = self._package_repository.get(
+                    canonical_url, version
+                )
+                # Cache it locally for future use
+                self.add(structure_definition)
+                return structure_definition
+            except RuntimeError:
+                # Package repository couldn't find it, continue to internet fallback
+                pass
+
         # Fall back to internet if enabled
         if self._internet_enabled:
             structure_definition = self._http_repository.get(canonical_url, version)
@@ -230,7 +597,7 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
 
         version_info = f" version {target_version}" if target_version else ""
         raise RuntimeError(
-            f"Structure definition not found for {base_url}{version_info}. Either load it locally or enable internet access to download it."
+            f"Structure definition not found for {base_url}{version_info}. Either load it locally, load the appropriate package, or enable internet access to download it."
         )
 
     def add(
@@ -270,17 +637,25 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
         self._update_latest_version(base_url, version)
 
     def has(self, canonical_url: str, version: Optional[str] = None) -> bool:
-        """Check if structure definition exists locally or can be downloaded."""
+        """Check if structure definition exists locally, in packages, or can be downloaded."""
         base_url, parsed_version = self.parse_canonical_url(canonical_url)
         target_version = version or parsed_version
 
         # Check local storage
         if base_url in self._local_definitions:
             if target_version:
-                return target_version in self._local_definitions[base_url]
+                if target_version in self._local_definitions[base_url]:
+                    return True
             else:
                 # Has any version locally
-                return bool(self._local_definitions[base_url])
+                if self._local_definitions[base_url]:
+                    return True
+
+        # Check package repository if available
+        if self._package_repository and self._package_repository.has(
+            canonical_url, version
+        ):
+            return True
 
         # Check if can be downloaded
         return self._internet_enabled and self._http_repository.has(
@@ -409,6 +784,66 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
         """Load and parse a JSON file."""
         with open(file_path, "r", encoding="utf-8") as file:
             return StructureDefinition.model_validate(json.load(file))
+
+    # Package-specific convenience methods
+    def load_package(
+        self, package_name: str, version: Optional[str] = None
+    ) -> List[StructureDefinition]:
+        """Load a FHIR package and return loaded structure definitions."""
+        if not self._package_repository:
+            raise RuntimeError("Package support is not enabled for this repository")
+
+        # Get current local URLs before loading
+        urls_before = set(self.get_loaded_urls())
+
+        # Load the package (this modifies the package repository's internal state)
+        self._package_repository.load_package(package_name, version)
+
+        # Get all structure definitions from the package repository
+        # and add any that aren't already in our local cache
+        loaded_definitions = []
+        for url in self._package_repository._local_definitions:
+            for ver, structure_def in self._package_repository._local_definitions[
+                url
+            ].items():
+                # Check if we already have this exact version locally
+                if (
+                    url not in self._local_definitions
+                    or ver not in self._local_definitions[url]
+                ):
+                    self.add(structure_def)
+                    loaded_definitions.append(structure_def)
+
+        return loaded_definitions
+
+    def get_loaded_packages(self) -> Dict[str, str]:
+        """Get dictionary of loaded FHIR packages (name -> version)."""
+        if not self._package_repository:
+            return {}
+        return self._package_repository.get_loaded_packages()
+
+    def has_package(self, package_name: str, version: Optional[str] = None) -> bool:
+        """Check if a package is loaded."""
+        if not self._package_repository:
+            return False
+        return self._package_repository.has_package(package_name, version)
+
+    def remove_package(self, package_name: str, version: Optional[str] = None) -> None:
+        """Remove a loaded package."""
+        if not self._package_repository:
+            return
+        self._package_repository.remove_package(package_name, version)
+
+    def set_registry_base_url(self, base_url: str) -> None:
+        """Set the FHIR package registry base URL."""
+        if not self._package_repository:
+            raise RuntimeError("Package support is not enabled for this repository")
+        self._package_repository.set_registry_base_url(base_url)
+
+    def clear_package_cache(self) -> None:
+        """Clear the package cache."""
+        if self._package_repository:
+            self._package_repository.clear_local_cache()
 
 
 # Convenience functions for easy configuration
