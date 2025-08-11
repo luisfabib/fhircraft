@@ -4,14 +4,22 @@ import json
 import os
 import sys
 import tempfile
+from pathlib import Path
 
 import pytest
 
-from fhircraft.fhir.resources.factory import clear_chache, construct_resource_model
+from fhircraft.fhir.resources.factory import (
+    clear_chache,
+    construct_resource_model,
+    disable_internet_access,
+    load_from_directory,
+    load_from_files,
+)
 from fhircraft.fhir.resources.generator import CodeGenerator
 
 VERSIONS = ["R4B", "R5"]
 CORE_EXAMPLES_DIRECTORY = f"test/static/fhir-core-examples"
+CORE_DEFINITIONS_DIRECTORY = f"test/static/fhir-core-definitions"
 PROFILES_EXAMPLES_DIRECTORY = f"test/static/fhir-profiles-examples"
 PROFILES_DEFINTIONS_DIRECTORY = f"test/static/fhir-profiles-definitions"
 
@@ -29,17 +37,17 @@ fhir_resources_test_cases = {
             [
                 (resource_label, filename)
                 for filename in _get_core_example_filenames(
-                    f"{resource_label}-*", version
+                    f"{resource_label.lower()}-*", version
                 )
             ]
             for resource_label in [
-                "observation",
-                "condition",
-                "patient",
-                "practicioner",
-                "procedure",
-                "medicationadministration",
-                "organization",
+                "Observation",
+                "Condition",
+                "Patient",
+                "Practitioner",
+                "Procedure",
+                "MedicationAdministration",
+                "Organization",
             ]
         ]
         for case in cases
@@ -49,11 +57,25 @@ fhir_resources_test_cases = {
 
 
 def _assert_construct_core_resource(version, resource_label, filename):
+    # Disable internet access to ensure we use local definitions
+    disable_internet_access()
+    # Load the FHIR resource definition from local files
+    load_from_files(
+        Path(CORE_DEFINITIONS_DIRECTORY)
+        / Path(version)
+        / Path(f"{resource_label.lower()}.profile.json")
+    )
+
+    fhir_version = {
+        "R4B": "4.3.0",
+        "R5": "5.0.0",
+    }.get(version, version)
+
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
         # Generate source code for Pydantic FHIR model
         resource = construct_resource_model(
-            canonical_url=f"https://hl7.org/fhir/{version}/{resource_label}.profile.json"
+            canonical_url=f"http://hl7.org/fhir/StructureDefinition/{resource_label}|{fhir_version}"
         )
         source_code = CodeGenerator().generate_resource_model_code(resource)
         # Store source code in a file
@@ -144,13 +166,15 @@ def test_construct_profiled_resource(filename):
 
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
+        # Disable internet access to ensure we use local definitions
+        disable_internet_access()
+        # Load the FHIR resource definition from local files
+        load_from_directory(Path(PROFILES_DEFINTIONS_DIRECTORY))
+
         # Generate source code for Pydantic FHIR model
         resource = construct_resource_model(
-            structure_definition=mock_resolve_profile_canonical_url(
-                fhir_resource["meta"]["profile"][0]
-            )
+            canonical_url=fhir_resource["meta"]["profile"][0]
         )
-        clear_chache()
         source_code = CodeGenerator().generate_resource_model_code(resource)
         # Store source code in a file
         temp_file_name = os.path.join(d, f"temp_test_{resource.__name__}.py")
@@ -165,4 +189,9 @@ def test_construct_profiled_resource(filename):
     fhir_resource_instance = getattr(module, resource.__name__).model_validate(
         fhir_resource
     )
+    assert json.loads(fhir_resource_instance.model_dump_json()) == fhir_resource
+    fhir_resource_instance = getattr(module, resource.__name__).model_validate(
+        fhir_resource
+    )
+    assert json.loads(fhir_resource_instance.model_dump_json()) == fhir_resource
     assert json.loads(fhir_resource_instance.model_dump_json()) == fhir_resource
