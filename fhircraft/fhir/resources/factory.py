@@ -166,6 +166,19 @@ class ResourceFactory:
         self.repository.set_internet_enabled(True)
 
     def load_definitions_from_directory(self, directory_path: Union[str, Path]) -> None:
+        """
+        Load FHIR structure definitions from the specified directory.
+
+        This method attempts to load structure definitions into the repository from the given directory path.
+        If the underlying repository supports loading from a directory (i.e., implements `load_from_directory`),
+        the method delegates the loading process to it. Otherwise, a NotImplementedError is raised.
+
+        Args:
+            directory_path (Union[str, Path]): The path to the directory containing structure definitions.
+
+        Raises:
+            NotImplementedError: If the repository does not support loading from a directory.
+        """
         """Load structure definitions from a directory."""
         if hasattr(self.repository, "load_from_directory"):
             self.repository.load_from_directory(directory_path)
@@ -175,14 +188,37 @@ class ResourceFactory:
             )
 
     def load_definitions_from_files(self, *file_paths: Union[str, Path]) -> None:
-        """Load structure definitions from individual files."""
+        """
+        Loads resource definitions from the specified file paths into the repository.
+
+        This method delegates the loading process to the repository's `load_from_files` method,
+        if it exists. If the repository does not support loading from files, a NotImplementedError is raised.
+
+        Args:
+            *file_paths (Union[str, Path]): One or more file paths from which to load resource definitions.
+
+        Raises:
+            NotImplementedError: If the repository does not support loading from files.
+        """
         if hasattr(self.repository, "load_from_files"):
             self.repository.load_from_files(*file_paths)
         else:
             raise NotImplementedError("Repository does not support loading from files")
 
     def load_definitions_from_list(self, *definitions: Dict[str, Any]) -> None:
-        """Load structure definitions from pre-loaded dictionaries."""
+        """
+        Loads resource definitions into the repository from a list of definition dictionaries.
+
+        This method forwards the provided definitions to the repository's `load_from_definitions`
+        method if it exists. If the repository does not support loading from definitions,
+        a NotImplementedError is raised.
+
+        Args:
+            *definitions (Dict[str, Any]): One or more resource definition dictionaries to load.
+
+        Raises:
+            NotImplementedError: If the repository does not support loading from definitions.
+        """
         if hasattr(self.repository, "load_from_definitions"):
             self.repository.load_from_definitions(*definitions)
         else:
@@ -190,9 +226,7 @@ class ResourceFactory:
                 "Repository does not support loading from definitions"
             )
 
-    def load_package(
-        self, package_name: str, version: Optional[str] = None
-    ) -> List[StructureDefinition]:
+    def load_package(self, package_name: str, version: Optional[str] = None) -> None:
         """Load a FHIR package and return loaded structure definitions.
 
         Args:
@@ -206,7 +240,7 @@ class ResourceFactory:
             RuntimeError: If package support is not enabled in the repository
         """
         if hasattr(self.repository, "load_package"):
-            return self.repository.load_package(package_name, version)
+            self.repository.load_package(package_name, version)
         else:
             raise NotImplementedError("Repository does not support package loading")
 
@@ -225,8 +259,8 @@ class ResourceFactory:
         """Check if a package is loaded.
 
         Args:
-            package_name: Name of the package
-            version: Version of the package (if None, checks any version)
+            package_name (str): Name of the package
+            version (Optional[str]): Version of the package (if None, checks any version)
 
         Returns:
             True if package is loaded
@@ -240,8 +274,8 @@ class ResourceFactory:
         """Remove a loaded package.
 
         Args:
-            package_name: Name of the package
-            version: Version of the package (if None, removes all versions)
+            package_name (str): Name of the package
+            version (Optional[str]): Version of the package (if None, removes all versions)
         """
         if hasattr(self.repository, "remove_package"):
             self.repository.remove_package(package_name, version)
@@ -250,7 +284,7 @@ class ResourceFactory:
         """Set the FHIR package registry base URL.
 
         Args:
-            base_url: The base URL for the package registry
+            base_url (str): The base URL for the package registry
 
         Raises:
             RuntimeError: If package support is not enabled in the repository

@@ -43,9 +43,9 @@ class FHIRPackageRegistryClient:
         Initialize the FHIR Package Registry client.
 
         Args:
-            base_url: Base URL for the API. Defaults to packages.simplifier.net
-            timeout: Request timeout in seconds
-            session: Optional requests session to use
+            base_url (Optional[str]): Base URL for the API. Defaults to packages.simplifier.net
+            timeout (float): Request timeout in seconds
+            session (Optional[requests.Session]): Optional requests session to use
         """
         self.base_url = base_url or self.FHIR_ORG_BASE_URL
         self.timeout = timeout
@@ -64,10 +64,10 @@ class FHIRPackageRegistryClient:
         List all versions for a package.
 
         Args:
-            package_name: Name of the package (e.g., "hl7.fhir.us.core")
+            package_name (str): Name of the package (e.g., "hl7.fhir.us.core")
 
         Returns:
-            PackageMetadata object with all available versions
+            (PackageMetadata) Package metadata object with all available versions
 
         Raises:
             PackageNotFoundError: If the package is not found
@@ -98,12 +98,12 @@ class FHIRPackageRegistryClient:
         Download a specific package version.
 
         Args:
-            package_name: Name of the package
-            package_version: Version of the package
-            extract: If True, return extracted TarFile object, otherwise raw bytes
+            package_name (str): Name of the package
+            package_version (str): Version of the package
+            extract (bool): If True, return extracted TarFile object, otherwise raw bytes
 
         Returns:
-            Raw tar.gz bytes or extracted TarFile object
+            (TarFile) Raw tar.gz bytes or extracted TarFile object
 
         Raises:
             PackageNotFoundError: If the package or version is not found
@@ -138,10 +138,10 @@ class FHIRPackageRegistryClient:
         Get the latest version tag for a package.
 
         Args:
-            package_name: Name of the package
+            package_name (str): Name of the package
 
         Returns:
-            Latest version string or None if not available
+            (str | None) Latest version string or None if not available
         """
         metadata = self.list_package_versions(package_name)
         return metadata.dist_tags.latest if metadata.dist_tags else None
@@ -153,11 +153,11 @@ class FHIRPackageRegistryClient:
         Download the latest version of a package.
 
         Args:
-            package_name: Name of the package
-            extract: If True, return extracted TarFile object, otherwise raw bytes
+            package_name (str): Name of the package
+            extract (bool): If True, return extracted TarFile object, otherwise raw bytes
 
         Returns:
-            Raw tar.gz bytes or extracted TarFile object
+            (Union[bytes, tarfile.TarFile]) Raw tar.gz bytes or extracted TarFile object
 
         Raises:
             PackageNotFoundError: If the package is not found or has no latest version
@@ -180,11 +180,11 @@ def get_package_metadata(
     Convenience function to get package metadata.
 
     Args:
-        package_name: Name of the package
-        base_url: Optional base URL (defaults to packages.simplifier.net)
+        package_name (str): Name of the package
+        base_url (Optional[str]): Optional base URL (defaults to packages.simplifier.net)
 
     Returns:
-        PackageMetadata object
+        (PackageMetadata) Metadata of the package
     """
     client = FHIRPackageRegistryClient(base_url=base_url)
     return client.list_package_versions(package_name)
@@ -200,13 +200,13 @@ def download_package(
     Convenience function to download a package.
 
     Args:
-        package_name: Name of the package
-        package_version: Version of the package
-        base_url: Optional base URL (defaults to packages.simplifier.net)
-        extract: If True, return extracted TarFile object, otherwise raw bytes
+        package_name (str): Name of the package
+        package_version (str): Version of the package
+        base_url (Optional[str]): Optional base URL (defaults to packages.simplifier.net)
+        extract (bool): If True, return extracted TarFile object, otherwise raw bytes
 
     Returns:
-        Raw tar.gz bytes or extracted TarFile object
+        (Union[bytes, tarfile.TarFile]) Raw tar.gz bytes or extracted TarFile object
     """
     client = FHIRPackageRegistryClient(base_url=base_url)
     return client.download_package(package_name, package_version, extract=extract)
@@ -219,12 +219,12 @@ def download_latest_package(
     Convenience function to download the latest version of a package.
 
     Args:
-        package_name: Name of the package
-        base_url: Optional base URL (defaults to packages.simplifier.net)
-        extract: If True, return extracted TarFile object, otherwise raw bytes
+        package_name (str): Name of the package
+        base_url (Optional[str]): Optional base URL (defaults to packages.simplifier.net)
+        extract (bool): If True, return extracted TarFile object, otherwise raw bytes
 
     Returns:
-        Raw tar.gz bytes or extracted TarFile object
+        (Union[bytes, tarfile.TarFile]) Raw tar.gz bytes or extracted TarFile object
     """
     client = FHIRPackageRegistryClient(base_url=base_url)
     return client.download_latest_package(package_name, extract=extract)

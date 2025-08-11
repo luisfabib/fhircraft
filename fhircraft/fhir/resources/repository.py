@@ -1,13 +1,8 @@
-#!/usr/bin/env python
-"""
-Structure Definition Repository
-"""
-
 import json
 import tarfile
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 from packaging import version
@@ -525,7 +520,18 @@ class PackageStructureDefinitionRepository(StructureDefinitionRepository):
 
 
 class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
-    """Repository that manages local storage and optional internet fallback."""
+    """
+    CompositeStructureDefinitionRepository provides a unified interface for managing, retrieving, and caching FHIR
+    StructureDefinition resources from multiple sources, including local storage, FHIR packages, and online repositories.
+
+    This repository supports:
+        - Local caching of StructureDefinitions, with version tracking and duplicate prevention.
+        - Optional integration with FHIR package repositories for bulk loading and management of definitions.
+        - Online retrieval of StructureDefinitions when enabled, with automatic local caching of downloaded resources.
+        - Utilities for loading definitions from files, directories, or pre-loaded dictionaries.
+        - Management of loaded packages, including loading, checking, and removal.
+        - Version management, including retrieval of all available versions, the latest version, and removal of specific versions.
+    """
 
     def __init__(
         self,
@@ -553,7 +559,27 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
     def get(
         self, canonical_url: str, version: Optional[str] = None
     ) -> StructureDefinition:
-        """Get structure definition with local-first, package, then internet fallback strategy."""
+        """
+        Retrieve a StructureDefinition resource by its canonical URL and optional version.
+
+        This method attempts to find the requested StructureDefinition in the following order:
+        1. Local repository: Checks for the resource in the local cache, optionally by version.
+        2. Package repository: If available, attempts to retrieve the resource from a package repository.
+        3. Internet: If enabled, tries to fetch the resource from an online repository.
+
+        If the resource is found in the package or internet repository, it is cached locally for future use.
+
+        Args:
+            canonical_url (str): The canonical URL of the StructureDefinition to retrieve.
+            version (Optional[str], optional): The specific version of the StructureDefinition to retrieve.
+                If not provided, the latest version is used if available.
+
+        Returns:
+            StructureDefinition: The requested StructureDefinition resource.
+
+        Raises:
+            RuntimeError: If the StructureDefinition cannot be found in any repository.
+        """
         base_url, parsed_version = self.parse_canonical_url(canonical_url)
         target_version = version or parsed_version
 
@@ -603,7 +629,21 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
     def add(
         self, structure_definition: StructureDefinition, fail_if_exists: bool = False
     ) -> None:
-        """Add a structure definition to local storage."""
+        """
+        Adds a StructureDefinition to the local repository.
+
+        Args:
+            structure_definition (StructureDefinition): The StructureDefinition instance to add.
+                Must have a 'url' field, and a version either in the URL or in the 'version' field.
+            fail_if_exists (bool, optional): If True, raises a ValueError if a StructureDefinition
+                with the same base URL and version already exists in the repository. Defaults to False.
+
+        Raises:
+            ValueError: If the StructureDefinition does not have a 'url' field.
+            ValueError: If the StructureDefinition does not have a version (in the URL or 'version' field).
+            ValueError: If a duplicate StructureDefinition is added and fail_if_exists is True.
+
+        """
         if not structure_definition.url:
             raise ValueError(
                 "StructureDefinition must have a 'url' field to be added to the repository."
@@ -637,7 +677,19 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
         self._update_latest_version(base_url, version)
 
     def has(self, canonical_url: str, version: Optional[str] = None) -> bool:
-        """Check if structure definition exists locally, in packages, or can be downloaded."""
+        """
+        Check if a resource with the given canonical URL and optional version exists in the repository.
+        This method searches for the resource in the following order:
+        1. Local storage: Checks if the resource is available locally, optionally matching the specified version.
+        2. Package repository: If configured, checks if the resource exists in the package repository.
+        3. HTTP repository: If internet access is enabled, checks if the resource can be found via the HTTP repository.
+        Args:
+            canonical_url (str): The canonical URL of the resource to check.
+            version (Optional[str], optional): The specific version of the resource to check for. Defaults to None.
+        Returns:
+            bool: True if the resource exists in any of the repositories or can be downloaded; False otherwise.
+        """
+
         base_url, parsed_version = self.parse_canonical_url(canonical_url)
         target_version = version or parsed_version
 
@@ -663,7 +715,15 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
         )
 
     def get_versions(self, canonical_url: str) -> List[str]:
-        """Get all available versions for a canonical URL."""
+        """
+        Retrieve all available versions for a given canonical URL.
+        Args:
+            canonical_url (str): The canonical URL of the resource, possibly including a version.
+        Returns:
+            List[str]: A sorted list of version strings available for the specified canonical URL.
+                Versions are sorted using semantic versioning if possible; otherwise, they are sorted lexicographically.
+        """
+
         base_url, _ = self.parse_canonical_url(canonical_url)
 
         if base_url in self._local_definitions:
@@ -678,12 +738,30 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
         return []
 
     def get_latest_version(self, canonical_url: str) -> Optional[str]:
-        """Get the latest version for a canonical URL."""
+        """
+        Retrieve the latest version string for a given FHIR resource canonical URL.
+        Args:
+            canonical_url (str): The canonical URL of the FHIR resource, possibly including a version.
+        Returns:
+            Optional[str]: The latest version string associated with the base canonical URL,
+                           or None if no version is found.
+        """
+
         base_url, _ = self.parse_canonical_url(canonical_url)
         return self._latest_versions.get(base_url)
 
     def _update_latest_version(self, base_url: str, new_version: str) -> None:
-        """Update the latest version tracking for a base URL."""
+        """
+        Updates the latest version for a given base URL if the new version is greater.
+        Compares the provided new_version with the currently stored latest version for the specified base_url.
+        Uses semantic versioning for comparison when possible; falls back to string comparison if versions are not valid semantic versions.
+        Args:
+            base_url (str): The base URL whose latest version is being tracked.
+            new_version (str): The new version string to compare and potentially set as the latest.
+        Returns:
+            None
+        """
+
         current_latest = self._latest_versions.get(base_url)
 
         if not current_latest:
@@ -700,7 +778,15 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
                 self._latest_versions[base_url] = new_version
 
     def load_from_directory(self, directory_path: Union[str, Path]) -> None:
-        """Load all structure definitions from a directory."""
+        """
+        Loads all JSON structure definitions from the specified directory and adds them to the repository.
+        Args:
+            directory_path (Union[str, Path]): The path to the directory containing JSON structure definition files.
+        Raises:
+            FileNotFoundError: If the specified directory does not exist.
+            RuntimeError: If an error occurs while loading or adding a structure definition from a file.
+        """
+
         directory = Path(directory_path)
         if not directory.exists():
             raise FileNotFoundError(f"Directory not found: {directory_path}")
@@ -715,7 +801,14 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
                 )
 
     def load_from_files(self, *file_paths: Union[str, Path]) -> None:
-        """Load structure definitions from individual files."""
+        """
+        Loads FHIR StructureDefinition resources from one or more JSON files and adds them to the repository.
+        Args:
+            *file_paths (Union[str, Path]): One or more file paths to JSON files containing FHIR StructureDefinition resources.
+        Raises:
+            RuntimeError: If loading or parsing any of the files fails, a RuntimeError is raised with details about the file and the error.
+        """
+
         for file_path in file_paths:
             try:
                 structure_def = self.__load_json_structure_definition(Path(file_path))
@@ -724,34 +817,78 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
                 raise RuntimeError(f"Failed to load {file_path}: {e}")
 
     def load_from_definitions(self, *definitions: Dict[str, Any]) -> None:
+        """
+        Loads FHIR structure definitions from one or more pre-loaded dictionaries.
+        Each dictionary in `definitions` should represent a FHIR StructureDefinition resource.
+        The method validates each dictionary and adds the resulting StructureDefinition
+        object to the repository.
+        Args:
+            *definitions (Dict[str, Any]): One or more dictionaries representing FHIR StructureDefinition resources.
+        Raises:
+            ValidationError: If any of the provided dictionaries do not conform to the StructureDefinition model.
+        """
+
         """Load structure definitions from pre-loaded dictionaries."""
         for structure_def in definitions:
             structure_definition = StructureDefinition.model_validate(structure_def)
             self.add(structure_definition)
 
     def set_internet_enabled(self, enabled: bool) -> None:
-        """Enable or disable internet access."""
+        """
+        Enables or disables internet access for the repository and its underlying HTTP repository.
+        Args:
+            enabled (bool): If True, internet access is enabled; if False, it is disabled.
+        """
+
         self._internet_enabled = enabled
         self._http_repository.set_internet_enabled(enabled)
 
     def get_loaded_urls(self) -> List[str]:
-        """Get a list of all locally loaded canonical URLs (base URLs)."""
+        """
+        Returns a list of URLs for all FHIR definitions currently loaded in the repository.
+
+        Returns:
+            List[str]: A list containing the URLs of the loaded FHIR definitions.
+        """
         return list(self._local_definitions.keys())
 
     def get_all_loaded_urls_with_versions(self) -> Dict[str, List[str]]:
-        """Get all loaded URLs with their available versions."""
+        """
+        Returns a dictionary mapping each loaded base URL to a list of its available versions.
+
+        Returns:
+            Dict[str, List[str]]: A dictionary where the keys are base URLs (str) and the values are lists of version strings (List[str]) associated with each URL.
+        """
         return {
             base_url: self.get_versions(base_url)
             for base_url in self._local_definitions.keys()
         }
 
     def clear_local_cache(self) -> None:
-        """Clear all locally cached structure definitions."""
+        """
+        Clears the local cache of definitions and latest versions.
+        This method removes all entries from the internal caches used to store local definitions
+        and their latest versions, effectively resetting the local state.
+        """
         self._local_definitions.clear()
         self._latest_versions.clear()
 
     def remove_version(self, canonical_url: str, version: Optional[str] = None) -> None:
-        """Remove a specific version or all versions of a structure definition."""
+        """
+        Remove a specific version or all versions of a resource identified by its canonical URL.
+        Args:
+            canonical_url (str): The canonical URL of the resource, optionally including a version.
+            version (Optional[str], optional): The specific version to remove. If not provided, the version is parsed from the canonical URL if present.
+                                               If neither is provided, all versions for the base URL are removed.
+        Returns:
+            None
+        Behavior:
+            - If a version is specified (either as an argument or in the canonical URL), removes only that version.
+            - If the removed version was the latest, updates the latest version to the next available one.
+            - If no versions remain for the base URL, cleans up internal data structures.
+            - If no version is specified, removes all versions associated with the base URL.
+        """
+
         base_url, parsed_version = self.parse_canonical_url(canonical_url)
         target_version = version or parsed_version
 
@@ -781,18 +918,37 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
             self._latest_versions.pop(base_url, None)
 
     def __load_json_structure_definition(self, file_path: Path) -> StructureDefinition:
-        """Load and parse a JSON file."""
+        """
+        Loads a FHIR StructureDefinition from a JSON file.
+        Args:
+            file_path (Path): The path to the JSON file containing the StructureDefinition.
+        Returns:
+            StructureDefinition: The validated StructureDefinition object parsed from the JSON file.
+        Raises:
+            FileNotFoundError: If the specified file does not exist.
+            JSONDecodeError: If the file is not valid JSON.
+            ValidationError: If the JSON does not conform to the StructureDefinition model.
+        """
+
         with open(file_path, "r", encoding="utf-8") as file:
             return StructureDefinition.model_validate(json.load(file))
 
     # Package-specific convenience methods
     def load_package(self, package_name: str, version: Optional[str] = None) -> None:
-        """Load a FHIR package and return loaded structure definitions."""
+        """
+        Loads a FHIR package into the repository, making its structure definitions available.
+        Args:
+            package_name (str): The name of the FHIR package to load.
+            version (Optional[str], optional): The specific version of the package to load. If None, the latest version is used.
+        Raises:
+            RuntimeError: If package support is not enabled for this repository.
+        Side Effects:
+            - Loads the specified package into the internal package repository.
+            - Adds any new structure definitions from the package to the local cache, avoiding duplicates.
+        """
+
         if not self._package_repository:
             raise RuntimeError("Package support is not enabled for this repository")
-
-        # Get current local URLs before loading
-        urls_before = set(self.get_loaded_urls())
 
         # Load the package (this modifies the package repository's internal state)
         self._package_repository.load_package(package_name, version)
@@ -813,31 +969,59 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
                     loaded_definitions.append(structure_def)
 
     def get_loaded_packages(self) -> Dict[str, str]:
-        """Get dictionary of loaded FHIR packages (name -> version)."""
+        """
+        Returns a dictionary of loaded FHIR packages.
+
+        Returns:
+            Dict[str, str]: A dictionary where the keys are package names and the values are their corresponding versions.
+        """
+
         if not self._package_repository:
             return {}
         return self._package_repository.get_loaded_packages()
 
     def has_package(self, package_name: str, version: Optional[str] = None) -> bool:
-        """Check if a package is loaded."""
+        """
+        Check if a package with the specified name and optional version exists in the package repository.
+        Args:
+            package_name (str): The name of the package to check for.
+            version (Optional[str], optional): The specific version of the package to check. Defaults to None.
+        Returns:
+            bool: True if the package (and version, if specified) exists in the repository, False otherwise.
+        """
+
         if not self._package_repository:
             return False
         return self._package_repository.has_package(package_name, version)
 
     def remove_package(self, package_name: str, version: Optional[str] = None) -> None:
-        """Remove a loaded package."""
+        """
+        Remove a package from the package repository.
+        Args:
+            package_name (str): The name of the package to remove.
+            version (Optional[str], optional): The specific version of the package to remove. If None, all versions may be removed. Defaults to None.
+        Returns:
+            None
+        """
+
         if not self._package_repository:
             return
         self._package_repository.remove_package(package_name, version)
 
     def set_registry_base_url(self, base_url: str) -> None:
-        """Set the FHIR package registry base URL."""
+        """
+        Sets the base URL for the package registry.
+        Args:
+            base_url (str): The base URL to be used for the package registry.
+        Raises:
+            RuntimeError: If package support is not enabled for this repository.
+        """
+
         if not self._package_repository:
             raise RuntimeError("Package support is not enabled for this repository")
         self._package_repository.set_registry_base_url(base_url)
 
     def clear_package_cache(self) -> None:
-        """Clear the package cache."""
         if self._package_repository:
             self._package_repository.clear_local_cache()
 
@@ -849,7 +1033,17 @@ def configure_repository(
     definitions: Optional[List[Dict[str, Any]]] = None,
     internet_enabled: bool = True,
 ) -> CompositeStructureDefinitionRepository:
-    """Configure a repository with various sources."""
+    """
+    Configures and returns a CompositeStructureDefinitionRepository by loading structure definitions
+    from a directory, a list of files, or a list of definition dictionaries.
+    Args:
+        directory (Optional[Union[str, Path]]): Path to a directory containing structure definition files to load.
+        files (Optional[List[Union[str, Path]]]): List of file paths to structure definition files to load.
+        definitions (Optional[List[Dict[str, Any]]]): List of structure definition dictionaries to load directly.
+        internet_enabled (bool): Whether to enable internet access for the repository (default is True).
+    Returns:
+        CompositeStructureDefinitionRepository: The configured repository with the loaded structure definitions.
+    """
     repo = CompositeStructureDefinitionRepository(internet_enabled=internet_enabled)
 
     if directory:
