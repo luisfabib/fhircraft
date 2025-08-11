@@ -8,13 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from fhircraft.fhir.resources.factory import (
-    clear_chache,
-    construct_resource_model,
-    disable_internet_access,
-    load_from_directory,
-    load_from_files,
-)
+from fhircraft.fhir.resources.factory import construct_resource_model, factory
 from fhircraft.fhir.resources.generator import CodeGenerator
 
 VERSIONS = ["R4B", "R5"]
@@ -58,9 +52,9 @@ fhir_resources_test_cases = {
 
 def _assert_construct_core_resource(version, resource_label, filename):
     # Disable internet access to ensure we use local definitions
-    disable_internet_access()
+    factory.disable_internet_access()
     # Load the FHIR resource definition from local files
-    load_from_files(
+    factory.load_definitions_from_files(
         Path(CORE_DEFINITIONS_DIRECTORY)
         / Path(version)
         / Path(f"{resource_label.lower()}.profile.json")
@@ -167,9 +161,9 @@ def test_construct_profiled_resource(filename):
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
         # Disable internet access to ensure we use local definitions
-        disable_internet_access()
+        factory.disable_internet_access()
         # Load the FHIR resource definition from local files
-        load_from_directory(Path(PROFILES_DEFINTIONS_DIRECTORY))
+        factory.load_definitions_from_directory(Path(PROFILES_DEFINTIONS_DIRECTORY))
 
         # Generate source code for Pydantic FHIR model
         resource = construct_resource_model(

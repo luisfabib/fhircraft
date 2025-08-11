@@ -916,11 +916,8 @@ class ResourceFactory:
         self.construction_cache = {}
 
 
+# Create default factory instance
 factory = ResourceFactory()
+
+# Public API
 construct_resource_model = factory.construct_resource_model
-clear_chache = factory.clear_chache
-disable_internet_access = factory.disable_internet_access
-enable_internet_access = factory.enable_internet_access
-load_from_definitions = factory.repository.load_from_definitions
-load_from_directory = factory.repository.load_from_directory
-load_from_files = factory.repository.load_from_files
