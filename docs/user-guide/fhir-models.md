@@ -126,18 +126,87 @@ versioned_patient = construct_resource_model(
 )
 ```
 
-!!! tip "Local-first strategy"
+!!! tip "Multi-source strategy"
 
-    Fhircraft's repository system follows a local-first approach:
+    Fhircraft's repository system follows a multi-source lookup strategy:
     
     1. **Local lookup**: First checks for locally loaded structure definitions
-    2. **Internet fallback**: Downloads from the canonical URL if not found locally
-    3. **Version support**: Handles semantic versioning with latest version tracking
-    4. **Caching**: Automatically caches downloaded definitions for better performance
+    2. **Package lookup**: Checks loaded FHIR packages for the definition
+    3. **Internet fallback**: Downloads from the canonical URL if not found
+    4. **Version support**: Handles semantic versioning with latest version tracking
+    5. **Caching**: Automatically caches downloaded definitions for better performance
 
 !!! warning "Network dependency"
 
     When using canonical URLs for definitions not available locally, ensure you have internet connectivity. For production environments, consider pre-loading all required structure definitions locally.
+
+#### Via FHIR packages
+
+Fhircraft supports automatic loading of FHIR packages from package registries, providing easy access to published Implementation Guides and core FHIR specifications. This is the recommended approach for working with standard FHIR profiles and extensions.
+
+```python
+from fhircraft.fhir.resources.factory import ResourceFactory
+
+# Create factory with package support enabled
+factory = ResourceFactory(enable_packages=True)
+
+# Load US Core Implementation Guide
+factory.load_package("hl7.fhir.us.core", "5.0.1")
+
+# Now construct models from the loaded package
+USCorePatient = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+)
+
+# Load FHIR R4 core specification
+factory.load_package("hl7.fhir.r4.core")
+
+# Construct core FHIR resources
+Patient = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
+)
+```
+
+**Batch package loading:**
+
+```python
+# Configure factory with multiple packages at once
+factory.configure_repository(
+    packages=[
+        "hl7.fhir.r4.core",  # Latest version
+        ("hl7.fhir.us.core", "5.0.1"),  # Specific version
+        ("hl7.fhir.uv.ips", "1.1.0"),  # International Patient Summary
+    ],
+    internet_enabled=True
+)
+
+# All structure definitions from loaded packages are now available
+USCorePatient = factory.construct_resource_model(
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+)
+```
+
+!!! tip "Package advantages"
+
+    Using FHIR packages provides several benefits:
+    
+    - **Automatic dependency resolution**: Packages include all required dependencies
+    - **Version management**: Precise version control with semantic versioning
+    - **Standard compliance**: Official packages ensure compliance with specifications
+    - **Comprehensive coverage**: Includes all resources, extensions, and value sets
+    - **Registry support**: Automatic discovery from public registries
+
+!!! info "Package sources"
+
+    Popular FHIR packages include:
+    
+    - `hl7.fhir.r4.core` - FHIR R4 core specification
+    - `hl7.fhir.r5.core` - FHIR R5 core specification
+    - `hl7.fhir.us.core` - US Core Implementation Guide
+    - `hl7.fhir.uv.ips` - International Patient Summary
+    - `hl7.fhir.uv.smart-app-launch` - SMART App Launch
+    
+    See the [Package Loading guide](package-loading.md) for comprehensive documentation.
 
 !!! note "Versioning support" 
 
@@ -240,16 +309,7 @@ patient_r5 = PatientR5(name=[{"family": "Smith"}])
 
 ## Repository System
 
-Fhircraft includes a repository system for managing FHIR structure definitions with local-first, internet-fallback strategy. This system provides efficient storage, versioning, and retrieval of structure definitions while minimizing network dependencies.
-
-### Repository Features
-
-- **Local-first approach**: Prioritizes locally stored definitions over internet downloads
-- **Internet fallback**: Automatically downloads missing definitions when internet is available
-- **Version management**: Supports semantic versioning with latest version tracking
-- **Multiple sources**: Load from directories, individual files, or pre-loaded dictionaries
-- **Caching**: Efficient caching of both structure definitions and constructed models
-- **Offline support**: Complete offline operation when all required definitions are pre-loaded
+Fhircraft includes a repository system for managing FHIR structure definitions with local-first, package-fallback, internet-fallback strategy. This system provides efficient storage, versioning, and retrieval of structure definitions while minimizing network dependencies.
 
 ### Basic Repository Configuration
 

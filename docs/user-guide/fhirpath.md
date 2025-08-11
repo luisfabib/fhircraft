@@ -325,39 +325,6 @@ These debugging methods are particularly useful when:
 - Debugging complex nested expressions
 - Validating expression behavior during development
 
-### Migration from Legacy Interface
-
-If you're upgrading from an older version of Fhircraft, here's how to migrate common patterns:
-
-```python
-# Old way (deprecated)
-result = expression.evaluate_for(data)
-if result is None:
-    # No values
-elif isinstance(result, list):
-    # Multiple values
-else:
-    # Single value
-
-# New way (recommended)
-if expression.is_empty(data):
-    # No values
-elif expression.count(data) == 1:
-    value = expression.single(data)
-else:
-    values = expression.values(data)
-
-# Old way (deprecated)
-expression.evaluate_and_replace(data, new_value)
-
-# New way (recommended)
-expression.update_values(data, new_value)  # For all matches
-# or
-expression.update_single(data, new_value)  # For single match only
-```
-
-The enhanced interface provides better type safety, clearer semantics, and more predictable behavior compared to the legacy methods.
-
 ## Quick Reference
 
 ### Method Summary

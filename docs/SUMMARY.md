@@ -13,6 +13,7 @@
     - FHIR Resources
         - [Pydantic Representation](user-guide/pydantic-representation.md)
         - [Working with Fhircraft Models](user-guide/fhir-models.md)
+        - [Package Loading](user-guide/package-loading.md)
     - [FHIRPath](user-guide/fhirpath.md)
   - Reference
     -  ./reference/*

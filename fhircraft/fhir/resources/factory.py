@@ -61,6 +61,15 @@ class ElementDefinitionNode(ElementDefinition):
 
 
 class ResourceFactory:
+    """Factory for constructing Pydantic models from FHIR StructureDefinitions.
+
+    The ResourceFactory provides functionality to:
+    - Load StructureDefinitions from various sources (files, directories, dictionaries)
+    - Load FHIR packages from package registries
+    - Construct Pydantic models from StructureDefinitions
+    - Cache constructed models for performance
+    - Manage internet access and package registry configuration
+    """
 
     @dataclass
     class FactoryConfig:
@@ -75,9 +84,32 @@ class ResourceFactory:
         resource_name: str
 
     def __init__(
-        self, repository: Optional[CompositeStructureDefinitionRepository] = None
+        self,
+        repository: Optional[CompositeStructureDefinitionRepository] = None,
+        internet_enabled: bool = True,
+        enable_packages: bool = True,
+        registry_base_url: Optional[str] = None,
+        timeout: float = 30.0,
     ):
-        self.repository = repository or CompositeStructureDefinitionRepository()
+        """Initialize the ResourceFactory.
+
+        Args:
+            repository: Custom repository to use. If None, creates a default CompositeStructureDefinitionRepository
+            internet_enabled: Whether to enable internet access for downloading definitions
+            enable_packages: Whether to enable FHIR package support
+            registry_base_url: Base URL for the FHIR package registry
+            timeout: Request timeout in seconds for package downloads
+        """
+        if repository is None:
+            self.repository = CompositeStructureDefinitionRepository(
+                internet_enabled=internet_enabled,
+                enable_packages=enable_packages,
+                registry_base_url=registry_base_url,
+                timeout=timeout,
+            )
+        else:
+            self.repository = repository
+
         self.construction_cache: Dict[str, type[BaseModel]] = {}
         self.Config: Optional[ResourceFactory.FactoryConfig] = None
 
@@ -87,10 +119,25 @@ class ResourceFactory:
         directory: Optional[Union[str, Path]] = None,
         files: Optional[List[Union[str, Path]]] = None,
         definitions: Optional[List[Dict[str, Any]]] = None,
+        packages: Optional[List[Union[str, Tuple[str, str]]]] = None,
         internet_enabled: bool = True,
+        registry_base_url: Optional[str] = None,
     ) -> None:
-        """Configure the factory repository with various sources."""
+        """Configure the factory repository with various sources.
+
+        Args:
+            directory: Directory containing structure definition files
+            files: List of individual structure definition files to load
+            definitions: List of structure definition dictionaries to load
+            packages: List of FHIR packages to load. Each can be a package name (string)
+                     or a tuple of (package_name, version)
+            internet_enabled: Whether to enable internet access
+            registry_base_url: Base URL for the package registry
+        """
         self.repository.set_internet_enabled(internet_enabled)
+
+        if registry_base_url and hasattr(self.repository, "set_registry_base_url"):
+            self.repository.set_registry_base_url(registry_base_url)
 
         if directory:
             self.load_definitions_from_directory(directory)
@@ -101,6 +148,15 @@ class ResourceFactory:
         if definitions:
             self.load_definitions_from_list(*definitions)
 
+        if packages:
+            for package in packages:
+                if isinstance(package, str):
+                    self.load_package(package)
+                elif isinstance(package, tuple) and len(package) == 2:
+                    self.load_package(package[0], package[1])
+                else:
+                    raise ValueError(f"Invalid package specification: {package}")
+
     def disable_internet_access(self) -> None:
         """Toggle offline mode (disable internet access) to avoid external requests."""
         self.repository.set_internet_enabled(False)
@@ -110,6 +166,19 @@ class ResourceFactory:
         self.repository.set_internet_enabled(True)
 
     def load_definitions_from_directory(self, directory_path: Union[str, Path]) -> None:
+        """
+        Load FHIR structure definitions from the specified directory.
+
+        This method attempts to load structure definitions into the repository from the given directory path.
+        If the underlying repository supports loading from a directory (i.e., implements `load_from_directory`),
+        the method delegates the loading process to it. Otherwise, a NotImplementedError is raised.
+
+        Args:
+            directory_path (Union[str, Path]): The path to the directory containing structure definitions.
+
+        Raises:
+            NotImplementedError: If the repository does not support loading from a directory.
+        """
         """Load structure definitions from a directory."""
         if hasattr(self.repository, "load_from_directory"):
             self.repository.load_from_directory(directory_path)
@@ -119,20 +188,118 @@ class ResourceFactory:
             )
 
     def load_definitions_from_files(self, *file_paths: Union[str, Path]) -> None:
-        """Load structure definitions from individual files."""
+        """
+        Loads resource definitions from the specified file paths into the repository.
+
+        This method delegates the loading process to the repository's `load_from_files` method,
+        if it exists. If the repository does not support loading from files, a NotImplementedError is raised.
+
+        Args:
+            *file_paths (Union[str, Path]): One or more file paths from which to load resource definitions.
+
+        Raises:
+            NotImplementedError: If the repository does not support loading from files.
+        """
         if hasattr(self.repository, "load_from_files"):
             self.repository.load_from_files(*file_paths)
         else:
             raise NotImplementedError("Repository does not support loading from files")
 
     def load_definitions_from_list(self, *definitions: Dict[str, Any]) -> None:
-        """Load structure definitions from pre-loaded dictionaries."""
+        """
+        Loads resource definitions into the repository from a list of definition dictionaries.
+
+        This method forwards the provided definitions to the repository's `load_from_definitions`
+        method if it exists. If the repository does not support loading from definitions,
+        a NotImplementedError is raised.
+
+        Args:
+            *definitions (Dict[str, Any]): One or more resource definition dictionaries to load.
+
+        Raises:
+            NotImplementedError: If the repository does not support loading from definitions.
+        """
         if hasattr(self.repository, "load_from_definitions"):
             self.repository.load_from_definitions(*definitions)
         else:
             raise NotImplementedError(
                 "Repository does not support loading from definitions"
             )
+
+    def load_package(self, package_name: str, version: Optional[str] = None) -> None:
+        """Load a FHIR package and return loaded structure definitions.
+
+        Args:
+            package_name: Name of the package (e.g., "hl7.fhir.us.core")
+            version: Version of the package (defaults to latest)
+
+        Returns:
+            List of StructureDefinition objects that were loaded
+
+        Raises:
+            RuntimeError: If package support is not enabled in the repository
+        """
+        if hasattr(self.repository, "load_package"):
+            self.repository.load_package(package_name, version)
+        else:
+            raise NotImplementedError("Repository does not support package loading")
+
+    def get_loaded_packages(self) -> Dict[str, str]:
+        """Get dictionary of loaded FHIR packages (name -> version).
+
+        Returns:
+            Dictionary mapping package names to their loaded versions
+        """
+        if hasattr(self.repository, "get_loaded_packages"):
+            return self.repository.get_loaded_packages()
+        else:
+            return {}
+
+    def has_package(self, package_name: str, version: Optional[str] = None) -> bool:
+        """Check if a package is loaded.
+
+        Args:
+            package_name (str): Name of the package
+            version (Optional[str]): Version of the package (if None, checks any version)
+
+        Returns:
+            True if package is loaded
+        """
+        if hasattr(self.repository, "has_package"):
+            return self.repository.has_package(package_name, version)
+        else:
+            return False
+
+    def remove_package(self, package_name: str, version: Optional[str] = None) -> None:
+        """Remove a loaded package.
+
+        Args:
+            package_name (str): Name of the package
+            version (Optional[str]): Version of the package (if None, removes all versions)
+        """
+        if hasattr(self.repository, "remove_package"):
+            self.repository.remove_package(package_name, version)
+
+    def set_registry_base_url(self, base_url: str) -> None:
+        """Set the FHIR package registry base URL.
+
+        Args:
+            base_url (str): The base URL for the package registry
+
+        Raises:
+            RuntimeError: If package support is not enabled in the repository
+        """
+        if hasattr(self.repository, "set_registry_base_url"):
+            self.repository.set_registry_base_url(base_url)
+        else:
+            raise NotImplementedError(
+                "Repository does not support package registry configuration"
+            )
+
+    def clear_package_cache(self) -> None:
+        """Clear the package cache."""
+        if hasattr(self.repository, "clear_package_cache"):
+            self.repository.clear_package_cache()
 
     def resolve_structure_definition(self, canonical_url: str) -> StructureDefinition:
         """Resolve structure definition using the repository."""

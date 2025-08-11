@@ -1,5 +1,9 @@
+import json
+import tarfile
+import tempfile
 from typing import List, Optional, get_args
 from unittest import TestCase
+from unittest.mock import MagicMock, Mock, patch
 
 from parameterized import parameterized, parameterized_class
 from pydantic import Field
@@ -7,8 +11,10 @@ from pydantic.fields import FieldInfo
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 import fhircraft.fhir.resources.datatypes.R4B.complex_types as complex_types
+from fhircraft.fhir.resources.definitions import StructureDefinition
 from fhircraft.fhir.resources.definitions.element_definition import ElementDefinition
 from fhircraft.fhir.resources.factory import ResourceFactory, _Unset
+from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 
 class FactoryTestCase(TestCase):
@@ -281,3 +287,117 @@ class TestProcessCardinalityConstraints(FactoryTestCase):
         min_card, max_card = self.factory._parse_element_cardinality(element)
         assert min_card == expected_min
         assert max_card == expected_max
+
+
+class TestResourceFactoryPackageMethods(TestCase):
+    """Test ResourceFactory package-related methods."""
+
+    def setUp(self):
+        """Set up test fixtures."""
+        self.factory_with_packages = ResourceFactory(
+            enable_packages=True, internet_enabled=False
+        )
+        self.factory_without_packages = ResourceFactory(
+            enable_packages=False, internet_enabled=False
+        )
+
+    def test_load_package_without_package_support(self):
+        """Test load_package raises error when package support is disabled."""
+        with self.assertRaises(RuntimeError):
+            self.factory_without_packages.load_package("test.package")
+
+    def test_get_loaded_packages_without_package_support(self):
+        """Test get_loaded_packages returns empty dict when package support is disabled."""
+        result = self.factory_without_packages.get_loaded_packages()
+        assert result == {}
+
+    def test_has_package_without_package_support(self):
+        """Test has_package returns False when package support is disabled."""
+        result = self.factory_without_packages.has_package("test.package")
+        assert result is False
+
+    def test_remove_package_without_package_support(self):
+        """Test remove_package does nothing when package support is disabled."""
+        # Should not raise an exception
+        self.factory_without_packages.remove_package("test.package")
+
+    def test_set_registry_base_url_without_package_support(self):
+        """Test set_registry_base_url raises error when package support is disabled."""
+        with self.assertRaises(RuntimeError) as context:
+            self.factory_without_packages.set_registry_base_url("https://example.com")
+
+    def test_clear_package_cache_without_package_support(self):
+        """Test clear_package_cache does nothing when package support is disabled."""
+        # Should not raise an exception
+        self.factory_without_packages.clear_package_cache()
+
+    def test_get_loaded_packages_with_package_support(self):
+        """Test get_loaded_packages works when package support is enabled."""
+        result = self.factory_with_packages.get_loaded_packages()
+        assert isinstance(result, dict)
+        assert len(result) == 0  # Should be empty initially
+
+    def test_has_package_with_package_support(self):
+        """Test has_package works when package support is enabled."""
+        result = self.factory_with_packages.has_package("nonexistent.package")
+        assert result is False
+
+    def test_set_registry_base_url_with_package_support(self):
+        """Test set_registry_base_url works when package support is enabled."""
+        # Should not raise an exception
+        self.factory_with_packages.set_registry_base_url("https://example.com")
+
+    def test_clear_package_cache_with_package_support(self):
+        """Test clear_package_cache works when package support is enabled."""
+        # Should not raise an exception
+        self.factory_with_packages.clear_package_cache()
+
+    @patch("fhircraft.fhir.packages.client.FHIRPackageRegistryClient.download_package")
+    def test_load_package_success(self, mock_download):
+        """Test successful package loading."""
+        # Create mock tar file with sample StructureDefinition
+        mock_tar = MagicMock(spec=tarfile.TarFile)
+        mock_member = MagicMock()
+        mock_member.isfile.return_value = True
+        mock_member.name = "package/StructureDefinition-Patient.json"
+
+        sample_patient = {
+            "resourceType": "StructureDefinition",
+            "url": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "version": "4.0.0",
+            "name": "Patient",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/DomainResource",
+            "derivation": "specialization",
+            "snapshot": {
+                "element": [{"id": "Patient", "path": "Patient", "min": 0, "max": "*"}]
+            },
+        }
+
+        mock_file = MagicMock()
+        mock_file.read.return_value = json.dumps(sample_patient).encode("utf-8")
+
+        mock_tar.getmembers.return_value = [mock_member]
+        mock_tar.extractfile.return_value = mock_file
+        mock_download.return_value = mock_tar
+
+        # Enable internet for this test
+        factory_with_internet = ResourceFactory(
+            enable_packages=True, internet_enabled=True
+        )
+
+        # Load package
+        factory_with_internet.load_package("test.package", "1.0.0")
+
+        # Verify results
+        mock_download.assert_called_once_with("test.package", "1.0.0", extract=True)
+        result = factory_with_internet.get_loaded_packages()
+        assert len(result) == 1
+
+    def test_load_package_internet_disabled(self):
+        """Test load_package fails when internet is disabled."""
+        with self.assertRaises(RuntimeError) as context:
+            self.factory_with_packages.load_package("test.package")
