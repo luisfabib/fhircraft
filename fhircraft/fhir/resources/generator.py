@@ -58,7 +58,7 @@ class CodeGenerator:
         module_name = get_module_name(obj)
         if (object_name := getattr(obj, "__name__", None)) is None:
             if (object_name := getattr(obj, "_name", None)) is None:
-                return
+                raise ValueError(f"Could not determine object name for import: {obj}")
         # Generate the import statement
         if (
             module_name not in [FACTORY_MODULE, "builtins"]
@@ -182,10 +182,12 @@ class CodeGenerator:
             source_code = source_code.replace(f"{FACTORY_MODULE}.", "")
         source_code = source_code.replace(LEFT_TO_RIGHT_COMPLEX, LEFT_TO_RIGHT_SIMPLE)
 
+        print(
+            f"Generated code for {len(self.data)} models with imports: {self.import_statements}"
+        )
+        print(source_code)
         return source_code
 
 
 generator = CodeGenerator()
-generate_resource_model_code = generator.generate_resource_model_code
-generate_resource_model_code = generator.generate_resource_model_code
 generate_resource_model_code = generator.generate_resource_model_code

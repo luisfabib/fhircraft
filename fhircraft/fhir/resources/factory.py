@@ -5,6 +5,7 @@ Pydantic FHIR Model Factory
 
 import inspect
 import json
+import keyword
 import warnings
 from collections import defaultdict
 
@@ -18,6 +19,7 @@ import requests
 
 # Pydantic modules
 from pydantic import BaseModel, Field, create_model, field_validator, model_validator
+from pydantic.aliases import AliasChoices
 from pydantic.dataclasses import dataclass
 from pydantic.fields import FieldInfo
 from pydantic.functional_validators import _decorators as _validators
@@ -443,6 +445,7 @@ class ResourceFactory:
         default: Any = _Unset,
         description: Optional[str] = None,
         alias: Optional[str] = None,
+        validation_alias: Optional[AliasChoices] = None,
     ) -> Tuple[Any, FieldInfo]:
         """
         Constructs a Pydantic field based on the provided parameters.
@@ -455,6 +458,7 @@ class ResourceFactory:
             default (Any, optional): The default value of the field. Defaults to _Unset.
             description (str, optional): The description of the field. Defaults to None.
             alias (str, optional): The alias of the field. Defaults to None.
+            validation_alias (AliasChoices, optional): The validation alias choices for the field. Defaults to None.
 
         Returns:
             Tuple[Any, FieldInfo]: The constructed Pydantic field type and Field instance.
@@ -475,11 +479,33 @@ class ResourceFactory:
             Field(
                 default,
                 alias=alias,
+                validation_alias=validation_alias,
                 description=description,
                 min_length=min_card if is_list_type else None,
                 max_length=max_card if is_list_type else None,
             ),
         )
+
+    def _handle_python_reserved_keyword(
+        self, field_name: str
+    ) -> Tuple[str, Optional[AliasChoices]]:
+        """
+        Handles Python reserved keywords in field names by appending an underscore
+        and creating appropriate validation aliases.
+
+        Args:
+            field_name (str): The original field name
+
+        Returns:
+            Tuple[str, Optional[AliasChoices]]: The processed field name and optional alias choices
+        """
+        if keyword.iskeyword(field_name):
+            # Append underscore to make it a valid Python identifier
+            safe_field_name = f"{field_name}_"
+            # Create validation alias that accepts both original name and modified name
+            validation_alias = AliasChoices(field_name, safe_field_name)
+            return safe_field_name, validation_alias
+        return field_name, None
 
     def _process_pattern_or_fixed_values(
         self, element: ElementDefinition, constraint_prefix: str
@@ -550,8 +576,16 @@ class ResourceFactory:
             typed_field_name = name + (
                 field_type if isinstance(field_type, str) else field_type.__name__
             )
-            fields[typed_field_name] = self._construct_Pydantic_field(
-                field_type, cardinality[0], cardinality[1], description=description
+            # Handle Python reserved keywords
+            safe_typed_field_name, validation_alias = (
+                self._handle_python_reserved_keyword(typed_field_name)
+            )
+            fields[safe_typed_field_name] = self._construct_Pydantic_field(
+                field_type,
+                cardinality[0],
+                cardinality[1],
+                description=description,
+                validation_alias=validation_alias,
             )
         # Add validator to ensure only one of these fields is set
         validators[f"{name}_type_choice_validator"] = model_validator(mode="after")(
@@ -763,6 +797,10 @@ class ResourceFactory:
         for name, element in structure.children.items():
             if base and name in base.model_fields:
                 continue
+            # Handle Python reserved keywords for field names early
+            safe_field_name, validation_alias = self._handle_python_reserved_keyword(
+                name
+            )
             # Get cardinality of element
             min_card, max_card = self._parse_element_cardinality(element)
             # Parse the FHIR types of the element
@@ -805,7 +843,7 @@ class ResourceFactory:
                 field_default = pattern_value
                 # Add the current field to the list of validated fields
                 validators[f"FHIR_{name}_pattern_constraint"] = field_validator(
-                    name, mode="after"
+                    safe_field_name, mode="after"
                 )(
                     partial(
                         fhir_validators.validate_FHIR_element_pattern,
@@ -826,7 +864,7 @@ class ResourceFactory:
             if constraints := element.constraint:
                 for constraint in constraints:
                     validators = self._add_element_constraint_validator(
-                        name, constraint, base, validators
+                        safe_field_name, constraint, base, validators
                     )
             # Process FHIR slicing on the element, if present
             if element.slices:
@@ -843,7 +881,7 @@ class ResourceFactory:
                 ]
                 # Add slicing cardinality validator for field
                 validators[f"{name}_slicing_cardinality_validator"] = field_validator(
-                    name, mode="after"
+                    safe_field_name, mode="after"
                 )(
                     partial(
                         fhir_validators.validate_slicing_cardinalities, field_name=name
@@ -912,21 +950,31 @@ class ResourceFactory:
                     __base__=(field_type,),  # type: ignore
                     __validators__=subfield_validators,
                 )
+            # Handle Python reserved keywords for field names
+            safe_field_name, validation_alias = self._handle_python_reserved_keyword(
+                name
+            )
             # Create and add the Pydantic field for the FHIR element
-            fields[name] = self._construct_Pydantic_field(
+            fields[safe_field_name] = self._construct_Pydantic_field(
                 field_type,
                 min_card,
                 max_card,
                 default=field_default,
                 description=element.short,
+                validation_alias=validation_alias,
             )
             # IF the field is of primitive type, add aliased field to accomodate their extensions
             if hasattr(primitives, str(field_type)):
-                fields[f"{name}_ext"] = self._construct_Pydantic_field(
+                # Also handle keyword collision for extension fields
+                safe_ext_field_name, ext_validation_alias = (
+                    self._handle_python_reserved_keyword(f"{name}_ext")
+                )
+                fields[safe_ext_field_name] = self._construct_Pydantic_field(
                     get_complex_FHIR_type("Element"),
                     min_card=0,
                     max_card=1,
                     alias=f"_{name}",
+                    validation_alias=ext_validation_alias,
                     default=field_default,
                     description=f"Placeholder element for {name} extensions",
                 )
