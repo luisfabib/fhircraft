@@ -424,3 +424,22 @@ def get_FHIR_release_from_version(version: str) -> str:
             f"FHIR version {version} is not supported. Supported versions are: "
             "DSTU2, STU3, R4, R4B, R5, and R6."
         )
+
+
+def get_module_name(obj: Any) -> str:
+    """
+    Returns the name of the module to which the given object belongs.
+
+    Args:
+        obj (Any): The object whose module name is to be retrieved.
+
+    Returns:
+        str: The name of the module containing the object.
+
+    Raises:
+        ValueError: If the object does not belong to any module.
+    """
+    module = inspect.getmodule(obj)
+    if module is None:
+        raise ValueError(f"The object {obj} does not belong to a module")
+    return module.__name__
