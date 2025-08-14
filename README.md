@@ -8,18 +8,14 @@
     <img src="docs/assets/images/logo-banner.png" width="50%">
   </a>
 
-  [![CI](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml/badge.svg?branch=main&event=push)](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml)
-  ![PyPI - Version](https://img.shields.io/pypi/v/fhircraft)
-  [![versions](https://img.shields.io/pypi/pyversions/fhircraft.svg)](https://github.com/luisfabib/fhircraft)
+  ![PyPI - Version](https://img.shields.io/pypi/v/fhircraft?style=flat&logo=pypi&label=PyPI%20Release&labelColor=%231e293b)
+  ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/fhircraft?style=flat-square&logo=python&labelColor=%231e293b)
   [![license](https://img.shields.io/github/license/luisfabib/fhircraft.svg)](https://github.com/luisfabib/fhircraft/blob/main/LICENSE)
   [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
   ![FHIR Releases](https://img.shields.io/badge/FHIR-R4_R4B_R5-blue?style=flat&logo=fireship&logoColor=red&labelColor=%231e293b)
 
   <p align="center">
     Fhircraft is a Python package that dynamically generates Pydantic FHIR (Fast Healthcare Interoperability Resources) resource models from FHIR specifications, enabling comprehensive data structuring, validation, and typing within Python. It also offers a fully functional FHIRPath engine and code generation features to facilitate integration with other systems.
-    <br />
-    <br />
-    :construction:<i> This package is under active development. Major and/or breaking changes are to be expected in future updates.</i>:construction:
     <br />
     <br />
     <a href="https://luisfabib.github.io/fhircraft "><strong>Explore the docs »</strong></a>
@@ -30,6 +26,9 @@
     <a href="https://github.com/luisfabib/fhircraft/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
+
+> [!WARNING]  
+> This package is under active development. Major and/or breaking changes are to be expected in future updates.
 
 ## Why use Fhircraft?
 
@@ -48,7 +47,7 @@
 
 ### Prerequisites
 
-A valid installation of Python >3.8 is required.  
+A valid installation of Python >3.10 is required.  
 
 
 ### Installation
@@ -167,7 +166,7 @@ This project has been supported by the following institutions:
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See ![LICENSE](https://github.com/luisfabib/fhircraft?tab=MIT-1-ov-file) for more information.
+Distributed under the MIT License. See [LICENSE](https://github.com/luisfabib/fhircraft?tab=MIT-1-ov-file) for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
