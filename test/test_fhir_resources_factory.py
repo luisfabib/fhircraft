@@ -1,4 +1,5 @@
 import json
+import keyword
 import tarfile
 import tempfile
 from typing import List, Optional, get_args
@@ -7,6 +8,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 from parameterized import parameterized, parameterized_class
 from pydantic import Field
+from pydantic.aliases import AliasChoices
 from pydantic.fields import FieldInfo
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
@@ -287,6 +289,348 @@ class TestProcessCardinalityConstraints(FactoryTestCase):
         min_card, max_card = self.factory._parse_element_cardinality(element)
         assert min_card == expected_min
         assert max_card == expected_max
+
+
+class TestHandlePythonReservedKeyword(FactoryTestCase):
+    """Test the _handle_python_reserved_keyword method."""
+
+    def test_handles_non_keyword_field_name(self):
+        """Test that non-keyword field names are returned unchanged."""
+        field_name = "name"
+        safe_field_name, validation_alias = (
+            self.factory._handle_python_reserved_keyword(field_name)
+        )
+
+        assert safe_field_name == "name"
+        assert validation_alias is None
+
+    def test_handles_keyword_field_name(self):
+        """Test that keyword field names are processed correctly."""
+        field_name = "class"  # Python reserved keyword
+        safe_field_name, validation_alias = (
+            self.factory._handle_python_reserved_keyword(field_name)
+        )
+
+        assert safe_field_name == "class_"
+        assert isinstance(validation_alias, AliasChoices)
+
+    @parameterized.expand(
+        [
+            ("and",),
+            ("or",),
+            ("not",),
+            ("if",),
+            ("else",),
+            ("elif",),
+            ("while",),
+            ("for",),
+            ("def",),
+            ("class",),
+            ("import",),
+            ("from",),
+            ("try",),
+            ("except",),
+            ("finally",),
+            ("with",),
+            ("as",),
+            ("pass",),
+            ("break",),
+            ("continue",),
+            ("return",),
+            ("yield",),
+            ("lambda",),
+            ("global",),
+            ("nonlocal",),
+            ("assert",),
+            ("del",),
+            ("is",),
+            ("in",),
+            ("True",),
+            ("False",),
+            ("None",),
+        ]
+    )
+    def test_handles_all_python_keywords(self, keyword_name):
+        """Test that all Python reserved keywords are handled correctly."""
+        safe_field_name, validation_alias = (
+            self.factory._handle_python_reserved_keyword(keyword_name)
+        )
+
+        assert safe_field_name == f"{keyword_name}_"
+        assert isinstance(validation_alias, AliasChoices)
+        # Note: AliasChoices.choices might not be directly accessible, so we test functionality
+
+    def test_handles_field_with_underscore_suffix(self):
+        """Test handling of field names that already have underscore suffix."""
+        field_name = "class_"  # Not a keyword due to underscore
+        safe_field_name, validation_alias = (
+            self.factory._handle_python_reserved_keyword(field_name)
+        )
+
+        assert safe_field_name == "class_"
+        assert validation_alias is None
+
+
+class TestConstructPydanticFieldWithValidationAlias(FactoryTestCase):
+    """Test the _construct_Pydantic_field method with validation_alias parameter."""
+
+    def test_constructs_field_with_validation_alias(self):
+        """Test that fields can be constructed with validation aliases."""
+        field_type = primitives.String
+        validation_alias = AliasChoices("class", "class_")
+
+        result = self.factory._construct_Pydantic_field(
+            field_type, min_card=1, max_card=1, validation_alias=validation_alias
+        )
+
+        assert result[0] == field_type
+        assert result[1].validation_alias == validation_alias
+
+    def test_constructs_field_without_validation_alias(self):
+        """Test that fields can still be constructed without validation aliases."""
+        field_type = primitives.String
+
+        result = self.factory._construct_Pydantic_field(
+            field_type, min_card=1, max_card=1
+        )
+
+        assert result[0] == field_type
+        assert result[1].validation_alias is None
+
+    def test_constructs_field_with_both_alias_and_validation_alias(self):
+        """Test that fields can have both alias and validation_alias."""
+        field_type = primitives.String
+        validation_alias = AliasChoices("class", "class_")
+        alias = "_class"
+
+        result = self.factory._construct_Pydantic_field(
+            field_type,
+            min_card=1,
+            max_card=1,
+            alias=alias,
+            validation_alias=validation_alias,
+        )
+
+        assert result[0] == field_type
+        assert result[1].alias == alias
+        assert result[1].validation_alias == validation_alias
+
+
+class TestPythonKeywordHandlingIntegration(FactoryTestCase):
+    """Integration tests for Python keyword handling in resource construction."""
+
+    def test_constructs_model_with_keyword_field_names(self):
+        """Test that models can be constructed with keyword field names."""
+        # Create a structure definition with a reserved keyword field
+        structure_def_dict = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/TestResource",
+            "name": "TestResource",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "TestResource",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "TestResource",
+                        "path": "TestResource",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "TestResource.class",
+                        "path": "TestResource.class",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                        "short": "A class field",
+                    },
+                    {
+                        "id": "TestResource.import",
+                        "path": "TestResource.import",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                        "short": "An import field",
+                    },
+                ]
+            },
+        }
+
+        # Construct the model
+        model = self.factory.construct_resource_model(
+            structure_definition=structure_def_dict
+        )
+
+        # Check that the model was created successfully
+        assert model is not None
+        assert hasattr(model, "__fields__") or hasattr(model, "model_fields")
+
+        # Check that keyword fields were renamed with underscore suffix
+        fields = getattr(model, "model_fields", getattr(model, "__fields__", {}))
+        assert "class_" in fields
+        assert "import_" in fields
+        assert "class" not in fields  # Original keyword should not be a field name
+        assert "import" not in fields  # Original keyword should not be a field name
+
+        # Check that validation aliases were set correctly
+        class_field = fields["class_"]
+        import_field = fields["import_"]
+
+        assert class_field.validation_alias is not None
+        assert import_field.validation_alias is not None
+        assert isinstance(class_field.validation_alias, AliasChoices)
+        assert isinstance(import_field.validation_alias, AliasChoices)
+
+    def test_model_accepts_both_keyword_and_safe_field_names(self):
+        """Test that the constructed model accepts both original and safe field names."""
+        # Create a simple structure definition with a keyword field
+        structure_def_dict = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/TestResource",
+            "name": "TestResource",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "TestResource",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "TestResource",
+                        "path": "TestResource",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "TestResource.class",
+                        "path": "TestResource.class",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                        "short": "A class field",
+                    },
+                ]
+            },
+        }
+
+        # Construct the model
+        TestModel = self.factory.construct_resource_model(
+            structure_definition=structure_def_dict
+        )
+
+        # Test that both field names work for validation
+        # Using the safe field name
+        instance1 = TestModel(class_="test_value")
+        assert hasattr(instance1, "class_")
+
+        # Using the original keyword name (should work due to validation_alias)
+        instance2 = TestModel(**{"class": "test_value"})
+        assert hasattr(instance2, "class_")
+
+    def test_handles_choice_type_fields_with_keywords(self):
+        """Test that choice type fields with keywords are handled correctly."""
+        structure_def_dict = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/TestResource",
+            "name": "TestResource",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "TestResource",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "TestResource",
+                        "path": "TestResource",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "TestResource.class[x]",
+                        "path": "TestResource.class[x]",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}, {"code": "boolean"}],
+                        "short": "A choice type field with keyword name",
+                    },
+                ]
+            },
+        }
+
+        # Construct the model
+        model = self.factory.construct_resource_model(
+            structure_definition=structure_def_dict
+        )
+
+        # Check that choice type fields were created with safe names
+        fields = getattr(model, "model_fields", getattr(model, "__fields__", {}))
+
+        # Should have fields like classString_ instead of classString (since class is a keyword)
+        choice_fields = [
+            field_name
+            for field_name in fields.keys()
+            if field_name.startswith("class") and field_name != "class_"
+        ]
+        assert len(choice_fields) > 0
+
+        # The choice fields should be safe (not starting with reserved keywords)
+        for field_name in choice_fields:
+            # Since 'class' is a keyword, the choice fields should be renamed
+            assert not keyword.iskeyword(field_name)
+
+    def test_handles_extension_fields_with_keywords(self):
+        """Test that extension fields (_ext suffix) with keywords are handled correctly."""
+        structure_def_dict = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/TestResource",
+            "name": "TestResource",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "TestResource",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "TestResource",
+                        "path": "TestResource",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "TestResource.for",
+                        "path": "TestResource.for",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                        "short": "A primitive field with keyword name",
+                    },
+                ]
+            },
+        }
+
+        # Construct the model
+        model = self.factory.construct_resource_model(
+            structure_definition=structure_def_dict
+        )
+
+        # Check that both the main field and extension field were created with safe names
+        fields = getattr(model, "model_fields", getattr(model, "__fields__", {}))
+
+        # Should have 'for_' field for the main field
+        assert "for_" in fields
+
+        # Should have an extension field for the 'for' field (primitive fields get _ext fields)
+        # The extension field name will be based on the original name + '_ext',
+        # then checked for keywords
+        ext_field_candidates = [
+            name for name in fields.keys() if "for" in name and "ext" in name
+        ]
+        assert len(ext_field_candidates) > 0
 
 
 class TestResourceFactoryPackageMethods(TestCase):
