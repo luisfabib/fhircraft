@@ -8,9 +8,6 @@ from pydantic import ValidationError
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.datatypes.type_utils import (  # Type checking functions; Type conversion functions; Complex type utilities; Utility functions
     FHIRTypeError,
-    converts_to_boolean,
-    converts_to_decimal,
-    converts_to_integer,
     get_primitive_type_by_name,
     get_primitive_type_name,
     is_boolean,
@@ -147,25 +144,6 @@ def test_type_conversion_functions():
     assert to_date("invalid") == None
 
 
-def test_conversion_checking_functions():
-    """Test the converts_to_* checking functions."""
-
-    # Boolean conversion checking
-    assert converts_to_boolean("true") == True
-    assert converts_to_boolean("1") == True
-    assert converts_to_boolean("invalid") == False
-
-    # Integer conversion checking
-    assert converts_to_integer("123") == True
-    assert converts_to_integer("12.34") == False
-    assert converts_to_integer("invalid") == False
-
-    # Decimal conversion checking
-    assert converts_to_decimal("12.34") == True
-    assert converts_to_decimal("123") == True
-    assert converts_to_decimal("invalid") == False
-
-
 def test_utility_functions():
     """Test utility functions for working with types."""
 
@@ -228,9 +206,3 @@ def test_edge_cases():
     assert is_date("2023") == True
     assert is_date("2023-12") == True
     assert is_date("2023-12-25") == True
-
-    # Different boolean representations
-    assert converts_to_boolean("yes") == True
-    assert converts_to_boolean("no") == True
-    assert converts_to_boolean("y") == True
-    assert converts_to_boolean("n") == True

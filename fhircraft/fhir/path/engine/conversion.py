@@ -169,14 +169,7 @@ class ConvertsToBoolean(FHIRTypeConversionFunction):
         self.validate_collection(collection)
         if not collection:
             return []
-
-        # Use type_utils for conversion checking
-        from fhircraft.fhir.resources.datatypes.type_utils import converts_to_boolean
-
-        value = collection[0].value
-        result = converts_to_boolean(value)
-
-        return [FHIRPathCollectionItem.wrap(result)]
+        return [FHIRPathCollectionItem.wrap(ToBoolean().evaluate(collection) != [])]
 
 
 class ToInteger(FHIRTypeConversionFunction):
@@ -244,14 +237,7 @@ class ConvertsToInteger(FHIRTypeConversionFunction):
         self.validate_collection(collection)
         if not collection:
             return []
-
-        # Use type_utils for conversion checking
-        from fhircraft.fhir.resources.datatypes.type_utils import converts_to_integer
-
-        value = collection[0].value
-        result = converts_to_integer(value)
-
-        return [FHIRPathCollectionItem.wrap(result)]
+        return [FHIRPathCollectionItem.wrap(ToInteger().evaluate(collection) != [])]
 
 
 class ToDate(FHIRTypeConversionFunction):

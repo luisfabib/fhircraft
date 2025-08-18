@@ -401,47 +401,6 @@ def to_quantity(value: Any) -> Union[Any, None]:
         return None
 
 
-# Conversion checking functions
-def converts_to_boolean(value: Any) -> bool:
-    """Check if value can be converted to FHIR Boolean."""
-    return to_boolean(value) is not None
-
-
-def converts_to_integer(value: Any) -> bool:
-    """Check if value can be converted to FHIR Integer."""
-    return to_integer(value) is not None
-
-
-def converts_to_decimal(value: Any) -> bool:
-    """Check if value can be converted to FHIR Decimal."""
-    return to_decimal(value) is not None
-
-
-def converts_to_date(value: Any) -> bool:
-    """Check if value can be converted to FHIR Date."""
-    return to_date(value) is not None
-
-
-def converts_to_datetime(value: Any) -> bool:
-    """Check if value can be converted to FHIR DateTime."""
-    return to_datetime(value) is not None
-
-
-def converts_to_time(value: Any) -> bool:
-    """Check if value can be converted to FHIR Time."""
-    return to_time(value) is not None
-
-
-def converts_to_quantity(value: Any) -> bool:
-    """Check if value can be converted to FHIR Quantity."""
-    return to_quantity(value) is not None
-
-
-def converts_to_string(value: Any) -> bool:
-    """Check if value can be converted to string."""
-    return to_string(value) is not None
-
-
 # Utility functions for working with type aliases
 def get_primitive_type_name(fhir_type: TypeAliasType) -> str:
     """Get the string name of a FHIR primitive type."""
