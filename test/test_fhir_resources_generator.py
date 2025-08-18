@@ -1,9 +1,9 @@
 import glob
-import importlib
 import json
 import os
 import sys
 import tempfile
+from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
 import pytest
@@ -77,8 +77,12 @@ def _assert_construct_core_resource(version, resource_label, filename):
         with open(temp_file_name, "w") as test_file:
             test_file.write(source_code)
         # Load the Pydantic FHIR model
-        spec = importlib.util.spec_from_file_location("module", temp_file_name)
-        module = importlib.util.module_from_spec(spec)
+        spec = spec_from_file_location("module", temp_file_name)
+        if not spec or not spec.loader:
+            raise ImportError(f"Could not load module from {temp_file_name}")
+        module = module_from_spec(spec)
+        if not module:
+            raise ImportError(f"Could not create module from spec {spec}")
         sys.modules["module.name"] = module
         spec.loader.exec_module(module)
         # Use the auto-generated model to validate a FHIR resource
@@ -175,8 +179,12 @@ def test_construct_profiled_resource(filename):
         with open(temp_file_name, "w") as test_file:
             test_file.write(source_code)
         # Load the Pydantic FHIR model
-        spec = importlib.util.spec_from_file_location("module", temp_file_name)
-        module = importlib.util.module_from_spec(spec)
+        spec = spec_from_file_location("module", temp_file_name)
+        if not spec or not spec.loader:
+            raise ImportError(f"Could not load module from {temp_file_name}")
+        module = module_from_spec(spec)
+        if not module:
+            raise ImportError(f"Could not create module from spec {spec}")
         sys.modules["module.name"] = module
         spec.loader.exec_module(module)
 
