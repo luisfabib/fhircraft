@@ -134,7 +134,7 @@ class ToBoolean(FHIRTypeConversionFunction):
             return []
 
         # Use type_utils for conversion
-        from fhircraft.fhir.resources.datatypes.type_utils import to_boolean
+        from fhircraft.fhir.resources.datatypes.utils import to_boolean
 
         value = collection[0].value
         result = to_boolean(value)
@@ -201,7 +201,7 @@ class ToInteger(FHIRTypeConversionFunction):
             return []
 
         # Use type_utils for conversion
-        from fhircraft.fhir.resources.datatypes.type_utils import to_integer
+        from fhircraft.fhir.resources.datatypes.utils import to_integer
 
         value = collection[0].value
         result = to_integer(value)

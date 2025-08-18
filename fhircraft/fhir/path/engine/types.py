@@ -13,8 +13,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
-from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
-from fhircraft.fhir.resources.datatypes.type_utils import validate_fhir_type
+from fhircraft.fhir.resources.datatypes.utils import validate_fhir_type
 
 
 class FHIRTypesOperator(FHIRPath):

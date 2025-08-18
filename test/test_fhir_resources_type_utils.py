@@ -6,7 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-from fhircraft.fhir.resources.datatypes.type_utils import (  # Type checking functions; Type conversion functions; Complex type utilities; Utility functions
+from fhircraft.fhir.resources.datatypes.utils import (  # Type checking functions; Type conversion functions; Complex type utilities; Utility functions
     FHIRTypeError,
     get_primitive_type_by_name,
     get_primitive_type_name,
