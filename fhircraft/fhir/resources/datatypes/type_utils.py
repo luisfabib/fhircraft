@@ -451,6 +451,8 @@ def validate_fhir_type(
     if isinstance(fhir_type, str):
         if hasattr(primitives, fhir_type):
             fhir_type = getattr(primitives, fhir_type)
+        elif complex_type := get_complex_FHIR_type(fhir_type):
+            fhir_type = complex_type
         else:
             raise FHIRTypeError(f"Unknown FHIR type: {fhir_type}")
 

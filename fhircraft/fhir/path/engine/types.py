@@ -2,6 +2,7 @@
 
 from typing import Any
 
+import fhircraft.fhir.path.engine.literals as fhirpath_literals
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
@@ -10,9 +11,10 @@ from fhircraft.fhir.path.engine.core import (
     Literal,
     This,
 )
-from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
+from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
+from fhircraft.fhir.resources.datatypes.type_utils import validate_fhir_type
 
 
 class FHIRTypesOperator(FHIRPath):
@@ -24,27 +26,49 @@ class FHIRTypesOperator(FHIRPath):
         self.left = left
         self.type_specifier = type_specifier
 
-    def _get_collection_type(
+    def _get_singleton_collection_value(
         self, collection: FHIRPathCollection, create=False
-    ) -> tuple[Any, Any | None]:
+    ) -> Any:
         left_collection = evaluate_fhirpath_collection(self.left, collection, create)
         if len(left_collection) > 1:
             raise FHIRPathRuntimeError(
-                f"FHIRPath operator {self.__str__()} expected a single-item collection for the left expression, instead got a {len(collection)}-items collection."
+                f"FHIRPath operator {self.__str__()} expected a singleton collection for the left expression, instead got a {len(collection)}-items collection."
             )
+        return left_collection[0].value
 
-        type = {
-            "String": str,
-            "Decimal": (int, float),
-            "Integer": int,
-            "Quantity": Quantity,
-            "DateTime": DateTime,
-            "Boolean": bool,
-            "Time": Time,
-            "Date": Date,
-        }.get(self.type_specifier)
-
-        return left_collection[0].value, type
+    def _validate_type_specifier(
+        self, collection: FHIRPathCollection, create: bool
+    ) -> bool:
+        """
+        Validates the type specifier against the known FHIR types.
+        Raises an error if the type specifier is not valid.
+        """
+        type_ = self.type_specifier
+        value = self._get_singleton_collection_value(collection, create)
+        print(
+            "Validating type specifier:",
+            type_,
+            "for value:",
+            value,
+            "of type:",
+            type(value),
+        )
+        # Handle the FHIRPath literal types as special cases
+        if isinstance(value, fhirpath_literals.Quantity):
+            return type_ == "Quantity"
+        elif isinstance(value, fhirpath_literals.Date):
+            return type_ == "Date"
+        elif isinstance(value, fhirpath_literals.DateTime):
+            return type_ == "DateTime"
+        elif isinstance(value, fhirpath_literals.Time):
+            return type_ == "Time"
+        return bool(
+            validate_fhir_type(
+                value,
+                type_,
+                raise_on_error=False,
+            )
+        )
 
     def __str__(self):
         return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.type_specifier.__str__()})"
@@ -91,9 +115,11 @@ class Is(FHIRTypesOperator):
         Raises:
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
-        # TODO: Implement propert type specifier handling
-        value, type = self._get_collection_type(collection, create=create)
-        return [FHIRPathCollectionItem.wrap(isinstance(value, type) if type else [])]
+        return [
+            FHIRPathCollectionItem.wrap(
+                self._validate_type_specifier(collection, create)
+            )
+        ]
 
 
 class LegacyIs(FHIRPathFunction):
@@ -113,7 +139,7 @@ class LegacyIs(FHIRPathFunction):
     def evaluate(
         self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
-        return Is(This(), self.type_specifier).evaluate(collection)
+        return Is(This(), self.type_specifier).evaluate(collection, create)
 
 
 class As(FHIRTypesOperator):
@@ -144,11 +170,10 @@ class As(FHIRTypesOperator):
         Raises:
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
-        # TODO: Implement propert type specifier handling
-        value, type = self._get_collection_type(collection, create=create)
+        value = self._get_singleton_collection_value(collection, create)
         return (
             [FHIRPathCollectionItem.wrap(value)]
-            if type is not None and isinstance(value, type)
+            if self._validate_type_specifier(collection, create)
             else []
         )
 

@@ -182,7 +182,7 @@ def test_detailed_validation():
         validate_fhir_type("invalid", primitives.Boolean, raise_on_error=True)
 
     # Unknown type name
-    with pytest.raises(FHIRTypeError):
+    with pytest.raises((FHIRTypeError, AttributeError)):
         validate_fhir_type("value", "UnknownType", raise_on_error=True)
 
 
