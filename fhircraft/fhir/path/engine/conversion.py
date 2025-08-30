@@ -132,16 +132,15 @@ class ToBoolean(FHIRTypeConversionFunction):
         self.validate_collection(collection)
         if not collection:
             return []
+
+        # Use type_utils for conversion
+        from fhircraft.fhir.resources.datatypes.utils import to_boolean
+
         value = collection[0].value
-        if isinstance(value, str):
-            if value.lower() in ["true", "t", "yes", "y", "1", "1.0"]:
-                return [FHIRPathCollectionItem.wrap(True)]
-            elif value.lower() in ["false", "f", "no", "n", "0", "0.0"]:
-                return [FHIRPathCollectionItem.wrap(False)]
-            else:
-                return []
-        elif isinstance(value, (int, float)):
-            return [FHIRPathCollectionItem.wrap(bool(value))]
+        result = to_boolean(value)
+
+        if result is not None:
+            return [FHIRPathCollectionItem.wrap(result)]
         else:
             return []
 
@@ -155,15 +154,8 @@ class ConvertsToBoolean(FHIRTypeConversionFunction):
         self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
-        If the input collection contains a single item, this function will return `True` if:
-            - the item is a `Boolean`
-            - the item is an `Integer` that is equal to one of the possible integer representations of `Boolean` values
-            - the item is a `Decimal` that is equal to one of the possible decimal representations of `Boolean` values
-            - the item is a `String` that is equal to one of the possible string representations of `Boolean` values
-
-        If the item is not one of the above types, or the item is a `String`, `Integer`, or `Decimal`, but is not equal to one of the possible values convertible to a `Boolean`, the result is false.
-        If the input collection is empty, the result is empty ('[]').
-
+        If the input collection contains a single item, this function will return `True` if the item can be converted to a Boolean, `False` otherwise.
+        If the input collection is empty, the result is empty.
 
         Args:
             collection (FHIRPathCollection): The input collection.
@@ -207,14 +199,15 @@ class ToInteger(FHIRTypeConversionFunction):
         self.validate_collection(collection)
         if not collection:
             return []
+
+        # Use type_utils for conversion
+        from fhircraft.fhir.resources.datatypes.utils import to_integer
+
         value = collection[0].value
-        if isinstance(value, (int, bool)):
-            return [FHIRPathCollectionItem.wrap(int(value))]
-        elif isinstance(value, str):
-            if re.match(r"[+-]?\d", value):
-                return [FHIRPathCollectionItem.wrap(int(value))]
-            else:
-                return []
+        result = to_integer(value)
+
+        if result is not None:
+            return [FHIRPathCollectionItem.wrap(result)]
         else:
             return []
 
@@ -228,12 +221,8 @@ class ConvertsToInteger(FHIRTypeConversionFunction):
         self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
-        If the input collection contains a single item, this function will return `True` if:
-            - the item is an `Integer`
-            - the item is a `String` and is convertible to an integer
-            - the item is a `Boolean`, where `True` results in a 1 and `False` results in a 0.
-        If the item is not one of the above types, or the item is a `String`, but is not convertible to an `Integer`, the result is false.
-        If the input collection is empty, the result is empty ('[]').
+        If the input collection contains a single item, this function will return `True` if the item can be converted to an Integer, `False` otherwise.
+        If the input collection is empty, the result is empty.
 
         Args:
             collection (FHIRPathCollection): The input collection.
