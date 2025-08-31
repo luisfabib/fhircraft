@@ -6,4 +6,3 @@ try:
     fhirpath = FhirPathParser()
 except Exception as e:
     print(traceback.format_exc())
-    print(traceback.format_exc())

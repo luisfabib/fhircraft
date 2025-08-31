@@ -5,6 +5,12 @@ import ply.yacc
 
 import fhircraft.fhir.path.engine.literals as literals
 import fhircraft.fhir.resources.datatypes.primitives as primitives
+from fhircraft.fhir.mapping.ConceptMap import (
+    ConceptMap,
+    ConceptMapElement,
+    ConceptMapGroup,
+    ConceptMapTarget,
+)
 from fhircraft.fhir.mapping.lexer import FhirMappingLanguageLexer
 from fhircraft.fhir.mapping.StructureMap import (
     StructureMap,
@@ -19,6 +25,7 @@ from fhircraft.fhir.mapping.StructureMap import (
     StructureMapTarget,
 )
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
+from fhircraft.fhir.resources.datatypes.utils import is_fhir_type
 from fhircraft.utils import ensure_list
 
 logger = logging.getLogger(__name__)
@@ -44,9 +51,9 @@ def _parse_StructureMapParameter(
         valueInteger=value if isinstance(value, int) else None,
         valueBoolean=value if isinstance(value, bool) else None,
         valueDecimal=value if isinstance(value, float) else None,
-        valueDate=value if isinstance(value, primitives.Date) else None,
-        valueDateTime=value if isinstance(value, primitives.DateTime) else None,
-        valueTime=value if isinstance(value, primitives.Time) else None,
+        valueDate=value if is_fhir_type(value, primitives.Date) else None,  # type: ignore
+        valueDateTime=value if is_fhir_type(value, primitives.DateTime) else None,  # type: ignore
+        valueTime=value if is_fhir_type(value, primitives.Time) else None,  # type: ignore
     )
 
 
@@ -54,7 +61,10 @@ class FhirMappingLanguageParserError(Exception):
     pass
 
 
-class FhirMappingLanguageParser:
+from fhircraft.fhir.path.parser import FhirPathParser
+
+
+class FhirMappingLanguageParser(FhirPathParser):
     """
     An LALR-parser for the FHIR Mapping Language
     """
@@ -80,7 +90,7 @@ class FhirMappingLanguageParser:
         except:
             module_name = __name__
 
-        start_symbol = "map"
+        start_symbol = "structureMap"
         parsing_table_module = "_".join([module_name, start_symbol, "parsetab"])
 
         # Generate the parse table
@@ -123,483 +133,671 @@ class FhirMappingLanguageParser:
                 f'FHIR Mapping Language parser error near the end of string "{self.string}"!'
             )
         raise FhirMappingLanguageParserError(
-            f'FHIR Mapping Language parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col)}'
+            f'FHIR Mapping Language parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col, t.lineno)}'
         )
 
-    def p_map(self, p):
-        """map : map_element
-        | map map_element"""
+    def p_mapper_structureMap(self, p):
+        """structureMap : m_metadata m_mapId m_conceptmap m_structure_list m_imports_list m_const_list m_group_mapper_list"""
+        # Initialize the structure map with the map id
+        self.structureMap.url = p[2]["url"]
+        self.structureMap.name = p[2]["name"]
+
+        for attr, value in p[1].items():
+            setattr(self.structureMap, attr, value)
+
+        if p[3]:
+            self.structureMap.contained = [p[3]]
+
+        # Add structures, imports, constants, and groups
+        if p[4]:
+            self.structureMap.structure = p[4]
+        if p[5]:
+            self.structureMap.imports = p[5]
+        if p[6]:
+            self.structureMap.const = p[6]
+        if p[7]:
+            self.structureMap.group = p[7]
+
         p[0] = self.structureMap
 
-    def p_map_element(self, p):
-        """map_element : structure
-        | imports
-        | const
-        | group
-        | metadata"""
-        if isinstance(p[1], StructureMapConst):
-            if not self.structureMap.const:
-                self.structureMap.const = []
-            self.structureMap.const.append(p[1])
-        elif isinstance(p[1], StructureMapStructure):
-            if not self.structureMap.structure:
-                self.structureMap.structure = []
-            self.structureMap.structure.append(p[1])
-        elif isinstance(p[1], StructureMapGroup):
-            if not getattr(self.structureMap, "group", None):
-                setattr(self.structureMap, "group", [])
-            self.structureMap.group.append(p[1])
-        elif isinstance(p[1], str):
-            if not self.structureMap.imports:
-                self.structureMap.imports = []
-            self.structureMap.imports.append(p[1])
+    def p_mapper_metadata(self, p):
+        """m_metadata : m_metadata m_metadata_entry
+        | m_metadata_entry
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = p[1] if p[1] else {}
+        else:
+            p[0] = {**(p[1] or {}), **p[2]}
+
+    def p_mapper_metadata_entry(self, p):
+        """m_metadata_entry : METADATA_DECLARATION m_identifier EQUAL m_metadata_value"""
+        if len(p) == 5:
+            p[0] = {p[2]: p[4]}
+        else:
+            p[0] = {}
+
+    def p_mapper_metadata_value(self, p):
+        """m_metadata_value : m_literal
+        | m_empty"""
         p[0] = p[1]
 
-    def p_structure(self, p):
-        """structure : USES url AS model_mode
-        | USES url ALIAS IDENTIFIER AS model_mode"""
-        p[0] = StructureMapStructure(
-            url=p[2],
-            mode=p[4] if len(p) == 5 else p[6],
-            alias=None if len(p) == 5 else p[4],
-        )
-
-    def p_imports(self, p):
-        """imports : IMPORTS url"""
-        p[0] = p[2]
-
-    def p_const(self, p):
-        """const : LET IDENTIFIER '=' literal ';'
-        | LET IDENTIFIER '=' fhirpath ';'"""
-        p[0] = StructureMapConst(name=p[2], value=str(p[4]))
-
-    def p_metadata(self, p):
-        """metadata : '/' '/' '/' IDENTIFIER '=' literal"""
-        p[0] = setattr(self.structureMap, p[4], p[6])
-
-    def p_group(self, p):
-        """group : GROUP IDENTIFIER parameters group_optional_arguments rules"""
-        p[0] = StructureMapGroup(
-            name=p[2],
-            input=p[3],
-            rule=p[5],
-            extends=p[4].get("extends"),
-            typeMode=p[4].get("type_mode"),
-        )
-
-    def p_group_optional_arguments(self, p):
-        """group_optional_arguments : group_optional_argument
-        | group_optional_argument group_optional_argument
-        | group_optional_arguments group_optional_arguments"""
-        if len(p) > 2:
-            p[0] = {**p[1], **p[2]}
+    def p_mapper_mapId(self, p):
+        """m_mapId : MAP m_url EQUAL m_identifier
+        | MAP m_url EQUAL STRING
+        | m_empty"""
+        if len(p) == 5:
+            p[0] = {"url": p[2], "name": p[4]}
         else:
-            p[0] = p[1]
+            p[0] = {"url": None, "name": None}
 
-    def p_group_optional_argument_empty(self, p):
-        """group_optional_argument : empty"""
-        p[0] = {}
-
-    def p_group_optiona_argument_extends(self, p):
-        """group_optional_argument : extends"""
-        p[0] = {"extends": p[1]}
-
-    def p_group_optiona_argument_type_mode(self, p):
-        """group_optional_argument : type_mode"""
-        p[0] = {"type_mode": p[1]}
-
-    def p_rules(self, p):
-        """rules : '{' rule_list '}'
-        | '{' rule '}'
-        | '{' empty '}'"""
-        if p[2]:
-            p[0] = ensure_list(p[2])
-        else:
+    def p_conceptmap(self, p):
+        """m_conceptmap : CONCEPTMAP m_conceptmap_name '{' m_conceptmap_prefix_list  m_conceptmap_mapping_list '}'
+        | m_empty"""
+        if len(p) == 2:
             p[0] = None
-
-    def p_rule_list(self, p):
-        """rule_list : rule rule
-        | rule_list rule"""
-        p[0] = ensure_list(p[1]) + ensure_list(p[2])
-
-    def p_type_mode(self, p):
-        """type_mode : '<' '<' group_type_mode '>' '>'"""
-        p[0] = p[3]
-
-    def p_extends(self, p):
-        """extends : EXTENDS IDENTIFIER"""
-        p[0] = p[2]
-
-    def p_parameters(self, p):
-        """parameters : '(' parameter ')'
-        | '(' parameter_list ')'"""
-        p[0] = p[2]
-
-    def p_parameter_list(self, p):
-        """parameter_list : parameter_list ',' parameter
-        | parameter ',' parameter"""
-        p[0] = ensure_list(p[1]) + ensure_list(p[3])
-
-    def p_parameter(self, p):
-        """parameter : input_mode IDENTIFIER
-        | input_mode IDENTIFIER ':' IDENTIFIER"""
-        p[0] = StructureMapInput(
-            mode=p[1], name=p[2], type=p[4] if len(p) == 5 else None
-        )
-
-    def p_rule(self, p):
-        """rule : rule_sources rule_arguments ';'
-        | rule_sources RIGHT_ARROW rule_targets rule_arguments ';'
-        """
-        p[0] = StructureMapRule(
-            source=p[1],
-            target=p[3] if p[2] == "->" else None,
-            dependent=p[4].get("dependent") if p[2] == "->" else p[2].get("rule_name"),
-            rule=(
-                p[4].get("contained_rules")
-                if p[2] == "->"
-                else p[2].get("contained_rules")
-            ),
-            name=p[4].get("rule_name") if p[2] == "->" else p[2].get("rule_name"),
-        )
-
-    def p_rule_arguments(self, p):
-        """rule_arguments : rule_argument
-        | rule_argument rule_argument
-        | rule_arguments rule_argument"""
-        if len(p) > 2:
-            p[0] = {**p[1], **p[2]}
+        elif len(p[4]) != 2:
+            raise FhirMappingLanguageParserError(
+                f"Invalid concept map prefix definition at {p.lineno}:{p.col}"
+            )
         else:
-            p[0] = p[1]
-
-    def p_rule_argument_empty(self, p):
-        """rule_argument : empty"""
-        p[0] = {}
-
-    def p_rule_argument_dependent(self, p):
-        """rule_argument : dependent"""
-        p[0] = {"dependent": p[1]}
-
-    def p_rule_argument_contained_rules(self, p):
-        """rule_argument : contained_rules"""
-        p[0] = {"contained_rules": p[1]}
-
-    def p_rule_argument_rule_name(self, p):
-        """rule_argument : rule_name"""
-        p[0] = {"rule_name": p[1]}
-
-    def p_rule_name(self, p):
-        """rule_name : STRING"""
-        p[0] = p[1]
-
-    def p_rule_sources(self, p):
-        """rule_sources : rule_source
-        | rule_source_list"""
-        p[0] = ensure_list(p[1])
-
-    def p_rule_source_list(self, p):
-        """rule_source_list : rule_source ',' rule_source
-        | rule_source_list ',' rule_source"""
-        p[0] = ensure_list(p[1]) + ensure_list(p[3])
-
-    def p_rule_source(self, p):
-        """rule_source : rule_context rule_element rule_source_arguments"""
-        p[0] = StructureMapSource(
-            context=p[1],
-            element=p[2],
-            min=p[3].get("source_cardinality", [None, None])[0],
-            max=p[3].get("source_cardinality", [None, None])[1],
-            type=p[3].get("source_type"),
-            defaultValue=p[3].get("source_default"),
-            listMode=p[3].get("source_list_mode"),
-            variable=p[3].get("alias"),
-            condition=p[3].get("where_clause"),
-            check=p[3].get("check_clause"),
-            logMessage=p[3].get("log"),
-        )
-
-    def p_rule_source_arguments(self, p):
-        """rule_source_arguments : rule_source_argument
-        | rule_source_argument rule_source_argument
-        | rule_source_arguments rule_source_argument"""
-        if len(p) > 2:
-            p[0] = {**p[1], **p[2]}
-        else:
-            p[0] = p[1]
-
-    def p_rule_source_argument_empty(self, p):
-        """rule_source_argument : empty"""
-        p[0] = {}
-
-    def p_rule_source_argument_source_type(self, p):
-        """rule_source_argument : source_type"""
-        p[0] = {"source_type": p[1]}
-
-    def p_rule_source_argument_source_cardinality(self, p):
-        """rule_source_argument : source_cardinality"""
-        p[0] = {"source_cardinality": p[1]}
-
-    def p_rule_source_argument_source_default(self, p):
-        """rule_source_argument : source_default"""
-        p[0] = {"source_default": p[1]}
-
-    def p_rule_source_argument_source_list_mode(self, p):
-        """rule_source_argument : source_list_mode"""
-        p[0] = {"source_list_mode": p[1]}
-
-    def p_rule_source_argument_alias(self, p):
-        """rule_source_argument : alias"""
-        p[0] = {"alias": p[1]}
-
-    def p_rule_source_argument_where_clause(self, p):
-        """rule_source_argument : where_clause"""
-        p[0] = {"where_clause": p[1]}
-
-    def p_rule_source_argument_check_clause(self, p):
-        """rule_source_argument : check_clause"""
-        p[0] = {"check_clause": p[1]}
-
-    def p_rule_source_argument_log(self, p):
-        """rule_source_argument : log"""
-        p[0] = {"log": p[1]}
-
-    def p_rule_targets(self, p):
-        """rule_targets : rule_target
-        | rule_target_list"""
-        p[0] = ensure_list(p[1])
-
-    def p_rule_target_list(self, p):
-        """rule_target_list : rule_target ',' rule_target
-        | rule_target_list ',' rule_target"""
-        p[0] = ensure_list(p[1]) + ensure_list(p[3])
-
-    def p_source_type(self, p):
-        """source_type : IDENTIFIER"""
-        p[0] = p[1]
-
-    def p_source_cardinality(self, p):
-        """source_cardinality : INTEGER '.' '.' upper_bound"""
-        p[0] = [p[1], p[4]]
-
-    def p_upper_bound(self, p):
-        """upper_bound : INTEGER
-        | '*'"""
-        p[0] = p[1]
-
-    def p_rule_context(self, p):
-        """rule_context : IDENTIFIER"""
-        p[0] = p[1]
-
-    def p_rule_element(self, p):
-        """rule_element : '.' IDENTIFIER"""
-        p[0] = p[2]
-
-    def p_source_default(self, p):
-        """source_default : DEFAULT '(' fhirpath ')'"""
-        p[0] = p[3]
-
-    def p_alias(self, p):
-        """alias : AS IDENTIFIER"""
-        p[0] = p[2]
-
-    def p_where_clause(self, p):
-        """where_clause : WHERE '(' fhirpath ')'"""
-        p[0] = p[3]
-
-    def p_check_clause(self, p):
-        """check_clause : CHECK '(' fhirpath ')'"""
-        p[0] = p[3]
-
-    def p_log(self, p):
-        """log : LOG '(' fhirpath ')'"""
-        p[0] = p[3]
-
-    def p_dependent(self, p):
-        """dependent : THEN invocations"""
-        p[0] = [
-            StructureMapDependent(
-                name=invocation["name"],
-                parameter=[
-                    _parse_StructureMapParameter(value)
-                    for value in invocation["parameter"]
+            source = p[4][0]
+            target = p[4][1]
+            p[0] = ConceptMap(
+                resourceType="ConceptMap",
+                status="draft",
+                name=p[2],
+                group=[
+                    ConceptMapGroup(
+                        source=source,
+                        target=target,
+                        element=p[5],
+                    )
                 ],
             )
-            for invocation in p[2]
-        ]
 
-    def p_contained_rules(self, p):
-        """contained_rules : THEN rules"""
+    def p_conceptmap_name(self, p):
+        """m_conceptmap_name : m_identifier
+        | STRING"""
+        p[0] = p[1]
+
+    def p_conceptmap_prefix_list(self, p):
+        """m_conceptmap_prefix_list : m_conceptmap_prefix_list m_conceptmap_prefix
+        | m_conceptmap_prefix
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = [p[1]] if p[1] else None
+        else:
+            p[0] = (p[1] or []) + [p[2]]
+
+    def p_conceptmap_prefix(self, p):
+        """m_conceptmap_prefix : PREFIX m_identifier EQUAL m_url"""
+        p[0] = p[4]
+
+    def p_conceptmap_mapping_list(self, p):
+        """m_conceptmap_mapping_list : m_conceptmap_mapping_list m_conceptmap_mapping
+        | m_conceptmap_mapping
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = [p[1]] if p[1] else None
+        else:
+            p[0] = (p[1] or []) + [p[2]]
+
+    def p_conceptmap_mapping(self, p):
+        """m_conceptmap_mapping : m_identifier ':' m_conceptmap_code m_conceptmap_mapping_operator m_identifier ':' m_conceptmap_code"""
+        p[0] = ConceptMapElement(
+            code=p[3], target=[ConceptMapTarget(code=p[7], relationship=p[4])]
+        )
+
+    def p_conceptmap_code(self, p):
+        """m_conceptmap_code : m_identifier
+        | STRING"""
+        p[0] = p[1]
+
+    def p_conceptmap_mapping_operator(self, p):
+        """m_conceptmap_mapping_operator : EQUAL
+        | NOT_EQUAL
+        | DOUBLE_EQUAL
+        | GREATER_EQUAL_THAN
+        | LESS_EQUAL_THAN"""
+        if p[1] == "==":
+            p[0] = "equivalent"
+        elif p[1] == "=":
+            p[0] = "related-to"
+        elif p[1] == "!=":
+            p[0] = "not-related-to"
+        elif p[1] == ">=":
+            p[0] = "source-is-broader-than-target"
+        elif p[1] == "<=":
+            p[0] = "source-is-narrower-than-target"
+
+    def p_mapper_url(self, p):
+        """m_url : DELIMITEDIDENTIFIER
+        | STRING"""
+        p[0] = p[1]
+
+    def p_mapper_identifier(self, p):
+        """m_identifier : IDENTIFIER
+        | DELIMITEDIDENTIFIER
+        | ROOT_NODE"""
+        p[0] = p[1]
+
+    def p_mapper_structure_list(self, p):
+        """m_structure_list : m_structure_list m_structure
+        | m_structure
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = [p[1]] if p[1] else None
+        else:
+            p[0] = (p[1] or []) + [p[2]]
+
+    def p_mapper_imports_list(self, p):
+        """m_imports_list : m_imports_list m_imports
+        | m_imports
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = [p[1]] if p[1] else None
+        else:
+            p[0] = (p[1] or []) + [p[2]]
+
+    def p_mapper_const_list(self, p):
+        """m_const_list : m_const_list m_const
+        | m_const
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = [p[1]] if p[1] else None
+        else:
+            p[0] = (p[1] or []) + [p[2]]
+
+    def p_mapper_group_mapper_list(self, p):
+        """m_group_mapper_list : m_group_mapper_list m_group
+        | m_group
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = [p[1]] if p[1] else None
+        else:
+            p[0] = (p[1] or []) + [p[2]]
+
+    def p_mapper_structure(self, p):
+        """m_structure : USES m_url m_structureAlias AS m_modelMode
+        | USES m_url AS m_modelMode"""
+        p[0] = StructureMapStructure(
+            url=p[2],
+            mode=p[5] if len(p) == 6 else p[4],
+            alias=p[3] if len(p) == 6 else None,
+        )
+
+    def p_mapper_structureAlias(self, p):
+        """m_structureAlias : ALIAS m_identifier"""
         p[0] = p[2]
 
-    def p_rule_target_invocation(self, p):
-        """rule_target : invocation
-        | invocation alias"""
-        p[0] = StructureMapTarget(
-            transform=p[1]["name"],
-            parameter=p[1]["parameter"],
-            variable=p[2] if len(p) == 3 else None,
-        )
-
-    def p_rule_target_context(self, p):
-        """rule_target : rule_context rule_element rule_target_optionals"""
-        p[0] = StructureMapTarget(
-            context=p[1],
-            element=p[2],
-            variable=p[3].get("alias"),
-            listMode=p[3].get("target_list_mode"),
-        )
-
-    def p_rule_target_context_implicit_copy(self, p):
-        """rule_target : rule_context rule_element '=' rule_context rule_target_optionals"""
-        p[0] = StructureMapTarget(
-            context=p[1],
-            element=p[2],
-            variable=p[5].get("alias"),
-            listMode=p[5].get("target_list_mode"),
-            transform="copy",
-            parameter=[StructureMapParameter(valueId=p[4])],
-        )
-
-    def p_rule_target_context_copy_literal(self, p):
-        """rule_target : rule_context rule_element '=' literal rule_target_optionals"""
-        p[0] = StructureMapTarget(
-            context=p[1],
-            element=p[2],
-            variable=p[5].get("alias"),
-            listMode=p[5].get("target_list_mode"),
-            transform="copy",
-            parameter=[_parse_StructureMapParameter(p[4])],
-        )
-
-    def p_rule_target_context_invocation(self, p):
-        """rule_target : rule_context rule_element '=' invocation rule_target_optionals"""
-        p[0] = StructureMapTarget(
-            context=p[1],
-            element=p[2],
-            variable=p[5].get("alias"),
-            listMode=p[5].get("target_list_mode"),
-            transform=p[4]["name"],
-            parameter=p[4]["parameter"],
-        )
-
-    def p_rule_target_optionals(self, p):
-        """rule_target_optionals : rule_target_optional
-        | rule_target_optionals rule_target_optional"""
-        if len(p) > 2:
-            p[0] = {**p[1], **p[2]}
-        else:
-            p[0] = p[1]
-
-    def p_rule_target_optional_empty(self, p):
-        """rule_target_optional : empty"""
-        p[0] = {}
-
-    def p_rule_target_optional_alias(self, p):
-        """rule_target_optional : alias"""
-        p[0] = {"alias": p[1]}
-
-    def p_rule_target_optional_target_list_mode(self, p):
-        """rule_target_optional : target_list_mode"""
-        p[0] = {"target_list_mode": p[1]}
-
-    def p_transform(self, p):
-        """transform : literal
-        | rule_context
-        | invocation"""
-        p[0] = p[1]
-
-    def p_invocations(self, p):
-        """invocations : invocation
-        | invocation_list"""
-        p[0] = ensure_list(p[1])
-
-    def p_invocation_list(self, p):
-        """invocation_list : invocation ',' invocation
-        | invocation_list ',' invocation"""
-        p[0] = ensure_list(p[1]) + ensure_list(p[3])
-
-    def p_invocation(self, p):
-        """invocation : IDENTIFIER '(' param_list ')'
-        | IDENTIFIER '(' param ')'"""
-        p[0] = {"name": p[1], "parameter": ensure_list(p[3])}
-
-    def p_param_list(self, p):
-        """param_list : param ',' param
-        | param_list ',' param"""
-        p[0] = ensure_list(p[1]) + ensure_list(p[3])
-
-    def p_param_id(self, p):
-        """param : IDENTIFIER"""
-        p[0] = StructureMapParameter(valueId=p[1])
-
-    def p_param_literal(self, p):
-        """param : literal"""
-        p[0] = _parse_StructureMapParameter(p[1])
-
-    def p_fhirpath(self, p):
-        """fhirpath : STRING"""
-        p[0] = p[1]
-
-    def p_literal(self, p):
-        """literal : INTEGER
-        | STRING
-        | BOOLEAN
-        | DECIMAL
-        | date
-        | time
-        | datetime"""
-        p[0] = p[1]
-
-    def p_group_type_mode(self, p):
-        """group_type_mode : TYPES
-        | TYPE '+'"""
-        p[0] = p[1] if len(p) == 2 else "type+"
-
-    def p_source_list_mode(self, p):
-        """source_list_mode : FIRST
-        | NOT_FIRST
-        | LAST
-        | NOT_LAST
-        | ONLY_ONE"""
-        p[0] = p[1]
-
-    def p_target_list_mode(self, p):
-        """target_list_mode : FIRST
-        | SHARE
-        | LAST
-        | SINGLE"""
-        p[0] = p[1]
-
-    def p_input_mode(self, p):
-        """input_mode : SOURCE
-        | TARGET"""
-        p[0] = p[1]
-
-    def p_model_mode(self, p):
-        """model_mode : SOURCE
+    def p_mapper_modelMode(self, p):
+        """m_modelMode : SOURCE
         | QUERIED
         | TARGET
         | PRODUCED"""
         p[0] = p[1]
 
-    def p_url(self, p):
-        "url : STRING"
+    def p_mapper_imports(self, p):
+        """m_imports : IMPORTS m_url"""
+        p[0] = p[2]
+
+    def p_mapper_const(self, p):
+        """m_const : LET m_identifier EQUAL m_fhirPath ';'"""
+        p[0] = StructureMapConst(name=p[2], value=str(p[4]))
+
+    def p_mapper_group(self, p):
+        """m_group : GROUP m_identifier m_parameters m_extends GROUPTYPE m_rules
+        | GROUP m_identifier m_parameters m_extends m_rules
+        | GROUP m_identifier m_parameters GROUPTYPE m_rules
+        | GROUP m_identifier m_parameters m_rules"""
+        # Parse optional arguments
+        extends = None
+        typeMode = None
+        rules = None
+
+        if len(p) == 7:  # all optional args present
+            extends = p[4]
+            typeMode = p[5]
+            rules = p[6]
+        elif len(p) == 6:  # one optional arg present
+            if isinstance(p[4], str) and p[4] not in [
+                "types",
+                "type-and-types",
+            ]:  # extends
+                extends = p[4]
+                rules = p[5]
+            else:  # typeMode
+                typeMode = p[4]
+                rules = p[5]
+        else:  # no optional args
+            rules = p[4]
+
+        p[0] = StructureMapGroup(
+            name=p[2],
+            input=p[3],
+            rule=rules,
+            extends=extends,
+            typeMode=typeMode,
+        )
+
+    def p_mapper_parameters(self, p):
+        """m_parameters : '(' m_parameter_list ')'
+        | '(' m_parameter ')'"""
+        p[0] = ensure_list(p[2])
+
+    def p_mapper_parameter_list(self, p):
+        """m_parameter_list : m_parameter ',' m_parameter
+        | m_parameter_list ',' m_parameter"""
+        p[0] = ensure_list(p[1]) + ensure_list(p[3])
+
+    def p_mapper_parameter(self, p):
+        """m_parameter : m_inputMode m_identifier m_type
+        | m_inputMode m_identifier"""
+        p[0] = StructureMapInput(
+            mode=p[1], name=p[2], type=p[3] if len(p) == 4 else None
+        )
+
+    def p_mapper_type(self, p):
+        """m_type : ':' m_identifier"""
+        p[0] = p[2]
+
+    def p_mapper_inputMode(self, p):
+        """m_inputMode : SOURCE
+        | TARGET"""
         p[0] = p[1]
 
-    def p_time(self, p):
-        "time : TIME"
+    def p_mapper_extends(self, p):
+        """m_extends : EXTENDS m_identifier"""
+        p[0] = p[2]
+
+    def p_mapper_rules(self, p):
+        """m_rules : '{' m_rule_list '}'
+        | '{' '}'"""
+        if len(p) == 4:
+            p[0] = p[2]
+        else:
+            p[0] = None
+
+    def p_mapper_rule_list(self, p):
+        """m_rule_list : m_rule
+        | m_rule_list m_rule
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = [p[1]] if p[1] else None
+        else:
+            p[0] = (p[1] or []) + [p[2]]
+
+    def p_mapper_rule(self, p):
+        """m_rule : m_ruleSources RIGHT_ARROW m_ruleTargets m_dependent m_ruleName ';'"""
+        sources = p[1]
+        targets = p[3]
+        dependent = p[4]
+        rule_name = p[5]
+        p[0] = StructureMapRule(
+            source=sources, target=targets, name=rule_name, **dependent
+        )
+
+    def p_mapper_rule_arrow_targets_dependent(self, p):
+        """m_rule : m_ruleSources RIGHT_ARROW m_ruleTargets m_dependent ';'"""
+        sources = p[1]
+        targets = p[3]
+        dependent = p[4]
+        p[0] = StructureMapRule(source=sources, target=targets, **dependent)
+
+    def p_mapper_rule_arrow_targets_name(self, p):
+        """m_rule : m_ruleSources RIGHT_ARROW m_ruleTargets m_ruleName ';'"""
+        sources = p[1]
+        targets = p[3]
+        rule_name = p[4]
+        p[0] = StructureMapRule(
+            source=sources,
+            target=targets,
+            name=rule_name,
+        )
+
+    def p_mapper_rule_arrow_targets(self, p):
+        """m_rule : m_ruleSources RIGHT_ARROW m_ruleTargets ';'"""
+        sources = p[1]
+        targets = p[3]
+        p[0] = StructureMapRule(
+            source=sources,
+            target=targets,
+        )
+
+    def p_mapper_rule_dependent_name(self, p):
+        """m_rule : m_ruleSources m_dependent m_ruleName ';'"""
+        sources = p[1]
+        dependent = p[2]
+        rule_name = p[3]
+        p[0] = StructureMapRule(source=sources, name=rule_name, **dependent)
+
+    def p_mapper_rule_dependent(self, p):
+        """m_rule : m_ruleSources m_dependent ';'"""
+        sources = p[1]
+        dependent = p[2]
+        p[0] = StructureMapRule(source=sources, **dependent)
+
+    def p_mapper_rule_name(self, p):
+        """m_rule : m_ruleSources m_ruleName ';'"""
+        sources = p[1]
+        rule_name = p[2]
+        p[0] = StructureMapRule(
+            source=sources,
+            name=rule_name,
+        )
+
+    def p_mapper_rule_sources(self, p):
+        """m_rule : m_ruleSources ';'"""
+        sources = p[1]
+        p[0] = StructureMapRule(
+            source=sources,
+        )
+
+    def p_mapper_ruleName(self, p):
+        """m_ruleName : m_identifier
+        | STRING"""
+        p[0] = p[1]
+
+    def p_mapper_ruleSources(self, p):
+        """m_ruleSources : m_ruleSource
+        | m_ruleSources ',' m_ruleSource"""
+        if len(p) == 2:
+            p[0] = [p[1]]
+        else:
+            p[0] = p[1] + [p[3]]
+
+    def p_mapper_ruleTargets(self, p):
+        """m_ruleTargets : m_ruleTarget
+        | m_ruleTargets ',' m_ruleTarget"""
+        if len(p) == 2:
+            p[0] = [p[1]]
+        else:
+            p[0] = p[1] + [p[3]]
+
+    def p_mapper_ruleSource(self, p):
+        """m_ruleSource : m_ruleContext m_source_modifiers"""
+        if "." in p[1]:
+            context, element = p[1].split(".")
+        else:
+            context = p[1]
+            element = None
+        modifiers = p[2] or {}
+
+        min_value = modifiers.get("min")
+        max_value = modifiers.get("max")
+        p[0] = StructureMapSource(
+            context=context,
+            element=element,
+            min=str(min_value) if min_value is not None else None,
+            max=str(max_value) if max_value is not None else None,
+            type=modifiers.get("type"),
+            defaultValue=modifiers.get("default"),
+            listMode=modifiers.get("listMode"),
+            variable=modifiers.get("variable"),
+            condition=modifiers.get("condition"),
+            check=modifiers.get("check"),
+            logMessage=modifiers.get("log"),
+        )
+
+    def p_mapper_source_modifiers(self, p):
+        """m_source_modifiers : m_source_modifiers m_source_modifier
+        | m_source_modifier
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = p[1] if p[1] else {}
+        else:
+            result = p[1] or {}
+            modifier = p[2] or {}
+            result.update(modifier)
+            p[0] = result
+
+    def p_mapper_source_modifier(self, p):
+        """m_source_modifier : m_sourceType
+        | m_sourceCardinality
+        | m_sourceDefault
+        | m_sourceListMode
+        | m_alias
+        | m_whereClause
+        | m_checkClause
+        | m_log"""
+        p[0] = p[1]
+
+    def p_mapper_ruleContext(self, p):
+        """m_ruleContext : m_identifier
+        | m_ruleContext '.' m_identifier"""
+        if len(p) == 2:
+            p[0] = p[1]
+        else:
+            p[0] = p[1] + "." + p[3]
+
+    def p_mapper_sourceType(self, p):
+        """m_sourceType : ':' m_identifier"""
+        p[0] = {"type": p[2]}
+
+    def p_mapper_sourceCardinality(self, p):
+        """m_sourceCardinality : INTEGER '.' '.' m_upperBound"""
+        p[0] = {"min": p[1], "max": p[4]}
+
+    def p_mapper_upperBound(self, p):
+        """m_upperBound : INTEGER
+        | '*'"""
+        p[0] = p[1]
+
+    def p_mapper_sourceDefault(self, p):
+        """m_sourceDefault : DEFAULT '(' m_fhirPath ')'"""
+        p[0] = {"default": p[3]}
+
+    def p_mapper_sourceListMode(self, p):
+        """m_sourceListMode : FIRST
+        | NOT_FIRST
+        | LAST
+        | NOT_LAST
+        | ONLY_ONE"""
+        p[0] = {"listMode": p[1]}
+
+    def p_mapper_alias(self, p):
+        """m_alias : AS m_identifier"""
+        p[0] = {"variable": p[2]}
+
+    def p_mapper_whereClause(self, p):
+        """m_whereClause : WHERE '(' m_fhirPath ')'"""
+        p[0] = {"condition": p[3]}
+
+    def p_mapper_checkClause(self, p):
+        """m_checkClause : CHECK '(' m_fhirPath ')'"""
+        p[0] = {"check": p[3]}
+
+    def p_mapper_log(self, p):
+        """m_log : LOG '(' m_fhirPath ')'"""
+        p[0] = {"log": p[3]}
+
+    def p_mapper_ruleTarget(self, p):
+        """m_ruleTarget : m_ruleContext EQUAL m_transform m_target_modifiers
+        | m_ruleContext m_target_modifiers
+        | m_invocation m_target_modifiers"""
+
+        if len(p) == 5:  # context = transform modifiers
+            if "." in p[1]:
+                context, element = p[1].split(".")
+            else:
+                context = p[1]
+                element = None
+            transform = p[3]
+            modifiers = p[4] or {}
+            p[0] = StructureMapTarget(
+                context=context,
+                element=element,
+                variable=modifiers.get("variable"),
+                listMode=modifiers.get("listMode"),
+                transform=(
+                    transform.get("name") if isinstance(transform, dict) else "copy"
+                ),
+                parameter=(
+                    transform.get("parameter")
+                    if isinstance(transform, dict)
+                    else transform if isinstance(transform, list) else [transform]
+                ),
+            )
+        elif len(p) == 3 and isinstance(p[1], dict):  # invocation modifiers
+            invocation = p[1]
+            modifiers = p[2] or {}
+
+            p[0] = StructureMapTarget(
+                transform=invocation.get("name"),
+                parameter=invocation.get("parameter"),
+                variable=modifiers.get("variable"),
+                listMode=modifiers.get("listMode"),
+            )
+        else:  # context modifiers
+            if "." in p[1]:
+                context, element = p[1].split(".")
+            else:
+                context = p[1]
+                element = None
+            modifiers = p[2] or {}
+            list_mode = modifiers.get("listMode")
+            p[0] = StructureMapTarget(
+                context=context,
+                element=element,
+                variable=modifiers.get("variable"),
+                listMode=[list_mode] if list_mode else None,
+            )
+
+    def p_mapper_target_modifiers(self, p):
+        """m_target_modifiers : m_target_modifiers m_target_modifier
+        | m_target_modifier
+        | m_empty"""
+        if len(p) == 2:
+            p[0] = p[1] if p[1] else {}
+        else:
+            result = p[1] or {}
+            modifier = p[2] or {}
+            result.update(modifier)
+            p[0] = result
+
+    def p_mapper_target_modifier(self, p):
+        """m_target_modifier : m_alias
+        | m_targetListMode"""
+        p[0] = p[1]
+
+    def p_mapper_targetListMode(self, p):
+        """m_targetListMode : FIRST
+        | SHARE
+        | LAST
+        | SINGLE"""
+        p[0] = {"listMode": p[1]}
+
+    def p_mapper_transform(self, p):
+        """m_transform : m_transform_invocation
+        | m_transform_rule_context
+        | m_transform_literal"""
+        p[0] = p[1]
+
+    def p_mapper_transform_rule_context(self, p):
+        """m_transform_rule_context : m_ruleContext"""
+        p[0] = StructureMapParameter(valueId=p[1])
+
+    def p_mapper_transform_literal(self, p):
+        """m_transform_literal : m_literal"""
+        p[0] = _parse_StructureMapParameter(p[1])
+
+    def p_mapper_transform_invocation(self, p):
+        """m_transform_invocation : m_invocation"""
+        p[0] = p[1]
+
+    def p_mapper_dependent_rules(self, p):
+        """m_dependent : THEN m_rules"""
+        p[0] = {"rule": p[2]}
+
+    def p_mapper_dependent_invocation_list(self, p):
+        """m_dependent : THEN m_invocation_list"""
+        p[0] = {
+            "dependent": [
+                StructureMapDependent(
+                    name=invocation.get("name"),
+                    parameter=invocation.get("parameter"),
+                )
+                for invocation in p[2]
+            ]
+        }
+
+    def p_mapper_dependent_mixed(self, p):
+        """m_dependent : THEN m_invocation_list m_rules"""
+        p[0] = {
+            "dependent": [
+                StructureMapDependent(
+                    name=invocation.get("name"),
+                    parameter=invocation.get("parameter"),
+                )
+                for invocation in p[2]
+            ],
+            "rule": p[3],
+        }
+
+    def p_mapper_invocation_list(self, p):
+        """m_invocation_list : m_invocation
+        | m_invocation_list ',' m_invocation"""
+        if len(p) == 2:
+            p[0] = [p[1]]
+        else:
+            p[0] = p[1] + [p[3]]
+
+    def p_mapper_invocation(self, p):
+        """m_invocation : m_identifier '(' m_paramList ')'
+        | m_identifier '(' ')'"""
+        p[0] = {"name": p[1], "parameter": p[3] if len(p) == 5 else []}
+
+    def p_mapper_paramList(self, p):
+        """m_paramList : m_param
+        | m_paramList ',' m_param"""
+        if len(p) == 2:
+            p[0] = [p[1]]
+        else:
+            p[0] = p[1] + [p[3]]
+
+    def p_mapper_param(self, p):
+        """m_param : m_param_id
+        | m_param_literal"""
+        p[0] = p[1]
+
+    def p_mapper_param_literal(self, p):
+        """m_param_literal : m_literal"""
+        p[0] = _parse_StructureMapParameter(p[1])
+
+    def p_mapper_param_id(self, p):
+        """m_param_id : m_identifier"""
+        p[0] = StructureMapParameter(valueId=p[1])
+
+    def p_mapper_fhirPath(self, p):
+        """m_fhirPath : expression"""
+        print("FHIRPATH", p[1], "->", str(p[1]))
+        p[0] = str(p[1])
+
+    def p_mapper_literal(self, p):
+        """m_literal : INTEGER
+        | ROOT_NODE
+        | STRING
+        | BOOLEAN
+        | DECIMAL
+        | m_date
+        | m_time
+        | m_datetime"""
+        p[0] = p[1]
+
+    def p_mapper_time(self, p):
+        "m_time : TIME"
         p[0] = literals.Time(p[1])
 
-    def p_date(self, p):
-        "date : DATE"
+    def p_mapper_date(self, p):
+        "m_date : DATE"
         p[0] = literals.Date(p[1])
 
-    def p_datetime(self, p):
-        "datetime : DATETIME"
+    def p_mapper_datetime(self, p):
+        "m_datetime : DATETIME"
         p[0] = literals.DateTime(p[1])
 
-    def p_empty(self, p):
-        """empty :"""
+    def p_mapper_empty(self, p):
+        """m_empty :"""
         p[0] = None
 
 

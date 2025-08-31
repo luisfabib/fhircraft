@@ -394,6 +394,9 @@ class Matches(StringManipulationFunction):
             raise FHIRPathError("Matches() argument must be a string.")
         self.regex = regex
 
+    def __str__(self):
+        return f"matches('{self.regex}')"
+
     def evaluate(
         self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:

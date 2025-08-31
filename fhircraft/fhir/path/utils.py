@@ -56,8 +56,29 @@ def join_fhirpath(*segments: str) -> str:
     return ".".join((str(segment).strip(".") for segment in segments if segment != ""))
 
 
-def _underline_error_in_fhir_path(fhir_path, error, error_position):
-    return f'{fhir_path[:error_position+len(str(error))+15]}...\n{" "*error_position}{"—"*len(str(error))}'
+def _underline_error_in_fhir_path(text, error, error_position, line_number=None):
+    """
+    Underlines the error in a FHIR path string, supporting multiline strings and optional line number.
+
+    Args:
+        text (str): The FHIR path string (may be multiline).
+        error (Any): The error object or message.
+        error_position (int): The position (character index) of the error in the string.
+        line_number (int, optional): The line number where the error occurred (1-based).
+
+    Returns:
+        str: A string with the error underlined, optionally prefixed with the line number.
+    """
+    lines = text.splitlines()
+    if line_number is not None and 1 <= line_number <= len(lines):
+        line = lines[line_number - 1]
+        line_offset = sum(len(l) + 1 for l in lines[: line_number - 1])  # +1 for '\n'
+        error_pos_in_line = error_position - 1
+        underline = " " * error_pos_in_line + "—" * len(str(error))
+        return f'\nLine {line_number}: {line}\n{" " * (len(f"Line {line_number}: "))}{underline}'
+    else:
+        underline = " " * error_position + "—" * len(str(error))
+        return f"{text[:error_position+len(str(error))+15]}...\n{underline}"
 
 
 def import_fhirpath_engine():
