@@ -44,14 +44,6 @@ class FHIRTypesOperator(FHIRPath):
         """
         type_ = self.type_specifier
         value = self._get_singleton_collection_value(collection, create)
-        print(
-            "Validating type specifier:",
-            type_,
-            "for value:",
-            value,
-            "of type:",
-            type(value),
-        )
         # Handle the FHIRPath literal types as special cases
         if isinstance(value, fhirpath_literals.Quantity):
             return type_ == "Quantity"

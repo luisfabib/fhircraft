@@ -21,6 +21,7 @@ import fhircraft.fhir.path.engine.types as types
 import fhircraft.fhir.path.engine.utility as utility
 from fhircraft.fhir.path.engine.core import (
     Element,
+    FHIRPath,
     Invocation,
     Literal,
     Parent,
@@ -79,7 +80,7 @@ class FhirPathParser:
             errorlog=logger,
         )
 
-    def parse(self, string, lexer=None):
+    def parse(self, string, lexer=None) -> FHIRPath:
         self.string = string
         lexer = lexer or self.lexer_class()
         return self.parse_token_stream(lexer.tokenize(string))

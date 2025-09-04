@@ -649,10 +649,16 @@ class Element(FHIRPath):
         for item in collection:
             if item.value is None:
                 continue
-            element_value = getattr(item.value, self.label, None)
+            if isinstance(item.value, dict):
+                element_value = item.value.get(self.label, None)
+            else:
+                element_value = getattr(item.value, self.label, None)
             if not element_value and not isinstance(element_value, bool) and create:
                 element_value = self.create_element(item.value)
-                setattr(item.value, self.label, element_value)
+                if isinstance(item.value, dict):
+                    item.value[self.label] = element_value
+                else:
+                    setattr(item.value, self.label, element_value)
 
             for index, value in enumerate(ensure_list(element_value)):
                 if create or value is not None:
@@ -833,5 +839,4 @@ class Invocation(FHIRPath):
         return "%s(%r, %r)" % (self.__class__.__name__, self.left, self.right)
 
     def __hash__(self):
-        return hash((self.left, self.right))
         return hash((self.left, self.right))

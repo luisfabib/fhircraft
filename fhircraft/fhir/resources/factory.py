@@ -1002,7 +1002,9 @@ class ResourceFactory:
 
         # Resolve the FHIR structure definition
         _structure_definition = None
-        if isinstance(structure_definition, str):
+        if isinstance(structure_definition, StructureDefinition):
+            _structure_definition = structure_definition
+        elif isinstance(structure_definition, str):
             _structure_definition = self.repository.__load_json_structure_definition(
                 Path(structure_definition)
             )

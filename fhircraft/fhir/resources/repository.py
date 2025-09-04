@@ -17,6 +17,12 @@ from fhircraft.fhir.resources.definitions import StructureDefinition
 from fhircraft.utils import load_env_variables
 
 
+class StructureDefinitionNotFoundError(FileNotFoundError):
+    """Raised when a required structure definition cannot be resolved."""
+
+    pass
+
+
 class StructureDefinitionRepository(ABC):
     """Abstract base class for structure definition repositories."""
 
@@ -622,7 +628,7 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
                 return structure_definition
 
         version_info = f" version {target_version}" if target_version else ""
-        raise RuntimeError(
+        raise StructureDefinitionNotFoundError(
             f"Structure definition not found for {base_url}{version_info}. Either load it locally, load the appropriate package, or enable internet access to download it."
         )
 
@@ -652,8 +658,8 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
         base_url, version = self.parse_canonical_url(structure_definition.url)
 
         # Use the structure definition's version field if no version in URL
-        if not version and structure_definition.version:
-            version = structure_definition.version
+        if not version:
+            version = structure_definition.version or structure_definition.fhirVersion
 
         if not version:
             raise ValueError(
