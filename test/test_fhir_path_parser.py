@@ -210,10 +210,10 @@ parser_test_cases = (
     ("parent.toTime()", Invocation(Element("parent"), ToTime())),
     ("parent.convertsToTime()", Invocation(Element("parent"), ConvertsToTime())),
     # ----------------------------------
-    # String manipualtion functions
+    # String manipulation functions
     # ----------------------------------
-    ("parent.indexOf('John')", Invocation(Element("parent"), IndexOf("Lucas"))),
-    ("parent.substring(1,2)", Invocation(Element("parent"), Substring(1, 2))),
+    ("parent.indexOf('John')", Invocation(Element("parent"), IndexOf("John"))),
+    ("parent.substring(0,12)", Invocation(Element("parent"), Substring(0, 12))),
     ("parent.startsWith('John')", Invocation(Element("parent"), StartsWith("John"))),
     ("parent.endsWith('John')", Invocation(Element("parent"), EndsWith("John"))),
     ("parent.contains('John')", Invocation(Element("parent"), Contains("John"))),
@@ -236,12 +236,15 @@ parser_test_cases = (
     # ----------------------------------
     # Types legacy functions
     # ----------------------------------
-    ("parent.is(String)", Invocation(Element("parent"), LegacyIs("String"))),
-    ("parent.as(String)", Invocation(Element("parent"), LegacyAs("String"))),
+    ("parent.is('String')", Invocation(Element("parent"), LegacyIs("String"))),
+    ("parent.as('String')", Invocation(Element("parent"), LegacyAs("String"))),
     # ----------------------------------
     # Utility functions
     # ----------------------------------
-    ("A.trace('id', id)", Invocation(Element("A"), Trace("id", Element("id")))),
+    (
+        "A.trace('id', id)",
+        Invocation(Element("A"), Trace(Literal("id"), Element("id"))),
+    ),
     ("now()", Now()),
     ("timeOfDay()", TimeOfDay()),
     ("today()", Today()),

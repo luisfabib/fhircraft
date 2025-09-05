@@ -528,7 +528,7 @@ class FhirPathParser:
 
     def p_fhirpath_function_arguments_list(self, p):
         """arguments : arguments ',' arguments"""
-        p[0] = ensure_list(p[1]) + ensure_list(p[2])
+        p[0] = ensure_list(p[1]) + ensure_list(p[3])
 
     def p_fhirpath_identifier(self, p):
         """identifier : IDENTIFIER"""

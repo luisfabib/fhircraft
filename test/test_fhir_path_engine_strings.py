@@ -70,6 +70,24 @@ def test_substring_returns_correct_index_of_substring_with_initial_and_final_ind
     assert result == [FHIRPathCollectionItem(value="Substring")]
 
 
+def test_substring_returns_correct_index_of_substring_returns_full_with_zero():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    result = Substring(0).evaluate(collection)
+    assert result == [FHIRPathCollectionItem(value="mySubstringValue")]
+
+
+def test_substring_returns_correct_index_of_substring_returns_only_beginning():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    result = Substring(0, 5).evaluate(collection)
+    assert result == [FHIRPathCollectionItem(value="mySub")]
+
+
+def test_substring_returns_empty_if_start_out_of_bounds():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    result = Substring(100).evaluate(collection)
+    assert result == []
+
+
 # -------------
 # StartsWith
 # -------------
