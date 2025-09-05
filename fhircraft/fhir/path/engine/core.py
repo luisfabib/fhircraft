@@ -528,14 +528,24 @@ class FHIRPathFunction(FHIRPath, ABC):
     Abstract base class representing a FHIRPath function, used for functional evaluation of collections.
     """
 
-    def __str__(self):
-        return f"{self.__class__.__name__.lower()}()"
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}()"
+    def __arguments__(self):
+        return [
+            getattr(self, key)
+            for key in inspect.signature(self.__init__).parameters
+            if key != "self" and hasattr(self, key)
+        ]
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__)
+        return (
+            isinstance(other, self.__class__)
+            and self.__arguments__() == other.__arguments__()
+        )
+
+    def __str__(self):
+        return f"{self.__class__.__name__.lower()}({','.join([str(arg) for arg in self.__arguments__()])})"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({','.join([repr(arg) for arg in self.__arguments__()])})"
 
 
 class Literal(FHIRPath):
