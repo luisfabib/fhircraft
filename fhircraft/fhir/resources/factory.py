@@ -902,7 +902,10 @@ class ResourceFactory:
                 )
                 for attribute, property_getter in subfield_properties.items():
                     setattr(field_type, attribute, property(property_getter))
-                if element.children["extension"].slices:
+                if (
+                    "extension" in element.children
+                    and element.children["extension"].slices
+                ):
                     extension_slice_base_type = get_complex_FHIR_type(
                         "Extension", self.Config.FHIR_release if self.Config else "R4B"
                     )
