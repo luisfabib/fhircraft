@@ -236,8 +236,8 @@ parser_test_cases = (
     # ----------------------------------
     # Types legacy functions
     # ----------------------------------
-    ("parent.is('String')", Invocation(Element("parent"), LegacyIs("String"))),
-    ("parent.as('String')", Invocation(Element("parent"), LegacyAs("String"))),
+    ("parent.is('String')", Invocation(Element("parent"), LegacyIs(Literal("String")))),
+    ("parent.as('String')", Invocation(Element("parent"), LegacyAs(Literal("String")))),
     # ----------------------------------
     # Utility functions
     # ----------------------------------

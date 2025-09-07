@@ -124,8 +124,10 @@ class LegacyIs(FHIRPathFunction):
         type_specifier (str): Type specifier.
     """
 
-    def __init__(self, type_specifier: str):
-        self.type_specifier = type_specifier
+    def __init__(self, type_specifier: str | Literal):
+        self.type_specifier = (
+            type_specifier if isinstance(type_specifier, str) else type_specifier.value
+        )
 
     def evaluate(
         self, collection: FHIRPathCollection, create=False
