@@ -1,12 +1,28 @@
 import json
 import os
 import pprint
+from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import BaseModel
 
-from fhircraft.fhir.mapping.engine import FHIRMappingEngine
-from fhircraft.fhir.mapping.StructureMap import StructureMap
+from fhircraft.fhir.mapping.engine import (
+    FHIRMappingEngine,
+    MappingError,
+    MappingScope,
+    RuleProcessingError,
+    StructureMapModelMode,
+    ValidationError,
+)
+from fhircraft.fhir.mapping.StructureMap import (
+    StructureMap,
+    StructureMapGroup,
+    StructureMapInput,
+    StructureMapRule,
+    StructureMapSource,
+    StructureMapStructure,
+    StructureMapTarget,
+)
 from fhircraft.fhir.resources.factory import ResourceFactory, StructureDefinition
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
@@ -23,6 +39,12 @@ EXAMPLES_DIRECTORY = "test/static/fhir-mapping-language/R5"
         ("tutorial4b"),
         ("tutorial4c"),
         ("tutorial5"),
+        ("tutorial6a"),
+        ("tutorial6b"),
+        ("tutorial6c"),
+        ("tutorial6d"),
+        ("tutorial7a"),
+        ("tutorial7b"),
     ],
 )
 def test_integration_tutorial_examples(directory):

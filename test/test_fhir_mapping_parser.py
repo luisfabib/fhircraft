@@ -632,7 +632,7 @@ def test_parser(string, expected_object):
 
 
 EXAMPLES_DIRECTORY = "test/static/fhir-mapping-language/R5"
-map_file_examples = (
+directories = (
     ("tutorial1"),
     ("tutorial2"),
     ("tutorial3"),
@@ -655,15 +655,19 @@ map_file_examples = (
 )
 
 
-@pytest.mark.parametrize("filename", map_file_examples)
-def test_parser_integration(filename):
+@pytest.mark.parametrize("directory", directories)
+def test_parser_integration(directory):
     with open(
-        os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), filename + ".map"),
+        os.path.join(
+            os.path.abspath(EXAMPLES_DIRECTORY), directory, directory + ".map"
+        ),
         encoding="utf8",
     ) as file:
         map_script = file.read()
     with open(
-        os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), filename + ".json"),
+        os.path.join(
+            os.path.abspath(EXAMPLES_DIRECTORY), directory, directory + ".json"
+        ),
         encoding="utf8",
     ) as file:
         expected_StructureMap = json.load(file)
