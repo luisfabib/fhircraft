@@ -154,7 +154,7 @@ class FHIRPath(ABC):
         collection = self.__evaluate_wrapped(data, create=True)
         if len(collection) == 0:
             raise FHIRPathError(
-                "No matching locations found. Cannot set value on empty result."
+                "FHIRPath yielded empty collection. Cannot set value on empty result."
             )
         elif len(collection) > 1:
             raise FHIRPathError(
@@ -358,6 +358,18 @@ class FHIRPath(ABC):
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
         return self.evaluate(collection, create=create)
 
+    def _invoke(self, invocation: "FHIRPath") -> "FHIRPath":
+        """
+        Invoke the FHIRPath expression on the given collection.
+
+        Args:
+            invocation (FHIRPath): The FHIRPath expression to invoke.
+
+        Returns:
+            Invocation[Self, FHIRPath]: The resulting invocation after processing.
+        """
+        return Invocation(self, invocation)
+
     def __get_child(self, child):
         """
         Determines and returns the appropriate child node in a path expression tree.
@@ -440,8 +452,6 @@ class FHIRPathCollectionItem(object):
             RuntimeError: If there is no setter function associated with this item.
         """
         if self.setter:
-            if isinstance(value, list):
-                raise ValueError("Only single value is accepted")
             self.setter(value)
         else:
             raise RuntimeError("There is not setter function associated with this item")
@@ -631,7 +641,11 @@ class Element(FHIRPath):
 
     @staticmethod
     def setter(
-        value: typing.Any, item: FHIRPathCollectionItem, index: int, label: str
+        value: typing.Any,
+        item: FHIRPathCollectionItem,
+        index: int,
+        label: str,
+        is_list_type: bool,
     ) -> None:
         """
         Sets the value of the specified element in the parent object.
@@ -643,14 +657,22 @@ class Element(FHIRPath):
             label (str): The label of the element to set.
         """
         parent = item.value
-        parents = getattr(parent, label)
-        if not isinstance(parents, list):
+        current_values = getattr(parent, label)
+        if not isinstance(current_values, list):
+            if not is_list_type and isinstance(value, list):
+                if value and len(value) > 1:
+                    raise ValueError(
+                        f"Cannot set multiple values to non-list field '{label}'"
+                    )
+                value = value[0] if value else None
             setattr(parent, label, value)
         else:
-            if len(parents) <= index:
-                parents.insert(index, value)
+            if is_list_type and isinstance(value, list):
+                setattr(parent, label, value)
+            elif len(current_values) <= index:
+                current_values.insert(index, value)
             else:
-                parents[index] = value
+                current_values[index] = value
 
     def evaluate(
         self, collection: FHIRPathCollection, create=False
@@ -676,9 +698,13 @@ class Element(FHIRPath):
                         value,
                         path=Element(self.label),
                         parent=item,
-                        setter=partial(
-                            self.setter, item=item, index=index, label=self.label
-                        ),
+                    )
+                    element.setter = partial(
+                        self.setter,
+                        item=item,
+                        index=index,
+                        label=self.label,
+                        is_list_type=element.is_list_type,
                     )
                     element_collection.append(element)
         return element_collection
@@ -833,9 +859,6 @@ class Invocation(FHIRPath):
         return self.right.evaluate(parent_collection, create)
 
     def __eq__(self, other):
-        print(f"Comparing {self} with {other}")
-        print(f"A: {self.left}, B: {other.left}", self.left == other.left)
-        print(f"A: {self.right}, B: {other.right}", self.right == other.right)
         return (
             isinstance(other, Invocation)
             and self.left == other.left

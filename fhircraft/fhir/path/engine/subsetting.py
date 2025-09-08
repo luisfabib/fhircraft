@@ -76,11 +76,16 @@ class Index(FHIRPath):
                 parent_array = collection[0]
                 if parent_array.parent:
                     new_values = ensure_list(
-                        getattr(parent_array.parent.value, parent_array.path.label)
+                        parent_array.parent.value.get(parent_array.path.label)
+                        if isinstance(parent_array.parent.value, dict)
+                        else getattr(parent_array.parent.value, parent_array.path.label)
                     )
-                    new_values.extend(
-                        [parent_array.construct_resource() for __ in range(pad)]
-                    )
+                    if hasattr(new_values[0].__class__, "model_construct"):
+                        new_values.extend(
+                            [parent_array.construct_resource() for __ in range(pad)]
+                        )
+                    else:
+                        new_values.extend([None for __ in range(pad)])
                 else:
                     new_values = collection
                     new_values.extend(

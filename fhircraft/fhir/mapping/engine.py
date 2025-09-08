@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional, Set, Type
 
 from pydantic import BaseModel
 
+import fhircraft.fhir.path.engine as fhirpath
 from fhircraft.fhir.mapping.StructureMap import (
     StructureMap,
     StructureMapDependent,
@@ -20,8 +21,8 @@ from fhircraft.fhir.mapping.StructureMap import (
     StructureMapSource,
     StructureMapTarget,
 )
-from fhircraft.fhir.path import fhirpath
-from fhircraft.fhir.path.engine.core import FHIRPath
+from fhircraft.fhir.path import fhirpath as fhirpath_parser
+from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
 from fhircraft.fhir.path.exceptions import FHIRPathError
 from fhircraft.fhir.resources.factory import ResourceFactory
 from fhircraft.fhir.resources.repository import (
@@ -89,7 +90,21 @@ class MappingScope:
 
     def define(self, variable: str, value: FHIRPath) -> None:
         """Define a new variable in this scope"""
+        if not isinstance(value, FHIRPath):
+            raise ValueError("Variables can only be assigned to a FHIRPath instance")
         self.variables[variable] = value
+
+    def get_target_instance(self, identifier: str) -> Optional[BaseModel]:
+        """Get a target instance by its identifier"""
+        return self.target_instances.get(identifier) or (
+            self.parent.get_target_instance(identifier) if self.parent else None
+        )
+
+    def get_source_instance(self, identifier: str) -> Optional[BaseModel]:
+        """Get a source instance by its identifier"""
+        return self.source_instances.get(identifier) or (
+            self.parent.get_source_instance(identifier) if self.parent else None
+        )
 
     def lookup(self, identifier: str) -> Optional[Any]:
         """Look up a variable, checking parent scopes if not found locally"""
@@ -347,7 +362,7 @@ class FHIRMappingEngine:
             self._validate_rule(nested_rule, issues)
 
     def process_group(
-        self, group: StructureMapGroup, context: MappingScope
+        self, group: StructureMapGroup, scope: MappingScope
     ) -> MappingScope:
         group_name = group.name or f"group_{id(group)}"
 
@@ -358,38 +373,34 @@ class FHIRMappingEngine:
         group_target_instances = {}
         for input in group.input or []:
             if input.mode == StructureMapModelMode.SOURCE:
-                if input.type in context.types:
-                    group_source_models[input.name] = context.types[input.type]
-                    group_source_instances[input.name] = context.source_instances.get(
+                if input.type in scope.types:
+                    group_source_models[input.name] = scope.types[input.type]
+                    group_source_instances[input.name] = scope.source_instances.get(
                         input.type
                     )
 
             elif input.mode == StructureMapModelMode.TARGET:
-                if input.type in context.types:
-                    group_target_models[input.name] = context.types[input.type]
-                    group_target_instances[input.name] = context.target_instances.get(
-                        input.type
+                if input.type in scope.types:
+                    group_target_models[input.name] = scope.types[input.type]
+                    group_target_instances[input.name] = (
+                        scope.target_instances.get(input.type)
+                        or group_target_models[input.name].model_construct()
                     )
 
-        group_context = MappingScope(
+        group_scope = MappingScope(
             name=group_name,
             source_instances=group_source_instances,
             target_instances=group_target_instances,
-            parent=context,
+            parent=scope,
         )
 
         for rule in group.rule or []:
-            group_context = self.process_rule(rule, group_context)
+            self.process_rule(rule, group_scope)
 
-        context.target_instances.update(group_context.target_instances)
-        return context
+        scope.target_instances.update(group_scope.target_instances)
+        return scope
 
-    def process_rule(
-        self,
-        rule: StructureMapRule,
-        scope: MappingScope,
-        rule_variables: Dict[str, Any] = {},
-    ) -> MappingScope:
+    def process_rule(self, rule: StructureMapRule, scope: MappingScope) -> MappingScope:
         rule_name = rule.name or f"rule_{id(rule)}"
 
         # Check for cycles
@@ -398,215 +409,277 @@ class FHIRMappingEngine:
             return scope
 
         scope.start_processing_rule(rule_name)
-        rule_variables.update(scope.source_instances)
-        rule_variables.update(scope.target_instances)
+        for key in scope.source_instances:
+            scope.define(key, fhirpath.Element(key))
+
+        for key in scope.target_instances:
+            scope.define(key, fhirpath.Element(key))
         try:
             logger.debug(f"Processing rule: {rule_name}")
 
-            # Process sources
+            # Process sources first to determine iteration
+            source_variables = {}
+            source_iteration_contexts = []
+
             for source in rule.source or []:
-                source_value = self.process_source(source, rule_variables)
+                self.process_source(source, scope)
 
-                # Store source value
                 var_name = source.variable or f"source_{id(source)}"
-                rule_variables[var_name] = source_value
+                source_fhirpath = scope.lookup(var_name)
 
-                # Check source condition
+                # Where condition
                 if source.condition:
-                    if not bool(
-                        fhirpath.parse(source.condition).single(rule_variables)
-                    ):
+                    condition_fhirpath = fhirpath_parser.parse(source.condition)
+                    condition_fhirpath = _replace_mapping_scope_elements(
+                        condition_fhirpath, scope
+                    )
+
+                    if not bool(condition_fhirpath.single(scope.source_instances)):
                         logger.debug(f"Source condition not met for rule {rule_name}")
                         return scope
 
-            # Process targets
-            for target in rule.target or []:
-                assert target.element and target.context
-                target_instance = scope.target_instances.get(target.context)
-                if not target_instance:
-                    raise RuleProcessingError(
-                        f"Target context {target.context} not found for rule {rule_name}"
+                # Check condition
+                if source.check:
+                    condition_fhirpath = fhirpath_parser.parse(source.check)
+                    condition_fhirpath = _replace_mapping_scope_elements(
+                        condition_fhirpath, scope
                     )
-                value = self.process_target(target, rule_variables)
 
-                if isinstance(value, list):
-                    if not is_list_field(
-                        target_instance.__class__.model_fields[target.element]
-                    ):
-                        if len(value) > 1:
-                            raise RuleProcessingError(
-                                f"Multiple values returned for non-list field {target.element} in rule {rule_name}"
-                            )
-                        value = value[0] if value else None
-                setattr(target_instance, target.element, value)
+                    if not bool(condition_fhirpath.single(scope.source_instances)):
+                        raise RuleProcessingError(
+                            f"Source check failed for rule {rule_name}"
+                        )
 
-                if target.variable:
-                    rule_variables[target.variable] = value
+                # Collect source values for iteration
+                if source_fhirpath is None:
+                    raise RuleProcessingError(f"Source variable {var_name} not found")
+                source_values = source_fhirpath.values(scope.source_instances)
+                source_variables[var_name] = source_values
 
-            # Process dependent rules
-            for dependent in rule.dependent or []:
-                self._process_dependent(dependent, scope, rule_variables)
+                # If this source yields multiple values, we need to iterate
+                if len(source_values) > 1:
+                    for idx, source_value in enumerate(source_values):
+                        iteration_context = {var_name: source_value}
+                        if idx < len(source_iteration_contexts):
+                            source_iteration_contexts[idx].update(iteration_context)
+                        else:
+                            source_iteration_contexts.append(iteration_context)
+                else:
+                    # Single or no value - add to all existing contexts or create first one
+                    single_value = source_values[0] if source_values else None
+                    iteration_context = {var_name: single_value}
+                    if source_iteration_contexts:
+                        for ctx in source_iteration_contexts:
+                            ctx.update(iteration_context)
+                    else:
+                        source_iteration_contexts.append(iteration_context)
 
-            # Process nested rules
-            for nested_rule in rule.rule or []:
-                self.process_rule(nested_rule, scope)
+            # If no iteration contexts were created, create a default one
+            if not source_iteration_contexts:
+                source_iteration_contexts = [{}]
+
+            # Execute the rule for each iteration context
+            for iteration_idx, iteration_context in enumerate(
+                source_iteration_contexts
+            ):
+                logger.debug(
+                    f"Processing iteration {iteration_idx} for rule {rule_name} with context: {iteration_context}"
+                )
+                # Create iteration scope
+                iteration_scope = MappingScope(
+                    name=f"{scope.name}_iter_{iteration_idx}",
+                    source_instances=scope.source_instances.copy(),
+                    target_instances=scope.target_instances.copy(),
+                    types=scope.types.copy(),
+                    variables=scope.variables.copy(),  # Copy existing variables
+                    parent=scope.parent,
+                )
+
+                # Define iteration variables in the iteration scope
+                for var_name, var_value in iteration_context.items():
+                    # Create a FHIRPath that returns just this iteration's value
+                    logger.debug(
+                        f"Defining iteration variable {var_name} = {var_value}"
+                    )
+                    iteration_scope.define(var_name, fhirpath.Literal(var_value))
+
+                # Process targets for this iteration
+                for target in rule.target or []:
+                    self.process_target(target, iteration_scope)
+
+                # Process dependent rules for this iteration
+                for dependent in rule.dependent or []:
+                    self._process_dependent(dependent, iteration_scope)
+
+                # Process nested rules for this iteration
+                for nested_rule in rule.rule or []:
+                    self.process_rule(nested_rule, iteration_scope)
+
+                # Merge back iteration results to main scope
+                scope.target_instances.update(iteration_scope.target_instances)
 
         finally:
             scope.finish_processing_rule(rule_name)
         return scope
 
-    def process_source(
-        self, source: StructureMapSource, rule_variables: Dict[str, Any]
-    ) -> Any:
-        source_item = rule_variables.get(source.context)
+    def process_source(self, source: StructureMapSource, scope: MappingScope) -> None:
+        path = scope.lookup(source.context)
+        if path is None:
+            raise RuleProcessingError(f"Source context {source.context} not found")
+
         # Apply element path if specified
         if source.element:
-            try:
-                # Parse and evaluate FHIRPath manually
-                if isinstance(source_item, list):
-                    values = [
-                        getattr(list_item, source.element) for list_item in source_item
-                    ]
-                else:
-                    values = getattr(source_item, source.element)
+            path = path._invoke(fhirpath.Element(source.element))
 
-                if source.listMode == "first":
-                    return values[0] if values else None
-                elif source.listMode == "not_first":
-                    return values[1] if len(values) > 1 else None
-                elif source.listMode == "not_last":
-                    return values[:-1] if values else None
-                elif source.listMode == "last":
-                    return values[-1] if values else None
-                elif source.listMode == "only_one":
-                    if len(values) != 1:
-                        raise RuleProcessingError(
-                            f"Expected exactly one value for {source.element}, got {len(values)}"
-                        )
-                    return values[0]
-                else:
-                    return values
+        # Apply list-option condition if specified
+        if source.listMode == "first":
+            path = path._invoke(fhirpath.First())
+        elif source.listMode == "not_first":
+            path = path._invoke(fhirpath.Tail())
+        elif source.listMode == "not_last":
+            path = path._invoke(fhirpath.Exclude(path._invoke(fhirpath.Last())))
+        elif source.listMode == "last":
+            path = path._invoke(fhirpath.Last())
+        elif source.listMode == "only_one":
+            path = path._invoke(fhirpath.Single())
 
-            except (FHIRPathError, IndexError) as e:
-                logger.warning(
-                    f"Failed to extract source element {source.element}: {e}"
-                )
-                return None
-
-        return source_item
+        # Store source FHIRPath
+        var_name = source.variable or f"source_{id(source)}"
+        scope.define(var_name, path)
 
     def process_target(
         self,
         target: StructureMapTarget,
-        rule_variables: Dict[str, Any],
+        scope: MappingScope,
     ) -> Any:
-        """
-        Process a target element to create or update target data.
+        if not target.context:
+            raise RuleProcessingError("Target context is required")
+        path = scope.lookup(target.context)
+        if path is None:
+            raise RuleProcessingError(f"Target context {target.context} not found")
 
-        Args:
-            target: The target element to process
-            source_value: The value from source processing
-            available_vars: Available variables in current scope
-        """
+        # Apply element path if specified
+        if target.element:
+            path = path._invoke(fhirpath.Element(target.element))
+
+        # Store target FHIRPath
+        var_name = target.variable or f"target_{id(target)}"
+        scope.define(var_name, path)
+
         transform = target.transform
-        if not transform:
-            return None
-        if transform == "copy":
-            if (
-                not target.parameter
-                or len(target.parameter) != 1
-                or not (source := target.parameter[0].valueId)
-            ):
-                raise RuleProcessingError(
-                    "Copy transform requires exactly one parameter of type Id"
-                )
-            return rule_variables.get(source)
-
-        elif transform == "create":
-            raise NotImplementedError("Create transform not implemented yet")
-        elif transform == "truncate":
-            if (
-                not target.parameter
-                or len(target.parameter) != 2
-                or not (source := target.parameter[0].valueId)
-                or not (length := target.parameter[1].valueInteger)
-            ):
-                raise RuleProcessingError(
-                    "The 'copy' transform requires exactly two parameters of type Id and Integer"
-                )
-            return fhirpath.parse(f"{source}.substring(0,{length})").single(
-                rule_variables
-            )
-
-        elif transform == "escape":
-            raise NotImplementedError("Escape transform not implemented yet")
-
-        elif transform == "cast":
-            if (
-                not target.parameter
-                or len(target.parameter) < 1
-                or len(target.parameter) > 2
-                or not (source := target.parameter[0].valueId)
-                or not (
-                    to_type := (
-                        target.parameter[1].valueString
-                        if len(target.parameter) == 2
-                        else None
+        if transform:
+            if transform == "copy":
+                if (
+                    not target.parameter
+                    or len(target.parameter) != 1
+                    or not (source := target.parameter[0].valueId)
+                ):
+                    raise RuleProcessingError(
+                        "Copy transform requires exactly one parameter of type Id"
                     )
-                )
-            ):
-                raise RuleProcessingError(
-                    "The 'copy' transform requires exactly two parameters of type Id and Integer"
-                )
-            if not to_type:
-                raise RuleProcessingError(
-                    "The 'cast' transform requires a type parameter of type String"
-                )
-            return fhirpath.parse(f"{source}.to{to_type.title()}()").single(
-                rule_variables
-            )
+                source_fhirpath = scope.lookup(source)
+                if not source_fhirpath:
+                    raise RuleProcessingError(f"Source variable {source} not found")
+                # Just copy the source value
+                transformed_values = source_fhirpath.values(scope.source_instances)
 
-        elif transform == "append":
-            raise NotImplementedError("Append transform not implemented yet")
-        elif transform == "translate":
-            raise NotImplementedError("Translate transform not implemented yet")
-        elif transform == "reference":
-            raise NotImplementedError("Reference transform not implemented yet")
-        elif transform == "dateOp":
-            raise NotImplementedError("DateOp transform not implemented yet")
-        elif transform == "uuid":
-            raise NotImplementedError("UUID transform not implemented yet")
-        elif transform == "pointer":
-            raise NotImplementedError("Pointer transform not implemented yet")
-        elif transform == "translate":
-            raise NotImplementedError("Translate transform not implemented yet")
-        elif transform == "evaluate":
-            raise NotImplementedError("Evaluate transform not implemented yet")
-        elif transform == "cc":
-            raise NotImplementedError("cc transform not implemented yet")
-        elif transform == "c":
-            raise NotImplementedError("c transform not implemented yet")
-        elif transform == "qty":
-            raise NotImplementedError("qty transform not implemented yet")
-        elif transform == "id":
-            raise NotImplementedError("id transform not implemented yet")
-        elif transform == "cp":
-            raise NotImplementedError("cp transform not implemented yet")
-        else:
-            raise RuntimeError(f"Invalid FHIR Mapping Language transform: {transform}")
+            elif transform == "create":
+                raise NotImplementedError("Create transform not implemented yet")
+            elif transform == "truncate":
+                if (
+                    not target.parameter
+                    or len(target.parameter) != 2
+                    or not (source := target.parameter[0].valueId)
+                    or not (length := target.parameter[1].valueInteger)
+                ):
+                    raise RuleProcessingError(
+                        "The 'truncate' transform requires exactly two parameters of type Id and Integer"
+                    )
+                source_fhirpath = scope.lookup(source)
+                if not source_fhirpath:
+                    raise RuleProcessingError(f"Source variable {source} not found")
+                transformed_values = source_fhirpath._invoke(
+                    fhirpath.Substring(0, int(length))
+                ).values(scope.source_instances)
+
+            elif transform == "escape":
+                raise NotImplementedError("Escape transform not implemented yet")
+
+            elif transform == "cast":
+                if (
+                    not target.parameter
+                    or len(target.parameter) < 1
+                    or len(target.parameter) > 2
+                    or not (source := target.parameter[0].valueId)
+                    or not (
+                        to_type := (
+                            target.parameter[1].valueString
+                            if len(target.parameter) == 2
+                            else None
+                        )
+                    )
+                ):
+                    raise RuleProcessingError(
+                        "The 'copy' transform requires exactly two parameters of type Id and Integer"
+                    )
+                if not to_type:
+                    raise RuleProcessingError(
+                        "The 'cast' transform requires a type parameter of type String"
+                    )
+                source_fhirpath = scope.lookup(source)
+                if not source_fhirpath:
+                    raise RuleProcessingError(f"Source variable {source} not found")
+                transformed_values = source_fhirpath._invoke(
+                    getattr(fhirpath, f"To{to_type.title()}")()
+                ).values(scope.source_instances)
+
+            elif transform == "append":
+                raise NotImplementedError("Append transform not implemented yet")
+            elif transform == "translate":
+                raise NotImplementedError("Translate transform not implemented yet")
+            elif transform == "reference":
+                raise NotImplementedError("Reference transform not implemented yet")
+            elif transform == "dateOp":
+                raise NotImplementedError("DateOp transform not implemented yet")
+            elif transform == "uuid":
+                raise NotImplementedError("UUID transform not implemented yet")
+            elif transform == "pointer":
+                raise NotImplementedError("Pointer transform not implemented yet")
+            elif transform == "translate":
+                raise NotImplementedError("Translate transform not implemented yet")
+            elif transform == "evaluate":
+                raise NotImplementedError("Evaluate transform not implemented yet")
+            elif transform == "cc":
+                raise NotImplementedError("cc transform not implemented yet")
+            elif transform == "c":
+                raise NotImplementedError("c transform not implemented yet")
+            elif transform == "qty":
+                raise NotImplementedError("qty transform not implemented yet")
+            elif transform == "id":
+                raise NotImplementedError("id transform not implemented yet")
+            elif transform == "cp":
+                raise NotImplementedError("cp transform not implemented yet")
+            else:
+                raise RuntimeError(
+                    f"Invalid FHIR Mapping Language transform: {transform}"
+                )
+
+            # Update the target structure
+            for index, transformed_value in enumerate(transformed_values):
+                indexed_path = path._invoke(fhirpath.Index(index))
+                indexed_path.update_single(scope.target_instances, transformed_value)
 
     def _process_dependent(
         self,
         dependent: StructureMapDependent,
         scope: MappingScope,
-        rule_variables: Dict[str, Any],
     ) -> None:
         """Process a dependent rule reference."""
         if dependent.name:
             # Find and execute the dependent rule
             target_rule = self._find_rule_by_name(dependent.name)
             if target_rule:
-                self.process_rule(target_rule, scope, rule_variables)
+                self.process_rule(target_rule, scope)
             else:
                 logger.warning(f"Dependent rule not found: {dependent.name}")
 
@@ -633,3 +706,24 @@ class FHIRMappingEngine:
         #     if deeper:
         #         return deeper
         # return None
+
+
+def _replace_mapping_scope_elements(path, scope: MappingScope):
+    """
+    Replace FHIRPath Element references with context Element references.
+
+    This is used to adjust FHIRPath expressions to the current mapping context.
+    """
+    if isinstance(path, fhirpath.Element):
+        if scope_fhirpath := scope.lookup(path.label):
+            return scope_fhirpath
+        return fhirpath.Element(f"context.{path.label}")
+    elif isinstance(path, (fhirpath.Invocation)):
+        left = _replace_mapping_scope_elements(path.left, scope)
+        right = _replace_mapping_scope_elements(path.right, scope)
+        return fhirpath.Invocation(left, right)
+    elif isinstance(path, fhirpath.FHIRComparisonOperator):
+        left = _replace_mapping_scope_elements(path.left, scope)
+        right = _replace_mapping_scope_elements(path.right, scope)
+        return path.__class__(left, right)
+    return path
