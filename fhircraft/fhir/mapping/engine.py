@@ -22,6 +22,7 @@ from fhircraft.fhir.mapping.StructureMap import (
     StructureMapSource,
     StructureMapTarget,
 )
+from fhircraft.fhir.mapping.ConceptMap import ConceptMap
 from fhircraft.fhir.path import fhirpath as fhirpath_parser
 from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
 from fhircraft.fhir.path.exceptions import FHIRPathError
@@ -80,6 +81,8 @@ class MappingScope:
     target_instances: Dict[str, BaseModel] = field(default_factory=dict)
     """The target instances being mapped"""
 
+    concept_maps: Dict[str, ConceptMap] = field(default_factory=dict)
+
     groups: OrderedDict[str, StructureMapGroup] = field(default_factory=OrderedDict)
     """The groups defined on this scope"""
 
@@ -106,6 +109,12 @@ class MappingScope:
         }
 
 
+    def get_concept_map(self, identifier: str) -> Optional[ConceptMap]:
+        """Get a concept map by its identifier"""
+        return self.concept_maps.get(identifier) or (
+            self.parent.get_concept_map(identifier) if self.parent else None
+        )
+    
     def get_target_instance(self, identifier: str) -> Optional[BaseModel]:
         """Get a target instance by its identifier"""
         return self.target_instances.get(identifier) or (
@@ -218,6 +227,7 @@ class FHIRMappingEngine:
             name="global",
             types={**source_models, **target_models},
             groups=OrderedDict([(group.name, group) for group in structure_map.group or []]),
+            concept_maps={map.name: map for map in (structure_map.contained or []) if map.resourceType == "ConceptMap"}
         )
 
         target_group = global_scope.groups.get(group) or list(global_scope.groups.values())[0]
@@ -564,17 +574,23 @@ class FHIRMappingEngine:
                 if (
                     not target.parameter
                     or len(target.parameter) != 1
-                    or not (source := target.parameter[0].valueId)
+                    or not (
+                        (source := target.parameter[0].valueId)
+                        or 
+                        (literal := target.parameter[0].value) 
+                    )
                 ):
                     raise RuleProcessingError(
                         "Copy transform requires exactly one parameter of type Id"
                     )
-                source_fhirpath = scope.lookup(source)
-                if not source_fhirpath:
-                    raise RuleProcessingError(f"Source variable {source} not found")
-                # Just copy the source value
-                transformed_values = source_fhirpath.values(scope.get_instances())
-
+                if source:
+                    source_fhirpath = scope.lookup(source)
+                    if not source_fhirpath:
+                        raise RuleProcessingError(f"Source variable {source} not found")
+                    # Just copy the source value
+                    transformed_values = source_fhirpath.values(scope.get_instances())
+                elif literal:
+                    transformed_values = [literal]
             elif transform == "create":
                 raise NotImplementedError("Create transform not implemented yet")
             elif transform == "truncate":
@@ -627,8 +643,6 @@ class FHIRMappingEngine:
 
             elif transform == "append":
                 raise NotImplementedError("Append transform not implemented yet")
-            elif transform == "translate":
-                raise NotImplementedError("Translate transform not implemented yet")
             elif transform == "reference":
                 raise NotImplementedError("Reference transform not implemented yet")
             elif transform == "dateOp":
@@ -638,7 +652,34 @@ class FHIRMappingEngine:
             elif transform == "pointer":
                 raise NotImplementedError("Pointer transform not implemented yet")
             elif transform == "translate":
-                raise NotImplementedError("Translate transform not implemented yet")
+                if (
+                    not target.parameter
+                    or len(target.parameter) != 3
+                    or not (source := target.parameter[0].valueId)
+                    or not (map_name := target.parameter[1].valueString)
+                    or not (output := target.parameter[2].valueString)
+                ):
+                    raise RuleProcessingError(
+                        "The 'translate' transform requires exactly two parameters of type Id and Integer"
+                    )
+                
+                source_code = scope.lookup(source).single(scope.get_instances())
+                concept_map = scope.get_concept_map(map_name.lstrip('#'))
+                transformed_values = None
+                if not concept_map:
+                    raise MappingError(f"Concept map '{map_name}' could not be resolved.")
+                for group in concept_map.group:
+                    for element in group.element:
+                        for element_target in element.target:
+                            if element.code == source_code:
+                                if output == 'code':
+                                    transformed_values = [element_target.code]
+                                    break
+                                else:
+                                    raise NotImplementedError(f"Output mode '{output}' for translate operation is not yet implemented.")
+                if not transformed_values:
+                    raise MappingError(f"Could not map source code '{source_code}' using concept map '{map_name}'.")
+
             elif transform == "evaluate":
                 raise NotImplementedError("Evaluate transform not implemented yet")
             elif transform == "cc":
@@ -685,7 +726,7 @@ def _replace_mapping_scope_elements(path, scope: MappingScope):
     if isinstance(path, fhirpath.Element):
         if scope_fhirpath := scope.lookup(path.label):
             return scope_fhirpath
-        return fhirpath.Element(f"context.{path.label}")
+        return fhirpath.Element(f"{path.label}")
     elif isinstance(path, (fhirpath.Invocation)):
         left = _replace_mapping_scope_elements(path.left, scope)
         right = _replace_mapping_scope_elements(path.right, scope)

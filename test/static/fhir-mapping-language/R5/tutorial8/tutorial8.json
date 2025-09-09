@@ -15,7 +15,7 @@
               "target": [
                 {
                   "code": "nach-da",
-                  "equivalence": "equivalent"
+                  "relationship": "equivalent"
                 }
               ]
             },
@@ -24,7 +24,7 @@
               "target": [
                 {
                   "code": "test",
-                  "equivalence": "equivalent"
+                  "relationship": "equivalent"
                 }
               ]
             }

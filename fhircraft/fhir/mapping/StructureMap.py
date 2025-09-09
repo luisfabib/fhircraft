@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex_types import Element
  
 from fhircraft.fhir.resources.datatypes.R5.complex_types import Meta,Narrative,Resource,Extension,Identifier,Coding,ContactDetail,UsageContext,CodeableConcept,BackboneElement
 
+from .ConceptMap import ConceptMap
  
 class StructureMapStructure(BackboneElement):
     url: Canonical = Field(
@@ -300,6 +301,11 @@ class StructureMapParameter(BackboneElement):
     )
 
 
+    @property 
+    def value(self):
+        return fhir_validators.get_type_choice_value_by_base(self, 
+            base="value",
+        )
 
     @model_validator(mode="after")
     def value_type_choice_validator(self):
@@ -556,7 +562,7 @@ class StructureMap(FHIRBaseModel):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[List[ConceptMap] ] = Field(
         description="Contained, inline Resources",
         default=None,
     )
