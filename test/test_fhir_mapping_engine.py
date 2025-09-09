@@ -45,6 +45,10 @@ EXAMPLES_DIRECTORY = "test/static/fhir-mapping-language/R5"
         ("tutorial6d"),
         ("tutorial7a"),
         ("tutorial7b"),
+        ("tutorial8"),
+        ("tutorial9"),
+        ("tutorial10"),
+        ("tutorial11"),
     ],
 )
 def test_integration_tutorial_examples(directory):

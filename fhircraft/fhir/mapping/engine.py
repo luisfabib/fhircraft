@@ -8,6 +8,7 @@ StructureMap resources to transform FHIR data from source to target structures.
 import enum
 import logging
 from dataclasses import dataclass, field
+from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Set, Type
 
 from pydantic import BaseModel
@@ -74,10 +75,13 @@ class MappingScope:
     """Mapping of types"""
 
     source_instances: Dict[str, BaseModel] = field(default_factory=dict)
-    """The source instances being constructed"""
+    """The source instances being mapped"""
 
     target_instances: Dict[str, BaseModel] = field(default_factory=dict)
-    """The target instances being constructed"""
+    """The target instances being mapped"""
+
+    groups: OrderedDict[str, StructureMapGroup] = field(default_factory=OrderedDict)
+    """The groups defined on this scope"""
 
     variables: Dict[str, FHIRPath] = field(default_factory=dict)
     """Mapping variables names to resolved FHIRPaths"""
@@ -93,6 +97,14 @@ class MappingScope:
         if not isinstance(value, FHIRPath):
             raise ValueError("Variables can only be assigned to a FHIRPath instance")
         self.variables[variable] = value
+
+    def get_instances(self) -> Dict[str, BaseModel]:
+        return {
+            **(self.parent.get_instances() if self.parent else {}),
+            **self.target_instances,
+            **self.source_instances,
+        }
+
 
     def get_target_instance(self, identifier: str) -> Optional[BaseModel]:
         """Get a target instance by its identifier"""
@@ -112,6 +124,8 @@ class MappingScope:
             return self.variables[identifier]
         elif identifier in self.types:
             return self.types[identifier]
+        elif identifier in self.groups:
+            return self.groups[identifier]
         elif self.parent:
             return self.parent.lookup(identifier)
         return None
@@ -183,24 +197,13 @@ class FHIRMappingEngine:
     def execute(
         self,
         structure_map: StructureMap,
-        data: tuple[BaseModel | dict, ...] | BaseModel | dict,
+        sources: tuple[BaseModel | dict, ...],
+        targets: tuple[BaseModel | dict, ...] | None = None,
+        group: str | None = None
     ) -> tuple[BaseModel, ...]:
-        """
-        Execute a structure map transformation.
-
-        Args:
-            structure_map: The StructureMap resource defining the transformation
-            data: The source data to transform
-        Returns:
-            The transformed target resource
-
-        Raises:
-            StructureDefinitionNotFoundError: If required structure definitions cannot be resolved
-            ValidationError: If input validation fails
-            MappingError: If transformation fails
-        """
-        if not isinstance(data, tuple):
-            data = (data,)
+        
+        if not isinstance(sources, tuple):
+            sources = (sources,)
 
         source_models = self._resolve_structure_definitions(
             structure_map, StructureMapModelMode.SOURCE
@@ -209,19 +212,57 @@ class FHIRMappingEngine:
             structure_map, StructureMapModelMode.TARGET
         )
 
-        validated_sources = self._validate_source_data(data, source_models)
+        validated_sources = self._validate_source_data(sources, source_models)
 
         global_scope = MappingScope(
             name="global",
-            source_instances=validated_sources,
             types={**source_models, **target_models},
+            groups=OrderedDict([(group.name, group) for group in structure_map.group or []]),
         )
 
-        # Step 4: Apply mapping rules
-        for group in structure_map.group or []:
-            global_scope = self.process_group(group, global_scope)
+        target_group = global_scope.groups.get(group) or list(global_scope.groups.values())[0]
 
-        # Step 5: Return output resource
+        # Validate the group parameters
+        expected_sources = len([input for input in (target_group.input or []) if input.mode == StructureMapModelMode.SOURCE])
+        if len(validated_sources) != expected_sources:
+            raise RuntimeError(f'Entrypoint group {target_group.name} expected {expected_sources} sources, got {len(sources)}.')
+        if targets:
+            expected_targets = len([input for input in (target_group.input or []) if input.mode == StructureMapModelMode.TARGET])
+            if len(targets) != expected_targets:
+                raise RuntimeError(f'Entrypoint group {target_group.name} expected {expected_sources} targets, got {len(sources)}.')
+        parameters = []
+        for input in target_group.input:
+            if input.mode == StructureMapModelMode.SOURCE:
+                if input.type:
+                    source_instance = validated_sources.get(input.type)
+                    if not source_instance:
+                        raise TypeError(f"Invalid source provided. None of the source arguments matches the '{input.name}' parameter of type {input.type} for the entrypoint group '{target_group.name}'.")
+                else:
+                    source_instance = sources.pop(0) 
+                source_instance_id = f"source_{id(source_instance)}"
+                global_scope.source_instances[source_instance_id] = source_instance
+                parameters.append(fhirpath.Element(source_instance_id))
+                    
+            if input.mode == StructureMapModelMode.TARGET:
+                if input.type and (target_type := global_scope.types.get(input.type)):
+                    if not targets:
+                        target_instance = target_type.model_construct()
+                    else:
+                        target_instance = next((target for target in targets if isinstance(target, target_type)), None)
+                        if not target_instance:
+                            raise TypeError(f"Invalid target provided. None of the target arguments matches the {input.name} parameters of type {input.type} for the entrypoint group '{target_group.name}'.")
+                else:
+                    if targets:
+                        target_instance = targets.pop(0)
+                    else:
+                        raise RuntimeError(f"Entrypoint group '{target_group.name}' parameter {input.name} does not specify any type and no target instances have been provided.")                                        
+
+                target_instance_id = f"source_{id(target_instance)}"
+                global_scope.target_instances[target_instance_id] = target_instance
+                parameters.append(fhirpath.Element(target_instance_id))
+
+        self.process_group(target_group, parameters, global_scope)
+
         return tuple(
             [
                 instance.model_validate(instance.model_dump())
@@ -362,43 +403,25 @@ class FHIRMappingEngine:
             self._validate_rule(nested_rule, issues)
 
     def process_group(
-        self, group: StructureMapGroup, scope: MappingScope
-    ) -> MappingScope:
+        self, group: StructureMapGroup, parameters: list[FHIRPath] | tuple[FHIRPath], scope: MappingScope
+    ):
         group_name = group.name or f"group_{id(group)}"
 
-        # Create local context for the group
-        group_source_models = {}
-        group_target_models = {}
-        group_source_instances = {}
-        group_target_instances = {}
-        for input in group.input or []:
-            if input.mode == StructureMapModelMode.SOURCE:
-                if input.type in scope.types:
-                    group_source_models[input.name] = scope.types[input.type]
-                    group_source_instances[input.name] = scope.source_instances.get(
-                        input.type
-                    )
-
-            elif input.mode == StructureMapModelMode.TARGET:
-                if input.type in scope.types:
-                    group_target_models[input.name] = scope.types[input.type]
-                    group_target_instances[input.name] = (
-                        scope.target_instances.get(input.type)
-                        or group_target_models[input.name].model_construct()
-                    )
-
+        # Construct local group scope
         group_scope = MappingScope(
             name=group_name,
-            source_instances=group_source_instances,
-            target_instances=group_target_instances,
             parent=scope,
         )
 
+        # Validate input parameters
+        if len(group.input) != len(parameters):
+            raise MappingError(f"Invalid number of parameters provided for group '{group_name}'. Expected {len(group.input)}, got {len(parameters)}.")
+        for input, parameter in zip(group.input, parameters):
+            group_scope.define(input.name, parameter)
+        
         for rule in group.rule or []:
             self.process_rule(rule, group_scope)
 
-        scope.target_instances.update(group_scope.target_instances)
-        return scope
 
     def process_rule(self, rule: StructureMapRule, scope: MappingScope) -> MappingScope:
         rule_name = rule.name or f"rule_{id(rule)}"
@@ -407,13 +430,8 @@ class FHIRMappingEngine:
         if scope.is_processing_rule(rule_name):
             logger.warning(f"Cycle detected in rule {rule_name}, skipping")
             return scope
-
         scope.start_processing_rule(rule_name)
-        for key in scope.source_instances:
-            scope.define(key, fhirpath.Element(key))
 
-        for key in scope.target_instances:
-            scope.define(key, fhirpath.Element(key))
         try:
             logger.debug(f"Processing rule: {rule_name}")
 
@@ -431,7 +449,7 @@ class FHIRMappingEngine:
                         condition_fhirpath, scope
                     )
 
-                    if not bool(condition_fhirpath.single(scope.source_instances)):
+                    if not bool(condition_fhirpath.single(scope.get_instances())):
                         logger.debug(f"Source condition not met for rule {rule_name}")
                         return scope
 
@@ -442,7 +460,7 @@ class FHIRMappingEngine:
                         condition_fhirpath, scope
                     )
 
-                    if not bool(condition_fhirpath.single(scope.source_instances)):
+                    if not bool(condition_fhirpath.single(scope.get_instances())):
                         raise RuleProcessingError(
                             f"Source check failed for rule {rule_name}"
                         )
@@ -450,7 +468,7 @@ class FHIRMappingEngine:
                 # Collect source values for iteration
                 if source_fhirpath is None:
                     raise RuleProcessingError(f"Source variable {var_name} not found")
-                source_iterations[var_name] = source_fhirpath.count(scope.source_instances)
+                source_iterations[var_name] = source_fhirpath.count(scope.get_instances())
             
             for source_var, iterations in source_iterations.items():
                 for source_iteration in range(iterations):
@@ -477,7 +495,9 @@ class FHIRMappingEngine:
 
                     # Process dependent rules for this iteration
                     for dependent in rule.dependent or []:
-                        self._process_dependent(dependent, iteration_scope)
+                        dependent_group = iteration_scope.lookup(dependent.name)
+                        parameters = [iteration_scope.lookup(param.valueId) for param in dependent.parameter]
+                        self.process_group(dependent_group, parameters, iteration_scope)
 
                     # Process nested rules for this iteration
                     for nested_rule in rule.rule or []:
@@ -553,7 +573,7 @@ class FHIRMappingEngine:
                 if not source_fhirpath:
                     raise RuleProcessingError(f"Source variable {source} not found")
                 # Just copy the source value
-                transformed_values = source_fhirpath.values(scope.source_instances)
+                transformed_values = source_fhirpath.values(scope.get_instances())
 
             elif transform == "create":
                 raise NotImplementedError("Create transform not implemented yet")
@@ -572,7 +592,7 @@ class FHIRMappingEngine:
                     raise RuleProcessingError(f"Source variable {source} not found")
                 transformed_values = source_fhirpath._invoke(
                     fhirpath.Substring(0, int(length))
-                ).values(scope.source_instances)
+                ).values(scope.get_instances())
 
             elif transform == "escape":
                 raise NotImplementedError("Escape transform not implemented yet")
@@ -603,7 +623,7 @@ class FHIRMappingEngine:
                     raise RuleProcessingError(f"Source variable {source} not found")
                 transformed_values = source_fhirpath._invoke(
                     getattr(fhirpath, f"To{to_type.title()}")()
-                ).values(scope.source_instances)
+                ).values(scope.get_instances())
 
             elif transform == "append":
                 raise NotImplementedError("Append transform not implemented yet")
@@ -639,7 +659,7 @@ class FHIRMappingEngine:
             # Update the target structure
             for index, transformed_value in enumerate(transformed_values):
                 indexed_path = path._invoke(fhirpath.Index(index))
-                indexed_path.update_single(scope.target_instances, transformed_value)
+                indexed_path.update_single(scope.get_instances(), transformed_value)
 
     def _process_dependent(
         self,
@@ -654,30 +674,6 @@ class FHIRMappingEngine:
                 self.process_rule(target_rule, scope)
             else:
                 logger.warning(f"Dependent rule not found: {dependent.name}")
-
-    def _find_rule_by_name(self, rule_name: str) -> Optional[StructureMapRule]:
-        """Find a rule by name in the structure map."""
-        # for group in self.structure_map.group or []:
-        #     for rule in group.rule or []:
-        #         if rule.name == rule_name:
-        #             return rule
-        #         # Check nested rules recursively
-        #         nested = self._find_rule_in_nested(rule, rule_name)
-        #         if nested:
-        #             return nested
-        # return None
-
-    def _find_rule_in_nested(
-        self, parent_rule: StructureMapRule, rule_name: str
-    ) -> Optional[StructureMapRule]:
-        """Recursively find a rule in nested rules."""
-        # for nested_rule in parent_rule.rule or []:
-        #     if nested_rule.name == rule_name:
-        #         return nested_rule
-        #     deeper = self._find_rule_in_nested(nested_rule, rule_name)
-        #     if deeper:
-        #         return deeper
-        # return None
 
 
 def _replace_mapping_scope_elements(path, scope: MappingScope):
