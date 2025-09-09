@@ -418,13 +418,10 @@ class FHIRMappingEngine:
             logger.debug(f"Processing rule: {rule_name}")
 
             # Process sources first to determine iteration
-            source_variables = {}
-            source_iteration_contexts = []
+            source_iterations = {}
 
             for source in rule.source or []:
-                self.process_source(source, scope)
-
-                var_name = source.variable or f"source_{id(source)}"
+                var_name = self.process_source(source, scope)
                 source_fhirpath = scope.lookup(var_name)
 
                 # Where condition
@@ -453,76 +450,47 @@ class FHIRMappingEngine:
                 # Collect source values for iteration
                 if source_fhirpath is None:
                     raise RuleProcessingError(f"Source variable {var_name} not found")
-                source_values = source_fhirpath.values(scope.source_instances)
-                source_variables[var_name] = source_values
+                source_iterations[var_name] = source_fhirpath.count(scope.source_instances)
+            
+            for source_var, iterations in source_iterations.items():
+                for source_iteration in range(iterations):
 
-                # If this source yields multiple values, we need to iterate
-                if len(source_values) > 1:
-                    for idx, source_value in enumerate(source_values):
-                        iteration_context = {var_name: source_value}
-                        if idx < len(source_iteration_contexts):
-                            source_iteration_contexts[idx].update(iteration_context)
-                        else:
-                            source_iteration_contexts.append(iteration_context)
-                else:
-                    # Single or no value - add to all existing contexts or create first one
-                    single_value = source_values[0] if source_values else None
-                    iteration_context = {var_name: single_value}
-                    if source_iteration_contexts:
-                        for ctx in source_iteration_contexts:
-                            ctx.update(iteration_context)
-                    else:
-                        source_iteration_contexts.append(iteration_context)
-
-            # If no iteration contexts were created, create a default one
-            if not source_iteration_contexts:
-                source_iteration_contexts = [{}]
-
-            # Execute the rule for each iteration context
-            for iteration_idx, iteration_context in enumerate(
-                source_iteration_contexts
-            ):
-                logger.debug(
-                    f"Processing iteration {iteration_idx} for rule {rule_name} with context: {iteration_context}"
-                )
-                # Create iteration scope
-                iteration_scope = MappingScope(
-                    name=f"{scope.name}_iter_{iteration_idx}",
-                    source_instances=scope.source_instances.copy(),
-                    target_instances=scope.target_instances.copy(),
-                    types=scope.types.copy(),
-                    variables=scope.variables.copy(),  # Copy existing variables
-                    parent=scope.parent,
-                )
-
-                # Define iteration variables in the iteration scope
-                for var_name, var_value in iteration_context.items():
-                    # Create a FHIRPath that returns just this iteration's value
                     logger.debug(
-                        f"Defining iteration variable {var_name} = {var_value}"
+                        f"Processing iteration {source_iteration} for rule {rule_name}"
                     )
-                    iteration_scope.define(var_name, fhirpath.Literal(var_value))
+                    # Create iteration scope
+                    iteration_scope = MappingScope(
+                        name=f"{scope.name}_iter_{source_iteration}",
+                        source_instances=scope.source_instances.copy(),
+                        target_instances=scope.target_instances.copy(),
+                        types=scope.types.copy(),
+                        variables=scope.variables.copy(),  # Copy existing variables
+                        parent=scope.parent,
+                    )
+                    
+                    # Set the source variable to an indexed FHIRPath
+                    iteration_scope.define(source_var, scope.lookup(source_var)._invoke(fhirpath.Index(source_iteration)))
 
-                # Process targets for this iteration
-                for target in rule.target or []:
-                    self.process_target(target, iteration_scope)
+                    # Process targets for this iteration
+                    for target in rule.target or []:
+                        self.process_target(target, iteration_scope, source_iteration)
 
-                # Process dependent rules for this iteration
-                for dependent in rule.dependent or []:
-                    self._process_dependent(dependent, iteration_scope)
+                    # Process dependent rules for this iteration
+                    for dependent in rule.dependent or []:
+                        self._process_dependent(dependent, iteration_scope)
 
-                # Process nested rules for this iteration
-                for nested_rule in rule.rule or []:
-                    self.process_rule(nested_rule, iteration_scope)
+                    # Process nested rules for this iteration
+                    for nested_rule in rule.rule or []:
+                        self.process_rule(nested_rule, iteration_scope)
 
-                # Merge back iteration results to main scope
-                scope.target_instances.update(iteration_scope.target_instances)
+                    # Merge back iteration results to main scope
+                    scope.target_instances.update(iteration_scope.target_instances)
 
         finally:
             scope.finish_processing_rule(rule_name)
         return scope
 
-    def process_source(self, source: StructureMapSource, scope: MappingScope) -> None:
+    def process_source(self, source: StructureMapSource, scope: MappingScope) -> str:
         path = scope.lookup(source.context)
         if path is None:
             raise RuleProcessingError(f"Source context {source.context} not found")
@@ -546,11 +514,13 @@ class FHIRMappingEngine:
         # Store source FHIRPath
         var_name = source.variable or f"source_{id(source)}"
         scope.define(var_name, path)
+        return var_name
 
     def process_target(
         self,
         target: StructureMapTarget,
         scope: MappingScope,
+        iteration: int
     ) -> Any:
         if not target.context:
             raise RuleProcessingError("Target context is required")
@@ -561,6 +531,8 @@ class FHIRMappingEngine:
         # Apply element path if specified
         if target.element:
             path = path._invoke(fhirpath.Element(target.element))
+        
+        path = path._invoke(fhirpath.Index(iteration))
 
         # Store target FHIRPath
         var_name = target.variable or f"target_{id(target)}"
