@@ -592,7 +592,15 @@ class FHIRMappingEngine:
                 elif literal:
                     transformed_values = [literal]
             elif transform == "create":
-                raise NotImplementedError("Create transform not implemented yet")
+                if (
+                    not target.parameter
+                    or len(target.parameter) != 1
+                    or not (create_type := target.parameter[0].value)
+                ):
+                    raise RuleProcessingError(
+                        "The 'create' transform requires exactly one parameter of type String"
+                    )
+                transformed_values = [scope.lookup(create_type).model_construct()]
             elif transform == "truncate":
                 if (
                     not target.parameter
@@ -644,7 +652,25 @@ class FHIRMappingEngine:
             elif transform == "append":
                 raise NotImplementedError("Append transform not implemented yet")
             elif transform == "reference":
-                raise NotImplementedError("Reference transform not implemented yet")
+                if (
+                    not target.parameter
+                    or len(target.parameter) != 1
+                    or not (source := target.parameter[0].valueId)
+                ):
+                    raise RuleProcessingError(
+                        "The 'reference' transform requires exactly one parameter of type Id"
+                    )
+                source_fhirpath = scope.lookup(source)
+                if not source_fhirpath:
+                    raise RuleProcessingError(f"Source variable {source} not found")
+                resource_type = source_fhirpath._invoke(
+                    fhirpath.Element('resourceType')
+                ).single(scope.get_instances())
+                resource_id = source_fhirpath._invoke(
+                    fhirpath.Element('id')
+                ).single(scope.get_instances())
+                transformed_values = [f"{resource_type}/{resource_id}"]
+                
             elif transform == "dateOp":
                 raise NotImplementedError("DateOp transform not implemented yet")
             elif transform == "uuid":

@@ -61,24 +61,15 @@ def test_integration_tutorial_examples(directory):
         encoding="utf8",
     ) as file:
         structure_map = StructureMap(**json.load(file))
-    with open(
-        os.path.join(
-            os.path.abspath(EXAMPLES_DIRECTORY),
-            directory,
-            directory + ".source.struct.json",
-        ),
-        encoding="utf8",
-    ) as file:
-        source_structure_definition = StructureDefinition(**json.load(file))
-    with open(
-        os.path.join(
-            os.path.abspath(EXAMPLES_DIRECTORY),
-            directory,
-            directory + ".target.struct.json",
-        ),
-        encoding="utf8",
-    ) as file:
-        target_structure_definition = StructureDefinition(**json.load(file))
+    structure_definitions = []
+    for _, _, files in os.walk(os.path.join(os.path.abspath(EXAMPLES_DIRECTORY),directory)):
+        for name in files:
+            if name.endswith('.struct.json'):
+                with open(
+                    os.path.join(os.path.abspath(EXAMPLES_DIRECTORY),directory,name),
+                    encoding="utf8",
+                ) as file:
+                    structure_definitions.append(StructureDefinition(**json.load(file)))
     with open(
         os.path.join(
             os.path.abspath(EXAMPLES_DIRECTORY),
@@ -99,8 +90,9 @@ def test_integration_tutorial_examples(directory):
         expected_result = json.load(file)
 
     repository = CompositeStructureDefinitionRepository(internet_enabled=False)
-    repository.add(source_structure_definition)
-    repository.add(target_structure_definition)
+    for structure in structure_definitions:
+        repository.add(structure)
+    
     engine = FHIRMappingEngine(repository=repository)
 
     result = engine.execute(structure_map, input)
