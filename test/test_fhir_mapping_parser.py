@@ -590,6 +590,59 @@ parser_test_cases = (
         ),
     ),
     (
+        """group map_example(source src, target tgt){src.a as sf -> tgt.b = evaluate(sf, '$this.a2 or $this.a3');}""",
+        add_rules_to_basic_map(
+            rules=[
+                StructureMapRule(
+                    source=[
+                        StructureMapSource(
+                            context="src",
+                            element="a",
+                            variable="sf",
+                        )
+                    ],
+                    target=[
+                        StructureMapTarget(
+                            context="tgt",
+                            element="b",
+                            transform="evaluate",
+                            parameter=[
+                                StructureMapParameter(valueId="sf"),
+                                StructureMapParameter(valueString="$this.a2 or $this.a3"),
+                            ],
+                        )
+                    ],
+                )
+            ]
+        ),
+    ),
+    (
+        """group map_example(source src, target tgt){src.a as sf -> tgt.b = (a2 or a3);}""",
+        add_rules_to_basic_map(
+            rules=[
+                StructureMapRule(
+                    source=[
+                        StructureMapSource(
+                            context="src",
+                            element="a",
+                            variable="sf",
+                        )
+                    ],
+                    target=[
+                        StructureMapTarget(
+                            context="tgt",
+                            element="b",
+                            transform="evaluate",
+                            parameter=[
+                                StructureMapParameter(valueString="a2 or a3"),
+                            ],
+                        )
+                    ],
+                )
+            ]
+        ),
+    ),
+    (
         """group map_example(source src, target tgt){src.field as sf -> tgt.field = evaluate('someExpr(sf)');}""",
         add_rules_to_basic_map(
             rules=[

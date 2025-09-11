@@ -342,7 +342,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         p[0] = p[2]
 
     def p_mapper_const(self, p):
-        """m_const : LET m_identifier EQUAL m_fhirPath ';'"""
+        """m_const : LET m_identifier EQUAL m_fhirpath ';'"""
         p[0] = StructureMapConst(name=p[2], value=str(p[4]))
 
     def p_mapper_group(self, p):
@@ -584,7 +584,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         p[0] = p[1]
 
     def p_mapper_sourceDefault(self, p):
-        """m_sourceDefault : DEFAULT '(' m_fhirPath ')'"""
+        """m_sourceDefault : DEFAULT '(' m_fhirpath ')'"""
         p[0] = {"default": p[3]}
 
     def p_mapper_sourceListMode(self, p):
@@ -600,15 +600,15 @@ class FhirMappingLanguageParser(FhirPathParser):
         p[0] = {"variable": p[2]}
 
     def p_mapper_whereClause(self, p):
-        """m_whereClause : WHERE '(' m_fhirPath ')'"""
+        """m_whereClause : WHERE '(' m_fhirpath ')'"""
         p[0] = {"condition": p[3]}
 
     def p_mapper_checkClause(self, p):
-        """m_checkClause : CHECK '(' m_fhirPath ')'"""
+        """m_checkClause : CHECK '(' m_fhirpath ')'"""
         p[0] = {"check": p[3]}
 
     def p_mapper_log(self, p):
-        """m_log : LOG '(' m_fhirPath ')'"""
+        """m_log : LOG '(' m_fhirpath ')'"""
         p[0] = {"log": p[3]}
 
     def p_mapper_ruleTarget(self, p):
@@ -688,7 +688,8 @@ class FhirMappingLanguageParser(FhirPathParser):
         p[0] = {"listMode": p[1]}
 
     def p_mapper_transform(self, p):
-        """m_transform : m_transform_invocation
+        """m_transform : m_transform_fhirpath
+        | m_transform_invocation
         | m_transform_rule_context
         | m_transform_literal"""
         p[0] = p[1]
@@ -696,6 +697,10 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_mapper_transform_rule_context(self, p):
         """m_transform_rule_context : m_ruleContext"""
         p[0] = StructureMapParameter(valueId=p[1])
+
+    def p_mapper_transform_fhirpath(self, p):
+        """m_transform_fhirpath : '(' m_fhirpath ')'"""
+        p[0] = {'name': 'evaluate', 'parameter': [StructureMapParameter(valueString=p[2])]}
 
     def p_mapper_transform_literal(self, p):
         """m_transform_literal : m_literal"""
@@ -769,7 +774,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         p[0] = StructureMapParameter(valueId=p[1])
 
     def p_mapper_fhirPath(self, p):
-        """m_fhirPath : expression"""
+        """m_fhirpath : expression"""
         print("FHIRPATH", p[1], "->", str(p[1]))
         p[0] = str(p[1])
 
