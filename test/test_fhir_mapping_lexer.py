@@ -44,6 +44,7 @@ token_test_cases = (  # ----------------- Symbols -----------------
     ("'string'", (("string", "STRING"),)),
     ("'test string'", (("test string", "STRING"),)),
     ("'string1' 'string2'", (("string1", "STRING"), ("string2", "STRING"))),
+    ("// documentation of something", (("documentation of something", "DOCUMENTATION"),)),
     # ----------------- Identifiers -----------------
     ("parent", (("parent", "IDENTIFIER"),)),
     ("_parent", (("_parent", "IDENTIFIER"),)),

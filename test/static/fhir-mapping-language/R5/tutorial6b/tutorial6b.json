@@ -54,7 +54,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "documentation": "leave error to lower layer; less informative"
         }
       ]
     }

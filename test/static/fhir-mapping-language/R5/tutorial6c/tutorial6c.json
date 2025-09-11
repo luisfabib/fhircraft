@@ -54,7 +54,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "documentation": "only use the first item in the list"
         }
       ]
     }

@@ -112,6 +112,7 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         "IDENTIFIER",
         "DELIMITEDIDENTIFIER",
         "METADATA_DECLARATION",
+        "DOCUMENTATION",
         "GROUPTYPE",
         "INTEGER",
         "DECIMAL",
@@ -120,7 +121,6 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         "TIME",
         "DATETIME",
         "STRING",
-        "COMMENT",
         "RIGHT_ARROW",
     ]
 
@@ -130,14 +130,16 @@ class FhirMappingLanguageLexer(FhirPathLexer):
             t.lexer.lineno += 1
             t.lexer.latest_newline = t.lexpos
 
-    # def t_ignore_COMMENT(self, t):
-    #     r"\/\*([\s\S]*?)\*\/|\/\/(.*)"
-    #     for substring in ["//", "/*", "*/"]:
-    #         t.value = t.value.replace(substring, "")
-    #     t.value = t.value.strip()
 
     def t_METADATA_DECLARATION(self, t):
         r"\/\/\/"
+        return t
+    
+    def t_DOCUMENTATION(self, t):
+        r"\/{2}(.*)"
+        for substring in ["//", "/*", "*/"]:
+            t.value = t.value.replace(substring, "")
+        t.value = t.value.strip()
         return t
 
     def t_RIGHT_ARROW(self, t):

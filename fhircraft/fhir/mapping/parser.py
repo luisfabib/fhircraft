@@ -317,6 +317,11 @@ class FhirMappingLanguageParser(FhirPathParser):
         else:
             p[0] = (p[1] or []) + [p[2]]
 
+    def p_mapper_documented_structure(self, p):
+        """m_structure : m_structure DOCUMENTATION """
+        p[1].documentation = p[2]
+        p[0] = p[1]
+
     def p_mapper_structure(self, p):
         """m_structure : USES m_url m_structureAlias AS m_modelMode
         | USES m_url AS m_modelMode"""
@@ -344,6 +349,18 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_mapper_const(self, p):
         """m_const : LET m_identifier EQUAL m_fhirpath ';'"""
         p[0] = StructureMapConst(name=p[2], value=str(p[4]))
+
+
+    def p_mapper_group_documentation(self, p):
+        """m_group : DOCUMENTATION m_group
+        | m_group DOCUMENTATION """
+        if isinstance(p[1], StructureMapGroup):
+            group = p[1]
+            group.documentation = p[2]
+        else:
+            group = p[2]
+            group.documentation = p[1]
+        p[0] = group
 
     def p_mapper_group(self, p):
         """m_group : GROUP m_identifier m_parameters m_extends GROUPTYPE m_rules
@@ -420,12 +437,25 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_rule_list(self, p):
         """m_rule_list : m_rule
+        | m_documented_rule
         | m_rule_list m_rule
+        | m_rule_list m_documented_rule
         | m_empty"""
         if len(p) == 2:
             p[0] = [p[1]] if p[1] else None
         else:
             p[0] = (p[1] or []) + [p[2]]
+
+    def p_mapper_rule_documentation(self, p):
+        """m_documented_rule : DOCUMENTATION m_rule
+        | m_rule DOCUMENTATION """
+        if isinstance(p[1], StructureMapRule):
+            rule = p[1]
+            rule.documentation = p[2]
+        else:
+            rule = p[2]
+            rule.documentation = p[1]
+        p[0] = rule
 
     def p_mapper_rule(self, p):
         """m_rule : m_ruleSources RIGHT_ARROW m_ruleTargets m_dependent m_ruleName ';'"""

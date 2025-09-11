@@ -38,6 +38,7 @@
       "rule": [
         {
           "name": "rule_ptr",
+          "documentation": "setting id to one is not necessary, this is just to compare the output",
           "source": [
             {
               "context": "src",

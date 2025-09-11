@@ -33,6 +33,7 @@
       "rule": [
         {
           "name": "rule_saz1",
+          "documentation": "setting up a variable for the parent",
           "source": [
             {
               "context": "src",
@@ -43,6 +44,7 @@
           "rule": [
             {
               "name": "rule_taz1",
+              "documentation": "one tgt.az1 for each az3",
               "source": [
                 {
                   "context": "s_az1",
@@ -61,6 +63,7 @@
               "rule": [
                 {
                   "name": "rule_az2",
+                  "documentation": "value for az2. Note that this refers to a previous context in the source",
                   "source": [
                     {
                       "context": "s_az1",
@@ -84,6 +87,7 @@
                 },
                 {
                   "name": "rule_az3",
+                  "documentation": "value for az3",
                   "source": [
                     {
                       "context": "s_az3"

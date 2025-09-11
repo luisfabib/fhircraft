@@ -9,10 +9,11 @@ from fhircraft.fhir.mapping.parser import FhirMappingLanguageParser
 from fhircraft.fhir.mapping.StructureMap import *
 
 
-def add_rules_to_basic_map(rules):
+def add_rules_to_basic_map(rules, documentation=None):
     return StructureMap.model_construct(
         group=[
             StructureMapGroup(
+                documentation=documentation,    
                 name="map_example",
                 input=[
                     StructureMapInput(name="src", mode="source"),
@@ -71,6 +72,11 @@ parser_test_cases = (
                 StructureMapStructure(url="http://example.org", mode="queried"),
                 StructureMapStructure(url="http://example.org", mode="produced"),
             ]
+        ),
+    ),    (
+        """uses 'http://example.org' as source // This documents the source""",
+        StructureMap.model_construct(
+            structure=[StructureMapStructure(url="http://example.org", mode="source", documentation="This documents the source")]
         ),
     ),
     # ----------------- IMPORTS DECLARATION  -----------------
@@ -463,8 +469,94 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field -> tgt.field = create('TestResource') as tr;}""",
+        """group map_example(source src, target tgt){
+            // This documents the rule
+            src.field -> tgt.field = create('TestResource') as tr;
+        }""",
         add_rules_to_basic_map(
+            rules=[
+                StructureMapRule(
+                    documentation="This documents the rule",
+                    source=[
+                        StructureMapSource(context="src", element="field"),
+                    ],
+                    target=[
+                        StructureMapTarget(
+                            context="tgt",
+                            element="field",
+                            transform="create",
+                            parameter=[
+                                StructureMapParameter(valueString="TestResource")
+                            ],
+                            variable="tr",
+                        )
+                    ],
+                )
+            ]
+        ),
+    ),
+    (
+        """group map_example(source src, target tgt){
+            src.field -> tgt.field = create('TestResource') as tr;
+            // This documents the rule
+        }""",
+        add_rules_to_basic_map(
+            rules=[
+                StructureMapRule(
+                    documentation="This documents the rule",
+                    source=[
+                        StructureMapSource(context="src", element="field"),
+                    ],
+                    target=[
+                        StructureMapTarget(
+                            context="tgt",
+                            element="field",
+                            transform="create",
+                            parameter=[
+                                StructureMapParameter(valueString="TestResource")
+                            ],
+                            variable="tr",
+                        )
+                    ],
+                )
+            ]
+        ),
+    ),
+    (
+        """
+        // This documents the group
+        group map_example(source src, target tgt){
+            src.field -> tgt.field = create('TestResource') as tr;
+        }""",
+        add_rules_to_basic_map(
+            documentation="This documents the group",
+            rules=[
+                StructureMapRule(
+                    source=[
+                        StructureMapSource(context="src", element="field"),
+                    ],
+                    target=[
+                        StructureMapTarget(
+                            context="tgt",
+                            element="field",
+                            transform="create",
+                            parameter=[
+                                StructureMapParameter(valueString="TestResource")
+                            ],
+                            variable="tr",
+                        )
+                    ],
+                )
+            ]
+        ),
+    ),
+    (
+        """
+        group map_example(source src, target tgt){
+            src.field -> tgt.field = create('TestResource') as tr;
+        } // This documents the group""",
+        add_rules_to_basic_map(
+            documentation="This documents the group",
             rules=[
                 StructureMapRule(
                     source=[
