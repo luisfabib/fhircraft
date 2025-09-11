@@ -54,10 +54,18 @@ class RuleProcessingError(MappingError):
     pass
 
 
+class StructureMapTargetListMode(str, enum.Enum):
+    """Enumeration of StructureMap model modes."""
+
+    FIRST = "first"  
+    LAST = "last"
+    SHARED = "shared"
+    SINGLE = "single"
+
 class StructureMapModelMode(str, enum.Enum):
     """Enumeration of StructureMap model modes."""
 
-    SOURCE = "source"  #
+    SOURCE = "source" 
     TARGET = "target"
     QUERIED = "queried"
     PRODUCED = "produced"
@@ -429,7 +437,27 @@ class FHIRMappingEngine:
         for input, parameter in zip(group.input, parameters):
             group_scope.define(input.name, parameter)
         
-        for rule in group.rule or []:
+        # Process rules in order, handling 'first' and 'last' list modes
+        rules = [] 
+        first_rule, last_rule = None, None
+        for rule in group.rule or []:   
+            if rule.target and (targetMode := next((target.listMode for target in rule.target if target.listMode), [None])[0]):
+                if targetMode == StructureMapTargetListMode.FIRST:
+                    if first_rule:
+                        raise RuntimeError('Only one rule with "first" target list mode is allowed per group.')
+                    first_rule = rule
+                elif targetMode == StructureMapTargetListMode.LAST:
+                    if last_rule:
+                        raise RuntimeError('Only one rule with "last" target list mode is allowed per group.')
+                    last_rule = rule
+                else:
+                    raise NotImplementedError("Only 'first' and 'last' target list modes are implemented so far. Mode '{}' not implemented")
+            else:
+                rules.append(rule)
+        rules = ([first_rule] if first_rule else []) + rules + ([last_rule] if last_rule else [])
+
+        # Process each rule
+        for rule in rules:
             self.process_rule(rule, group_scope)
 
 
@@ -501,7 +529,7 @@ class FHIRMappingEngine:
 
                     # Process targets for this iteration
                     for target in rule.target or []:
-                        self.process_target(target, iteration_scope, source_iteration)
+                        self.process_target(target, iteration_scope)
 
                     # Process dependent rules for this iteration
                     for dependent in rule.dependent or []:
@@ -550,8 +578,7 @@ class FHIRMappingEngine:
         self,
         target: StructureMapTarget,
         scope: MappingScope,
-        iteration: int
-    ) -> Any:
+        ) -> Any:
         if not target.context:
             raise RuleProcessingError("Target context is required")
         path = scope.lookup(target.context)
@@ -561,8 +588,9 @@ class FHIRMappingEngine:
         # Apply element path if specified
         if target.element:
             path = path._invoke(fhirpath.Element(target.element))
-        
-        path = path._invoke(fhirpath.Index(iteration))
+
+        insert_index = path.count(scope.get_instances())
+        path = path._invoke(fhirpath.Index(insert_index))
 
         # Store target FHIRPath
         var_name = target.variable or f"target_{id(target)}"
@@ -724,9 +752,8 @@ class FHIRMappingEngine:
                 )
 
             # Update the target structure
-            for index, transformed_value in enumerate(transformed_values):
-                indexed_path = path._invoke(fhirpath.Index(index))
-                indexed_path.update_single(scope.get_instances(), transformed_value)
+            transformed_value = transformed_values[0]
+            path.update_single(scope.get_instances(), transformed_value)
 
     def _process_dependent(
         self,
