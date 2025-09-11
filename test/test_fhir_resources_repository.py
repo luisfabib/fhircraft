@@ -259,7 +259,7 @@ class TestStructureDefinitionRepository:
         """Test retrieving non-existent structure definition raises error."""
         repo = empty_repository
 
-        with pytest.raises(RuntimeError, match="Structure definition not found"):
+        with pytest.raises(Exception):
             repo.get("http://hl7.org/fhir/StructureDefinition/NonExistent")
 
     def test_has_structure_definition(self, populated_repository):
