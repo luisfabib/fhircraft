@@ -7,14 +7,16 @@ StructureMap resources to transform FHIR data from source to target structures.
 
 import enum
 import logging
-import uuid 
 import re
-from dataclasses import dataclass, field
+import uuid
 from collections import OrderedDict
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Set, Type
+
 from pydantic import BaseModel
 
 import fhircraft.fhir.path.engine as fhirpath
+from fhircraft.fhir.mapping.ConceptMap import ConceptMap
 from fhircraft.fhir.mapping.StructureMap import (
     StructureMap,
     StructureMapDependent,
@@ -24,18 +26,17 @@ from fhircraft.fhir.mapping.StructureMap import (
     StructureMapSource,
     StructureMapTarget,
 )
-from fhircraft.fhir.mapping.ConceptMap import ConceptMap
 from fhircraft.fhir.path import fhirpath as fhirpath_parser
 from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
 from fhircraft.fhir.path.exceptions import FHIRPathError
-from fhircraft.fhir.resources.factory import ResourceFactory
 from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
-    CodeableConcept, 
-    Coding, 
-    Quantity, 
-    Identifier, 
+    CodeableConcept,
+    Coding,
     ContactPoint,
+    Identifier,
+    Quantity,
 )
+from fhircraft.fhir.resources.factory import ResourceFactory
 from fhircraft.fhir.resources.repository import (
     CompositeStructureDefinitionRepository,
     StructureDefinitionNotFoundError,
@@ -66,15 +67,16 @@ class RuleProcessingError(MappingError):
 class StructureMapTargetListMode(str, enum.Enum):
     """Enumeration of StructureMap model modes."""
 
-    FIRST = "first"  
+    FIRST = "first"
     LAST = "last"
     SHARED = "shared"
     SINGLE = "single"
 
+
 class StructureMapModelMode(str, enum.Enum):
     """Enumeration of StructureMap model modes."""
 
-    SOURCE = "source" 
+    SOURCE = "source"
     TARGET = "target"
     QUERIED = "queried"
     PRODUCED = "produced"
@@ -125,41 +127,51 @@ class MappingScope:
             **self.source_instances,
         }
 
-
-    def get_concept_map(self, identifier: str) -> Optional[ConceptMap]:
+    def get_concept_map(self, identifier: str) -> ConceptMap:
         """Get a concept map by its identifier"""
-        return self.concept_maps.get(identifier) or (
+        concept_map = self.concept_maps.get(identifier) or (
             self.parent.get_concept_map(identifier) if self.parent else None
         )
-    
-    def get_target_instance(self, identifier: str) -> Optional[BaseModel]:
+        if not concept_map:
+            raise MappingError(
+                f"Concept map '{identifier}' not found in current or parent scopes."
+            )
+        return concept_map
+
+    def get_target_instance(self, identifier: str) -> BaseModel:
         """Get a target instance by its identifier"""
         instance = self.target_instances.get(identifier) or (
             self.parent.get_target_instance(identifier) if self.parent else None
         )
         if not instance:
-            raise MappingError(f"Target instance '{identifier}' not found in current or parent scopes.")
+            raise MappingError(
+                f"Target instance '{identifier}' not found in current or parent scopes."
+            )
         return instance
 
-    def get_source_instance(self, identifier: str) -> Optional[BaseModel]:
+    def get_source_instance(self, identifier: str) -> BaseModel:
         """Get a source instance by its identifier"""
         instance = self.source_instances.get(identifier) or (
             self.parent.get_source_instance(identifier) if self.parent else None
         )
         if not instance:
-            raise MappingError(f"Source instance '{identifier}' not found in current or parent scopes.")
+            raise MappingError(
+                f"Source instance '{identifier}' not found in current or parent scopes."
+            )
         return instance
 
-    def get_type(self, identifier: str) -> Optional[type[BaseModel]]:
+    def get_type(self, identifier: str) -> type[BaseModel]:
         """Get a type by its identifier"""
         type_ = self.types.get(identifier) or (
             self.parent.get_type(identifier) if self.parent else None
         )
         if not type_:
-            raise MappingError(f"Type '{identifier}' not found in current or parent scopes.")
+            raise MappingError(
+                f"Type '{identifier}' not found in current or parent scopes."
+            )
         return type_
 
-    def lookup(self, identifier: str) -> Optional[Any]:
+    def lookup(self, identifier: str) -> Any:
         """Look up a variable, checking parent scopes if not found locally"""
         if identifier in self.variables:
             return self.variables[identifier]
@@ -168,8 +180,11 @@ class MappingScope:
         elif identifier in self.groups:
             return self.groups[identifier]
         elif self.parent:
-            return self.parent.lookup(identifier)
-        return None
+            try:
+                return self.parent.lookup(identifier)
+            except MappingError:
+                pass
+        raise MappingError(f"Variable or identifier '{identifier}' not found.")
 
     def exists(self, identifier: str) -> bool:
         """Check if identifier exists in this scope or any parent scope"""
@@ -238,11 +253,11 @@ class FHIRMappingEngine:
     def execute(
         self,
         structure_map: StructureMap,
-        sources: tuple[BaseModel | dict, ...],
-        targets: tuple[BaseModel | dict, ...] | None = None,
-        group: str | None = None
+        sources: tuple[BaseModel | dict],
+        targets: tuple[BaseModel | dict] | None = None,
+        group: str | None = None,
     ) -> tuple[BaseModel, ...]:
-        
+
         if not isinstance(sources, tuple):
             sources = (sources,)
 
@@ -252,55 +267,104 @@ class FHIRMappingEngine:
         target_models = self._resolve_structure_definitions(
             structure_map, StructureMapModelMode.TARGET
         )
+        queried_models = self._resolve_structure_definitions(
+            structure_map, StructureMapModelMode.QUERIED
+        )
+        produced_models = self._resolve_structure_definitions(
+            structure_map, StructureMapModelMode.PRODUCED
+        )
 
         validated_sources = self._validate_source_data(sources, source_models)
 
         global_scope = MappingScope(
             name="global",
-            types={**source_models, **target_models},
-            groups=OrderedDict([(group.name, group) for group in structure_map.group or []]),
-            concept_maps={map.name: map for map in (structure_map.contained or []) if map.resourceType == "ConceptMap"}
+            types={
+                **source_models,
+                **target_models,
+                **queried_models,
+                **produced_models,
+            },
+            groups=OrderedDict(
+                [(group.name, group) for group in structure_map.group or []]
+            ),
+            concept_maps={
+                map.name: map
+                for map in (structure_map.contained or [])
+                if map.resourceType == "ConceptMap" and map.name
+            },
         )
 
-        target_group = global_scope.groups.get(group) or list(global_scope.groups.values())[0]
+        target_group = (global_scope.groups.get(group) if group else None) or list(
+            global_scope.groups.values()
+        )[0]
 
         # Validate the group parameters
-        expected_sources = len([input for input in (target_group.input or []) if input.mode == StructureMapModelMode.SOURCE])
+        expected_sources = len(
+            [
+                input
+                for input in (target_group.input or [])
+                if input.mode == StructureMapModelMode.SOURCE
+            ]
+        )
         if len(validated_sources) != expected_sources:
-            raise RuntimeError(f'Entrypoint group {target_group.name} expected {expected_sources} sources, got {len(sources)}.')
+            raise RuntimeError(
+                f"Entrypoint group {target_group.name} expected {expected_sources} sources, got {len(sources)}."
+            )
         if targets:
-            expected_targets = len([input for input in (target_group.input or []) if input.mode == StructureMapModelMode.TARGET])
+            expected_targets = len(
+                [
+                    input
+                    for input in (target_group.input or [])
+                    if input.mode
+                    in (StructureMapModelMode.TARGET, StructureMapModelMode.PRODUCED)
+                ]
+            )
             if len(targets) != expected_targets:
-                raise RuntimeError(f'Entrypoint group {target_group.name} expected {expected_sources} targets, got {len(sources)}.')
+                raise RuntimeError(
+                    f"Entrypoint group {target_group.name} expected {expected_targets} targets, got {len(targets)}."
+                )
         parameters = []
         for input in target_group.input:
             if input.mode == StructureMapModelMode.SOURCE:
                 if input.type:
                     source_instance = validated_sources.get(input.type)
                     if not source_instance:
-                        raise TypeError(f"Invalid source provided. None of the source arguments matches the '{input.name}' parameter of type {input.type} for the entrypoint group '{target_group.name}'.")
+                        raise TypeError(
+                            f"Invalid source provided. None of the source arguments matches the '{input.name}' parameter of type {input.type} for the entrypoint group '{target_group.name}'."
+                        )
                 else:
-                    source_instance = sources.pop(0) 
+                    source_instance = sources[0]
                 source_instance_id = f"source_{id(source_instance)}"
-                global_scope.source_instances[source_instance_id] = source_instance
+                global_scope.source_instances[source_instance_id] = source_instance  # type: ignore
                 parameters.append(fhirpath.Element(source_instance_id))
-                    
+
             if input.mode == StructureMapModelMode.TARGET:
                 if input.type and (target_type := global_scope.types.get(input.type)):
                     if not targets:
                         target_instance = target_type.model_construct()
                     else:
-                        target_instance = next((target for target in targets if isinstance(target, target_type)), None)
+                        target_instance = next(
+                            (
+                                target
+                                for target in targets
+                                if isinstance(target, target_type)
+                            ),
+                            None,
+                        )
                         if not target_instance:
-                            raise TypeError(f"Invalid target provided. None of the target arguments matches the {input.name} parameters of type {input.type} for the entrypoint group '{target_group.name}'.")
+                            raise TypeError(
+                                f"Invalid target provided. None of the target arguments matches the {input.name} parameters of type {input.type} for the entrypoint group '{target_group.name}'."
+                            )
                 else:
                     if targets:
-                        target_instance = targets.pop(0)
+                        target_instance = targets[0]
                     else:
-                        raise RuntimeError(f"Entrypoint group '{target_group.name}' parameter {input.name} does not specify any type and no target instances have been provided.")                                        
+                        raise RuntimeError(
+                            f"Entrypoint group '{target_group.name}' parameter {input.name} does not specify any type and no target instances have been provided."
+                        )
 
                 target_instance_id = f"source_{id(target_instance)}"
-                global_scope.target_instances[target_instance_id] = target_instance
+                global_scope.target_instances[target_instance_id] = target_instance  # type: ignore
                 parameters.append(fhirpath.Element(target_instance_id))
 
         self.process_group(target_group, parameters, global_scope)
@@ -445,7 +509,10 @@ class FHIRMappingEngine:
             self._validate_rule(nested_rule, issues)
 
     def process_group(
-        self, group: StructureMapGroup, parameters: list[FHIRPath] | tuple[FHIRPath], scope: MappingScope
+        self,
+        group: StructureMapGroup,
+        parameters: list[FHIRPath] | tuple[FHIRPath],
+        scope: MappingScope,
     ):
         group_name = group.name or f"group_{id(group)}"
 
@@ -457,33 +524,49 @@ class FHIRMappingEngine:
 
         # Validate input parameters
         if len(group.input) != len(parameters):
-            raise MappingError(f"Invalid number of parameters provided for group '{group_name}'. Expected {len(group.input)}, got {len(parameters)}.")
+            raise MappingError(
+                f"Invalid number of parameters provided for group '{group_name}'. Expected {len(group.input)}, got {len(parameters)}."
+            )
         for input, parameter in zip(group.input, parameters):
             group_scope.define(input.name, parameter)
-        
+
         # Process rules in order, handling 'first' and 'last' list modes
-        rules = [] 
+        rules = []
         first_rule, last_rule = None, None
-        for rule in group.rule or []:   
-            if rule.target and (targetMode := next((target.listMode for target in rule.target if target.listMode), [None])[0]):
+        for rule in group.rule or []:
+            if rule.target and (
+                targetMode := next(
+                    (target.listMode for target in rule.target if target.listMode),
+                    [None],
+                )[0]
+            ):
                 if targetMode == StructureMapTargetListMode.FIRST:
                     if first_rule:
-                        raise RuntimeError('Only one rule with "first" target list mode is allowed per group.')
+                        raise RuntimeError(
+                            'Only one rule with "first" target list mode is allowed per group.'
+                        )
                     first_rule = rule
                 elif targetMode == StructureMapTargetListMode.LAST:
                     if last_rule:
-                        raise RuntimeError('Only one rule with "last" target list mode is allowed per group.')
+                        raise RuntimeError(
+                            'Only one rule with "last" target list mode is allowed per group.'
+                        )
                     last_rule = rule
                 else:
-                    raise NotImplementedError("Only 'first' and 'last' target list modes are implemented so far. Mode '{}' not implemented")
+                    raise NotImplementedError(
+                        "Only 'first' and 'last' target list modes are implemented so far. Mode '{}' not implemented"
+                    )
             else:
                 rules.append(rule)
-        rules = ([first_rule] if first_rule else []) + rules + ([last_rule] if last_rule else [])
+        rules = (
+            ([first_rule] if first_rule else [])
+            + rules
+            + ([last_rule] if last_rule else [])
+        )
 
         # Process each rule
         for rule in rules:
             self.process_rule(rule, group_scope)
-
 
     def process_rule(self, rule: StructureMapRule, scope: MappingScope) -> MappingScope:
         rule_name = rule.name or f"rule_{id(rule)}"
@@ -530,8 +613,10 @@ class FHIRMappingEngine:
                 # Collect source values for iteration
                 if source_fhirpath is None:
                     raise RuleProcessingError(f"Source variable {var_name} not found")
-                source_iterations[var_name] = source_fhirpath.count(scope.get_instances())
-            
+                source_iterations[var_name] = source_fhirpath.count(
+                    scope.get_instances()
+                )
+
             for source_var, iterations in source_iterations.items():
                 for source_iteration in range(iterations):
 
@@ -547,9 +632,16 @@ class FHIRMappingEngine:
                         variables=scope.variables.copy(),  # Copy existing variables
                         parent=scope.parent,
                     )
-                    
+
                     # Set the source variable to an indexed FHIRPath
-                    iteration_scope.define(source_var, scope.lookup(source_var)._invoke(fhirpath.Index(source_iteration)))
+                    if (rule_source := scope.lookup(source_var)) is None:
+                        raise RuleProcessingError(
+                            f"Source variable {source_var} not found"
+                        )
+                    iteration_scope.define(
+                        source_var,
+                        rule_source._invoke(fhirpath.Index(source_iteration)),
+                    )
 
                     # Process targets for this iteration
                     for target in rule.target or []:
@@ -558,7 +650,14 @@ class FHIRMappingEngine:
                     # Process dependent rules for this iteration
                     for dependent in rule.dependent or []:
                         dependent_group = iteration_scope.lookup(dependent.name)
-                        parameters = [iteration_scope.lookup(param.valueId) for param in dependent.parameter]
+                        if not dependent_group:
+                            raise RuleProcessingError(
+                                f"Dependent group or rule '{dependent.name}' not found"
+                            )
+                        parameters = [
+                            iteration_scope.lookup(param.value)
+                            for param in dependent.parameter
+                        ]
                         self.process_group(dependent_group, parameters, iteration_scope)
 
                     # Process nested rules for this iteration
@@ -602,7 +701,7 @@ class FHIRMappingEngine:
         self,
         target: StructureMapTarget,
         scope: MappingScope,
-        ) -> Any:
+    ) -> Any:
         if not target.context:
             raise RuleProcessingError("Target context is required")
         path = scope.lookup(target.context)
@@ -622,6 +721,7 @@ class FHIRMappingEngine:
 
         transform = target.transform
         if transform:
+            target.parameter = target.parameter or []
             if transform == "copy":
                 transformed_value = self._copy_transform(scope, target.parameter)
             elif transform == "create":
@@ -664,15 +764,15 @@ class FHIRMappingEngine:
             # Update the target structure
             path.update_single(scope.get_instances(), transformed_value)
 
-
     @staticmethod
-    def _copy_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> Any:
+    def _copy_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> Any:
         if (
-            not parameters or len(parameters) != 1
+            not parameters
+            or len(parameters) != 1
             or not (
-                (source := parameters[0].valueId)
-                or 
-                (literal := parameters[0].value) 
+                (source := parameters[0].valueId) or (literal := parameters[0].value)
             )
         ):
             raise RuleProcessingError(
@@ -690,9 +790,12 @@ class FHIRMappingEngine:
             return literal
 
     @staticmethod
-    def _create_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> BaseModel:
+    def _create_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> BaseModel:
         if (
-            not parameters or len(parameters) != 1
+            not parameters
+            or len(parameters) != 1
             or not (create_type := parameters[0].value)
         ):
             raise RuleProcessingError(
@@ -700,9 +803,10 @@ class FHIRMappingEngine:
             )
         return scope.get_type(create_type).model_construct()
 
-
     @staticmethod
-    def _truncate_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> str:
+    def _truncate_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> str:
         if (
             not parameters
             or len(parameters) != 2
@@ -715,24 +819,21 @@ class FHIRMappingEngine:
         source_fhirpath = scope.lookup(source)
         if not source_fhirpath:
             raise RuleProcessingError(f"Source variable {source} not found")
-        return source_fhirpath._invoke(
-            fhirpath.Substring(0, int(length))
-        ).single(scope.get_instances())
-
+        return source_fhirpath._invoke(fhirpath.Substring(0, int(length))).single(
+            scope.get_instances()
+        )
 
     @staticmethod
-    def _cast_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> Any:
+    def _cast_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> Any:
         if (
             not parameters
             or len(parameters) < 1
             or len(parameters) > 2
             or not (source := parameters[0].valueId)
             or not (
-                to_type := (
-                    parameters[1].valueString
-                    if len(parameters) == 2
-                    else None
-                )
+                to_type := (parameters[1].valueString if len(parameters) == 2 else None)
             )
         ):
             raise RuleProcessingError(
@@ -749,13 +850,11 @@ class FHIRMappingEngine:
             getattr(fhirpath, f"To{to_type.title()}")()
         ).single(scope.get_instances())
 
-
     @staticmethod
-    def _append_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> str:
-        if (
-            not parameters
-            or len(parameters) < 1
-        ):
+    def _append_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> str:
+        if not parameters or len(parameters) < 1:
             raise RuleProcessingError(
                 "The 'append' transform requires at least one parameter of type Id and String"
             )
@@ -764,16 +863,22 @@ class FHIRMappingEngine:
             if parameter.valueId:
                 source_fhirpath = scope.lookup(parameter.valueId)
                 if not source_fhirpath:
-                    raise RuleProcessingError(f"Source variable {parameter.valueId} not found")
+                    raise RuleProcessingError(
+                        f"Source variable {parameter.valueId} not found"
+                    )
                 strings.append(str(source_fhirpath.single(scope.get_instances())))
             elif parameter.valueString:
                 strings.append(parameter.valueString)
             else:
-                raise RuleProcessingError("Invalid parameter type for 'append' transform")
-        return ''.join(strings)
+                raise RuleProcessingError(
+                    "Invalid parameter type for 'append' transform"
+                )
+        return "".join(strings)
 
     @staticmethod
-    def _reference_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> str:
+    def _reference_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> str:
         if (
             not parameters
             or len(parameters) != 1
@@ -786,15 +891,17 @@ class FHIRMappingEngine:
         if not source_fhirpath:
             raise RuleProcessingError(f"Source variable {source} not found")
         resource_type = source_fhirpath._invoke(
-            fhirpath.Element('resourceType')
+            fhirpath.Element("resourceType")
         ).single(scope.get_instances())
-        resource_id = source_fhirpath._invoke(
-            fhirpath.Element('id')
-        ).single(scope.get_instances())
+        resource_id = source_fhirpath._invoke(fhirpath.Element("id")).single(
+            scope.get_instances()
+        )
         return f"{resource_type}/{resource_id}"
-    
+
     @staticmethod
-    def _uuid_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> str:
+    def _uuid_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> str:
         if parameters:
             raise RuleProcessingError(
                 "The 'uuid' transform does not take any parameters"
@@ -802,7 +909,9 @@ class FHIRMappingEngine:
         return str(uuid.uuid4())
 
     @staticmethod
-    def _translate_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> str:
+    def _translate_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> str:
         if (
             not parameters
             or len(parameters) != 3
@@ -813,29 +922,44 @@ class FHIRMappingEngine:
             raise RuleProcessingError(
                 "The 'translate' transform requires exactly two parameters of type Id and Integer"
             )
-        
+
         source_code = scope.lookup(source).single(scope.get_instances())
-        concept_map = scope.get_concept_map(map_name.lstrip('#'))
+        concept_map = scope.get_concept_map(map_name.lstrip("#"))
         if not concept_map:
             raise MappingError(f"Concept map '{map_name}' could not be resolved.")
+        if concept_map.group is None:
+            raise MappingError(f"Concept map '{map_name}' has no groups defined.")
         for group in concept_map.group:
             for element in group.element:
+                if element.target is None:
+                    continue
                 for element_target in element.target:
                     if element.code == source_code:
-                        if output == 'code':
+                        if output == "code":
+                            if element_target.code is None:
+                                raise MappingError(
+                                    f"Concept map '{map_name}' does not define a target code for source code '{source_code}'."
+                                )
                             return element_target.code
                         else:
-                            raise NotImplementedError(f"Output mode '{output}' for translate operation is not yet implemented.")
+                            raise NotImplementedError(
+                                f"Output mode '{output}' for translate operation is not yet implemented."
+                            )
         else:
-            raise MappingError(f"Could not map source code '{source_code}' using concept map '{map_name}'.")
+            raise MappingError(
+                f"Could not map source code '{source_code}' using concept map '{map_name}'."
+            )
 
     @staticmethod
-    def _evaluate_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> str:
+    def _evaluate_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> Any:
         if len(parameters) == 1:
             raise NotImplementedError(
                 "The evaluate transforms with implicit FHIRPath context is not supported."
-            )   
-        if (len(parameters) != 2
+            )
+        if (
+            len(parameters) != 2
             or not (source := parameters[0].valueId)
             or not (evaluate_fhirpath := parameters[1].valueString)
         ):
@@ -845,32 +969,44 @@ class FHIRMappingEngine:
         context = scope.lookup(source).single(scope.get_instances())
         if not context:
             raise MappingError(f"Context '{context}' could not be resolved.")
-        transformed_values =  fhirpath_parser.parse(evaluate_fhirpath).values(context)
+        transformed_values = fhirpath_parser.parse(evaluate_fhirpath).values(context)
         if transformed_values and len(transformed_values) > 1:
-            raise MappingError(f"Currently, the evaluate transform only supports FHIRPath expressions that yield a single value. It returned {len(transformed_values)}")
+            raise MappingError(
+                f"Currently, the evaluate transform only supports FHIRPath expressions that yield a single value. It returned {len(transformed_values)}"
+            )
         return transformed_values[0] if transformed_values else None
 
     @staticmethod
-    def _cc_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> CodeableConcept:
-        if not parameters or len(parameters)>3 or len(parameters)<1:
+    def _cc_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> CodeableConcept:
+        if not parameters or len(parameters) > 3 or len(parameters) < 1:
             raise RuleProcessingError(
                 "The 'cc' transform either one parameter of type String or two parameters of type String and String"
-            )        
+            )
         if len(parameters) == 1:
             return CodeableConcept(text=parameters[0].valueString)
         else:
-            return CodeableConcept(coding=[Coding(
-                code=parameters[0].valueString,
-                system=parameters[1].valueString,
-                display=parameters[2].valueString if len(parameters) == 3 else None,
-            )])
+            return CodeableConcept(
+                coding=[
+                    Coding(
+                        code=parameters[0].valueString,
+                        system=parameters[1].valueString,
+                        display=(
+                            parameters[2].valueString if len(parameters) == 3 else None
+                        ),
+                    )
+                ]
+            )
 
     @staticmethod
-    def _c_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> Coding:
-        if not parameters or len(parameters)>3 or len(parameters)<2:
+    def _c_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> Coding:
+        if not parameters or len(parameters) > 3 or len(parameters) < 2:
             raise RuleProcessingError(
                 "The 'c' transform takes two or three parameters of type String"
-            )       
+            )
         return Coding(
             code=parameters[0].valueString,
             system=parameters[1].valueString,
@@ -878,26 +1014,38 @@ class FHIRMappingEngine:
         )
 
     @staticmethod
-    def _qty_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> Quantity:
-        if not parameters or len(parameters)>4 or len(parameters)<1:
+    def _qty_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> Quantity:
+        if not parameters or len(parameters) > 4 or len(parameters) < 1:
             raise RuleProcessingError(
                 "The 'qty' transform takes at least one or two parameters of type String"
-            )       
+            )
         if len(parameters) == 1:
-            matches = re.search(r"(<|<=|>=|>|ad)?(\d+((\.|\,)\d+)?) (.*)", parameters[0].valueString)
+            if not parameters[0].valueString:
+                raise RuleProcessingError(
+                    "The 'qty' transform single parameter must be a non-empty String"
+                )
+            matches = re.search(
+                r"(<|<=|>=|>|ad)?(\d+((\.|\,)\d+)?) (.*)", parameters[0].valueString
+            )
             if not matches:
                 raise RuleProcessingError(
                     "The 'qty' transform single parameter must be of the form '[<|<=|>=|>|ad]<number> <unit>'"
                 )
-            
+
             return Quantity(
                 comparator=matches.group(1) if matches.group(1) else None,
-                value=float(matches.group(2).replace(',', '.')),
+                value=float(matches.group(2).replace(",", ".")),
                 unit=matches.group(5),
                 system=None,
                 code=None,
             )
         else:
+            if parameters[0].valueString is None or parameters[1].valueString is None:
+                raise RuleProcessingError(
+                    "The 'qty' transform first two parameters must be non-empty Strings"
+                )
             return Quantity(
                 value=float(parameters[0].valueString),
                 unit=parameters[1].valueString,
@@ -906,27 +1054,38 @@ class FHIRMappingEngine:
             )
 
     @staticmethod
-    def _id_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> Identifier:
-        if not parameters or len(parameters)>3 or len(parameters)<2:
+    def _id_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> Identifier:
+        if not parameters or len(parameters) > 3 or len(parameters) < 2:
             raise RuleProcessingError(
                 "The 'id' transform takes at least two or three parameters of type String"
-            )       
+            )
         return Identifier(
             system=parameters[0].valueString,
             value=parameters[1].valueString,
-            type=CodeableConcept(
-                coding=[Coding(
-                    code=parameters[2].valueString, 
-                    system='http://hl7.org/fhir/ValueSet/identifier-type'
-            )]) if len(parameters) == 3 else None,
+            type=(
+                CodeableConcept(
+                    coding=[
+                        Coding(
+                            code=parameters[2].valueString,
+                            system="http://hl7.org/fhir/ValueSet/identifier-type",
+                        )
+                    ]
+                )
+                if len(parameters) == 3
+                else None
+            ),
         )
 
     @staticmethod
-    def _cp_transform(scope: MappingScope, parameters: List[StructureMapParameter]) -> ContactPoint:
-        if not parameters or len(parameters)>2 or len(parameters)<1:
+    def _cp_transform(
+        scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> ContactPoint:
+        if not parameters or len(parameters) > 2 or len(parameters) < 1:
             raise RuleProcessingError(
                 "The 'cp' transform takes at least one or two parameters of type String"
-            )       
+            )
         if len(parameters) == 1:
             raise NotImplementedError(
                 "The 'cp' transform with a single parameter is not yet implemented"
@@ -936,6 +1095,7 @@ class FHIRMappingEngine:
             value=parameters[1].valueString,
         )
 
+
 def _replace_mapping_scope_elements(path, scope: MappingScope):
     """
     Replace FHIRPath Element references with context Element references.
@@ -943,9 +1103,10 @@ def _replace_mapping_scope_elements(path, scope: MappingScope):
     This is used to adjust FHIRPath expressions to the current mapping context.
     """
     if isinstance(path, fhirpath.Element):
-        if scope_fhirpath := scope.lookup(path.label):
-            return scope_fhirpath
-        return fhirpath.Element(f"{path.label}")
+        try:
+            return scope.lookup(path.label)
+        except MappingError:
+            return fhirpath.Element(f"{path.label}")
     elif isinstance(path, (fhirpath.Invocation)):
         left = _replace_mapping_scope_elements(path.left, scope)
         right = _replace_mapping_scope_elements(path.right, scope)
