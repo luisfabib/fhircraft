@@ -13,7 +13,7 @@ def add_rules_to_basic_map(rules, documentation=None):
     return StructureMap.model_construct(
         group=[
             StructureMapGroup(
-                documentation=documentation,    
+                documentation=documentation,
                 name="map_example",
                 input=[
                     StructureMapInput(name="src", mode="source"),
@@ -73,10 +73,17 @@ parser_test_cases = (
                 StructureMapStructure(url="http://example.org", mode="produced"),
             ]
         ),
-    ),    (
+    ),
+    (
         """uses 'http://example.org' as source // This documents the source""",
         StructureMap.model_construct(
-            structure=[StructureMapStructure(url="http://example.org", mode="source", documentation="This documents the source")]
+            structure=[
+                StructureMapStructure(
+                    url="http://example.org",
+                    mode="source",
+                    documentation="This documents the source",
+                )
+            ]
         ),
     ),
     # ----------------- IMPORTS DECLARATION  -----------------
@@ -101,6 +108,12 @@ parser_test_cases = (
         """let my_const = 'string';""",
         StructureMap.model_construct(
             const=[StructureMapConst(name="my_const", value="string")]
+        ),
+    ),
+    (
+        """let my_const = a.b.substring(1,2);""",
+        StructureMap.model_construct(
+            const=[StructureMapConst(name="my_const", value="a.b.substring(1,2)")]
         ),
     ),
     (
@@ -547,7 +560,7 @@ parser_test_cases = (
                         )
                     ],
                 )
-            ]
+            ],
         ),
     ),
     (
@@ -574,7 +587,7 @@ parser_test_cases = (
                         )
                     ],
                 )
-            ]
+            ],
         ),
     ),
     (
@@ -700,7 +713,9 @@ parser_test_cases = (
                             transform="evaluate",
                             parameter=[
                                 StructureMapParameter(valueId="sf"),
-                                StructureMapParameter(valueString="$this.a2 or $this.a3"),
+                                StructureMapParameter(
+                                    valueString="$this.a2 or $this.a3"
+                                ),
                             ],
                         )
                     ],

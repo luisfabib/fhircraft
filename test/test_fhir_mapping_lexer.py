@@ -5,7 +5,29 @@ from fhircraft.fhir.mapping.lexer import (
     FhirMappingLanguageLexerError,
 )
 
-token_test_cases = (  # ----------------- Symbols -----------------
+token_test_cases = (
+    # ----------------- Keywords -----------------
+    ("map", (("map", "MAP"),)),
+    ("imports", (("imports", "IMPORTS"),)),
+    ("alias", (("alias", "ALIAS"),)),
+    ("extends", (("extends", "EXTENDS"),)),
+    ("default", (("default", "DEFAULT"),)),
+    ("where", (("where", "WHERE"),)),
+    ("check", (("check", "CHECK"),)),
+    ("log", (("log", "LOG"),)),
+    ("then", (("then", "THEN"),)),
+    ("first", (("first", "FIRST"),)),
+    ("not_first", (("not_first", "NOT_FIRST"),)),
+    ("last", (("last", "LAST"),)),
+    ("not_last", (("not_last", "NOT_LAST"),)),
+    ("only_one", (("only_one", "ONLY_ONE"),)),
+    ("share", (("share", "SHARE"),)),
+    ("single", (("single", "SINGLE"),)),
+    ("queried", (("queried", "QUERIED"),)),
+    ("produced", (("produced", "PRODUCED"),)),
+    ("conceptmap", (("conceptmap", "CONCEPTMAP"),)),
+    ("prefix", (("prefix", "PREFIX"),)),
+    # ----------------- Symbols -----------------
     (".", ((".", "."),)),
     (",", ((",", ","),)),
     ("+", (("+", "+"),)),
@@ -19,6 +41,13 @@ token_test_cases = (  # ----------------- Symbols -----------------
     ("}", (("}", "}"),)),
     ("{", (("{", "{"),)),
     ("{}", (("{", "{"), ("}", "}"))),
+    (":", ((":", ":"),)),
+    (";", ((";", ";"),)),
+    ("[", (("[", "["),)),
+    ("]", (("]", "]"),)),
+    ("=", (("=", "EQUAL"),)),
+    ("<", (("<", "LESS_THAN"),)),
+    (">", ((">", "GREATER_THAN"),)),
     # ----------------- Literals -----------------
     ("true", (("true", "BOOLEAN"),)),
     ("false", (("false", "BOOLEAN"),)),
@@ -44,7 +73,12 @@ token_test_cases = (  # ----------------- Symbols -----------------
     ("'string'", (("string", "STRING"),)),
     ("'test string'", (("test string", "STRING"),)),
     ("'string1' 'string2'", (("string1", "STRING"), ("string2", "STRING"))),
-    ("// documentation of something", (("documentation of something", "DOCUMENTATION"),)),
+    (
+        "// documentation of something",
+        (("documentation of something", "DOCUMENTATION"),),
+    ),
+    ('"hello world"', (("hello world", "STRING"),)),
+    ('"test"', (("test", "STRING"),)),
     # ----------------- Identifiers -----------------
     ("parent", (("parent", "IDENTIFIER"),)),
     ("_parent", (("_parent", "IDENTIFIER"),)),
@@ -56,8 +90,11 @@ token_test_cases = (  # ----------------- Symbols -----------------
     ("`parent name`", (("parent name", "DELIMITEDIDENTIFIER"),)),
     ("parent.child", (("parent", "IDENTIFIER"), (".", "."), ("child", "IDENTIFIER"))),
     ("parent.*", (("parent", "IDENTIFIER"), (".", "."), ("*", "*"))),
+    # ----------------- Other -----------------
+    ("->", (("->", "RIGHT_ARROW"),)),
     ("<<types>>", (("types", "GROUPTYPE"),)),
     ("<<type+>>", (("type-and-types", "GROUPTYPE"),)),
+    # ----------------- Complex  -----------------
     (
         "/// name = 'title'",
         (
@@ -67,7 +104,6 @@ token_test_cases = (  # ----------------- Symbols -----------------
             ("title", "STRING"),
         ),
     ),
-    # ----------------- COMPLEX  -----------------
     (
         "uses 'http://example.org' as source",
         (
@@ -88,6 +124,18 @@ token_test_cases = (  # ----------------- Symbols -----------------
         ),
     ),
     (
+        "let const = example.value;",
+        (
+            ("let", "LET"),
+            ("const", "IDENTIFIER"),
+            ("=", "EQUAL"),
+            ("example", "IDENTIFIER"),
+            (".", "."),
+            ("value", "IDENTIFIER"),
+            (";", ";"),
+        ),
+    ),
+    (
         "group example(source src, target tgt){}",
         (
             ("group", "GROUP"),
@@ -101,6 +149,137 @@ token_test_cases = (  # ----------------- Symbols -----------------
             (")", ")"),
             ("{", "{"),
             ("}", "}"),
+        ),
+    ),
+    (
+        "map 'some title' = title",
+        (
+            ("map", "MAP"),
+            ("some title", "STRING"),
+            ("=", "EQUAL"),
+            ("title", "IDENTIFIER"),
+        ),
+    ),
+    (
+        "imports 'http://example.org'",
+        (
+            ("imports", "IMPORTS"),
+            ("http://example.org", "STRING"),
+        ),
+    ),
+    (
+        "group patient extends person",
+        (
+            ("group", "GROUP"),
+            ("patient", "IDENTIFIER"),
+            ("extends", "EXTENDS"),
+            ("person", "IDENTIFIER"),
+        ),
+    ),
+    (
+        "source src: Patient as patient",
+        (
+            ("source", "SOURCE"),
+            ("src", "IDENTIFIER"),
+            (":", ":"),
+            ("Patient", "ROOT_NODE"),
+            ("as", "AS"),
+            ("patient", "IDENTIFIER"),
+        ),
+    ),
+    (
+        "target tgt: Patient as patient",
+        (
+            ("target", "TARGET"),
+            ("tgt", "IDENTIFIER"),
+            (":", ":"),
+            ("Patient", "ROOT_NODE"),
+            ("as", "AS"),
+            ("patient", "IDENTIFIER"),
+        ),
+    ),
+    (
+        "where condition -> create patient",
+        (
+            ("where", "WHERE"),
+            ("condition", "IDENTIFIER"),
+            ("->", "RIGHT_ARROW"),
+            ("create", "IDENTIFIER"),
+            ("patient", "IDENTIFIER"),
+        ),
+    ),
+    (
+        "check src.exists()",
+        (
+            ("check", "CHECK"),
+            ("src", "IDENTIFIER"),
+            (".", "."),
+            ("exists", "IDENTIFIER"),
+            ("(", "("),
+            (")", ")"),
+        ),
+    ),
+    (
+        "log 'Processing patient'",
+        (
+            ("log", "LOG"),
+            ("Processing patient", "STRING"),
+        ),
+    ),
+    # ----------------- Edge Cases for Numbers -----------------
+    ("0", ((0, "INTEGER"),)),
+    ("-0", ((0, "INTEGER"),)),
+    ("0.0", ((0.0, "DECIMAL"),)),
+    ("-0.0", ((-0.0, "DECIMAL"),)),
+    ("123.456", ((123.456, "DECIMAL"),)),
+    ("-999", ((-999, "INTEGER"),)),
+    # ----------------- Edge Cases for Dates/Times -----------------
+    ("@2024-12-31", (("@2024-12-31", "DATE"),)),
+    ("@T23:59:59", (("@T23:59:59", "TIME"),)),
+    ("@T23:59:59.999", (("@T23:59:59.999", "TIME"),)),
+    (
+        "@2024-12-31T23:59:59.999-05:00",
+        (("@2024-12-31T23:59:59.999-05:00", "DATETIME"),),
+    ),
+    # ----------------- Multiple Tokens in Sequence -----------------
+    (
+        "let x = 5; let y = 10;",
+        (
+            ("let", "LET"),
+            ("x", "IDENTIFIER"),
+            ("=", "EQUAL"),
+            (5, "INTEGER"),
+            (";", ";"),
+            ("let", "LET"),
+            ("y", "IDENTIFIER"),
+            ("=", "EQUAL"),
+            (10, "INTEGER"),
+            (";", ";"),
+        ),
+    ),
+    (
+        "src.name -> tgt.fullName",
+        (
+            ("src", "IDENTIFIER"),
+            (".", "."),
+            ("name", "IDENTIFIER"),
+            ("->", "RIGHT_ARROW"),
+            ("tgt", "IDENTIFIER"),
+            (".", "."),
+            ("fullName", "IDENTIFIER"),
+        ),
+    ),
+    # ----------------- Mixed Operations -----------------
+    (
+        "first() + last()",
+        (
+            ("first", "FIRST"),
+            ("(", "("),
+            (")", ")"),
+            ("+", "+"),
+            ("last", "LAST"),
+            ("(", "("),
+            (")", ")"),
         ),
     ),
 )
