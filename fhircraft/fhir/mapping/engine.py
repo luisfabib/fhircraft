@@ -638,6 +638,18 @@ class FHIRMappingEngine:
                 source_iterations[var_name] = source_fhirpath.count(
                     scope.get_instances()
                 )
+                if source.min is not None and source_iterations[var_name] < source.min:
+                    raise RuleProcessingError(
+                        f"Source minimum cardinality not met for rule {rule_name}"
+                    )
+                if (
+                    source.max is not None
+                    and source.max != "*"
+                    and source_iterations[var_name] > int(source.max)
+                ):
+                    raise RuleProcessingError(
+                        f"Source maximum cardinality exceeded for rule {rule_name}"
+                    )
 
             for source_var, iterations in source_iterations.items():
                 for source_iteration in range(iterations):
