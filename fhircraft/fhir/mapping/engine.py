@@ -258,9 +258,11 @@ class FHIRMappingEngine:
         group: str | None = None,
     ) -> tuple[BaseModel, ...]:
 
+        # Ensure sources is a tuple
         if not isinstance(sources, tuple):
             sources = (sources,)
 
+        # Resolve structure definitions
         source_models = self._resolve_structure_definitions(
             structure_map, StructureMapModelMode.SOURCE
         )
@@ -274,8 +276,10 @@ class FHIRMappingEngine:
             structure_map, StructureMapModelMode.PRODUCED
         )
 
+        # Validate source data
         validated_sources = self._validate_source_data(sources, source_models)
 
+        # Create the global mapping scope
         global_scope = MappingScope(
             name="global",
             types={
@@ -294,6 +298,18 @@ class FHIRMappingEngine:
             },
         )
 
+        # Parse and validate constants
+        for const in structure_map.const or []:
+            if not const.name:
+                raise ValueError("Constant must have a name")
+            if const.name in source_models or const.name in target_models:
+                raise ValueError(
+                    f"Constant name '{const.name}' conflicts with existing source or target model"
+                )
+            # Add the constant as a variable in the global scope
+            global_scope.define(const.name, fhirpath_parser.parse(const.value))
+
+        # Determine the entrypoint group
         target_group = (global_scope.groups.get(group) if group else None) or list(
             global_scope.groups.values()
         )[0]
@@ -310,6 +326,8 @@ class FHIRMappingEngine:
             raise RuntimeError(
                 f"Entrypoint group {target_group.name} expected {expected_sources} sources, got {len(sources)}."
             )
+
+        # Validate targets if provided
         if targets:
             expected_targets = len(
                 [
@@ -323,6 +341,8 @@ class FHIRMappingEngine:
                 raise RuntimeError(
                     f"Entrypoint group {target_group.name} expected {expected_targets} targets, got {len(targets)}."
                 )
+
+        # Bind source and target instances to group parameters
         parameters = []
         for input in target_group.input:
             if input.mode == StructureMapModelMode.SOURCE:
@@ -367,8 +387,10 @@ class FHIRMappingEngine:
                 global_scope.target_instances[target_instance_id] = target_instance  # type: ignore
                 parameters.append(fhirpath.Element(target_instance_id))
 
+        # Process the entrypoint group
         self.process_group(target_group, parameters, global_scope)
 
+        # Return the resulting target instances
         return tuple(
             [
                 instance.model_validate(instance.model_dump())
