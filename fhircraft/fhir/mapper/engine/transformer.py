@@ -113,9 +113,7 @@ class MappingTransformer:
     ) -> Any:
         # Just copy the source value or use the literal
         if source:
-            source_fhirpath = scope.lookup(source)
-            if not source_fhirpath:
-                raise RuleProcessingError(f"Source variable {source} not found")
+            source_fhirpath = scope.resolve_fhirpath(source)
             # Just copy the source value
             return source_fhirpath.single(scope.get_instances())
         elif literal:
@@ -139,9 +137,7 @@ class MappingTransformer:
         ],
     )
     def _truncate_transform(scope: MappingScope, source: str, length: int) -> str:
-        source_fhirpath = scope.lookup(source)
-        if not source_fhirpath:
-            raise RuleProcessingError(f"Source variable {source} not found")
+        source_fhirpath = scope.resolve_fhirpath(source)
         return source_fhirpath._invoke(fhirpath.Substring(0, int(length))).single(
             scope.get_instances()
         )
@@ -160,9 +156,7 @@ class MappingTransformer:
             raise NotImplementedError(
                 "Implicit type casting if not yet supported for the 'cast' transform. Please specify the target type explicitly."
             )
-        source_fhirpath = scope.lookup(source)
-        if not source_fhirpath:
-            raise RuleProcessingError(f"Source variable {source} not found")
+        source_fhirpath = scope.resolve_fhirpath(source)
         return source_fhirpath._invoke(
             getattr(fhirpath, f"To{to_type.title()}")()
         ).single(scope.get_instances())
@@ -178,11 +172,7 @@ class MappingTransformer:
         strings = []
         for parameter in parameters:
             if parameter.valueId:
-                source_fhirpath = scope.lookup(parameter.valueId)
-                if not source_fhirpath:
-                    raise RuleProcessingError(
-                        f"Source variable {parameter.valueId} not found"
-                    )
+                source_fhirpath = scope.resolve_fhirpath(parameter.valueId)
                 strings.append(str(source_fhirpath.single(scope.get_instances())))
             elif parameter.valueString:
                 strings.append(parameter.valueString)
@@ -199,9 +189,7 @@ class MappingTransformer:
         ],
     )
     def _reference_transform(scope: MappingScope, source: str) -> str:
-        source_fhirpath = scope.lookup(source)
-        if not source_fhirpath:
-            raise RuleProcessingError(f"Source variable {source} not found")
+        source_fhirpath = scope.resolve_fhirpath(source)
         resource_type = source_fhirpath._invoke(
             fhirpath.Element("resourceType")
         ).single(scope.get_instances())
@@ -226,10 +214,8 @@ class MappingTransformer:
     def _translate_transform(
         scope: MappingScope, source: str, map_name: str, output: str = "code"
     ) -> str:
-        source_code = scope.lookup(source).single(scope.get_instances())
+        source_code = scope.resolve_fhirpath(source).single(scope.get_instances())
         concept_map = scope.get_concept_map(map_name.lstrip("#"))
-        if not concept_map:
-            raise MappingError(f"Concept map '{map_name}' could not be resolved.")
         if concept_map.group is None:
             raise MappingError(f"Concept map '{map_name}' has no groups defined.")
         for group in concept_map.group:
@@ -272,9 +258,7 @@ class MappingTransformer:
             raise NotImplementedError(
                 "The evaluate transforms with implicit FHIRPath context is not supported."
             )
-        context = scope.lookup(source).single(scope.get_instances())
-        if not context:
-            raise MappingError(f"Context '{context}' could not be resolved.")
+        context = scope.resolve_fhirpath(source).single(scope.get_instances())
         transformed_values = fhirpath_parser.parse(evaluate_fhirpath).values(context)
         if transformed_values and len(transformed_values) > 1:
             raise MappingError(

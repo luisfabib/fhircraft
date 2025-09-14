@@ -131,7 +131,7 @@ class FHIRMappingEngine:
                     f"Constant name '{const.name}' conflicts with existing source or target model"
                 )
             # Add the constant as a variable in the global scope
-            global_scope.define(const.name, fhirpath_parser.parse(const.value))
+            global_scope.define_variable(const.name, fhirpath_parser.parse(const.value))
 
         # Determine the entrypoint group
         target_group = (global_scope.groups.get(group) if group else None) or list(
@@ -374,7 +374,7 @@ class FHIRMappingEngine:
                 f"Invalid number of parameters provided for group '{group_name}'. Expected {len(group.input)}, got {len(parameters)}."
             )
         for input, parameter in zip(group.input, parameters):
-            group_scope.define(input.name, parameter)
+            group_scope.define_variable(input.name, parameter)
 
         # Process rules in order, handling 'first' and 'last' list modes
         rules = []
@@ -431,7 +431,7 @@ class FHIRMappingEngine:
 
             for source in rule.source or []:
                 var_name = self.process_source(source, scope)
-                source_fhirpath = scope.lookup(var_name)
+                source_fhirpath = scope.resolve_fhirpath(var_name)
 
                 # Where condition
                 if source.condition:
@@ -492,11 +492,11 @@ class FHIRMappingEngine:
                     )
 
                     # Set the source variable to an indexed FHIRPath
-                    if (rule_source := scope.lookup(source_var)) is None:
+                    if (rule_source := scope.resolve_fhirpath(source_var)) is None:
                         raise RuleProcessingError(
                             f"Source variable {source_var} not found"
                         )
-                    iteration_scope.define(
+                    iteration_scope.define_variable(
                         source_var,
                         rule_source._invoke(fhirpath.Index(source_iteration)),
                     )
@@ -507,13 +507,17 @@ class FHIRMappingEngine:
 
                     # Process dependent rules for this iteration
                     for dependent in rule.dependent or []:
-                        dependent_group = iteration_scope.lookup(dependent.name)
+                        dependent_group = iteration_scope.resolve_symbol(dependent.name)
                         if not dependent_group:
                             raise RuleProcessingError(
                                 f"Dependent group or rule '{dependent.name}' not found"
                             )
+                        if not isinstance(dependent_group, StructureMapGroup):
+                            raise RuleProcessingError(
+                                f"Dependent '{dependent.name}' is not a group"
+                            )
                         parameters = [
-                            iteration_scope.lookup(param.value)
+                            iteration_scope.resolve_fhirpath(param.value)
                             for param in dependent.parameter
                         ]
                         self.process_group(dependent_group, parameters, iteration_scope)
@@ -530,10 +534,7 @@ class FHIRMappingEngine:
         return scope
 
     def process_source(self, source: StructureMapSource, scope: MappingScope) -> str:
-        path = scope.lookup(source.context)
-        if path is None:
-            raise RuleProcessingError(f"Source context {source.context} not found")
-
+        path = scope.resolve_fhirpath(source.context)
         # Apply element path if specified
         if source.element:
             path = path._invoke(fhirpath.Element(source.element))
@@ -544,7 +545,11 @@ class FHIRMappingEngine:
         elif source.listMode == "not_first":
             path = path._invoke(fhirpath.Tail())
         elif source.listMode == "not_last":
-            path = path._invoke(fhirpath.Exclude(path._invoke(fhirpath.Last())))
+            path = path._invoke(
+                fhirpath.Exclude(
+                    path._invoke(fhirpath.Last()).single(scope.get_instances())
+                )
+            )
         elif source.listMode == "last":
             path = path._invoke(fhirpath.Last())
         elif source.listMode == "only_one":
@@ -552,7 +557,7 @@ class FHIRMappingEngine:
 
         # Store source FHIRPath
         var_name = source.variable or f"source_{id(source)}"
-        scope.define(var_name, path)
+        scope.define_variable(var_name, path)
         return var_name
 
     def process_target(
@@ -562,10 +567,7 @@ class FHIRMappingEngine:
     ) -> Any:
         if not target.context:
             raise RuleProcessingError("Target context is required")
-        path = scope.lookup(target.context)
-        if path is None:
-            raise RuleProcessingError(f"Target context {target.context} not found")
-
+        path = scope.resolve_fhirpath(target.context)
         # Apply element path if specified
         if target.element:
             path = path._invoke(fhirpath.Element(target.element))
@@ -575,7 +577,7 @@ class FHIRMappingEngine:
 
         # Store target FHIRPath
         var_name = target.variable or f"target_{id(target)}"
-        scope.define(var_name, path)
+        scope.define_variable(var_name, path)
 
         transform = target.transform
         if transform:
@@ -596,7 +598,7 @@ def _replace_mapping_scope_elements(path, scope: MappingScope):
     """
     if isinstance(path, fhirpath.Element):
         try:
-            return scope.lookup(path.label)
+            return scope.resolve_fhirpath(path.label)
         except MappingError:
             return fhirpath.Element(f"{path.label}")
     elif isinstance(path, (fhirpath.Invocation)):

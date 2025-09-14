@@ -143,14 +143,12 @@ def create_simple_source_structure_definition() -> StructureDefinition:
                 ElementDefinition(
                     id="SimpleSource",
                     path="SimpleSource",
-                    definition="Simple source resource for testing",
                     min=0,
                     max="*",
                 ),
                 ElementDefinition(
                     id="SimpleSource.name",
                     path="SimpleSource.name",
-                    definition="Name field",
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="string")],
@@ -158,7 +156,6 @@ def create_simple_source_structure_definition() -> StructureDefinition:
                 ElementDefinition(
                     id="SimpleSource.age",
                     path="SimpleSource.age",
-                    definition="Age field",
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="integer")],
