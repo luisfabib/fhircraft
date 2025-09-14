@@ -86,6 +86,9 @@ class FHIRMappingEngine:
         if not isinstance(sources, tuple):
             sources = (sources,)
 
+        if structure_map.imports:
+            raise NotImplementedError("StructureMap imports are not implemented yet")
+
         # Resolve structure definitions
         source_models = self._resolve_structure_definitions(
             structure_map, StructureMapModelMode.SOURCE
