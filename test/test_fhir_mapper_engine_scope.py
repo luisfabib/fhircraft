@@ -2,6 +2,7 @@ import pytest
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.core import MappingScope
+from fhircraft.fhir.mapper.engine.exceptions import MappingError
 from fhircraft.fhir.path.engine.core import Element
 
 
@@ -108,10 +109,8 @@ class TestMappingScope:
     def test_lookup_not_found(self):
         """Test looking up non-existent variable"""
         scope = MappingScope(name="test")
-
-        result = scope.lookup("nonexistent")
-
-        assert result is None
+        with pytest.raises(MappingError):
+            scope.lookup("nonexistent")
 
     def test_lookup_child_overrides_parent(self):
         """Test that child scope variables override parent scope"""

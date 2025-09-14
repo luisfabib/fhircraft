@@ -117,7 +117,11 @@ class MappingScope:
 
     def exists(self, identifier: str) -> bool:
         """Check if identifier exists in this scope or any parent scope"""
-        return self.lookup(identifier) is not None
+        try:
+            self.lookup(identifier)
+            return True
+        except MappingError:
+            return False
 
     def exists_local(self, identifier: str) -> bool:
         """Check if identifier exists in the current scope only"""
@@ -153,6 +157,4 @@ class MappingScope:
         return f"Scope({self.name}, variables: {list(self.variables.keys())}, types: {list(self.types.keys())})"
 
     def __repr__(self) -> str:
-        return f"Scope(name='{self.name}', parent={self.parent.name if self.parent else None}, variables={list(self.variables.keys())}, types={list(self.types.keys())})"
-
         return f"Scope(name='{self.name}', parent={self.parent.name if self.parent else None}, variables={list(self.variables.keys())}, types={list(self.types.keys())})"
