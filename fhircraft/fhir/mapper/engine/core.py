@@ -436,6 +436,16 @@ class FHIRMappingEngine:
                 var_name = self.process_source(source, scope)
                 source_fhirpath = scope.resolve_fhirpath(var_name)
 
+                if source.type:
+                    condition_fhirpath = source_fhirpath._invoke(
+                        getattr(fhirpath, f"Is{source.type.title()}")
+                    )
+                    if not bool(condition_fhirpath.single(scope.get_instances())):
+                        logger.debug(
+                            f"Source type condition not met for rule {rule_name}"
+                        )
+                        return scope
+
                 # Where condition
                 if source.condition:
                     condition_fhirpath = fhirpath_parser.parse(source.condition)
