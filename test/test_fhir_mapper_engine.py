@@ -1,20 +1,12 @@
 import json
 import os
 import pprint
-from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import BaseModel
 
-from fhircraft.fhir.mapping.engine import (
-    FHIRMappingEngine,
-    MappingError,
-    MappingScope,
-    RuleProcessingError,
-    StructureMapModelMode,
-    ValidationError,
-)
-from fhircraft.fhir.mapping.StructureMap import (
+from fhircraft.fhir.mapper.engine.core import FHIRMappingEngine
+from fhircraft.fhir.mapper.structures.StructureMap import (
     StructureMap,
     StructureMapConst,
     StructureMapGroup,
@@ -32,7 +24,7 @@ from fhircraft.fhir.resources.definitions.element_definition import (
 from fhircraft.fhir.resources.definitions.structure_definition import (
     StructureDefinitionSnapshot,
 )
-from fhircraft.fhir.resources.factory import ResourceFactory, StructureDefinition
+from fhircraft.fhir.resources.factory import StructureDefinition
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 EXAMPLES_DIRECTORY = "test/static/fhir-mapping-language/R5"

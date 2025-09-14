@@ -4,9 +4,9 @@ from pprint import pprint
 
 import pytest
 
-from fhircraft.fhir.mapping.lexer import FhirMappingLanguageLexer
-from fhircraft.fhir.mapping.parser import FhirMappingLanguageParser
-from fhircraft.fhir.mapping.StructureMap import *
+from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
+from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
+from fhircraft.fhir.mapper.structures.StructureMap import *
 
 
 def add_rules_to_basic_map(rules, documentation=None):

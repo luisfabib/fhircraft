@@ -5,14 +5,14 @@ import ply.yacc
 
 import fhircraft.fhir.path.engine.literals as literals
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-from fhircraft.fhir.mapping.ConceptMap import (
+from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
+from fhircraft.fhir.mapper.structures.ConceptMap import (
     ConceptMap,
     ConceptMapElement,
     ConceptMapGroup,
     ConceptMapTarget,
 )
-from fhircraft.fhir.mapping.lexer import FhirMappingLanguageLexer
-from fhircraft.fhir.mapping.StructureMap import (
+from fhircraft.fhir.mapper.structures.StructureMap import (
     StructureMap,
     StructureMapConst,
     StructureMapDependent,
@@ -318,7 +318,7 @@ class FhirMappingLanguageParser(FhirPathParser):
             p[0] = (p[1] or []) + [p[2]]
 
     def p_mapper_documented_structure(self, p):
-        """m_structure : m_structure DOCUMENTATION """
+        """m_structure : m_structure DOCUMENTATION"""
         p[1].documentation = p[2]
         p[0] = p[1]
 
@@ -350,10 +350,9 @@ class FhirMappingLanguageParser(FhirPathParser):
         """m_const : LET m_identifier EQUAL m_fhirpath ';'"""
         p[0] = StructureMapConst(name=p[2], value=str(p[4]))
 
-
     def p_mapper_group_documentation(self, p):
         """m_group : DOCUMENTATION m_group
-        | m_group DOCUMENTATION """
+        | m_group DOCUMENTATION"""
         if isinstance(p[1], StructureMapGroup):
             group = p[1]
             group.documentation = p[2]
@@ -448,7 +447,7 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_rule_documentation(self, p):
         """m_documented_rule : DOCUMENTATION m_rule
-        | m_rule DOCUMENTATION """
+        | m_rule DOCUMENTATION"""
         if isinstance(p[1], StructureMapRule):
             rule = p[1]
             rule.documentation = p[2]
@@ -730,7 +729,10 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_transform_fhirpath(self, p):
         """m_transform_fhirpath : '(' m_fhirpath ')'"""
-        p[0] = {'name': 'evaluate', 'parameter': [StructureMapParameter(valueString=p[2])]}
+        p[0] = {
+            "name": "evaluate",
+            "parameter": [StructureMapParameter(valueString=p[2])],
+        }
 
     def p_mapper_transform_literal(self, p):
         """m_transform_literal : m_literal"""

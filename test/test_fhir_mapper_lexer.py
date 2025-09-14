@@ -1,6 +1,6 @@
 import pytest
 
-from fhircraft.fhir.mapping.lexer import (
+from fhircraft.fhir.mapper.lexer import (
     FhirMappingLanguageLexer,
     FhirMappingLanguageLexerError,
 )

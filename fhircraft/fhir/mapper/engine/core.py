@@ -7,61 +7,29 @@ StructureMap resources to transform FHIR data from source to target structures.
 
 import enum
 import logging
-import re
-import uuid
 from collections import OrderedDict
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Type
+from typing import Any, Dict, List, Type
 
 from pydantic import BaseModel
 
 import fhircraft.fhir.path.engine as fhirpath
-from fhircraft.fhir.mapping.ConceptMap import ConceptMap
-from fhircraft.fhir.mapping.StructureMap import (
+from fhircraft.fhir.mapper.structures.StructureMap import (
     StructureMap,
-    StructureMapDependent,
     StructureMapGroup,
-    StructureMapParameter,
     StructureMapRule,
     StructureMapSource,
     StructureMapTarget,
 )
 from fhircraft.fhir.path import fhirpath as fhirpath_parser
-from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
-from fhircraft.fhir.path.exceptions import FHIRPathError
-from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
-    CodeableConcept,
-    Coding,
-    ContactPoint,
-    Identifier,
-    Quantity,
-)
+from fhircraft.fhir.path.engine.core import FHIRPath
 from fhircraft.fhir.resources.factory import ResourceFactory
-from fhircraft.fhir.resources.repository import (
-    CompositeStructureDefinitionRepository,
-    StructureDefinitionNotFoundError,
-)
-from fhircraft.utils import is_list_field
+from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
+
+from .exceptions import MappingError, RuleProcessingError
+from .scope import MappingScope
+from .transformer import MappingTransformer
 
 logger = logging.getLogger(__name__)
-
-
-class MappingError(Exception):
-    """Base exception for mapping engine errors."""
-
-    pass
-
-
-class ValidationError(MappingError):
-    """Raised when input data validation fails."""
-
-    pass
-
-
-class RuleProcessingError(MappingError):
-    """Raised when rule processing fails."""
-
-    pass
 
 
 class StructureMapTargetListMode(str, enum.Enum):
@@ -80,151 +48,6 @@ class StructureMapModelMode(str, enum.Enum):
     TARGET = "target"
     QUERIED = "queried"
     PRODUCED = "produced"
-
-
-@dataclass
-class MappingScope:
-    """
-    A scope defines the visibility and accessibility of identifiers (variables, types, etc.)
-    """
-
-    name: str
-    """Name of the scope"""
-
-    types: Dict[str, type[BaseModel]] = field(default_factory=dict)
-    """Mapping of types"""
-
-    source_instances: Dict[str, BaseModel] = field(default_factory=dict)
-    """The source instances being mapped"""
-
-    target_instances: Dict[str, BaseModel] = field(default_factory=dict)
-    """The target instances being mapped"""
-
-    concept_maps: Dict[str, ConceptMap] = field(default_factory=dict)
-
-    groups: OrderedDict[str, StructureMapGroup] = field(default_factory=OrderedDict)
-    """The groups defined on this scope"""
-
-    variables: Dict[str, FHIRPath] = field(default_factory=dict)
-    """Mapping variables names to resolved FHIRPaths"""
-
-    processing_rules: Set[str] = field(default_factory=set)
-    """Set of currently processing rules"""
-
-    parent: Optional["MappingScope"] = None
-    """Parent mapping scope"""
-
-    def define(self, variable: str, value: FHIRPath) -> None:
-        """Define a new variable in this scope"""
-        if not isinstance(value, FHIRPath):
-            raise ValueError("Variables can only be assigned to a FHIRPath instance")
-        self.variables[variable] = value
-
-    def get_instances(self) -> Dict[str, BaseModel]:
-        return {
-            **(self.parent.get_instances() if self.parent else {}),
-            **self.target_instances,
-            **self.source_instances,
-        }
-
-    def get_concept_map(self, identifier: str) -> ConceptMap:
-        """Get a concept map by its identifier"""
-        concept_map = self.concept_maps.get(identifier) or (
-            self.parent.get_concept_map(identifier) if self.parent else None
-        )
-        if not concept_map:
-            raise MappingError(
-                f"Concept map '{identifier}' not found in current or parent scopes."
-            )
-        return concept_map
-
-    def get_target_instance(self, identifier: str) -> BaseModel:
-        """Get a target instance by its identifier"""
-        instance = self.target_instances.get(identifier) or (
-            self.parent.get_target_instance(identifier) if self.parent else None
-        )
-        if not instance:
-            raise MappingError(
-                f"Target instance '{identifier}' not found in current or parent scopes."
-            )
-        return instance
-
-    def get_source_instance(self, identifier: str) -> BaseModel:
-        """Get a source instance by its identifier"""
-        instance = self.source_instances.get(identifier) or (
-            self.parent.get_source_instance(identifier) if self.parent else None
-        )
-        if not instance:
-            raise MappingError(
-                f"Source instance '{identifier}' not found in current or parent scopes."
-            )
-        return instance
-
-    def get_type(self, identifier: str) -> type[BaseModel]:
-        """Get a type by its identifier"""
-        type_ = self.types.get(identifier) or (
-            self.parent.get_type(identifier) if self.parent else None
-        )
-        if not type_:
-            raise MappingError(
-                f"Type '{identifier}' not found in current or parent scopes."
-            )
-        return type_
-
-    def lookup(self, identifier: str) -> Any:
-        """Look up a variable, checking parent scopes if not found locally"""
-        if identifier in self.variables:
-            return self.variables[identifier]
-        elif identifier in self.types:
-            return self.types[identifier]
-        elif identifier in self.groups:
-            return self.groups[identifier]
-        elif self.parent:
-            try:
-                return self.parent.lookup(identifier)
-            except MappingError:
-                pass
-        raise MappingError(f"Variable or identifier '{identifier}' not found.")
-
-    def exists(self, identifier: str) -> bool:
-        """Check if identifier exists in this scope or any parent scope"""
-        return self.lookup(identifier) is not None
-
-    def exists_local(self, identifier: str) -> bool:
-        """Check if identifier exists in the current scope only"""
-        return identifier in self.variables or identifier in self.types
-
-    def get_all_symbols(self) -> Dict[str, Any]:
-        """Get all symbols visible from this scope (including inherited)"""
-        all_symbols = {}
-        if self.parent:
-            all_symbols.update(self.parent.get_all_symbols())
-        all_symbols.update(self.variables)
-        return all_symbols
-
-    def get_path(self) -> List[str]:
-        """Get the path from root to this scope"""
-        if self.parent:
-            return self.parent.get_path() + [self.name]
-        return [self.name]
-
-    def is_processing_rule(self, rule_name: str) -> bool:
-        """Check if a rule is currently being processed (cycle detection)."""
-        return rule_name in self.processing_rules
-
-    def start_processing_rule(self, rule_name: str) -> None:
-        """Mark a rule as being processed."""
-        self.processing_rules.add(rule_name)
-
-    def finish_processing_rule(self, rule_name: str) -> None:
-        """Mark a rule as finished processing."""
-        self.processing_rules.discard(rule_name)
-
-    def __str__(self) -> str:
-        return f"Scope({self.name}, variables: {list(self.variables.keys())}, types: {list(self.types.keys())})"
-
-    def __repr__(self) -> str:
-        return f"Scope(name='{self.name}', parent={self.parent.name if self.parent else None}, variables={list(self.variables.keys())}, types={list(self.types.keys())})"
 
 
 class FHIRMappingEngine:
@@ -249,6 +72,7 @@ class FHIRMappingEngine:
         """
         self.repository = repository or CompositeStructureDefinitionRepository()
         self.factory = factory or ResourceFactory(repository=self.repository)
+        self.transformer = MappingTransformer()
 
     def execute(
         self,
@@ -415,7 +239,7 @@ class FHIRMappingEngine:
             ValidationError: If input validation fails
         """
         if not structure_map.structure:
-            raise ValidationError("Structure map does not specify any structures")
+            raise MappingError("Structure map does not specify any structures")
 
         return {
             s.alias
@@ -453,10 +277,10 @@ class FHIRMappingEngine:
                     elif hasattr(entry, "__dict__"):
                         validated_entries[alias] = source_model(**entry.__dict__)
                     return None
-                except ValidationError:
+                except MappingError:
                     continue
             else:
-                raise ValidationError(
+                raise MappingError(
                     f"Source data entry of type {type(entry)} does not match any source model"
                 )
 
@@ -756,378 +580,12 @@ class FHIRMappingEngine:
         transform = target.transform
         if transform:
             target.parameter = target.parameter or []
-            if transform == "copy":
-                transformed_value = self._copy_transform(scope, target.parameter)
-            elif transform == "create":
-                transformed_value = self._create_transform(scope, target.parameter)
-            elif transform == "truncate":
-                transformed_value = self._truncate_transform(scope, target.parameter)
-            elif transform == "escape":
-                raise NotImplementedError("Escape transform not implemented yet")
-            elif transform == "cast":
-                transformed_value = self._cast_transform(scope, target.parameter)
-            elif transform == "append":
-                transformed_value = self._append_transform(scope, target.parameter)
-            elif transform == "reference":
-                transformed_value = self._reference_transform(scope, target.parameter)
-            elif transform == "dateOp":
-                raise NotImplementedError("DateOp transform not implemented yet")
-            elif transform == "uuid":
-                transformed_value = self._uuid_transform(scope, target.parameter)
-            elif transform == "pointer":
-                raise NotImplementedError("Pointer transform not implemented yet")
-            elif transform == "translate":
-                transformed_value = self._translate_transform(scope, target.parameter)
-            elif transform == "evaluate":
-                transformed_value = self._evaluate_transform(scope, target.parameter)
-            elif transform == "cc":
-                transformed_value = self._cc_transform(scope, target.parameter)
-            elif transform == "c":
-                transformed_value = self._c_transform(scope, target.parameter)
-            elif transform == "qty":
-                transformed_value = self._qty_transform(scope, target.parameter)
-            elif transform == "id":
-                transformed_value = self._id_transform(scope, target.parameter)
-            elif transform == "cp":
-                transformed_value = self._cp_transform(scope, target.parameter)
-            else:
-                raise RuntimeError(
-                    f"Invalid FHIR Mapping Language transform: {transform}"
-                )
-
+            # Execute the transform
+            transformed_value = self.transformer.execute(
+                transform, scope, target.parameter
+            )
             # Update the target structure
             path.update_single(scope.get_instances(), transformed_value)
-
-    @staticmethod
-    def _copy_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> Any:
-        if (
-            not parameters
-            or len(parameters) != 1
-            or not (
-                (source := parameters[0].valueId) or (literal := parameters[0].value)
-            )
-        ):
-            raise RuleProcessingError(
-                "Copy transform requires exactly one parameter of type Id or a literal value."
-            )
-        # Just copy the source value or use the literal
-        if source:
-            source_fhirpath = scope.lookup(source)
-            if not source_fhirpath:
-                raise RuleProcessingError(f"Source variable {source} not found")
-            # Just copy the source value
-            return source_fhirpath.single(scope.get_instances())
-        elif literal:
-            # Just use the literal value
-            return literal
-
-    @staticmethod
-    def _create_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> BaseModel:
-        if (
-            not parameters
-            or len(parameters) != 1
-            or not (create_type := parameters[0].value)
-        ):
-            raise RuleProcessingError(
-                "The 'create' transform requires exactly one parameter of type String"
-            )
-        return scope.get_type(create_type).model_construct()
-
-    @staticmethod
-    def _truncate_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> str:
-        if (
-            not parameters
-            or len(parameters) != 2
-            or not (source := parameters[0].valueId)
-            or not (length := parameters[1].valueInteger)
-        ):
-            raise RuleProcessingError(
-                "The 'truncate' transform requires exactly two parameters of type Id and Integer"
-            )
-        source_fhirpath = scope.lookup(source)
-        if not source_fhirpath:
-            raise RuleProcessingError(f"Source variable {source} not found")
-        return source_fhirpath._invoke(fhirpath.Substring(0, int(length))).single(
-            scope.get_instances()
-        )
-
-    @staticmethod
-    def _cast_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> Any:
-        if (
-            not parameters
-            or len(parameters) < 1
-            or len(parameters) > 2
-            or not (source := parameters[0].valueId)
-            or not (
-                to_type := (parameters[1].valueString if len(parameters) == 2 else None)
-            )
-        ):
-            raise RuleProcessingError(
-                "The 'cast' transform requires at least one parameter of type Id and optionally a second parameter of type String"
-            )
-        if not to_type:
-            raise RuleProcessingError(
-                "Implicit type casting if not supported for the 'cast' transform. Please specify the target type explicitly."
-            )
-        source_fhirpath = scope.lookup(source)
-        if not source_fhirpath:
-            raise RuleProcessingError(f"Source variable {source} not found")
-        return source_fhirpath._invoke(
-            getattr(fhirpath, f"To{to_type.title()}")()
-        ).single(scope.get_instances())
-
-    @staticmethod
-    def _append_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> str:
-        if not parameters or len(parameters) < 1:
-            raise RuleProcessingError(
-                "The 'append' transform requires at least one parameter of type Id and String"
-            )
-        strings = []
-        for parameter in parameters:
-            if parameter.valueId:
-                source_fhirpath = scope.lookup(parameter.valueId)
-                if not source_fhirpath:
-                    raise RuleProcessingError(
-                        f"Source variable {parameter.valueId} not found"
-                    )
-                strings.append(str(source_fhirpath.single(scope.get_instances())))
-            elif parameter.valueString:
-                strings.append(parameter.valueString)
-            else:
-                raise RuleProcessingError(
-                    "Invalid parameter type for 'append' transform"
-                )
-        return "".join(strings)
-
-    @staticmethod
-    def _reference_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> str:
-        if (
-            not parameters
-            or len(parameters) != 1
-            or not (source := parameters[0].valueId)
-        ):
-            raise RuleProcessingError(
-                "The 'reference' transform requires exactly one parameter of type Id"
-            )
-        source_fhirpath = scope.lookup(source)
-        if not source_fhirpath:
-            raise RuleProcessingError(f"Source variable {source} not found")
-        resource_type = source_fhirpath._invoke(
-            fhirpath.Element("resourceType")
-        ).single(scope.get_instances())
-        resource_id = source_fhirpath._invoke(fhirpath.Element("id")).single(
-            scope.get_instances()
-        )
-        return f"{resource_type}/{resource_id}"
-
-    @staticmethod
-    def _uuid_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> str:
-        if parameters:
-            raise RuleProcessingError(
-                "The 'uuid' transform does not take any parameters"
-            )
-        return str(uuid.uuid4())
-
-    @staticmethod
-    def _translate_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> str:
-        if (
-            not parameters
-            or len(parameters) != 3
-            or not (source := parameters[0].valueId)
-            or not (map_name := parameters[1].valueString)
-            or not (output := parameters[2].valueString)
-        ):
-            raise RuleProcessingError(
-                "The 'translate' transform requires exactly two parameters of type Id and Integer"
-            )
-
-        source_code = scope.lookup(source).single(scope.get_instances())
-        concept_map = scope.get_concept_map(map_name.lstrip("#"))
-        if not concept_map:
-            raise MappingError(f"Concept map '{map_name}' could not be resolved.")
-        if concept_map.group is None:
-            raise MappingError(f"Concept map '{map_name}' has no groups defined.")
-        for group in concept_map.group:
-            for element in group.element:
-                if element.target is None:
-                    continue
-                for element_target in element.target:
-                    if element.code == source_code:
-                        if output == "code":
-                            if element_target.code is None:
-                                raise MappingError(
-                                    f"Concept map '{map_name}' does not define a target code for source code '{source_code}'."
-                                )
-                            return element_target.code
-                        else:
-                            raise NotImplementedError(
-                                f"Output mode '{output}' for translate operation is not yet implemented."
-                            )
-        else:
-            raise MappingError(
-                f"Could not map source code '{source_code}' using concept map '{map_name}'."
-            )
-
-    @staticmethod
-    def _evaluate_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> Any:
-        if len(parameters) == 1:
-            raise NotImplementedError(
-                "The evaluate transforms with implicit FHIRPath context is not supported."
-            )
-        if (
-            len(parameters) != 2
-            or not (source := parameters[0].valueId)
-            or not (evaluate_fhirpath := parameters[1].valueString)
-        ):
-            raise RuleProcessingError(
-                "The 'evaluate' transform requires exactly two parameters of type Id and String"
-            )
-        context = scope.lookup(source).single(scope.get_instances())
-        if not context:
-            raise MappingError(f"Context '{context}' could not be resolved.")
-        transformed_values = fhirpath_parser.parse(evaluate_fhirpath).values(context)
-        if transformed_values and len(transformed_values) > 1:
-            raise MappingError(
-                f"Currently, the evaluate transform only supports FHIRPath expressions that yield a single value. It returned {len(transformed_values)}"
-            )
-        return transformed_values[0] if transformed_values else None
-
-    @staticmethod
-    def _cc_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> CodeableConcept:
-        if not parameters or len(parameters) > 3 or len(parameters) < 1:
-            raise RuleProcessingError(
-                "The 'cc' transform either one parameter of type String or two parameters of type String and String"
-            )
-        if len(parameters) == 1:
-            return CodeableConcept(text=parameters[0].valueString)
-        else:
-            return CodeableConcept(
-                coding=[
-                    Coding(
-                        code=parameters[0].valueString,
-                        system=parameters[1].valueString,
-                        display=(
-                            parameters[2].valueString if len(parameters) == 3 else None
-                        ),
-                    )
-                ]
-            )
-
-    @staticmethod
-    def _c_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> Coding:
-        if not parameters or len(parameters) > 3 or len(parameters) < 2:
-            raise RuleProcessingError(
-                "The 'c' transform takes two or three parameters of type String"
-            )
-        return Coding(
-            code=parameters[0].valueString,
-            system=parameters[1].valueString,
-            display=parameters[2].valueString if len(parameters) == 3 else None,
-        )
-
-    @staticmethod
-    def _qty_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> Quantity:
-        if not parameters or len(parameters) > 4 or len(parameters) < 1:
-            raise RuleProcessingError(
-                "The 'qty' transform takes at least one or two parameters of type String"
-            )
-        if len(parameters) == 1:
-            if not parameters[0].valueString:
-                raise RuleProcessingError(
-                    "The 'qty' transform single parameter must be a non-empty String"
-                )
-            matches = re.search(
-                r"(<|<=|>=|>|ad)?(\d+((\.|\,)\d+)?) (.*)", parameters[0].valueString
-            )
-            if not matches:
-                raise RuleProcessingError(
-                    "The 'qty' transform single parameter must be of the form '[<|<=|>=|>|ad]<number> <unit>'"
-                )
-
-            return Quantity(
-                comparator=matches.group(1) if matches.group(1) else None,
-                value=float(matches.group(2).replace(",", ".")),
-                unit=matches.group(5),
-                system=None,
-                code=None,
-            )
-        else:
-            if parameters[0].valueString is None or parameters[1].valueString is None:
-                raise RuleProcessingError(
-                    "The 'qty' transform first two parameters must be non-empty Strings"
-                )
-            return Quantity(
-                value=float(parameters[0].valueString),
-                unit=parameters[1].valueString,
-                system=parameters[2].valueString if len(parameters) > 2 else None,
-                code=parameters[3].valueString if len(parameters) > 2 else None,
-            )
-
-    @staticmethod
-    def _id_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> Identifier:
-        if not parameters or len(parameters) > 3 or len(parameters) < 2:
-            raise RuleProcessingError(
-                "The 'id' transform takes at least two or three parameters of type String"
-            )
-        return Identifier(
-            system=parameters[0].valueString,
-            value=parameters[1].valueString,
-            type=(
-                CodeableConcept(
-                    coding=[
-                        Coding(
-                            code=parameters[2].valueString,
-                            system="http://hl7.org/fhir/ValueSet/identifier-type",
-                        )
-                    ]
-                )
-                if len(parameters) == 3
-                else None
-            ),
-        )
-
-    @staticmethod
-    def _cp_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
-    ) -> ContactPoint:
-        if not parameters or len(parameters) > 2 or len(parameters) < 1:
-            raise RuleProcessingError(
-                "The 'cp' transform takes at least one or two parameters of type String"
-            )
-        if len(parameters) == 1:
-            raise NotImplementedError(
-                "The 'cp' transform with a single parameter is not yet implemented"
-            )
-        return ContactPoint(
-            system=parameters[0].valueString,
-            value=parameters[1].valueString,
-        )
 
 
 def _replace_mapping_scope_elements(path, scope: MappingScope):
@@ -1149,4 +607,5 @@ def _replace_mapping_scope_elements(path, scope: MappingScope):
         left = _replace_mapping_scope_elements(path.left, scope)
         right = _replace_mapping_scope_elements(path.right, scope)
         return path.__class__(left, right)
+    return path
     return path

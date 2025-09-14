@@ -1,10 +1,8 @@
-from typing import Any, Dict
-
 import pytest
 from pydantic import BaseModel
 
-from fhircraft.fhir.mapping.engine import MappingScope
-from fhircraft.fhir.path.engine.core import Element, FHIRPath
+from fhircraft.fhir.mapper.engine.core import MappingScope
+from fhircraft.fhir.path.engine.core import Element
 
 
 class MockBaseModel(BaseModel):
