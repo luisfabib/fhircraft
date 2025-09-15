@@ -35,12 +35,10 @@ from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 from fhircraft.fhir.resources.definitions import (
     ElementDefinition,
     ElementDefinitionConstraint,
+    ElementDefinitionType,
     StructureDefinition,
 )
-from fhircraft.fhir.resources.repository import (
-    CompositeStructureDefinitionRepository,
-    StructureDefinitionRepository,
-)
+from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 from fhircraft.utils import (
     capitalize,
     ensure_list,
@@ -66,11 +64,11 @@ class ResourceFactory:
     """Factory for constructing Pydantic models from FHIR StructureDefinitions.
 
     The ResourceFactory provides functionality to:
-    - Load StructureDefinitions from various sources (files, directories, dictionaries)
-    - Load FHIR packages from package registries
-    - Construct Pydantic models from StructureDefinitions
-    - Cache constructed models for performance
-    - Manage internet access and package registry configuration
+        - Load StructureDefinitions from various sources (files, directories, dictionaries)
+        - Load FHIR packages from package registries
+        - Construct Pydantic models from StructureDefinitions
+        - Cache constructed models for performance
+        - Manage internet access and package registry configuration
     """
 
     @dataclass
@@ -380,34 +378,65 @@ class ResourceFactory:
                     )
         return list(root.children.values())
 
-    def _get_complex_FHIR_type(self, field_type_name: str) -> type | str:
+    def _get_complex_FHIR_type(self, element_type: ElementDefinitionType | str) -> type:
         """
-        Parses and loads the FHIR element type based on the provided field type name.
+        Resolves and returns the Python type corresponding to a FHIR complex or primitive type
+        based on the provided ElementDefinitionType.
+
+        This method processes the type code from the element definition, handling FHIR and FHIRPath
+        type prefixes, and attempts to resolve it as a FHIR primitive or complex type. If the type
+        cannot be resolved directly, it attempts to construct a resource model from a provided
+        profile URL. Raises a RuntimeError if the type cannot be resolved.
 
         Args:
-            field_type_name (str): The name of the field type to be parsed.
+            element_type (ElementDefinitionType | str): The FHIR element type definition to resolve.
 
         Returns:
-            Union[type, str]: The parsed FHIR element type, returns input string if type not found.
+            type: The resolved Python type corresponding to the FHIR type.
+
+        Raises:
+            RuntimeError: If the FHIR type cannot be resolved and no profile canonical URL is provided,
+                          or if the profile URL cannot be resolved to a resource model.
         """
         FHIR_COMPLEX_TYPE_PREFIX = "http://hl7.org/fhir/StructureDefinition/"
         FHIRPATH_TYPE_PREFIX = "http://hl7.org/fhirpath/System."
+        element_type_code = (
+            element_type.code
+            if isinstance(element_type, ElementDefinitionType)
+            else element_type
+        )
         # Pre-process the type string
-        field_type_name = str(field_type_name)
-        field_type_name = field_type_name.removeprefix(FHIR_COMPLEX_TYPE_PREFIX)
-        field_type_name = field_type_name.removeprefix(FHIRPATH_TYPE_PREFIX)
-        field_type_name = capitalize(field_type_name)
+        element_type_code = str(element_type_code)
+        element_type_code = element_type_code.removeprefix(FHIR_COMPLEX_TYPE_PREFIX)
+        element_type_code = element_type_code.removeprefix(FHIRPATH_TYPE_PREFIX)
+        element_type_code = capitalize(element_type_code)
         # Check if type is a FHIR primitive datatype
-        field_type = getattr(primitives, field_type_name, None)
+        field_type = getattr(primitives, element_type_code, None)
         if field_type:
             return field_type
         try:
             # Check if type is a FHIR complex datatype
             return get_complex_FHIR_type(
-                field_type_name, self.Config.FHIR_release if self.Config else "R4B"
+                element_type_code, self.Config.FHIR_release if self.Config else "4.3.0"
             )
         except (ModuleNotFoundError, AttributeError):
-            return field_type_name
+            if isinstance(element_type, ElementDefinitionType) and element_type.profile:
+                # Try to resolve custom type from profile URL
+                if type_structure_definition := self.resolve_structure_definition(
+                    element_type.profile[0]
+                ):
+                    return self.construct_resource_model(
+                        structure_definition=type_structure_definition,
+                        base_model=FHIRBaseModel,
+                    )
+                else:
+                    raise RuntimeError(
+                        f"Could not resolve the canonical URL '{element_type.profile[0]}' for the FHIR type '{element_type_code}'. Please add the resource to the factory repository."
+                    )
+            else:
+                raise RuntimeError(
+                    f"Could not resolve FHIR type '{element_type_code}' and no profile canonical URL provided in the element definition"
+                )
 
     def _create_model_with_properties(
         self,
@@ -805,10 +834,7 @@ class ResourceFactory:
             min_card, max_card = self._parse_element_cardinality(element)
             # Parse the FHIR types of the element
             field_types = (
-                [
-                    self._get_complex_FHIR_type(field_type.code)
-                    for field_type in element.type
-                ]
+                [self._get_complex_FHIR_type(field_type) for field_type in element.type]
                 if element.type
                 else []
             )
@@ -902,9 +928,13 @@ class ResourceFactory:
                 )
                 for attribute, property_getter in subfield_properties.items():
                     setattr(field_type, attribute, property(property_getter))
-                if element.children["extension"].slices:
+                if (
+                    "extension" in element.children
+                    and element.children["extension"].slices
+                ):
                     extension_slice_base_type = get_complex_FHIR_type(
-                        "Extension", self.Config.FHIR_release if self.Config else "R4B"
+                        "Extension",
+                        self.Config.FHIR_release if self.Config else "4.3.0",
                     )
                     extension_type = Annotated[
                         Union[
@@ -925,7 +955,7 @@ class ResourceFactory:
                         element.children["extension"],
                         get_complex_FHIR_type(
                             "Extension",
-                            self.Config.FHIR_release if self.Config else "R4B",
+                            self.Config.FHIR_release if self.Config else "4.3.0",
                         ),
                     )
                     # Get cardinality of extension element
@@ -1002,7 +1032,9 @@ class ResourceFactory:
 
         # Resolve the FHIR structure definition
         _structure_definition = None
-        if isinstance(structure_definition, str):
+        if isinstance(structure_definition, StructureDefinition):
+            _structure_definition = structure_definition
+        elif isinstance(structure_definition, str):
             _structure_definition = self.repository.__load_json_structure_definition(
                 Path(structure_definition)
             )
@@ -1040,11 +1072,11 @@ class ResourceFactory:
         # Configure the factory for the current FHIR environment
         if not _structure_definition.fhirVersion:
             warnings.warn(
-                "StructureDefinition does not specify FHIR version, defaulting to R4B."
+                "StructureDefinition does not specify FHIR version, defaulting to 4.3.0."
             )
         self.Config = self.FactoryConfig(
             FHIR_release=get_FHIR_release_from_version(
-                _structure_definition.fhirVersion or "R4B"
+                _structure_definition.fhirVersion or "4.3.0"
             ),
             resource_name=_structure_definition.name,
         )
@@ -1058,7 +1090,7 @@ class ResourceFactory:
         # If the resource has metadata, prefill the information
         if "meta" in fields:
             Meta = get_complex_FHIR_type(
-                "Meta", self.Config.FHIR_release if self.Config else "R4B"
+                "Meta", self.Config.FHIR_release if self.Config else "4.3.0"
             )
             fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
             fields["meta"] = (

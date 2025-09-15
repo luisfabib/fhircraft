@@ -1,0 +1,17 @@
+{
+  "resourceType": "TRight",
+  "ptr": [
+    "Basic/1"
+  ],
+  "f2": [
+    {
+      "resourceType": "Basic",
+      "meta": {"profile": ["http://hl7.org/fhir/StructureDefinition/Basic"],
+              "versionId": "5.0.0"},
+      "id": "1",
+      "code": {
+        "text": "test"
+      }
+    }
+  ]
+}

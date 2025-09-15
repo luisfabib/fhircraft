@@ -9,6 +9,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathCollectionItem,
     FHIRPathFunction,
+    Literal,
 )
 from fhircraft.fhir.path.engine.filtering import Select
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Time
@@ -28,8 +29,8 @@ class Trace(FHIRPathFunction):
         name  (str): Subtring query.
     """
 
-    def __init__(self, name: str, projection: Optional[FHIRPath] = None):
-        self.name = name
+    def __init__(self, name: Literal | str, projection: Optional[FHIRPath] = None):
+        self.name = name if isinstance(name, str) else name.value
         self.projection = projection
 
     def evaluate(

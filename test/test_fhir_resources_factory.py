@@ -10,11 +10,12 @@ from parameterized import parameterized, parameterized_class
 from pydantic import Field
 from pydantic.aliases import AliasChoices
 from pydantic.fields import FieldInfo
+import pytest
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 import fhircraft.fhir.resources.datatypes.R4B.complex_types as complex_types
 from fhircraft.fhir.resources.definitions import StructureDefinition
-from fhircraft.fhir.resources.definitions.element_definition import ElementDefinition
+from fhircraft.fhir.resources.definitions.element_definition import ElementDefinition, ElementDefinitionType
 from fhircraft.fhir.resources.factory import ResourceFactory, _Unset
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
@@ -145,11 +146,17 @@ class TestBuildElementTreeStructure(FactoryTestCase):
 class TestGetFhirType(FactoryTestCase):
 
     def test_parses_fhir_primitive_datatype(self):
+        element_type = ElementDefinitionType(code="string")
+        result = self.factory._get_complex_FHIR_type(element_type)
+        assert result == primitives.String
+
+    def test_parses_fhir_primitive_datatype_as_string(self):
         result = self.factory._get_complex_FHIR_type("string")
         assert result == primitives.String
 
     def test_parses_fhir_complex_datatype(self):
-        result = self.factory._get_complex_FHIR_type("Coding")
+        element_type = ElementDefinitionType(code="Coding")
+        result = self.factory._get_complex_FHIR_type(element_type)
         assert result == complex_types.Coding
 
     def test_parses_fhir_complex_datatype_from_canonical_url(self):
@@ -163,10 +170,49 @@ class TestGetFhirType(FactoryTestCase):
             "http://hl7.org/fhirpath/System.String"
         )
         assert result == primitives.String
+        
+    def test_parses_fhir_profiled_type(self):
+        profile_url = "http://example.org/fhir/StructureDefinition/CustomType"
+        element_type = ElementDefinitionType(code="CustomType", profile=[profile_url])
+        self.factory.repository.load_from_definitions(
+            StructureDefinition(
+                resourceType="StructureDefinition",
+                url=profile_url,
+                name="CustomType",
+                version="1.0.0",
+                status="active",
+                kind="complex-type",
+                abstract=False,
+                type="BackboneElement",
+                baseDefinition="http://hl7.org/fhir/StructureDefinition/BackboneElement",
+                derivation="specialization",
+                snapshot={
+                    "element": [
+                        {
+                            "id": "CustomType",
+                            "path": "CustomType",
+                            "min": 0,
+                            "max": "*",
+                        },
+                        {
+                            "id": "CustomType.customField",
+                            "path": "CustomType.customField",
+                            "min": 0,
+                            "max": "1",
+                            "type": [{"code": "string"}],
+                        },
+                    ]   
+                },
+            )
+        )
+        result = self.factory._get_complex_FHIR_type(
+            element_type
+        )
+        assert result == self.factory.construction_cache[profile_url]
 
     def test_returns_field_type_name_if_not_found(self):
-        result = self.factory._get_complex_FHIR_type("UnknownType")
-        assert result == "UnknownType"
+        with pytest.raises(RuntimeError):
+            self.factory._get_complex_FHIR_type("UnknownType")
 
 
 class TestConstructPydanticField(FactoryTestCase):

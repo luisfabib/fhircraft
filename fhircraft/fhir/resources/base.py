@@ -49,7 +49,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                     ]
                 )
             # Set the whole list of slices in the resource
-            collection = fhirpath.parse(element).evaluate_for(instance, create=True)
+            collection = fhirpath.parse(element).__evaluate_wrapped(
+                instance, create=True
+            )
             [item.set_literal(slice_resources) for item in collection]
         return instance
 
@@ -103,7 +105,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         for element, slices in cls.get_sliced_elements().items():
             valid_elements = [
                 col.value
-                for col in fhirpath.parse(element).evaluate_for(resource, create=True)
+                for col in fhirpath.parse(element).__evaluate_wrapped(
+                    resource, create=True
+                )
                 if col.value is not None
             ]
             new_valid_elements = []
@@ -125,7 +129,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                         if entry not in new_valid_elements:
                             new_valid_elements.append(entry)
             # Set the new list with only the valid slices
-            collection = fhirpath.parse(element).evaluate_for(resource, create=True)
+            collection = fhirpath.parse(element).__evaluate_wrapped(
+                resource, create=True
+            )
             [col.set_literal(new_valid_elements) for col in collection]
         return resource
 

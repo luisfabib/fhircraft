@@ -103,7 +103,7 @@ class And(FHIRPath):
         return [FHIRPathCollectionItem.wrap(left_boolean and right_boolean)]
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        return f"{self.left} = {self.right}"
 
     def __repr__(self):
         return (
@@ -168,7 +168,7 @@ class Or(FHIRPath):
         return [FHIRPathCollectionItem.wrap(left_boolean or right_boolean)]
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        return f"{self.left} or {self.right}"
 
     def __repr__(self):
         return (
@@ -221,7 +221,7 @@ class Xor(FHIRPath):
         return [FHIRPathCollectionItem.wrap(left_boolean ^ right_boolean)]
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        return f"{self.left} xor {self.right}"
 
     def __repr__(self):
         return (
@@ -300,7 +300,7 @@ class Implies(FHIRPath):
         return []
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        return f"{self.left} implies {self.right}"
 
     def __repr__(self):
         return (

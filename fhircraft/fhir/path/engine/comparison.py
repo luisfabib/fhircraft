@@ -22,7 +22,7 @@ class FHIRComparisonOperator(FHIRPath, ABC):
         self.right = right
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right})"
 
     def __repr__(self):
         return (
@@ -72,6 +72,9 @@ class GreaterThan(FHIRComparisonOperator):
             return []
         return [FHIRPathCollectionItem.wrap(left_value > right_value)]
 
+    def __str__(self):
+        return f"{self.left} > {self.right}"
+
 
 class LessThan(FHIRComparisonOperator):
     """
@@ -110,6 +113,9 @@ class LessThan(FHIRComparisonOperator):
         if not left_value or not right_value:
             return []
         return [FHIRPathCollectionItem.wrap(left_value < right_value)]
+
+    def __str__(self):
+        return f"{self.left} < {self.right}"
 
 
 class LessEqualThan(FHIRComparisonOperator):
@@ -150,6 +156,9 @@ class LessEqualThan(FHIRComparisonOperator):
             return []
         return [FHIRPathCollectionItem.wrap(left_value <= right_value)]
 
+    def __str__(self):
+        return f"{self.left} <= {self.right}"
+
 
 class GreaterEqualThan(FHIRComparisonOperator):
     """
@@ -188,6 +197,6 @@ class GreaterEqualThan(FHIRComparisonOperator):
         if not left_value or not right_value:
             return []
         return [FHIRPathCollectionItem.wrap(left_value >= right_value)]
-        if not left_value or not right_value:
-            return []
-        return [FHIRPathCollectionItem.wrap(left_value >= right_value)]
+
+    def __str__(self):
+        return f"{self.left} >= {self.right}"

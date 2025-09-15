@@ -99,14 +99,9 @@ class Substring(StringManipulationFunction):
         end (Optional[int]): End index of the substring.
     """
 
-    def __init__(self, start: int | Literal, end: Optional[int | Literal] = None):
-        if isinstance(start, Literal):
-            start = start.value
-        if end is not None:
-            if isinstance(end, Literal):
-                end = end.value
-        self.start = start
-        self.end = end
+    def __init__(self, start: int | Literal, end: int | Literal | None = None):
+        self.start: int = start.value if isinstance(start, Literal) else start
+        self.end: int | None = end.value if isinstance(end, Literal) else end
 
     def evaluate(
         self, collection: FHIRPathCollection, create=False
@@ -133,9 +128,9 @@ class Substring(StringManipulationFunction):
 
         """
         self.validate_collection(collection)
-        if not collection or not self.start:
+        if not collection or self.start > len(collection[0].value) - 1:
             return []
-        if not self.end:
+        if self.end is None:
             return [FHIRPathCollectionItem.wrap(collection[0].value[self.start :])]
         return [FHIRPathCollectionItem.wrap(collection[0].value[self.start : self.end])]
 
@@ -393,6 +388,9 @@ class Matches(StringManipulationFunction):
         if not isinstance(regex, str):
             raise FHIRPathError("Matches() argument must be a string.")
         self.regex = regex
+
+    def __str__(self):
+        return f"matches('{self.regex}')"
 
     def evaluate(
         self, collection: FHIRPathCollection, create=False

@@ -443,3 +443,27 @@ def get_module_name(obj: Any) -> str:
     if module is None:
         raise ValueError(f"The object {obj} does not belong to a module")
     return module.__name__
+
+
+def is_list_field(field) -> bool:
+    """
+    Determines if a given Pydantic field or FieldInfo is a list type,
+    including Optional[List[T]] and Union[List[T], ...].
+    """
+    annotation = getattr(field, "annotation", None)
+    if annotation is None:
+        annotation = getattr(field, "outer_type_", None)
+    if annotation is None:
+        annotation = getattr(field, "type_", None)
+    if annotation is None:
+        return False
+
+    def _is_list_type(ann):
+        origin = getattr(ann, "__origin__", None)
+        if origin in (list, List):
+            return True
+        if origin is Union:
+            return any(_is_list_type(arg) for arg in getattr(ann, "__args__", ()))
+        return False
+
+    return _is_list_type(annotation)
