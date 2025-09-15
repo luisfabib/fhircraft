@@ -623,4 +623,6 @@ def _replace_mapping_scope_elements(path, scope: MappingScope):
         right = _replace_mapping_scope_elements(path.right, scope)
         return path.__class__(left, right)
     return path
-    return path
+
+
+mapper = FHIRMappingEngine()

@@ -35,13 +35,10 @@ from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 from fhircraft.fhir.resources.definitions import (
     ElementDefinition,
     ElementDefinitionConstraint,
+    ElementDefinitionType,
     StructureDefinition,
-    ElementDefinitionType
 )
-from fhircraft.fhir.resources.repository import (
-    CompositeStructureDefinitionRepository,
-    StructureDefinitionRepository,
-)
+from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 from fhircraft.utils import (
     capitalize,
     ensure_list,
@@ -403,7 +400,11 @@ class ResourceFactory:
         """
         FHIR_COMPLEX_TYPE_PREFIX = "http://hl7.org/fhir/StructureDefinition/"
         FHIRPATH_TYPE_PREFIX = "http://hl7.org/fhirpath/System."
-        element_type_code = element_type.code if isinstance(element_type, ElementDefinitionType) else element_type
+        element_type_code = (
+            element_type.code
+            if isinstance(element_type, ElementDefinitionType)
+            else element_type
+        )
         # Pre-process the type string
         element_type_code = str(element_type_code)
         element_type_code = element_type_code.removeprefix(FHIR_COMPLEX_TYPE_PREFIX)
@@ -421,14 +422,21 @@ class ResourceFactory:
         except (ModuleNotFoundError, AttributeError):
             if isinstance(element_type, ElementDefinitionType) and element_type.profile:
                 # Try to resolve custom type from profile URL
-                if type_structure_definition := self.resolve_structure_definition(element_type.profile[0]):
+                if type_structure_definition := self.resolve_structure_definition(
+                    element_type.profile[0]
+                ):
                     return self.construct_resource_model(
-                        structure_definition=type_structure_definition, base_model=FHIRBaseModel
+                        structure_definition=type_structure_definition,
+                        base_model=FHIRBaseModel,
                     )
                 else:
-                    raise RuntimeError(f"Could not resolve the canonical URL '{element_type.profile[0]}' for the FHIR type '{element_type_code}'. Please add the resource to the factory repository.")
+                    raise RuntimeError(
+                        f"Could not resolve the canonical URL '{element_type.profile[0]}' for the FHIR type '{element_type_code}'. Please add the resource to the factory repository."
+                    )
             else:
-                raise RuntimeError(f"Could not resolve FHIR type '{element_type_code}' and no profile canonical URL provided in the element definition")
+                raise RuntimeError(
+                    f"Could not resolve FHIR type '{element_type_code}' and no profile canonical URL provided in the element definition"
+                )
 
     def _create_model_with_properties(
         self,
@@ -826,10 +834,7 @@ class ResourceFactory:
             min_card, max_card = self._parse_element_cardinality(element)
             # Parse the FHIR types of the element
             field_types = (
-                [
-                    self._get_complex_FHIR_type(field_type)
-                    for field_type in element.type
-                ]
+                [self._get_complex_FHIR_type(field_type) for field_type in element.type]
                 if element.type
                 else []
             )
@@ -928,7 +933,8 @@ class ResourceFactory:
                     and element.children["extension"].slices
                 ):
                     extension_slice_base_type = get_complex_FHIR_type(
-                        "Extension", self.Config.FHIR_release if self.Config else "4.3.0"
+                        "Extension",
+                        self.Config.FHIR_release if self.Config else "4.3.0",
                     )
                     extension_type = Annotated[
                         Union[
