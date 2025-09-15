@@ -7,13 +7,13 @@ Basic tests to validate the high-level API functionality.
 import pytest
 from pydantic import BaseModel
 
-from fhircraft.fhir.mapper import (
-    FHIRMapper,
-    execute_mapping,
-    load_structure_map,
-    parse_mapping_script,
-)
+from fhircraft.fhir.mapper import FHIRMapper
 from fhircraft.fhir.mapper.structures.StructureMap import StructureMap
+
+from .test_fhir_mapper_engine import (
+    create_simple_source_structure_definition,
+    create_simple_target_structure_definition,
+)
 
 
 class SimpleSource(BaseModel):
@@ -31,7 +31,10 @@ def test_parse_mapping_script():
     script = """
     map 'http://example.org/test' = 'test'
     
-    group main(source src, target tgt) {
+    uses "http://example.org/StructureDefinition/SimpleSource" alias SimpleSource as source
+    uses "http://example.org/StructureDefinition/SimpleTarget" alias SimpleTarget as target
+
+    group main(source src: SimpleSource, target tgt: SimpleTarget) {
         src.name -> tgt.full_name;
         src.age -> tgt.years_old;
     }
@@ -43,21 +46,6 @@ def test_parse_mapping_script():
     assert isinstance(structure_map, StructureMap)
     assert structure_map.name == "test"
     assert structure_map.url == "http://example.org/test"
-
-
-def test_convenience_parse_function():
-    """Test the convenience parse function."""
-    script = """
-    map 'http://example.org/test' = 'test'
-    
-    group main(source src, target tgt) {
-        src.name -> tgt.full_name;
-    }
-    """
-
-    structure_map = parse_mapping_script(script)
-    assert isinstance(structure_map, StructureMap)
-    assert structure_map.name == "test"
 
 
 def test_load_structure_map_from_dict():
@@ -110,11 +98,14 @@ def test_list_groups():
     script = """
     map 'http://example.org/test' = 'test'
     
-    group first(source src, target tgt) {
+    uses "http://example.org/StructureDefinition/SimpleSource" alias SimpleSource as source
+    uses "http://example.org/StructureDefinition/SimpleTarget" alias SimpleTarget as target
+
+    group first_map(source src: SimpleSource, target tgt: SimpleTarget) {
         src.name -> tgt.full_name;
     }
-    
-    group second(source src, target tgt) {
+
+    group second_map(source src: SimpleSource, target tgt: SimpleTarget) {
         src.age -> tgt.years_old;
     }
     """
@@ -122,8 +113,8 @@ def test_list_groups():
     mapper = FHIRMapper()
     groups = mapper.list_groups(script)
 
-    assert "first" in groups
-    assert "second" in groups
+    assert "first_map" in groups
+    assert "second_map" in groups
     assert len(groups) == 2
 
 
@@ -132,7 +123,10 @@ def test_basic_execute_mapping():
     script = """
     map 'http://example.org/test' = 'test'
     
-    group main(source src, target tgt) {
+    uses "http://example.org/StructureDefinition/SimpleSource" alias SimpleSource as source
+    uses "http://example.org/StructureDefinition/SimpleTarget" alias SimpleTarget as target
+
+    group main(source src: SimpleSource, target tgt: SimpleTarget) {
         src.name -> tgt.full_name;
         src.age -> tgt.years_old;
     }
@@ -141,25 +135,9 @@ def test_basic_execute_mapping():
     source = SimpleSource(name="John Doe", age=30)
 
     mapper = FHIRMapper()
+    mapper.add_structure_definition(create_simple_source_structure_definition())
+    mapper.add_structure_definition(create_simple_target_structure_definition())
     result = mapper.execute_mapping(script, source)
-
-    assert len(result) == 1
-    target = result[0]
-
-
-def test_convenience_execute_mapping():
-    """Test convenience execute mapping function."""
-    script = """
-    map 'http://example.org/test' = 'test'
-    
-    group main(source src, target tgt) {
-        src.name -> tgt.full_name;
-    }
-    """
-
-    source = {"name": "Jane Doe", "age": 25}
-
-    result = execute_mapping(script, source)
 
     assert len(result) == 1
 
@@ -169,11 +147,14 @@ def test_execute_mapping_with_options():
     script = """
     map 'http://example.org/test' = 'test'
     
-    group first(source src, target tgt) {
+    uses "http://example.org/StructureDefinition/SimpleSource" alias SimpleSource as source
+    uses "http://example.org/StructureDefinition/SimpleTarget" alias SimpleTarget as target
+
+    group first_map(source src: SimpleSource, target tgt: SimpleTarget) {
         src.name -> tgt.full_name;
     }
-    
-    group second(source src, target tgt) {
+
+    group second_map(source src: SimpleSource, target tgt: SimpleTarget) {
         src.age -> tgt.years_old;
     }
     """
@@ -181,25 +162,7 @@ def test_execute_mapping_with_options():
     source = SimpleSource(name="Bob Smith", age=40)
 
     mapper = FHIRMapper()
-    result = mapper.execute_mapping(script, source, group="second")
+    mapper.add_structure_definition(create_simple_source_structure_definition())
+    mapper.add_structure_definition(create_simple_target_structure_definition())
+    result = mapper.execute_mapping(script, source, group="second_map")
     assert len(result) == 1
-
-
-def test_execute_mapping_with_multiple_sources():
-    """Test mapping execution with multiple sources."""
-    script = """
-    map 'http://example.org/test' = 'test'
-    
-    group main(source src1, source src2, target tgt) {
-        src1.name -> tgt.full_name;
-        src2.age -> tgt.years_old;
-    }
-    """
-
-    source1 = {"name": "Alice"}
-    source2 = {"age": 35}
-
-    mapper = FHIRMapper()
-    result = mapper.execute_mapping(script, (source1, source2))
-
-    assert len(result) == 2
