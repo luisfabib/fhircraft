@@ -52,11 +52,14 @@ class StructureMapModelMode(str, enum.Enum):
 
 class FHIRMappingEngine:
     """
-    Main FHIR Mapping Language execution engine.
+    FHIRMappingEngine is responsible for executing FHIR StructureMap-based transformations between FHIR resources.
 
-    This engine processes StructureMap resources to transform FHIR data
-    from source structures to target structures following the FHIR Mapping
-    Language specification.
+    This engine validates, processes, and applies mapping rules defined in a StructureMap to transform source FHIR resources into target resources, supporting complex mapping logic, rule dependencies, and FHIRPath-based expressions.
+
+    Attributes:
+        repository (CompositeStructureDefinitionRepository): Repository for FHIR StructureDefinitions.
+        factory (ResourceFactory): Factory for constructing FHIR resource models.
+        transformer (MappingTransformer): Executes FHIRPath-based transforms.
     """
 
     def __init__(
@@ -64,12 +67,6 @@ class FHIRMappingEngine:
         repository: CompositeStructureDefinitionRepository | None = None,
         factory: ResourceFactory | None = None,
     ):
-        """
-        Initialize the mapping engine.
-
-        Args:
-            repository (CompositeStructureDefinitionRepository | None): Structure definition repository for resolving canonical URLs. If `None`, a default empty repository will be created.
-        """
         self.repository = repository or CompositeStructureDefinitionRepository()
         self.factory = factory or ResourceFactory(repository=self.repository)
         self.transformer = MappingTransformer()
@@ -81,6 +78,28 @@ class FHIRMappingEngine:
         targets: tuple[BaseModel | dict] | None = None,
         group: str | None = None,
     ) -> tuple[BaseModel, ...]:
+        """
+        Executes a FHIR StructureMap transformation using the provided sources and optional targets.
+
+        This method resolves structure definitions, validates input data, sets up the mapping scope,
+        binds source and target instances to group parameters, and processes the entrypoint group
+        to produce the mapped target instances.
+
+        Args:
+            structure_map (StructureMap): The StructureMap resource defining the transformation rules.
+            sources (tuple[BaseModel | dict]): Source data to be mapped, as a tuple of Pydantic models or dictionaries.
+            targets (tuple[BaseModel | dict] | None, optional): Optional target instances to populate. If not provided, new instances are created as needed.
+            group (str | None, optional): The name of the entrypoint group to execute. If not specified, the first group is used.
+
+        Returns:
+            tuple[BaseModel, ...]: A tuple of resulting target instances after the transformation.
+
+        Raises:
+            NotImplementedError: If StructureMap imports are present (not supported).
+            ValueError: If a constant in the StructureMap is missing a name or conflicts with a model name.
+            RuntimeError: If the number of provided sources or targets does not match the group parameters, or if required targets are missing.
+            TypeError: If provided sources or targets do not match the expected types for the group parameters.
+        """
 
         # Ensure sources is a tuple
         if not isinstance(sources, tuple):
@@ -151,7 +170,7 @@ class FHIRMappingEngine:
         )
         if len(validated_sources) != expected_sources:
             raise RuntimeError(
-                f"Entrypoint group {target_group.name} expected {expected_sources} sources, got {len(sources)}."
+                f"Entrypoint group {target_group.name} expected {expected_sources} sources, got {len(validated_sources)}."
             )
 
         # Validate targets if provided
@@ -225,144 +244,27 @@ class FHIRMappingEngine:
             ]
         )
 
-    def _resolve_structure_definitions(
-        self, structure_map: StructureMap, mode: StructureMapModelMode
-    ) -> Dict[str, type[BaseModel]]:
-        """
-        Resolve source and target structure definitions from the repository.
-
-        Args:
-            structure_map (StructureMap): The structure map containing structure references
-
-        Returns:
-            Dict[str, StructureDefinition]: Mapping of structure aliases to resolved structure definitions
-
-        Raises:
-            StructureDefinitionNotFoundError: If structure definitions canonical URLs cannot be resolved within the repository
-            ValidationError: If input validation fails
-        """
-        if not structure_map.structure:
-            raise MappingError("Structure map does not specify any structures")
-
-        return {
-            s.alias
-            or s.url: self.factory.construct_resource_model(
-                structure_definition=self.repository.get(s.url)
-            )
-            for s in structure_map.structure
-            if s.mode == mode
-        }
-
-    def _validate_source_data(
-        self,
-        source_data: tuple[BaseModel | dict, ...],
-        source_models: Dict[str, Type[BaseModel]],
-    ) -> dict[str, BaseModel]:
-        """
-        Validate input data against source structure.
-
-        Args:
-            source_data (tuple[BaseModel | dict, ...]): Tuple of source data object
-            source_models (Dict[str, Type[BaseModel]]): Mapping of structure aliases to Pydantic model classes for validation
-
-        Returns:
-            (dict[str, BaseModel]): Mapping of aliases to validated source data instances
-        """
-        validated_entries = {}
-
-        def _validate_entry(entry: BaseModel | dict) -> None:
-            for alias, source_model in source_models.items():
-                try:
-                    if isinstance(entry, source_model):
-                        validated_entries[alias] = entry
-                    elif isinstance(entry, dict):
-                        validated_entries[alias] = source_model(**entry)
-                    elif hasattr(entry, "__dict__"):
-                        validated_entries[alias] = source_model(**entry.__dict__)
-                    return None
-                except MappingError:
-                    continue
-            else:
-                raise MappingError(
-                    f"Source data entry of type {type(entry)} does not match any source model"
-                )
-
-        for entry in source_data:
-            _validate_entry(entry)
-
-        return validated_entries
-
-    def validate_structure_map(self, structure_map: StructureMap) -> List[str]:
-        """
-        Validate a structure map for common issues.
-
-        Args:
-            structure_map: The structure map to validate
-
-        Returns:
-            List of validation warnings/errors
-        """
-        issues = []
-
-        # Check basic structure
-        if not structure_map.group:
-            issues.append("StructureMap has no groups defined")
-
-        if not structure_map.structure:
-            issues.append("StructureMap has no structure declarations")
-
-        # Check structure declarations
-        source_structures = [
-            s for s in structure_map.structure or [] if s.mode == "source"
-        ]
-        target_structures = [
-            s for s in structure_map.structure or [] if s.mode == "target"
-        ]
-
-        if not source_structures:
-            issues.append("No source structures defined")
-        if not target_structures:
-            issues.append("No target structures defined")
-
-        # Check groups and rules
-        for group in structure_map.group or []:
-            if not group.rule:
-                issues.append(f"Group {group.name} has no rules")
-
-            for rule in group.rule or []:
-                self._validate_rule(rule, issues)
-
-        return issues
-
-    def _validate_rule(self, rule: StructureMapRule, issues: List[str]) -> None:
-        """Validate a single rule."""
-        rule_name = rule.name or f"unnamed_rule_{id(rule)}"
-
-        if not rule.source:
-            issues.append(f"Rule {rule_name} has no source elements")
-
-        if not rule.target:
-            issues.append(f"Rule {rule_name} has no target elements")
-
-        # Check for potential cycles in dependent rules
-        if rule.dependent:
-            for dep in rule.dependent:
-                if dep.name == rule.name:
-                    issues.append(f"Rule {rule_name} depends on itself")
-
-        # Validate nested rules
-        for nested_rule in rule.rule or []:
-            self._validate_rule(nested_rule, issues)
-        # Validate nested rules
-        for nested_rule in rule.rule or []:
-            self._validate_rule(nested_rule, issues)
-
     def process_group(
         self,
         group: StructureMapGroup,
         parameters: list[FHIRPath] | tuple[FHIRPath],
         scope: MappingScope,
     ):
+        """
+        Processes a StructureMap group by validating input parameters, constructing a local mapping scope,
+        and executing the group's rules in the correct order, handling special list modes ('first' and 'last').
+
+        Args:
+            group (StructureMapGroup): The group definition containing mapping rules and input definitions.
+            parameters (list[FHIRPath] | tuple[FHIRPath]): The input parameters to be mapped, corresponding to the group's input definitions.
+            scope (MappingScope): The parent mapping scope to use as the basis for the group's local scope.
+
+        Raises:
+            MappingError: If the number of provided parameters does not match the group's input definitions.
+            RuntimeError: If more than one rule with 'first' or 'last' target list mode is found in the group.
+            NotImplementedError: If a target list mode other than 'first' or 'last' is encountered.
+
+        """
         group_name = group.name or f"group_{id(group)}"
 
         # Construct local group scope
@@ -418,6 +320,29 @@ class FHIRMappingEngine:
             self.process_rule(rule, group_scope)
 
     def process_rule(self, rule: StructureMapRule, scope: MappingScope) -> MappingScope:
+        """
+        Processes a single StructureMap rule within the given mapping scope.
+
+        This method handles the evaluation and execution of a StructureMapRule, including:
+        - Cycle detection to prevent infinite recursion.
+        - Source processing to determine iteration counts and validate type, condition, and check constraints.
+        - Iterative processing for each source instance, including:
+            - Creating an iteration-specific mapping scope.
+            - Setting indexed FHIRPath variables for the current iteration.
+            - Processing target mappings, dependent rules/groups, and nested rules.
+            - Merging results from each iteration back into the main scope.
+
+        Args:
+            rule (StructureMapRule): The rule to process.
+            scope (MappingScope): The current mapping scope.
+
+        Returns:
+            MappingScope: The updated mapping scope after processing the rule.
+
+        Raises:
+            RuleProcessingError: If any rule constraints (such as cardinality, type, or checks) are violated,
+                or if required variables or dependent groups are not found.
+        """
         rule_name = rule.name or f"rule_{id(rule)}"
 
         # Check for cycles
@@ -449,7 +374,7 @@ class FHIRMappingEngine:
                 # Where condition
                 if source.condition:
                     condition_fhirpath = fhirpath_parser.parse(source.condition)
-                    condition_fhirpath = _replace_mapping_scope_elements(
+                    condition_fhirpath = self._replace_mapping_scope_elements(
                         condition_fhirpath, scope
                     )
 
@@ -460,7 +385,7 @@ class FHIRMappingEngine:
                 # Check condition
                 if source.check:
                     condition_fhirpath = fhirpath_parser.parse(source.check)
-                    condition_fhirpath = _replace_mapping_scope_elements(
+                    condition_fhirpath = self._replace_mapping_scope_elements(
                         condition_fhirpath, scope
                     )
 
@@ -547,6 +472,22 @@ class FHIRMappingEngine:
         return scope
 
     def process_source(self, source: StructureMapSource, scope: MappingScope) -> str:
+        """
+        Processes a StructureMapSource object within a given MappingScope and returns the variable name
+        associated with the resolved FHIRPath expression.
+
+        This method resolves the FHIRPath context from the source, applies any specified element path,
+        and modifies the path according to the listMode option (e.g., first, last, not_first, not_last, only_one).
+        The resulting FHIRPath expression is stored in the scope under a variable name, which is either
+        provided by the source or generated uniquely.
+
+        Args:
+            source (StructureMapSource): The source mapping definition containing context, element, listMode, and variable.
+            scope (MappingScope): The current mapping scope used to resolve FHIRPath and store variables.
+
+        Returns:
+            str: The variable name under which the resolved FHIRPath expression is stored in the scope.
+        """
         path = scope.resolve_fhirpath(source.context)
         # Apply element path if specified
         if source.element:
@@ -578,6 +519,25 @@ class FHIRMappingEngine:
         target: StructureMapTarget,
         scope: MappingScope,
     ) -> Any:
+        """
+        Processes a StructureMapTarget within the given mapping scope.
+
+        This method resolves the FHIRPath context for the target, applies any specified element path,
+        determines the appropriate insertion index, and stores the resulting FHIRPath in the scope as a variable.
+        If a transform is specified on the target, it executes the transform with the provided parameters and
+        updates the target structure with the transformed value.
+
+        Args:
+            target (StructureMapTarget): The mapping target to process, containing context, element, variable,
+                transform, and parameters.
+            scope (MappingScope): The current mapping scope, used for resolving FHIRPath contexts and managing variables.
+
+        Returns:
+            Any: The result of processing the target, typically the updated FHIRPath or transformed value.
+
+        Raises:
+            RuleProcessingError: If the target context is not specified.
+        """
         if not target.context:
             raise RuleProcessingError("Target context is required")
         path = scope.resolve_fhirpath(target.context)
@@ -602,27 +562,194 @@ class FHIRMappingEngine:
             # Update the target structure
             path.update_single(scope.get_instances(), transformed_value)
 
+    def validate_structure_map(self, structure_map: StructureMap) -> List[str]:
+        """
+        Validates the structure and content of a given StructureMap instance.
 
-def _replace_mapping_scope_elements(path, scope: MappingScope):
-    """
-    Replace FHIRPath Element references with context Element references.
+        This method checks for the presence of required groups and structure declarations,
+        ensures that both source and target structures are defined, and verifies that each
+        group contains rules. It also delegates rule-specific validation to the _validate_rule method.
 
-    This is used to adjust FHIRPath expressions to the current mapping context.
-    """
-    if isinstance(path, fhirpath.Element):
-        try:
-            return scope.resolve_fhirpath(path.label)
-        except MappingError:
-            return fhirpath.Element(f"{path.label}")
-    elif isinstance(path, (fhirpath.Invocation)):
-        left = _replace_mapping_scope_elements(path.left, scope)
-        right = _replace_mapping_scope_elements(path.right, scope)
-        return fhirpath.Invocation(left, right)
-    elif isinstance(path, fhirpath.FHIRComparisonOperator):
-        left = _replace_mapping_scope_elements(path.left, scope)
-        right = _replace_mapping_scope_elements(path.right, scope)
-        return path.__class__(left, right)
-    return path
+        Args:
+            structure_map (StructureMap): The StructureMap object to validate.
+
+        Returns:
+            List[str]: A list of validation issue messages. The list is empty if no issues are found.
+        """
+        issues = []
+
+        # Check basic structure
+        if not structure_map.group:
+            issues.append("StructureMap has no groups defined")
+
+        if not structure_map.structure:
+            issues.append("StructureMap has no structure declarations")
+
+        # Check structure declarations
+        source_structures = [
+            s for s in structure_map.structure or [] if s.mode == "source"
+        ]
+        target_structures = [
+            s for s in structure_map.structure or [] if s.mode == "target"
+        ]
+
+        if not source_structures:
+            issues.append("No source structures defined")
+        if not target_structures:
+            issues.append("No target structures defined")
+
+        # Check groups and rules
+        for group in structure_map.group or []:
+            if not group.rule:
+                issues.append(f"Group {group.name} has no rules")
+
+            for rule in group.rule or []:
+                self._validate_rule(rule, issues)
+
+        return issues
+
+    def _resolve_structure_definitions(
+        self, structure_map: StructureMap, mode: StructureMapModelMode
+    ) -> Dict[str, type[BaseModel]]:
+        """
+        Resolves and constructs resource models for the specified mode from the given StructureMap.
+
+        Args:
+            structure_map (StructureMap): The structure map containing structure definitions to resolve.
+            mode (StructureMapModelMode): The mode (e.g., source or target) to filter structures by.
+
+        Returns:
+            Dict[str, type[BaseModel]]: A dictionary mapping structure aliases or URLs to their corresponding resource model classes.
+
+        Raises:
+            MappingError: If the structure map does not specify any structures.
+        """
+        if not structure_map.structure:
+            raise MappingError("Structure map does not specify any structures")
+
+        return {
+            s.alias
+            or s.url: self.factory.construct_resource_model(
+                structure_definition=self.repository.get(s.url)
+            )
+            for s in structure_map.structure
+            if s.mode == mode
+        }
+
+    def _validate_source_data(
+        self,
+        source_data: tuple[BaseModel | dict, ...],
+        source_models: Dict[str, Type[BaseModel]],
+    ) -> dict[str, BaseModel]:
+        """
+        Validates and maps a tuple of source data entries to their corresponding Pydantic models.
+
+        Each entry in `source_data` is checked against the provided `source_models`. If an entry matches a model (either as an instance, a dict, or an object with a `__dict__`), it is validated and added to the result dictionary under the model's alias. If an entry does not match any model, a `MappingError` is raised.
+
+        Args:
+            source_data (tuple[BaseModel | dict, ...]): A tuple containing source data entries, which can be Pydantic model instances, dictionaries, or objects with a `__dict__` attribute.
+            source_models (Dict[str, Type[BaseModel]]): A dictionary mapping string aliases to Pydantic model classes.
+
+        Returns:
+            dict[str, BaseModel]: A dictionary mapping aliases to validated Pydantic model instances.
+
+        Raises:
+            MappingError: If any entry in `source_data` does not match any of the provided source models.
+        """
+        validated_entries = {}
+
+        def _validate_entry(entry: BaseModel | dict) -> None:
+            for alias, source_model in source_models.items():
+                try:
+                    if isinstance(entry, source_model):
+                        validated_entries[alias] = entry
+                    elif isinstance(entry, dict):
+                        validated_entries[alias] = source_model(**entry)
+                    elif hasattr(entry, "__dict__"):
+                        validated_entries[alias] = source_model(**entry.__dict__)
+                    return None
+                except MappingError:
+                    continue
+            else:
+                raise MappingError(
+                    f"Source data entry of type {type(entry)} does not match any source model"
+                )
+
+        for entry in source_data:
+            _validate_entry(entry)
+
+        return validated_entries
+
+    def _validate_rule(self, rule: StructureMapRule, issues: List[str]) -> None:
+        """
+        Validates a StructureMapRule object and appends any issues found to the provided issues list.
+
+        This method checks for the following:
+            - The rule has at least one source element.
+            - The rule has at least one target element.
+            - The rule does not depend on itself (to prevent cycles).
+            - Recursively validates any nested rules.
+
+        Args:
+            rule (StructureMapRule): The rule to validate.
+            issues (List[str]): A list to which validation issue messages will be appended.
+
+        Returns:
+            None
+        """
+        rule_name = rule.name or f"unnamed_rule_{id(rule)}"
+
+        if not rule.source:
+            issues.append(f"Rule {rule_name} has no source elements")
+
+        if not rule.target:
+            issues.append(f"Rule {rule_name} has no target elements")
+
+        # Check for potential cycles in dependent rules
+        if rule.dependent:
+            for dep in rule.dependent:
+                if dep.name == rule.name:
+                    issues.append(f"Rule {rule_name} depends on itself")
+
+        # Validate nested rules
+        for nested_rule in rule.rule or []:
+            self._validate_rule(nested_rule, issues)
+        # Validate nested rules
+        for nested_rule in rule.rule or []:
+            self._validate_rule(nested_rule, issues)
+
+    def _replace_mapping_scope_elements(self, path, scope: MappingScope):
+        """
+        Recursively replaces elements in a FHIRPath expression tree with their corresponding values from the given mapping scope.
+
+        Args:
+            path: A FHIRPath expression node, which can be an instance of fhirpath.Element, fhirpath.Invocation, fhirpath.FHIRComparisonOperator, or other supported types.
+            scope (MappingScope): The mapping scope used to resolve FHIRPath element labels.
+
+        Returns:
+            The FHIRPath expression tree with elements replaced according to the mapping scope.
+
+        Raises:
+            MappingError: If a FHIRPath element label cannot be resolved in the mapping scope.
+
+        Notes:
+            - If a fhirpath.Element cannot be resolved in the scope, a new fhirpath.Element with the same label is returned.
+            - The function processes Invocation and FHIRComparisonOperator nodes recursively.
+        """
+        if isinstance(path, fhirpath.Element):
+            try:
+                return scope.resolve_fhirpath(path.label)
+            except MappingError:
+                return fhirpath.Element(f"{path.label}")
+        elif isinstance(path, (fhirpath.Invocation)):
+            left = self._replace_mapping_scope_elements(path.left, scope)
+            right = self._replace_mapping_scope_elements(path.right, scope)
+            return fhirpath.Invocation(left, right)
+        elif isinstance(path, fhirpath.FHIRComparisonOperator):
+            left = self._replace_mapping_scope_elements(path.left, scope)
+            right = self._replace_mapping_scope_elements(path.right, scope)
+            return path.__class__(left, right)
+        return path
 
 
 mapper = FHIRMappingEngine()

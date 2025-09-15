@@ -64,11 +64,11 @@ class ResourceFactory:
     """Factory for constructing Pydantic models from FHIR StructureDefinitions.
 
     The ResourceFactory provides functionality to:
-    - Load StructureDefinitions from various sources (files, directories, dictionaries)
-    - Load FHIR packages from package registries
-    - Construct Pydantic models from StructureDefinitions
-    - Cache constructed models for performance
-    - Manage internet access and package registry configuration
+        - Load StructureDefinitions from various sources (files, directories, dictionaries)
+        - Load FHIR packages from package registries
+        - Construct Pydantic models from StructureDefinitions
+        - Cache constructed models for performance
+        - Manage internet access and package registry configuration
     """
 
     @dataclass
