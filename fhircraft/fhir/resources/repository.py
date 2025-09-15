@@ -2,7 +2,10 @@ import json
 import tarfile
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
+
+# Define a type variable for the resource type
+T = TypeVar("T")
 
 import requests
 from packaging import version
@@ -23,24 +26,22 @@ class StructureDefinitionNotFoundError(FileNotFoundError):
     pass
 
 
-class StructureDefinitionRepository(ABC):
-    """Abstract base class for structure definition repositories."""
+class AbstractRepository(ABC, Generic[T]):
+    """Abstract base class for generic repositories."""
 
     @abstractmethod
-    def get(
-        self, canonical_url: str, version: Optional[str] = None
-    ) -> StructureDefinition:
-        """Retrieve a structure definition by canonical URL and optional version."""
+    def get(self, canonical_url: str, version: Optional[str] = None) -> T:
+        """Retrieve a resource by canonical URL and optional version."""
         pass
 
     @abstractmethod
-    def add(self, structure_def: StructureDefinition) -> None:
-        """Add a structure definition to the repository."""
+    def add(self, resource: T) -> None:
+        """Add a resource to the repository."""
         pass
 
     @abstractmethod
     def has(self, canonical_url: str, version: Optional[str] = None) -> bool:
-        """Check if a structure definition exists in the repository."""
+        """Check if a resource exists in the repository."""
         pass
 
     @abstractmethod
@@ -74,7 +75,7 @@ class StructureDefinitionRepository(ABC):
         return base_url
 
 
-class HttpStructureDefinitionRepository(StructureDefinitionRepository):
+class HttpStructureDefinitionRepository(AbstractRepository[StructureDefinition]):
     """Repository that downloads structure definitions from the internet."""
 
     def __init__(self):
@@ -194,7 +195,7 @@ class HttpStructureDefinitionRepository(StructureDefinitionRepository):
         return StructureDefinition.model_validate(response.json())
 
 
-class PackageStructureDefinitionRepository(StructureDefinitionRepository):
+class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinition]):
     """Repository that can load FHIR packages from package registries."""
 
     def __init__(
@@ -525,7 +526,7 @@ class PackageStructureDefinitionRepository(StructureDefinitionRepository):
         self._loaded_packages.clear()
 
 
-class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
+class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinition]):
     """
     CompositeStructureDefinitionRepository provides a unified interface for managing, retrieving, and caching FHIR
     StructureDefinition resources from multiple sources, including local storage, FHIR packages, and online repositories.
