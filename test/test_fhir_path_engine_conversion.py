@@ -1,14 +1,9 @@
 import pytest
-from sympy import true
 
 from fhircraft.fhir.path.engine.conversion import *
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPathCollectionItem,
-    FHIRPathError,
-    Invocation,
-    Root,
-    This,
 )
 from fhircraft.fhir.path.engine.existence import Empty, Exists
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
