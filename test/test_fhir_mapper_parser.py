@@ -111,9 +111,9 @@ parser_test_cases = (
         ),
     ),
     (
-        """let my_const = a.b.substring(1,2);""",
+        """let my_const = a.b.substring(1, 2);""",
         StructureMap.model_construct(
-            const=[StructureMapConst(name="my_const", value="a.b.substring(1,2)")]
+            const=[StructureMapConst(name="my_const", value="a.b.substring(1, 2)")]
         ),
     ),
     (

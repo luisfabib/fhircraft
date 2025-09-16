@@ -1,6 +1,6 @@
 import logging
 import os.path
-
+from typing import Any
 import ply.yacc
 
 import fhircraft.fhir.path.engine.additional as additional
@@ -80,7 +80,7 @@ class FhirPathParser:
             errorlog=logger,
         )
 
-    def parse(self, string, lexer=None) -> FHIRPath:
+    def parse(self, string, lexer=None) -> FHIRPath | Any:
         self.string = string
         lexer = lexer or self.lexer_class()
         return self.parse_token_stream(lexer.tokenize(string))
