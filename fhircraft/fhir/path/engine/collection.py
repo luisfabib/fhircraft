@@ -22,7 +22,7 @@ class FHIRCollectionOperator(FHIRPath):
         self.right = right
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        raise NotImplementedError("Subclasses must implement __str__ method.")
 
     def __repr__(self):
         return (
@@ -67,6 +67,8 @@ class Union(FHIRCollectionOperator):
         )
         return UnionFunction(left_collection).evaluate(right_collection)
 
+    def __str__(self):
+        return f"{self.left} | {self.right}"
 
 class In(FHIRCollectionOperator):
     """
@@ -112,6 +114,8 @@ class In(FHIRCollectionOperator):
         ]
         return [FHIRPathCollectionItem.wrap(value in check_collection)]
 
+    def __str__(self):
+        return f"{self.left} in {self.right}"
 
 class Contains(FHIRCollectionOperator):
     """
@@ -156,4 +160,7 @@ class Contains(FHIRCollectionOperator):
             for item in left_collection
         ]
         return [FHIRPathCollectionItem.wrap(value in check_collection)]
-        return [FHIRPathCollectionItem.wrap(value in check_collection)]
+
+    def __str__(self):
+        return f"{self.left} contains {self.right}"
+    

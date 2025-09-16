@@ -65,7 +65,7 @@ class Equals(FHIRPath):
         return [FHIRPathCollectionItem.wrap(equals)]
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        return f"{self.left} == {self.right}"
 
     def __repr__(self):
         return (
@@ -143,7 +143,7 @@ class Equivalent(FHIRPath):
         return [FHIRPathCollectionItem.wrap(equivalent)]
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        return f"{self.left} ~ {self.right}"
 
     def __repr__(self):
         return (
@@ -199,8 +199,8 @@ class NotEquals(FHIRPath):
         ]
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
-
+        return f"{self.left} != {self.right}"
+    
     def __repr__(self):
         return (
             f"{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})"
@@ -255,8 +255,8 @@ class NotEquivalent(FHIRPath):
         ]
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
-
+        return f"{self.left} !~ {self.right}"
+    
     def __repr__(self):
         return (
             f"{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})"

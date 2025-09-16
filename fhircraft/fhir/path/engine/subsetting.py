@@ -31,7 +31,7 @@ class Index(FHIRPath):
         self.index = index
 
     def evaluate(
-        self, collection: FHIRPathCollection, create: bool
+        self, collection: FHIRPathCollection, create: bool = False
     ) -> FHIRPathCollection:
         """
         The indexer operation returns a collection with only the index-th item (0-based index). If the input
@@ -132,7 +132,7 @@ class Single(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, *args, **kwargs
+        self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
         Will return the single item in the input if there is just one item. If the input collection is empty (`[]`), the result is empty.
@@ -148,7 +148,6 @@ class Single(FHIRPathFunction):
         Info:
             Equivalent to `Index(0)` with additional error raising in case of non-singleton input collection.
         """
-        collection = ensure_list(collection)
         if len(collection) > 1:
             raise FHIRPathError(
                 f"Expected single value for single(), instead got {len(collection)} items in the collection"
@@ -162,7 +161,7 @@ class First(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, *args, **kwargs
+        self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only the first item in the input collection.
@@ -176,7 +175,6 @@ class First(FHIRPathFunction):
         Info:
             Equivalent to `Index(0)`.
         """
-        collection = ensure_list(collection)
         return Index(0).evaluate(collection, create=False)
 
 
@@ -186,7 +184,7 @@ class Last(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, *args, **kwargs
+        self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only the last item in the input collection.
@@ -200,7 +198,6 @@ class Last(FHIRPathFunction):
         Info:
             Equivalent to `Index(-1)`.
         """
-        collection = ensure_list(collection)
         return Index(-1).evaluate(collection, create=False)
 
 
@@ -210,7 +207,7 @@ class Tail(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, *args, **kwargs
+        self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing all but the first item in the input collection. Will return
@@ -222,7 +219,6 @@ class Tail(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
         return ensure_list(collection[1:])
 
 
@@ -242,7 +238,7 @@ class Skip(FHIRPathFunction):
         self.num = num
 
     def evaluate(
-        self, collection: FHIRPathCollection, *args, **kwargs
+        self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing all but the first `num` items in the input collection. Will return
@@ -256,7 +252,6 @@ class Skip(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
         if self.num <= 0:
             return []
         return ensure_list(collection[self.num :])
@@ -278,7 +273,7 @@ class Take(FHIRPathFunction):
         self.num = num
 
     def evaluate(
-        self, collection: FHIRPathCollection, *args, **kwargs
+        self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing the first `num` items in the input collection, or less if there
@@ -291,7 +286,6 @@ class Take(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
         if self.num <= 0:
             return []
         return ensure_list(collection[: self.num])
@@ -305,11 +299,11 @@ class Intersect(FHIRPathFunction):
         other_collection (FHIRPathCollection): The other collection to compute the intersection with.
     """
 
-    def __init__(self, other_collection: FHIRPathCollection):
-        self.other_collection = ensure_list(other_collection)
+    def __init__(self, other_collection: FHIRPath | FHIRPathCollection):
+        self.other_collection = other_collection
 
     def evaluate(
-        self, collection: FHIRPathCollection, *args, **kwargs
+        self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
         Returns the set of elements that are in both collections. Duplicate items will be eliminated
@@ -321,7 +315,8 @@ class Intersect(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
+        if isinstance(self.other_collection, FHIRPath):
+            self.other_collection = self.other_collection.evaluate(collection, create=create)
         return [item for item in collection if item in self.other_collection]
 
 
@@ -333,11 +328,11 @@ class Exclude(FHIRPathFunction):
         other_collection (FHIRPathCollection): The other collection to compute the exclusion with.
     """
 
-    def __init__(self, other_collection: FHIRPathCollection):
-        self.other_collection = ensure_list(other_collection)
+    def __init__(self, other_collection: FHIRPath | FHIRPathCollection):
+        self.other_collection = other_collection
 
     def evaluate(
-        self, collection: FHIRPathCollection, *args, **kwargs
+        self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         """
         Returns the set of elements that are not in the other collection. Duplicate items will not be
@@ -349,6 +344,7 @@ class Exclude(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        collection = ensure_list(collection)
+        if isinstance(self.other_collection, FHIRPath):
+            self.other_collection = self.other_collection.evaluate(collection, create=create)
         return [item for item in collection if item not in self.other_collection]
-        return [item for item in collection if item not in self.other_collection]
+

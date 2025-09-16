@@ -1,7 +1,7 @@
 import pytest
 
 from fhircraft.fhir.path.engine.core import (
-    Element,
+    Literal,
     FHIRPathCollectionItem,
     FHIRPathError,
     Invocation,
@@ -52,6 +52,9 @@ def test_indexOf_returns_zero_if_empty_substring():
     result = IndexOf("").evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=0)]
 
+def test_indexOf_string_representation():
+    expression = IndexOf("Substring")
+    assert str(expression) == "indexOf('Substring')"
 
 # -------------
 # Substring
@@ -87,6 +90,10 @@ def test_substring_returns_empty_if_start_out_of_bounds():
     result = Substring(100).evaluate(collection)
     assert result == []
 
+def test_substring_string_representation():
+    expression = Substring(2, 11)
+    assert str(expression) == "substring(2, 11)"
+
 
 # -------------
 # StartsWith
@@ -110,6 +117,9 @@ def test_startswith_returns_false_if_not_starts_with_prefix():
     result = StartsWith("yourSub").evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=False)]
 
+def test_startswith_string_representation():
+    expression = StartsWith("mySub")
+    assert str(expression) == "startsWith('mySub')"
 
 # -------------
 # EndsWith
@@ -133,6 +143,9 @@ def test_endswith_returns_false_if_not_ends_with_suffix():
     result = EndsWith("Values").evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=False)]
 
+def test_endswith_string_representation():
+    expression = EndsWith("Value")
+    assert str(expression) == "endsWith('Value')"
 
 # -------------
 # Contains
@@ -156,6 +169,9 @@ def test_contains_returns_false_if_not_substring_contained():
     result = Contains("Substrings").evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=False)]
 
+def test_contains_string_representation():
+    expression = Contains("Substring")
+    assert str(expression) == "contains('Substring')"
 
 # -------------
 # Upper
@@ -173,6 +189,9 @@ def test_upper_returns_uppercase_string():
     result = Upper().evaluate(collection)
     assert result == [FHIRPathCollectionItem(value="MYSUBSTRINGVALUE")]
 
+def test_upper_string_representation():
+    expression = Upper()
+    assert str(expression) == "upper()"
 
 # -------------
 # Lower
@@ -190,6 +209,9 @@ def test_lower_returns_lowercase_string():
     result = Lower().evaluate(collection)
     assert result == [FHIRPathCollectionItem(value="mysubstringvalue")]
 
+def test_lower_string_representation():
+    expression = Lower()
+    assert str(expression) == "lower()"
 
 # -------------
 # Replace
@@ -219,6 +241,9 @@ def test_replace_sorround_all_characters():
     result = Replace("", "X").evaluate(collection)
     assert result == [FHIRPathCollectionItem(value="XaXbX")]
 
+def test_replace_string_representation():
+    expression = Replace("my", "your")
+    assert str(expression) == "replace('my', 'your')"
 
 # ----------------
 # Matches
@@ -242,6 +267,9 @@ def test_matches_returns_false_if_not_match():
     result = Matches(r"^(?:your).*").evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=False)]
 
+def test_matches_string_representation():
+    expression = Matches(r"^(?:my).*")
+    assert str(expression) == "matches('^(?:my).*')"
 
 # ----------------
 # ReplaceMatches
@@ -259,6 +287,9 @@ def test_replacematches_pattern():
     result = ReplaceMatches(r"^(?:my)", "your").evaluate(collection)
     assert result == [FHIRPathCollectionItem(value="yourSubstringValue")]
 
+def test_replacematches_string_representation():
+    expression = ReplaceMatches(r"^(?:my)", "your")
+    assert str(expression) == "replaceMatches('^(?:my)', 'your')"
 
 # ----------------
 # Length
@@ -276,6 +307,9 @@ def test_length_returns_correct_length():
     result = Length().evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=16)]
 
+def test_length_string_representation():
+    expression = Length()
+    assert str(expression) == "length()"
 
 # ----------------
 # ToChars
@@ -293,6 +327,9 @@ def test_tochars_returns_collection_of_characters():
     result = ToChars().evaluate(collection)
     assert [item.value for item in result] == ["A", "B", "C"]
 
+def test_tochars_string_representation():
+    expression = ToChars()
+    assert str(expression) == "toChars()"
 
 # ----------------
 # Concatenation
@@ -317,3 +354,7 @@ def test_concatenation_treats_empty_as_empty_string():
     collection = []
     result = Concatenation([FHIRPathCollectionItem(value="A")], []).evaluate(collection)
     assert result == [FHIRPathCollectionItem(value="A")]
+
+def test_concatenation_string_representation():
+    expression = Concatenation(Literal("A"), Literal("B"))
+    assert str(expression) == "'A' & 'B'"

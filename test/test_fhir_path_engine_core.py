@@ -13,6 +13,16 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.strings import Upper
 
+from dataclasses import dataclass
+from typing import List, Optional
+from unittest import TestCase
+
+import pytest
+
+from fhircraft.fhir.path.engine.core import Element, Invocation, This
+from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
+
+
 
 class TestRoot(TestCase):
 
@@ -36,6 +46,10 @@ class TestRoot(TestCase):
         item = FHIRPathCollectionItem(value="single")
         result = Root().evaluate([item])
         assert result == [item]
+
+    def test_root_string_representation(self):
+        expression = Root()
+        assert str(expression) == "$"
 
 
 class TestParent(TestCase):
@@ -73,6 +87,10 @@ class TestParent(TestCase):
         result = Parent().evaluate(items)
         assert result == []
 
+    def test_parent_string_representation(self):
+        expression = Parent()
+        assert str(expression) == "$"
+
 
 class TestThis(TestCase):
     class DummyValue:
@@ -107,6 +125,10 @@ class TestThis(TestCase):
         assert result == [item]
         assert result[0].value is None
 
+    def test_this_string_representation(self):
+        expression = This()
+        assert str(expression) == "$this"
+
 
 class TestElement(TestCase):
 
@@ -122,6 +144,10 @@ class TestElement(TestCase):
 
         self.resource = DummyResource()
         self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
+
+    def test_element_string_representation(self):
+        expression = Element("elementName")
+        assert str(expression) == "elementName"
 
     def test_evaluate_returns_field_value(self):
         # Should return the value of the field as a FHIRPathCollectionItem
@@ -191,66 +217,47 @@ class TestInvocation(TestCase):
     def test_evaluate_empty_collection_returns_empty_list(self):
         result = Invocation(Element("status"), Upper()).evaluate([])
         assert result == []
+    
+    def test_invocation_string_representation(self):
+        expression = Invocation(Element("left"), Element("right"))
+        assert str(expression) == "left.right"
 
 
 class TestLiteral(TestCase):
+    
+    def test_evaluate_returns_single_value_for_multiple_collection_items(self):
+        items = [
+            FHIRPathCollectionItem(value="a"),
+            FHIRPathCollectionItem(value="b"),
+        ]
+        literal = Literal(42)
+        result = literal.evaluate(items)
+        assert len(result) == 1
+        assert all(item.value == 42 for item in result)
 
-    class TestLiteral(TestCase):
+    def test_evaluate_with_empty_collection_returns_nonempty_list(self):
+        literal = Literal("test")
+        result = literal.evaluate([])
+        assert result == [FHIRPathCollectionItem(value="test")]
 
-        def test_evaluate_returns_literal_value_for_each_item(self):
-            # Should return a FHIRPathCollectionItem with the literal value for each input item
-            items = [
-                FHIRPathCollectionItem(value="a"),
-                FHIRPathCollectionItem(value="b"),
-            ]
-            literal = Literal(42)
-            result = literal.evaluate(items)
-            assert len(result) == 2
-            assert all(item.value == 42 for item in result)
-            assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
+    def test_evaluate_with_single_item(self):
+        item = FHIRPathCollectionItem(value="x")
+        literal = Literal(True)
+        result = literal.evaluate([item])
+        assert len(result) == 1
+        assert result[0].value is True
 
-        def test_evaluate_with_empty_collection_returns_empty_list(self):
-            literal = Literal("test")
-            result = literal.evaluate([])
-            assert result == []
-
-        def test_evaluate_with_single_item(self):
-            item = FHIRPathCollectionItem(value="x")
-            literal = Literal(True)
-            result = literal.evaluate([item])
-            assert len(result) == 1
-            assert result[0].value is True
-
-        def test_evaluate_returns_parent_link(self):
-            # Should set parent on returned FHIRPathCollectionItem
-            item = FHIRPathCollectionItem(value="x")
-            literal = Literal("foo")
-            result = literal.evaluate([item])
-            assert result[0].parent == item
-
-        def test_evaluate_with_none_literal(self):
-            items = [FHIRPathCollectionItem(value="a")]
-            literal = Literal(None)
-            result = literal.evaluate(items)
-            assert len(result) == 1
-            assert result[0].value is None
-
-
-"""
-Test file demonstrating the improved FHIRPath interface.
-
-This file shows examples of using the enhanced public interface methods
-for common FHIRPath operations.
-"""
-
-from dataclasses import dataclass
-from typing import List, Optional
-from unittest import TestCase
-
-import pytest
-
-from fhircraft.fhir.path.engine.core import Element, Invocation, This
-from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
+    def test_evaluate_with_none_literal(self):
+        items = [FHIRPathCollectionItem(value="a")]
+        literal = Literal(None)
+        result = literal.evaluate(items)
+        assert len(result) == 1
+        assert result[0].value is None
+    
+    def test_literal_string_representation(self):
+        assert str(Literal("foo")) == "\'foo\'"
+        assert str(Literal(120)) == "120"
+        assert str(Literal(True)) == "true"
 
 
 @dataclass
@@ -263,8 +270,7 @@ class MockPatient:
     telecom: Optional[List[dict]] = None
 
 
-class TestImprovedFHIRPathInterface(TestCase):
-    """Test cases demonstrating the improved FHIRPath interface."""
+class TestPublicFHIRPathInterface(TestCase):
 
     def setUp(self):
         """Set up test data."""
@@ -390,15 +396,3 @@ class TestImprovedFHIRPathInterface(TestCase):
         # No matches
         path = Element("gender")
         self.assertTrue(path.is_empty(self.empty_patient))
-
-    def test_set_value_modifies_all_matches(self):
-        """Test set_value() modifies all matching locations."""
-        # This test would require a more complete implementation
-        # with proper setter functionality
-        pass
-
-    def test_set_single_value_modifies_single_match(self):
-        """Test set_single_value() modifies exactly one matching location."""
-        # This test would require a more complete implementation
-        # with proper setter functionality
-        pass

@@ -1,6 +1,6 @@
 import logging
 import os.path
-
+from typing import Any
 import ply.yacc
 
 import fhircraft.fhir.path.engine.additional as additional
@@ -80,7 +80,7 @@ class FhirPathParser:
             errorlog=logger,
         )
 
-    def parse(self, string, lexer=None) -> FHIRPath:
+    def parse(self, string, lexer=None) -> FHIRPath | Any:
         self.string = string
         lexer = lexer or self.lexer_class()
         return self.parse_token_stream(lexer.tokenize(string))
@@ -536,8 +536,8 @@ class FhirPathParser:
 
     def p_fhirpath_literal(self, p):
         """literal : number
+        | boolean
         | STRING
-        | BOOLEAN
         | date
         | time
         | datetime
@@ -548,6 +548,10 @@ class FhirPathParser:
     def p_fhirpath_literal_empty(self, p):
         """literal : '{' '}'"""
         p[0] = Literal([])
+
+    def p_fhirpath_boolean(self, p):
+        "boolean : BOOLEAN"
+        p[0] = True if p[1]=="true" else False
 
     def p_fhirpath_datetime(self, p):
         "datetime : DATETIME"

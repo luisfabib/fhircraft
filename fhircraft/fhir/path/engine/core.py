@@ -7,6 +7,7 @@ from functools import partial
 from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
 from fhircraft.fhir.path.exceptions import FHIRPathError, FHIRPathRuntimeError
+from fhircraft.fhir.resources.datatypes.utils import is_date, is_datetime, is_time
 from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
 
 # Get logger name
@@ -527,7 +528,7 @@ class FHIRPathCollectionItem(object):
             return self.value == value
 
     def __repr__(self):
-        return f"FHIRPathCollectionItem(value={self.value.__repr__()[:10]}, element={self.element.__repr__()[:10]}..., index={self.index}, parent={self.parent.full_path if self.parent else None})"
+        return f"{{{self.value.__repr__()[:10]}}}"
 
     def __hash__(self):
         return hash((self.path, self.parent, self.value.__repr__()))
@@ -552,7 +553,7 @@ class FHIRPathFunction(FHIRPath, ABC):
         )
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({','.join([str(arg) for arg in self.__arguments__()])})"
+        return f"{self.__class__.__name__[0].lower() + self.__class__.__name__[1:]}({', '.join([str(arg) for arg in self.__arguments__()])})"
 
     def __repr__(self):
         return f"{self.__class__.__name__}({','.join([repr(arg) for arg in self.__arguments__()])})"
@@ -584,7 +585,14 @@ class Literal(FHIRPath):
         return [FHIRPathCollectionItem(self.value, parent=None, path=None)]
 
     def __str__(self):
-        return str(self.value)
+        if isinstance(self.value, bool):
+            return "true" if self.value else "false"
+        elif is_date(self.value) or is_datetime(self.value) or is_time(self.value):
+            return self.value
+        elif isinstance(self.value, str):
+            return f"'{self.value}'"
+        else:   
+            return str(self.value)
 
     def __repr__(self):
         return "Literal(%r)" % (self.value,)
@@ -815,7 +823,7 @@ class This(FHIRPath):
         return collection
 
     def __str__(self):
-        return "`this`"
+        return "$this"
 
     def __repr__(self):
         return "This()"

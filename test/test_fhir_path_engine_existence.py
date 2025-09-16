@@ -23,6 +23,9 @@ def test_empty_returns_false_for_non_empty_collection():
     result = Empty().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
 
+def test_empty_string_representation():
+    expression = Empty()
+    assert str(expression) == "empty()"
 
 # -------------
 # Exists
@@ -58,6 +61,10 @@ def test_exists_applies_criteria_correctly_and_returns_false_if_filtered_collect
     assert result == [FHIRPathCollectionItem.wrap(False)]
 
 
+def test_exists_string_representation():
+    expression = Exists()
+    assert str(expression) == "exists()"
+
 # -------------
 # All
 # -------------
@@ -81,6 +88,11 @@ def test_all_returns_false_for_criteria_not_applying_to_all():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     result = All(criteria).evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
+
+
+def test_all_string_representation():
+    expression = All(Element("criteria"))
+    assert str(expression) == "all(criteria)"
 
 
 # -------------
@@ -112,6 +124,10 @@ def test_allTrue_returns_false_if_any_item_is_false():
     assert result == [FHIRPathCollectionItem.wrap(False)]
 
 
+def test_alltrue_string_representation():
+    expression = AllTrue()
+    assert str(expression) == "allTrue()"
+
 # -------------
 # AnyTrue
 # -------------
@@ -140,6 +156,10 @@ def test_anyTrue_returns_true_if_any_item_is_true():
     result = AnyTrue().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
+
+def test_anytrue_string_representation():
+    expression = AnyTrue()
+    assert str(expression) == "anyTrue()"
 
 # -------------
 # AllFalse
@@ -170,6 +190,10 @@ def test_allFalse_returns_false_if_any_item_is_true():
     assert result == [FHIRPathCollectionItem.wrap(False)]
 
 
+def test_allfalse_string_representation():
+    expression = AllFalse()
+    assert str(expression) == "allFalse()"
+
 # -------------
 # AnyFalse
 # -------------
@@ -199,6 +223,10 @@ def test_anyFalse_returns_true_if_any_item_is_false():
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
+def test_anyfalse_string_representation():
+    expression = AnyFalse()
+    assert str(expression) == "anyFalse()"
+
 # -------------
 # Count
 # -------------
@@ -214,6 +242,11 @@ def test_count_nonempty_collection():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     result = Count().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(2)]
+
+
+def test_count_string_representation():
+    expression = Count()
+    assert str(expression) == "count()"
 
 
 # -------------
@@ -248,6 +281,10 @@ def test_subsetOf_returns_false_when_not_all_items_in_input_collection_are_in_ot
     assert result == [FHIRPathCollectionItem.wrap(False)]
 
 
+def test_subsetof_string_representation():
+    expression = SubsetOf(Element('other'))
+    assert str(expression) == "subsetOf(other)"
+
 # -------------
 # SupersetOf
 # -------------
@@ -277,6 +314,10 @@ def test_supersetOf_returns_false_when_not_all_items_in_other_collection_are_in_
     assert result == [FHIRPathCollectionItem.wrap(False)]
 
 
+def test_supersetof_string_representation():
+    expression = SupersetOf(Element('other'))
+    assert str(expression) == "supersetOf(other)"
+
 # -------------
 # Distinct
 # -------------
@@ -305,6 +346,10 @@ def test_disctinct_with_repeatition():
     )
 
 
+def test_distinct_string_representation():
+    expression = Distinct()
+    assert str(expression) == "distinct()"
+
 # -------------
 # IsDistinct
 # -------------
@@ -327,3 +372,8 @@ def test_isDisctinct_with_repeatition():
     new_collection = collection + collection
     result = IsDistinct().evaluate(new_collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
+
+
+def test_isdistinct_string_representation():
+    expression = IsDistinct()
+    assert str(expression) == "isDistinct()"

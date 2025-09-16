@@ -104,13 +104,13 @@ class FhirMappingLanguageParser(FhirPathParser):
             errorlog=logger,
         )
 
-    def parse(self, script_string, lexer=None) -> StructureMap:
-        self.string = script_string
+    def parse(self, string, lexer=None) -> StructureMap:
+        self.string = string
         lexer = lexer or self.lexer_class()
         self.structureMap = StructureMap.model_construct(
-            text={"div": script_string},
+            text={"div": string},
         )
-        return self.parse_token_stream(lexer.tokenize(script_string))
+        return self.parse_token_stream(lexer.tokenize(string))
 
     def is_valid(self, string):
         try:
@@ -807,8 +807,7 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_fhirPath(self, p):
         """m_fhirpath : expression"""
-        print("FHIRPATH", p[1], "->", str(p[1]))
-        p[0] = str(p[1])
+        p[0] = str(p[1]).strip("'")
 
     def p_mapper_literal(self, p):
         """m_literal : INTEGER

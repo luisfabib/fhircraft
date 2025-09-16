@@ -594,7 +594,6 @@ class ToString(FHIRTypeConversionFunction):
         else:
             return []
 
-
 class ConvertsToString(FHIRTypeConversionFunction):
     """
     A representation of the FHIRPath [`convertsToString()`](http://hl7.org/fhirpath/N1/#convertstostring-boolean) function.

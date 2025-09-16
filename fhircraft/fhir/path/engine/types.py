@@ -62,7 +62,7 @@ class FHIRTypesOperator(FHIRPath):
         )
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.type_specifier.__str__()})"
+        raise NotImplementedError("Subclasses must implement __str__ method.")
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.left.__repr__(), self.type_specifier.__repr__()})"
@@ -112,6 +112,9 @@ class Is(FHIRTypesOperator):
             )
         ]
 
+    def __str__(self):
+        return f"{self.left} is {self.type_specifier}"
+
 
 class LegacyIs(FHIRPathFunction):
     """
@@ -134,6 +137,8 @@ class LegacyIs(FHIRPathFunction):
     ) -> FHIRPathCollection:
         return Is(This(), self.type_specifier).evaluate(collection, create)
 
+    def __str__(self):
+        return f"is({self.type_specifier})"
 
 class As(FHIRTypesOperator):
     """
@@ -170,6 +175,8 @@ class As(FHIRTypesOperator):
             else []
         )
 
+    def __str__(self):
+        return f"{self.left} as {self.type_specifier}"
 
 class LegacyAs(FHIRPathFunction):
     """
@@ -193,3 +200,6 @@ class LegacyAs(FHIRPathFunction):
         self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
         return As(This(), self.type_specifier).evaluate(collection)
+
+    def __str__(self):
+        return f"as({self.type_specifier})"

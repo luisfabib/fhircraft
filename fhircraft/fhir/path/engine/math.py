@@ -22,7 +22,7 @@ class FHIRMathOperator(FHIRPath):
         self.right = right
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        raise NotImplementedError("Subclasses must implement __str__ method.")
 
     def __repr__(self):
         return (
@@ -88,6 +88,9 @@ class Addition(FHIRMathOperator):
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot add {type(left_value).__name__} and {type(right_value).__name__}."
             )
+    
+    def __str__(self):
+        return f"{self.left} + {self.right}"
 
 
 class Subtraction(FHIRMathOperator):
@@ -135,6 +138,8 @@ class Subtraction(FHIRMathOperator):
                 f"FHIRPath operator {self.__str__()} cannot subtract {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
+    def __str__(self):
+        return f"{self.left} - {self.right}"
 
 class Multiplication(FHIRMathOperator):
     """
@@ -179,6 +184,8 @@ class Multiplication(FHIRMathOperator):
                 f"FHIRPath operator {self.__str__()} cannot multiply {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
+    def __str__(self):
+        return f"{self.left} * {self.right}"
 
 class Division(FHIRMathOperator):
     """
@@ -226,6 +233,8 @@ class Division(FHIRMathOperator):
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
+    def __str__(self):
+        return f"{self.left} / {self.right}"
 
 class Div(FHIRMathOperator):
     """
@@ -269,6 +278,8 @@ class Div(FHIRMathOperator):
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
+    def __str__(self):
+        return f"{self.left} div {self.right}"
 
 class Mod(FHIRMathOperator):
     """
@@ -307,3 +318,6 @@ class Mod(FHIRMathOperator):
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
             )
+
+    def __str__(self):
+        return f"{self.left} mod {self.right}"

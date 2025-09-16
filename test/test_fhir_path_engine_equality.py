@@ -46,6 +46,9 @@ def test_equals_returns_correct_boolean(left, right, expected):
     ).evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
+def test_equals_string_representation():
+    expression = Equals(Element("left"), Element("right"))
+    assert str(expression) == "left == right"
 
 @pytest.mark.parametrize("left, right, expected", equals_boolean_logic_cases)
 def test_notequals_returns_correct_boolean(left, right, expected):
@@ -57,6 +60,9 @@ def test_notequals_returns_correct_boolean(left, right, expected):
     ).evaluate(collection)
     assert result != [FHIRPathCollectionItem(value=expected)]
 
+def test_notequals_string_representation():
+    expression = NotEquals(Element("left"), Element("right"))
+    assert str(expression) == "left != right"
 
 # -------------
 # Equivalent
@@ -98,6 +104,9 @@ def test_equivalent_returns_correct_boolean(left, right, expected):
     ).evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
+def test_equivalent_string_representation():
+    expression = Equivalent(Element("left"), Element("right"))
+    assert str(expression) == "left ~ right"
 
 @pytest.mark.parametrize("left, right, expected", equivalent_boolean_logic_cases)
 def test_notequivalent_returns_correct_boolean(left, right, expected):
@@ -108,3 +117,7 @@ def test_notequivalent_returns_correct_boolean(left, right, expected):
         Invocation(Element("right"), GetValue()),
     ).evaluate(collection)
     assert result != [FHIRPathCollectionItem(value=expected)]
+
+def test_notequivalent_string_representation():
+    expression = NotEquivalent(Element("left"), Element("right"))
+    assert str(expression) == "left !~ right"

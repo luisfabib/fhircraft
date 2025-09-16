@@ -29,6 +29,9 @@ def test_addition_returns_correct_logic_boolean(left, right, expected):
     ).evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
+def test_addition_string_representation():
+    expression = Addition(Element("left"), Element("right"))
+    assert str(expression) == "left + right"
 
 # -------------
 # Subtraction
@@ -51,6 +54,9 @@ def test_subtraction_returns_correct_logic_boolean(left, right, expected):
     ).evaluate(collection)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
+def test_subtraction_string_representation():
+    expression = Subtraction(Element("left"), Element("right"))
+    assert str(expression) == "left - right"
 
 # -------------
 # Multiplication
@@ -75,6 +81,9 @@ def test_multiplication_returns_correct_logic_boolean(left, right, expected):
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
+def test_multiplication_string_representation():
+    expression = Multiplication(Element("left"), Element("right"))
+    assert str(expression) == "left * right"
 
 # -------------
 # Division
@@ -100,6 +109,9 @@ def test_division_returns_correct_logic_boolean(left, right, expected):
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
+def test_division_string_representation():
+    expression = Division(Element("left"), Element("right"))
+    assert str(expression) == "left / right"
 
 # -------------
 # Div
@@ -125,6 +137,9 @@ def test_div_returns_correct_logic_boolean(left, right, expected):
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
+def test_div_string_representation():
+    expression = Div(Element("left"), Element("right"))
+    assert str(expression) == "left div right"
 
 # -------------
 # Mod
@@ -145,3 +160,7 @@ def test_mod_returns_correct_logic_boolean(left, right, expected):
         Invocation(Element("right"), GetValue()),
     ).evaluate(collection)
     assert round(result[0].value, 4) == round(expected, 4)
+
+def test_mod_string_representation():
+    expression = Mod(Element("left"), Element("right"))
+    assert str(expression) == "left mod right"
