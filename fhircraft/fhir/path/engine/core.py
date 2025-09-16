@@ -528,7 +528,7 @@ class FHIRPathCollectionItem(object):
             return self.value == value
 
     def __repr__(self):
-        return f"FHIRPathCollectionItem(value={self.value.__repr__()[:10]}, element={self.element.__repr__()[:10]}..., index={self.index}, parent={self.parent.full_path if self.parent else None})"
+        return f"{{{self.value.__repr__()[:10]}}}"
 
     def __hash__(self):
         return hash((self.path, self.parent, self.value.__repr__()))
