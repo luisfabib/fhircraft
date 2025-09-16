@@ -103,7 +103,7 @@ class And(FHIRPath):
         return [FHIRPathCollectionItem.wrap(left_boolean and right_boolean)]
 
     def __str__(self):
-        return f"{self.left} = {self.right}"
+        return f"{self.left} and {self.right}"
 
     def __repr__(self):
         return (

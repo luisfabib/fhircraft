@@ -1,4 +1,5 @@
 import pytest
+from sympy import true
 
 from fhircraft.fhir.path.engine.conversion import *
 from fhircraft.fhir.path.engine.core import (
@@ -24,7 +25,6 @@ def test_iif_returns_empty_if_empty():
     collection = []
     result = Iif(Exists(), [FHIRPathCollectionItem.wrap(1)]).evaluate(collection)
     assert result == []
-
 
 def test_iif_returns_value_if_criterion_is_true():
     collection = [FHIRPathCollectionItem(value=True)]
@@ -70,6 +70,10 @@ def test_iif_returns_evaluated_value_if_criterion_is_false_and_no_otherwise():
     assert result == []
 
 
+def test_iif_string_representation():
+    expression = Iif(Element("left"), Element("right"), Element("other"))
+    assert str(expression) == "iif(left, right, other)"
+
 # ---------------------------
 # ToBoolean()
 # ---------------------------
@@ -81,7 +85,7 @@ def test_toBoolean_returns_empty_if_empty():
     assert result == []
 
 
-def test_toBoolean_returns_emtpy_for_invalid_type():
+def test_toBoolean_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ToBoolean().evaluate(collection)
     assert result == []
@@ -113,6 +117,14 @@ def test_toBoolean_converts_correctly_for_valid_type(value, expected):
     result = ToBoolean().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
+def test_toBoolean_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ToBoolean().evaluate(collection)
+
+def test_toBoolean_string_representation():
+    expression = ToBoolean()
+    assert str(expression) == "toBoolean()"
 
 # ---------------------------
 # ConvertsToBoolean()
@@ -125,7 +137,7 @@ def test_convertstoboolean_returns_empty_if_empty():
     assert result == []
 
 
-def test_convertstoboolean_returns_emtpy_for_invalid_type():
+def test_convertstoboolean_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToBoolean().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
@@ -158,6 +170,15 @@ def test_convertstoboolean_returns_true_for_valid_type(value):
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
+def test_convertsToBoolean_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ConvertsToBoolean().evaluate(collection)
+
+def test_convertsToBoolean_string_representation():
+    expression = ConvertsToBoolean()
+    assert str(expression) == "convertsToBoolean()"
+
 # ---------------------------
 # ToInteger()
 # ---------------------------
@@ -169,7 +190,7 @@ def test_tointeger_returns_empty_if_empty():
     assert result == []
 
 
-def test_tointeger_returns_emtpy_for_invalid_type():
+def test_tointeger_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ToInteger().evaluate(collection)
     assert result == []
@@ -192,6 +213,16 @@ def test_tointeger_converts_correctly_for_valid_type(value, expected):
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 
+def test_toInteger_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ToInteger().evaluate(collection)
+
+
+def test_toInteger_string_representation():
+    expression = ToInteger()
+    assert str(expression) == "toInteger()"
+
 # ---------------------------
 # ConvertsToInteger()
 # ---------------------------
@@ -203,7 +234,7 @@ def test_convertstointeger_returns_empty_if_empty():
     assert result == []
 
 
-def test_convertstointeger_returns_emtpy_for_invalid_type():
+def test_convertstointeger_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToInteger().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
@@ -226,6 +257,16 @@ def test_convertstointeger_returns_true_for_valid_type(value):
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
+def test_convertstoInteger_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ConvertsToInteger().evaluate(collection)
+
+
+def test_convertsToInteger_string_representation():
+    expression = ConvertsToInteger()
+    assert str(expression) == "convertsToInteger()"
+
 # ---------------------------
 # ToDecimal()
 # ---------------------------
@@ -237,7 +278,7 @@ def test_todecimal_returns_empty_if_empty():
     assert result == []
 
 
-def test_todecimal_returns_emtpy_for_invalid_type():
+def test_todecimal_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ToDecimal().evaluate(collection)
     assert result == []
@@ -259,6 +300,16 @@ def test_todecimal_converts_correctly_for_valid_type(value, expected):
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 
+def test_toDecimal_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ToDecimal().evaluate(collection)
+
+
+def test_toDecimal_string_representation():
+    expression = ToDecimal()
+    assert str(expression) == "toDecimal()"
+
 # ---------------------------
 # ConvertsToDecimal()
 # ---------------------------
@@ -270,7 +321,7 @@ def test_convertstodecimal_returns_empty_if_empty():
     assert result == []
 
 
-def test_convertstodecimal_returns_emtpy_for_invalid_type():
+def test_convertstodecimal_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToDecimal().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
@@ -292,6 +343,15 @@ def test_convertstodecimal_returns_true_for_valid_type(value):
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
+def test_convertsToDecimal_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ConvertsToDecimal().evaluate(collection)
+
+def test_convertsToDecimal_string_representation():
+    expression = ConvertsToDecimal()
+    assert str(expression) == "convertsToDecimal()"
+
 # ---------------------------
 # ToDate()
 # ---------------------------
@@ -303,7 +363,7 @@ def test_todate_returns_empty_if_empty():
     assert result == []
 
 
-def test_todate_returns_emtpy_for_invalid_type():
+def test_todate_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ToDate().evaluate(collection)
     assert result == []
@@ -325,6 +385,15 @@ def test_todate_converts_correctly_for_valid_type(value, expected):
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 
+def test_toDate_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ToDate().evaluate(collection)
+
+def test_toDate_string_representation():
+    expression = ToDate()
+    assert str(expression) == "toDate()"
+
 # ---------------------------
 # ConvertsToDate()
 # ---------------------------
@@ -336,7 +405,7 @@ def test_convertstodate_returns_empty_if_empty():
     assert result == []
 
 
-def test_convertstodate_returns_emtpy_for_invalid_type():
+def test_convertstodate_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToDate().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
@@ -358,6 +427,16 @@ def test_convertstodate_returns_true_for_valid_type(value):
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
+def test_convertsToDate_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ConvertsToDate().evaluate(collection)
+
+def test_convertsToDate_string_representation():
+    expression = ConvertsToDate()
+    assert str(expression) == "convertsToDate()"
+
+
 # ---------------------------
 # ToDateTime()
 # ---------------------------
@@ -369,7 +448,7 @@ def test_todatetime_returns_empty_if_empty():
     assert result == []
 
 
-def test_todatetime_returns_emtpy_for_invalid_type():
+def test_todatetime_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ToDateTime().evaluate(collection)
     assert result == []
@@ -391,6 +470,15 @@ def test_todatetime_converts_correctly_for_valid_type(value, expected):
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 
+def test_toDateTime_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ToDateTime().evaluate(collection)
+
+def test_toDateTime_string_representation():
+    expression = ToDateTime()
+    assert str(expression) == "toDateTime()"
+
 # ---------------------------
 # ConvertsToDateTime()
 # ---------------------------
@@ -402,7 +490,7 @@ def test_convertstodatetime_returns_empty_if_empty():
     assert result == []
 
 
-def test_convertstodatetime_returns_emtpy_for_invalid_type():
+def test_convertstodatetime_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToDateTime().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
@@ -424,6 +512,15 @@ def test_convertstodatetime_returns_true_for_valid_type(value):
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
+def test_convertsToDateTime_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ConvertsToDateTime().evaluate(collection)
+
+def test_convertsToDateTime_string_representation():
+    expression = ConvertsToDateTime()
+    assert str(expression) == "convertsToDateTime()"
+
 # ---------------------------
 # ToQuantity()
 # ---------------------------
@@ -435,7 +532,7 @@ def test_toquantity_returns_empty_if_empty():
     assert result == []
 
 
-def test_toquantity_returns_emtpy_for_invalid_type():
+def test_toquantity_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ToQuantity().evaluate(collection)
     assert result == []
@@ -457,6 +554,15 @@ def test_toquantity_converts_correctly_for_valid_type(value, expected):
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 
+def test_toQuantity_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ToQuantity().evaluate(collection)
+
+def test_toQuantity_string_representation():
+    expression = ToQuantity()
+    assert str(expression) == "toQuantity()"
+
 # ---------------------------
 # ConvertsToQuantity()
 # ---------------------------
@@ -468,7 +574,7 @@ def test_convertstoquantity_returns_empty_if_empty():
     assert result == []
 
 
-def test_convertstoquantity_returns_emtpy_for_invalid_type():
+def test_convertstoquantity_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToQuantity().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
@@ -491,6 +597,62 @@ def test_convertstoquantity_returns_true_for_valid_type(value):
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
+def test_convertsToQuantity_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ConvertsToQuantity().evaluate(collection)
+
+def test_convertsToQuantity_string_representation():
+    expression = ConvertsToQuantity()
+    assert str(expression) == "convertsToQuantity()"
+
+# ---------------------------
+# ToString()
+# ---------------------------
+
+
+def test_toString_returns_empty_if_empty():
+    collection = []
+    result = ToString().evaluate(collection)
+    assert result == []
+
+
+def test_toString_returns_empty_for_invalid_type():
+    collection = [FHIRPathCollectionItem(value=BaseException)]
+    result = ToString().evaluate(collection)
+    assert result == []
+
+
+toString_cases = (
+    ("abc", "abc"),
+    (2014, "2014"),
+    (12.345, "12.345"),
+    ("2014-02-01T:12:25", "2014-02-01T:12:25"),
+    ("2014-02-01", "2014-02-01"),
+    (True, "true"),
+    (False, "false"),
+    (Quantity(value=12.5, unit="mg"), "12.5 mg"),
+    ("2014-02-01T00:00:00.000Z", "2014-02-01T00:00:00.000Z"),
+)
+
+
+@pytest.mark.parametrize("value, expected", toString_cases)
+def test_toString_converts_correctly_for_valid_type(value, expected):
+    collection = [FHIRPathCollectionItem(value=value)]
+    result = ToString().evaluate(collection)
+    assert result == [FHIRPathCollectionItem.wrap(expected)]
+
+
+def test_toString_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ToString().evaluate(collection)
+
+
+def test_toString_string_representation():
+    expression = ToString()
+    assert str(expression) == "toString()"
+
 # ---------------------------
 # ConvertsToString()
 # ---------------------------
@@ -502,7 +664,7 @@ def test_convertstostring_returns_empty_if_empty():
     assert result == []
 
 
-def test_convertstostring_returns_emtpy_for_invalid_type():
+def test_convertstostring_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value=BaseException)]
     result = ConvertsToString().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
@@ -527,6 +689,15 @@ def test_convertstostring_returns_true_for_valid_type(value):
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
+def test_convertsToString_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ConvertsToString().evaluate(collection)
+
+def test_convertsToString_string_representation():
+    expression = ConvertsToString()
+    assert str(expression) == "convertsToString()"
+
 # ---------------------------
 # ToTime()
 # ---------------------------
@@ -538,7 +709,7 @@ def test_totime_returns_empty_if_empty():
     assert result == []
 
 
-def test_totime_returns_emtpy_for_invalid_type():
+def test_totime_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ToTime().evaluate(collection)
     assert result == []
@@ -560,6 +731,15 @@ def test_totime_converts_correctly_for_valid_type(value, expected):
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 
+def test_toTime_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ToTime().evaluate(collection)
+
+def test_toTime_string_representation():
+    expression = ToTime()
+    assert str(expression) == "toTime()"
+
 # ---------------------------
 # ConvertsToTime()
 # ---------------------------
@@ -571,7 +751,7 @@ def test_convertstotime_returns_empty_if_empty():
     assert result == []
 
 
-def test_convertstotime_returns_emtpy_for_invalid_type():
+def test_convertstotime_returns_empty_for_invalid_type():
     collection = [FHIRPathCollectionItem(value="invalid")]
     result = ConvertsToDateTime().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(False)]
@@ -591,3 +771,13 @@ def test_convertstotime_returns_true_for_valid_type(value):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ConvertsToTime().evaluate(collection)
     assert result == [FHIRPathCollectionItem.wrap(True)]
+
+
+def test_convertsToTime_raises_error_for_multiple_items():
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    with pytest.raises(FHIRPathRuntimeError):
+        ConvertsToTime().evaluate(collection)
+
+def test_convertsToTime_string_representation():
+    expression = ConvertsToTime()
+    assert str(expression) == "convertsToTime()"

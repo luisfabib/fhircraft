@@ -168,12 +168,10 @@ class OfType(FHIRPathFunction):
         type (class): Type class
     """
 
-    def __init__(self, _type: type | Literal):
-        if isinstance(_type, Literal):
-            _type = _type.value
+    def __init__(self, _type: type | str):
         self.type = _type
 
-    def evaluate(self, collection: FHIRPathCollection) -> FHIRPathCollection:
+    def evaluate(self, collection: FHIRPathCollection, create=False) -> FHIRPathCollection:
         """
         Returns a collection that contains all items in the input collection that are of the given type
         or a subclass thereof. If the input collection is empty (`[]`), the result is empty.
@@ -188,7 +186,7 @@ class OfType(FHIRPathFunction):
         return [item for item in collection if isinstance(item.value, self.type)]  # type: ignore
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.type.__str__()})"
+        return f"ofType({self.type})"
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.type.__repr__()})"

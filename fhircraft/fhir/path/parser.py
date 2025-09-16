@@ -536,8 +536,8 @@ class FhirPathParser:
 
     def p_fhirpath_literal(self, p):
         """literal : number
+        | boolean
         | STRING
-        | BOOLEAN
         | date
         | time
         | datetime
@@ -548,6 +548,10 @@ class FhirPathParser:
     def p_fhirpath_literal_empty(self, p):
         """literal : '{' '}'"""
         p[0] = Literal([])
+
+    def p_fhirpath_boolean(self, p):
+        "boolean : BOOLEAN"
+        p[0] = True if p[1]=="true" else False
 
     def p_fhirpath_datetime(self, p):
         "datetime : DATETIME"

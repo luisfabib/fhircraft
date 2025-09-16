@@ -271,12 +271,6 @@ class SubsetOf(FHIRPathFunction):
         else:
             return [FHIRPathCollectionItem.wrap(True)]
 
-    def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.other.__str__()})"
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}({self.other.__repr__()})"
-
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.other == other.other
 
@@ -324,12 +318,6 @@ class SupersetOf(FHIRPathFunction):
                 return [FHIRPathCollectionItem.wrap(False)]
         else:
             return [FHIRPathCollectionItem.wrap(True)]
-
-    def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.other.__str__()})"
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}({self.other.__repr__()})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.other == other.other

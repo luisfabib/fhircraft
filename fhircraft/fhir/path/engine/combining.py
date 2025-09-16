@@ -52,7 +52,7 @@ class Combine(FHIRPathFunction):
     """
 
     def __init__(self, other_collection: FHIRPath | FHIRPathCollection):
-        self.other_collection = ensure_list(other_collection)
+        self.other_collection = other_collection
 
     def evaluate(
         self, collection: FHIRPathCollection, create=False

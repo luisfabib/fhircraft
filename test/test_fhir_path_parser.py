@@ -39,6 +39,12 @@ parser_test_cases = (
     # ----------------------------------
     # Literals
     # ----------------------------------
+    ("'string'", Literal("string")),
+    ("'string with spaces'", Literal("string with spaces")),
+    ("true", Literal(True)),
+    ("false", Literal(False)),
+    ("0.5", Literal(0.5)),
+    ("12", Literal(12)),
     ("12 'mg'", Literal(Quantity(12, "mg"))),
     ("12.5 'kg'", Literal(Quantity(12.5, "kg"))),
     ("5 days", Literal(Quantity(5, "days"))),
@@ -233,6 +239,7 @@ parser_test_cases = (
     ),
     ("parent.length()", Invocation(Element("parent"), Length())),
     ("parent.toChars()", Invocation(Element("parent"), ToChars())),
+    ("left & right ", Concatenation(Element("left"), Element("right"))),
     # ----------------------------------
     # Types legacy functions
     # ----------------------------------

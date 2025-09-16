@@ -58,10 +58,10 @@ class IndexOf(StringManipulationFunction):
     """
 
     def __init__(self, substring: str | Literal):
-        if isinstance(substring, Literal):
-            substring = substring.value
-        if not isinstance(substring, str):
-            raise FHIRPathError("IndexOf() argument must be a string.")
+        if isinstance(substring, str):
+            substring = Literal(substring)
+        if not isinstance(substring, Literal):
+            raise FHIRPathError("IndexOf() argument must be a literal string.")
         self.substring = substring
 
     def evaluate(
@@ -87,8 +87,7 @@ class IndexOf(StringManipulationFunction):
         self.validate_collection(collection)
         if len(collection) == 0:
             return []
-        return [FHIRPathCollectionItem.wrap(collection[0].value.find(self.substring))]
-
+        return [FHIRPathCollectionItem.wrap(collection[0].value.find(self.substring.value))]
 
 class Substring(StringManipulationFunction):
     """
@@ -144,10 +143,10 @@ class StartsWith(StringManipulationFunction):
     """
 
     def __init__(self, prefix: str | Literal):
-        if isinstance(prefix, Literal):
-            prefix = prefix.value
-        if not isinstance(prefix, str):
-            raise FHIRPathError("StartsWith() argument must be a string.")
+        if isinstance(prefix, str):
+            prefix = Literal(prefix)
+        if not isinstance(prefix, Literal):
+            raise FHIRPathError("StartsWith() argument must be a string literal.")
         self.prefix = prefix
 
     def evaluate(
@@ -170,15 +169,14 @@ class StartsWith(StringManipulationFunction):
 
         """
         self.validate_collection(collection)
-        if not collection or not self.prefix:
+        if not collection or not self.prefix.value:
             return []
-        if not isinstance(self.prefix, str):
-            evaluation = self.prefix.evaluate(collection, create=False)
-            if not evaluation:
-                return []
-            self.prefix = evaluation[0].value
+        prefix_collection = self.prefix.evaluate(collection)
+        if not prefix_collection:
+            return []
+        prefix = prefix_collection[0].value
         return [
-            FHIRPathCollectionItem.wrap(collection[0].value.startswith(self.prefix))
+            FHIRPathCollectionItem.wrap(collection[0].value.startswith(prefix))
         ]
 
 
@@ -191,10 +189,10 @@ class EndsWith(StringManipulationFunction):
     """
 
     def __init__(self, suffix: str | Literal):
-        if isinstance(suffix, Literal):
-            suffix = suffix.value
-        if not isinstance(suffix, str):
-            raise FHIRPathError("EndsWith() argument must be a string.")
+        if isinstance(suffix, str):
+            suffix = Literal(suffix)
+        if not isinstance(suffix, Literal):
+            raise FHIRPathError("EndsWith() argument must be a string literal.")
         self.suffix = suffix
 
     def evaluate(
@@ -217,9 +215,9 @@ class EndsWith(StringManipulationFunction):
 
         """
         self.validate_collection(collection)
-        if not collection or not self.suffix:
+        if not collection or not self.suffix.value:
             return []
-        return [FHIRPathCollectionItem.wrap(collection[0].value.endswith(self.suffix))]
+        return [FHIRPathCollectionItem.wrap(collection[0].value.endswith(self.suffix.value))]
 
 
 class Contains(StringManipulationFunction):
@@ -231,10 +229,10 @@ class Contains(StringManipulationFunction):
     """
 
     def __init__(self, substring: str | Literal):
-        if isinstance(substring, Literal):
-            substring = substring.value
-        if not isinstance(substring, str):
-            raise FHIRPathError("Contains() argument must be a string.")
+        if isinstance(substring, str):
+            substring = Literal(substring)
+        if not isinstance(substring, Literal):
+            raise FHIRPathError("Contains() argument must be a string literal.")
         self.substring = substring
 
     def evaluate(
@@ -262,9 +260,9 @@ class Contains(StringManipulationFunction):
 
         """
         self.validate_collection(collection)
-        if not collection or not self.substring:
+        if not collection or not self.substring.value:
             return []
-        return [FHIRPathCollectionItem.wrap(self.substring in collection[0].value)]
+        return [FHIRPathCollectionItem.wrap(self.substring.value in collection[0].value)]
 
 
 class Upper(StringManipulationFunction):
@@ -333,14 +331,14 @@ class Replace(StringManipulationFunction):
     """
 
     def __init__(self, pattern: str | Literal, substitution: str | Literal):
-        if isinstance(pattern, Literal):
-            pattern = pattern.value
-        if not isinstance(pattern, str):
-            raise FHIRPathError("Replace() pattern argument must be a string.")
-        if isinstance(substitution, Literal):
-            substitution = substitution.value
-        if not isinstance(substitution, str):
-            raise FHIRPathError("Replace() substitution argument must be a string.")
+        if isinstance(pattern, str):
+            pattern = Literal(pattern)
+        if not isinstance(pattern, Literal):
+            raise FHIRPathError("Replace() pattern argument must be a string literal.")
+        if isinstance(substitution, str):
+            substitution = Literal(substitution)
+        if not isinstance(substitution, Literal):
+            raise FHIRPathError("Replace() substitution argument must be a string literal.")
         self.pattern = pattern
         self.substitution = substitution
 
@@ -365,11 +363,11 @@ class Replace(StringManipulationFunction):
             FHIRPathError: If the item in the input collection is not a string.
         """
         self.validate_collection(collection)
-        if not collection or not self.substitution:
+        if not collection or not self.substitution.value:
             return []
         return [
             FHIRPathCollectionItem.wrap(
-                collection[0].value.replace(self.pattern, self.substitution)
+                collection[0].value.replace(self.pattern.value, self.substitution.value)
             )
         ]
 
@@ -383,14 +381,11 @@ class Matches(StringManipulationFunction):
     """
 
     def __init__(self, regex: str | Literal):
-        if isinstance(regex, Literal):
-            regex = regex.value
-        if not isinstance(regex, str):
-            raise FHIRPathError("Matches() argument must be a string.")
+        if isinstance(regex, str):
+            regex = Literal(regex)
+        if not isinstance(regex, Literal):
+            raise FHIRPathError("Matches() argument must be a string literal.")
         self.regex = regex
-
-    def __str__(self):
-        return f"matches('{self.regex}')"
 
     def evaluate(
         self, collection: FHIRPathCollection, create=False
@@ -412,10 +407,10 @@ class Matches(StringManipulationFunction):
             FHIRPathError: If the item in the input collection is not a string.
         """
         self.validate_collection(collection)
-        if not collection or not self.regex:
+        if not collection or not self.regex.value:
             return []
         return [
-            FHIRPathCollectionItem.wrap(bool(re.match(self.regex, collection[0].value)))
+            FHIRPathCollectionItem.wrap(bool(re.match(self.regex.value, collection[0].value)))
         ]
 
 
@@ -429,15 +424,15 @@ class ReplaceMatches(StringManipulationFunction):
     """
 
     def __init__(self, regex: str | Literal, substitution: str | Literal):
-        if isinstance(regex, Literal):
-            regex = regex.value
-        if not isinstance(regex, str):
-            raise FHIRPathError("ReplaceMatches() regex argument must be a string.")
-        if isinstance(substitution, Literal):
-            substitution = substitution.value
-        if not isinstance(substitution, str):
+        if isinstance(regex, str):
+            regex = Literal(regex)
+        if not isinstance(regex, Literal):
+            raise FHIRPathError("ReplaceMatches() regex argument must be a string literal.")
+        if isinstance(substitution, str):
+            substitution = Literal(substitution)
+        if not isinstance(substitution, Literal):
             raise FHIRPathError(
-                "ReplaceMatches() substitution argument must be a string."
+                "ReplaceMatches() substitution argument must be a string literal."
             )
         self.regex = regex
         self.substitution = substitution
@@ -465,7 +460,7 @@ class ReplaceMatches(StringManipulationFunction):
             return []
         return [
             FHIRPathCollectionItem.wrap(
-                re.sub(self.regex, self.substitution, collection[0].value)
+                re.sub(self.regex.value, self.substitution.value, collection[0].value)
             )
         ]
 
@@ -571,7 +566,7 @@ class Concatenation(FHIRPath):
         return [FHIRPathCollectionItem.wrap(f"{left}{right}")]
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        return f"{self.left} & {self.right}"
 
     def __repr__(self):
         return (

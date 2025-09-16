@@ -21,6 +21,9 @@ def test_union_returns_combined_collection_without_duplicates():
         FHIRPathCollectionItem(value="B"),
     ]
 
+def test_union_string_representation():
+    expression = Union(Element("left"), Element("right"))
+    assert str(expression) == "left | right"
 
 # -------------
 # In
@@ -35,7 +38,6 @@ def test_in_returns_empty_if_left_empty():
     result = In([], Element("right")).evaluate(collection)
     result = result[0].value if len(result) == 1 else result
     assert result == []
-
 
 def test_in_returns_false_if_right_empty():
     resource = namedtuple("Resource", ["left", "right"])(
@@ -58,6 +60,9 @@ def test_in_checks_membership_correctly():
     result = result[0].value if len(result) == 1 else result
     assert result == True
 
+def test_in_string_representation():
+    expression = In(Element("left"), Element("right"))
+    assert str(expression) == "left in right"
 
 # -------------
 # Contains
@@ -94,3 +99,7 @@ def test_contains_checks_containership_correctly():
     )
     result = result[0].value if len(result) == 1 else result
     assert result == True
+
+def test_contains_string_representation():
+    expression = Contains(Element("left"), Element("right"))
+    assert str(expression) == "left contains right"
