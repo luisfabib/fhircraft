@@ -1,6 +1,5 @@
 import logging
 import os.path
-from typing import override
 
 import ply.yacc
 
@@ -105,7 +104,6 @@ class FhirMappingLanguageParser(FhirPathParser):
             errorlog=logger,
         )
 
-    @override
     def parse(self, string, lexer=None) -> StructureMap:
         self.string = string
         lexer = lexer or self.lexer_class()
