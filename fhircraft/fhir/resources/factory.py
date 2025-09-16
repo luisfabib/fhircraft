@@ -919,7 +919,7 @@ class ResourceFactory:
                     capitalize(
                         self.Config.resource_name if self.Config else "Unknown"
                     ).strip()
-                    + capitalize(name).strip()
+                    + ''.join([capitalize(label).strip() for label in  element.path.split(".")[1:]])
                 )
                 field_subfields, subfield_validators, subfield_properties = (
                     self._process_FHIR_structure_into_Pydantic_components(
