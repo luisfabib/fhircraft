@@ -528,7 +528,8 @@ class ResourceFactory:
         Returns:
             Tuple[str, Optional[AliasChoices]]: The processed field name and optional alias choices
         """
-        if keyword.iskeyword(field_name):
+        CLASS_RESERVED_KEYWORDS = {"property", "classmethod", "field_validator", "model_validator"}
+        if keyword.iskeyword(field_name) or field_name in CLASS_RESERVED_KEYWORDS:
             # Append underscore to make it a valid Python identifier
             safe_field_name = f"{field_name}_"
             # Create validation alias that accepts both original name and modified name
