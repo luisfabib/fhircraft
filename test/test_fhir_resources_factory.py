@@ -14,7 +14,7 @@ import pytest
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 import fhircraft.fhir.resources.datatypes.R4B.complex_types as complex_types
-from fhircraft.fhir.resources.definitions import StructureDefinition
+from fhircraft.fhir.resources.definitions import StructureDefinition, StructureDefinitionSnapshot
 from fhircraft.fhir.resources.definitions.element_definition import ElementDefinition, ElementDefinitionType
 from fhircraft.fhir.resources.factory import ResourceFactory, _Unset
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
@@ -186,7 +186,7 @@ class TestGetFhirType(FactoryTestCase):
                 type="BackboneElement",
                 baseDefinition="http://hl7.org/fhir/StructureDefinition/BackboneElement",
                 derivation="specialization",
-                snapshot={
+                snapshot=StructureDefinitionSnapshot.model_validate({
                     "element": [
                         {
                             "id": "CustomType",
@@ -202,7 +202,7 @@ class TestGetFhirType(FactoryTestCase):
                             "type": [{"code": "string"}],
                         },
                     ]   
-                },
+                }),
             )
         )
         result = self.factory._get_complex_FHIR_type(
@@ -567,14 +567,13 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             structure_definition=structure_def_dict
         )
 
-        # Test that both field names work for validation
+        assert "class_" in TestModel.model_fields
         # Using the safe field name
-        instance1 = TestModel(class_="test_value")
-        assert hasattr(instance1, "class_")
-
+        instance1 = TestModel(**{"class_": "test_value"})
         # Using the original keyword name (should work due to validation_alias)
         instance2 = TestModel(**{"class": "test_value"})
-        assert hasattr(instance2, "class_")
+        assert getattr(instance1, 'class_') == "test_value"
+        assert getattr(instance2, 'class_') == "test_value"
 
     def test_handles_choice_type_fields_with_keywords(self):
         """Test that choice type fields with keywords are handled correctly."""
