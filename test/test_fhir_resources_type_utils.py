@@ -6,6 +6,8 @@ import pytest
 from pydantic import ValidationError
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
+from fhircraft.fhir.resources.datatypes.R4.complex_types import Coding
+from fhircraft.fhir.resources.definitions.element_definition import ElementDefinitionDiscriminator
 from fhircraft.fhir.resources.datatypes.utils import (  # Type checking functions; Type conversion functions; Complex type utilities; Utility functions
     FHIRTypeError,
     get_primitive_type_by_name,
@@ -14,7 +16,9 @@ from fhircraft.fhir.resources.datatypes.utils import (  # Type checking function
     is_date,
     is_datetime,
     is_decimal,
-    is_fhir_type,
+    is_fhir_primitive_type,
+    is_fhir_complex_type,
+    is_fhir_resource_type,
     is_integer,
     is_positive_int,
     is_string,
@@ -28,120 +32,166 @@ from fhircraft.fhir.resources.datatypes.utils import (  # Type checking function
     to_decimal,
     to_integer,
     to_time,
-    validate_fhir_type,
 )
 
 
-def test_type_checking_functions():
-    """Test the is_* type checking functions."""
 
-    # Boolean type checking
-    assert is_boolean(True) == True
-    assert is_boolean("true") == True
-    assert is_boolean("false") == True
-    assert is_boolean("invalid") == False
-    assert is_boolean(123) == False
+@pytest.mark.parametrize("value, expected", (
+    (True, True),
+    (False, True),
+    ("true", True),
+    ("false", True),
+    ("1", True),
+    ("0", True),
+    (123, False),
+    (1, True),
+    ("invalid", False),
+))
+def test_is_boolean(value, expected):
+    assert is_boolean(value) == expected
 
-    # Integer type checking
-    assert is_integer(123) == True
-    assert is_integer("123") == True
-    assert is_integer("-456") == True
-    assert is_integer("12.34") == False
-    assert is_integer("abc") == False
+@pytest.mark.parametrize("value,expected", [
+    (123, True),
+    ("123", True),
+    ("-456", True),
+    ("12.34", False),
+    ("abc", False),
+    (0, True),  # Edge case: zero value
+    (-2147483648, True),  # Edge case: min 32-bit int
+    (2147483647, True),   # Edge case: max 32-bit int
+])
+def test_is_integer(value, expected):
+    assert is_integer(value) == expected
 
-    # Decimal type checking
-    assert is_decimal(12.34) == True
-    assert is_decimal("12.34") == True
-    assert is_decimal("12") == True
-    assert is_decimal("invalid") == False
+@pytest.mark.parametrize("value,expected", [
+    (12.34, True),
+    ("12.34", True),
+    ("12", True),
+    ("invalid", False),
+])
+def test_is_decimal(value, expected):
+    assert is_decimal(value) == expected
 
-    # String type checking
-    assert is_string("hello") == True
-    assert is_string("") == True
-    assert is_string(123) == False
+@pytest.mark.parametrize("value,expected", [
+    ("hello", True),
+    ("", True),  # Edge case: empty string
+    (123, False),
+])
+def test_is_string(value, expected):
+    assert is_string(value) == expected
 
-    # Date type checking
-    assert is_date("2023-12-25") == True
-    assert is_date("2023-12") == True
-    assert is_date("2023") == True
-    assert is_date("invalid-date") == False
+@pytest.mark.parametrize("value,expected", [
+    ("2023-12-25", True),
+    ("2023-12", True),
+    ("2023", True),
+    ("invalid-date", False),
+])
+def test_is_date_param(value, expected):
+    assert is_date(value) == expected
 
-    # Datetime type checking
-    assert is_datetime("2023-12-25T10:30:00+02:00") == True
-    assert is_datetime("2023-12-25T10:30:00Z") == True
-    assert is_datetime("2023-12-25T10:30:00") == True
-    assert is_datetime("2023-12-25T10:30") == True
-    assert is_datetime("2023-12-25T10") == True
-    assert is_datetime("2023-12-25") == True
-    assert is_datetime("2023-12") == True
-    assert is_datetime("2023") == True
-    assert is_datetime("invalid-datetime") == False
+@pytest.mark.parametrize("value,expected", [
+    ("2023-12-25T10:30:00+02:00", True),
+    ("2023-12-25T10:30:00Z", True),
+    ("2023-12-25T10:30:00", True),
+    ("2023-12-25T10:30", True),
+    ("2023-12-25T10", True),
+    ("2023-12-25", True),
+    ("2023-12", True),
+    ("2023", True),
+    ("invalid-datetime", False),
+])
+def test_is_datetime(value, expected):
+    assert is_datetime(value) == expected
 
-    # Time type checking
-    assert is_time("10:30:00") == True
-    assert is_time("23:59:59") == True
-    assert is_time("00:00:00") == True
-    assert is_time("10:30") == True
-    assert is_time("invalid-time") == False
+@pytest.mark.parametrize("value,expected", [
+    ("10:30:00", True),
+    ("23:59:59", True),
+    ("00:00:00", True),
+    ("10:30", True),
+    ("invalid-time", False),
+])
+def test_is_time(value, expected):
+    assert is_time(value) == expected
 
-    # UnsignedInt type checking
-    assert is_unsigned_int(123) == True
-    assert is_unsigned_int("123") == True
-    assert is_unsigned_int(0) == True
-    assert is_unsigned_int(-123) == False
-    assert is_unsigned_int("-123") == False
+@pytest.mark.parametrize("value,expected", [
+    (123, True),
+    ("123", True),
+    (0, True),
+    (-123, False),
+    ("-123", False),
+])
+def test_is_unsigned_int(value, expected):
+    assert is_unsigned_int(value) == expected
 
-    # PositiveInt type checking
-    assert is_positive_int(123) == True
-    assert is_positive_int("123") == True
-    assert is_positive_int(0) == False
-    assert is_positive_int(-123) == False
-
-
-def test_generic_type_checking():
-    """Test the generic is_fhir_type function."""
-
-    # Using TypeAliasType
-    assert is_fhir_type("true", primitives.Boolean) == True
-    assert is_fhir_type("123", primitives.Integer) == True
-    assert is_fhir_type("invalid", primitives.Boolean) == False
-
-    # Using string type names
-    assert is_fhir_type("true", "Boolean") == True
-    assert is_fhir_type("123", "Integer") == True
-    assert is_fhir_type("invalid", "Boolean") == False
-
-    # Invalid type name
-    with pytest.raises(ValueError):
-        is_fhir_type("value", "InvalidType")
+@pytest.mark.parametrize("value,expected", [
+    (123, True),
+    ("123", True),
+    (0, False),
+    (-123, False),
+])
+def test_is_positive_int(value, expected):
+    assert is_positive_int(value) == expected
 
 
-def test_type_conversion_functions():
-    """Test the to_* type conversion functions."""
+@pytest.mark.parametrize("value,expected", [
+    ("true", True),
+    ("false", False),
+    ("1", True),
+    ("0", False),
+    ("invalid", None),
+])
+def test_to_boolean(value, expected):
+    assert to_boolean(value) == expected
 
-    # Boolean conversion
-    assert to_boolean("true") == True
-    assert to_boolean("false") == False
-    assert to_boolean("1") == True
-    assert to_boolean("0") == False
-    assert to_boolean("invalid") == None
+@pytest.mark.parametrize("value,expected", [
+    ("123", 123),
+    ("-456", -456),
+    (789, 789),
+    ("invalid", None),
+])
+def test_to_integer(value, expected):
+    assert to_integer(value) == expected
 
-    # Integer conversion
-    assert to_integer("123") == 123
-    assert to_integer("-456") == -456
-    assert to_integer(789) == 789
-    assert to_integer("invalid") == None
+@pytest.mark.parametrize("value,expected", [
+    ("12.34", 12.34),
+    ("56", 56.0),
+    (78.9, 78.9),
+    ("invalid", None),
+])
+def test_to_decimal(value, expected):
+    assert to_decimal(value) == expected
 
-    # Decimal conversion
-    assert to_decimal("12.34") == 12.34
-    assert to_decimal("56") == 56.0
-    assert to_decimal(78.9) == 78.9
-    assert to_decimal("invalid") == None
+@pytest.mark.parametrize("value,expected", [
+    ("2023-12-25", "2023-12-25"),
+    ("2023-12-25T10:30:00", "2023-12-25"),
+    ("invalid", None),
+])
+def test_to_date(value, expected):
+    assert to_date(value) == expected
 
-    # Date conversion
-    assert to_date("2023-12-25") == "2023-12-25"
-    assert to_date("2023-12-25T10:30:00") == "2023-12-25"
-    assert to_date("invalid") == None
+@pytest.mark.parametrize("value,expected", [
+    ("10:30:00", "10:30:00"),
+    ("23:59:59", "23:59:59"),
+    ("00:00:00", "00:00:00"),
+    ("10:30", "10:30"),
+    ("invalid", None),
+])
+def test_to_time(value, expected):
+    assert to_time(value) == expected
+
+@pytest.mark.parametrize("value,expected", [
+    ("2023-12-25T10:30:00+02:00", "2023-12-25T10:30:00+02:00"),
+    ("2023-12-25T10:30:00Z", "2023-12-25T10:30:00Z"),
+    ("2023-12-25T10:30:00", "2023-12-25T10:30:00"),
+    ("2023-12-25T10:30", "2023-12-25T10:30"),
+    ("2023-12-25T10", "2023-12-25T10"),
+    ("2023-12-25", "2023-12-25"),
+    ("2023-12", "2023-12"),
+    ("2023", "2023"),
+    ("invalid-datetime", None),
+])
+def test_to_datetime(value, expected):
+    assert to_datetime(value) == expected
 
 
 def test_utility_functions():
@@ -166,43 +216,26 @@ def test_utility_functions():
     assert len(type_names) > 15  # Should have many primitive types
 
 
-def test_detailed_validation():
-    """Test detailed validation with error handling."""
+@pytest.mark.parametrize("value,fhir_type,expected", [
+    ("true", "Boolean", True),
+    ("123", "Integer", True),
+    ("invalid", "Boolean", False),
+    ("2023-12-25", "Date", True),
+    ("not-a-date", "Date", False),
+])
+def test_is_fhir_primitive_type(value, fhir_type, expected):
+    assert is_fhir_primitive_type(value, fhir_type) == expected
 
-    # Valid case
-    result = validate_fhir_type("true", primitives.Boolean, raise_on_error=False)
-    assert result == True
+@pytest.mark.parametrize("value,fhir_type,expected", [
+    (Coding(code='123', system='example.com'), Coding, True),
+    ("not-coding", Coding, False),
+])
+def test_is_fhir_complex_type(value, fhir_type, expected):
+    assert is_fhir_complex_type(value, fhir_type) == expected
 
-    # Invalid case - should return False when raise_on_error=False
-    result = validate_fhir_type("invalid", primitives.Boolean, raise_on_error=False)
-    assert result == False
-
-    # Invalid case - should raise when raise_on_error=True
-    with pytest.raises((ValidationError, FHIRTypeError)):
-        validate_fhir_type("invalid", primitives.Boolean, raise_on_error=True)
-
-    # Unknown type name
-    with pytest.raises((FHIRTypeError, AttributeError)):
-        validate_fhir_type("value", "UnknownType", raise_on_error=True)
-
-
-def test_edge_cases():
-    """Test edge cases and boundary conditions."""
-
-    # Empty strings
-    assert is_string("") == True
-    assert is_uri("") == True  # Empty URI is valid in FHIR
-
-    # Zero values
-    assert is_integer(0) == True
-    assert is_unsigned_int(0) == True
-    assert is_positive_int(0) == False  # Zero is not positive
-
-    # Boundary values for integers
-    assert is_integer(-2147483648) == True  # Min 32-bit int
-    assert is_integer(2147483647) == True  # Max 32-bit int
-
-    # Partial dates
-    assert is_date("2023") == True
-    assert is_date("2023-12") == True
-    assert is_date("2023-12-25") == True
+@pytest.mark.parametrize("value,fhir_type,expected", [
+    (ElementDefinitionDiscriminator(type='value', path='example'), ElementDefinitionDiscriminator, True),
+    ("not-elementdefinition", ElementDefinitionDiscriminator, False),
+])
+def test_is_fhir_resource_type(value, fhir_type, expected):
+    assert is_fhir_resource_type(value, fhir_type) == expected

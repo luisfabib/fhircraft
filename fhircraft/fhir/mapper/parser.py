@@ -25,7 +25,7 @@ from fhircraft.fhir.mapper.structures.StructureMap import (
     StructureMapTarget,
 )
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
-from fhircraft.fhir.resources.datatypes.utils import is_fhir_type
+from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive_type
 from fhircraft.utils import ensure_list
 
 logger = logging.getLogger(__name__)
@@ -51,9 +51,9 @@ def _parse_StructureMapParameter(
         valueInteger=value if isinstance(value, int) else None,
         valueBoolean=value if isinstance(value, bool) else None,
         valueDecimal=value if isinstance(value, float) else None,
-        valueDate=value if is_fhir_type(value, primitives.Date) else None,  # type: ignore
-        valueDateTime=value if is_fhir_type(value, primitives.DateTime) else None,  # type: ignore
-        valueTime=value if is_fhir_type(value, primitives.Time) else None,  # type: ignore
+        valueDate=value if is_fhir_primitive_type(value, primitives.Date) else None,  # type: ignore
+        valueDateTime=value if is_fhir_primitive_type(value, primitives.DateTime) else None,  # type: ignore
+        valueTime=value if is_fhir_primitive_type(value, primitives.Time) else None,  # type: ignore
     )
 
 
