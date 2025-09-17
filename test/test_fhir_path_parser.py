@@ -246,6 +246,19 @@ parser_test_cases = (
     ("parent.is('String')", Invocation(Element("parent"), LegacyIs(Literal("String")))),
     ("parent.as('String')", Invocation(Element("parent"), LegacyAs(Literal("String")))),
     # ----------------------------------
+    # Math functions
+    # ----------------------------------
+    ("parent.abs()", Invocation(Element("parent"), Abs())),
+    ("parent.ceiling()", Invocation(Element("parent"), Ceiling())),
+    ("parent.floor()", Invocation(Element("parent"), Floor())),
+    ("parent.log(10)", Invocation(Element("parent"), Log(Literal(10)))),
+    ("parent.sqrt()", Invocation(Element("parent"), Sqrt())),
+    ("parent.exp()", Invocation(Element("parent"), Exp())),
+    ("parent.ln()", Invocation(Element("parent"), Ln())),
+    ("parent.power(2)", Invocation(Element("parent"), Power(Literal(2)))),
+    ("parent.round(2)", Invocation(Element("parent"), Round(Literal(2)))),
+    ("parent.truncate()", Invocation(Element("parent"), Truncate())),
+    # ----------------------------------
     # Utility functions
     # ----------------------------------
     (

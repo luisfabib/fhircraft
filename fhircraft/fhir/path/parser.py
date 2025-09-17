@@ -1,6 +1,7 @@
 import logging
 import os.path
 from typing import Any
+
 import ply.yacc
 
 import fhircraft.fhir.path.engine.additional as additional
@@ -457,25 +458,25 @@ class FhirPathParser:
         # Math
         # -------------------------------------------------------------------------------
         elif check(p, "abs", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Abs()
         elif check(p, "ceiling", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Ceiling()
         elif check(p, "exp", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Exp()
         elif check(p, "floor", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Floor()
         elif check(p, "ln", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Ln()
         elif check(p, "log", nargs=1):
-            raise NotImplementedError()
+            p[0] = math.Log(*p[3])
         elif check(p, "power", nargs=1):
-            raise NotImplementedError()
+            p[0] = math.Power(*p[3])
         elif check(p, "round", nargs=1):
-            raise NotImplementedError()
+            p[0] = math.Round(*p[3])
         elif check(p, "sqrt", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Sqrt()
         elif check(p, "truncate", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Truncate()
         # -------------------------------------------------------------------------------
         # Tree navigation
         # -------------------------------------------------------------------------------
@@ -551,7 +552,7 @@ class FhirPathParser:
 
     def p_fhirpath_boolean(self, p):
         "boolean : BOOLEAN"
-        p[0] = True if p[1]=="true" else False
+        p[0] = True if p[1] == "true" else False
 
     def p_fhirpath_datetime(self, p):
         "datetime : DATETIME"
@@ -593,4 +594,5 @@ class IteratorToTokenStream:
         try:
             return next(self.iterator)
         except StopIteration:
+            return None
             return None
