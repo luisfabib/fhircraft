@@ -1003,7 +1003,7 @@ class ResourceFactory:
                     self._handle_python_reserved_keyword(f"{name}_ext")
                 )
                 fields[safe_ext_field_name] = self._construct_Pydantic_field(
-                    get_complex_FHIR_type("Element"),
+                    get_complex_FHIR_type("Extension", self.Config.FHIR_release if self.Config else "4.3.0"),
                     min_card=0,
                     max_card=1,
                     alias=f"_{name}",
