@@ -927,8 +927,6 @@ class ResourceFactory:
                         element, field_type
                     )
                 )
-                for attribute, property_getter in subfield_properties.items():
-                    setattr(field_type, attribute, property(property_getter))
                 if (
                     "extension" in element.children
                     and element.children["extension"].slices
@@ -975,11 +973,12 @@ class ResourceFactory:
                     field_subfields["extension"] = self._construct_Pydantic_field(
                         extension_type, extension_min_card, extension_max_card
                     )
-                field_type = create_model(
+                field_type = self._create_model_with_properties(
                     backbone_model_name,
-                    **field_subfields,
-                    __base__=(field_type,),  # type: ignore
-                    __validators__=subfield_validators,
+                    fields=field_subfields,
+                    base=(field_type,), 
+                    validators=subfield_validators,
+                    properties=subfield_properties,
                 )
             # Handle Python reserved keywords for field names
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
