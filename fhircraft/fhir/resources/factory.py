@@ -1118,10 +1118,14 @@ class ResourceFactory:
             )
             fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
             fields["meta"] = (
-                Optional[Meta],
-                Meta(
-                    profile=[_structure_definition.url],
-                    versionId=_structure_definition.version,
+                Meta,
+                Field(
+                    title='Meta',
+                    description="Metadata about the resource.",
+                    default=Meta(
+                        profile=[_structure_definition.url],
+                        versionId=_structure_definition.version,
+                    )
                 ),
             )
         # Construct the Pydantic model representing the FHIR resource

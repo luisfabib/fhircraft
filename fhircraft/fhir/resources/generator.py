@@ -8,6 +8,7 @@ from typing import Any, Dict, List, get_args
 
 from jinja2 import Environment, FileSystemLoader, Template
 from pydantic import BaseModel
+from pydantic_core import PydanticUndefined
 
 from fhircraft.fhir.resources.factory import ResourceFactory
 from fhircraft.utils import ensure_list, get_module_name
@@ -130,11 +131,23 @@ class CodeGenerator:
                     self.import_statements["typing"].append("Literal")
                 annotation_string = f"Literal['{info.annotation['fixedValue'].value}']"
 
+            default = info.default
+            if default is PydanticUndefined:
+                default = "..."
+            elif isinstance(info.default, str):
+                default = f'"{info.default}"'
+            elif isinstance(info.default, BaseModel):
+                arguments = ", ".join(
+                    f"{key}={value!r}"
+                    for key, value in info.default.model_dump(exclude_none=True).items()
+                )
+                default = f"{info.default.__class__.__name__}({arguments})"
+
             subdata[field] = {
                 "annotation": annotation_string,
                 "description": info.description,
                 "alias": info.alias,
-                "default": info.default,
+                "default": default,
             }
         model_properties = {
             key: value.fget
