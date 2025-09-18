@@ -46,6 +46,7 @@ def test_load_structure_map_from_dict():
     map_dict = {
         "resourceType": "StructureMap",
         "name": "test",
+        "status:": "draft",
         "url": "http://example.org/test",
         "group": [
             {

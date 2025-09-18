@@ -460,6 +460,10 @@ class FHIRMappingEngine:
                         ]
                         self.process_group(dependent_group, parameters, iteration_scope)
 
+                    # Process nested rules for this iteration
+                    for nested_rule in rule.rule or []:
+                        self.process_rule(nested_rule, iteration_scope)
+
                     # Merge back iteration results to main scope
                     scope.target_instances.update(iteration_scope.target_instances)
 
