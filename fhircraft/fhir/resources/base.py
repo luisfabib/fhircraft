@@ -166,4 +166,3 @@ class FHIRSliceModel(FHIRBaseModel):
         Returns `True` if the instance has been modified, `False` otherwise.
         """
         return self != self.__class__.model_construct_with_slices()
-        return self != self.__class__.model_construct_with_slices()

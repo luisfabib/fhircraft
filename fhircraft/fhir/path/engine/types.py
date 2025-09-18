@@ -62,9 +62,10 @@ class FHIRTypesOperator(FHIRPath):
                 try:
                     return is_fhir_complex_type(value,type_)
                 except FHIRTypeError:
-                    print(f"Type specifier '{type_}' is not a known primitive or complex FHIR type. Trying as resource type...")
-                    return is_fhir_resource_type(value,type_)
-                
+                    try:
+                        return is_fhir_resource_type(value,type_)
+                    except FHIRTypeError:   
+                        return False            
     def __str__(self):
         raise NotImplementedError("Subclasses must implement __str__ method.")
 
