@@ -162,20 +162,22 @@ def validate_type_choice_element(
         AssertionError: If more than one value is set for the type choice element.
     """
     types_set_count = sum(
-        getattr(
-            instance,
-            (
-                field_name_base + field_type
-                if isinstance(field_type, str)
-                else field_type.__name__
-            ),
-            None,
-        )
-        is not None
+        (
+            getattr(
+                instance,
+                (
+                    field_name_base + (field_type
+                    if isinstance(field_type, str)
+                    else field_type.__name__)
+                ),
+                None,
+            )
+
+        ) is not None
         for field_type in field_types
     )
     assert types_set_count <= 1, f"Type choice element {field_name_base}[x] can only have one value set."
-    assert not required or (required and types_set_count > 0), f"Type choice element {field_name_base}[x] must have one value set."
+    assert not required or (required and types_set_count > 0), f"Type choice element {field_name_base}[x] must have one value set. Got {types_set_count}."
     return instance
 
 
