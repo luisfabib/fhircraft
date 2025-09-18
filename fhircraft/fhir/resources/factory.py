@@ -445,6 +445,7 @@ class ResourceFactory:
         base: Tuple[type[ModelT], ...],
         validators: dict,
         properties: dict,
+        docstring: str | None = None,
     ) -> type[ModelT]:
         """
         Constructs a Pydantic model with specified fields, base, validators, and properties.
@@ -460,7 +461,7 @@ class ResourceFactory:
             BaseModel: The constructed Pydantic model.
         """
         # Construct the slice model
-        model = create_model(name, **fields, __base__=base, __validators__=validators)
+        model = create_model(name, **fields, __base__=base, __validators__=validators, __doc__=docstring)
         # Set the properties
         for attribute, property_getter in properties.items():
             setattr(model, attribute, property(property_getter))
@@ -684,6 +685,7 @@ class ResourceFactory:
                     base=bases,
                     validators=slice_validators,
                     properties=slice_properties,
+                    docstring=slice_element.definition,
                 )
             assert issubclass(
                 slice_model, FHIRSliceModel
@@ -979,6 +981,7 @@ class ResourceFactory:
                     base=(field_type,), 
                     validators=subfield_validators,
                     properties=subfield_properties,
+                    docstring=element.definition,
                 )
             # Handle Python reserved keywords for field names
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
@@ -1107,6 +1110,7 @@ class ResourceFactory:
             base=(base_model,),
             validators=validators,
             properties=properties,
+            docstring=_structure_definition.description,
         )
         # Add the current model to the cache
         self.construction_cache[_structure_definition.url] = model

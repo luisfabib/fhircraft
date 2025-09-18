@@ -472,6 +472,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "resourceType": "StructureDefinition",
             "url": "http://example.org/StructureDefinition/TestResource",
             "name": "TestResource",
+            "description": "A test resource",
             "status": "active",
             "kind": "resource",
             "abstract": False,
@@ -512,10 +513,10 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
 
         # Check that the model was created successfully
         assert model is not None
-        assert hasattr(model, "__fields__") or hasattr(model, "model_fields")
+        assert hasattr(model, "model_fields")
 
         # Check that keyword fields were renamed with underscore suffix
-        fields = getattr(model, "model_fields", getattr(model, "__fields__", {}))
+        fields = model.model_fields
         assert "class_" in fields
         assert "import_" in fields
         assert "class" not in fields  # Original keyword should not be a field name
@@ -524,6 +525,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
         # Check that validation aliases were set correctly
         class_field = fields["class_"]
         import_field = fields["import_"]
+
+        assert model.__doc__ == "A test resource"
 
         assert class_field.validation_alias is not None
         assert import_field.validation_alias is not None
@@ -612,7 +615,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
         )
 
         # Check that choice type fields were created with safe names
-        fields = getattr(model, "model_fields", getattr(model, "__fields__", {}))
+        fields = model.model_fields
 
         # Should have fields like classString_ instead of classString (since class is a keyword)
         choice_fields = [
@@ -664,7 +667,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
         )
 
         # Check that both the main field and extension field were created with safe names
-        fields = getattr(model, "model_fields", getattr(model, "__fields__", {}))
+        fields = model.model_fields
 
         # Should have 'for_' field for the main field
         assert "for_" in fields
