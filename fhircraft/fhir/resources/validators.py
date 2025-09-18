@@ -7,8 +7,8 @@ from typing import Any, List, TypeVar, Union
 
 from pydantic import BaseModel
 
-from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
+from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -33,7 +33,7 @@ def _validate_FHIR_element_constraint(
         AssertionError: If the validation fails and severity is not 'warning'.
         Warning: If the validation fails and severity is 'warning'.
     """
-    from fhircraft.fhir.path import fhirpath
+    from fhircraft.fhir.path.parser import fhirpath
     from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
     from fhircraft.fhir.path.exceptions import (
         FhirPathLexerError,
@@ -145,7 +145,7 @@ def validate_FHIR_element_pattern(
 
 
 def validate_type_choice_element(
-    instance: T, field_types: List[Any], field_name_base: str
+    instance: T, field_types: List[Any], field_name_base: str, required: bool = False
 ) -> T:
     """
     Validate the type choice element for a given instance.
@@ -161,22 +161,21 @@ def validate_type_choice_element(
     Raises:
         AssertionError: If more than one value is set for the type choice element.
     """
-    assert (
-        sum(
-            getattr(
-                instance,
-                (
-                    field_name_base + field_type
-                    if isinstance(field_type, str)
-                    else field_type.__name__
-                ),
-                None,
-            )
-            is not None
-            for field_type in field_types
+    types_set_count = sum(
+        getattr(
+            instance,
+            (
+                field_name_base + field_type
+                if isinstance(field_type, str)
+                else field_type.__name__
+            ),
+            None,
         )
-        <= 1
-    ), f"Type choice element {field_name_base}[x] can only have one value set."
+        is not None
+        for field_type in field_types
+    )
+    assert types_set_count <= 1, f"Type choice element {field_name_base}[x] can only have one value set."
+    assert not required or (required and types_set_count > 0), f"Type choice element {field_name_base}[x] must have one value set."
     return instance
 
 

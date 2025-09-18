@@ -613,8 +613,8 @@ class ResourceFactory:
             )
             fields[safe_typed_field_name] = self._construct_Pydantic_field(
                 field_type,
-                cardinality[0],
-                cardinality[1],
+                min_card=0,
+                max_card=cardinality[1],
                 description=description,
                 validation_alias=validation_alias,
             )
@@ -624,6 +624,7 @@ class ResourceFactory:
                 fhir_validators.validate_type_choice_element,
                 field_types=field_types,
                 field_name_base=name,
+                required=cardinality[0] > 0,
             )
         )
         properties[name] = partial(
