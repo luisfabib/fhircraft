@@ -13,8 +13,6 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
 )
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
-from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
-
 
 class Iif(FHIRPathFunction):
     """
@@ -497,6 +495,8 @@ class ToQuantity(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
+        from fhircraft.fhir.resources.datatypes.utils import get_complex_FHIR_type
+        
         self.validate_collection(collection)
         Quantity = get_complex_FHIR_type("Quantity")
         if not collection:
@@ -581,6 +581,8 @@ class ToString(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
+        from fhircraft.fhir.resources.datatypes.utils import get_complex_FHIR_type
+        
         self.validate_collection(collection)
         if not collection:
             return []

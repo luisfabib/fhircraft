@@ -1,6 +1,6 @@
 from typing import Any, List, Optional, Union
 
-from fhircraft.fhir.path import FhirPathParser
+from fhircraft.fhir.path.parser import FhirPathParser
 from fhircraft.fhir.path.exceptions import FHIRPathError, FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import import_fhirpath_engine
 

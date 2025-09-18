@@ -33,6 +33,7 @@ from fhircraft.fhir.path.exceptions import FhirPathLexerError, FhirPathParserErr
 from fhircraft.fhir.path.lexer import FhirPathLexer
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.utils import ensure_list
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -595,4 +596,9 @@ class IteratorToTokenStream:
             return next(self.iterator)
         except StopIteration:
             return None
-            return None
+
+
+try:
+    fhirpath = FhirPathParser()
+except Exception as e:
+    print(traceback.format_exc())

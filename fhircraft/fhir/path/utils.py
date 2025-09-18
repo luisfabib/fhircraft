@@ -82,7 +82,7 @@ def _underline_error_in_fhir_path(text, error, error_position, line_number=None)
 
 
 def import_fhirpath_engine():
-    from fhircraft.fhir.path import fhirpath
+    from fhircraft.fhir.path.parser import fhirpath
 
     return fhirpath
 

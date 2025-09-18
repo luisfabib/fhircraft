@@ -6,11 +6,11 @@ from urllib.request import urlopen
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
-from fhircraft.fhir.mapper.structures import ConceptMap, StructureMap
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 from .parser import FhirMappingLanguageParser
-from .structures.StructureMap import StructureMap
+from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMap
+from fhircraft.fhir.resources.datatypes.R5.resources.concept_map import ConceptMap
 
 __all__ = [
     # High-level API

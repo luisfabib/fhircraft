@@ -13,14 +13,14 @@ from typing import Any, Dict, List, Type
 from pydantic import BaseModel
 
 import fhircraft.fhir.path.engine as fhirpath
-from fhircraft.fhir.mapper.structures.StructureMap import (
+from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
     StructureMap,
     StructureMapGroup,
-    StructureMapRule,
-    StructureMapSource,
-    StructureMapTarget,
+    StructureMapGroupRule,
+    StructureMapGroupRuleSource,
+    StructureMapGroupRuleTarget,
 )
-from fhircraft.fhir.path import fhirpath as fhirpath_parser
+from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.path.engine.core import FHIRPath
 from fhircraft.fhir.resources.factory import ResourceFactory
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
@@ -105,7 +105,7 @@ class FHIRMappingEngine:
         if not isinstance(sources, tuple):
             sources = (sources,)
 
-        if structure_map.imports:
+        if structure_map.import_:
             raise NotImplementedError("StructureMap imports are not implemented yet")
 
         # Resolve structure definitions
@@ -319,11 +319,11 @@ class FHIRMappingEngine:
         for rule in rules:
             self.process_rule(rule, group_scope)
 
-    def process_rule(self, rule: StructureMapRule, scope: MappingScope) -> MappingScope:
+    def process_rule(self, rule: StructureMapGroupRule, scope: MappingScope) -> MappingScope:
         """
         Processes a single StructureMap rule within the given mapping scope.
 
-        This method handles the evaluation and execution of a StructureMapRule, including:
+        This method handles the evaluation and execution of a StructureMapGroupRule, including:
         - Cycle detection to prevent infinite recursion.
         - Source processing to determine iteration counts and validate type, condition, and check constraints.
         - Iterative processing for each source instance, including:
@@ -333,7 +333,7 @@ class FHIRMappingEngine:
             - Merging results from each iteration back into the main scope.
 
         Args:
-            rule (StructureMapRule): The rule to process.
+            rule (StructureMapGroupRule): The rule to process.
             scope (MappingScope): The current mapping scope.
 
         Returns:
@@ -460,10 +460,6 @@ class FHIRMappingEngine:
                         ]
                         self.process_group(dependent_group, parameters, iteration_scope)
 
-                    # Process nested rules for this iteration
-                    for nested_rule in rule.rule or []:
-                        self.process_rule(nested_rule, iteration_scope)
-
                     # Merge back iteration results to main scope
                     scope.target_instances.update(iteration_scope.target_instances)
 
@@ -471,9 +467,9 @@ class FHIRMappingEngine:
             scope.finish_processing_rule(rule_name)
         return scope
 
-    def process_source(self, source: StructureMapSource, scope: MappingScope) -> str:
+    def process_source(self, source: StructureMapGroupRuleSource, scope: MappingScope) -> str:
         """
-        Processes a StructureMapSource object within a given MappingScope and returns the variable name
+        Processes a StructureMapGroupRuleSource object within a given MappingScope and returns the variable name
         associated with the resolved FHIRPath expression.
 
         This method resolves the FHIRPath context from the source, applies any specified element path,
@@ -482,7 +478,7 @@ class FHIRMappingEngine:
         provided by the source or generated uniquely.
 
         Args:
-            source (StructureMapSource): The source mapping definition containing context, element, listMode, and variable.
+            source (StructureMapGroupRuleSource): The source mapping definition containing context, element, listMode, and variable.
             scope (MappingScope): The current mapping scope used to resolve FHIRPath and store variables.
 
         Returns:
@@ -516,11 +512,11 @@ class FHIRMappingEngine:
 
     def process_target(
         self,
-        target: StructureMapTarget,
+        target: StructureMapGroupRuleTarget,
         scope: MappingScope,
     ) -> Any:
         """
-        Processes a StructureMapTarget within the given mapping scope.
+        Processes a StructureMapGroupRuleTarget within the given mapping scope.
 
         This method resolves the FHIRPath context for the target, applies any specified element path,
         determines the appropriate insertion index, and stores the resulting FHIRPath in the scope as a variable.
@@ -528,7 +524,7 @@ class FHIRMappingEngine:
         updates the target structure with the transformed value.
 
         Args:
-            target (StructureMapTarget): The mapping target to process, containing context, element, variable,
+            target (StructureMapGroupRuleTarget): The mapping target to process, containing context, element, variable,
                 transform, and parameters.
             scope (MappingScope): The current mapping scope, used for resolving FHIRPath contexts and managing variables.
 
@@ -680,9 +676,9 @@ class FHIRMappingEngine:
 
         return validated_entries
 
-    def _validate_rule(self, rule: StructureMapRule, issues: List[str]) -> None:
+    def _validate_rule(self, rule: StructureMapGroupRule, issues: List[str]) -> None:
         """
-        Validates a StructureMapRule object and appends any issues found to the provided issues list.
+        Validates a StructureMapGroupRule object and appends any issues found to the provided issues list.
 
         This method checks for the following:
             - The rule has at least one source element.
@@ -691,7 +687,7 @@ class FHIRMappingEngine:
             - Recursively validates any nested rules.
 
         Args:
-            rule (StructureMapRule): The rule to validate.
+            rule (StructureMapGroupRule): The rule to validate.
             issues (List[str]): A list to which validation issue messages will be appended.
 
         Returns:

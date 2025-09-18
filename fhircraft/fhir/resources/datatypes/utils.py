@@ -13,8 +13,17 @@ from pydantic import Field, ValidationError, create_model, BaseModel
 
 from typing_extensions import TypeAliasType
 
+from fhircraft.utils import get_FHIR_release_from_version
+
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
+
+import fhircraft.fhir.resources.datatypes.R4.complex_types as r4_complex_types
+import fhircraft.fhir.resources.datatypes.R4B.complex_types as r4b_complex_types
+import fhircraft.fhir.resources.datatypes.R5.complex_types as r5_complex_types
+
+import fhircraft.fhir.resources.datatypes.R4.resources as r4_resources
+import fhircraft.fhir.resources.datatypes.R4B.resources as r4b_resources
+import fhircraft.fhir.resources.datatypes.R5.resources as r5_resources
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel
@@ -24,6 +33,39 @@ class FHIRTypeError(Exception):
     """Raised when type checking or conversion fails."""
 
     pass
+
+__complex_types_relases__ = {
+    "R4": r4_complex_types,
+    "R4B": r4b_complex_types,
+    "R5": r5_complex_types,
+}
+
+__resource_types_relases__ = {
+    "R4": r4_resources,
+    "R4B": r4b_resources,
+    "R5": r5_resources,
+}
+
+def get_fhir_primitive_type(type_str: str) -> type:
+    return getattr(primitives, type_str, None)
+
+def get_complex_FHIR_type(type_str: str, release="R4B") -> type:
+    complex_FHIR_types = __complex_types_relases__.get(release)
+    if not complex_FHIR_types:
+        raise ValueError(f"Unsupported FHIR release: {release}")
+    return getattr(complex_FHIR_types, type_str)
+
+def get_fhir_resource_type(type_str: str, release="R4B") -> type:
+    resource_FHIR_types = __resource_types_relases__.get(release)
+    if not resource_FHIR_types:
+        raise ValueError(f"Unsupported FHIR release: {release}")
+    resource = getattr(resource_FHIR_types, type_str, None)
+    if not resource:
+        from fhircraft.fhir.resources.factory import factory
+        resource = next((model for model in factory.construction_cache if model.__name__ == type_str and release == get_FHIR_release_from_version(model.fhirVersion)), None)
+        if not resource:
+            raise AttributeError(f"Unknown {release} FHIR resource type: {type_str}")
+    return resource
 
 
 # Type checking functions
@@ -130,15 +172,15 @@ def is_fhir_resource_type(value: Any, fhir_type: "FHIRBaseModel", raise_on_error
     Raises:
         FHIRTypeError: If the fhir_type is a string and does not correspond to a known resource type
     """
-    from fhircraft.fhir.resources.factory import factory as fhir_factory
     if isinstance(fhir_type, str):
-        match = [model for model in fhir_factory.construction_cache if model.__name__ == fhir_type]
-        if not match:
+        try:
+            resource = get_fhir_resource_type(fhir_type)
+        except AttributeError as e:
             if raise_on_error:
-                raise FHIRTypeError(f"Unknown FHIR resource: {fhir_type}")
+                raise e
             else:
                 return False
-        fhir_type = match[0]
+        fhir_type = resource
 
     try:
         if hasattr(fhir_type, "model_validate"):

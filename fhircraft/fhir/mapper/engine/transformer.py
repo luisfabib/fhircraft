@@ -7,8 +7,8 @@ from typing import Any, Callable, List
 from pydantic import BaseModel
 
 import fhircraft.fhir.path.engine as fhirpath
-from fhircraft.fhir.mapper.structures.StructureMap import StructureMapParameter
-from fhircraft.fhir.path import fhirpath as fhirpath_parser
+from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMapGroupRuleTargetParameter as StructureMapParameter
+from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
     CodeableConcept,
     Coding,

@@ -1,6 +1,7 @@
 import pytest
 
 from fhircraft.fhir.path.engine.conversion import *
+from fhircraft.fhir.path.engine.conversion import FHIRPathRuntimeError
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPathCollectionItem,

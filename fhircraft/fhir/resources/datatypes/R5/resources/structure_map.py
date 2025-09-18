@@ -282,27 +282,35 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
     Parameters to the transform.
     """
     valueId: Id = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueString: String = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueBoolean: Boolean = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueInteger: Integer = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueDecimal: Decimal = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueDate: Date = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueTime: Time = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueDateTime: DateTime = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
 
@@ -551,6 +559,7 @@ class StructureMap(FHIRBaseModel):
         alias="_id",
     )
     meta: Optional[Meta] = Field(
+        default=None,
         description=None,
     )
     implicitRules: Optional[Uri] = Field(

@@ -1,7 +1,6 @@
 import ply.lex
 
 from fhircraft.fhir.path.lexer import FhirPathLexer
-from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 
 
 class FhirMappingLanguageLexerError(Exception):

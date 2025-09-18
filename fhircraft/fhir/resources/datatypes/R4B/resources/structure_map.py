@@ -451,18 +451,23 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
     Parameters to the transform.
     """
     valueId: Id = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueString: String = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueBoolean: Boolean = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueInteger: Integer = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
     valueDecimal: Decimal = Field(
+        default=None,
         description="Parameter value - variable or literal",
     )
 
