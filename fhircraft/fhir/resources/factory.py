@@ -58,7 +58,7 @@ class ElementDefinitionNode(ElementDefinition):
     node_label: str = Field(...)
     children: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
     slices: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
-
+    root: Optional["ElementDefinitionNode"] = None
 
 class ResourceFactory:
     """Factory for constructing Pydantic models from FHIR StructureDefinitions.
@@ -367,6 +367,7 @@ class ResourceFactory:
                         ElementDefinitionNode.model_validate(
                             {
                                 "node_label": part,
+                                "root": root,
                                 "path": "__root__",
                                 **(
                                     element.model_dump(exclude_unset=True)
@@ -834,17 +835,35 @@ class ResourceFactory:
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
             )
+            if element.contentReference:
+                reference_path = element.contentReference.lstrip("#")
+                referenced_element = structure.root
+                parts = reference_path.split(".")
+                for part in parts:
+                    if not referenced_element or not referenced_element.children:
+                        return referenced_element
+                    referenced_element = referenced_element.children.get(part)
+                if not referenced_element:
+                    raise ValueError(f"Could not resolve content reference: {element.contentReference}")
+                
+                field_types = [self.construction_cache.get(referenced_element.path)]
+                element.min = element.min or referenced_element.min
+                element.max = element.max or referenced_element.max 
+                element.constraint = element.constraint or referenced_element.constraint
+            else:
+                # Parse the FHIR types of the element
+                field_types = (
+                    [self._get_complex_FHIR_type(field_type) for field_type in element.type]
+                    if element.type
+                    else []
+                )
+                # If has no type, skip element
+                if not field_types:
+                    continue
+
             # Get cardinality of element
             min_card, max_card = self._parse_element_cardinality(element)
-            # Parse the FHIR types of the element
-            field_types = (
-                [self._get_complex_FHIR_type(field_type) for field_type in element.type]
-                if element.type
-                else []
-            )
-            # If has no type, skip element
-            if not field_types:
-                continue
+
             # Handle type choice elements
             if "[x]" in name:
                 fields, validators, properties = self._process_choice_type_field(
@@ -984,6 +1003,7 @@ class ResourceFactory:
                     properties=subfield_properties,
                     docstring=element.definition,
                 )
+                self.construction_cache[element.path] = field_type
             # Handle Python reserved keywords for field names
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
