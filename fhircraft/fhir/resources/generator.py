@@ -40,6 +40,7 @@ class CodeGenerator:
         """
         self.import_statements = defaultdict(list)
         self.data = {}
+        self._processing_models = set()  # Track models being processed to prevent infinite recursion
 
     def _add_import_statement(self, obj: Any) -> None:
         """
@@ -88,7 +89,9 @@ class CodeGenerator:
                 type_obj, BaseModel
             ):
                 # If object was created by ResourceFactory, then serialize the model
-                self._serialize_model(type_obj)
+                # But only if we're not already processing it (to prevent infinite recursion)
+                if type_obj not in self._processing_models:
+                    self._serialize_model(type_obj)
             else:
                 # Otherwise, import the model's module
                 self._add_import_statement(type_obj)
@@ -103,58 +106,74 @@ class CodeGenerator:
         Args:
             model (BaseModel): The model to be serialized.
         """
-        model_base = model.__base__
-        # Add import statement for the base class the the model inherits
-        if model_base and model_base != BaseModel:
-            self._add_import_statement(model.__base__)
+        # Check if we're already processing this model or have already processed it
+        if model in self._processing_models or model in self.data:
+            return
+            
+        # Add to processing set to prevent infinite recursion
+        self._processing_models.add(model)
+        
+        try:
+            model_base = model.__base__
+            # Add import statement for the base class the the model inherits
+            if model_base and model_base != BaseModel:
+                self._add_import_statement(model.__base__)
 
-        subdata = {}
-        for field, info in model.model_fields.items():
-            if (
-                model.__base__
-                and field in model.__base__.model_fields
-                and all(
-                    [
-                        getattr(info, slot)
-                        == getattr(model.__base__.model_fields[field], slot)
-                        for slot in info.__slots__
-                        if not slot.startswith("_")
-                    ]
-                )
-            ):
-                continue
-            self._recursively_import_annotation_types(info.annotation)
-            annotation_string = repr(info.annotation)
+            subdata = {}
+            for field, info in model.model_fields.items():
+                if (
+                    model.__base__
+                    and field in model.__base__.model_fields
+                    and all(
+                        [
+                            getattr(info, slot)
+                            == getattr(model.__base__.model_fields[field], slot)
+                            for slot in info.__slots__
+                            if not slot.startswith("_")
+                        ]
+                    )
+                ):
+                    continue
+                self._recursively_import_annotation_types(info.annotation)
+                annotation_string = repr(info.annotation)
 
-            if isinstance(info.annotation, type(Enum)):
-                if "Literal" not in self.import_statements["typing"]:
-                    self.import_statements["typing"].append("Literal")
-                annotation_string = f"Literal['{info.annotation['fixedValue'].value}']"
+                # Handle self-referencing models
+                if not 'Literal' in annotation_string:
+                    annotation_string = re.sub(rf"\b{model.__name__}\b", f'"{model.__name__}"', annotation_string, 0)
 
-            default = info.default
-            if default is PydanticUndefined:
-                default = "..."
-            elif isinstance(info.default, str):
-                default = f'"{info.default}"'
-            elif isinstance(info.default, BaseModel):
-                arguments = ", ".join(
-                    f"{key}={value!r}"
-                    for key, value in info.default.model_dump(exclude_none=True).items()
-                )
-                default = f"{info.default.__class__.__name__}({arguments})"
+                if isinstance(info.annotation, type(Enum)):
+                    if "Literal" not in self.import_statements["typing"]:
+                        self.import_statements["typing"].append("Literal")
+                    annotation_string = f"Literal['{info.annotation['fixedValue'].value}']"
 
-            subdata[field] = {
-                "annotation": annotation_string,
-                "description": info.description,
-                "alias": info.alias,
-                "default": default,
+                default = info.default
+                if default is PydanticUndefined:
+                    default = "..."
+                elif isinstance(info.default, str):
+                    default = f'"{info.default}"'
+                elif isinstance(info.default, BaseModel):
+                    arguments = ", ".join(
+                        f"{key}={value!r}"
+                        for key, value in info.default.model_dump(exclude_none=True).items()
+                    )
+                    default = f"{info.default.__class__.__name__}({arguments})"
+
+                subdata[field] = {
+                    "annotation": annotation_string,
+                    "description": info.description,
+                    "alias": info.alias,
+                    "default": default,
+                }
+            model_properties = {
+                key: value.fget
+                for key, value in model.__dict__.items()
+                if isinstance(value, property)
             }
-        model_properties = {
-            key: value.fget
-            for key, value in model.__dict__.items()
-            if isinstance(value, property)
-        }
-        self.data.update({model: {"fields": subdata, "properties": model_properties}})
+            self.data.update({model: {"fields": subdata, "properties": model_properties}})
+        
+        finally:
+            # Always remove from processing set when done
+            self._processing_models.discard(model)
 
     def generate_resource_model_code(
         self,
