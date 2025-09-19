@@ -1123,7 +1123,7 @@ class ResourceFactory:
                 "Meta", self.Config.FHIR_release if self.Config else "4.3.0"
             )
             fields["meta"] = (
-                Meta,
+                Optional[Meta],
                 Field(
                     title='Meta',
                     description="Metadata about the resource.",
