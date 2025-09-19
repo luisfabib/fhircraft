@@ -111,7 +111,7 @@ class ResourceFactory:
             self.repository = repository
 
         self.construction_cache: Dict[str, type[BaseModel]] = {}
-        self.Config: Optional[ResourceFactory.FactoryConfig] = None
+        self.Config: ResourceFactory.FactoryConfig
 
     # Convenience functions for easy configuration
     def configure_repository(
@@ -418,7 +418,7 @@ class ResourceFactory:
         try:
             # Check if type is a FHIR complex datatype
             return get_complex_FHIR_type(
-                element_type_code, self.Config.FHIR_release if self.Config else "4.3.0"
+                element_type_code, self.Config.FHIR_release
             )
         except (ModuleNotFoundError, AttributeError):
             if isinstance(element_type, ElementDefinitionType) and element_type.profile:
@@ -1114,7 +1114,12 @@ class ResourceFactory:
         if "contained" in fields:
             validators["contained_FHIR_resource_validator"] = field_validator(
                 "contained", mode="plain"
-            )(fhir_validators.validate_contained_resource)
+            )(
+                partial(
+                    fhir_validators.validate_contained_resource,
+                    release=self.Config.FHIR_release,
+                )
+            )
         # If the resource has metadata, prefill the information
         if "resourceType" in fields:
             fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
