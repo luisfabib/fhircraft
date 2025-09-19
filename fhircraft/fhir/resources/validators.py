@@ -234,7 +234,7 @@ def get_type_choice_value_by_base(instance: BaseModel, base: str) -> Any:
                 return value
 
 
-def validate_contained_resource(cls, resources: Any) -> List[FHIRBaseModel] | None:
+def validate_contained_resource(cls, resources: Any, release: str) -> List[FHIRBaseModel] | None:
     """
     Validate that a contained resource is a valid FHIR resource.
 
@@ -259,7 +259,7 @@ def validate_contained_resource(cls, resources: Any) -> List[FHIRBaseModel] | No
         if isinstance(resource, FHIRBaseModel):
             validated_resources.append(resource)
         if isinstance(resource, dict) and "resourceType" in resource:
-            resourceModel = get_fhir_resource_type(resource["resourceType"])
+            resourceModel = get_fhir_resource_type(resource["resourceType"], release=release)
             validated_resources.append(resourceModel.model_validate(resource))
         else:
             raise ValidationError("Contained resource must be a FHIRBaseModel or a dict, and must have a 'resourceType' property.")
