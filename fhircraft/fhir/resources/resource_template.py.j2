@@ -51,18 +51,16 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     {% endfor %}
     {% for name, validator in model.__pydantic_decorators__.field_validators.items() %}
     {% with validation_function = validator.func.__func__ %}
+    {% if validation_function|attr('func') %}
     @field_validator(*{{ validator.info.fields }}, mode="{{ validator.info.mode }}", check_fields={{ validator.info.check_fields }})
     @classmethod
     def {{ name }}(cls, value):    
-        {% if validation_function|attr('func') %}
         return fhir_validators.{{ validation_function.func.__name__ }}(cls, value, 
             {% for arg, value in validation_function.keywords.items() %}
             {{ arg }}={% if value is string %}"{{value|escapequotes}}"{% else %}{{value}}{%endif%},
             {% endfor %}
         )
-        {% else %}
-        return fhir_validators.{{ validation_function.__name__ }}(cls, value)
-        {% endif %}
+    {% endif %}
     {% endwith %}
 
     {% endfor %}

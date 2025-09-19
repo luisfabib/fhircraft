@@ -15,6 +15,7 @@ def add_rules_to_basic_map(rules, documentation=None):
             StructureMapGroup(
                 documentation=documentation,
                 name="map_example",
+                status="draft",
                 input=[
                     StructureMapGroupInput(name="src", mode="source"),
                     StructureMapGroupInput(name="tgt", mode="target"),
@@ -89,12 +90,12 @@ parser_test_cases = (
     # ----------------- IMPORTS DECLARATION  -----------------
     (
         """imports 'http://example.org'""",
-        StructureMap.model_construct(imports=["http://example.org"]),
+        StructureMap.model_construct(import_=["http://example.org"]),
     ),
     (
         """imports 'http://example1.org' \n imports 'http://example2.org'""",
         StructureMap.model_construct(
-            imports=["http://example1.org", "http://example2.org"]
+            import_=["http://example1.org", "http://example2.org"]
         ),
     ),
     # ----------------- CONSTANT DECLARATION  -----------------
@@ -449,7 +450,7 @@ parser_test_cases = (
         imports 'http://another.org'
         imports 'http://third.org'""",
         StructureMap.model_construct(
-            imports=["http://example.org", "http://another.org", "http://third.org"]
+            import_=["http://example.org", "http://another.org", "http://third.org"]
         ),
     ),
     (
@@ -781,8 +782,8 @@ parser_test_cases = (
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(string, expected_object):
     parser = FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
-    parsed_map = parser.parse(string).model_dump(exclude="text")
-    expected_map = expected_object.model_dump(exclude="text")
+    parsed_map = parser.parse(string).model_dump(exclude=("text","status","meta"))
+    expected_map = expected_object.model_dump(exclude=("text","status","meta"))
     if parsed_map != expected_map:
         print("\nParsed:\n---------------------------")
         pprint(parsed_map)
@@ -833,8 +834,8 @@ def test_parser_integration(directory):
         expected_StructureMap = json.load(file)
     parser = FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
 
-    parsed_map = parser.parse(map_script).model_dump(exclude="text")
-    expected_map = StructureMap(**expected_StructureMap).model_dump(exclude="text")
+    parsed_map = parser.parse(map_script).model_dump(exclude=("text","status","meta"))
+    expected_map = StructureMap.model_validate(expected_StructureMap).model_dump(exclude=("text","status","meta"))
     if parsed_map != expected_map:
         print("\nParsed:\n---------------------------")
         pprint(parsed_map)

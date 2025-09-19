@@ -332,7 +332,7 @@ class MappingTransformer:
         source_fhirpath = scope.resolve_fhirpath(source)
         resource_type = source_fhirpath._invoke(
             fhirpath.Element("resourceType")
-        ).single(scope.get_instances())
+        ).single(scope.get_instances()) or source_fhirpath.single(scope.get_instances()).__class__.__name__
         resource_id = source_fhirpath._invoke(fhirpath.Element("id")).single(
             scope.get_instances()
         )

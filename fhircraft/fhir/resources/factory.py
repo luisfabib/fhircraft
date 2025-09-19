@@ -841,15 +841,16 @@ class ResourceFactory:
                 parts = reference_path.split(".")
                 for part in parts:
                     if not referenced_element or not referenced_element.children:
-                        return referenced_element
+                        break
                     referenced_element = referenced_element.children.get(part)
                 if not referenced_element:
-                    raise ValueError(f"Could not resolve content reference: {element.contentReference}")
-                
-                field_types = [self.construction_cache.get(referenced_element.path)]
-                element.min = element.min or referenced_element.min
-                element.max = element.max or referenced_element.max 
-                element.constraint = element.constraint or referenced_element.constraint
+                    warnings.warn(f"Could not resolve content reference: {element.contentReference}. Assigning generic type for field {name}.")
+                    field_types = [Any]
+                else:                   
+                    field_types = [self.construction_cache.get(referenced_element.path)]
+                    element.min = element.min or referenced_element.min
+                    element.max = element.max or referenced_element.max 
+                    element.constraint = element.constraint or referenced_element.constraint
             else:
                 # Parse the FHIR types of the element
                 field_types = (
@@ -1121,12 +1122,11 @@ class ResourceFactory:
                 )
             )
         # If the resource has metadata, prefill the information
-        if "resourceType" in fields:
-            fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
         if "meta" in fields:
             Meta = get_complex_FHIR_type(
                 "Meta", self.Config.FHIR_release if self.Config else "4.3.0"
             )
+            fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
             fields["meta"] = (
                 Optional[Meta],
                 Field(

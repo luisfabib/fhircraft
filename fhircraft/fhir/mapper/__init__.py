@@ -97,7 +97,9 @@ class FHIRMapper:
             return source
 
         if isinstance(source, dict):
-            return StructureMap(**source)
+            from pprint import pprint
+            pprint(source)
+            return StructureMap.model_validate(source)
 
         if isinstance(source, (str, Path)):
             source_str = str(source)
@@ -107,7 +109,7 @@ class FHIRMapper:
                 try:
                     with urlopen(source_str) as response:
                         data = json.loads(response.read().decode("utf-8"))
-                    return StructureMap(**data)
+                    return StructureMap.model_validate(data)
                 except Exception as e:
                     raise Exception(
                         f"Failed to load StructureMap from URL {source_str}: {e}"
@@ -120,7 +122,7 @@ class FHIRMapper:
 
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            return StructureMap(**data)
+            return StructureMap.model_validate(data)
 
         raise ValueError(f"Unsupported source type: {type(source)}")
 

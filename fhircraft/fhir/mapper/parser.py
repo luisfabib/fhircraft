@@ -141,6 +141,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         # Initialize the structure map with the map id
         self.structureMap.url = p[2]["url"]
         self.structureMap.name = p[2]["name"]
+        self.structureMap.status = 'draft'  # Default status
 
         for attr, value in p[1].items():
             setattr(self.structureMap, attr, value)
