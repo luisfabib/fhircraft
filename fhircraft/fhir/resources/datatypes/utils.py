@@ -7,6 +7,7 @@ and FHIRPath conversion functions use these utilities.
 """
 
 import re
+import importlib
 from typing import Any, Type, Union, TYPE_CHECKING
 
 from pydantic import Field, ValidationError, create_model, BaseModel
@@ -20,10 +21,6 @@ import fhircraft.fhir.resources.datatypes.primitives as primitives
 import fhircraft.fhir.resources.datatypes.R4.complex_types as r4_complex_types
 import fhircraft.fhir.resources.datatypes.R4B.complex_types as r4b_complex_types
 import fhircraft.fhir.resources.datatypes.R5.complex_types as r5_complex_types
-
-import fhircraft.fhir.resources.datatypes.R4.resources as r4_resources
-import fhircraft.fhir.resources.datatypes.R4B.resources as r4b_resources
-import fhircraft.fhir.resources.datatypes.R5.resources as r5_resources
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel
@@ -40,11 +37,6 @@ __complex_types_relases__ = {
     "R5": r5_complex_types,
 }
 
-__resource_types_relases__ = {
-    "R4": r4_resources,
-    "R4B": r4b_resources,
-    "R5": r5_resources,
-}
 
 def get_fhir_primitive_type(type_str: str) -> type:
     return getattr(primitives, type_str, None)
@@ -56,10 +48,13 @@ def get_complex_FHIR_type(type_str: str, release="R4B") -> type:
     return getattr(complex_FHIR_types, type_str)
 
 def get_fhir_resource_type(type_str: str, release="R4B") -> type:
-    resource_FHIR_types = __resource_types_relases__.get(release)
-    if not resource_FHIR_types:
-        raise ValueError(f"Unsupported FHIR release: {release}")
-    resource = getattr(resource_FHIR_types, type_str, None)
+    # Convert CamelCase to snake_case for module lookup
+    type_str_snake = re.sub(r'(?<!^)(?=[A-Z])', '_', type_str).lower()
+    try:
+        resource_module = importlib.import_module(f'fhircraft.fhir.resources.datatypes.{release}.resources.{type_str_snake}')
+    except ModuleNotFoundError:
+        raise ValueError(f"Could not import type {type_str} for FHIR release {release}")
+    resource = getattr(resource_module, type_str, None)
     if not resource:
         from fhircraft.fhir.resources.factory import factory
         resource = next((model for model in factory.construction_cache if model.__name__ == type_str and release == get_FHIR_release_from_version(model.fhirVersion)), None)
