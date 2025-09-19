@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 from enum import Enum
 from importlib.metadata import version
-from typing import Any, Dict, List, get_args
+from typing import Any, Dict, ForwardRef, List, get_args
 
 from jinja2 import Environment, FileSystemLoader, Template
 from pydantic import BaseModel
@@ -58,6 +58,8 @@ class CodeGenerator:
         """
         # Get the name of the module and the object
         module_name = get_module_name(obj)
+        if isinstance(obj, ForwardRef): 
+            return None
         if (object_name := getattr(obj, "__name__", None)) is None:
             if (object_name := getattr(obj, "_name", None)) is None:
                 raise ValueError(f"Could not determine object name for import: {obj}")
@@ -137,8 +139,12 @@ class CodeGenerator:
                 self._recursively_import_annotation_types(info.annotation)
                 annotation_string = repr(info.annotation)
 
+                # Handle forward references
+                if 'ForwardRef' in annotation_string:
+                    annotation_string = re.sub(r"ForwardRef\('(\w+)'\)", r"'\1'", annotation_string)
+                    
                 # Handle self-referencing models
-                if not 'Literal' in annotation_string:
+                elif not 'Literal' in annotation_string:
                     annotation_string = re.sub(rf"\b{model.__name__}\b", f'"{model.__name__}"', annotation_string, 0)
 
                 if isinstance(info.annotation, type(Enum)):
