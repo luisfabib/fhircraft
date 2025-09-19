@@ -5,7 +5,7 @@ import warnings
 # Standard modules
 from typing import Any, List, TypeVar, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
@@ -232,3 +232,36 @@ def get_type_choice_value_by_base(instance: BaseModel, base: str) -> Any:
             value = getattr(instance, field)
             if value is not None:
                 return value
+
+
+def validate_contained_resource(cls, resources: Any) -> List[FHIRBaseModel] | None:
+    """
+    Validate that a contained resource is a valid FHIR resource.
+
+    Args:
+        cls (Any): Placeholder for an argument that is not used in the function.
+        resource (Any): The contained resource to validate.
+
+    Returns:
+        FHIRBaseModel: The validated contained resource.
+
+    Raises:
+        TypeError: If the contained resource is not a FHIRBaseModel or a dict.
+    """
+    from fhircraft.fhir.resources.datatypes.utils import get_fhir_resource_type
+
+    if not resources:
+        return None
+    if not isinstance(resources, list):
+        resources = [resources]
+    validated_resources = []
+    for i, resource in enumerate(resources): 
+        if isinstance(resource, FHIRBaseModel):
+            validated_resources.append(resource)
+        if isinstance(resource, dict) and "resourceType" in resource:
+            resourceModel = get_fhir_resource_type(resource["resourceType"])
+            validated_resources.append(resourceModel.model_validate(resource))
+        else:
+            raise ValidationError("Contained resource must be a FHIRBaseModel or a dict, and must have a 'resourceType' property.")
+
+    return validated_resources
