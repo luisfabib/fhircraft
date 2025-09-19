@@ -815,7 +815,6 @@ class TestCompositeRepositoryPackageIntegration:
                 "http://hl7.org/fhir/StructureDefinition/Patient"
             )
         ]
-        print(loaded_packages)
         assert len(loaded_packages) == 1
         assert (
             loaded_packages[0].url == "http://hl7.org/fhir/StructureDefinition/Patient"

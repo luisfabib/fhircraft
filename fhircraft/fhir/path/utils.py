@@ -6,7 +6,6 @@ from fhircraft.utils import ensure_list
 if TYPE_CHECKING:
     from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection
 
-from fhircraft.fhir.path.engine.literals import Quantity
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
 
@@ -82,7 +81,7 @@ def _underline_error_in_fhir_path(text, error, error_position, line_number=None)
 
 
 def import_fhirpath_engine():
-    from fhircraft.fhir.path import fhirpath
+    from fhircraft.fhir.path.parser import fhirpath
 
     return fhirpath
 
@@ -135,6 +134,7 @@ def evaluate_and_prepare_collection_values(
 ) -> tuple[Any | None, Any | None]:
 
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
+        from fhircraft.fhir.path.engine.literals import Quantity
         return [
             (
                 Quantity(item.value.value, item.value.unit)

@@ -6,16 +6,16 @@ import pytest
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.core import FHIRMappingEngine
-from fhircraft.fhir.mapper.structures.StructureMap import (
+from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
     StructureMap,
     StructureMapConst,
     StructureMapGroup,
-    StructureMapInput,
-    StructureMapParameter,
-    StructureMapRule,
-    StructureMapSource,
+    StructureMapGroupInput,
+    StructureMapGroupRuleTargetParameter,
+    StructureMapGroupRule,
+    StructureMapGroupRuleSource,
     StructureMapStructure,
-    StructureMapTarget,
+    StructureMapGroupRuleTarget,
 )
 from fhircraft.fhir.resources.definitions.element_definition import (
     ElementDefinition,
@@ -247,8 +247,8 @@ def create_simple_structure_map(map_content: str) -> StructureMap:
                 name="main",
                 typeMode="none",
                 input=[
-                    StructureMapInput(name="src", type="SimpleSource", mode="source"),
-                    StructureMapInput(name="tgt", type="SimpleTarget", mode="target"),
+                    StructureMapGroupInput(name="src", type="SimpleSource", mode="source"),
+                    StructureMapGroupInput(name="tgt", type="SimpleTarget", mode="target"),
                 ],
                 rule=[
                     # Rules will be added by the test cases
@@ -265,29 +265,29 @@ simple_mapping_test_cases = [
         {"name": "John Doe", "age": 30},
         {"fullName": "John Doe", "yearsOld": 30},
         [
-            StructureMapRule(
+            StructureMapGroupRule(
                 name="mapName",
                 source=[
-                    StructureMapSource(context="src", element="name", variable="n")
+                    StructureMapGroupRuleSource(context="src", element="name", variable="n")
                 ],
                 target=[
-                    StructureMapTarget(
+                    StructureMapGroupRuleTarget(
                         context="tgt",
                         element="fullName",
                         transform="copy",
-                        parameter=[StructureMapParameter(valueId="n")],
+                        parameter=[StructureMapGroupRuleTargetParameter(valueId="n")],
                     )
                 ],
             ),
-            StructureMapRule(
+            StructureMapGroupRule(
                 name="mapAge",
-                source=[StructureMapSource(context="src", element="age", variable="a")],
+                source=[StructureMapGroupRuleSource(context="src", element="age", variable="a")],
                 target=[
-                    StructureMapTarget(
+                    StructureMapGroupRuleTarget(
                         context="tgt",
                         element="yearsOld",
                         transform="copy",
-                        parameter=[StructureMapParameter(valueId="a")],
+                        parameter=[StructureMapGroupRuleTargetParameter(valueId="a")],
                     )
                 ],
             ),
@@ -298,41 +298,41 @@ simple_mapping_test_cases = [
         {"name": "Jane Smith", "age": 25},
         {"fullName": "Jane Smith", "yearsOld": 25, "status": "active"},
         [
-            StructureMapRule(
+            StructureMapGroupRule(
                 name="mapName",
                 source=[
-                    StructureMapSource(context="src", element="name", variable="n")
+                    StructureMapGroupRuleSource(context="src", element="name", variable="n")
                 ],
                 target=[
-                    StructureMapTarget(
+                    StructureMapGroupRuleTarget(
                         context="tgt",
                         element="fullName",
                         transform="copy",
-                        parameter=[StructureMapParameter(valueId="n")],
+                        parameter=[StructureMapGroupRuleTargetParameter(valueId="n")],
                     )
                 ],
             ),
-            StructureMapRule(
+            StructureMapGroupRule(
                 name="mapAge",
-                source=[StructureMapSource(context="src", element="age", variable="a")],
+                source=[StructureMapGroupRuleSource(context="src", element="age", variable="a")],
                 target=[
-                    StructureMapTarget(
+                    StructureMapGroupRuleTarget(
                         context="tgt",
                         element="yearsOld",
                         transform="copy",
-                        parameter=[StructureMapParameter(valueId="a")],
+                        parameter=[StructureMapGroupRuleTargetParameter(valueId="a")],
                     )
                 ],
             ),
-            StructureMapRule(
+            StructureMapGroupRule(
                 name="setStatus",
-                source=[StructureMapSource(context="src")],
+                source=[StructureMapGroupRuleSource(context="src")],
                 target=[
-                    StructureMapTarget(
+                    StructureMapGroupRuleTarget(
                         context="tgt",
                         element="status",
                         transform="copy",
-                        parameter=[StructureMapParameter(valueString="active")],
+                        parameter=[StructureMapGroupRuleTargetParameter(valueString="active")],
                     )
                 ],
             ),
@@ -343,17 +343,17 @@ simple_mapping_test_cases = [
         {"name": "Bob Johnson", "age": 45},
         {"fullName": "Bob Johnson"},
         [
-            StructureMapRule(
+            StructureMapGroupRule(
                 name="mapNameOnly",
                 source=[
-                    StructureMapSource(context="src", element="name", variable="n")
+                    StructureMapGroupRuleSource(context="src", element="name", variable="n")
                 ],
                 target=[
-                    StructureMapTarget(
+                    StructureMapGroupRuleTarget(
                         context="tgt",
                         element="fullName",
                         transform="copy",
-                        parameter=[StructureMapParameter(valueId="n")],
+                        parameter=[StructureMapGroupRuleTargetParameter(valueId="n")],
                     )
                 ],
             )
@@ -364,15 +364,15 @@ simple_mapping_test_cases = [
         {"name": "Bob Johnson", "age": 45},
         {"yearsOld": 25},
         [
-            StructureMapRule(
+            StructureMapGroupRule(
                 name="mapNameOnly",
-                source=[StructureMapSource(context="src")],
+                source=[StructureMapGroupRuleSource(context="src")],
                 target=[
-                    StructureMapTarget(
+                    StructureMapGroupRuleTarget(
                         context="tgt",
                         element="yearsOld",
                         transform="copy",
-                        parameter=[StructureMapParameter(valueId="fixAge")],
+                        parameter=[StructureMapGroupRuleTargetParameter(valueId="fixAge")],
                     )
                 ],
             )

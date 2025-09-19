@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional, Set, TypeVar, Union
 
 from pydantic import BaseModel
 
-from fhircraft.fhir.mapper.structures.ConceptMap import ConceptMap
-from fhircraft.fhir.mapper.structures.StructureMap import StructureMapGroup
+from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMapGroup
+from fhircraft.fhir.resources.datatypes.R5.resources.concept_map import ConceptMap
 from fhircraft.fhir.path.engine.core import FHIRPath
 
 from .exceptions import MappingError

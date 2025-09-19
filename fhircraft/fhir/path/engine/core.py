@@ -7,7 +7,6 @@ from functools import partial
 from typing import TYPE_CHECKING, Any, Callable, List, Optional
 
 from fhircraft.fhir.path.exceptions import FHIRPathError, FHIRPathRuntimeError
-from fhircraft.fhir.resources.datatypes.utils import is_date, is_datetime, is_time
 from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from_field
 
 # Get logger name
@@ -585,6 +584,7 @@ class Literal(FHIRPath):
         return [FHIRPathCollectionItem(self.value, parent=None, path=None)]
 
     def __str__(self):
+        from fhircraft.fhir.resources.datatypes.utils import is_date, is_datetime, is_time
         if isinstance(self.value, bool):
             return "true" if self.value else "false"
         elif is_date(self.value) or is_datetime(self.value) or is_time(self.value):

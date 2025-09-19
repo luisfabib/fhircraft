@@ -4,10 +4,8 @@ Pydantic FHIR Model Factory
 """
 
 import inspect
-import json
 import keyword
 import warnings
-from collections import defaultdict
 
 # Standard modules
 from enum import Enum
@@ -22,7 +20,6 @@ from pydantic import BaseModel, Field, create_model, field_validator, model_vali
 from pydantic.aliases import AliasChoices
 from pydantic.dataclasses import dataclass
 from pydantic.fields import FieldInfo
-from pydantic.functional_validators import _decorators as _validators
 from pydantic_core import PydanticUndefined
 from typing_extensions import Annotated
 
@@ -43,7 +40,6 @@ from fhircraft.utils import (
     capitalize,
     ensure_list,
     get_FHIR_release_from_version,
-    load_env_variables,
 )
 
 ModelT = TypeVar("ModelT", bound="BaseModel")
@@ -58,7 +54,7 @@ class ElementDefinitionNode(ElementDefinition):
     node_label: str = Field(...)
     children: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
     slices: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
-
+    root: Optional["ElementDefinitionNode"] = None
 
 class ResourceFactory:
     """Factory for constructing Pydantic models from FHIR StructureDefinitions.
@@ -111,7 +107,7 @@ class ResourceFactory:
             self.repository = repository
 
         self.construction_cache: Dict[str, type[BaseModel]] = {}
-        self.Config: Optional[ResourceFactory.FactoryConfig] = None
+        self.Config: ResourceFactory.FactoryConfig
 
     # Convenience functions for easy configuration
     def configure_repository(
@@ -367,6 +363,7 @@ class ResourceFactory:
                         ElementDefinitionNode.model_validate(
                             {
                                 "node_label": part,
+                                "root": root,
                                 "path": "__root__",
                                 **(
                                     element.model_dump(exclude_unset=True)
@@ -417,7 +414,7 @@ class ResourceFactory:
         try:
             # Check if type is a FHIR complex datatype
             return get_complex_FHIR_type(
-                element_type_code, self.Config.FHIR_release if self.Config else "4.3.0"
+                element_type_code, self.Config.FHIR_release
             )
         except (ModuleNotFoundError, AttributeError):
             if isinstance(element_type, ElementDefinitionType) and element_type.profile:
@@ -445,6 +442,7 @@ class ResourceFactory:
         base: Tuple[type[ModelT], ...],
         validators: dict,
         properties: dict,
+        docstring: str | None = None,
     ) -> type[ModelT]:
         """
         Constructs a Pydantic model with specified fields, base, validators, and properties.
@@ -460,7 +458,7 @@ class ResourceFactory:
             BaseModel: The constructed Pydantic model.
         """
         # Construct the slice model
-        model = create_model(name, **fields, __base__=base, __validators__=validators)
+        model = create_model(name, **fields, __base__=base, __validators__=validators, __doc__=docstring)
         # Set the properties
         for attribute, property_getter in properties.items():
             setattr(model, attribute, property(property_getter))
@@ -612,8 +610,8 @@ class ResourceFactory:
             )
             fields[safe_typed_field_name] = self._construct_Pydantic_field(
                 field_type,
-                cardinality[0],
-                cardinality[1],
+                min_card=0,
+                max_card=cardinality[1],
                 description=description,
                 validation_alias=validation_alias,
             )
@@ -623,6 +621,7 @@ class ResourceFactory:
                 fhir_validators.validate_type_choice_element,
                 field_types=field_types,
                 field_name_base=name,
+                required=cardinality[0] > 0,
             )
         )
         properties[name] = partial(
@@ -684,6 +683,7 @@ class ResourceFactory:
                     base=bases,
                     validators=slice_validators,
                     properties=slice_properties,
+                    docstring=slice_element.definition,
                 )
             assert issubclass(
                 slice_model, FHIRSliceModel
@@ -804,8 +804,131 @@ class ResourceFactory:
             )
         return validators
 
+    def _resolve_content_reference_type(
+        self, referenced_element: ElementDefinitionNode, structure_root: ElementDefinitionNode, 
+        resolving_paths: Optional[set] = None
+    ) -> type:
+        """
+        Recursively resolve the type for a content reference element.
+        
+        Args:
+            referenced_element: The element being referenced
+            structure_root: The root structure for context
+            resolving_paths: Set of paths currently being resolved (to prevent infinite recursion)
+            
+        Returns:
+            The resolved type for the referenced element
+        """
+        if resolving_paths is None:
+            resolving_paths = set()
+            
+        # Check for circular references
+        if referenced_element.path in resolving_paths:
+            warnings.warn(f"Circular reference detected for path: {referenced_element.path}. Using Any.")
+            return Any
+            
+        # Check if already in cache
+        if referenced_element.path in self.construction_cache:
+            return self.construction_cache[referenced_element.path]
+        
+        # Add current path to resolving set
+        resolving_paths.add(referenced_element.path)
+        
+        try:
+            # If the referenced element has children, create a backbone model for it
+            if referenced_element.children:
+                # Check if any children would cause circular references
+                for child_name, child_element in referenced_element.children.items():
+                    if child_element.contentReference:
+                        ref_path = child_element.contentReference.lstrip("#")
+                        if ref_path in resolving_paths:
+                            return ''.join([path[0].upper() + path[1:] for path in referenced_element.path.split(".")])
+                        
+                backbone_model_name = (
+                    capitalize(self.Config.resource_name if self.Config else "Unknown").strip()
+                    + ''.join([capitalize(label).strip() for label in referenced_element.path.split(".")[1:]])
+                )
+                
+                # Process the referenced element's children
+                field_subfields, subfield_validators, subfield_properties = (
+                    self._process_FHIR_structure_into_Pydantic_components(
+                        referenced_element, None, resolving_paths
+                    )
+                )
+                
+                # Handle extension slices for the referenced element
+                if (
+                    "extension" in referenced_element.children
+                    and referenced_element.children["extension"].slices
+                ):
+                    extension_slice_base_type = get_complex_FHIR_type(
+                        "Extension",
+                        self.Config.FHIR_release if self.Config else "4.3.0",
+                    )
+                    extension_type = Annotated[
+                        Union[
+                            tuple(
+                                [
+                                    *self._build_element_slice_models(
+                                        referenced_element.children["extension"],
+                                        extension_slice_base_type,
+                                    ),
+                                    extension_slice_base_type,
+                                ]
+                            )
+                        ],
+                        Field(union_mode="left_to_right"),
+                    ]
+
+                    # Get cardinality of extension element
+                    extension_min_card, extension_max_card = (
+                        self._parse_element_cardinality(referenced_element.children["extension"])
+                    )
+                    # Add slicing cardinality validator for field
+                    subfield_validators[
+                        f"extension_slicing_cardinality_validator"
+                    ] = field_validator("extension", mode="after")(
+                        partial(
+                            fhir_validators.validate_slicing_cardinalities,
+                            field_name="extension",
+                        )
+                    )
+                    field_subfields["extension"] = self._construct_Pydantic_field(
+                        extension_type, extension_min_card, extension_max_card
+                    )
+                
+                # Create the backbone model
+                field_type = self._create_model_with_properties(
+                    backbone_model_name,
+                    fields=field_subfields,
+                    base=(FHIRBaseModel,), 
+                    validators=subfield_validators,
+                    properties=subfield_properties,
+                    docstring=referenced_element.definition,
+                )
+                
+                # Cache the result
+                self.construction_cache[referenced_element.path] = field_type
+                return field_type
+            
+            # If the referenced element has types defined, resolve them
+            elif referenced_element.type:
+                field_types = [self._get_complex_FHIR_type(field_type) for field_type in referenced_element.type]
+                if len(field_types) > 1:
+                    return Union[tuple(field_types)]
+                else:
+                    return field_types[0]
+            
+            # Fallback to Any if we can't resolve the type
+            warnings.warn(f"Could not resolve type for content reference: {referenced_element.path}. Using Any.")
+            return Any
+            
+        finally:
+            # Always remove from resolving set when done
+            resolving_paths.discard(referenced_element.path)
+
     def _process_FHIR_structure_into_Pydantic_components(
-        self, structure: ElementDefinitionNode, base: Any | None = None
+        self, structure: ElementDefinitionNode, base: Any | None = None, resolving_paths: Optional[set] = None
     ) -> Tuple[
         Dict[str, Any],
         Dict[str, Callable],
@@ -817,10 +940,14 @@ class ResourceFactory:
         Args:
             structure (dict): The structure containing FHIR elements.
             base (type[BaseModel], optional): The base model to check for existing validators. Defaults to None.
+            resolving_paths (set, optional): Set of paths currently being resolved to prevent circular references.
 
         Returns:
             Tuple[dict, dict, dict]: A tuple containing fields, validators, and properties.
         """
+        if resolving_paths is None:
+            resolving_paths = set()
+            
         fields = {}
         validators = {}
         properties = {}
@@ -831,17 +958,44 @@ class ResourceFactory:
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
             )
+            if element.contentReference:
+                reference_path = element.contentReference.lstrip("#")
+                referenced_element = structure.root
+                parts = reference_path.split(".")
+                for part in parts:
+                    if not referenced_element or not referenced_element.children:
+                        break
+                    referenced_element = referenced_element.children.get(part)
+                if not referenced_element:
+                    warnings.warn(f"Could not resolve content reference: {element.contentReference}. Assigning generic type for field {name}.")
+                    field_types = [Any]
+                else:
+                    # Check if we're already resolving this path (circular reference)
+                    if referenced_element.path in resolving_paths:
+                        warnings.warn(f"Circular content reference detected: {element.contentReference} -> {referenced_element.path}. Using Any.")
+                        field_types = [Any]
+                    else:
+                        # Use the new helper method to resolve the type recursively
+                        resolved_type = self._resolve_content_reference_type(referenced_element, structure.root, resolving_paths)
+                        field_types = [resolved_type]
+                        # Copy metadata from the referenced element
+                        element.min = element.min or referenced_element.min
+                        element.max = element.max or referenced_element.max 
+                        element.constraint = element.constraint or referenced_element.constraint
+            else:
+                # Parse the FHIR types of the element
+                field_types = (
+                    [self._get_complex_FHIR_type(field_type) for field_type in element.type]
+                    if element.type
+                    else []
+                )
+                # If has no type, skip element
+                if not field_types:
+                    continue
+
             # Get cardinality of element
             min_card, max_card = self._parse_element_cardinality(element)
-            # Parse the FHIR types of the element
-            field_types = (
-                [self._get_complex_FHIR_type(field_type) for field_type in element.type]
-                if element.type
-                else []
-            )
-            # If has no type, skip element
-            if not field_types:
-                continue
+
             # Handle type choice elements
             if "[x]" in name:
                 fields, validators, properties = self._process_choice_type_field(
@@ -924,7 +1078,7 @@ class ResourceFactory:
                 )
                 field_subfields, subfield_validators, subfield_properties = (
                     self._process_FHIR_structure_into_Pydantic_components(
-                        element, field_type
+                        element, field_type, resolving_paths
                     )
                 )
                 if (
@@ -979,7 +1133,9 @@ class ResourceFactory:
                     base=(field_type,), 
                     validators=subfield_validators,
                     properties=subfield_properties,
+                    docstring=element.definition,
                 )
+                self.construction_cache[element.path] = field_type
             # Handle Python reserved keywords for field names
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
@@ -1000,7 +1156,7 @@ class ResourceFactory:
                     self._handle_python_reserved_keyword(f"{name}_ext")
                 )
                 fields[safe_ext_field_name] = self._construct_Pydantic_field(
-                    get_complex_FHIR_type("Element"),
+                    get_complex_FHIR_type("Extension", self.Config.FHIR_release if self.Config else "4.3.0"),
                     min_card=0,
                     max_card=1,
                     alias=f"_{name}",
@@ -1087,6 +1243,15 @@ class ResourceFactory:
         # Process resource-level constraints
         for constraint in structure.constraint or []:
             validators = self._add_model_constraint_validator(constraint, validators)
+        if "contained" in fields:
+            validators["contained_FHIR_resource_validator"] = field_validator(
+                "contained", mode="plain"
+            )(
+                partial(
+                    fhir_validators.validate_contained_resource,
+                    release=self.Config.FHIR_release,
+                )
+            )
         # If the resource has metadata, prefill the information
         if "meta" in fields:
             Meta = get_complex_FHIR_type(
@@ -1095,9 +1260,13 @@ class ResourceFactory:
             fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
             fields["meta"] = (
                 Optional[Meta],
-                Meta(
-                    profile=[_structure_definition.url],
-                    versionId=_structure_definition.version,
+                Field(
+                    title='Meta',
+                    description="Metadata about the resource.",
+                    default=Meta(
+                        profile=[_structure_definition.url],
+                        versionId=_structure_definition.version,
+                    )
                 ),
             )
         # Construct the Pydantic model representing the FHIR resource
@@ -1107,6 +1276,7 @@ class ResourceFactory:
             base=(base_model,),
             validators=validators,
             properties=properties,
+            docstring=_structure_definition.description,
         )
         # Add the current model to the cache
         self.construction_cache[_structure_definition.url] = model

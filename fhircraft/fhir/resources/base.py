@@ -3,6 +3,7 @@ from typing import ClassVar
 
 from pydantic import BaseModel, ValidationError
 from pydantic.fields import FieldInfo
+from pydantic_core import PydanticUndefined
 
 from fhircraft.fhir.path.mixin import FHIRPathMixin
 from fhircraft.utils import get_all_models_from_field
@@ -22,6 +23,30 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     def model_dump_json(self, *args, **kwargs):
         kwargs.update({"by_alias": True, "exclude_none": True})
         return super().model_dump_json(*args, **kwargs)
+
+    @classmethod 
+    def model_construct(cls, set_defaults=True, *args, **kwargs) -> object:
+        """
+        Constructs a model without running validation, with an option to set default values for fields that have them defined.
+
+        Args:
+            set_defaults (bool): Optional, if `True`, sets default values for fields that have them defined (default is `True`).
+
+        Returns:
+            instance (Self): An instance of the model.
+        """
+        instance = super().model_construct(*args, **kwargs)
+        if not set_defaults:
+            return instance
+        # Set default values for fields that have them defined
+        for field_name, field in cls.model_fields.items():
+            if getattr(instance, field_name, None) is not None:
+                continue
+            if field.default not in (PydanticUndefined, None):
+                setattr(instance, field_name, copy(field.default))
+            elif field.default_factory not in (PydanticUndefined, None):
+                setattr(instance, field_name, field.default_factory())
+        return instance
 
     @classmethod
     def model_construct_with_slices(cls, slice_copies: int = 9) -> object:
@@ -165,5 +190,4 @@ class FHIRSliceModel(FHIRBaseModel):
         Checks if the FHIRSliceModel instance has been modified by comparing it with a new instance constructed with slices.
         Returns `True` if the instance has been modified, `False` otherwise.
         """
-        return self != self.__class__.model_construct_with_slices()
         return self != self.__class__.model_construct_with_slices()

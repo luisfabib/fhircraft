@@ -74,3 +74,11 @@ include = [
 Homepage = "https://github.com/luisfabib/fhircraft"
 Issues = "https://github.com/luisfabib/fhircraft/issues"
 Documentation = "https://luisfabib.github.io/fhircraft/"
+
+
+[tool.pytest.ini_options]
+python_files = [
+    "**/test/test_*.py",
+]
+
+testpaths = ['test']

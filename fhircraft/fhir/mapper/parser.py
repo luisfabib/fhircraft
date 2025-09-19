@@ -6,26 +6,26 @@ import ply.yacc
 import fhircraft.fhir.path.engine.literals as literals
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
-from fhircraft.fhir.mapper.structures.ConceptMap import (
+from fhircraft.fhir.resources.datatypes.R5.resources.concept_map import (
     ConceptMap,
-    ConceptMapElement,
+    ConceptMapGroupElement,
     ConceptMapGroup,
-    ConceptMapTarget,
+    ConceptMapGroupElementTarget,
 )
-from fhircraft.fhir.mapper.structures.StructureMap import (
+from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive_type
+from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
     StructureMap,
     StructureMapConst,
-    StructureMapDependent,
+    StructureMapGroupRuleDependent,
     StructureMapGroup,
-    StructureMapInput,
-    StructureMapParameter,
-    StructureMapRule,
-    StructureMapSource,
+    StructureMapGroupInput,
+    StructureMapGroupRuleTargetParameter,
+    StructureMapGroupRule,
+    StructureMapGroupRuleSource,
     StructureMapStructure,
-    StructureMapTarget,
+    StructureMapGroupRuleTarget,
 )
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
-from fhircraft.fhir.resources.datatypes.utils import is_fhir_type
 from fhircraft.utils import ensure_list
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def parse(string: str) -> StructureMap:
     return FhirMappingLanguageParser().parse(string)
 
 
-def _parse_StructureMapParameter(
+def _parse_StructureMapGroupRuleTargetParameter(
     value: (
         str
         | int
@@ -45,15 +45,15 @@ def _parse_StructureMapParameter(
         | primitives.DateTime
         | primitives.Time
     ),
-) -> StructureMapParameter:
-    return StructureMapParameter(
+) -> StructureMapGroupRuleTargetParameter:
+    return StructureMapGroupRuleTargetParameter(
         valueString=value if isinstance(value, str) else None,
         valueInteger=value if isinstance(value, int) else None,
         valueBoolean=value if isinstance(value, bool) else None,
         valueDecimal=value if isinstance(value, float) else None,
-        valueDate=value if is_fhir_type(value, primitives.Date) else None,  # type: ignore
-        valueDateTime=value if is_fhir_type(value, primitives.DateTime) else None,  # type: ignore
-        valueTime=value if is_fhir_type(value, primitives.Time) else None,  # type: ignore
+        valueDate=value if is_fhir_primitive_type(value, primitives.Date) else None,  # type: ignore
+        valueDateTime=value if is_fhir_primitive_type(value, primitives.DateTime) else None,  # type: ignore
+        valueTime=value if is_fhir_primitive_type(value, primitives.Time) else None,  # type: ignore
     )
 
 
@@ -141,6 +141,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         # Initialize the structure map with the map id
         self.structureMap.url = p[2]["url"]
         self.structureMap.name = p[2]["name"]
+        self.structureMap.status = 'draft'  # Default status
 
         for attr, value in p[1].items():
             setattr(self.structureMap, attr, value)
@@ -152,7 +153,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         if p[4]:
             self.structureMap.structure = p[4]
         if p[5]:
-            self.structureMap.imports = p[5]
+            self.structureMap.import_ = p[5]
         if p[6]:
             self.structureMap.const = p[6]
         if p[7]:
@@ -244,8 +245,8 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_conceptmap_mapping(self, p):
         """m_conceptmap_mapping : m_identifier ':' m_conceptmap_code m_conceptmap_mapping_operator m_identifier ':' m_conceptmap_code"""
-        p[0] = ConceptMapElement(
-            code=p[3], target=[ConceptMapTarget(code=p[7], relationship=p[4])]
+        p[0] = ConceptMapGroupElement(
+            code=p[3], target=[ConceptMapGroupElementTarget(code=p[7], relationship=p[4])]
         )
 
     def p_conceptmap_code(self, p):
@@ -409,7 +410,7 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_mapper_parameter(self, p):
         """m_parameter : m_inputMode m_identifier m_type
         | m_inputMode m_identifier"""
-        p[0] = StructureMapInput(
+        p[0] = StructureMapGroupInput(
             mode=p[1], name=p[2], type=p[3] if len(p) == 4 else None
         )
 
@@ -448,7 +449,7 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_mapper_rule_documentation(self, p):
         """m_documented_rule : DOCUMENTATION m_rule
         | m_rule DOCUMENTATION"""
-        if isinstance(p[1], StructureMapRule):
+        if isinstance(p[1], StructureMapGroupRule):
             rule = p[1]
             rule.documentation = p[2]
         else:
@@ -462,7 +463,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         targets = p[3]
         dependent = p[4]
         rule_name = p[5]
-        p[0] = StructureMapRule(
+        p[0] = StructureMapGroupRule(
             source=sources, target=targets, name=rule_name, **dependent
         )
 
@@ -471,14 +472,14 @@ class FhirMappingLanguageParser(FhirPathParser):
         sources = p[1]
         targets = p[3]
         dependent = p[4]
-        p[0] = StructureMapRule(source=sources, target=targets, **dependent)
+        p[0] = StructureMapGroupRule(source=sources, target=targets, **dependent)
 
     def p_mapper_rule_arrow_targets_name(self, p):
         """m_rule : m_ruleSources RIGHT_ARROW m_ruleTargets m_ruleName ';'"""
         sources = p[1]
         targets = p[3]
         rule_name = p[4]
-        p[0] = StructureMapRule(
+        p[0] = StructureMapGroupRule(
             source=sources,
             target=targets,
             name=rule_name,
@@ -488,7 +489,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         """m_rule : m_ruleSources RIGHT_ARROW m_ruleTargets ';'"""
         sources = p[1]
         targets = p[3]
-        p[0] = StructureMapRule(
+        p[0] = StructureMapGroupRule(
             source=sources,
             target=targets,
         )
@@ -498,19 +499,19 @@ class FhirMappingLanguageParser(FhirPathParser):
         sources = p[1]
         dependent = p[2]
         rule_name = p[3]
-        p[0] = StructureMapRule(source=sources, name=rule_name, **dependent)
+        p[0] = StructureMapGroupRule(source=sources, name=rule_name, **dependent)
 
     def p_mapper_rule_dependent(self, p):
         """m_rule : m_ruleSources m_dependent ';'"""
         sources = p[1]
         dependent = p[2]
-        p[0] = StructureMapRule(source=sources, **dependent)
+        p[0] = StructureMapGroupRule(source=sources, **dependent)
 
     def p_mapper_rule_name(self, p):
         """m_rule : m_ruleSources m_ruleName ';'"""
         sources = p[1]
         rule_name = p[2]
-        p[0] = StructureMapRule(
+        p[0] = StructureMapGroupRule(
             source=sources,
             name=rule_name,
         )
@@ -518,7 +519,7 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_mapper_rule_sources(self, p):
         """m_rule : m_ruleSources ';'"""
         sources = p[1]
-        p[0] = StructureMapRule(
+        p[0] = StructureMapGroupRule(
             source=sources,
         )
 
@@ -554,7 +555,7 @@ class FhirMappingLanguageParser(FhirPathParser):
 
         min_value = modifiers.get("min")
         max_value = modifiers.get("max")
-        p[0] = StructureMapSource(
+        p[0] = StructureMapGroupRuleSource(
             context=context,
             element=element,
             min=str(min_value) if min_value is not None else None,
@@ -653,7 +654,7 @@ class FhirMappingLanguageParser(FhirPathParser):
                 element = None
             transform = p[3]
             modifiers = p[4] or {}
-            p[0] = StructureMapTarget(
+            p[0] = StructureMapGroupRuleTarget(
                 context=context,
                 element=element,
                 variable=modifiers.get("variable"),
@@ -671,7 +672,7 @@ class FhirMappingLanguageParser(FhirPathParser):
             invocation = p[1]
             modifiers = p[2] or {}
 
-            p[0] = StructureMapTarget(
+            p[0] = StructureMapGroupRuleTarget(
                 transform=invocation.get("name"),
                 parameter=invocation.get("parameter"),
                 variable=modifiers.get("variable"),
@@ -685,7 +686,7 @@ class FhirMappingLanguageParser(FhirPathParser):
                 element = None
             modifiers = p[2] or {}
             list_mode = modifiers.get("listMode")
-            p[0] = StructureMapTarget(
+            p[0] = StructureMapGroupRuleTarget(
                 context=context,
                 element=element,
                 variable=modifiers.get("variable"),
@@ -725,18 +726,18 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_transform_rule_context(self, p):
         """m_transform_rule_context : m_ruleContext"""
-        p[0] = StructureMapParameter(valueId=p[1])
+        p[0] = StructureMapGroupRuleTargetParameter(valueId=p[1])
 
     def p_mapper_transform_fhirpath(self, p):
         """m_transform_fhirpath : '(' m_fhirpath ')'"""
         p[0] = {
             "name": "evaluate",
-            "parameter": [StructureMapParameter(valueString=p[2])],
+            "parameter": [StructureMapGroupRuleTargetParameter(valueString=p[2])],
         }
 
     def p_mapper_transform_literal(self, p):
         """m_transform_literal : m_literal"""
-        p[0] = _parse_StructureMapParameter(p[1])
+        p[0] = _parse_StructureMapGroupRuleTargetParameter(p[1])
 
     def p_mapper_transform_invocation(self, p):
         """m_transform_invocation : m_invocation"""
@@ -750,7 +751,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         """m_dependent : THEN m_invocation_list"""
         p[0] = {
             "dependent": [
-                StructureMapDependent(
+                StructureMapGroupRuleDependent(
                     name=invocation.get("name"),
                     parameter=invocation.get("parameter"),
                 )
@@ -762,7 +763,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         """m_dependent : THEN m_invocation_list m_rules"""
         p[0] = {
             "dependent": [
-                StructureMapDependent(
+                StructureMapGroupRuleDependent(
                     name=invocation.get("name"),
                     parameter=invocation.get("parameter"),
                 )
@@ -799,11 +800,11 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_param_literal(self, p):
         """m_param_literal : m_literal"""
-        p[0] = _parse_StructureMapParameter(p[1])
+        p[0] = _parse_StructureMapGroupRuleTargetParameter(p[1])
 
     def p_mapper_param_id(self, p):
         """m_param_id : m_identifier"""
-        p[0] = StructureMapParameter(valueId=p[1])
+        p[0] = StructureMapGroupRuleTargetParameter(valueId=p[1])
 
     def p_mapper_fhirPath(self, p):
         """m_fhirpath : expression"""

@@ -7,8 +7,8 @@ from typing import Any, Callable, List
 from pydantic import BaseModel
 
 import fhircraft.fhir.path.engine as fhirpath
-from fhircraft.fhir.mapper.structures.StructureMap import StructureMapParameter
-from fhircraft.fhir.path import fhirpath as fhirpath_parser
+from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMapGroupRuleTargetParameter as StructureMapParameter
+from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
     CodeableConcept,
     Coding,
@@ -80,7 +80,6 @@ def validate_transform_parameters(
                         break
                     transform_arguments[expected.name] = value
                 else:
-                    print(transform_arguments)
                     # All parameters match this signature
                     return func(scope, **transform_arguments)
             raise RuleProcessingError(
@@ -332,7 +331,7 @@ class MappingTransformer:
         source_fhirpath = scope.resolve_fhirpath(source)
         resource_type = source_fhirpath._invoke(
             fhirpath.Element("resourceType")
-        ).single(scope.get_instances())
+        ).single(scope.get_instances()) or source_fhirpath.single(scope.get_instances()).__class__.__name__
         resource_id = source_fhirpath._invoke(fhirpath.Element("id")).single(
             scope.get_instances()
         )

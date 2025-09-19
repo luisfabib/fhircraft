@@ -13,8 +13,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
-from fhircraft.fhir.resources.datatypes.utils import validate_fhir_type
-
+from fhircraft.fhir.resources.datatypes import utils as type_utils
 
 class FHIRTypesOperator(FHIRPath):
     """
@@ -42,8 +41,11 @@ class FHIRTypesOperator(FHIRPath):
         Validates the type specifier against the known FHIR types.
         Raises an error if the type specifier is not valid.
         """
+
         type_ = self.type_specifier
         value = self._get_singleton_collection_value(collection, create)
+        if value is None:
+            return []
         # Handle the FHIRPath literal types as special cases
         if isinstance(value, fhirpath_literals.Quantity):
             return type_ == "Quantity"
@@ -53,14 +55,15 @@ class FHIRTypesOperator(FHIRPath):
             return type_ == "DateTime"
         elif isinstance(value, fhirpath_literals.Time):
             return type_ == "Time"
-        return bool(
-            validate_fhir_type(
-                value,
-                type_,
-                raise_on_error=False,
-            )
-        )
-
+        else:
+            try:
+                return type_utils.is_fhir_primitive_type(value,type_)
+            except type_utils.FHIRTypeError:
+                try:
+                    return type_utils.is_fhir_complex_type(value,type_)
+                except type_utils.FHIRTypeError:
+                    return type_utils.is_fhir_resource_type(value,type_)   
+                  
     def __str__(self):
         raise NotImplementedError("Subclasses must implement __str__ method.")
 
