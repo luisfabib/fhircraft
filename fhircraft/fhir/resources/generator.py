@@ -152,23 +152,25 @@ class CodeGenerator:
                         self.import_statements["typing"].append("Literal")
                     annotation_string = f"Literal['{info.annotation['fixedValue'].value}']"
 
-                default = info.default
-                if default is PydanticUndefined:
-                    default = "..."
-                elif isinstance(info.default, str):
+                default = "..."
+                default_factory = "..."
+                if isinstance(info.default, str):
                     default = f'"{info.default}"'
                 elif isinstance(info.default, BaseModel):
                     arguments = ", ".join(
                         f"{key}={value!r}"
                         for key, value in info.default.model_dump(exclude_none=True).items()
                     )
-                    default = f"{info.default.__class__.__name__}({arguments})"
+                    default_factory = f"lambda: {info.default.__class__.__name__}({arguments})"
+                elif info.default is not PydanticUndefined:
+                    default = repr(info.default)
 
                 subdata[field] = {
                     "annotation": annotation_string,
                     "description": info.description,
                     "alias": info.alias,
                     "default": default,
+                    "default_factory": default_factory,
                 }
             model_properties = {
                 key: value.fget

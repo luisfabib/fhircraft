@@ -80,7 +80,6 @@ def validate_transform_parameters(
                         break
                     transform_arguments[expected.name] = value
                 else:
-                    print(transform_arguments)
                     # All parameters match this signature
                     return func(scope, **transform_arguments)
             raise RuleProcessingError(

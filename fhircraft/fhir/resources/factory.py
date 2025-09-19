@@ -4,10 +4,8 @@ Pydantic FHIR Model Factory
 """
 
 import inspect
-import json
 import keyword
 import warnings
-from collections import defaultdict
 
 # Standard modules
 from enum import Enum
@@ -22,7 +20,6 @@ from pydantic import BaseModel, Field, create_model, field_validator, model_vali
 from pydantic.aliases import AliasChoices
 from pydantic.dataclasses import dataclass
 from pydantic.fields import FieldInfo
-from pydantic.functional_validators import _decorators as _validators
 from pydantic_core import PydanticUndefined
 from typing_extensions import Annotated
 
@@ -43,7 +40,6 @@ from fhircraft.utils import (
     capitalize,
     ensure_list,
     get_FHIR_release_from_version,
-    load_env_variables,
 )
 
 ModelT = TypeVar("ModelT", bound="BaseModel")

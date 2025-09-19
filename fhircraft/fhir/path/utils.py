@@ -6,7 +6,6 @@ from fhircraft.utils import ensure_list
 if TYPE_CHECKING:
     from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection
 
-from fhircraft.fhir.path.engine.literals import Quantity
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
 
@@ -135,6 +134,7 @@ def evaluate_and_prepare_collection_values(
 ) -> tuple[Any | None, Any | None]:
 
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
+        from fhircraft.fhir.path.engine.literals import Quantity
         return [
             (
                 Quantity(item.value.value, item.value.unit)

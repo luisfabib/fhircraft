@@ -32,7 +32,12 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     {% for field, info in model_data.fields.items() %}
     {{ field }}: {{ info.annotation}} = Field(
         description={% if info.description %}{{ info.description|tojson }}{% else %}None{% endif %},
+        {% if info.default != '...' %}
         default={{ info.default }},
+        {% endif %}
+        {% if info.default_factory != '...' %}
+        default_factory={{ info.default_factory }},
+        {% endif %}
         {% if info.alias %}
         alias="{{ info.alias }}",
         {% endif %}

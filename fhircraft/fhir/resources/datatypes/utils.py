@@ -50,10 +50,8 @@ def get_complex_FHIR_type(type_str: str, release="R4B") -> type:
 def get_fhir_resource_type(type_str: str, release="R4B") -> type:
     # Convert CamelCase to snake_case for module lookup
     type_str_snake = re.sub(r'(?<!^)(?=[A-Z])', '_', type_str).lower()
-    try:
-        resource_module = importlib.import_module(f'fhircraft.fhir.resources.datatypes.{release}.resources.{type_str_snake}')
-    except ModuleNotFoundError:
-        raise ValueError(f"Could not import type {type_str} for FHIR release {release}")
+    resource_module = importlib.import_module(f'fhircraft.fhir.resources.datatypes.{release}.resources.{type_str_snake}')
+
     resource = getattr(resource_module, type_str, None)
     if not resource:
         from fhircraft.fhir.resources.factory import factory

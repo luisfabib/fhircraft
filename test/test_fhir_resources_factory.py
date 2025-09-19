@@ -2,7 +2,8 @@ import json
 import keyword
 import tarfile
 import tempfile
-from typing import List, Optional, get_args
+import warnings
+from typing import List, Optional, get_args, Any
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock, patch
 
@@ -16,7 +17,7 @@ import fhircraft.fhir.resources.datatypes.primitives as primitives
 import fhircraft.fhir.resources.datatypes.R4B.complex_types as complex_types
 from fhircraft.fhir.resources.definitions import StructureDefinition, StructureDefinitionSnapshot
 from fhircraft.fhir.resources.definitions.element_definition import ElementDefinition, ElementDefinitionType
-from fhircraft.fhir.resources.factory import ResourceFactory, _Unset
+from fhircraft.fhir.resources.factory import ResourceFactory, _Unset, ElementDefinitionNode
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 
@@ -793,3 +794,156 @@ class TestResourceFactoryPackageMethods(TestCase):
         """Test load_package fails when internet is disabled."""
         with self.assertRaises(RuntimeError) as context:
             self.factory_with_packages.load_package("test.package")
+
+        self.assertIn("internet access is disabled", str(context.exception).lower())
+
+
+class TestContentReferenceResolution(FactoryTestCase):
+    """Test cases for contentReference resolution functionality."""
+
+    def setUp(self):
+        super().setUp()
+        # Create a mock root structure for testing
+        self.root_structure = ElementDefinitionNode(
+            id="TestResource",
+            path="TestResource",
+            node_label="TestResource",
+            children={},
+            slices={},
+            root=None
+        )
+        self.root_structure.root = self.root_structure
+
+    def test_resolve_content_reference_type_simple(self):
+        """Test resolving a simple contentReference to a primitive type."""
+        # Create referenced element with primitive type
+        referenced_element = ElementDefinitionNode(
+            id="TestResource.targetField",
+            path="TestResource.targetField",
+            node_label="targetField",
+            type=[ElementDefinitionType(code="string")],
+            children={},
+            slices={}
+        )
+        self.root_structure.children["targetField"] = referenced_element
+        
+        # Test resolution
+        resolved_type = self.factory._resolve_content_reference_type(
+            referenced_element, self.root_structure
+        )
+        
+        self.assertEqual(resolved_type, primitives.String)
+
+    def test_resolve_content_reference_type_complex_with_children(self):
+        """Test resolving contentReference to an element with children (backbone element)."""
+        # Create referenced element with children
+        referenced_element = ElementDefinitionNode(
+            id="TestResource.backboneField",
+            path="TestResource.backboneField",
+            node_label="backboneField",
+            children={
+                "subField": ElementDefinitionNode(
+                    id="TestResource.backboneField.subField",
+                    path="TestResource.backboneField.subField",
+                    node_label="subField",
+                    type=[ElementDefinitionType(code="string")],
+                    children={},
+                    slices={}
+                )
+            },
+            slices={}
+        )
+        self.root_structure.children["backboneField"] = referenced_element
+        
+        # Test resolution
+        resolved_type = self.factory._resolve_content_reference_type(
+            referenced_element, self.root_structure
+        )
+        
+        # Should create a backbone model
+        self.assertTrue(hasattr(resolved_type, '__name__'))
+        self.assertTrue(hasattr(resolved_type, 'model_fields'))
+        self.assertIn('subField', resolved_type.model_fields)
+
+    def test_content_reference_with_invalid_path(self):
+        """Test handling of contentReference with invalid path."""
+        # Create structure with invalid contentReference
+        structure = ElementDefinitionNode(
+            id="TestResource",
+            path="TestResource",
+            node_label="TestResource",
+            children={
+                "invalidRefField": ElementDefinitionNode(
+                    id="TestResource.invalidRefField",
+                    path="TestResource.invalidRefField",
+                    node_label="invalidRefField",
+                    contentReference="#TestResource.nonExistentField",
+                    children={},
+                    slices={}
+                )
+            },
+            slices={},
+            root=None
+        )
+        structure.root = structure
+        structure.children["invalidRefField"].root = structure
+        
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            fields, _, _ = self.factory._process_FHIR_structure_into_Pydantic_components(structure)
+            
+            # Should create field with Any type and generate warning
+            self.assertIn("invalidRefField", fields)
+            self.assertTrue(len(w) > 0)
+            self.assertIn("Could not resolve content reference", str(w[0].message))
+
+    def test_construct_resource_model_with_content_reference(self):
+        """Test complete resource model construction with contentReference."""
+        mock_structure_definition = {
+            "resourceType": "StructureDefinition",
+            "id": "test-content-ref",
+            "url": "http://example.org/StructureDefinition/test-content-ref",
+            "name": "TestContentRef",
+            "status": "draft",
+            "fhirVersion": "4.0.1",
+            "kind": "resource",
+            "abstract": False,
+            "type": "TestResource",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/DomainResource",
+            "derivation": "specialization",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "TestResource",
+                        "path": "TestResource",
+                        "min": 0,
+                        "max": "*",
+                        "base": {"path": "TestResource", "min": 0, "max": "*"},
+                        "type": [{"code": "DomainResource"}]
+                    },
+                    {
+                        "id": "TestResource.earlyField",
+                        "path": "TestResource.earlyField",
+                        "min": 0,
+                        "max": "1",
+                        "contentReference": "#TestResource.laterField"
+                    },
+                    {
+                        "id": "TestResource.laterField",
+                        "path": "TestResource.laterField",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}]
+                    }
+                ]
+            }
+        }
+        
+        # Should not raise exception
+        model = self.factory.construct_resource_model(
+            structure_definition=mock_structure_definition
+        )
+        
+        self.assertEqual(model.__name__, "TestContentRef")
+        self.assertIn('earlyField', model.model_fields)
+        self.assertIn('laterField', model.model_fields)
