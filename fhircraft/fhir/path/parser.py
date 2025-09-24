@@ -1,5 +1,6 @@
 import logging
 import os.path
+import traceback
 from typing import Any
 
 import ply.yacc
@@ -33,7 +34,6 @@ from fhircraft.fhir.path.exceptions import FhirPathLexerError, FhirPathParserErr
 from fhircraft.fhir.path.lexer import FhirPathLexer
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.utils import ensure_list
-import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -365,6 +365,12 @@ class FhirPathParser:
             p[0] = additional.GetValue()
         elif check(p, "htmlChecks", nargs=0):
             p[0] = additional.HtmlChecks()
+        elif check(p, "lowBoundary", nargs=0):
+            p[0] = additional.LowBoundary()
+        elif check(p, "highBoundary", nargs=0):
+            p[0] = additional.HighBoundary()
+        elif check(p, "elementDefinition", nargs=0):
+            p[0] = additional.ElementDefinition()
         # -------------------------------------------------------------------------------
         # Subsetting
         # -------------------------------------------------------------------------------
