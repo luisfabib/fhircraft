@@ -130,3 +130,178 @@ def test_htmlchecks_valid_xhtml():
     collection = [FHIRPathCollectionItem(value=html_snippet)]
     result = HtmlChecks().evaluate(collection)
     assert result[0].value == True
+
+
+# -------------
+# LowBoundary
+# -------------
+
+
+def test_lowboundary_returns_empty_for_empty_collection():
+    collection = []
+    result = LowBoundary().evaluate(collection)
+    assert result == []
+
+
+def test_lowboundary_integer_precision():
+    """Test low boundary for integer values"""
+    collection = [FHIRPathCollectionItem(value=10)]
+    result = LowBoundary().evaluate(collection)
+    assert result[0].value == 10
+
+
+def test_lowboundary_float_precision():
+    """Test low boundary for decimal values with different precisions"""
+    # Single decimal place
+    collection = [FHIRPathCollectionItem(value=1.5)]
+    result = LowBoundary().evaluate(collection)
+    assert result[0].value == 1.5 - sys.float_info.epsilon
+
+    # Two decimal places
+    collection = [FHIRPathCollectionItem(value=1.25)]
+    result = LowBoundary().evaluate(collection)
+    assert result[0].value == 1.25 - sys.float_info.epsilon
+
+
+def test_lowboundary_year_only():
+    """Test low boundary for year-only date strings"""
+    collection = [FHIRPathCollectionItem(value="2018")]
+    result = LowBoundary().evaluate(collection)
+    assert result[0].value == "2018-01-01T00:00:00.000"
+
+
+def test_lowboundary_year_month():
+    """Test low boundary for year-month date strings"""
+    collection = [FHIRPathCollectionItem(value="2018-03")]
+    result = LowBoundary().evaluate(collection)
+    assert result[0].value == "2018-03-01T00:00:00.000"
+
+
+def test_lowboundary_full_date():
+    """Test low boundary for full date strings"""
+    collection = [FHIRPathCollectionItem(value="2018-03-15")]
+    result = LowBoundary().evaluate(collection)
+    assert result[0].value == "2018-03-15T00:00:00.000"
+
+
+def test_lowboundary_complete_datetime():
+    """Test low boundary for complete datetime strings (should return as-is)"""
+    collection = [FHIRPathCollectionItem(value="2018-03-15T14:30:45.123Z")]
+    result = LowBoundary().evaluate(collection)
+    assert result[0].value == "2018-03-15T14:30:45.123Z"
+
+
+def test_lowboundary_non_datetime_string():
+    """Test low boundary for non-datetime strings (should return as-is)"""
+    collection = [FHIRPathCollectionItem(value="not-a-date")]
+    result = LowBoundary().evaluate(collection)
+    assert result[0].value == "not-a-date"
+
+
+def test_lowboundary_quantity():
+    """Test low boundary for Quantity objects"""
+    from test.test_fhir_path_engine_conversion import Quantity
+
+    quantity = Quantity(
+        value=10.5, unit="kg", system="http://unitsofmeasure.org", code="kg"
+    )
+    collection = [FHIRPathCollectionItem(value=quantity)]
+    result = LowBoundary().evaluate(collection)
+
+    assert result[0].value.value == 10.5 - sys.float_info.epsilon
+    assert result[0].value.unit == "kg"
+    assert result[0].value.system == "http://unitsofmeasure.org"
+    assert result[0].value.code == "kg"
+
+
+# -------------
+# HighBoundary
+# -------------
+
+
+def test_highboundary_returns_empty_for_empty_collection():
+    collection = []
+    result = HighBoundary().evaluate(collection)
+    assert result == []
+
+
+def test_highboundary_integer_precision():
+    """Test high boundary for integer values"""
+    collection = [FHIRPathCollectionItem(value=10)]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == 10
+
+
+def test_highboundary_float_precision():
+    """Test high boundary for decimal values with different precisions"""
+    # Single decimal place
+    collection = [FHIRPathCollectionItem(value=1.5)]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == 1.5 + sys.float_info.epsilon
+
+    # Two decimal places
+    collection = [FHIRPathCollectionItem(value=1.25)]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == 1.25 + sys.float_info.epsilon
+
+
+def test_highboundary_year_only():
+    """Test high boundary for year-only date strings"""
+    collection = [FHIRPathCollectionItem(value="2018")]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == "2018-12-31T23:59:59.999"
+
+
+def test_highboundary_year_month():
+    """Test high boundary for year-month date strings"""
+    # Regular month
+    collection = [FHIRPathCollectionItem(value="2018-03")]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == "2018-03-31T23:59:59.999"
+
+    # February in non-leap year
+    collection = [FHIRPathCollectionItem(value="2018-02")]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == "2018-02-28T23:59:59.999"
+
+    # February in leap year
+    collection = [FHIRPathCollectionItem(value="2020-02")]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == "2020-02-29T23:59:59.999"
+
+
+def test_highboundary_full_date():
+    """Test high boundary for full date strings"""
+    collection = [FHIRPathCollectionItem(value="2018-03-15")]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == "2018-03-15T23:59:59.999"
+
+
+def test_highboundary_complete_datetime():
+    """Test high boundary for complete datetime strings (should return as-is)"""
+    collection = [FHIRPathCollectionItem(value="2018-03-15T14:30:45.123Z")]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == "2018-03-15T14:30:45.123Z"
+
+
+def test_highboundary_non_datetime_string():
+    """Test high boundary for non-datetime strings (should return as-is)"""
+    collection = [FHIRPathCollectionItem(value="not-a-date")]
+    result = HighBoundary().evaluate(collection)
+    assert result[0].value == "not-a-date"
+
+
+def test_highboundary_quantity():
+    """Test high boundary for Quantity objects"""
+    from test.test_fhir_path_engine_conversion import Quantity
+
+    quantity = Quantity(
+        value=10.5, unit="kg", system="http://unitsofmeasure.org", code="kg"
+    )
+    collection = [FHIRPathCollectionItem(value=quantity)]
+    result = HighBoundary().evaluate(collection)
+
+    assert result[0].value.value == 10.5 + sys.float_info.epsilon
+    assert result[0].value.unit == "kg"
+    assert result[0].value.system == "http://unitsofmeasure.org"
+    assert result[0].value.code == "kg"

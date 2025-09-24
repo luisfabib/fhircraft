@@ -3,7 +3,9 @@ FHIR adds (compatible) functionality to the set of common FHIRPath functions. So
 are candidates for elevation to the base version of FHIRPath when the next version is released.
 """
 
+import calendar
 import re
+import sys
 from html.parser import HTMLParser
 from xml.etree import ElementTree as ET
 
@@ -19,6 +21,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.equality import Equals
 from fhircraft.fhir.path.engine.filtering import Where
+from fhircraft.fhir.path.engine.literals import Quantity
 from fhircraft.utils import ensure_list, load_url
 
 
@@ -53,7 +56,7 @@ class Extension(FHIRPathFunction):
             collection (FHIRPathCollection): The input collection.
 
         Returns:
-            FHIRPathCollection): The indexed collection item.
+            collection (FHIRPathCollection): The output collection.
         """
         return Invocation(
             Element("extension"),
@@ -126,7 +129,7 @@ class HasValue(FHIRPathFunction):
             collection (FHIRPathCollection): The input collection.
 
         Returns:
-            bool
+            collection (FHIRPathCollection): The output collection.
         """
         if len(collection) != 1:
             has_value = False
@@ -153,7 +156,7 @@ class GetValue(FHIRPathFunction):
             collection (FHIRPathCollection): The input collection.
 
         Returns:
-            Any: Value
+            collection (FHIRPathCollection): The output collection.
         """
         if not HasValue().evaluate(collection, create=create):
             return []
@@ -466,4 +469,209 @@ class HtmlChecks(FHIRPathFunction):
 
         except Exception:
             return [FHIRPathCollectionItem.wrap(False)]
-            return [FHIRPathCollectionItem.wrap(False)]
+
+
+class ElementDefinition(FHIRPathFunction):
+    """
+    A representation of the FHIRPath [`elementDefinition()`](https://www.hl7.org/fhir/fhirpath.html) function.
+    """
+
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
+        """
+        Returns the FHIR element definition information for each element in the input collection.
+        If the input collection is empty, the return value will be empty.
+
+        Args:
+            collection (FHIRPathCollection): The input collection.
+
+        Raises:
+            NotImplementedError: This FHIRPath function is not supported.
+        """
+        raise NotImplementedError(
+            "The FHIRPath elementDefinition() function is not supported."
+        )
+
+
+class LowBoundary(FHIRPathFunction):
+    """
+    A representation of the FHIRPath [`lowBoundary()`](https://www.hl7.org/fhir/fhirpath.html) function.
+    """
+
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
+        """
+        Returns the low boundary of a quantity or range based on precision.
+        For date/time values, returns the earliest possible moment.
+        For decimal values, returns the lowest value within precision range.
+
+        Args:
+            collection (FHIRPathCollection): The input collection.
+
+        Returns:
+            collection (FHIRPathCollection): The output collection.
+        """
+        if not collection:
+            return []
+
+        result = []
+        for item in collection:
+            value = item.value
+
+            if isinstance(value, str):
+                # Handle date/time strings
+                if self._is_datetime_string(value):
+                    low_boundary = self._get_datetime_low_boundary(value)
+                    result.append(FHIRPathCollectionItem.wrap(low_boundary))
+                else:
+                    result.append(item)  # Return as-is for non-datetime strings
+            elif isinstance(value, (int, float)):
+                # Handle numeric values - determine precision and calculate boundary
+                low_boundary = self._get_numeric_low_boundary(value)
+                result.append(FHIRPathCollectionItem.wrap(low_boundary))
+            elif isinstance(value, Quantity):
+                # Handle Quantity type
+                new_quantity = Quantity(
+                    value=self._get_numeric_low_boundary(value.value),
+                    unit=value.unit if hasattr(value, "unit") else None,
+                )
+                result.append(FHIRPathCollectionItem.wrap(new_quantity))
+            else:
+                result.append(item)  # Return as-is for other types
+
+        return result
+
+    def _is_datetime_string(self, value: str) -> bool:
+        """Check if string represents a date/time value"""
+        # Match FHIR date/datetime patterns
+        datetime_pattern = r"^\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?(Z|[+-]\d{2}:\d{2})?)?)?)?$"
+        return bool(re.match(datetime_pattern, value))
+
+    def _get_datetime_low_boundary(self, value: str) -> str:
+        """Get the earliest possible moment for a date/time string"""
+        if len(value) == 4:  # Year only: @2018
+            return f"{value}-01-01T00:00:00.000"
+        elif len(value) == 7:  # Year-month: @2018-03
+            return f"{value}-01T00:00:00.000"
+        elif len(value) == 10:  # Date: @2018-03-15
+            return f"{value}T00:00:00.000"
+        elif (
+            "T" in value
+            and not value.endswith("Z")
+            and "+" not in value
+            and "-" not in value[-6:]
+        ):
+            # Incomplete time, fill with zeros
+            if value.count(":") == 0:  # Only hour
+                return f"{value}:00:00.000"
+            elif value.count(":") == 1:  # Hour and minute
+                return f"{value}:00.000"
+            else:
+                return f"{value}.000" if "." not in value else value
+        else:
+            return value  # Already complete or has timezone
+
+    def _get_numeric_low_boundary(self, value) -> float:
+        """Get the low boundary for a numeric value based on precision"""
+        if isinstance(value, int):
+            # Integer precision: boundary is value - 0.5
+            return value
+        elif isinstance(value, float):
+            # Determine decimal places for precision
+            return value - sys.float_info.epsilon
+        return value
+
+
+class HighBoundary(FHIRPathFunction):
+    """
+    A representation of the FHIRPath [`highBoundary()`](https://www.hl7.org/fhir/fhirpath.html) function.
+    """
+
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
+        """
+        Returns the high boundary of a quantity or range based on precision.
+        For date/time values, returns the latest possible moment.
+        For decimal values, returns the highest value within precision range.
+
+        Args:
+            collection (FHIRPathCollection): The input collection.
+
+        Returns:
+            collection (FHIRPathCollection): The output collection.
+        """
+        if not collection:
+            return []
+
+        result = []
+        for item in collection:
+            value = item.value
+
+            if isinstance(value, str):
+                # Handle date/time strings
+                if self._is_datetime_string(value):
+                    high_boundary = self._get_datetime_high_boundary(value)
+                    result.append(FHIRPathCollectionItem.wrap(high_boundary))
+                else:
+                    result.append(item)  # Return as-is for non-datetime strings
+            elif isinstance(value, (int, float)):
+                # Handle numeric values - determine precision and calculate boundary
+                high_boundary = self._get_numeric_high_boundary(value)
+                result.append(FHIRPathCollectionItem.wrap(high_boundary))
+            elif isinstance(value, Quantity):
+                # Handle Quantity type
+                new_quantity = Quantity(
+                    value=self._get_numeric_high_boundary(value.value),
+                    unit=value.unit if hasattr(value, "unit") else None,
+                )
+                result.append(FHIRPathCollectionItem.wrap(new_quantity))
+            else:
+                result.append(item)  # Return as-is for other types
+
+        return result
+
+    def _is_datetime_string(self, value: str) -> bool:
+        """Check if string represents a date/time value"""
+        datetime_pattern = r"^\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?(Z|[+-]\d{2}:\d{2})?)?)?)?$"
+        return bool(re.match(datetime_pattern, value))
+
+    def _get_datetime_high_boundary(self, value: str) -> str:
+        """Get the latest possible moment for a date/time string"""
+        import calendar
+
+        if len(value) == 4:  # Year only: @2018
+            return f"{value}-12-31T23:59:59.999"
+        elif len(value) == 7:  # Year-month: @2018-03
+            year, month = map(int, value.split("-"))
+            last_day = calendar.monthrange(year, month)[1]
+            return f"{value}-{last_day:02d}T23:59:59.999"
+        elif len(value) == 10:  # Date: @2018-03-15
+            return f"{value}T23:59:59.999"
+        elif (
+            "T" in value
+            and not value.endswith("Z")
+            and "+" not in value
+            and "-" not in value[-6:]
+        ):
+            # Incomplete time, fill with maximum values
+            if value.count(":") == 0:  # Only hour
+                return f"{value}:59:59.999"
+            elif value.count(":") == 1:  # Hour and minute
+                return f"{value}:59.999"
+            else:
+                return f"{value}.999" if "." not in value else value
+        else:
+            return value  # Already complete or has timezone
+
+    def _get_numeric_high_boundary(self, value) -> float:
+        """Get the high boundary for a numeric value based on precision"""
+        if isinstance(value, int):
+            # Integer precision: boundary is value + 0.5 (exclusive)
+            return value
+        elif isinstance(value, float):
+            # Determine decimal places for precision
+            return value + sys.float_info.epsilon
+        return value
