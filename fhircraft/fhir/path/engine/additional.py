@@ -3,6 +3,10 @@ FHIR adds (compatible) functionality to the set of common FHIRPath functions. So
 are candidates for elevation to the base version of FHIRPath when the next version is released.
 """
 
+import re
+from html.parser import HTMLParser
+from xml.etree import ElementTree as ET
+
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPath,
@@ -210,6 +214,192 @@ class HtmlChecks(FHIRPathFunction):
     A representation of the FHIRPath [`htmlChecks()`](https://build.fhir.org/fhirpath.html#functions) function.
     """
 
+    # Allowed HTML elements based on HTML 4.0 chapters 7-11 (except section 4 of chapter 9) and 15
+    ALLOWED_ELEMENTS = {
+        # Text formatting (chapter 7)
+        "b",
+        "big",
+        "i",
+        "s",
+        "small",
+        "tt",
+        "u",
+        "strong",
+        "em",
+        "dfn",
+        "code",
+        "samp",
+        "kbd",
+        "var",
+        "cite",
+        "abbr",
+        "acronym",
+        "sub",
+        "sup",
+        "span",
+        "bdo",
+        # Lists (chapter 10)
+        "ul",
+        "ol",
+        "li",
+        "dl",
+        "dt",
+        "dd",
+        # Tables (chapter 11)
+        "table",
+        "caption",
+        "thead",
+        "tbody",
+        "tfoot",
+        "colgroup",
+        "col",
+        "tr",
+        "th",
+        "td",
+        # Block elements (chapter 8)
+        "div",
+        "p",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "blockquote",
+        "pre",
+        "address",
+        # Links and images (chapter 15 + special allowance)
+        "a",
+        "img",
+        # Line breaks
+        "br",
+        "hr",
+    }
+
+    # Forbidden elements that must not be present
+    FORBIDDEN_ELEMENTS = {
+        "head",
+        "body",
+        "html",
+        "script",
+        "form",
+        "input",
+        "button",
+        "select",
+        "textarea",
+        "base",
+        "link",
+        "meta",
+        "title",
+        "style",
+        "object",
+        "embed",
+        "applet",
+        "frame",
+        "frameset",
+        "iframe",
+        "noframes",
+    }
+
+    # Event attributes that are not allowed
+    EVENT_ATTRIBUTES = {
+        "onclick",
+        "ondblclick",
+        "onmousedown",
+        "onmouseup",
+        "onmouseover",
+        "onmousemove",
+        "onmouseout",
+        "onfocus",
+        "onblur",
+        "onkeypress",
+        "onkeydown",
+        "onkeyup",
+        "onsubmit",
+        "onreset",
+        "onselect",
+        "onchange",
+        "onload",
+        "onunload",
+    }
+
+    class XHTMLValidator(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.errors = []
+            self.has_content = False
+            self.in_div = False
+            self.div_count = 0
+
+        def handle_starttag(self, tag, attrs):
+            # Check if this is the root div
+            if tag == "div":
+                self.div_count += 1
+                if self.div_count == 1:
+                    self.in_div = True
+                    # Check for required xmlns attribute
+                    xmlns_found = False
+                    for attr_name, attr_value in attrs:
+                        if (
+                            attr_name == "xmlns"
+                            and attr_value == "http://www.w3.org/1999/xhtml"
+                        ):
+                            xmlns_found = True
+                        elif attr_name.lower() in HtmlChecks.EVENT_ATTRIBUTES:
+                            self.errors.append(
+                                f"Event attribute '{attr_name}' is not allowed"
+                            )
+                    if not xmlns_found and self.div_count == 1:
+                        self.errors.append(
+                            "Root div element must have xmlns='http://www.w3.org/1999/xhtml'"
+                        )
+
+            # Check if element is allowed
+            if tag.lower() not in HtmlChecks.ALLOWED_ELEMENTS:
+                if tag.lower() in HtmlChecks.FORBIDDEN_ELEMENTS:
+                    self.errors.append(f"Forbidden element '{tag}' found")
+                else:
+                    self.errors.append(f"Element '{tag}' is not in the allowed set")
+
+            # Check attributes for event handlers and external references
+            for attr_name, attr_value in attrs:
+                attr_lower = attr_name.lower()
+
+                # Check for event attributes
+                if attr_lower in HtmlChecks.EVENT_ATTRIBUTES:
+                    self.errors.append(
+                        f"Event attribute '{attr_name}' is not allowed on '{tag}'"
+                    )
+
+                # Check for external stylesheet references
+                if (
+                    tag.lower() == "link"
+                    and attr_value
+                    and attr_lower == "rel"
+                    and "stylesheet" in attr_value.lower()
+                ):
+                    self.errors.append("External stylesheet references are not allowed")
+
+                # Check for external script sources
+                if tag.lower() == "script" and attr_lower == "src":
+                    self.errors.append("External script references are not allowed")
+
+        def handle_endtag(self, tag):
+            if tag == "div":
+                self.div_count -= 1
+                if self.div_count == 0:
+                    self.in_div = False
+
+        def handle_data(self, data):
+            if self.in_div and data.strip():
+                self.has_content = True
+
+        def handle_startendtag(self, tag, attrs):
+            # Handle self-closing tags like <img/>, <br/>
+            if tag == "img" and self.in_div:
+                self.has_content = True
+            self.handle_starttag(tag, attrs)
+
     def evaluate(
         self, collection: FHIRPathCollection, create=False
     ) -> FHIRPathCollection:
@@ -229,10 +419,51 @@ class HtmlChecks(FHIRPathFunction):
 
         collection = ensure_list(collection)
 
-        if len(collection) > 1:
-            raise FHIRPathError(
-                f"FHIRPath operator {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection."
-            )
-        value = collection[0]
-        # TODO: Implement HTML validity check
-        return [FHIRPathCollectionItem.wrap(True)]
+        if len(collection) != 1:
+            return []  # Return empty for non-single collections
+
+        item = collection[0]
+
+        # Check if the item is an XHTML string
+        if not isinstance(item.value, str):
+            return []  # Return empty for non-string values
+
+        xhtml_content = item.value.strip()
+
+        if not xhtml_content:
+            return [FHIRPathCollectionItem.wrap(False)]
+
+        try:
+            # Basic XML well-formedness check
+            try:
+                ET.fromstring(xhtml_content)
+            except ET.ParseError:
+                return [FHIRPathCollectionItem.wrap(False)]
+
+            # Check if it starts with a div element
+            if not re.match(r"^\s*<div\s", xhtml_content, re.IGNORECASE):
+                return [FHIRPathCollectionItem.wrap(False)]
+
+            # Validate HTML structure and content
+            validator = self.XHTMLValidator()
+            validator.feed(xhtml_content)
+
+            # Check validation results
+            if validator.errors:
+                return [FHIRPathCollectionItem.wrap(False)]
+
+            # Check if div has non-whitespace content
+            if not validator.has_content:
+                return [FHIRPathCollectionItem.wrap(False)]
+
+            # Check for HTML entities (not allowed, should use Unicode)
+            if re.search(
+                r"&(?!#\d+;|#x[0-9a-fA-F]+;|amp;|lt;|gt;|quot;|apos;)", xhtml_content
+            ):
+                return [FHIRPathCollectionItem.wrap(False)]
+
+            return [FHIRPathCollectionItem.wrap(True)]
+
+        except Exception:
+            return [FHIRPathCollectionItem.wrap(False)]
+            return [FHIRPathCollectionItem.wrap(False)]

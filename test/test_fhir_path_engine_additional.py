@@ -84,3 +84,49 @@ def test_getvalue_returns_empty_for_collection_with_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     result = GetValue().evaluate(collection)
     assert result == []
+
+
+# -------------
+# HtmlChecks
+# -------------
+
+
+def test_htmlchecks_returns_empty_for_empty_collection():
+    collection = []
+    result = HtmlChecks().evaluate(collection)
+    assert result == []
+
+
+def test_htmlchecks_invalid_xhtml():
+    html_snippet = """
+    <html>
+        <head>
+            <link rel="stylesheet" href="styles.css">
+            <title>Test</title>
+        </head>
+        <body>
+            <p>Hello, World!</p>
+        </body>
+    </html>
+    """
+    collection = [FHIRPathCollectionItem(value=html_snippet)]
+    result = HtmlChecks().evaluate(collection)
+    assert result[0].value == False
+
+
+def test_htmlchecks_invalid_empty_div():
+    html_snippet = """
+    <div xmlns=\"http://www.w3.org/1999/xhtml\"></div>
+    """
+    collection = [FHIRPathCollectionItem(value=html_snippet)]
+    result = HtmlChecks().evaluate(collection)
+    assert result[0].value == False
+
+
+def test_htmlchecks_valid_xhtml():
+    html_snippet = """
+    <div xmlns=\"http://www.w3.org/1999/xhtml\">text</div>
+    """
+    collection = [FHIRPathCollectionItem(value=html_snippet)]
+    result = HtmlChecks().evaluate(collection)
+    assert result[0].value == True
