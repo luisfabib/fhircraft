@@ -159,6 +159,13 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             )
             [col.set_literal(new_valid_elements) for col in collection]
         return resource
+    
+    def __repr__(self) -> str:
+        repr_args = []
+        for fieldname in self.model_fields_set or self.__class__model_fields:
+            value = getattr(self, fieldname)
+            repr_args.append(f'{fieldname}={value}')
+        return f"{self.__class__.__name__}({', '.join(repr_args)})"
 
 
 class FHIRSliceModel(FHIRBaseModel):
