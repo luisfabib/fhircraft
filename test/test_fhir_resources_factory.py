@@ -232,12 +232,12 @@ class TestConstructPydanticField(FactoryTestCase):
         assert result[0] == field_type
         assert result[1].is_required() == False
 
-    def test_constructs_optional_field(self):
+    def test_constructs_non_optional_field(self):
         field_type = primitives.String
         result = self.factory._construct_Pydantic_field(
             field_type, min_card=0, max_card=1
         )
-        assert result[0] == Optional[field_type]
+        assert result[0] == field_type
         assert result[1].is_required() == False
         assert result[1].default is None
 
@@ -254,7 +254,7 @@ class TestConstructPydanticField(FactoryTestCase):
         result = self.factory._construct_Pydantic_field(
             field_type, min_card=0, max_card=99999
         )
-        assert result[0] == Optional[List[field_type]]
+        assert result[0] == List[field_type]
         assert result[1].is_required() == False
         assert result[1].default is None
 
