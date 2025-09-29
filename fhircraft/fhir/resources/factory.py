@@ -497,14 +497,12 @@ class ResourceFactory:
         if is_list_type:
             actual_field_type = List[actual_field_type]
         
-        # All fields are non-required (Pydantic), since cardinality and requiredness is handled by FHIR validators 
+        # All fields are non-required and non-nullable
         if default is _Unset:
             default = None
         elif is_list_type:
             default = ensure_list(default)
-                
-        if min_card == 0:
-            actual_field_type = Optional[actual_field_type]
+            
         # Construct the Pydantic field
         return (
             actual_field_type,
