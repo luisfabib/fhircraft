@@ -8,7 +8,6 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
 )
 from fhircraft.fhir.path.engine.filtering import Repeat
-from fhircraft.utils import ensure_list
 
 
 class Children(FHIRPathFunction):
@@ -28,7 +27,6 @@ class Children(FHIRPathFunction):
         Returns:
             FHIRPathCollection: The output collection.
         """
-        collection = ensure_list(collection)
         children_collection = []
         for item in collection:
             if isinstance(item.value, BaseModel):
