@@ -493,13 +493,18 @@ class ResourceFactory:
         # Determine whether typing should be a list based on max. cardinality
         is_list_type = max_card is None or max_card > 1
         actual_field_type = field_type
+        # Handle list types
         if is_list_type:
             actual_field_type = List[actual_field_type]
-            default = ensure_list(default) if default is not _Unset else default
-        # Determine whether the field is optional
+        
+        # All fields are non-required (Pydantic), since cardinality and requiredness is handled by FHIR validators 
+        if default is _Unset:
+            default = None
+        elif is_list_type:
+            default = ensure_list(default)
+                
         if min_card == 0:
             actual_field_type = Optional[actual_field_type]
-            default = None
         # Construct the Pydantic field
         return (
             actual_field_type,
