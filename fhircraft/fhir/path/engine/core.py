@@ -787,3 +787,52 @@ class Invocation(FHIRPath):
 
     def __hash__(self):
         return hash((self.left, self.right))
+
+
+class RootElement(FHIRPath):
+    """
+    A class representing the root of a FHIRPath, i.e. the top-most segment of the FHIRPath
+    whose collection has no parent associated.
+
+    Attributes:
+        type (str): The expected FHIR resource type of the root element, by default.
+    """
+
+    def __init__(self, type: str = "Resource"):
+        self.type = type
+
+    def evaluate(
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+    ) -> FHIRPathCollection:
+        """
+        Evaluate the input collection to assert that the entries are valid FHIR resources of the given type.
+
+        Args:
+            collection (Collection): The collection of items to be evaluated.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
+
+        Returns:
+            collection (Collection): The same collection after validation.
+        """
+        for item in collection:
+            resource = item.value 
+            # Check if resource is of valid type
+            if (
+                (isinstance(resource, dict) and  ("resourceType" not in resource or not resource["resourceType"] == self.type)) or 
+                (not isinstance(resource, dict) and (not hasattr(resource, "resourceType") or not resource.resourceType == self.type))
+            ):
+                raise FHIRPathError(f"Root element must be a valid FHIR resource of type {self.type}.")
+        return collection
+
+    def __str__(self):
+        return self.type
+
+    def __repr__(self):
+        return f'RootElement("{self.type}")'
+
+    def __eq__(self, other):
+        return isinstance(other, RootElement) and self.type == other.type
+
+    def __hash__(self):
+        return hash(self.type)

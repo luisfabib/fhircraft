@@ -9,7 +9,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathError,
     Invocation,
 )
-from fhircraft.fhir.path.engine.environment import Root
+from fhircraft.fhir.path.engine.environment import This
 from fhircraft.fhir.path.engine.subsetting import *
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
@@ -64,7 +64,7 @@ class TestIndexPrimitive(TestCase):
     def setUp(self):
         TestResource = namedtuple("TestResource", "field")
         self.resource = TestResource(field=[1, 2, 3])
-        parent = FHIRPathCollectionItem(self.resource, path=Root())
+        parent = FHIRPathCollectionItem(self.resource, path=This())
         self.collection = Element("field").evaluate([parent], env)
 
     def test_index_evaluates_correctly(self):
@@ -115,7 +115,7 @@ class TestIndexResources(TestCase):
                 Coding(code="code-3", system="system-3"),
             ]
         )
-        parent = FHIRPathCollectionItem(self.resource, path=Root())
+        parent = FHIRPathCollectionItem(self.resource, path=This())
         self.collection = Element("coding").evaluate([parent], env)
 
     def test_index_evaluates_correctly(self):
@@ -151,7 +151,7 @@ class TestIndexResources(TestCase):
 
     def test_index_creates_with_empty_list(self):
         resource = CodeableConcept(coding=[])
-        parent = FHIRPathCollectionItem(resource, path=Root())
+        parent = FHIRPathCollectionItem(resource, path=This())
         collection = Element("coding").evaluate([parent], env, create=True)
         Index(0).evaluate(collection, env, create=True)
         assert len(resource.coding) == 1

@@ -29,14 +29,12 @@ parser_test_cases = (
     ("`foo`", Element("foo")),
     ("`div`", Element("div")),
     ("foo[1]", Invocation(Element("foo"), Index(1))),
+    ("Observation", RootElement("Observation")),
     # ----------------------------------
     # Variables/Constants
     # ----------------------------------
-    ("$", Root()),
     ("$this", This()),
     ("$index", CollectionIndex()),
-    ("%rootResource", Root()),
-    ("%resource", Parent()),
     ("%context", This()),
     # ----------------------------------
     # Literals

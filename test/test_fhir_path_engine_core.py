@@ -7,9 +7,12 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
     Invocation,
     Literal,
+    FHIRPathError,
 )
-from fhircraft.fhir.path.engine.environment import (Root, Parent, This, CollectionIndex)
+from fhircraft.fhir.path.engine.environment import (This, CollectionIndex)
 from fhircraft.fhir.path.engine.strings import Upper
+
+from fhircraft.fhir.resources.datatypes.R4.resources.patient import Patient
 
 from dataclasses import dataclass
 from typing import List, Optional
@@ -17,7 +20,7 @@ from unittest import TestCase
 
 import pytest
 
-from fhircraft.fhir.path.engine.core import Element, Invocation
+from fhircraft.fhir.path.engine.core import Element, Invocation, RootElement
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
 env = dict()
@@ -27,67 +30,68 @@ class TestRoot(TestCase):
     def test_evaluate_returns_collection_unchanged(self):
         # Root().evaluate should return the collection unchanged
         items = [
-            FHIRPathCollectionItem(value="a"),
-            FHIRPathCollectionItem(value="b"),
-            FHIRPathCollectionItem(value="c"),
+            FHIRPathCollectionItem(value=Patient()),
+            FHIRPathCollectionItem(value=Patient()),
+            FHIRPathCollectionItem(value=Patient()),
         ]
-        result = Root().evaluate(items, env)
+        result = RootElement('Patient').evaluate(items, env)
         assert result == items
         assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
 
     def test_evaluate_empty_collection_returns_empty_list(self):
         # Root().evaluate([]) should return []
-        result = Root().evaluate([], env)
+        result = RootElement('Patient').evaluate([], env)
         assert result == []
 
-    def test_evaluate_with_single_item(self):
-        item = FHIRPathCollectionItem(value="single")
-        result = Root().evaluate([item], env)
-        assert result == [item]
+    def test_raises_error_for_wrong_type(self):
+        item = FHIRPathCollectionItem(value=Patient())
+        with pytest.raises(FHIRPathError):
+            RootElement('Condition').evaluate([item], env)
+
 
     def test_root_string_representation(self):
-        expression = Root()
-        assert str(expression) == "$"
+        expression = RootElement('Patient')
+        assert str(expression) == "Patient"
 
 
-class TestParent(TestCase):
-    class DummyValue:
-        pass
+# class TestParent(TestCase):
+#     class DummyValue:
+#         pass
 
-    def _make_item_with_parent(self, parent_value=None):
-        parent_item = FHIRPathCollectionItem(value=parent_value or self.DummyValue())
-        child_item = FHIRPathCollectionItem(value=self.DummyValue(), parent=parent_item)
-        return child_item, parent_item
+#     def _make_item_with_parent(self, parent_value=None):
+#         parent_item = FHIRPathCollectionItem(value=parent_value or self.DummyValue())
+#         child_item = FHIRPathCollectionItem(value=self.DummyValue(), parent=parent_item)
+#         return child_item, parent_item
 
-    def test_evaluate_returns_parents_when_present(self):
-        child1, parent1 = self._make_item_with_parent()
-        child2, parent2 = self._make_item_with_parent()
-        collection = [child1, child2]
-        result = Parent().evaluate(collection, env)
-        assert result == [parent1, parent2]
-        assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
+#     def test_evaluate_returns_parents_when_present(self):
+#         child1, parent1 = self._make_item_with_parent()
+#         child2, parent2 = self._make_item_with_parent()
+#         collection = [child1, child2]
+#         result = Parent().evaluate(collection, env)
+#         assert result == [parent1, parent2]
+#         assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
 
-    def test_evaluate_skips_items_without_parent(self):
-        item_without_parent = FHIRPathCollectionItem(value=self.DummyValue())
-        child, parent = self._make_item_with_parent()
-        collection = [item_without_parent, child]
-        result = Parent().evaluate(collection, env)
-        assert result == [parent]
-        assert parent in result
-        assert item_without_parent not in result
+#     def test_evaluate_skips_items_without_parent(self):
+#         item_without_parent = FHIRPathCollectionItem(value=self.DummyValue())
+#         child, parent = self._make_item_with_parent()
+#         collection = [item_without_parent, child]
+#         result = Parent().evaluate(collection, env)
+#         assert result == [parent]
+#         assert parent in result
+#         assert item_without_parent not in result
 
-    def test_evaluate_empty_collection_returns_empty_list(self):
-        result = Parent().evaluate([], env)
-        assert result == []
+#     def test_evaluate_empty_collection_returns_empty_list(self):
+#         result = Parent().evaluate([], env)
+#         assert result == []
 
-    def test_evaluate_all_items_without_parent_returns_empty_list(self):
-        items = [FHIRPathCollectionItem(value=self.DummyValue()) for _ in range(3)]
-        result = Parent().evaluate(items, env)
-        assert result == []
+#     def test_evaluate_all_items_without_parent_returns_empty_list(self):
+#         items = [FHIRPathCollectionItem(value=self.DummyValue()) for _ in range(3)]
+#         result = Parent().evaluate(items, env)
+#         assert result == []
 
-    def test_parent_string_representation(self):
-        expression = Parent()
-        assert str(expression) == "$"
+#     def test_parent_string_representation(self):
+#         expression = Parent()
+#         assert str(expression) == "$"
 
 
 class TestThis(TestCase):
@@ -167,7 +171,7 @@ class TestElement(TestCase):
                 ]
 
         self.resource = DummyResource()
-        self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
+        self.collection = [FHIRPathCollectionItem(self.resource, path=This())]
 
     def test_element_string_representation(self):
         expression = Element("elementName")
@@ -190,7 +194,7 @@ class TestElement(TestCase):
             pass
 
         dummy = Dummy()
-        collection = [FHIRPathCollectionItem(dummy, path=Root())]
+        collection = [FHIRPathCollectionItem(dummy, path=This())]
         result = Element("newField").evaluate(collection, env, create=True)
         assert len(result) == 1
         assert hasattr(dummy, "newField")
@@ -238,7 +242,7 @@ class TestInvocation(TestCase):
                 self.status = "active"
 
         self.resource = DummyResource()
-        self.collection = [FHIRPathCollectionItem(self.resource, path=Root())]
+        self.collection = [FHIRPathCollectionItem(self.resource, path=This())]
 
     def test_evaluate_invokes_method_on_each_item(self):
         result = Invocation(Element("status"), Upper()).evaluate(self.collection, env)

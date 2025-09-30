@@ -24,6 +24,7 @@ import fhircraft.fhir.path.engine.utility as utility
 import fhircraft.fhir.path.engine.environment as environment
 from fhircraft.fhir.path.engine.core import (
     Element,
+    RootElement,
     FHIRPath,
     Invocation,
     Literal,
@@ -252,7 +253,7 @@ class FhirPathParser:
 
     def p_fhirpath_root(self, p):
         """root : ROOT_NODE"""
-        p[0] = environment.Root()
+        p[0] = RootElement(p[1])
 
     def p_fhirpath_element(self, p):
         """element : identifier"""
@@ -266,18 +267,12 @@ class FhirPathParser:
         """constant : ENVIRONMENTAL_VARIABLE"""
         if p[1] == "%context":
             p[0] = environment.This()
-        elif p[1] == "%resource":
-            p[0] = environment.Parent()
-        elif p[1] == "%rootResource":
-            p[0] = environment.Root()
         else:
             p[0] = p[1]
 
     def p_fhirpath_contextual(self, p):
         """contextual : CONTEXTUAL_OPERATOR"""
-        if p[1] == "$":
-            p[0] = environment.Root()
-        elif p[1] == "$this":
+        if p[1] == "$this":
             p[0] = environment.This()
         elif p[1] == "$index":
             p[0] = environment.CollectionIndex()
