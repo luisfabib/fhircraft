@@ -1,11 +1,11 @@
 import re
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Union, Dict
 
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 from fhircraft.utils import ensure_list
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection
+    from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
 
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
@@ -136,7 +136,7 @@ def evaluate_and_prepare_collection_values(
     create=False,
     prevent_all_empty: bool = True,
 ) -> tuple[Any | None, Any | None]:
-
+    from fhircraft.fhir.path.engine.core import Literal
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
         from fhircraft.fhir.path.engine.literals import Quantity
         return [
@@ -169,11 +169,17 @@ def evaluate_and_prepare_collection_values(
             left_collection = [None]
         if len(right_collection) == 0:
             right_collection = [None]
-    return left_collection[0], right_collection[0]
+    left_value = left_collection[0]
+    right_value = right_collection[0]
+    if isinstance(left_value, Literal):
+        left_value = left_value.value
+    if isinstance(right_value, Literal):
+        right_value = right_value.value
+    return left_value, right_value
 
 
-def get_expression_context(environment: dict, item: FHIRPathCollectionItem, index: int) -> dict:
+def get_expression_context(environment: Dict[str, FHIRPathCollectionItem], item: FHIRPathCollectionItem, index: int) -> dict:
     context = environment.copy()
-    context["$this"] = [item]
-    context["$index"] = [FHIRPathCollectionItem.wrap(index)]
+    context["$this"] = item
+    context["$index"] = FHIRPathCollectionItem.wrap(index)
     return context

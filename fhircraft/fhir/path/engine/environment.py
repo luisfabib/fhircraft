@@ -28,7 +28,10 @@ class ContextualVariable(FHIRPath):
         """
         if self.variable not in environment:
             raise ValueError(f"The {self.variable} operator is not defined within the current context.")
-        return [FHIRPathCollectionItem.wrap(environment[self.variable])]
+        value = environment[self.variable]
+        if value is None or value == []:
+            return []
+        return [FHIRPathCollectionItem.wrap(value)]
 
     def __str__(self):
         return self.variable

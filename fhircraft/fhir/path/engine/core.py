@@ -550,7 +550,7 @@ class FHIRPathFunction(FHIRPath, ABC):
         )
 
     def __str__(self):
-        return f"{self.__class__.__name__[0].lower() + self.__class__.__name__[1:]}({', '.join([str(arg) for arg in self.__arguments__()])})"
+        return f"{self.__class__.__name__[0].lower() + self.__class__.__name__[1:]}({', '.join([str(arg) for arg in self.__arguments__() if arg is not None])})"
 
     def __repr__(self):
         return f"{self.__class__.__name__}({','.join([repr(arg) for arg in self.__arguments__()])})"
