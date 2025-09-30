@@ -493,13 +493,16 @@ class ResourceFactory:
         # Determine whether typing should be a list based on max. cardinality
         is_list_type = max_card is None or max_card > 1
         actual_field_type = field_type
+        # Handle list types
         if is_list_type:
             actual_field_type = List[actual_field_type]
-            default = ensure_list(default) if default is not _Unset else default
-        # Determine whether the field is optional
-        if min_card == 0:
-            actual_field_type = Optional[actual_field_type]
+        
+        # All fields are non-required and non-nullable
+        if default is _Unset:
             default = None
+        elif is_list_type:
+            default = ensure_list(default)
+            
         # Construct the Pydantic field
         return (
             actual_field_type,
@@ -1156,7 +1159,7 @@ class ResourceFactory:
                     self._handle_python_reserved_keyword(f"{name}_ext")
                 )
                 fields[safe_ext_field_name] = self._construct_Pydantic_field(
-                    get_complex_FHIR_type("Extension", self.Config.FHIR_release if self.Config else "4.3.0"),
+                    get_complex_FHIR_type("Element", self.Config.FHIR_release if self.Config else "4.3.0"),
                     min_card=0,
                     max_card=1,
                     alias=f"_{name}",

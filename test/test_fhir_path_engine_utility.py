@@ -25,7 +25,7 @@ def test_trace_string_representation():
 def test_today_returns_current_date():
     result = Today().evaluate([])
     assert isinstance(result[0].value, Date)
-    assert result[0] == Date(value_date=datetime.datetime.now().date())
+    assert result[0].value == Date(value_date=datetime.datetime.now().date())
 
 def test_today_string_representation():
     expression = Today()
@@ -38,7 +38,7 @@ def test_today_string_representation():
 def test_now_returns_current_datetime():
     result = Now().evaluate([])
     assert isinstance(result[0].value, DateTime)
-    assert result[0] == DateTime(value_datetime=datetime.datetime.now())
+    assert result[0].value == DateTime(value_datetime=datetime.datetime.now())
 
 def test_now_string_representation():
     expression = Now()
@@ -51,7 +51,7 @@ def test_now_string_representation():
 def test_timeofday_returns_current_time():
     result = TimeOfDay().evaluate([])
     assert isinstance(result[0].value, Time)
-    assert result[0] == Time(value_time=datetime.datetime.now())
+    assert result[0].value == Time(value_time=datetime.datetime.now())
 
 def test_timeofday_string_representation():
     expression = TimeOfDay()

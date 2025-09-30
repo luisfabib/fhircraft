@@ -230,14 +230,14 @@ class TestConstructPydanticField(FactoryTestCase):
             field_type, min_card=1, max_card=1
         )
         assert result[0] == field_type
-        assert result[1].is_required() == True
+        assert result[1].is_required() == False
 
-    def test_constructs_optional_field(self):
+    def test_constructs_non_optional_field(self):
         field_type = primitives.String
         result = self.factory._construct_Pydantic_field(
             field_type, min_card=0, max_card=1
         )
-        assert result[0] == Optional[field_type]
+        assert result[0] == field_type
         assert result[1].is_required() == False
         assert result[1].default is None
 
@@ -247,14 +247,14 @@ class TestConstructPydanticField(FactoryTestCase):
             field_type, min_card=1, max_card=99999
         )
         assert result[0] == List[field_type]
-        assert result[1].is_required() == True
+        assert result[1].is_required() == False
 
     def test_constructs_optional_list_field(self):
         field_type = primitives.String
         result = self.factory._construct_Pydantic_field(
             field_type, min_card=0, max_card=99999
         )
-        assert result[0] == Optional[List[field_type]]
+        assert result[0] == List[field_type]
         assert result[1].is_required() == False
         assert result[1].default is None
 
@@ -327,6 +327,7 @@ class TestProcessCardinalityConstraints(FactoryTestCase):
 
     @parameterized.expand(
         [
+            (ElementDefinition.model_construct(min=0, max="0"), 0, 0),
             (ElementDefinition.model_construct(min=0, max="1"), 0, 1),
             (ElementDefinition.model_construct(min=1, max="2"), 1, 2),
             (ElementDefinition.model_construct(min=0, max="*"), 0, 99999),
@@ -670,16 +671,9 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
         # Check that both the main field and extension field were created with safe names
         fields = model.model_fields
 
-        # Should have 'for_' field for the main field
         assert "for_" in fields
+        assert "for_ext" in fields
 
-        # Should have an extension field for the 'for' field (primitive fields get _ext fields)
-        # The extension field name will be based on the original name + '_ext',
-        # then checked for keywords
-        ext_field_candidates = [
-            name for name in fields.keys() if "for" in name and "ext" in name
-        ]
-        assert len(ext_field_candidates) > 0
 
 
 class TestResourceFactoryPackageMethods(TestCase):

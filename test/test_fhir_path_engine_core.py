@@ -199,6 +199,12 @@ class TestElement(TestCase):
         result = Element("status").evaluate(self.collection, create=False)
         assert result[0].parent == self.collection[0]
 
+def test_children_returns_correct_primitive_extension():
+    ext = dict(extension=[dict(url="http://example.com/ext", value="Extension Value")])
+    resource = dict(fieldA=1, fieldB_ext=ext)
+    collection = [FHIRPathCollectionItem(value=resource)]
+    result = Element('fieldB').evaluate(collection)
+    assert result[0].value == ext
 
 class TestInvocation(TestCase):
 
