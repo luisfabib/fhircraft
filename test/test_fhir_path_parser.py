@@ -33,6 +33,7 @@ parser_test_cases = (
     # ----------------------------------
     ("$", Root()),
     ("$this", This()),
+    ("$index", CollectionIndex()),
     ("%rootResource", Root()),
     ("%resource", Parent()),
     ("%context", This()),

@@ -10,6 +10,7 @@ from fhircraft.fhir.path.engine.core import (
     Parent,
     Root,
     This,
+    CollectionIndex,
 )
 from fhircraft.fhir.path.engine.strings import Upper
 
@@ -129,6 +130,32 @@ class TestThis(TestCase):
         expression = This()
         assert str(expression) == "$this"
 
+
+class TestCollectionIndex(TestCase):
+    class DummyValue:
+        pass
+
+    def setUp(self):
+        self.value1 = self.DummyValue()
+        self.value2 = self.DummyValue()
+        self.items = [
+            FHIRPathCollectionItem(value=self.value1),
+            FHIRPathCollectionItem(value=self.value2),
+        ]
+
+    def test_evaluate_returns_indices(self):
+        # Index().evaluate should return the indices
+        result = CollectionIndex().evaluate(self.items)
+        assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
+        assert [item.value for item in result] == [0, 1]
+
+    def test_evaluate_empty_collection_returns_empty_list(self):
+        result = CollectionIndex().evaluate([])
+        assert result == []
+
+    def test_index_string_representation(self):
+        expression = CollectionIndex()
+        assert str(expression) == "$index"
 
 class TestElement(TestCase):
 

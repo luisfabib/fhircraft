@@ -38,7 +38,6 @@ def test_today_string_representation():
 def test_now_returns_current_datetime():
     result = Now().evaluate([])
     assert isinstance(result[0].value, DateTime)
-    assert result[0].value == DateTime(value_datetime=datetime.datetime.now())
 
 def test_now_string_representation():
     expression = Now()

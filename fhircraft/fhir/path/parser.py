@@ -25,6 +25,7 @@ from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPath,
     Invocation,
+    CollectionIndex,
     Literal,
     Parent,
     Root,
@@ -282,7 +283,7 @@ class FhirPathParser:
         elif p[1] == "$this":
             p[0] = This()
         elif p[1] == "$index":
-            raise NotImplementedError()
+            p[0] = CollectionIndex()
         elif p[1] == "$total":
             raise NotImplementedError()
         else:

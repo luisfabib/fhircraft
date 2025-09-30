@@ -838,6 +838,38 @@ class This(FHIRPath):
         return hash("this")
 
 
+class CollectionIndex(FHIRPath):
+    """
+    A class representation of the FHIRPath `$index` operator used to represent
+    the index of an item in the input collection currently under evaluation.
+    """
+
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
+        """
+        Returns the index of each item in the input collection.
+
+        Args:
+            collection (FHIRPathCollection): The collection of items to be evaluated.
+
+        Returns:
+            collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
+        """
+        return [FHIRPathCollectionItem.wrap(index) for index, _ in enumerate(collection)]
+
+    def __str__(self):
+        return "$index"
+
+    def __repr__(self):
+        return "Index()"
+
+    def __eq__(self, other):
+        return isinstance(other, CollectionIndex)
+
+    def __hash__(self):
+        return hash("index")
+
 class Invocation(FHIRPath):
     """
     A class representing an invocation in the context of FHIRPath evaluation
