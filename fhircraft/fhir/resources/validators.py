@@ -45,11 +45,7 @@ def _validate_FHIR_element_constraint(
         return value
     for item in ensure_list(value):
         try:
-            valid = fhirpath.parse(expression).evaluate(
-                [FHIRPathCollectionItem(value=item)], create=False
-            )
-            if valid == []:
-                valid = True
+            valid = fhirpath.parse(expression).single(item, default=True)
             error_message = f'{human}. [{key}] -> "{expression}"'
             if severity == "warning" and not valid:
                 warnings.warn(error_message, FhirPathWarning)

@@ -7,6 +7,8 @@ from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.equality import *
 from fhircraft.fhir.path.engine.literals import *
 
+env = dict()
+
 # -------------
 # Equals
 # -------------
@@ -43,7 +45,7 @@ def test_equals_returns_correct_boolean(left, right, expected):
     result = Equals(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 def test_equals_string_representation():
@@ -57,7 +59,7 @@ def test_notequals_returns_correct_boolean(left, right, expected):
     result = NotEquals(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     assert result != [FHIRPathCollectionItem(value=expected)]
 
 def test_notequals_string_representation():
@@ -101,7 +103,7 @@ def test_equivalent_returns_correct_boolean(left, right, expected):
     result = Equivalent(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 def test_equivalent_string_representation():
@@ -115,7 +117,7 @@ def test_notequivalent_returns_correct_boolean(left, right, expected):
     result = NotEquivalent(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     assert result != [FHIRPathCollectionItem(value=expected)]
 
 def test_notequivalent_string_representation():

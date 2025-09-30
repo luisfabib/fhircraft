@@ -46,7 +46,7 @@ class Extension(FHIRPathFunction):
         self.url = url
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Filters the input collection for items named `extension` with the given `url`.
@@ -54,6 +54,8 @@ class Extension(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -61,7 +63,7 @@ class Extension(FHIRPathFunction):
         return Invocation(
             Element("extension"),
             Where(Equals(Element("url"), [FHIRPathCollectionItem.wrap(self.url)])),
-        ).evaluate(collection, create=create)
+        ).evaluate(collection, environment, create)
 
     def __str__(self):
         return f'Extension("{self.url}")'
@@ -86,7 +88,7 @@ class TypeChoice(FHIRPath):
         self.type_choice_name = type_choice_name
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         return [
             FHIRPathCollectionItem(
@@ -119,7 +121,7 @@ class HasValue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns true if the input collection contains a single value which is a FHIR primitive, and it has a primitive
@@ -127,6 +129,8 @@ class HasValue(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -146,7 +150,7 @@ class GetValue(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Return the underlying system value for the FHIR primitive if the input collection contains a single
@@ -154,11 +158,13 @@ class GetValue(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        if not HasValue().evaluate(collection, create=create):
+        if not HasValue().evaluate(collection, environment, create=create):
             return []
         if len(collection) != 1:
             return []
@@ -171,7 +177,7 @@ class Resolve(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         For each item in the collection, if it is a string that is a `uri` (or `canonical` or `url`), locate the target of the
@@ -183,6 +189,8 @@ class Resolve(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -404,7 +412,7 @@ class HtmlChecks(FHIRPathFunction):
             self.handle_starttag(tag, attrs)
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         When invoked on a single xhtml element returns true if the rules around HTML usage are met, and false if they are not.
@@ -412,6 +420,8 @@ class HtmlChecks(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             bool
@@ -477,7 +487,7 @@ class ElementDefinition(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the FHIR element definition information for each element in the input collection.
@@ -485,6 +495,8 @@ class ElementDefinition(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Raises:
             NotImplementedError: This FHIRPath function is not supported.
@@ -500,7 +512,7 @@ class LowBoundary(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the low boundary of a quantity or range based on precision.
@@ -509,6 +521,8 @@ class LowBoundary(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.
@@ -590,7 +604,7 @@ class HighBoundary(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the high boundary of a quantity or range based on precision.
@@ -599,6 +613,8 @@ class HighBoundary(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             collection (FHIRPathCollection): The output collection.

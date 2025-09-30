@@ -6,6 +6,8 @@ from fhircraft.fhir.path.engine.additional import GetValue
 from fhircraft.fhir.path.engine.boolean import *
 from fhircraft.fhir.path.engine.core import *
 
+env = dict()
+
 # -------------
 # And
 # -------------
@@ -30,7 +32,7 @@ def test_and_returns_correct_logic_boolean(left, right, expected):
     result = And(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
@@ -62,7 +64,7 @@ def test_or_returns_correct_logic_boolean(left, right, expected):
     result = Or(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
@@ -94,7 +96,7 @@ def test_xor_returns_correct_logic_boolean(left, right, expected):
     result = Xor(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
@@ -126,7 +128,7 @@ def test_implies_returns_correct_logic_boolean(left, right, expected):
     result = Implies(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 
@@ -146,7 +148,7 @@ not_boolean_logic_cases = (
 
 @pytest.mark.parametrize("value, expected", not_boolean_logic_cases)
 def test_not_returns_correct_logic_boolean(value, expected):
-    result = Not().evaluate([FHIRPathCollectionItem(value=value)])
+    result = Not().evaluate([FHIRPathCollectionItem(value=value)], env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
 

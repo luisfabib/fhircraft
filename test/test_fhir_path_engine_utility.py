@@ -2,6 +2,8 @@ from fhircraft.fhir.path.engine.utility import *
 from fhircraft.fhir.path.engine.literals import Date, Time
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem, Element
 
+env = dict()
+
 logger = logging.getLogger("FHIRPath")
 
 # -------------
@@ -11,7 +13,7 @@ logger = logging.getLogger("FHIRPath")
 def test_trace_logs_collection_and_returns_input(caplog):
     caplog.set_level(logging.INFO)
     collection = [FHIRPathCollectionItem(value="item1"), FHIRPathCollectionItem(value="item2")]
-    result = Trace("TestTrace").evaluate(collection)    
+    result = Trace("TestTrace").evaluate(collection, env)    
     assert result == collection
 
 def test_trace_string_representation():
@@ -23,7 +25,7 @@ def test_trace_string_representation():
 # -------------
 
 def test_today_returns_current_date():
-    result = Today().evaluate([])
+    result = Today().evaluate([], env)
     assert isinstance(result[0].value, Date)
     assert result[0].value == Date(value_date=datetime.datetime.now().date())
 
@@ -36,7 +38,7 @@ def test_today_string_representation():
 # -------------
 
 def test_now_returns_current_datetime():
-    result = Now().evaluate([])
+    result = Now().evaluate([], env)
     assert isinstance(result[0].value, DateTime)
 
 def test_now_string_representation():
@@ -48,7 +50,7 @@ def test_now_string_representation():
 # -------------
 
 def test_timeofday_returns_current_time():
-    result = TimeOfDay().evaluate([])
+    result = TimeOfDay().evaluate([], env)
     assert isinstance(result[0].value, Time)
     assert result[0].value == Time(value_time=datetime.datetime.now())
 

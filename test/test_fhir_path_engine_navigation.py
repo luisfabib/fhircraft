@@ -6,6 +6,8 @@ from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.navigation import *
 from fhircraft.fhir.resources.datatypes.R4.complex_types import Element as El, Extension
 
+env = dict()
+
 # -------------
 # Children
 # -------------
@@ -13,7 +15,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex_types import Element as El, E
 
 def test_children_returns_empty_for_empty_collection():
     collection = []
-    result = Children().evaluate(collection)
+    result = Children().evaluate(collection, env)
     assert result == []
 
 
@@ -25,7 +27,7 @@ def test_children_returns_correct_elements_model():
 
     resource = Resource(fieldA=1, fieldB=2, fieldC=3)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Children().evaluate(collection)
+    result = Children().evaluate(collection, env)
     assert result[0].value == 1
     assert result[1].value == 2
     assert result[2].value == 3
@@ -39,7 +41,7 @@ def test_children_returns_correct_elements_dict():
 
     resource = Resource(fieldA=1, fieldB=2, fieldC=3).model_dump()
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Children().evaluate(collection)
+    result = Children().evaluate(collection, env)
     assert result[0].value == 1
     assert result[1].value == 2
     assert result[2].value == 3
@@ -55,7 +57,7 @@ def test_children_string_representation():
 
 def test_decendants_returns_empty_for_empty_collection():
     collection = []
-    result = Descendants().evaluate(collection)
+    result = Descendants().evaluate(collection, env)
     assert result == []
 
 
@@ -70,7 +72,7 @@ def test_descendants_returns_correct_elements():
         fieldA=1, fieldB=2, fieldC=3, subfield=Resource(fieldA=4, fieldB=5, fieldC=6)
     )
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Descendants().evaluate(collection)
+    result = Descendants().evaluate(collection, env)
     assert result[0].value == 1
     assert result[1].value == 2
     assert result[2].value == 3

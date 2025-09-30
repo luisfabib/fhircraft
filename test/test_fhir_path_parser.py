@@ -16,6 +16,7 @@ from fhircraft.fhir.path.engine.literals import *
 from fhircraft.fhir.path.engine.math import *
 from fhircraft.fhir.path.engine.navigation import *
 from fhircraft.fhir.path.engine.strings import *
+from fhircraft.fhir.path.engine.environment import *
 from fhircraft.fhir.path.engine.subsetting import *
 from fhircraft.fhir.path.engine.types import *
 from fhircraft.fhir.path.engine.utility import *

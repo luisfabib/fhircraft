@@ -1,8 +1,11 @@
 from collections import namedtuple
 
 from fhircraft.fhir.path.engine.comparison import *
+from fhircraft.fhir.path.engine.environment import This
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.filtering import *
+
+env = dict()
 
 # -------------
 # Where
@@ -12,7 +15,7 @@ from fhircraft.fhir.path.engine.filtering import *
 def test_where_returns_empty_for_empty_collection():
     collection = []
     result = Where(LessThan(This(), [FHIRPathCollectionItem.wrap(1)])).evaluate(
-        collection
+        collection, env
     )
     assert result == []
 
@@ -20,7 +23,7 @@ def test_where_returns_empty_for_empty_collection():
 def test_where_returns_valid_items_in_collection_where_true():
     collection = [FHIRPathCollectionItem(value=4), FHIRPathCollectionItem(value=1)]
     result = Where(LessThan(This(), [FHIRPathCollectionItem.wrap(3)])).evaluate(
-        collection
+        collection, env
     )
     assert result == [collection[1]]
 
@@ -35,7 +38,7 @@ def test_where_string_representation():
 
 def test_select_returns_empty_for_empty_collection():
     collection = []
-    result = Select(Invocation(This(), Element("field"))).evaluate(collection)
+    result = Select(Invocation(This(), Element("field"))).evaluate(collection, env)
     assert result == []
 
 
@@ -45,7 +48,7 @@ def test_select_returns_collection_of_projected_elements():
         FHIRPathCollectionItem(value=Resource(field=123)),
         FHIRPathCollectionItem(value=Resource(field=456)),
     ]
-    result = Select(Invocation(This(), Element("field"))).evaluate(collection)
+    result = Select(Invocation(This(), Element("field"))).evaluate(collection, env)
     assert result[0].value == 123
     assert result[1].value == 456
 
@@ -60,7 +63,7 @@ def test_select_string_representation():
 
 def test_repeat_returns_empty_for_empty_collection():
     collection = []
-    result = Repeat(Invocation(This(), Element("field"))).evaluate(collection)
+    result = Repeat(Invocation(This(), Element("field"))).evaluate(collection, env)
     assert result == []
 
 
@@ -78,7 +81,7 @@ def test_repeat_returns_collection_of_nested_repeating_elements():
             )
         )
     ]
-    result = Repeat(Invocation(This(), Element("items"))).evaluate(collection)
+    result = Repeat(Invocation(This(), Element("items"))).evaluate(collection, env)
     assert [item.value.label for item in result] == [
         "1.1",
         "1.2",
@@ -98,7 +101,7 @@ def test_repeat_string_representation():
 
 def test_ofType_returns_empty_for_empty_collection():
     collection = []
-    result = OfType(str).evaluate(collection)
+    result = OfType(str).evaluate(collection, env)
     assert result == []
 
 
@@ -110,7 +113,7 @@ def test_ofType_returns_filtered_collection_by_type():
         FHIRPathCollectionItem(value=Resource2(value=2)),
         FHIRPathCollectionItem(value=Resource1(value=3)),
     ]
-    result = OfType(Resource1).evaluate(collection)
+    result = OfType(Resource1).evaluate(collection, env)
     assert result == [collection[0], collection[2]]
 
 

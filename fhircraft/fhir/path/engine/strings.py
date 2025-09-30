@@ -65,7 +65,7 @@ class IndexOf(StringManipulationFunction):
         self.substring = substring
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the 0-based index of the first position substring is found in the input string,
@@ -75,6 +75,8 @@ class IndexOf(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -103,7 +105,7 @@ class Substring(StringManipulationFunction):
         self.end: int | None = end.value if isinstance(end, Literal) else end
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the part of the string starting at position start (zero-based). If length is given, will
@@ -117,6 +119,8 @@ class Substring(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -150,7 +154,7 @@ class StartsWith(StringManipulationFunction):
         self.prefix = prefix
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns true when the input string starts with the given prefix.
@@ -159,6 +163,8 @@ class StartsWith(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -171,7 +177,7 @@ class StartsWith(StringManipulationFunction):
         self.validate_collection(collection)
         if not collection or not self.prefix.value:
             return []
-        prefix_collection = self.prefix.evaluate(collection)
+        prefix_collection = self.prefix.evaluate(collection, environment, create)
         if not prefix_collection:
             return []
         prefix = prefix_collection[0].value
@@ -196,7 +202,7 @@ class EndsWith(StringManipulationFunction):
         self.suffix = suffix
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns true when the input string ends with the given suffix.
@@ -205,6 +211,8 @@ class EndsWith(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -236,7 +244,7 @@ class Contains(StringManipulationFunction):
         self.substring = substring
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns true when the given substring is a substring of the input string.
@@ -245,6 +253,8 @@ class Contains(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -271,7 +281,7 @@ class Upper(StringManipulationFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the input string with all characters converted to upper case.
@@ -279,6 +289,8 @@ class Upper(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -299,7 +311,7 @@ class Lower(StringManipulationFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the input string with all characters converted to lower case.
@@ -307,6 +319,8 @@ class Lower(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -343,7 +357,7 @@ class Replace(StringManipulationFunction):
         self.substitution = substitution
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the input string with all instances of `pattern` replaced with `substitution`.
@@ -354,6 +368,8 @@ class Replace(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -388,7 +404,7 @@ class Matches(StringManipulationFunction):
         self.regex = regex
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` when the value matches the given regular expression. Regular expressions
@@ -398,6 +414,8 @@ class Matches(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -438,7 +456,7 @@ class ReplaceMatches(StringManipulationFunction):
         self.substitution = substitution
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Matches the input using the regular expression in regex and replaces each match with the
@@ -447,6 +465,8 @@ class ReplaceMatches(StringManipulationFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -471,13 +491,15 @@ class Length(StringManipulationFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the length of the input string. If the input collection is empty (`[]`), the result is empty.
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -498,13 +520,15 @@ class ToChars(StringManipulationFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the list of characters in the input string. If the input collection is empty (`[]`), the result is empty.
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -538,7 +562,7 @@ class Concatenation(FHIRPath):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         For strings, will concatenate the strings, where an empty operand is taken to be the empty string.
@@ -549,6 +573,8 @@ class Concatenation(FHIRPath):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -557,7 +583,7 @@ class Concatenation(FHIRPath):
             FHIRPathError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create, prevent_all_empty=False
+            self, self.left, self.right, collection, environment, create, prevent_all_empty=False
         )
         left_value = left_value or [""]
         right_value = right_value or [""]

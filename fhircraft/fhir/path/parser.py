@@ -21,15 +21,12 @@ import fhircraft.fhir.path.engine.strings as strings
 import fhircraft.fhir.path.engine.subsetting as subsetting
 import fhircraft.fhir.path.engine.types as types
 import fhircraft.fhir.path.engine.utility as utility
+import fhircraft.fhir.path.engine.environment as environment
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPath,
     Invocation,
-    CollectionIndex,
     Literal,
-    Parent,
-    Root,
-    This,
 )
 from fhircraft.fhir.path.exceptions import FhirPathLexerError, FhirPathParserError
 from fhircraft.fhir.path.lexer import FhirPathLexer
@@ -255,7 +252,7 @@ class FhirPathParser:
 
     def p_fhirpath_root(self, p):
         """root : ROOT_NODE"""
-        p[0] = Root()
+        p[0] = environment.Root()
 
     def p_fhirpath_element(self, p):
         """element : identifier"""
@@ -268,22 +265,22 @@ class FhirPathParser:
     def p_fhirpath_constant(self, p):
         """constant : ENVIRONMENTAL_VARIABLE"""
         if p[1] == "%context":
-            p[0] = This()
+            p[0] = environment.This()
         elif p[1] == "%resource":
-            p[0] = Parent()
+            p[0] = environment.Parent()
         elif p[1] == "%rootResource":
-            p[0] = Root()
+            p[0] = environment.Root()
         else:
             p[0] = p[1]
 
     def p_fhirpath_contextual(self, p):
         """contextual : CONTEXTUAL_OPERATOR"""
         if p[1] == "$":
-            p[0] = Root()
+            p[0] = environment.Root()
         elif p[1] == "$this":
-            p[0] = This()
+            p[0] = environment.This()
         elif p[1] == "$index":
-            p[0] = CollectionIndex()
+            p[0] = environment.CollectionIndex()
         elif p[1] == "$total":
             raise NotImplementedError()
         else:

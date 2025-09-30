@@ -16,13 +16,15 @@ class Children(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns a collection with all immediate child nodes of all items in the input collection.
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -46,7 +48,7 @@ class Descendants(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns a collection with all descendant nodes of all items in the input collection. The result does not include
@@ -54,6 +56,8 @@ class Descendants(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -61,4 +65,4 @@ class Descendants(FHIRPathFunction):
         Note:
             This function is a shorthand for `repeat(children())`.
         """
-        return Repeat(Children()).evaluate(collection, create)
+        return Repeat(Children()).evaluate(collection, environment, create)

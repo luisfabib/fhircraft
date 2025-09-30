@@ -89,12 +89,13 @@ def import_fhirpath_engine():
 def evaluate_fhirpath_collection(
     fhir_path: Union["FHIRPath", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
+    environment: dict,
     create: bool = False,
 ) -> "FHIRPathCollection":
     from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollectionItem
 
     return (
-        [item for item in fhir_path.evaluate(collection, create)]
+        [item for item in fhir_path.evaluate(collection, environment, create)]
         if isinstance(fhir_path, FHIRPath)
         else [FHIRPathCollectionItem.wrap(item) for item in ensure_list(fhir_path)]
     )
@@ -104,6 +105,7 @@ def evaluate_left_right_expressions(
     left: Union["FHIRPath", "FHIRPathCollection"],
     right: Union["FHIRPath", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
+    environment: dict,
     create: "bool",
 ) -> tuple["FHIRPathCollection", "FHIRPathCollection"]:
     """
@@ -119,8 +121,8 @@ def evaluate_left_right_expressions(
     Returns:
         tuple[FHIRPathCollection, FHIRPathCollection]: A tuple containing the evaluated left and right collections of values.
     """
-    left_collection = evaluate_fhirpath_collection(left, collection, create)
-    right_collection = evaluate_fhirpath_collection(right, collection, create)
+    left_collection = evaluate_fhirpath_collection(left, collection, environment, create)
+    right_collection = evaluate_fhirpath_collection(right, collection, environment, create)
     return left_collection, right_collection
 
 
@@ -129,6 +131,7 @@ def evaluate_and_prepare_collection_values(
     left: Union["FHIRPath", "FHIRPathCollection"],
     right: Union["FHIRPath", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
+    environment: dict,
     create=False,
     prevent_all_empty: bool = True,
 ) -> tuple[Any | None, Any | None]:
@@ -145,7 +148,7 @@ def evaluate_and_prepare_collection_values(
         ]
 
     left_collection, right_collection = evaluate_left_right_expressions(
-        left, right, collection, create
+        left, right, collection, environment, create
     )
     left_collection = _get_collection_values(left_collection)
     right_collection = _get_collection_values(right_collection)

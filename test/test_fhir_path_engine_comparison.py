@@ -5,6 +5,8 @@ from fhircraft.fhir.path.engine.comparison import *
 from fhircraft.fhir.path.engine.additional import GetValue
 from fhircraft.fhir.path.engine.core import Element,  FHIRPathCollectionItem, Invocation
 
+env = dict()
+
 #-------------
 # GreaterThan
 #-------------
@@ -31,7 +33,7 @@ def test_greater_than_returns_correct_boolean(left, right, expected):
     result = GreaterThan(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 def test_greaterthan_string_representation():
@@ -64,7 +66,7 @@ def test_less_than_returns_correct_boolean(left, right, expected):
     result = LessThan(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 def test_lessthan_string_representation():
@@ -97,7 +99,7 @@ def test_less_equal_than_returns_correct_boolean(left, right, expected):
     result = LessEqualThan(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 def test_lessequalthan_string_representation():
@@ -128,7 +130,7 @@ def test_greater_equal_than_returns_correct_boolean(left, right, expected):
     result = GreaterEqualThan(
         Invocation(Element("left"), GetValue()),
         Invocation(Element("right"), GetValue()),
-    ).evaluate(collection)
+    ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 def test_greater_equal_than_string_representation():
