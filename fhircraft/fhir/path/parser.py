@@ -22,6 +22,7 @@ import fhircraft.fhir.path.engine.subsetting as subsetting
 import fhircraft.fhir.path.engine.types as types
 import fhircraft.fhir.path.engine.utility as utility
 import fhircraft.fhir.path.engine.environment as environment
+import fhircraft.fhir.path.engine.aggregates as aggregates
 from fhircraft.fhir.path.engine.core import (
     Element,
     RootElement,
@@ -508,6 +509,11 @@ class FhirPathParser:
             p[0] = types.LegacyIs(*p[3])
         elif check(p, "as", nargs=1):
             p[0] = types.LegacyAs(*p[3])
+        # -------------------------------------------------------------------------------
+        # Aggregation functions
+        # -------------------------------------------------------------------------------
+        elif check(p, "aggregate", nargs=[1, 2]):
+            p[0] = aggregates.Aggregate(*p[3])
         else:
             pos = self.string.find(str(p[1]))
             raise FhirPathParserError(

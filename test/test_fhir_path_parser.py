@@ -18,6 +18,7 @@ from fhircraft.fhir.path.engine.navigation import *
 from fhircraft.fhir.path.engine.strings import *
 from fhircraft.fhir.path.engine.environment import *
 from fhircraft.fhir.path.engine.subsetting import *
+from fhircraft.fhir.path.engine.aggregates import *
 from fhircraft.fhir.path.engine.types import *
 from fhircraft.fhir.path.engine.utility import *
 from fhircraft.fhir.path.lexer import FhirPathLexer, FhirPathLexerError
@@ -259,6 +260,11 @@ parser_test_cases = (
     ("parent.power(2)", Invocation(Element("parent"), Power(Literal(2)))),
     ("parent.round(2)", Invocation(Element("parent"), Round(Literal(2)))),
     ("parent.truncate()", Invocation(Element("parent"), Truncate())),
+    # ----------------------------------
+    # Aggregation functions
+    # ----------------------------------
+    ("parent.aggregate($this + $total)", Invocation(Element("parent"), Aggregate(Addition(ContextualThis(), ContextualTotal())))),
+    ("parent.aggregate($this + $total, 0)", Invocation(Element("parent"), Aggregate(Addition(ContextualThis(), ContextualTotal()), Literal(0)))),
     # ----------------------------------
     # Utility functions
     # ----------------------------------
