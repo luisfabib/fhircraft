@@ -682,40 +682,43 @@ class Element(FHIRPath):
             else:
                 current_values[index] = value
 
-    def evaluate(
-        self, collection: FHIRPathCollection, create=False
-    ) -> FHIRPathCollection:
+    def _get_collection_by_label(self, collection: FHIRPathCollection, label: str, create: bool) -> FHIRPathCollection:
         element_collection = []
         for item in collection:
             if item.value is None:
                 continue
             if isinstance(item.value, dict):
-                element_value = item.value.get(self.label, None)
+                element_value = item.value.get(label, None)
             else:
-                element_value = getattr(item.value, self.label, None)
+                element_value = getattr(item.value, label, None)
             if not element_value and not isinstance(element_value, bool) and create:
                 element_value = self.create_element(item.value)
                 if isinstance(item.value, dict):
-                    item.value[self.label] = element_value
+                    item.value[label] = element_value
                 else:
-                    setattr(item.value, self.label, element_value)
+                    setattr(item.value, label, element_value)
 
             for index, value in enumerate(ensure_list(element_value)):
                 if create or value is not None:
                     element = FHIRPathCollectionItem(
                         value,
-                        path=Element(self.label),
+                        path=Element(label),
                         parent=item,
                     )
                     element.setter = partial(
                         self.setter,
                         item=item,
                         index=index,
-                        label=self.label,
+                        label=label,
                         is_list_type=element.is_list_type,
                     )
                     element_collection.append(element)
         return element_collection
+    
+    def evaluate(
+        self, collection: FHIRPathCollection, create=False
+    ) -> FHIRPathCollection:
+        return self._get_collection_by_label(collection, self.label, create) or self._get_collection_by_label(collection, f'{self.label}_ext', create)
 
     def __str__(self):
         return self.label

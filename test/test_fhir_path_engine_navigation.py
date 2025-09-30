@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.navigation import *
+from fhircraft.fhir.resources.datatypes.R4.complex_types import Element as El, Extension
 
 # -------------
 # Children
@@ -16,13 +17,27 @@ def test_children_returns_empty_for_empty_collection():
     assert result == []
 
 
-def test_children_returns_correct_elements():
+def test_children_returns_correct_elements_model():
     class Resource(BaseModel):
         fieldA: int
         fieldB: int
         fieldC: int
 
     resource = Resource(fieldA=1, fieldB=2, fieldC=3)
+    collection = [FHIRPathCollectionItem(value=resource)]
+    result = Children().evaluate(collection)
+    assert result[0].value == 1
+    assert result[1].value == 2
+    assert result[2].value == 3
+
+
+def test_children_returns_correct_elements_dict():
+    class Resource(BaseModel):
+        fieldA: int
+        fieldB: int
+        fieldC: int
+
+    resource = Resource(fieldA=1, fieldB=2, fieldC=3).model_dump()
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Children().evaluate(collection)
     assert result[0].value == 1

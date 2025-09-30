@@ -162,7 +162,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     
     def __repr__(self) -> str:
         repr_args = []
-        for fieldname in self.model_fields_set or self.__class__model_fields:
+        for fieldname in self.model_fields_set or self.__class__.model_fields:
             value = getattr(self, fieldname)
             repr_args.append(f'{fieldname}={value}')
         return f"{self.__class__.__name__}({', '.join(repr_args)})"
