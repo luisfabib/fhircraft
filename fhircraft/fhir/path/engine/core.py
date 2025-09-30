@@ -379,22 +379,15 @@ class FHIRPath(ABC):
             child: The child node to be evaluated, which can be an instance of This, Root, or another node type.
 
         Returns:
-            The resulting node based on the following logic:
-                - If the current node is an instance of This or Root, returns the child node.
-                - If the child node is an instance of This, returns the current node.
-                - If the child node is an instance of Root, returns the child node.
-                - Otherwise, returns a new Invocation node combining the current node and the child.
+            The resulting node
 
         Note:
             This method is used internally to manage navigation and invocation logic within the path engine.
         """
-        from .environment import This, Root
-        if isinstance(self, This) or isinstance(self, Root):
+        if isinstance(self, This):
             return child
         elif isinstance(child, This):
             return self
-        elif isinstance(child, Root):
-            return child
         else:
             return Invocation(self, child)
 
@@ -422,7 +415,6 @@ class FHIRPathCollectionItem(object):
     setter: Optional[Callable] = None
     
     def __psot_init__(self):
-        from fhircraft.fhir.path.engine.environment import This
         self.path = self.path or This()
         
     @classmethod
@@ -770,7 +762,7 @@ class Invocation(FHIRPath):
             FHIRPathCollection: The resulting child collection after the evaluation process.
         """
         parent_collection = self.left.evaluate(collection, environment, create)
-        return self.right.evaluate(parent_collection, create)
+        return self.right.evaluate(parent_collection, environment, create)
 
     def __eq__(self, other):
         return (
@@ -788,6 +780,39 @@ class Invocation(FHIRPath):
     def __hash__(self):
         return hash((self.left, self.right))
 
+class This(FHIRPath):
+    """
+    A representation of a current element. Used for internal purposes and has no FHIRPath shorthand notation.
+    """
+
+    def evaluate(
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+    ) -> FHIRPathCollection:
+        """
+        Simply returns the input collection.
+
+        Args:
+            collection (FHIRPathCollection): The collection of items to be evaluated.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
+
+        Returns:
+            collection (FHIRPathCollection): The output collection.
+        """
+        return environment.get("this", collection)
+
+    def __str__(self):
+        return ""
+
+    def __repr__(self):
+        return "This()"
+
+    def __eq__(self, other):
+        return isinstance(other, This)
+
+    def __hash__(self):
+        return hash("")
+    
 
 class RootElement(FHIRPath):
     """

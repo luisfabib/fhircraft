@@ -10,6 +10,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.filtering import Where
 from fhircraft.fhir.path.exceptions import FHIRPathError
+from fhircraft.fhir.path.utils import get_expression_context
 
 
 class Empty(FHIRPathFunction):
@@ -111,11 +112,11 @@ class All(FHIRPathFunction):
                 all(
                     [
                         (
-                            self.criteria.evaluate([item], environment, create)
+                            self.criteria.evaluate([item], get_expression_context(environment, item, index), create)
                             if isinstance(self.criteria, FHIRPath)
                             else item.value == self.criteria
                         )
-                        for item in collection
+                        for index,item in enumerate(collection)
                     ]
                 )
             )

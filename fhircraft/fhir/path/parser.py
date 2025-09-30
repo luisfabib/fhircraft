@@ -27,6 +27,7 @@ from fhircraft.fhir.path.engine.core import (
     RootElement,
     FHIRPath,
     Invocation,
+    This,
     Literal,
 )
 from fhircraft.fhir.path.exceptions import FhirPathLexerError, FhirPathParserError
@@ -266,18 +267,18 @@ class FhirPathParser:
     def p_fhirpath_constant(self, p):
         """constant : ENVIRONMENTAL_VARIABLE"""
         if p[1] == "%context":
-            p[0] = environment.This()
+            p[0] = This()
         else:
             p[0] = p[1]
 
     def p_fhirpath_contextual(self, p):
         """contextual : CONTEXTUAL_OPERATOR"""
         if p[1] == "$this":
-            p[0] = environment.This()
+            p[0] = environment.ContextualThis()
         elif p[1] == "$index":
-            p[0] = environment.CollectionIndex()
+            p[0] = environment.ContextualIndex()
         elif p[1] == "$total":
-            raise NotImplementedError()
+            p[0] = environment.ContextualTotal()
         else:
             raise FhirPathParserError(
                 f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Invalid contextual operator "{p[1]}".\n{_underline_error_in_fhir_path(self.string, p[1], p.lexpos(1))}'

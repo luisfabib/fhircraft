@@ -1,10 +1,5 @@
-import operator
-from unittest import TestCase
-
-import pytest
 
 from fhircraft.fhir.path.engine.comparison import *
-from fhircraft.fhir.path.engine.environment import This
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.existence import *
 

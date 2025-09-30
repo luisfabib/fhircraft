@@ -10,7 +10,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
     Literal,
 )
-from fhircraft.fhir.path.engine.environment import This
+from fhircraft.fhir.path.engine.core import This
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
 from fhircraft.fhir.resources.datatypes import utils as type_utils

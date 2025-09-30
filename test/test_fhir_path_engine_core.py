@@ -8,8 +8,8 @@ from fhircraft.fhir.path.engine.core import (
     Invocation,
     Literal,
     FHIRPathError,
+    This,
 )
-from fhircraft.fhir.path.engine.environment import (This, CollectionIndex)
 from fhircraft.fhir.path.engine.strings import Upper
 
 from fhircraft.fhir.resources.datatypes.R4.resources.patient import Patient
@@ -30,9 +30,9 @@ class TestRoot(TestCase):
     def test_evaluate_returns_collection_unchanged(self):
         # Root().evaluate should return the collection unchanged
         items = [
-            FHIRPathCollectionItem(value=Patient()),
-            FHIRPathCollectionItem(value=Patient()),
-            FHIRPathCollectionItem(value=Patient()),
+            FHIRPathCollectionItem(value=MockPatient()),
+            FHIRPathCollectionItem(value=MockPatient()),
+            FHIRPathCollectionItem(value=MockPatient()),
         ]
         result = RootElement('Patient').evaluate(items, env)
         assert result == items
@@ -44,7 +44,7 @@ class TestRoot(TestCase):
         assert result == []
 
     def test_raises_error_for_wrong_type(self):
-        item = FHIRPathCollectionItem(value=Patient())
+        item = FHIRPathCollectionItem(value=MockPatient())
         with pytest.raises(FHIRPathError):
             RootElement('Condition').evaluate([item], env)
 
@@ -129,34 +129,7 @@ class TestThis(TestCase):
 
     def test_this_string_representation(self):
         expression = This()
-        assert str(expression) == "$this"
-
-
-class TestCollectionIndex(TestCase):
-    class DummyValue:
-        pass
-
-    def setUp(self):
-        self.value1 = self.DummyValue()
-        self.value2 = self.DummyValue()
-        self.items = [
-            FHIRPathCollectionItem(value=self.value1),
-            FHIRPathCollectionItem(value=self.value2),
-        ]
-
-    def test_evaluate_returns_indices(self):
-        # Index().evaluate should return the indices
-        result = CollectionIndex().evaluate(self.items, env)
-        assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
-        assert [item.value for item in result] == [0, 1]
-
-    def test_evaluate_empty_collection_returns_empty_list(self):
-        result = CollectionIndex().evaluate([], env)
-        assert result == []
-
-    def test_index_string_representation(self):
-        expression = CollectionIndex()
-        assert str(expression) == "$index"
+        assert str(expression) == ""
 
 class TestElement(TestCase):
 
@@ -298,6 +271,7 @@ class TestLiteral(TestCase):
 class MockPatient:
     """Mock FHIR Patient resource for testing."""
 
+    resourceType: str = "Patient"
     name: Optional[List[dict]] = None
     gender: Optional[str] = None
     birthDate: Optional[str] = None

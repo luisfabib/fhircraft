@@ -1,6 +1,7 @@
 import re
 from typing import TYPE_CHECKING, Any, Union
 
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 from fhircraft.utils import ensure_list
 
 if TYPE_CHECKING:
@@ -169,3 +170,10 @@ def evaluate_and_prepare_collection_values(
         if len(right_collection) == 0:
             right_collection = [None]
     return left_collection[0], right_collection[0]
+
+
+def get_expression_context(environment: dict, item: FHIRPathCollectionItem, index: int) -> dict:
+    context = environment.copy()
+    context["$this"] = [item]
+    context["$index"] = [FHIRPathCollectionItem.wrap(index)]
+    return context

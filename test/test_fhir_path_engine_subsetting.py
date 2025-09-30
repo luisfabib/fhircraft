@@ -9,7 +9,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathError,
     Invocation,
 )
-from fhircraft.fhir.path.engine.environment import This
+from fhircraft.fhir.path.engine.core import This
 from fhircraft.fhir.path.engine.subsetting import *
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 

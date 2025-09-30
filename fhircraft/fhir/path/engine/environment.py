@@ -3,55 +3,20 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
+    This,
 )
 
-
-class This(FHIRPath):
+class ContextualVariable(FHIRPath):
     """
-    A class representation of the FHIRPath `$this` operator used to represent
-    the item from the input collection currently under evaluation.
+    A base class for FHIRPath contextual variables such as `$this`, `$index`, and `$total`.
     """
+    variable: str
 
     def evaluate(
         self,  collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
-        Simply returns the input collection.
-
-        Args:
-            collection (FHIRPathCollection): The collection of items to be evaluated.
-            environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
-
-        Returns:
-            collection (FHIRPathCollection): The output collection.
-        """
-        return environment.get("this", collection)
-
-    def __str__(self):
-        return "$this"
-
-    def __repr__(self):
-        return "This()"
-
-    def __eq__(self, other):
-        return isinstance(other, This)
-
-    def __hash__(self):
-        return hash("this")
-
-
-class CollectionIndex(FHIRPath):
-    """
-    A class representation of the FHIRPath `$index` operator used to represent
-    the index of an item in the input collection currently under evaluation.
-    """
-
-    def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
-    ) -> FHIRPathCollection:
-        """
-        Returns the index of each item in the input collection.
+        Evaluates the contextual variable within the given environment.
 
         Args:
             collection (FHIRPathCollection): The collection of items to be evaluated.
@@ -61,16 +26,59 @@ class CollectionIndex(FHIRPath):
         Returns:
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
         """
-        return [FHIRPathCollectionItem.wrap(index) for index, _ in enumerate(collection)]
+        if self.variable not in environment:
+            raise ValueError(f"The {self.variable} operator is not defined within the current context.")
+        return [FHIRPathCollectionItem.wrap(environment[self.variable])]
 
     def __str__(self):
-        return "$index"
+        return self.variable
 
     def __repr__(self):
-        return "Index()"
+        return self.__class__.__name__ + "()"
 
     def __eq__(self, other):
-        return isinstance(other, CollectionIndex)
+        return isinstance(other, self.__class__)
 
     def __hash__(self):
-        return hash("index")
+        return hash(self.variable)
+    
+class ContextualThis(ContextualVariable):
+    """
+    A class representation of the FHIRPath `$this` operator used to represent
+    the item from the input collection currently under evaluation.
+    """
+    variable = "$this"
+
+    def evaluate(
+        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+    ) -> FHIRPathCollection:
+        """
+        Evaluates the contextual variable within the given environment. For `$this`, if the variable is not defined in the current context
+        it returns the current collection being evaluated (for compatibility with the FHIR restricted subset where `$this` can refer to
+        any element that has focus).
+
+        Args:
+            collection (FHIRPathCollection): The collection of items to be evaluated.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
+
+        Returns:
+            collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
+        """
+        if self.variable not in environment:
+            return collection
+        return [FHIRPathCollectionItem.wrap(environment[self.variable])]
+
+class ContextualIndex(ContextualVariable):
+    """
+    A class representation of the FHIRPath `$index` operator used to represent
+    the index of an item in the input collection currently under evaluation.
+    """
+    variable = "$index"
+
+class ContextualTotal(ContextualVariable):
+    """
+    A class representation of the FHIRPath `$total` operator used to represent
+    an aggregated value over a collection within a context.
+    """
+    variable = "$total"

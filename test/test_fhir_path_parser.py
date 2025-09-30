@@ -33,8 +33,9 @@ parser_test_cases = (
     # ----------------------------------
     # Variables/Constants
     # ----------------------------------
-    ("$this", This()),
-    ("$index", CollectionIndex()),
+    ("$this", ContextualThis()),
+    ("$index", ContextualIndex()),
+    ("$total", ContextualTotal()),
     ("%context", This()),
     # ----------------------------------
     # Literals
@@ -135,7 +136,7 @@ parser_test_cases = (
     ),
     (
         "parent.all($this = 'parent')",
-        Invocation(Element("parent"), All(Equals(This(), Literal("parent")))),
+        Invocation(Element("parent"), All(Equals(ContextualThis(), Literal("parent")))),
     ),
     ("parent.allTrue()", Invocation(Element("parent"), AllTrue())),
     ("parent.anyTrue()", Invocation(Element("parent"), AnyTrue())),
@@ -167,11 +168,11 @@ parser_test_cases = (
     ),
     (
         "parent.select($this.child)",
-        Invocation(Element("parent"), Select(Invocation(This(), Element("child")))),
+        Invocation(Element("parent"), Select(Invocation(ContextualThis(), Element("child")))),
     ),
     (
         "parent.repeat($this.child)",
-        Invocation(Element("parent"), Repeat(Invocation(This(), Element("child")))),
+        Invocation(Element("parent"), Repeat(Invocation(ContextualThis(), Element("child")))),
     ),
     # ----------------------------------
     # Combining functions
@@ -190,7 +191,7 @@ parser_test_cases = (
     (
         "parent.iif($this, 'value1', 'value2')",
         Invocation(
-            Element("parent"), Iif(This(), Literal("value1"), Literal("value2"))
+            Element("parent"), Iif(ContextualThis(), Literal("value1"), Literal("value2"))
         ),
     ),
     ("parent.toBoolean()", Invocation(Element("parent"), ToBoolean())),

@@ -5,6 +5,7 @@ that require a function in this section to be called explicitly.
 
 import re
 
+from fhircraft.fhir.path.utils import get_expression_context
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
@@ -59,7 +60,12 @@ class Iif(FHIRPathFunction):
             FHIRPathRuntimeError: If input collection has more than one item.
 
         """
-        criterion_collection = self.criterion.evaluate(collection, environment, create)
+        criterion_collection = []
+        for index,item in enumerate(collection):
+            criterion_collection.extend(
+                self.criterion.evaluate([item], get_expression_context(environment, item, index), create)
+            )
+            
         if not criterion_collection:
             criterion = False
         else:
