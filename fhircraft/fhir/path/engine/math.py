@@ -55,7 +55,7 @@ class Addition(FHIRMathOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         For Integer, Decimal, and quantity, adds the operands. For strings, concatenates the right
@@ -110,7 +110,7 @@ class Subtraction(FHIRMathOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Subtracts the right operand from the left operand (supported for Integer, Decimal, and Quantity).
@@ -161,7 +161,7 @@ class Multiplication(FHIRMathOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication
@@ -210,7 +210,7 @@ class Division(FHIRMathOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Divides the left operand by the right operand (supported for Integer, Decimal, and Quantity).
@@ -262,7 +262,7 @@ class Div(FHIRMathOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Performs truncated division of the left operand by the right operand (supported for Integer and Decimal).
@@ -310,7 +310,7 @@ class Mod(FHIRMathOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Computes the remainder of the truncated division of its arguments (supported for Integer and Decimal).
@@ -352,7 +352,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
     math_operation: Callable
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Computes the computed value based on its argument (supported for Integer, Decimal and Quantity values).

@@ -2,7 +2,8 @@
 FHIRPath supports a general-purpose aggregate function to enable the calculation of aggregates such as sum, min, and max to be expressed
 """
 
-from typing import Any 
+from typing import Any
+
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
@@ -12,6 +13,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.utils import get_expression_context
 from fhircraft.utils import ensure_list
+
 
 class Aggregate(FHIRPathFunction):
     """
@@ -29,7 +31,7 @@ class Aggregate(FHIRPathFunction):
     ):
         self.expression = expression
         if init is None:
-             self.init = None
+            self.init = None
         else:
             init = ensure_list(init)
             if len(init) != 1:
@@ -37,7 +39,7 @@ class Aggregate(FHIRPathFunction):
             self.init = FHIRPathCollectionItem.wrap(init[0]).value
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Performs general-purpose aggregation by evaluating the aggregator expression for each element of the input collection.
@@ -55,18 +57,16 @@ class Aggregate(FHIRPathFunction):
             FHIRPathCollection: The output collection.
         """
         context = environment.copy()
-        for index,item in enumerate(collection):
+        for index, item in enumerate(collection):
             # Set up the environment for evaluating the expression
             context = get_expression_context(context, item, index)
             context["$total"] = context.get("$total", self.init if self.init else [])
             print(context)
             # Evaluate the expression
-            result = self.expression.evaluate(
-                [item], context, create=create
-            )
+            result = self.expression.evaluate([item], context, create=create)
             # Update the total variable for the next iteration
             context["$total"] = result[0].value
         result = context.get("$total")
         if result is None:
-            return 
+            return []
         return [FHIRPathCollectionItem.wrap(result)]

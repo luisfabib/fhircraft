@@ -6,21 +6,18 @@ and to convert between different types. The core conversion logic is implemented
 and FHIRPath conversion functions use these utilities.
 """
 
-import re
 import importlib
-from typing import Any, Type, Union, TYPE_CHECKING
+import re
+from typing import TYPE_CHECKING, Any, Type, Union
 
-from pydantic import Field, ValidationError, create_model, BaseModel
-
+from pydantic import BaseModel, Field, ValidationError, create_model
 from typing_extensions import TypeAliasType
 
-from fhircraft.utils import get_FHIR_release_from_version
-
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-
 import fhircraft.fhir.resources.datatypes.R4.complex_types as r4_complex_types
 import fhircraft.fhir.resources.datatypes.R4B.complex_types as r4b_complex_types
 import fhircraft.fhir.resources.datatypes.R5.complex_types as r5_complex_types
+from fhircraft.utils import get_FHIR_release_from_version
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel
@@ -31,6 +28,7 @@ class FHIRTypeError(Exception):
 
     pass
 
+
 __complex_types_relases__ = {
     "R4": r4_complex_types,
     "R4B": r4b_complex_types,
@@ -38,8 +36,9 @@ __complex_types_relases__ = {
 }
 
 
-def get_fhir_primitive_type(type_str: str) -> type:
+def get_fhir_primitive_type(type_str: str) -> type | None:
     return getattr(primitives, type_str, None)
+
 
 def get_complex_FHIR_type(type_str: str, release="R4B") -> type:
     complex_FHIR_types = __complex_types_relases__.get(release)
@@ -47,22 +46,37 @@ def get_complex_FHIR_type(type_str: str, release="R4B") -> type:
         raise ValueError(f"Unsupported FHIR release: {release}")
     return getattr(complex_FHIR_types, type_str)
 
+
 def get_fhir_resource_type(type_str: str, release="R4B") -> type:
     # Convert CamelCase to snake_case for module lookup
-    type_str_snake = re.sub(r'(?<!^)(?=[A-Z])', '_', type_str).lower()
-    resource_module = importlib.import_module(f'fhircraft.fhir.resources.datatypes.{release}.resources.{type_str_snake}')
+    type_str_snake = re.sub(r"(?<!^)(?=[A-Z])", "_", type_str).lower()
+    resource_module = importlib.import_module(
+        f"fhircraft.fhir.resources.datatypes.{release}.resources.{type_str_snake}"
+    )
 
     resource = getattr(resource_module, type_str, None)
     if not resource:
         from fhircraft.fhir.resources.factory import factory
-        resource = next((model for model in factory.construction_cache if model.__name__ == type_str and release == get_FHIR_release_from_version(model.fhirVersion)), None)
+
+        resource = next(
+            (
+                model
+                for model in factory.construction_cache.values()
+                if model.__name__ == type_str
+                and release
+                == get_FHIR_release_from_version(getattr(model, "fhirVersion", ""))
+            ),
+            None,
+        )
         if not resource:
             raise AttributeError(f"Unknown {release} FHIR resource type: {type_str}")
     return resource
 
 
 # Type checking functions
-def is_fhir_primitive_type(value: Any, fhir_type: Union[Type, TypeAliasType, str], raise_on_error: bool = True) -> bool:
+def is_fhir_primitive_type(
+    value: Any, fhir_type: Type | TypeAliasType | str, raise_on_error: bool = True
+) -> bool:
     """
     Check if a value conforms to a FHIR primitive type.
 
@@ -73,7 +87,7 @@ def is_fhir_primitive_type(value: Any, fhir_type: Union[Type, TypeAliasType, str
 
     Returns:
         bool: `True` if the value conforms to the type, `False` otherwise
-    
+
     Raises:
         FHIRTypeError: If the fhir_type is a string and does not correspond to a known type
 
@@ -119,7 +133,10 @@ def is_fhir_primitive_type(value: Any, fhir_type: Union[Type, TypeAliasType, str
 
     return False
 
-def is_fhir_complex_type(value: Any, fhir_type: "FHIRBaseModel", raise_on_error: bool = True) -> bool:
+
+def is_fhir_complex_type(
+    value: Any, fhir_type: "FHIRBaseModel | type | str", raise_on_error: bool = True
+) -> bool:
     """
     Check if a value conforms to a complex FHIR type.
 
@@ -130,7 +147,7 @@ def is_fhir_complex_type(value: Any, fhir_type: "FHIRBaseModel", raise_on_error:
 
     Returns:
         bool: `True` if the value conforms to the type, `False` otherwise
-    
+
     Raises:
         FHIRTypeError: If the fhir_type is a string and does not correspond to a known complex type
     """
@@ -150,7 +167,9 @@ def is_fhir_complex_type(value: Any, fhir_type: "FHIRBaseModel", raise_on_error:
         return False
 
 
-def is_fhir_resource_type(value: Any, fhir_type: "FHIRBaseModel", raise_on_error: bool = True) -> bool:
+def is_fhir_resource_type(
+    value: Any, fhir_type: "FHIRBaseModel | type | str", raise_on_error: bool = True
+) -> bool:
     """
     Check if a value conforms to a FHIR resource.
 
@@ -161,7 +180,7 @@ def is_fhir_resource_type(value: Any, fhir_type: "FHIRBaseModel", raise_on_error
 
     Returns:
         bool: `True` if the value conforms to the type, `False` otherwise
-    
+
     Raises:
         FHIRTypeError: If the fhir_type is a string and does not correspond to a known resource type
     """
@@ -534,4 +553,3 @@ def list_primitive_types() -> list[str]:
         if not name.startswith("_")
         and isinstance(getattr(primitives, name), TypeAliasType)
     ]
-

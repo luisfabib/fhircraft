@@ -50,7 +50,7 @@ class Union(FHIRCollectionOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Merge the two collections into a single collection, eliminating any duplicate values to
@@ -67,10 +67,13 @@ class Union(FHIRCollectionOperator):
         left_collection, right_collection = evaluate_left_right_expressions(
             self.left, self.right, collection, environment, create=create
         )
-        return UnionFunction(left_collection).evaluate(right_collection, environment, create)
+        return UnionFunction(left_collection).evaluate(
+            right_collection, environment, create
+        )
 
     def __str__(self):
         return f"{self.left} | {self.right}"
+
 
 class In(FHIRCollectionOperator):
     """
@@ -82,7 +85,7 @@ class In(FHIRCollectionOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         If the left operand is a collection with a single item, this operator returns true if the item is in the
@@ -121,6 +124,7 @@ class In(FHIRCollectionOperator):
     def __str__(self):
         return f"{self.left} in {self.right}"
 
+
 class Contains(FHIRCollectionOperator):
     """
     A representation of the FHIRPath [`contains`](https://hl7.org/fhirpath/N1/#and) operator.
@@ -131,7 +135,7 @@ class Contains(FHIRCollectionOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         If the right operand is a collection with a single item, this operator returns true if the item is in the
@@ -169,4 +173,3 @@ class Contains(FHIRCollectionOperator):
 
     def __str__(self):
         return f"{self.left} contains {self.right}"
-    

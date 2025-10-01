@@ -132,7 +132,7 @@ class Single(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Will return the single item in the input if there is just one item. If the input collection is empty (`[]`), the result is empty.
@@ -163,7 +163,7 @@ class First(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only the first item in the input collection.
@@ -188,7 +188,7 @@ class Last(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only the last item in the input collection.
@@ -213,7 +213,7 @@ class Tail(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing all but the first item in the input collection. Will return
@@ -246,7 +246,7 @@ class Skip(FHIRPathFunction):
         self.num = num
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing all but the first `num` items in the input collection. Will return
@@ -283,7 +283,7 @@ class Take(FHIRPathFunction):
         self.num = num
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing the first `num` items in the input collection, or less if there
@@ -315,7 +315,7 @@ class Intersect(FHIRPathFunction):
         self.other_collection = other_collection
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the set of elements that are in both collections. Duplicate items will be eliminated
@@ -330,7 +330,9 @@ class Intersect(FHIRPathFunction):
             FHIRPathCollection): The output collection.
         """
         if isinstance(self.other_collection, FHIRPath):
-            self.other_collection = self.other_collection.evaluate(collection, environment, create)
+            self.other_collection = self.other_collection.evaluate(
+                collection, environment, create
+            )
         return [item for item in collection if item in self.other_collection]
 
 
@@ -346,7 +348,7 @@ class Exclude(FHIRPathFunction):
         self.other_collection = other_collection
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the set of elements that are not in the other collection. Duplicate items will not be
@@ -361,6 +363,7 @@ class Exclude(FHIRPathFunction):
             FHIRPathCollection): The output collection.
         """
         if isinstance(self.other_collection, FHIRPath):
-            self.other_collection = self.other_collection.evaluate(collection, environment, create)
+            self.other_collection = self.other_collection.evaluate(
+                collection, environment, create
+            )
         return [item for item in collection if item not in self.other_collection]
-

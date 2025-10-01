@@ -42,7 +42,9 @@ class Where(FHIRPathFunction):
         """
         collection = ensure_list(collection)
         expression_collection = [
-            self.expression.evaluate([item], get_expression_context(environment, item, index), create) 
+            self.expression.evaluate(
+                [item], get_expression_context(environment, item, index), create
+            )
             for index, item in enumerate(collection)
         ]
         checks = [
@@ -97,8 +99,12 @@ class Select(FHIRPathFunction):
         collection = ensure_list(collection)
         return [
             projected_item
-            for index,item in enumerate(collection)
-            for projected_item in ensure_list(self.projection.evaluate([item], get_expression_context(environment, item, index), create))
+            for index, item in enumerate(collection)
+            for projected_item in ensure_list(
+                self.projection.evaluate(
+                    [item], get_expression_context(environment, item, index), create
+                )
+            )
         ]
 
     def __str__(self):
@@ -143,8 +149,10 @@ class Repeat(FHIRPathFunction):
 
         def project_recursively(input_collection):
             output_collection = []
-            for index,item in enumerate(input_collection):
-                new_collection = self.projection.evaluate([item], get_expression_context(environment, item, index), create)
+            for index, item in enumerate(input_collection):
+                new_collection = self.projection.evaluate(
+                    [item], get_expression_context(environment, item, index), create
+                )
                 output_collection.extend(new_collection)
                 if len(new_collection) > 0:
                     output_collection.extend(project_recursively(new_collection))
@@ -176,7 +184,9 @@ class OfType(FHIRPathFunction):
     def __init__(self, _type: type | str):
         self.type = _type
 
-    def evaluate(self,  collection: FHIRPathCollection, environment: dict, create: bool = False) -> FHIRPathCollection:
+    def evaluate(
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+    ) -> FHIRPathCollection:
         """
         Returns a collection that contains all items in the input collection that are of the given type
         or a subclass thereof. If the input collection is empty (`[]`), the result is empty.

@@ -65,7 +65,7 @@ class IndexOf(StringManipulationFunction):
         self.substring = substring
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the 0-based index of the first position substring is found in the input string,
@@ -89,7 +89,10 @@ class IndexOf(StringManipulationFunction):
         self.validate_collection(collection)
         if len(collection) == 0:
             return []
-        return [FHIRPathCollectionItem.wrap(collection[0].value.find(self.substring.value))]
+        return [
+            FHIRPathCollectionItem.wrap(collection[0].value.find(self.substring.value))
+        ]
+
 
 class Substring(StringManipulationFunction):
     """
@@ -105,7 +108,7 @@ class Substring(StringManipulationFunction):
         self.end: int | None = end.value if isinstance(end, Literal) else end
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the part of the string starting at position start (zero-based). If length is given, will
@@ -154,7 +157,7 @@ class StartsWith(StringManipulationFunction):
         self.prefix = prefix
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns true when the input string starts with the given prefix.
@@ -181,9 +184,7 @@ class StartsWith(StringManipulationFunction):
         if not prefix_collection:
             return []
         prefix = prefix_collection[0].value
-        return [
-            FHIRPathCollectionItem.wrap(collection[0].value.startswith(prefix))
-        ]
+        return [FHIRPathCollectionItem.wrap(collection[0].value.startswith(prefix))]
 
 
 class EndsWith(StringManipulationFunction):
@@ -202,7 +203,7 @@ class EndsWith(StringManipulationFunction):
         self.suffix = suffix
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns true when the input string ends with the given suffix.
@@ -225,7 +226,9 @@ class EndsWith(StringManipulationFunction):
         self.validate_collection(collection)
         if not collection or not self.suffix.value:
             return []
-        return [FHIRPathCollectionItem.wrap(collection[0].value.endswith(self.suffix.value))]
+        return [
+            FHIRPathCollectionItem.wrap(collection[0].value.endswith(self.suffix.value))
+        ]
 
 
 class Contains(StringManipulationFunction):
@@ -244,7 +247,7 @@ class Contains(StringManipulationFunction):
         self.substring = substring
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns true when the given substring is a substring of the input string.
@@ -272,7 +275,9 @@ class Contains(StringManipulationFunction):
         self.validate_collection(collection)
         if not collection or not self.substring.value:
             return []
-        return [FHIRPathCollectionItem.wrap(self.substring.value in collection[0].value)]
+        return [
+            FHIRPathCollectionItem.wrap(self.substring.value in collection[0].value)
+        ]
 
 
 class Upper(StringManipulationFunction):
@@ -281,7 +286,7 @@ class Upper(StringManipulationFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the input string with all characters converted to upper case.
@@ -311,7 +316,7 @@ class Lower(StringManipulationFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the input string with all characters converted to lower case.
@@ -352,12 +357,14 @@ class Replace(StringManipulationFunction):
         if isinstance(substitution, str):
             substitution = Literal(substitution)
         if not isinstance(substitution, Literal):
-            raise FHIRPathError("Replace() substitution argument must be a string literal.")
+            raise FHIRPathError(
+                "Replace() substitution argument must be a string literal."
+            )
         self.pattern = pattern
         self.substitution = substitution
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the input string with all instances of `pattern` replaced with `substitution`.
@@ -404,7 +411,7 @@ class Matches(StringManipulationFunction):
         self.regex = regex
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` when the value matches the given regular expression. Regular expressions
@@ -428,7 +435,9 @@ class Matches(StringManipulationFunction):
         if not collection or not self.regex.value:
             return []
         return [
-            FHIRPathCollectionItem.wrap(bool(re.match(self.regex.value, collection[0].value)))
+            FHIRPathCollectionItem.wrap(
+                bool(re.match(self.regex.value, collection[0].value))
+            )
         ]
 
 
@@ -445,7 +454,9 @@ class ReplaceMatches(StringManipulationFunction):
         if isinstance(regex, str):
             regex = Literal(regex)
         if not isinstance(regex, Literal):
-            raise FHIRPathError("ReplaceMatches() regex argument must be a string literal.")
+            raise FHIRPathError(
+                "ReplaceMatches() regex argument must be a string literal."
+            )
         if isinstance(substitution, str):
             substitution = Literal(substitution)
         if not isinstance(substitution, Literal):
@@ -456,7 +467,7 @@ class ReplaceMatches(StringManipulationFunction):
         self.substitution = substitution
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Matches the input using the regular expression in regex and replaces each match with the
@@ -491,7 +502,7 @@ class Length(StringManipulationFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the length of the input string. If the input collection is empty (`[]`), the result is empty.
@@ -520,7 +531,7 @@ class ToChars(StringManipulationFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the list of characters in the input string. If the input collection is empty (`[]`), the result is empty.
@@ -562,7 +573,7 @@ class Concatenation(FHIRPath):
         self.right = right
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         For strings, will concatenate the strings, where an empty operand is taken to be the empty string.
@@ -583,7 +594,13 @@ class Concatenation(FHIRPath):
             FHIRPathError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, environment, create, prevent_all_empty=False
+            self,
+            self.left,
+            self.right,
+            collection,
+            environment,
+            create,
+            prevent_all_empty=False,
         )
         left_value = left_value or [""]
         right_value = right_value or [""]

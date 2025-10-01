@@ -38,7 +38,9 @@ class Children(FHIRPathFunction):
             else:
                 fields = []
             for field in fields:
-                children_collection.extend(Element(field).evaluate([item], create))
+                children_collection.extend(
+                    Element(field).evaluate([item], environment, create)
+                )
         return children_collection
 
 

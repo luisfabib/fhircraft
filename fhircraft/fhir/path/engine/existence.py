@@ -19,7 +19,7 @@ class Empty(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if the input collection is empty (`{}`) and `False` otherwise.
@@ -47,7 +47,7 @@ class Exists(FHIRPathFunction):
         self.criteria = criteria
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if the collection has any elements, and `False` otherwise.
@@ -91,7 +91,7 @@ class All(FHIRPathFunction):
         self.criteria = criteria
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if for every element in the input collection, criteria evaluates to `True`.
@@ -112,11 +112,15 @@ class All(FHIRPathFunction):
                 all(
                     [
                         (
-                            self.criteria.evaluate([item], get_expression_context(environment, item, index), create)
+                            self.criteria.evaluate(
+                                [item],
+                                get_expression_context(environment, item, index),
+                                create,
+                            )
                             if isinstance(self.criteria, FHIRPath)
                             else item.value == self.criteria
                         )
-                        for index,item in enumerate(collection)
+                        for index, item in enumerate(collection)
                     ]
                 )
             )
@@ -156,7 +160,7 @@ class AllTrue(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if all the items are `True`. If any
@@ -179,7 +183,7 @@ class AnyTrue(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if any of the items are `True`.
@@ -202,7 +206,7 @@ class AllFalse(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if all the items are `False`.
@@ -225,7 +229,7 @@ class AnyFalse(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Takes a collection of Boolean values and returns `True` if any of the items are `False`. If all
@@ -254,7 +258,7 @@ class SubsetOf(FHIRPathFunction):
         self.other = other
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if all items in the input collection are members of the collection passed as the
@@ -304,7 +308,7 @@ class SupersetOf(FHIRPathFunction):
         self.other = other
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns true if all items in the collection passed as the other argument are
@@ -348,7 +352,7 @@ class Count(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns the integer count of the number of items in the input collection. Returns 0 when the input collection is empty.
@@ -371,7 +375,7 @@ class Distinct(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only the unique items in the input collection. If the input collection is empty (`[]`), the result is empty.
@@ -394,7 +398,7 @@ class IsDistinct(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if all the items in the input collection are distinct.

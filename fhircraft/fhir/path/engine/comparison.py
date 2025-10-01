@@ -50,7 +50,7 @@ class GreaterThan(FHIRComparisonOperator):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         The greater than operator (>) returns true if the first operand is strictly greater than the second.
@@ -94,7 +94,7 @@ class LessThan(FHIRComparisonOperator):
         self.right = right
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         The less than operator (<) returns true if the first operand is strictly less than the second.
@@ -138,7 +138,7 @@ class LessEqualThan(FHIRComparisonOperator):
         self.right = right
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         The less or equal operator (<=) returns true if the first operand is less than or equal to the second.
@@ -182,7 +182,7 @@ class GreaterEqualThan(FHIRComparisonOperator):
         self.right = right
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         The greater or equal operator (>=) returns true if the first operand is greater than or equal to the second.

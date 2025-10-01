@@ -34,7 +34,9 @@ def _evaluate_boolean_expressions(
             Each value is True, False, or None if the operand cannot be evaluated to a boolean.
     """
     left_collection = (
-        left.evaluate(collection, environment, create) if isinstance(left, FHIRPath) else left
+        left.evaluate(collection, environment, create)
+        if isinstance(left, FHIRPath)
+        else left
     )
     if isinstance(left_collection, bool):
         left_boolean = left_collection
@@ -74,7 +76,7 @@ class And(FHIRPath):
         self.right = right
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if both operands evaluate to `True`, `False` if either operand evaluates to `False`, and the empty collection (`[]`) otherwise.
@@ -141,7 +143,7 @@ class Or(FHIRPath):
         self.right = right
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `False` if both operands evaluate to `False`, `True` if either operand evaluates to `True`, and empty (`[]`) otherwise.
@@ -208,7 +210,7 @@ class Xor(FHIRPath):
         self.right = right
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if exactly one of the operands evaluates to `True`, `False` if either both operands evaluate to `True` or both operands evaluate to `False`, and the empty collection (`[]`) otherwise.
@@ -263,7 +265,7 @@ class Implies(FHIRPath):
         self.right = right
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         If the left operand evaluates to `True`, this operator returns the boolean evaluation of the right operand. If the
@@ -334,7 +336,7 @@ class Not(FHIRPathFunction):
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if the input collection evaluates to `False`, and `False` if it evaluates to `True`. Otherwise, the result is empty (`[]`):

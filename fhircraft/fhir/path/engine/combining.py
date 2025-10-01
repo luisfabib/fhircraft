@@ -21,7 +21,7 @@ class Union(FHIRPathFunction):
         self.other_collection = other_collection
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Merge the two collections into a single collection, eliminating any duplicate values.
@@ -35,7 +35,9 @@ class Union(FHIRPathFunction):
             FHIRPathCollection: The output collection.
         """
         if isinstance(self.other_collection, FHIRPath):
-            self.other_collection = self.other_collection.evaluate(collection, environment, create)
+            self.other_collection = self.other_collection.evaluate(
+                collection, environment, create
+            )
         return [
             FHIRPathCollectionItem.wrap(item)
             for item in sorted(
@@ -57,7 +59,7 @@ class Combine(FHIRPathFunction):
         self.other_collection = other_collection
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Merge the input and other collections into a single collection without eliminating duplicate
@@ -73,5 +75,7 @@ class Combine(FHIRPathFunction):
             FHIRPathCollection: The output collection.
         """
         if isinstance(self.other_collection, FHIRPath):
-            self.other_collection = self.other_collection.evaluate(collection, environment, create)
+            self.other_collection = self.other_collection.evaluate(
+                collection, environment, create
+            )
         return collection + self.other_collection
