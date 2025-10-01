@@ -1,15 +1,18 @@
 import logging
 import os.path
+import traceback
 from typing import Any
 
 import ply.yacc
 
 import fhircraft.fhir.path.engine.additional as additional
+import fhircraft.fhir.path.engine.aggregates as aggregates
 import fhircraft.fhir.path.engine.boolean as boolean
 import fhircraft.fhir.path.engine.collection as collection
 import fhircraft.fhir.path.engine.combining as combining
 import fhircraft.fhir.path.engine.comparison as comparison
 import fhircraft.fhir.path.engine.conversion as conversion
+import fhircraft.fhir.path.engine.environment as environment
 import fhircraft.fhir.path.engine.equality as equality
 import fhircraft.fhir.path.engine.existence as existence
 import fhircraft.fhir.path.engine.filtering as filtering
@@ -25,15 +28,13 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     Invocation,
     Literal,
-    Parent,
-    Root,
+    RootElement,
     This,
 )
 from fhircraft.fhir.path.exceptions import FhirPathLexerError, FhirPathParserError
 from fhircraft.fhir.path.lexer import FhirPathLexer
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.utils import ensure_list
-import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -254,7 +255,7 @@ class FhirPathParser:
 
     def p_fhirpath_root(self, p):
         """root : ROOT_NODE"""
-        p[0] = Root()
+        p[0] = RootElement(p[1])
 
     def p_fhirpath_element(self, p):
         """element : identifier"""
@@ -266,25 +267,16 @@ class FhirPathParser:
 
     def p_fhirpath_constant(self, p):
         """constant : ENVIRONMENTAL_VARIABLE"""
-        if p[1] == "%context":
-            p[0] = This()
-        elif p[1] == "%resource":
-            p[0] = Parent()
-        elif p[1] == "%rootResource":
-            p[0] = Root()
-        else:
-            p[0] = p[1]
+        p[0] = environment.EnvironmentVariable(p[1])
 
     def p_fhirpath_contextual(self, p):
         """contextual : CONTEXTUAL_OPERATOR"""
-        if p[1] == "$":
-            p[0] = Root()
-        elif p[1] == "$this":
-            p[0] = This()
+        if p[1] == "$this":
+            p[0] = environment.ContextualThis()
         elif p[1] == "$index":
-            raise NotImplementedError()
+            p[0] = environment.ContextualIndex()
         elif p[1] == "$total":
-            raise NotImplementedError()
+            p[0] = environment.ContextualTotal()
         else:
             raise FhirPathParserError(
                 f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Invalid contextual operator "{p[1]}".\n{_underline_error_in_fhir_path(self.string, p[1], p.lexpos(1))}'
@@ -365,6 +357,26 @@ class FhirPathParser:
             p[0] = additional.GetValue()
         elif check(p, "htmlChecks", nargs=0):
             p[0] = additional.HtmlChecks()
+        elif check(p, "lowBoundary", nargs=0):
+            p[0] = additional.LowBoundary()
+        elif check(p, "highBoundary", nargs=0):
+            p[0] = additional.HighBoundary()
+        elif check(p, "elementDefinition", nargs=0):
+            p[0] = additional.ElementDefinition()
+        elif check(p, "slice", nargs=2):
+            p[0] = additional.Slice(*p[3])
+        elif check(p, "checkModifiers", nargs=1):
+            p[0] = additional.CheckModifiers(*p[3])
+        elif check(p, "conformsTo", nargs=1):
+            p[0] = additional.ConformsTo(*p[3])
+        elif check(p, "memberOf", nargs=1):
+            p[0] = additional.MemberOf(*p[3])
+        elif check(p, "subsumes", nargs=1):
+            p[0] = additional.Subsumes(*p[3])
+        elif check(p, "subsumedBy", nargs=1):
+            p[0] = additional.SubsumedBy(*p[3])
+        elif check(p, "comparable", nargs=1):
+            p[0] = additional.Comparable(*p[3])
         # -------------------------------------------------------------------------------
         # Subsetting
         # -------------------------------------------------------------------------------
@@ -508,6 +520,11 @@ class FhirPathParser:
             p[0] = types.LegacyIs(*p[3])
         elif check(p, "as", nargs=1):
             p[0] = types.LegacyAs(*p[3])
+        # -------------------------------------------------------------------------------
+        # Aggregation functions
+        # -------------------------------------------------------------------------------
+        elif check(p, "aggregate", nargs=[1, 2]):
+            p[0] = aggregates.Aggregate(*p[3])
         else:
             pos = self.string.find(str(p[1]))
             raise FhirPathParserError(

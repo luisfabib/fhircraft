@@ -11,6 +11,7 @@ token_test_cases = (
     # -------- Environmental Operators -----------
     ("%resource", (("%resource", "ENVIRONMENTAL_VARIABLE"),)),
     ("%context", (("%context", "ENVIRONMENTAL_VARIABLE"),)),
+    ("%`custom-named-variable`", (("%`custom-named-variable`", "ENVIRONMENTAL_VARIABLE"),)),
     # ----------------- Symbols -----------------
     (".", ((".", "."),)),
     (",", ((",", ","),)),

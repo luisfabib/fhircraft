@@ -7,6 +7,8 @@ from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.literals import Date, Quantity
 from fhircraft.fhir.path.engine.types import *
 
+env = dict()
+
 # -------------
 # Is
 # -------------
@@ -53,7 +55,7 @@ def test_is_returns_correct_boolean(left, type_specifier, expected):
     resource = namedtuple("Resource", ["left"])(left=left)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Is(Invocation(Element("left"), GetValue()), type_specifier).evaluate(
-        collection
+        collection, env
     )
     assert result[0].value == expected
 
@@ -64,7 +66,7 @@ def test_is_string_representation():
 @pytest.mark.parametrize("left, type_specifier, expected", test_cases)
 def test_legacy_is_returns_correct_boolean(left, type_specifier, expected):
     collection = [FHIRPathCollectionItem(value=left)]
-    result = LegacyIs(type_specifier).evaluate(collection)
+    result = LegacyIs(type_specifier).evaluate(collection, env)
     assert result[0].value == expected
 
 def test_legacy_is_string_representation():
@@ -79,7 +81,7 @@ def test_legacy_is_string_representation():
 @pytest.mark.parametrize("expected, type_specifier, equal", test_cases)
 def test_as_returns_correct_boolean(expected, type_specifier, equal):
     collection = [FHIRPathCollectionItem(value=expected)]
-    result = As(This(), type_specifier).evaluate(collection)
+    result = As(This(), type_specifier).evaluate(collection, env)
     assert result[0].value == expected if equal else result == []
 
 def test_as_string_representation():
@@ -89,7 +91,7 @@ def test_as_string_representation():
 @pytest.mark.parametrize("expected, type_specifier, equal", test_cases)
 def test_legacy_as_returns_correct_boolean(expected, type_specifier, equal):
     collection = [FHIRPathCollectionItem(value=expected)]
-    result = LegacyAs(type_specifier).evaluate(collection)
+    result = LegacyAs(type_specifier).evaluate(collection, env)
     assert result[0].value == expected if equal else result == []
 
 def test_legacy_as_string_representation():

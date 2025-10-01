@@ -16,6 +16,7 @@ def _evaluate_boolean_expressions(
     left: FHIRPath | FHIRPathCollection,
     right: FHIRPath | FHIRPathCollection,
     collection: FHIRPathCollection,
+    environment: dict,
     create: bool,
 ) -> tuple[bool | None, bool | None]:
     """
@@ -25,6 +26,7 @@ def _evaluate_boolean_expressions(
         left (FHIRPath | FHIRPathCollection): The left operand, which can be a FHIRPath expression or a collection.
         right (FHIRPath | FHIRPathCollection): The right operand, which can be a FHIRPath expression or a collection.
         collection (FHIRPathCollection): The context collection used for evaluation.
+        environment (dict): The environment context for the evaluation.
         create (bool): Whether to create missing elements during evaluation.
 
     Returns:
@@ -32,7 +34,9 @@ def _evaluate_boolean_expressions(
             Each value is True, False, or None if the operand cannot be evaluated to a boolean.
     """
     left_collection = (
-        left.evaluate(collection, create=create) if isinstance(left, FHIRPath) else left
+        left.evaluate(collection, environment, create)
+        if isinstance(left, FHIRPath)
+        else left
     )
     if isinstance(left_collection, bool):
         left_boolean = left_collection
@@ -42,7 +46,7 @@ def _evaluate_boolean_expressions(
         else:
             left_boolean = None
     right_collection = (
-        right.evaluate(collection, create=create)
+        right.evaluate(collection, environment, create)
         if isinstance(right, FHIRPath)
         else right
     )
@@ -72,19 +76,21 @@ class And(FHIRPath):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if both operands evaluate to `True`, `False` if either operand evaluates to `False`, and the empty collection (`[]`) otherwise.
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         left_boolean, right_boolean = _evaluate_boolean_expressions(
-            self.left, self.right, collection, create=create
+            self.left, self.right, collection, environment, create=create
         )
         if left_boolean is None:
             if right_boolean is True:
@@ -137,19 +143,21 @@ class Or(FHIRPath):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `False` if both operands evaluate to `False`, `True` if either operand evaluates to `True`, and empty (`[]`) otherwise.
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         left_boolean, right_boolean = _evaluate_boolean_expressions(
-            self.left, self.right, collection, create=create
+            self.left, self.right, collection, environment, create=create
         )
         if left_boolean is None:
             if right_boolean is True:
@@ -202,19 +210,21 @@ class Xor(FHIRPath):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if exactly one of the operands evaluates to `True`, `False` if either both operands evaluate to `True` or both operands evaluate to `False`, and the empty collection (`[]`) otherwise.
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         left_boolean, right_boolean = _evaluate_boolean_expressions(
-            self.left, self.right, collection, create=create
+            self.left, self.right, collection, environment, create
         )
         if left_boolean is None or right_boolean is None:
             return []
@@ -255,7 +265,7 @@ class Implies(FHIRPath):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         If the left operand evaluates to `True`, this operator returns the boolean evaluation of the right operand. If the
@@ -264,12 +274,14 @@ class Implies(FHIRPath):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection
         """
         left_boolean, right_boolean = _evaluate_boolean_expressions(
-            self.left, self.right, collection, create=create
+            self.left, self.right, collection, environment, create
         )
         if left_boolean is None:
             if right_boolean is True:
@@ -324,7 +336,7 @@ class Not(FHIRPathFunction):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns `True` if the input collection evaluates to `False`, and `False` if it evaluates to `True`. Otherwise, the result is empty (`[]`):
@@ -332,6 +344,8 @@ class Not(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection

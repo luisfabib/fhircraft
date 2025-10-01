@@ -55,7 +55,7 @@ class Addition(FHIRMathOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         For Integer, Decimal, and quantity, adds the operands. For strings, concatenates the right
@@ -65,6 +65,8 @@ class Addition(FHIRMathOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -73,7 +75,7 @@ class Addition(FHIRMathOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
             return []
@@ -108,7 +110,7 @@ class Subtraction(FHIRMathOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Subtracts the right operand from the left operand (supported for Integer, Decimal, and Quantity).
@@ -116,6 +118,8 @@ class Subtraction(FHIRMathOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -124,7 +128,7 @@ class Subtraction(FHIRMathOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
             return []
@@ -157,7 +161,7 @@ class Multiplication(FHIRMathOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Multiplies both arguments (supported for Integer, Decimal, and Quantity). For multiplication
@@ -166,6 +170,8 @@ class Multiplication(FHIRMathOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -175,7 +181,7 @@ class Multiplication(FHIRMathOperator):
         """
 
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
             return []
@@ -204,7 +210,7 @@ class Division(FHIRMathOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Divides the left operand by the right operand (supported for Integer, Decimal, and Quantity).
@@ -215,6 +221,8 @@ class Division(FHIRMathOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -223,7 +231,7 @@ class Division(FHIRMathOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
             return []
@@ -254,13 +262,15 @@ class Div(FHIRMathOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Performs truncated division of the left operand by the right operand (supported for Integer and Decimal).
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -269,7 +279,7 @@ class Div(FHIRMathOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
             return []
@@ -300,13 +310,15 @@ class Mod(FHIRMathOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Computes the remainder of the truncated division of its arguments (supported for Integer and Decimal).
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -315,7 +327,7 @@ class Mod(FHIRMathOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if left_value is None or right_value is None:
             return []
@@ -340,13 +352,15 @@ class FHIRPathMathFunction(FHIRPathFunction):
     math_operation: Callable
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Computes the computed value based on its argument (supported for Integer, Decimal and Quantity values).
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.

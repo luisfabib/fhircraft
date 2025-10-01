@@ -3,21 +3,31 @@ import keyword
 import tarfile
 import tempfile
 import warnings
-from typing import List, Optional, get_args, Any
+from typing import Any, List, Optional, get_args
 from unittest import TestCase
 from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 from parameterized import parameterized, parameterized_class
 from pydantic import Field
 from pydantic.aliases import AliasChoices
 from pydantic.fields import FieldInfo
-import pytest
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 import fhircraft.fhir.resources.datatypes.R4B.complex_types as complex_types
-from fhircraft.fhir.resources.definitions import StructureDefinition, StructureDefinitionSnapshot
-from fhircraft.fhir.resources.definitions.element_definition import ElementDefinition, ElementDefinitionType
-from fhircraft.fhir.resources.factory import ResourceFactory, _Unset, ElementDefinitionNode
+from fhircraft.fhir.resources.definitions import (
+    StructureDefinition,
+    StructureDefinitionSnapshot,
+)
+from fhircraft.fhir.resources.definitions.element_definition import (
+    ElementDefinition,
+    ElementDefinitionType,
+)
+from fhircraft.fhir.resources.factory import (
+    ElementDefinitionNode,
+    ResourceFactory,
+    _Unset,
+)
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 
@@ -171,7 +181,7 @@ class TestGetFhirType(FactoryTestCase):
             "http://hl7.org/fhirpath/System.String"
         )
         assert result == primitives.String
-        
+
     def test_parses_fhir_profiled_type(self):
         profile_url = "http://example.org/fhir/StructureDefinition/CustomType"
         element_type = ElementDefinitionType(code="CustomType", profile=[profile_url])
@@ -181,34 +191,35 @@ class TestGetFhirType(FactoryTestCase):
                 url=profile_url,
                 name="CustomType",
                 version="1.0.0",
+                fhirVersion="4.0.0",
                 status="active",
                 kind="complex-type",
                 abstract=False,
                 type="BackboneElement",
                 baseDefinition="http://hl7.org/fhir/StructureDefinition/BackboneElement",
                 derivation="specialization",
-                snapshot=StructureDefinitionSnapshot.model_validate({
-                    "element": [
-                        {
-                            "id": "CustomType",
-                            "path": "CustomType",
-                            "min": 0,
-                            "max": "*",
-                        },
-                        {
-                            "id": "CustomType.customField",
-                            "path": "CustomType.customField",
-                            "min": 0,
-                            "max": "1",
-                            "type": [{"code": "string"}],
-                        },
-                    ]   
-                }),
+                snapshot=StructureDefinitionSnapshot.model_validate(
+                    {
+                        "element": [
+                            {
+                                "id": "CustomType",
+                                "path": "CustomType",
+                                "min": 0,
+                                "max": "*",
+                            },
+                            {
+                                "id": "CustomType.customField",
+                                "path": "CustomType.customField",
+                                "min": 0,
+                                "max": "1",
+                                "type": [{"code": "string"}],
+                            },
+                        ]
+                    }
+                ),
             )
         )
-        result = self.factory._get_complex_FHIR_type(
-            element_type
-        )
+        result = self.factory._get_complex_FHIR_type(element_type)
         assert result == self.factory.construction_cache[profile_url]
 
     def test_returns_field_type_name_if_not_found(self):
@@ -577,8 +588,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
         instance1 = TestModel(**{"class_": "test_value"})
         # Using the original keyword name (should work due to validation_alias)
         instance2 = TestModel(**{"class": "test_value"})
-        assert getattr(instance1, 'class_') == "test_value"
-        assert getattr(instance2, 'class_') == "test_value"
+        assert getattr(instance1, "class_") == "test_value"
+        assert getattr(instance2, "class_") == "test_value"
 
     def test_handles_choice_type_fields_with_keywords(self):
         """Test that choice type fields with keywords are handled correctly."""
@@ -673,7 +684,6 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
 
         assert "for_" in fields
         assert "for_ext" in fields
-
 
 
 class TestResourceFactoryPackageMethods(TestCase):
@@ -804,7 +814,7 @@ class TestContentReferenceResolution(FactoryTestCase):
             node_label="TestResource",
             children={},
             slices={},
-            root=None
+            root=None,
         )
         self.root_structure.root = self.root_structure
 
@@ -817,15 +827,15 @@ class TestContentReferenceResolution(FactoryTestCase):
             node_label="targetField",
             type=[ElementDefinitionType(code="string")],
             children={},
-            slices={}
+            slices={},
         )
         self.root_structure.children["targetField"] = referenced_element
-        
+
         # Test resolution
         resolved_type = self.factory._resolve_content_reference_type(
             referenced_element, self.root_structure
         )
-        
+
         self.assertEqual(resolved_type, primitives.String)
 
     def test_resolve_content_reference_type_complex_with_children(self):
@@ -842,22 +852,22 @@ class TestContentReferenceResolution(FactoryTestCase):
                     node_label="subField",
                     type=[ElementDefinitionType(code="string")],
                     children={},
-                    slices={}
+                    slices={},
                 )
             },
-            slices={}
+            slices={},
         )
         self.root_structure.children["backboneField"] = referenced_element
-        
+
         # Test resolution
         resolved_type = self.factory._resolve_content_reference_type(
             referenced_element, self.root_structure
         )
-        
+
         # Should create a backbone model
-        self.assertTrue(hasattr(resolved_type, '__name__'))
-        self.assertTrue(hasattr(resolved_type, 'model_fields'))
-        self.assertIn('subField', resolved_type.model_fields)
+        self.assertTrue(hasattr(resolved_type, "__name__"))
+        self.assertTrue(hasattr(resolved_type, "model_fields"))
+        self.assertIn("subField", resolved_type.model_fields)
 
     def test_content_reference_with_invalid_path(self):
         """Test handling of contentReference with invalid path."""
@@ -873,19 +883,21 @@ class TestContentReferenceResolution(FactoryTestCase):
                     node_label="invalidRefField",
                     contentReference="#TestResource.nonExistentField",
                     children={},
-                    slices={}
+                    slices={},
                 )
             },
             slices={},
-            root=None
+            root=None,
         )
         structure.root = structure
         structure.children["invalidRefField"].root = structure
-        
+
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            fields, _, _ = self.factory._process_FHIR_structure_into_Pydantic_components(structure)
-            
+            fields, _, _ = (
+                self.factory._process_FHIR_structure_into_Pydantic_components(structure)
+            )
+
             # Should create field with Any type and generate warning
             self.assertIn("invalidRefField", fields)
             self.assertTrue(len(w) > 0)
@@ -913,31 +925,31 @@ class TestContentReferenceResolution(FactoryTestCase):
                         "min": 0,
                         "max": "*",
                         "base": {"path": "TestResource", "min": 0, "max": "*"},
-                        "type": [{"code": "DomainResource"}]
+                        "type": [{"code": "DomainResource"}],
                     },
                     {
                         "id": "TestResource.earlyField",
                         "path": "TestResource.earlyField",
                         "min": 0,
                         "max": "1",
-                        "contentReference": "#TestResource.laterField"
+                        "contentReference": "#TestResource.laterField",
                     },
                     {
                         "id": "TestResource.laterField",
                         "path": "TestResource.laterField",
                         "min": 0,
                         "max": "1",
-                        "type": [{"code": "string"}]
-                    }
+                        "type": [{"code": "string"}],
+                    },
                 ]
-            }
+            },
         }
-        
+
         # Should not raise exception
         model = self.factory.construct_resource_model(
             structure_definition=mock_structure_definition
         )
-        
+
         self.assertEqual(model.__name__, "TestContentRef")
-        self.assertIn('earlyField', model.model_fields)
-        self.assertIn('laterField', model.model_fields)
+        self.assertIn("earlyField", model.model_fields)
+        self.assertIn("laterField", model.model_fields)

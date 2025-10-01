@@ -5,10 +5,12 @@ import pytest
 import fhircraft.fhir.path.engine.collection as collection
 import fhircraft.fhir.path.engine.combining as combining
 from fhircraft.fhir.path.engine.additional import *
+from fhircraft.fhir.path.engine.aggregates import *
 from fhircraft.fhir.path.engine.boolean import *
 from fhircraft.fhir.path.engine.comparison import *
 from fhircraft.fhir.path.engine.conversion import *
 from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.path.engine.environment import *
 from fhircraft.fhir.path.engine.equality import *
 from fhircraft.fhir.path.engine.existence import *
 from fhircraft.fhir.path.engine.filtering import *
@@ -28,14 +30,16 @@ parser_test_cases = (
     ("`foo`", Element("foo")),
     ("`div`", Element("div")),
     ("foo[1]", Invocation(Element("foo"), Index(1))),
+    ("Observation", RootElement("Observation")),
     # ----------------------------------
     # Variables/Constants
     # ----------------------------------
-    ("$", Root()),
-    ("$this", This()),
-    ("%rootResource", Root()),
-    ("%resource", Parent()),
-    ("%context", This()),
+    ("$this", ContextualThis()),
+    ("$index", ContextualIndex()),
+    ("$total", ContextualTotal()),
+    ("%context", EnvironmentVariable("%context")),
+    ("%sct", EnvironmentVariable("%sct")),
+    ("%`custom-named-variable`", EnvironmentVariable("%`custom-named-variable`")),
     # ----------------------------------
     # Literals
     # ----------------------------------
@@ -108,10 +112,6 @@ parser_test_cases = (
             Element("parent"), Where(Equals(Element("child"), Literal(Time("@T12:05"))))
         ),
     ),
-    (
-        "parent.extension('http://domain.org/extension')",
-        Invocation(Element("parent"), Extension("http://domain.org/extension")),
-    ),
     ("parent.value[x]", Invocation(Element("parent"), TypeChoice("value"))),
     # ----------------------------------
     # Subsetting functions
@@ -135,7 +135,7 @@ parser_test_cases = (
     ),
     (
         "parent.all($this = 'parent')",
-        Invocation(Element("parent"), All(Equals(This(), Literal("parent")))),
+        Invocation(Element("parent"), All(Equals(ContextualThis(), Literal("parent")))),
     ),
     ("parent.allTrue()", Invocation(Element("parent"), AllTrue())),
     ("parent.anyTrue()", Invocation(Element("parent"), AnyTrue())),
@@ -167,11 +167,15 @@ parser_test_cases = (
     ),
     (
         "parent.select($this.child)",
-        Invocation(Element("parent"), Select(Invocation(This(), Element("child")))),
+        Invocation(
+            Element("parent"), Select(Invocation(ContextualThis(), Element("child")))
+        ),
     ),
     (
         "parent.repeat($this.child)",
-        Invocation(Element("parent"), Repeat(Invocation(This(), Element("child")))),
+        Invocation(
+            Element("parent"), Repeat(Invocation(ContextualThis(), Element("child")))
+        ),
     ),
     # ----------------------------------
     # Combining functions
@@ -190,7 +194,8 @@ parser_test_cases = (
     (
         "parent.iif($this, 'value1', 'value2')",
         Invocation(
-            Element("parent"), Iif(This(), Literal("value1"), Literal("value2"))
+            Element("parent"),
+            Iif(ContextualThis(), Literal("value1"), Literal("value2")),
         ),
     ),
     ("parent.toBoolean()", Invocation(Element("parent"), ToBoolean())),
@@ -259,15 +264,77 @@ parser_test_cases = (
     ("parent.round(2)", Invocation(Element("parent"), Round(Literal(2)))),
     ("parent.truncate()", Invocation(Element("parent"), Truncate())),
     # ----------------------------------
+    # Aggregation functions
+    # ----------------------------------
+    (
+        "parent.aggregate($this + $total)",
+        Invocation(
+            Element("parent"), Aggregate(Addition(ContextualThis(), ContextualTotal()))
+        ),
+    ),
+    (
+        "parent.aggregate($this + $total, 0)",
+        Invocation(
+            Element("parent"),
+            Aggregate(Addition(ContextualThis(), ContextualTotal()), Literal(0)),
+        ),
+    ),
+    # ----------------------------------
     # Utility functions
     # ----------------------------------
     (
-        "A.trace('id', id)",
-        Invocation(Element("A"), Trace(Literal("id"), Element("id"))),
+        "parent.trace('id', id)",
+        Invocation(Element("parent"), Trace(Literal("id"), Element("id"))),
     ),
     ("now()", Now()),
     ("timeOfDay()", TimeOfDay()),
     ("today()", Today()),
+    # ----------------------------------
+    # Additional functions
+    # ----------------------------------
+    (
+        "parent.extension('value')",
+        Invocation(Element("parent"), Extension(Literal("value"))),
+    ),
+    (
+        "parent.memberOf('value')",
+        Invocation(Element("parent"), MemberOf(Literal("value"))),
+    ),
+    (
+        "parent.subsumes('code')",
+        Invocation(Element("parent"), Subsumes(Literal("code"))),
+    ),
+    (
+        "parent.subsumedBy('code')",
+        Invocation(Element("parent"), SubsumedBy(Literal("code"))),
+    ),
+    (
+        "parent.comparable(12 'mg')",
+        Invocation(Element("parent"), Comparable(Quantity(value=12, unit="mg"))),
+    ),
+    ("parent.resolve()", Invocation(Element("parent"), Resolve())),
+    ("parent.hasValue()", Invocation(Element("parent"), HasValue())),
+    ("parent.getValue()", Invocation(Element("parent"), GetValue())),
+    ("parent.htmlChecks()", Invocation(Element("parent"), HtmlChecks())),
+    ("parent.lowBoundary()", Invocation(Element("parent"), LowBoundary())),
+    ("parent.highBoundary()", Invocation(Element("parent"), HighBoundary())),
+    ("parent.elementDefinition()", Invocation(Element("parent"), ElementDefinition())),
+    (
+        "parent.slice('url', 'name')",
+        Invocation(Element("parent"), Slice(Literal("url"), Literal("name"))),
+    ),
+    (
+        "parent.checkModifiers('modifier')",
+        Invocation(Element("parent"), CheckModifiers(Literal("modifier"))),
+    ),
+    (
+        "parent.conformsTo('valueset')",
+        Invocation(Element("parent"), ConformsTo(Literal("valueset"))),
+    ),
+    (
+        "parent.memberOf('valueset')",
+        Invocation(Element("parent"), MemberOf(Literal("valueset"))),
+    ),
     # ----------------------------------
     # Types Operators
     # ----------------------------------

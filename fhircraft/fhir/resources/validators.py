@@ -7,8 +7,8 @@ from typing import Any, List, TypeVar, Union
 
 from pydantic import BaseModel, ValidationError
 
-from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -33,23 +33,19 @@ def _validate_FHIR_element_constraint(
         AssertionError: If the validation fails and severity is not 'warning'.
         Warning: If the validation fails and severity is 'warning'.
     """
-    from fhircraft.fhir.path.parser import fhirpath
     from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
     from fhircraft.fhir.path.exceptions import (
         FhirPathLexerError,
         FhirPathParserError,
         FhirPathWarning,
     )
+    from fhircraft.fhir.path.parser import fhirpath
 
     if value is None:
         return value
     for item in ensure_list(value):
         try:
-            valid = fhirpath.parse(expression).evaluate(
-                [FHIRPathCollectionItem(value=item)], create=False
-            )
-            if valid == []:
-                valid = True
+            valid = fhirpath.parse(expression).single(item, default=True)
             error_message = f'{human}. [{key}] -> "{expression}"'
             if severity == "warning" and not valid:
                 warnings.warn(error_message, FhirPathWarning)
@@ -166,18 +162,25 @@ def validate_type_choice_element(
             getattr(
                 instance,
                 (
-                    field_name_base + (field_type
-                    if isinstance(field_type, str)
-                    else field_type.__name__)
+                    field_name_base
+                    + (
+                        field_type
+                        if isinstance(field_type, str)
+                        else field_type.__name__
+                    )
                 ),
                 None,
             )
-
-        ) is not None
+        )
+        is not None
         for field_type in field_types
     )
-    assert types_set_count <= 1, f"Type choice element {field_name_base}[x] can only have one value set."
-    assert not required or (required and types_set_count > 0), f"Type choice element {field_name_base}[x] must have one value set. Got {types_set_count}."
+    assert (
+        types_set_count <= 1
+    ), f"Type choice element {field_name_base}[x] can only have one value set."
+    assert not required or (
+        required and types_set_count > 0
+    ), f"Type choice element {field_name_base}[x] must have one value set. Got {types_set_count}."
     return instance
 
 
@@ -234,7 +237,9 @@ def get_type_choice_value_by_base(instance: BaseModel, base: str) -> Any:
                 return value
 
 
-def validate_contained_resource(cls, resources: Any, release: str) -> List[FHIRBaseModel] | None:
+def validate_contained_resource(
+    cls, resources: Any, release: str
+) -> List[FHIRBaseModel] | None:
     """
     Validate that a contained resource is a valid FHIR resource.
 
@@ -255,13 +260,17 @@ def validate_contained_resource(cls, resources: Any, release: str) -> List[FHIRB
     if not isinstance(resources, list):
         resources = [resources]
     validated_resources = []
-    for i, resource in enumerate(resources): 
+    for i, resource in enumerate(resources):
         if isinstance(resource, FHIRBaseModel):
             validated_resources.append(resource)
         if isinstance(resource, dict) and "resourceType" in resource:
-            resourceModel = get_fhir_resource_type(resource["resourceType"], release=release)
+            resourceModel = get_fhir_resource_type(
+                resource["resourceType"], release=release
+            )
             validated_resources.append(resourceModel.model_validate(resource))
         else:
-            raise ValidationError("Contained resource must be a FHIRBaseModel or a dict, and must have a 'resourceType' property.")
+            raise ValidationError(
+                "Contained resource must be a FHIRBaseModel or a dict, and must have a 'resourceType' property."
+            )
 
     return validated_resources

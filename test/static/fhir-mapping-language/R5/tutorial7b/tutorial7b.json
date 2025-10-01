@@ -1,7 +1,7 @@
 {
   "resourceType": "StructureMap",
   "url": "http://hl7.org/fhir/StructureMap/tutorial-step7b",
-  "name": "tutorial",
+  "name": "Tutorial",
   "status": "draft",
   "structure": [
     {

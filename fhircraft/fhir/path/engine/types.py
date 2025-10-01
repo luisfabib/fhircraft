@@ -15,6 +15,7 @@ from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
 from fhircraft.fhir.resources.datatypes import utils as type_utils
 
+
 class FHIRTypesOperator(FHIRPath):
     """
     Abstract class definition for the category of types FHIRPath operators.
@@ -25,27 +26,23 @@ class FHIRTypesOperator(FHIRPath):
         self.type_specifier = type_specifier
 
     def _get_singleton_collection_value(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> Any:
-        left_collection = evaluate_fhirpath_collection(self.left, collection, create)
+        left_collection = evaluate_fhirpath_collection(
+            self.left, collection, environment, create
+        )
         if len(left_collection) > 1:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} expected a singleton collection for the left expression, instead got a {len(collection)}-items collection."
             )
         return left_collection[0].value
 
-    def _validate_type_specifier(
-        self, collection: FHIRPathCollection, create: bool
-    ) -> bool:
+    def _validate_type_specifier(self, value: Any) -> bool:
         """
         Validates the type specifier against the known FHIR types.
         Raises an error if the type specifier is not valid.
         """
-
         type_ = self.type_specifier
-        value = self._get_singleton_collection_value(collection, create)
-        if value is None:
-            return []
         # Handle the FHIRPath literal types as special cases
         if isinstance(value, fhirpath_literals.Quantity):
             return type_ == "Quantity"
@@ -57,13 +54,13 @@ class FHIRTypesOperator(FHIRPath):
             return type_ == "Time"
         else:
             try:
-                return type_utils.is_fhir_primitive_type(value,type_)
+                return type_utils.is_fhir_primitive_type(value, type_)
             except type_utils.FHIRTypeError:
                 try:
-                    return type_utils.is_fhir_complex_type(value,type_)
+                    return type_utils.is_fhir_complex_type(value, type_)
                 except type_utils.FHIRTypeError:
-                    return type_utils.is_fhir_resource_type(value,type_)   
-                  
+                    return type_utils.is_fhir_resource_type(value, type_)
+
     def __str__(self):
         raise NotImplementedError("Subclasses must implement __str__ method.")
 
@@ -91,7 +88,7 @@ class Is(FHIRTypesOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         If the left operand is a collection with a single item and the second operand is a type identifier,
@@ -102,6 +99,8 @@ class Is(FHIRTypesOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -109,11 +108,10 @@ class Is(FHIRTypesOperator):
         Raises:
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
-        return [
-            FHIRPathCollectionItem.wrap(
-                self._validate_type_specifier(collection, create)
-            )
-        ]
+        value = self._get_singleton_collection_value(collection, environment, create)
+        if value is None:
+            return []
+        return [FHIRPathCollectionItem.wrap(self._validate_type_specifier(value))]
 
     def __str__(self):
         return f"{self.left} is {self.type_specifier}"
@@ -136,12 +134,13 @@ class LegacyIs(FHIRPathFunction):
         )
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
-        return Is(This(), self.type_specifier).evaluate(collection, create)
+        return Is(This(), self.type_specifier).evaluate(collection, environment, create)
 
     def __str__(self):
         return f"is({self.type_specifier})"
+
 
 class As(FHIRTypesOperator):
     """
@@ -153,7 +152,7 @@ class As(FHIRTypesOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         If the left operand is a collection with a single item and the second operand is an identifier,
@@ -164,6 +163,8 @@ class As(FHIRTypesOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -171,15 +172,16 @@ class As(FHIRTypesOperator):
         Raises:
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
-        value = self._get_singleton_collection_value(collection, create)
+        value = self._get_singleton_collection_value(collection, environment, create)
         return (
             [FHIRPathCollectionItem.wrap(value)]
-            if self._validate_type_specifier(collection, create)
+            if self._validate_type_specifier(value)
             else []
         )
 
     def __str__(self):
         return f"{self.left} as {self.type_specifier}"
+
 
 class LegacyAs(FHIRPathFunction):
     """
@@ -200,9 +202,9 @@ class LegacyAs(FHIRPathFunction):
         )
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
-        return As(This(), self.type_specifier).evaluate(collection)
+        return As(This(), self.type_specifier).evaluate(collection, environment, create)
 
     def __str__(self):
         return f"as({self.type_specifier})"

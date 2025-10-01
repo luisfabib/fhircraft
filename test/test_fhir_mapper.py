@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper import FHIRMapper
-
 from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMap
+
 from .test_fhir_mapper_engine import (
     create_simple_source_structure_definition,
     create_simple_target_structure_definition,
@@ -46,7 +46,7 @@ def test_load_structure_map_from_dict():
     map_dict = {
         "resourceType": "StructureMap",
         "status": "draft",
-        "name": "test",
+        "name": "TestMap",
         "url": "http://example.org/test",
         "group": [
             {
@@ -63,12 +63,15 @@ def test_load_structure_map_from_dict():
     structure_map = mapper.load_structure_map(map_dict)
 
     assert isinstance(structure_map, StructureMap)
-    assert structure_map.name == "test"
+    assert structure_map.name == "TestMap"
 
 
 def test_load_structure_map_from_existing():
     """Test loading from existing StructureMap object."""
-    original = StructureMap.model_construct(name="test", url="http://example.org/test")
+    original = StructureMap.model_construct(
+        name="TestMap", url="http://example.org/test"
+    )
+    assert isinstance(original, StructureMap)
 
     mapper = FHIRMapper()
     loaded = mapper.load_structure_map(original)

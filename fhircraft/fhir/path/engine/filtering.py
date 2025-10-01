@@ -6,8 +6,10 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathFunction,
-    Literal,
+    This,
 )
+from fhircraft.fhir.path.engine.types import As
+from fhircraft.fhir.path.utils import get_expression_context
 from fhircraft.utils import ensure_list
 
 
@@ -23,7 +25,7 @@ class Where(FHIRPathFunction):
         self.expression = expression
 
     def evaluate(
-        self, collection: FHIRPathCollection, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Returns a collection containing only those elements in the input collection for which
@@ -33,14 +35,18 @@ class Where(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
-            create (bool): Whether to auto-generate missing path segments.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
         """
         collection = ensure_list(collection)
         expression_collection = [
-            self.expression.evaluate([item], create) for item in collection
+            self.expression.evaluate(
+                [item], get_expression_context(environment, item, index), create
+            )
+            for index, item in enumerate(collection)
         ]
         checks = [
             bool(collection[0].value) if len(collection) > 0 else False
@@ -73,7 +79,7 @@ class Select(FHIRPathFunction):
         self.projection = projection
 
     def evaluate(
-        self, collection: FHIRPathCollection, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Evaluates the projection expression for each item in the input collection. The result of each
@@ -85,7 +91,8 @@ class Select(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
-            create (bool): Whether to auto-generate missing path segments.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
@@ -93,8 +100,12 @@ class Select(FHIRPathFunction):
         collection = ensure_list(collection)
         return [
             projected_item
-            for item in collection
-            for projected_item in ensure_list(self.projection.evaluate([item], create))
+            for index, item in enumerate(collection)
+            for projected_item in ensure_list(
+                self.projection.evaluate(
+                    [item], get_expression_context(environment, item, index), create
+                )
+            )
         ]
 
     def __str__(self):
@@ -122,7 +133,7 @@ class Repeat(FHIRPathFunction):
         self.projection = projection
 
     def evaluate(
-        self, collection: FHIRPathCollection, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         A version of select that will repeat the projection and add it to the output collection, as
@@ -130,7 +141,8 @@ class Repeat(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): The input collection.
-            create (bool): Whether to auto-generate missing path segments.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
@@ -138,8 +150,10 @@ class Repeat(FHIRPathFunction):
 
         def project_recursively(input_collection):
             output_collection = []
-            for item in input_collection:
-                new_collection = self.projection.evaluate([item], create)
+            for index, item in enumerate(input_collection):
+                new_collection = self.projection.evaluate(
+                    [item], get_expression_context(environment, item, index), create
+                )
                 output_collection.extend(new_collection)
                 if len(new_collection) > 0:
                     output_collection.extend(project_recursively(new_collection))
@@ -168,22 +182,31 @@ class OfType(FHIRPathFunction):
         type (class): Type class
     """
 
-    def __init__(self, _type: type | str):
+    def __init__(self, _type: str):
         self.type = _type
 
-    def evaluate(self, collection: FHIRPathCollection, create=False) -> FHIRPathCollection:
+    def evaluate(
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+    ) -> FHIRPathCollection:
         """
         Returns a collection that contains all items in the input collection that are of the given type
         or a subclass thereof. If the input collection is empty (`[]`), the result is empty.
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection): The output collection.
         """
         collection = ensure_list(collection)
-        return [item for item in collection if isinstance(item.value, self.type)]  # type: ignore
+        filtered_collection = []
+        for item in collection:
+            filtered_collection.extend(
+                As(This(), self.type).evaluate([item], environment, create)
+            )
+        return filtered_collection
 
     def __str__(self):
         return f"ofType({self.type})"
