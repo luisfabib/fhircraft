@@ -3,7 +3,7 @@
   "contained": [
     {
       "resourceType": "ConceptMap",
-      "name": "tutorialmap",
+      "name": "TutorialMap",
       "status": "draft",
       "group": [
         {
@@ -34,7 +34,7 @@
     }
   ],
   "url": "http://hl7.org/fhir/StructureMap/tutorial-step8",
-  "name": "tutorial",
+  "name": "Tutorial",
   "status": "draft",
   "structure": [
     {
@@ -84,7 +84,7 @@
                   "valueId": "d"
                 },
                 {
-                  "valueString": "#tutorialmap"
+                  "valueString": "#TutorialMap"
                 },
                 {
                   "valueString": "code"

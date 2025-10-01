@@ -1,5 +1,5 @@
 
-map "http://hl7.org/fhir/StructureMap/tutorial-step13" = "tutorial"
+map "http://hl7.org/fhir/StructureMap/tutorial-step13" = "Tutorial"
 
 uses "http://hl7.org/fhir/StructureDefinition/tutorial-left-13" alias TLeft as source
 uses "http://hl7.org/fhir/StructureDefinition/tutorial-right-13" alias TRight as target

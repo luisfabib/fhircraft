@@ -6,8 +6,8 @@ import pytest
 
 from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
 from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
-
 from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import *
+
 
 def add_rules_to_basic_map(rules, documentation=None):
     return StructureMap.model_construct(
@@ -15,7 +15,6 @@ def add_rules_to_basic_map(rules, documentation=None):
             StructureMapGroup(
                 documentation=documentation,
                 name="map_example",
-                status="draft",
                 input=[
                     StructureMapGroupInput(name="src", mode="source"),
                     StructureMapGroupInput(name="tgt", mode="target"),
@@ -45,6 +44,10 @@ parser_test_cases = (
     (
         """/// title = 'Example map'""",
         StructureMap.model_construct(title="Example map"),
+    ),
+    (
+        """/// name = 'ExampleMap'""",
+        StructureMap.model_construct(name="ExampleMap"),
     ),
     # ----------------- STRUCTURE DECLARATION  -----------------
     (
@@ -295,7 +298,9 @@ parser_test_cases = (
                             context="tgt",
                             element="fieldB",
                             transform="copy",
-                            parameter=[StructureMapGroupRuleTargetParameter(valueId="a")],
+                            parameter=[
+                                StructureMapGroupRuleTargetParameter(valueId="a")
+                            ],
                         )
                     ],
                 ),
@@ -312,7 +317,9 @@ parser_test_cases = (
                             context="tgt",
                             element="fieldA",
                             transform="copy",
-                            parameter=[StructureMapGroupRuleTargetParameter(valueId="b")],
+                            parameter=[
+                                StructureMapGroupRuleTargetParameter(valueId="b")
+                            ],
                         )
                     ],
                 ),
@@ -358,7 +365,11 @@ parser_test_cases = (
                         StructureMapGroupRuleTarget(
                             variable="a",
                             transform="create",
-                            parameter=[StructureMapGroupRuleTargetParameter(valueString="Resource")],
+                            parameter=[
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="Resource"
+                                )
+                            ],
                         )
                     ],
                     dependent=None,
@@ -384,7 +395,11 @@ parser_test_cases = (
                             context="tgt",
                             element="fieldB",
                             transform="append",
-                            parameter=[StructureMapGroupRuleTargetParameter(valueString="string")],
+                            parameter=[
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="string"
+                                )
+                            ],
                         )
                     ],
                     dependent=None,
@@ -419,7 +434,11 @@ parser_test_cases = (
                                     context="tgt",
                                     element="fieldA",
                                     transform="copy",
-                                    parameter=[StructureMapGroupRuleTargetParameter(valueId="aa")],
+                                    parameter=[
+                                        StructureMapGroupRuleTargetParameter(
+                                            valueId="aa"
+                                        )
+                                    ],
                                 )
                             ],
                         )
@@ -500,7 +519,9 @@ parser_test_cases = (
                             element="field",
                             transform="create",
                             parameter=[
-                                StructureMapGroupRuleTargetParameter(valueString="TestResource")
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="TestResource"
+                                )
                             ],
                             variable="tr",
                         )
@@ -527,7 +548,9 @@ parser_test_cases = (
                             element="field",
                             transform="create",
                             parameter=[
-                                StructureMapGroupRuleTargetParameter(valueString="TestResource")
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="TestResource"
+                                )
                             ],
                             variable="tr",
                         )
@@ -555,7 +578,9 @@ parser_test_cases = (
                             element="field",
                             transform="create",
                             parameter=[
-                                StructureMapGroupRuleTargetParameter(valueString="TestResource")
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="TestResource"
+                                )
                             ],
                             variable="tr",
                         )
@@ -582,7 +607,9 @@ parser_test_cases = (
                             element="field",
                             transform="create",
                             parameter=[
-                                StructureMapGroupRuleTargetParameter(valueString="TestResource")
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="TestResource"
+                                )
                             ],
                             variable="tr",
                         )
@@ -634,7 +661,9 @@ parser_test_cases = (
                             context="tgt",
                             element="field",
                             transform="copy",
-                            parameter=[StructureMapGroupRuleTargetParameter(valueId="sf")],
+                            parameter=[
+                                StructureMapGroupRuleTargetParameter(valueId="sf")
+                            ],
                         )
                     ],
                 )
@@ -687,7 +716,9 @@ parser_test_cases = (
                             transform="concatenate",
                             parameter=[
                                 StructureMapGroupRuleTargetParameter(valueId="sf"),
-                                StructureMapGroupRuleTargetParameter(valueString="-suffix"),
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="-suffix"
+                                ),
                             ],
                         )
                     ],
@@ -742,7 +773,9 @@ parser_test_cases = (
                             element="b",
                             transform="evaluate",
                             parameter=[
-                                StructureMapGroupRuleTargetParameter(valueString="a2 or a3"),
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="a2 or a3"
+                                ),
                             ],
                         )
                     ],
@@ -768,7 +801,9 @@ parser_test_cases = (
                             element="field",
                             transform="evaluate",
                             parameter=[
-                                StructureMapGroupRuleTargetParameter(valueString="someExpr(sf)"),
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="someExpr(sf)"
+                                ),
                             ],
                         )
                     ],
@@ -782,8 +817,8 @@ parser_test_cases = (
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(string, expected_object):
     parser = FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
-    parsed_map = parser.parse(string).model_dump(exclude=("text","status","meta"))
-    expected_map = expected_object.model_dump(exclude=("text","status","meta"))
+    parsed_map = parser.parse(string).model_dump(exclude=("text", "status", "meta"))
+    expected_map = expected_object.model_dump(exclude=("text", "status", "meta"))
     if parsed_map != expected_map:
         print("\nParsed:\n---------------------------")
         pprint(parsed_map)
@@ -834,8 +869,10 @@ def test_parser_integration(directory):
         expected_StructureMap = json.load(file)
     parser = FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
 
-    parsed_map = parser.parse(map_script).model_dump(exclude=("text","status","meta"))
-    expected_map = StructureMap.model_validate(expected_StructureMap).model_dump(exclude=("text","status","meta"))
+    parsed_map = parser.parse(map_script).model_dump(exclude=("text", "status", "meta"))
+    expected_map = StructureMap.model_validate(expected_StructureMap).model_dump(
+        exclude=("text", "status", "meta")
+    )
     if parsed_map != expected_map:
         print("\nParsed:\n---------------------------")
         pprint(parsed_map)

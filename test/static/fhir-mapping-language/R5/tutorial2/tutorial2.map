@@ -1,5 +1,5 @@
 /// url = 'http://hl7.org/fhir/StructureMap/tutorial-step2'
-/// name = 'tutorial-step2'
+/// name = 'TutorialStep2'
 /// title = 'Tutorial Step 2'
 
 uses "http://hl7.org/fhir/StructureDefinition/tutorial-left-2" alias TLeft as source

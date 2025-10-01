@@ -1,7 +1,7 @@
 {
   "resourceType": "StructureMap",
   "url": "http://hl7.org/fhir/StructureMap/tutorial-step4c",
-  "name": "tutorial-step4c",
+  "name": "TutorialStep4c",
   "title": "Tutorial Step 4c",
   "status": "draft",
   "structure": [
