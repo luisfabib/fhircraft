@@ -307,3 +307,36 @@ def test_highboundary_quantity():
     assert result[0].value.unit == "kg"
     assert result[0].value.system == "http://unitsofmeasure.org"
     assert result[0].value.code == "kg"
+
+
+# -------------
+# Comparable
+# -------------
+
+
+def test_comparable_same_units():
+    collection = [FHIRPathCollectionItem(value=Quantity(value=10, unit="mg"))]
+    quantity = Quantity(
+        value=12,
+        unit="mg",
+    )
+    assert Comparable(quantity).single(collection, env) == True
+
+
+def test_comparable_different_units():
+    collection = [FHIRPathCollectionItem(value=Quantity(value=10, unit="l"))]
+    quantity = Quantity(
+        value=12,
+        unit="mg",
+    )
+    assert Comparable(quantity).single(collection, env) == False
+
+
+def test_comparable_returns_empty_for_empty_collection():
+    collection = []
+    quantity = Quantity(
+        value=12,
+        unit="mg",
+    )
+    result = Comparable(quantity).evaluate(collection, env)
+    assert result == []

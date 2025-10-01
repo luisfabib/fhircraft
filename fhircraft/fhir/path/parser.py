@@ -6,11 +6,13 @@ from typing import Any
 import ply.yacc
 
 import fhircraft.fhir.path.engine.additional as additional
+import fhircraft.fhir.path.engine.aggregates as aggregates
 import fhircraft.fhir.path.engine.boolean as boolean
 import fhircraft.fhir.path.engine.collection as collection
 import fhircraft.fhir.path.engine.combining as combining
 import fhircraft.fhir.path.engine.comparison as comparison
 import fhircraft.fhir.path.engine.conversion as conversion
+import fhircraft.fhir.path.engine.environment as environment
 import fhircraft.fhir.path.engine.equality as equality
 import fhircraft.fhir.path.engine.existence as existence
 import fhircraft.fhir.path.engine.filtering as filtering
@@ -21,15 +23,13 @@ import fhircraft.fhir.path.engine.strings as strings
 import fhircraft.fhir.path.engine.subsetting as subsetting
 import fhircraft.fhir.path.engine.types as types
 import fhircraft.fhir.path.engine.utility as utility
-import fhircraft.fhir.path.engine.environment as environment
-import fhircraft.fhir.path.engine.aggregates as aggregates
 from fhircraft.fhir.path.engine.core import (
     Element,
-    RootElement,
     FHIRPath,
     Invocation,
-    This,
     Literal,
+    RootElement,
+    This,
 )
 from fhircraft.fhir.path.exceptions import FhirPathLexerError, FhirPathParserError
 from fhircraft.fhir.path.lexer import FhirPathLexer
@@ -363,6 +363,20 @@ class FhirPathParser:
             p[0] = additional.HighBoundary()
         elif check(p, "elementDefinition", nargs=0):
             p[0] = additional.ElementDefinition()
+        elif check(p, "slice", nargs=2):
+            p[0] = additional.Slice(*p[3])
+        elif check(p, "checkModifiers", nargs=1):
+            p[0] = additional.CheckModifiers(*p[3])
+        elif check(p, "conformsTo", nargs=1):
+            p[0] = additional.ConformsTo(*p[3])
+        elif check(p, "memberOf", nargs=1):
+            p[0] = additional.MemberOf(*p[3])
+        elif check(p, "subsumes", nargs=1):
+            p[0] = additional.Subsumes(*p[3])
+        elif check(p, "subsumedBy", nargs=1):
+            p[0] = additional.SubsumedBy(*p[3])
+        elif check(p, "comparable", nargs=1):
+            p[0] = additional.Comparable(*p[3])
         # -------------------------------------------------------------------------------
         # Subsetting
         # -------------------------------------------------------------------------------
