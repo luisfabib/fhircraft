@@ -48,9 +48,11 @@ def test_equals_returns_correct_boolean(left, right, expected):
     ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
+
 def test_equals_string_representation():
     expression = Equals(Element("left"), Element("right"))
     assert str(expression) == "left == right"
+
 
 @pytest.mark.parametrize("left, right, expected", equals_boolean_logic_cases)
 def test_notequals_returns_correct_boolean(left, right, expected):
@@ -62,9 +64,11 @@ def test_notequals_returns_correct_boolean(left, right, expected):
     ).evaluate(collection, env)
     assert result != [FHIRPathCollectionItem(value=expected)]
 
+
 def test_notequals_string_representation():
     expression = NotEquals(Element("left"), Element("right"))
     assert str(expression) == "left != right"
+
 
 # -------------
 # Equivalent
@@ -78,7 +82,9 @@ equivalent_boolean_logic_cases = (
     (123, 123, True),
     (123, 456, False),
     (1.23, 1.23, True),
+    (1.23, 1.23123, True),
     (1.23, 4.56, False),
+    (1.23, 1.25123, False),
     (True, True, True),
     (False, False, True),
     (False, True, False),
@@ -93,6 +99,9 @@ equivalent_boolean_logic_cases = (
     ("ABC", [], False),
     ([], "ABC", False),
     ([], [], True),
+    (dict(a=1, b=2), dict(b=2, a=1), True),
+    (dict(a=1, b=2, id="123"), dict(b=2, a=1, id="456"), True),
+    (dict(a=1, b=2, c=3), dict(b=2, a=1, id="456"), False),
 )
 
 
@@ -106,9 +115,11 @@ def test_equivalent_returns_correct_boolean(left, right, expected):
     ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
+
 def test_equivalent_string_representation():
     expression = Equivalent(Element("left"), Element("right"))
     assert str(expression) == "left ~ right"
+
 
 @pytest.mark.parametrize("left, right, expected", equivalent_boolean_logic_cases)
 def test_notequivalent_returns_correct_boolean(left, right, expected):
@@ -119,6 +130,7 @@ def test_notequivalent_returns_correct_boolean(left, right, expected):
         Invocation(Element("right"), GetValue()),
     ).evaluate(collection, env)
     assert result != [FHIRPathCollectionItem(value=expected)]
+
 
 def test_notequivalent_string_representation():
     expression = NotEquivalent(Element("left"), Element("right"))
