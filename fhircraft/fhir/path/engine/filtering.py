@@ -6,8 +6,9 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathFunction,
-    Literal,
+    This,
 )
+from fhircraft.fhir.path.engine.types import As
 from fhircraft.fhir.path.utils import get_expression_context
 from fhircraft.utils import ensure_list
 
@@ -181,7 +182,7 @@ class OfType(FHIRPathFunction):
         type (class): Type class
     """
 
-    def __init__(self, _type: type | str):
+    def __init__(self, _type: str):
         self.type = _type
 
     def evaluate(
@@ -200,7 +201,12 @@ class OfType(FHIRPathFunction):
             FHIRPathCollection): The output collection.
         """
         collection = ensure_list(collection)
-        return [item for item in collection if isinstance(item.value, self.type)]  # type: ignore
+        filtered_collection = []
+        for item in collection:
+            filtered_collection.extend(
+                As(This(), self.type).evaluate([item], environment, create)
+            )
+        return filtered_collection
 
     def __str__(self):
         return f"ofType({self.type})"

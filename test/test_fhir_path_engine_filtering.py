@@ -1,8 +1,11 @@
 from collections import namedtuple
 
+import pytest
+
 from fhircraft.fhir.path.engine.comparison import *
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.filtering import *
+from fhircraft.fhir.path.engine.literals import Date, Quantity
 
 env = dict()
 
@@ -26,9 +29,11 @@ def test_where_returns_valid_items_in_collection_where_true():
     )
     assert result == [collection[1]]
 
+
 def test_where_string_representation():
-    expression = Where(LessThan(Element('field'), Literal(3)))
+    expression = Where(LessThan(Element("field"), Literal(3)))
     assert str(expression) == "where(field < 3)"
+
 
 # -------------
 # Select
@@ -51,9 +56,11 @@ def test_select_returns_collection_of_projected_elements():
     assert result[0].value == 123
     assert result[1].value == 456
 
+
 def test_select_string_representation():
-    expression = Select(Invocation(Element('field'), Element("subfield")))
+    expression = Select(Invocation(Element("field"), Element("subfield")))
     assert str(expression) == "select(field.subfield)"
+
 
 # -------------
 # Repeat
@@ -89,33 +96,44 @@ def test_repeat_returns_collection_of_nested_repeating_elements():
         "1.3.1",
     ]
 
+
 def test_repeat_string_representation():
-    expression = Repeat(Invocation(Element('field'), Element("subfield")))
+    expression = Repeat(Invocation(Element("field"), Element("subfield")))
     assert str(expression) == "repeat(field.subfield)"
+
 
 # -------------
 # ofType
 # -------------
 
+ofType_cases = (
+    ("ABC", "String"),
+    (12, "Integer"),
+    (12, "UnsignedInt"),
+    (12, "PositiveInt"),
+    (Date("@2024"), "Date"),
+    (Quantity(12, "g"), "Quantity"),
+)
+
+
+@pytest.mark.parametrize("expected, type", ofType_cases)
+def test_ofType_returns_filtered_collection_by_type(expected, type):
+    collection = [
+        FHIRPathCollectionItem(value="ABC"),
+        FHIRPathCollectionItem(value=12),
+        FHIRPathCollectionItem(value=Date("@2024")),
+        FHIRPathCollectionItem(value=Quantity(12, "g")),
+    ]
+    result = OfType(type).evaluate(collection, env)
+    assert result == [FHIRPathCollectionItem(value=expected)]
+
 
 def test_ofType_returns_empty_for_empty_collection():
     collection = []
-    result = OfType(str).evaluate(collection, env)
+    result = OfType("String").evaluate(collection, env)
     assert result == []
 
 
-def test_ofType_returns_filtered_collection_by_type():
-    Resource1 = namedtuple("Resource1Type", "value")
-    Resource2 = namedtuple("Resource2Type", "value")
-    collection = [
-        FHIRPathCollectionItem(value=Resource1(value=1)),
-        FHIRPathCollectionItem(value=Resource2(value=2)),
-        FHIRPathCollectionItem(value=Resource1(value=3)),
-    ]
-    result = OfType(Resource1).evaluate(collection, env)
-    assert result == [collection[0], collection[2]]
-
-
 def test_ofType_string_representation():
-    expression = OfType('Patient')
+    expression = OfType("Patient")
     assert str(expression) == "ofType(Patient)"
