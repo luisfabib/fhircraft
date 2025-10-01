@@ -1,11 +1,10 @@
-
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
     FHIRPathCollectionItem,
     This,
 )
-import warnings
+from fhircraft.fhir.path.exceptions import FHIRPathError
 
 
 class FHIRPathVariable(FHIRPath):
@@ -15,6 +14,7 @@ class FHIRPathVariable(FHIRPath):
     Attributes:
         variable (str): The name of the variable.
     """
+
     variable: str
 
     def __str__(self):
@@ -41,7 +41,7 @@ class EnvironmentVariable(FHIRPathVariable):
         self.variable = variable
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Evaluates the contextual variable within the given environment.
@@ -55,8 +55,9 @@ class EnvironmentVariable(FHIRPathVariable):
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
         """
         if self.variable not in environment:
-            warnings.warn(f"The {self.variable} variable is not defined within the current context.")
-            return []
+            raise FHIRPathError(
+                f"The {self.variable} variable is not defined within the current context."
+            )
         value = environment[self.variable]
         if value is None or value == []:
             return []
@@ -67,10 +68,11 @@ class ContextualVariable(FHIRPath):
     """
     A base class for FHIRPath contextual variables such as `$this`, `$index`, and `$total`.
     """
+
     variable: str
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Evaluates the contextual variable within the given environment.
@@ -84,7 +86,9 @@ class ContextualVariable(FHIRPath):
             collection (FHIRPathCollection): A list of FHIRPathCollectionItem instances after evaluation.
         """
         if self.variable not in environment:
-            raise ValueError(f"The {self.variable} variable is not defined within the current context.")
+            raise FHIRPathError(
+                f"The {self.variable} variable is not defined within the current context."
+            )
         value = environment[self.variable]
         if value is None or value == []:
             return []
@@ -101,16 +105,18 @@ class ContextualVariable(FHIRPath):
 
     def __hash__(self):
         return hash(self.variable)
-    
+
+
 class ContextualThis(ContextualVariable):
     """
     A class representation of the FHIRPath `$this` operator used to represent
     the item from the input collection currently under evaluation.
     """
+
     variable = "$this"
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Evaluates the contextual variable within the given environment. For `$this`, if the variable is not defined in the current context
@@ -129,16 +135,20 @@ class ContextualThis(ContextualVariable):
             return collection
         return [FHIRPathCollectionItem.wrap(environment[self.variable])]
 
+
 class ContextualIndex(ContextualVariable):
     """
     A class representation of the FHIRPath `$index` operator used to represent
     the index of an item in the input collection currently under evaluation.
     """
+
     variable = "$index"
+
 
 class ContextualTotal(ContextualVariable):
     """
     A class representation of the FHIRPath `$total` operator used to represent
     an aggregated value over a collection within a context.
     """
+
     variable = "$total"

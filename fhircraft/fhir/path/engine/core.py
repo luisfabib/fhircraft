@@ -12,32 +12,34 @@ from fhircraft.utils import contains_list_type, ensure_list, get_fhir_model_from
 # Get logger name
 logger = logging.getLogger(__name__)
 
-type FHIRPathCollection = List["FHIRPathCollectionItem"]
+FHIRPathCollection = List["FHIRPathCollectionItem"]
 
 
 class FHIRPath(ABC):
     """Abstract base class for FHIRPath expressions."""
 
-    def values(self, data) -> List[Any]:
+    def values(self, data, environment: dict | None = None) -> List[Any]:
         """
         Evaluates the FHIRPath expression and returns all resulting values as a list.
 
         Args:
             data: The data to evaluate the FHIRPath expression against.
+            environment: Optional map of additional variables to include in the evaluation context.
 
         Returns:
             List[Any]: A list of all values that match the FHIRPath expression. Returns an empty list if no matches are found.
         """
-        collection = self.__evaluate_wrapped(data)
+        collection = self.__evaluate_wrapped(data, environment=environment)
         return [item.value for item in collection]
 
-    def single(self, data, default=None) -> Any:
+    def single(self, data, default=None, environment: dict | None = None) -> Any:
         """
         Evaluates the FHIRPath expression and returns a single value.
 
         Args:
             data: The data to evaluate the FHIRPath expression against.
             default: The default value to return if no matches are found.
+            environment: Optional map of additional variables to include in the evaluation context.
 
         Returns:
             Any: The single matching value.
@@ -45,7 +47,7 @@ class FHIRPath(ABC):
         Raises:
             FHIRPathError: If more than one value is found.
         """
-        values = self.values(data)
+        values = self.values(data, environment=environment)
         if len(values) == 0:
             return default
         elif len(values) == 1:
@@ -56,82 +58,88 @@ class FHIRPath(ABC):
                 f"Use values() to retrieve multiple values or first() to get the first one."
             )
 
-    def first(self, data, default=None) -> Any:
+    def first(self, data, default=None, environment: dict | None = None) -> Any:
         """
         Evaluates the FHIRPath expression and returns the first value.
 
         Args:
             data: The data to evaluate the FHIRPath expression against.
             default: The default value to return if no matches are found.
+            environment: Optional map of additional variables to include in the evaluation context.
 
         Returns:
             Any: The first matching value, or the default if no matches.
         """
-        values = self.values(data)
+        values = self.values(data, environment=environment)
         return values[0] if values else default
 
-    def last(self, data, default=None) -> Any:
+    def last(self, data, default=None, environment: dict | None = None) -> Any:
         """
         Evaluates the FHIRPath expression and returns the last value.
 
         Args:
             data: The data to evaluate the FHIRPath expression against.
             default: The default value to return if no matches are found.
+            environment: Optional map of additional variables to include in the evaluation context.
 
         Returns:
             Any: The last matching value, or the default if no matches.
         """
-        values = self.values(data)
+        values = self.values(data, environment=environment)
         return values[-1] if values else default
 
-    def exists(self, data) -> bool:
+    def exists(self, data, environment: dict | None = None) -> bool:
         """
         Checks if the FHIRPath expression matches any values in the data.
 
         Args:
             data: The data to evaluate the FHIRPath expression against.
+            environment: Optional map of additional variables to include in the evaluation context.
 
         Returns:
             bool: True if at least one value matches, False otherwise.
         """
-        return len(self.values(data)) > 0
+        return len(self.values(data, environment=environment)) > 0
 
-    def count(self, data) -> int:
+    def count(self, data, environment: dict | None = None) -> int:
         """
         Returns the number of values that match the FHIRPath expression.
 
         Args:
             data: The data to evaluate the FHIRPath expression against.
+            environment: Optional map of additional variables to include in the evaluation context.
 
         Returns:
             int: The number of matching values.
         """
-        return len(self.values(data))
+        return len(self.values(data, environment=environment))
 
-    def is_empty(self, data) -> bool:
+    def is_empty(self, data, environment: dict | None = None) -> bool:
         """
         Checks if the FHIRPath expression matches no values in the data.
 
         Args:
             data: The data to evaluate the FHIRPath expression against.
+            environment: Optional map of additional variables to include in the evaluation context.
 
         Returns:
             bool: True if no values match, False otherwise.
         """
-        return not self.exists(data)
+        return not self.exists(data, environment=environment)
 
-    def update_values(self, data, value) -> None:
+    def update_values(self, data, value, environment: dict | None = None) -> None:
         """
         Evaluates the FHIRPath expression and sets all matching locations to the given value.
 
         Args:
             data: The data to evaluate the FHIRPath expression against.
             value: The value to set at all matching locations.
+            environment: Optional map of additional variables to include in the evaluation context.
 
         Raises:
             RuntimeError: If no matching locations are found or if locations cannot be set.
         """
-        collection = self.__evaluate_wrapped(data, create=True)
+        collection = self.__evaluate_wrapped(data, environment=environment, create=True)
         if not collection:
             raise RuntimeError(
                 "No matching locations found. Cannot set value on empty result."
@@ -139,7 +147,7 @@ class FHIRPath(ABC):
         for item in collection:
             item.set_value(value)
 
-    def update_single(self, data, value) -> None:
+    def update_single(self, data, value, environment: dict | None = None) -> None:
         """
         Evaluates the FHIRPath expression and sets a single matching location to the given value.
 
@@ -151,7 +159,7 @@ class FHIRPath(ABC):
             FHIRPathError: If zero or more than one matching locations are found.
             RuntimeError: If the location cannot be set.
         """
-        collection = self.__evaluate_wrapped(data, create=True)
+        collection = self.__evaluate_wrapped(data, environment=environment, create=True)
         if len(collection) == 0:
             raise FHIRPathError(
                 "FHIRPath yielded empty collection. Cannot set value on empty result."
@@ -163,7 +171,9 @@ class FHIRPath(ABC):
             )
         collection[0].set_value(value)
 
-    def trace(self, data, verbose: bool = False) -> List[str]:
+    def trace(
+        self, data, verbose: bool = False, environment: dict | None = None
+    ) -> List[str]:
         """
         Returns a trace of evaluation steps for debugging purposes.
 
@@ -202,7 +212,9 @@ class FHIRPath(ABC):
                     )
 
             # Evaluate and trace results
-            result_collection = self.evaluate(wrapped_data, create=False)
+            result_collection = self.evaluate(
+                wrapped_data, environment=environment or dict(), create=False
+            )
             trace_step(f"Evaluation completed: {len(result_collection)} results")
 
             if verbose:
@@ -269,10 +281,7 @@ class FHIRPath(ABC):
             debug_data["trace"] = self.trace(data, verbose=True)
 
             # Perform evaluation
-            wrapped_data = [
-                FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)
-            ]
-            result_collection = self.evaluate(wrapped_data, create=False)
+            result_collection = self.__evaluate_wrapped(data, create=False)
 
             # Analyze results
             debug_data["result_count"] = len(result_collection)
@@ -318,7 +327,10 @@ class FHIRPath(ABC):
 
     @abstractmethod
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict, create: bool, 
+        self,
+        collection: FHIRPathCollection,
+        environment: dict,
+        create: bool,
     ) -> FHIRPathCollection:
         """
         Evaluates the current object against the provided FHIRPathCollection.
@@ -354,7 +366,16 @@ class FHIRPath(ABC):
             )
         super().__init_subclass__(**kwargs)
 
-    def __evaluate_wrapped(self, data: Any, environment: dict | None = None, create=False) -> FHIRPathCollection:
+    def __evaluate_wrapped(
+        self, data: Any, environment: dict | None = None, create=False
+    ) -> FHIRPathCollection:
+        environment = (environment or dict()) | {
+            "%ucum": FHIRPathCollectionItem.wrap("http://unitsofmeasure.org"),
+            "%context": FHIRPathCollectionItem.wrap(data),
+            # TODO: Add support for %resource and %rootResource when evaluating within a contained resource context
+            "%resource": FHIRPathCollectionItem.wrap(data),
+            "%rootResource": FHIRPathCollectionItem.wrap(data),
+        }
         # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
         return self.evaluate(collection, environment or dict(), create)
@@ -408,15 +429,15 @@ class FHIRPathCollectionItem(object):
     """
 
     value: typing.Any
-    path: Optional[typing.Any] = None
+    path: typing.Any = None
     element: Optional[str] = None
     index: Optional[int] = None
     parent: Optional["FHIRPathCollectionItem"] = None
     setter: Optional[Callable] = None
-    
+
     def __psot_init__(self):
         self.path = self.path or This()
-        
+
     @classmethod
     def wrap(cls, data: Any) -> "FHIRPathCollectionItem":
         """
@@ -568,7 +589,10 @@ class Literal(FHIRPath):
         self.value = value
 
     def evaluate(
-        self, collection: FHIRPathCollection, environment: dict = None, create: bool = False
+        self,
+        collection: FHIRPathCollection,
+        environment: dict,
+        create: bool = False,
     ) -> FHIRPathCollection:
         """
         Simply returns the input collection.
@@ -584,14 +608,19 @@ class Literal(FHIRPath):
         return [FHIRPathCollectionItem(self.value, parent=None, path=None)]
 
     def __str__(self):
-        from fhircraft.fhir.resources.datatypes.utils import is_date, is_datetime, is_time
+        from fhircraft.fhir.resources.datatypes.utils import (
+            is_date,
+            is_datetime,
+            is_time,
+        )
+
         if isinstance(self.value, bool):
             return "true" if self.value else "false"
         elif is_date(self.value) or is_datetime(self.value) or is_time(self.value):
             return self.value
         elif isinstance(self.value, str):
             return f"'{self.value}'"
-        else:   
+        else:
             return str(self.value)
 
     def __repr__(self):
@@ -682,7 +711,9 @@ class Element(FHIRPath):
             else:
                 current_values[index] = value
 
-    def _get_collection_by_label(self, collection: FHIRPathCollection, label: str, create: bool) -> FHIRPathCollection:
+    def _get_collection_by_label(
+        self, collection: FHIRPathCollection, label: str, create: bool
+    ) -> FHIRPathCollection:
         element_collection = []
         for item in collection:
             if item.value is None:
@@ -714,11 +745,13 @@ class Element(FHIRPath):
                     )
                     element_collection.append(element)
         return element_collection
-    
+
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
-        return self._get_collection_by_label(collection, self.label, create) or self._get_collection_by_label(collection, f'{self.label}_ext', create)
+        return self._get_collection_by_label(
+            collection, self.label, create
+        ) or self._get_collection_by_label(collection, f"{self.label}_ext", create)
 
     def __str__(self):
         return self.label
@@ -731,6 +764,7 @@ class Element(FHIRPath):
 
     def __hash__(self):
         return hash(self.label)
+
 
 class Invocation(FHIRPath):
     """
@@ -747,7 +781,7 @@ class Invocation(FHIRPath):
         self.right = right
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Performs the evaluation of the Invocation by applying the left-hand side FHIRPath segment on the given collection to obtain a parent collection.
@@ -780,13 +814,14 @@ class Invocation(FHIRPath):
     def __hash__(self):
         return hash((self.left, self.right))
 
+
 class This(FHIRPath):
     """
     A representation of a current element. Used for internal purposes and has no FHIRPath shorthand notation.
     """
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Simply returns the input collection.
@@ -812,7 +847,7 @@ class This(FHIRPath):
 
     def __hash__(self):
         return hash("")
-    
+
 
 class RootElement(FHIRPath):
     """
@@ -827,7 +862,7 @@ class RootElement(FHIRPath):
         self.type = type
 
     def evaluate(
-        self,  collection: FHIRPathCollection, environment: dict, create: bool = False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Evaluate the input collection to assert that the entries are valid FHIR resources of the given type.
@@ -841,13 +876,24 @@ class RootElement(FHIRPath):
             collection (Collection): The same collection after validation.
         """
         for item in collection:
-            resource = item.value 
+            resource = item.value
             # Check if resource is of valid type
             if (
-                (isinstance(resource, dict) and  ("resourceType" not in resource or not resource["resourceType"] == self.type)) or 
-                (not isinstance(resource, dict) and (not hasattr(resource, "resourceType") or not resource.resourceType == self.type))
+                isinstance(resource, dict)
+                and (
+                    "resourceType" not in resource
+                    or not resource["resourceType"] == self.type
+                )
+            ) or (
+                not isinstance(resource, dict)
+                and (
+                    not hasattr(resource, "resourceType")
+                    or not resource.resourceType == self.type
+                )
             ):
-                raise FHIRPathError(f"Root element must be a valid FHIR resource of type {self.type}.")
+                raise FHIRPathError(
+                    f"Root element must be a valid FHIR resource of type {self.type}."
+                )
         return collection
 
     def __str__(self):
