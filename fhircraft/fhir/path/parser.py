@@ -267,10 +267,7 @@ class FhirPathParser:
 
     def p_fhirpath_constant(self, p):
         """constant : ENVIRONMENTAL_VARIABLE"""
-        if p[1] == "%context":
-            p[0] = This()
-        else:
-            p[0] = p[1]
+        p[0] = environment.EnvironmentVariable(p[1])
 
     def p_fhirpath_contextual(self, p):
         """contextual : CONTEXTUAL_OPERATOR"""

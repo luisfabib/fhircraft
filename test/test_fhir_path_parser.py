@@ -37,7 +37,9 @@ parser_test_cases = (
     ("$this", ContextualThis()),
     ("$index", ContextualIndex()),
     ("$total", ContextualTotal()),
-    ("%context", This()),
+    ("%context", EnvironmentVariable("%context")),
+    ("%sct", EnvironmentVariable("%sct")),
+    ("%`custom-named-variable`", EnvironmentVariable("%`custom-named-variable`")),
     # ----------------------------------
     # Literals
     # ----------------------------------

@@ -346,7 +346,7 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
         # -------------------------------------------------------------------------------
         # A token introduced by a % refers to a value that is passed into the evaluation
         # engine by the calling environment.
-        r"\%(\w*)?"
+        r"(?:\%[a-zA-Z][a-zA-Z0-9\-]*|\%\`[a-zA-Z][a-zA-Z0-9\-][^\`]*\`)"
         return t
 
     def t_CONTEXTUAL_OPERATOR(self, t):
