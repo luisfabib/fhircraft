@@ -56,7 +56,7 @@ class TestConstructPydanticFieldWithValidationAlias(FactoryTestCase):
             field_type, min_card=1, max_card=1, validation_alias=validation_alias
         )
 
-        assert result[0] == field_type
+        assert result[0] == Optional[field_type]
         assert result[1].validation_alias == validation_alias
 
     def test_constructs_field_without_validation_alias(self):
@@ -67,7 +67,7 @@ class TestConstructPydanticFieldWithValidationAlias(FactoryTestCase):
             field_type, min_card=1, max_card=1
         )
 
-        assert result[0] == field_type
+        assert result[0] == Optional[field_type]
         assert result[1].validation_alias is None
 
     def test_constructs_field_with_both_alias_and_validation_alias(self):
@@ -84,7 +84,7 @@ class TestConstructPydanticFieldWithValidationAlias(FactoryTestCase):
             validation_alias=validation_alias,
         )
 
-        assert result[0] == field_type
+        assert result[0] == Optional[field_type]
         assert result[1].alias == alias
         assert result[1].validation_alias == validation_alias
 

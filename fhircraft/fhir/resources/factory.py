@@ -511,7 +511,9 @@ class ResourceFactory:
             default = None
         elif is_list_type:
             default = ensure_list(default)
-            
+        
+        if default is None: 
+            actual_field_type = Optional[actual_field_type]
         # Construct the Pydantic field
         return (
             actual_field_type,

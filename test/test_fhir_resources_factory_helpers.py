@@ -338,7 +338,6 @@ class TestConstructPydanticField(FactoryTestCase):
     def test_output_structure(self):
         result = self.factory._construct_Pydantic_field(str, min_card=1, max_card=1)
         assert isinstance(result, tuple)
-        assert isinstance(result[0], type)
         assert isinstance(result[1], FieldInfo)
 
     def test_constructs_required_field(self):
@@ -346,7 +345,7 @@ class TestConstructPydanticField(FactoryTestCase):
         result = self.factory._construct_Pydantic_field(
             field_type, min_card=1, max_card=1
         )
-        assert result[0] == field_type
+        assert result[0] == Optional[field_type]
         assert result[1].is_required() == False
 
     def test_constructs_non_optional_field(self):
@@ -354,7 +353,7 @@ class TestConstructPydanticField(FactoryTestCase):
         result = self.factory._construct_Pydantic_field(
             field_type, min_card=0, max_card=1
         )
-        assert result[0] == field_type
+        assert result[0] == Optional[field_type]
         assert result[1].is_required() == False
         assert result[1].default is None
 
@@ -363,7 +362,7 @@ class TestConstructPydanticField(FactoryTestCase):
         result = self.factory._construct_Pydantic_field(
             field_type, min_card=1, max_card=99999
         )
-        assert result[0] == List[field_type]
+        assert result[0] == Optional[List[field_type]]
         assert result[1].is_required() == False
 
     def test_constructs_optional_list_field(self):
@@ -371,7 +370,7 @@ class TestConstructPydanticField(FactoryTestCase):
         result = self.factory._construct_Pydantic_field(
             field_type, min_card=0, max_card=99999
         )
-        assert result[0] == List[field_type]
+        assert result[0] == Optional[List[field_type]]
         assert result[1].is_required() == False
         assert result[1].default is None
 
@@ -556,7 +555,7 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         assert isinstance(fields, dict)
         assert "valueString" in fields
         field_type, field_info = fields["valueString"]
-        assert field_type == primitives.String
+        assert field_type == Optional[primitives.String]
         assert field_info.default is None
 
     def test_multiple_choice_type_fields(self):
@@ -573,9 +572,9 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         assert "valueString" in fields
         assert "valueBoolean" in fields
         assert "valueCoding" in fields
-        assert fields["valueString"][0] == primitives.String
-        assert fields["valueBoolean"][0] == primitives.Boolean
-        assert fields["valueCoding"][0] == complex_types.Coding
+        assert fields["valueString"][0] == Optional[primitives.String]
+        assert fields["valueBoolean"][0] == Optional[primitives.Boolean]
+        assert fields["valueCoding"][0] == Optional[complex_types.Coding]
 
     def test_choice_type_with_list_cardinality(self):
         # Simulate a choice type element with list cardinality
@@ -585,7 +584,7 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         fields = self.factory._construct_type_choice_fields(basename, element_types, max_card)
         assert "valueString" in fields
         field_type, field_info = fields["valueString"]
-        assert field_type == List[primitives.String]
+        assert field_type == Optional[List[primitives.String]]
         assert field_info.default is None
 
     def test_choice_type_with_required_cardinality(self):
@@ -596,7 +595,7 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         fields = self.factory._construct_type_choice_fields(basename, element_types, max_card)
         assert "valueBoolean" in fields
         field_type, field_info = fields["valueBoolean"]
-        assert field_type == primitives.Boolean
+        assert field_type == Optional[primitives.Boolean]
 
 #----------------------------------------------------------------
 # _parse_element_cardinality()
@@ -709,7 +708,7 @@ class TestConstructPrimitiveExtensionField(FactoryTestCase):
         assert "name_ext" in fields
         field = fields["name_ext"]
         assert isinstance(field, tuple)
-        assert field[0] is complex_types.Element
+        assert field[0] is Optional[complex_types.Element]
         assert isinstance(field[1], FieldInfo)
         assert field[1].default is None
 
@@ -722,7 +721,7 @@ class TestConstructPrimitiveExtensionField(FactoryTestCase):
         assert "class_" in fields
         field = fields["class_"]
         assert isinstance(field, tuple)
-        assert field[0] is complex_types.Element
+        assert field[0] is Optional[complex_types.Element]
         assert isinstance(field[1], FieldInfo)
         assert field[1].default is None
 
