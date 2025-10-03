@@ -5,7 +5,7 @@ from pydantic import Field, field_validator, model_validator
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import *
-
+from fhircraft.utils import model_rebuild_all
 
 class Element(FHIRBaseModel):
     """
@@ -6211,76 +6211,4 @@ class DomainResource(Resource):
         )
 
 
-Element.model_rebuild()
-
-BackboneElement.model_rebuild()
-
-Address.model_rebuild()
-
-Age.model_rebuild()
-
-Annotation.model_rebuild()
-
-CodeableConcept.model_rebuild()
-
-ContactDetail.model_rebuild()
-
-ContactPoint.model_rebuild()
-
-Contributor.model_rebuild()
-
-Count.model_rebuild()
-
-DataRequirement.model_rebuild()
-
-Distance.model_rebuild()
-
-Dosage.model_rebuild()
-
-Duration.model_rebuild()
-
-ElementDefinition.model_rebuild()
-
-Extension.model_rebuild()
-
-HumanName.model_rebuild()
-
-Identifier.model_rebuild()
-
-MarketingStatus.model_rebuild()
-
-Meta.model_rebuild()
-
-Narrative.model_rebuild()
-
-Population.model_rebuild()
-
-ProdCharacteristic.model_rebuild()
-
-ProductShelfLife.model_rebuild()
-
-Range.model_rebuild()
-
-Ratio.model_rebuild()
-
-Reference.model_rebuild()
-
-RelatedArtifact.model_rebuild()
-
-SampledData.model_rebuild()
-
-Signature.model_rebuild()
-
-SubstanceAmount.model_rebuild()
-
-Timing.model_rebuild()
-
-TriggerDefinition.model_rebuild()
-
-UsageContext.model_rebuild()
-
-Resource.model_rebuild()
-
-DomainResource.model_rebuild()
-
-DomainResource.model_rebuild()
+model_rebuild_all()

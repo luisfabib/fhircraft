@@ -2,6 +2,7 @@
 
 # Fhircraft modules
 import fhircraft
+from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
@@ -92,6 +93,7 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
 {% endfor %}
 
 {% for model, model_data in data.items() %}
+{% if not model.__pydantic_complete__ %}
 {{ model.__name__ }}.model_rebuild()
-
+{% endif %}
 {% endfor %}

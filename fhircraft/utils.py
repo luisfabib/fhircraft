@@ -469,7 +469,7 @@ def is_list_field(field) -> bool:
 
     return _is_list_type(annotation)
 
-def module_model_rebuild():
+def model_rebuild_all():
     """
     Call model_rebuild() on all Pydantic models defined in the module where this function is called.
     This is useful when models have forward references or need to be re-evaluated

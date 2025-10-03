@@ -5,7 +5,7 @@ from pydantic import Field, field_validator, model_validator
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.utils import module_model_rebuild
+from fhircraft.utils import model_rebuild_all
 
 
 
@@ -6496,4 +6496,4 @@ class DomainResource(Resource):
         )
 
 
-module_model_rebuild()
+model_rebuild_all()
