@@ -305,7 +305,6 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
         "LESS_THAN",
         "LESS_EQUAL_THAN",
         "EQUAL",
-        "DOUBLE_EQUAL",
         "NOT_EQUAL",
         "EQUIVALENT",
         "NOT_EQUIVALENT",
@@ -445,10 +444,6 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
 
     def t_LESS_EQUAL_THAN(self, t):
         r"<="
-        return t
-
-    def t_DOUBLE_EQUAL(self, t):
-        r"=="
         return t
 
     def t_LESS_THAN(self, t):
