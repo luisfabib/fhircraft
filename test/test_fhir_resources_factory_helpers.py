@@ -1,10 +1,9 @@
 import pytest
 import warnings 
 
-from typing import List, Optional, Tuple, Type, Union, get_args
+from typing import List, Optional, get_args
 from unittest import mock, TestCase
 
-from sympy import root
 from fhircraft.fhir.resources.factory import ElementDefinitionNode, ResourceFactory, FHIRSliceModel, ResourceFactoryValidators
 from pydantic import BaseModel
 
@@ -17,7 +16,6 @@ from fhircraft.fhir.resources.definitions import (
 from fhircraft.fhir.resources.definitions.element_definition import (
     ElementDefinition,
     ElementDefinitionType,
-    ElementDefinitionConstraint,
 )
 from parameterized import parameterized, parameterized_class
 from pydantic import Field
@@ -170,36 +168,36 @@ class TestBuildElementTreeStructure(FactoryTestCase):
         assert nodes == []
 
 #----------------------------------------------------------------
-# _get_complex_FHIR_type()
+# _resolve_FHIR_type()
 # ---------------------------------------------------------------- 
 
 class TestGetComplexFhirType(FactoryTestCase):
     """
-    Unit tests for the _get_complex_FHIR_type method of the FHIR resource factory.
+    Unit tests for the _resolve_FHIR_type method of the FHIR resource factory.
     """
 
     def test_parses_fhir_primitive_datatype(self):
         element_type = ElementDefinitionType(code="string")
-        result = self.factory._get_complex_FHIR_type(element_type)
+        result = self.factory._resolve_FHIR_type(element_type)
         assert result == primitives.String
 
     def test_parses_fhir_primitive_datatype_as_string(self):
-        result = self.factory._get_complex_FHIR_type("string")
+        result = self.factory._resolve_FHIR_type("string")
         assert result == primitives.String
 
     def test_parses_fhir_complex_datatype(self):
         element_type = ElementDefinitionType(code="Coding")
-        result = self.factory._get_complex_FHIR_type(element_type)
+        result = self.factory._resolve_FHIR_type(element_type)
         assert result == complex_types.Coding
 
     def test_parses_fhir_complex_datatype_from_canonical_url(self):
-        result = self.factory._get_complex_FHIR_type(
+        result = self.factory._resolve_FHIR_type(
             "http://hl7.org/fhir/StructureDefinition/Extension"
         )
         assert result == complex_types.Extension
 
     def test_parses_fhir_fhirpath_datatype(self):
-        result = self.factory._get_complex_FHIR_type(
+        result = self.factory._resolve_FHIR_type(
             "http://hl7.org/fhirpath/System.String"
         )
         assert result == primitives.String
@@ -241,12 +239,12 @@ class TestGetComplexFhirType(FactoryTestCase):
                 ),
             )
         )
-        result = self.factory._get_complex_FHIR_type(element_type)
+        result = self.factory._resolve_FHIR_type(element_type)
         assert result == self.factory.construction_cache[profile_url]
 
     def test_returns_field_type_name_if_not_found(self):
         with pytest.raises(RuntimeError):
-            self.factory._get_complex_FHIR_type("UnknownType")
+            self.factory._resolve_FHIR_type("UnknownType")
 
 
 #----------------------------------------------------------------
