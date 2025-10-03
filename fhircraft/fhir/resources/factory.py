@@ -56,7 +56,124 @@ class ElementDefinitionNode(ElementDefinition):
     children: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
     slices: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
     root: Optional["ElementDefinitionNode"] = None
+
+
+@dataclass
+class ResourceFactoryValidators:
+    """Container for resource-level validators."""
     
+    _validators: dict = Field(default_factory=dict)
+
+    def get_all(self) -> dict:
+        return self._validators
+
+    def add(self, validator_name: str, validator: Any) -> None:
+        self._validators[validator_name] = validator
+
+    def add_model_constraint_validator(
+        self, constraint: ElementDefinitionConstraint
+    ):
+        """
+        Adds a model constraint validator based on the provided constraint.
+
+        Args:
+            constraint (dict): The constraint details including expression, human-readable description, key, and severity.
+        """
+        # Construct function name for validator
+        constraint_name = constraint.key.replace("-", "_")
+        validator_name = f"FHIR_{constraint_name}_constraint_model_validator"
+        # Add the current field to the list of validated fields
+        if constraint.expression:
+            self._validators[validator_name] = model_validator(mode="after")(
+                partial(
+                    fhir_validators.validate_model_constraint,
+                    expression=constraint.expression,
+                    human=constraint.human,
+                    key=constraint.key,
+                    severity=constraint.severity,
+                )
+            )
+
+    def add_element_constraint_validator(
+        self,
+        field: str,
+        constraint: ElementDefinitionConstraint,
+        base: Any,
+    ):
+        """
+        Adds a validator for a specific element constraint to the validators dictionary.
+
+        Args:
+            field (str): The field to validate.
+            constraint (dict): The details of the constraint including expression, human-readable description, key, and severity.
+            base (Any): The base model to check for existing validators.
+        """
+        # Construct function name for validator
+        constraint_name = constraint.key.replace("-", "_")
+        validator_name = f"FHIR_{constraint_name}_constraint_validator"
+        # Check if validator has already been constructed for another field
+        validate_fields = [field]
+        # Get the list of fields already being validated by this constraint
+        if validator_name in self._validators:
+            validator = self._validators.get(validator_name)
+            if validator:
+                validate_fields.extend(validator.decorator_info.fields)
+        # Get the list of fields already being validated by this constraint in base model
+        if base and validator_name in base.__pydantic_decorators__.field_validators:
+            validate_fields.extend(
+                base.__pydantic_decorators__.field_validators[
+                    validator_name
+                ].info.fields
+            )
+        # Add the current field to the list of validated fields
+        if constraint.expression:
+            self._validators[validator_name] = field_validator(
+                *validate_fields, mode="after"
+            )(
+                partial(
+                    fhir_validators.validate_element_constraint,
+                    expression=constraint.expression,
+                    human=constraint.human,
+                    key=constraint.key,
+                    severity=constraint.severity,
+                )
+            )
+
+    def add_slicing_validator(self, field: str):
+        """
+        Adds a validator to ensure that slicing rules are followed for sliced elements.
+        """
+        self._validators[f"{field}_slicing_cardinality_validator"] = field_validator(field, mode="after")(
+            partial(
+                fhir_validators.validate_slicing_cardinalities,
+                field_name=field,
+            )
+        )
+    
+    def add_type_choice_validator(
+        self,
+        field: str,
+        allowed_types: List[Union[str, type]],
+        required: bool = False,
+    ):
+        """
+        Adds a validator to ensure that the field's value matches one of the allowed types.
+
+        Args:
+            field (str): The field to validate.
+            allowed_types (List[Union[str, type]]): List of allowed types for the field.
+            required (bool): Whether the field is required. Defaults to `False`.
+        """
+        self._validators[f"{field}_type_choice_validator"] = model_validator(mode="after")(
+            partial(
+                fhir_validators.validate_type_choice_element,
+                field_types=allowed_types,
+                field_name_base=field,
+                required=required,
+            )
+        )
+
+
 
 class ResourceFactory:
     """Factory for constructing Pydantic models from FHIR StructureDefinitions.
@@ -1220,122 +1337,6 @@ class ResourceFactory:
         Clears the factory cache.
         """
         self.construction_cache = {}
-
-
-@dataclass
-class ResourceFactoryValidators:
-    """Container for resource-level validators."""
-    
-    _validators: dict = Field(default_factory=dict)
-
-    def get_all(self) -> dict:
-        return self._validators
-
-    def add(self, validator_name: str, validator: Any) -> None:
-        self._validators[validator_name] = validator
-
-    def add_model_constraint_validator(
-        self, constraint: ElementDefinitionConstraint
-    ):
-        """
-        Adds a model constraint validator based on the provided constraint.
-
-        Args:
-            constraint (dict): The constraint details including expression, human-readable description, key, and severity.
-        """
-        # Construct function name for validator
-        constraint_name = constraint.key.replace("-", "_")
-        validator_name = f"FHIR_{constraint_name}_constraint_model_validator"
-        # Add the current field to the list of validated fields
-        if constraint.expression:
-            self._validators[validator_name] = model_validator(mode="after")(
-                partial(
-                    fhir_validators.validate_model_constraint,
-                    expression=constraint.expression,
-                    human=constraint.human,
-                    key=constraint.key,
-                    severity=constraint.severity,
-                )
-            )
-
-    def add_element_constraint_validator(
-        self,
-        field: str,
-        constraint: ElementDefinitionConstraint,
-        base: Any,
-    ):
-        """
-        Adds a validator for a specific element constraint to the validators dictionary.
-
-        Args:
-            field (str): The field to validate.
-            constraint (dict): The details of the constraint including expression, human-readable description, key, and severity.
-            base (Any): The base model to check for existing validators.
-        """
-        # Construct function name for validator
-        constraint_name = constraint.key.replace("-", "_")
-        validator_name = f"FHIR_{constraint_name}_constraint_validator"
-        # Check if validator has already been constructed for another field
-        validate_fields = [field]
-        # Get the list of fields already being validated by this constraint
-        if validator_name in self._validators:
-            validator = self._validators.get(validator_name)
-            if validator:
-                validate_fields.extend(validator.decorator_info.fields)
-        # Get the list of fields already being validated by this constraint in base model
-        if base and validator_name in base.__pydantic_decorators__.field_validators:
-            validate_fields.extend(
-                base.__pydantic_decorators__.field_validators[
-                    validator_name
-                ].info.fields
-            )
-        # Add the current field to the list of validated fields
-        if constraint.expression:
-            self._validators[validator_name] = field_validator(
-                *validate_fields, mode="after"
-            )(
-                partial(
-                    fhir_validators.validate_element_constraint,
-                    expression=constraint.expression,
-                    human=constraint.human,
-                    key=constraint.key,
-                    severity=constraint.severity,
-                )
-            )
-
-    def add_slicing_validator(self, field: str):
-        """
-        Adds a validator to ensure that slicing rules are followed for sliced elements.
-        """
-        self._validators[f"{field}_slicing_cardinality_validator"] = field_validator(field, mode="after")(
-            partial(
-                fhir_validators.validate_slicing_cardinalities,
-                field_name=field,
-            )
-        )
-    
-    def add_type_choice_validator(
-        self,
-        field: str,
-        allowed_types: List[Union[str, type]],
-        required: bool = False,
-    ):
-        """
-        Adds a validator to ensure that the field's value matches one of the allowed types.
-
-        Args:
-            field (str): The field to validate.
-            allowed_types (List[Union[str, type]]): List of allowed types for the field.
-            required (bool): Whether the field is required. Defaults to `False`.
-        """
-        self._validators[f"{field}_type_choice_validator"] = model_validator(mode="after")(
-            partial(
-                fhir_validators.validate_type_choice_element,
-                field_types=allowed_types,
-                field_name_base=field,
-                required=required,
-            )
-        )
 
 
 
