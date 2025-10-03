@@ -5099,7 +5099,7 @@ class Signature(Element):
     A Signature - XML DigSig, JWS, Graphical image of signature, etc.
     """
 
-    type: List["Coding"] = Field(
+    type: Optional[List["Coding"]] = Field(
         description="Indication of the reason the entity signed the object(s)",
         default=None,
     )
