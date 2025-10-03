@@ -8,6 +8,7 @@ and FHIRPath conversion functions use these utilities.
 
 import importlib
 import re
+
 from typing import TYPE_CHECKING, Any, Type, Union
 
 from pydantic import BaseModel, Field, ValidationError, create_model

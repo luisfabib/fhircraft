@@ -13,7 +13,6 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypeVar, Union
 
-import requests
 
 # Pydantic modules
 from pydantic import BaseModel, Field, create_model, field_validator, model_validator
@@ -32,6 +31,7 @@ from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 from fhircraft.fhir.resources.definitions import (
     ElementDefinition,
     ElementDefinitionConstraint,
+    ElementDefinitionSlicing,
     ElementDefinitionType,
     StructureDefinition,
 )
@@ -47,6 +47,7 @@ SlicedModelT = TypeVar("SlicedModelT", bound="FHIRSliceModel")
 
 _Unset: Any = PydanticUndefined
 
+TYPE_CHOICE_SUFFIX = "[x]"
 
 class ElementDefinitionNode(ElementDefinition):
     """A node in the ElementDefinition tree structure."""
@@ -55,6 +56,7 @@ class ElementDefinitionNode(ElementDefinition):
     children: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
     slices: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
     root: Optional["ElementDefinitionNode"] = None
+    
 
 class ResourceFactory:
     """Factory for constructing Pydantic models from FHIR StructureDefinitions.
@@ -107,6 +109,8 @@ class ResourceFactory:
             self.repository = repository
 
         self.construction_cache: Dict[str, type[BaseModel]] = {}
+        self.paths_in_processing: set[str] = set()
+        self.local_cache: Dict[str, type[BaseModel]] = {}
         self.Config: ResourceFactory.FactoryConfig
 
     # Convenience functions for easy configuration
@@ -375,7 +379,7 @@ class ResourceFactory:
                     )
         return list(root.children.values())
 
-    def _get_complex_FHIR_type(self, element_type: ElementDefinitionType | str) -> type:
+    def _get_complex_FHIR_type(self, element_type: ElementDefinitionType | str) -> type | str:
         """
         Resolves and returns the Python type corresponding to a FHIR complex or primitive type
         based on the provided ElementDefinitionType.
@@ -403,7 +407,6 @@ class ResourceFactory:
             else element_type
         )
         # Pre-process the type string
-        element_type_code = str(element_type_code)
         element_type_code = element_type_code.removeprefix(FHIR_COMPLEX_TYPE_PREFIX)
         element_type_code = element_type_code.removeprefix(FHIRPATH_TYPE_PREFIX)
         element_type_code = capitalize(element_type_code)
@@ -430,12 +433,15 @@ class ResourceFactory:
                     raise RuntimeError(
                         f"Could not resolve the canonical URL '{element_type.profile[0]}' for the FHIR type '{element_type_code}'. Please add the resource to the factory repository."
                     )
+            elif isinstance(element_type, ElementDefinitionType) and element_type.code:                        
+                return self.local_cache.get(element_type.code, element_type.code)
+                
             else:
                 raise RuntimeError(
                     f"Could not resolve FHIR type '{element_type_code}' and no profile canonical URL provided in the element definition"
                 )
 
-    def _create_model_with_properties(
+    def _construct_model_with_properties(
         self,
         name: str,
         fields: dict,
@@ -456,6 +462,9 @@ class ResourceFactory:
 
         Returns:
             BaseModel: The constructed Pydantic model.
+        
+        Note: 
+            Additional properties are added at runtime and are not reflected in the static type.
         """
         # Construct the slice model
         model = create_model(name, **fields, __base__=base, __validators__=validators, __doc__=docstring)
@@ -575,36 +584,35 @@ class ResourceFactory:
             )
         return constrained_value
 
-    def _process_choice_type_field(
+    def _construct_type_choice_fields(
         self,
-        name,
-        field_types,
-        cardinality,
-        fields,
-        validators,
-        properties,
-        description=None,
-    ):
+        basename: str,
+        field_types: List,
+        max_card: int,
+        description: str | None = None,
+    ) -> Dict[str, Tuple[Any, FieldInfo]]:
         """
-        Processes choice type fields by creating Pydantic fields for each type, adding validators, and setting properties.
+        Constructs a dictionary of Pydantic fields for FHIR type choice elements.
+
+        For FHIR elements that allow multiple types (denoted by [x]), this method generates
+        a field for each possible type, handling Python reserved keywords and setting appropriate
+        cardinality and descriptions.
 
         Args:
-            name (str): The name of the field.
-            field_types (List[type]): The types of the field.
-            cardinality (List[int]): The cardinality constraints of the field.
-            fields (dict): Dictionary of fields for the model.
-            validators (dict): Dictionary of validators for the model.
-            properties (dict): Dictionary of properties to be set for the model.
-            description (str, optional): The description of the field. Defaults to None.
+            name (str): The base name of the FHIR element, without containing '[x]'.
+            field_types (List[Union[str, type]]): List of possible types for the element.
+            max_cardinality (int | None): Minimum and maximum allowed occurrences.
+            description (Optional[str]): Description of the field(s).
 
         Returns:
-            Tuple[dict, dict, dict]: A tuple containing updated fields, validators, and properties.
+            Dict[str, Tuple[Any, FieldInfo]]: A dictionary mapping safe field names to their
+            corresponding type and Pydantic FieldInfo.
         """
         # Get base name
-        name = name.replace("[x]", "")
+        fields = {}
         # Create a field for each type
         for field_type in field_types:
-            typed_field_name = name + (
+            typed_field_name = basename + (
                 field_type if isinstance(field_type, str) else field_type.__name__
             )
             # Handle Python reserved keywords
@@ -614,92 +622,106 @@ class ResourceFactory:
             fields[safe_typed_field_name] = self._construct_Pydantic_field(
                 field_type,
                 min_card=0,
-                max_card=cardinality[1],
+                max_card=max_card,
                 description=description,
                 validation_alias=validation_alias,
             )
-        # Add validator to ensure only one of these fields is set
-        validators[f"{name}_type_choice_validator"] = model_validator(mode="after")(
-            partial(
-                fhir_validators.validate_type_choice_element,
-                field_types=field_types,
-                field_name_base=name,
-                required=cardinality[0] > 0,
-            )
-        )
-        properties[name] = partial(
-            fhir_validators.get_type_choice_value_by_base, base=name
-        )
-        return fields, validators, properties
+        return fields
 
-    def _build_element_slice_models(
-        self, element: ElementDefinitionNode, slice_base: Any
-    ) -> List[type[FHIRSliceModel]]:
+    def _construct_slice_model(
+        self, name: str, definition: ElementDefinitionNode, base: type[BaseModel]
+    ) -> type[FHIRSliceModel]:
         """
-        Constructs and returns a list of FHIR slice model classes for a given element definition.
+        Constructs a Pydantic model representing a FHIR slice based on the provided element definition.
 
-        This method processes the "slices" defined within the provided element dictionary,
-        generating a Pydantic model class for each slice. If a canonical profile URL is specified
-        for a slice, the corresponding resource model is constructed using that profile. Otherwise,
-        a new model is dynamically created based on the slice's structure and properties.
+        This method handles two scenarios:
+        1. If the element definition specifies a canonical profile URL, it constructs the slice model using the referenced resource model.
+        2. Otherwise, it dynamically generates a model name, processes the element definition into Pydantic fields, validators, and properties, and constructs the slice model accordingly.
 
-        Each generated slice model is ensured to be a subclass of `FHIRSliceModel`, and its
-        cardinality constraints (min and max) are set according to the slice definition.
+        The resulting model is always a subclass of `FHIRSliceModel`, and its cardinality constraints are set based on the element definition.
 
         Args:
-            element (dict): The element definition containing slice information.
-            slice_base (type[BaseModel]): The base model class to use for the generated slice models.
+            name (str): The name of the slice.
+            definition (ElementDefinitionNode): The FHIR element definition node describing the slice.
+            base (type[BaseModel]): The base Pydantic model to inherit from.
 
         Returns:
-            List[type[FHIRSliceModel]]: A list of dynamically constructed FHIR slice model classes.
-        """
-        slice_types = []
-        for slice_name, slice_element in element.slices.items():
-            if (slice_element_types := slice_element.type) and (
-                slice_element_canonical_urls := slice_element_types[0].profile
-            ):
-                # Construct the slice model from the canonical URL
-                slice_model = self.construct_resource_model(
-                    slice_element_canonical_urls[0], base_model=FHIRSliceModel
-                )
-            else:
-                # Construct the slice model's name
-                slice_name = "".join(
-                    [capitalize(word) for word in slice_name.split("-")]
-                )
-                slice_model_name = capitalize(slice_name)
-                # Process and compile all subfields of the slice
-                slice_subfields, slice_validators, slice_properties = (
-                    self._process_FHIR_structure_into_Pydantic_components(
-                        slice_element, FHIRSliceModel
-                    )
-                )
-                # Construct the slice model
-                bases = (
-                    (slice_base,)
-                    if slice_base is FHIRSliceModel
-                    else (slice_base, FHIRSliceModel)
-                )
-                slice_model = self._create_model_with_properties(
-                    slice_model_name,
-                    fields=slice_subfields,
-                    base=bases,
-                    validators=slice_validators,
-                    properties=slice_properties,
-                    docstring=slice_element.definition,
-                )
-            assert issubclass(
-                slice_model, FHIRSliceModel
-            ), f"Slice model {slice_model} is not a subclass of FHIRSliceModel"
-            # Store the specific slice cardinality
-            slice_model.min_cardinality, slice_model.max_cardinality = (
-                self._parse_element_cardinality(slice_element)
-            )
-            # Store the slice model in the list of slices of the element
-            slice_types.append(slice_model)
-        # Create annotated type as union of slice models and original type (important, last in the definition)
-        return slice_types
+            type[FHIRSliceModel]: The constructed slice model class.
 
+        Raises:
+            AssertionError: If the constructed model is not a subclass of `FHIRSliceModel`.
+        """
+        if (types := definition.type) and (
+            canonical_urls := types[0].profile
+        ):
+            # Construct the slice model from the canonical URL
+            slice_model = self.construct_resource_model(
+                canonical_urls[0], base_model=FHIRSliceModel
+            )
+        else:
+            # Construct the slice model's name
+            slice_model_name = capitalize("".join(
+                [capitalize(word) for word in name.split("-")]
+            ))
+            # Process and compile all subfields of the slice
+            slice_subfields, slice_validators, slice_properties = (
+                self._process_FHIR_structure_into_Pydantic_components(
+                    definition, FHIRSliceModel
+                )
+            )
+            # Construct the slice model
+            bases = (
+                (base,)
+                if base is FHIRSliceModel or issubclass(base, FHIRSliceModel)
+                else (base, FHIRSliceModel)
+            )
+            slice_model = self._construct_model_with_properties(
+                slice_model_name,
+                fields=slice_subfields,
+                base=bases,
+                validators=slice_validators.get_all(),
+                properties=slice_properties,
+                docstring=definition.short,
+            )
+        assert issubclass(
+            slice_model, FHIRSliceModel
+        ), f"Slice model {slice_model} is not a subclass of FHIRSliceModel"
+        # Store the specific slice cardinality
+        slice_model.min_cardinality, slice_model.max_cardinality = (
+            self._parse_element_cardinality(definition)
+        )
+        return slice_model
+
+    def _construct_annotated_sliced_field(
+        self,
+        slices: Dict[str, ElementDefinitionNode],
+        field_type: type[BaseModel]
+    ) -> Annotated:
+        """
+        Constructs an annotated field representing a union of sliced models and the base field type.
+
+        Args:
+            slices (Dict[str, ElementDefinitionNode]): A dictionary mapping slice names to their corresponding ElementDefinitionNode objects.
+            field_type (type[BaseModel]): The base model type for the field.
+
+        Returns:
+            (Annotated): An annotated type representing a union of all constructed slice models and the base field type, with additional field metadata specifying union mode as "left_to_right".
+        """
+        return Annotated[
+            Union[
+                tuple(
+                    [
+                        *[
+                            self._construct_slice_model(slice_name, slice_element, field_type)
+                            for slice_name, slice_element in slices.items()
+                        ],
+                        field_type,
+                    ]
+                )
+            ],
+            Field(union_mode="left_to_right"),
+        ]
+    
     def _parse_element_cardinality(self, element: ElementDefinition) -> Tuple[int, int]:
         """
         Parses the cardinality constraints from a FHIR element definition.
@@ -712,6 +734,7 @@ class ResourceFactory:
             tuple: A tuple (min_card, max_card) where:
                 - min_card (int): The minimum allowed occurrences of the element.
                 - max_card (int): The maximum allowed occurrences of the element.
+        
         Notes:
             - If "min" is not numeric, defaults to 0.
             - If "max" is "*", uses 99999 as a stand-in for unbounded.
@@ -727,214 +750,102 @@ class ResourceFactory:
             max_card = 99999
         return min_card, max_card
 
-    def _add_model_constraint_validator(
-        self, constraint: ElementDefinitionConstraint, validators: dict
-    ) -> dict:
-        """
-        Adds a model constraint validator based on the provided constraint.
 
+
+
+    def _resolve_content_reference(self, element: ElementDefinitionNode) -> ElementDefinitionNode:
+        """
+        Resolves the content reference for a given ElementDefinitionNode by copying relevant fields
+        from the referenced element to the current element. Adds cycle detection to prevent infinite recursion.
         Args:
-            constraint (dict): The constraint details including expression, human-readable description, key, and severity.
-            validators (dict): The dictionary of validators to update with the new constraint validator.
+            element (ElementDefinitionNode): The element node containing a content reference.
 
         Returns:
-            dict: The updated dictionary of validators.
-        """
-        # Construct function name for validator
-        constraint_name = constraint.key.replace("-", "_")
-        validator_name = f"FHIR_{constraint_name}_constraint_model_validator"
-        # Add the current field to the list of validated fields
-        if constraint.expression:
-            validators[validator_name] = model_validator(mode="after")(
-                partial(
-                    fhir_validators.validate_model_constraint,
-                    expression=constraint.expression,
-                    human=constraint.human,
-                    key=constraint.key,
-                    severity=constraint.severity,
-                )
-            )
-        return validators
+            ElementDefinitionNode: The updated element node with fields populated from the referenced element.
 
-    def _add_element_constraint_validator(
-        self,
-        field: str,
-        constraint: ElementDefinitionConstraint,
-        base: Any,
-        validators: dict,
-    ) -> dict:
+        Raises:
+            ValueError: If the provided element does not have a content reference.
+
+        Warns:
+            UserWarning: If the content reference cannot be resolved or a cycle is detected.
         """
-        Adds a validator for a specific element constraint to the validators dictionary.
+        if not element.contentReference:
+            raise ValueError("Element does not have a content reference")
+
+        reference_path = element.contentReference.lstrip("#")
+        referenced_element = None
+        search = element.root
+        parts = reference_path.split(".")
+
+        # Detect cycles
+        if reference_path in self.paths_in_processing:
+            backbone_model_name = (
+                capitalize(
+                    self.Config.resource_name if self.Config else "Unknown"
+                ).strip()
+                + ''.join([capitalize(label).strip() for label in reference_path.split(".")[1:]])
+            )
+            element.type = [ElementDefinitionType(code=backbone_model_name)]
+            element.children = {}
+            return element
+        self.paths_in_processing.add(reference_path)
+
+        for part in parts:
+            if not search or not search.children:
+                break
+            search = search.children.get(part)
+        else:
+            if search:
+                referenced_element = search
+
+        if not referenced_element:
+            warnings.warn(f"Could not resolve content reference: {element.contentReference}.")
+            self.paths_in_processing.remove(reference_path)
+            return element
+
+        for field in ("children", "type", "maxLength", "binding"):
+            setattr(element, field, getattr(referenced_element, field, None))
+        for field in ("defaultValue", "fixed", "pattern", "example", "minValue", "maxValue"):
+            for attr in element.__class__.model_fields:
+                if attr.startswith(field) and getattr(referenced_element, attr, None) is not None:
+                    setattr(element, attr, getattr(referenced_element, attr, None))
+
+        return element
+
+    def _construct_primitive_extension_field(
+            self, 
+            name: str, 
+    ) -> dict[str, Tuple[Any, FieldInfo]]:
+        """
+        Constructs a Pydantic field for a FHIR primitive extension.
+
+        This method creates a field for the extension element associated with a FHIR primitive field,
+        handling Python reserved keywords in the field name and setting appropriate field metadata.
 
         Args:
-            field (str): The field to validate.
-            constraint (dict): The details of the constraint including expression, human-readable description, key, and severity.
-            base (Any): The base model to check for existing validators.
-            validators (dict): The dictionary of validators to update.
+            name (str): The name of the FHIR primitive field for which to construct the extension field.
 
         Returns:
-            dict: The updated dictionary of validators.
+            Dict[str, Tuple[Any, FieldInfo]]: A dictionary mapping the safe extension field name to a tuple containing the field type and its Pydantic FieldInfo configuration.
         """
-        # Construct function name for validator
-        constraint_name = constraint.key.replace("-", "_")
-        validator_name = f"FHIR_{constraint_name}_constraint_validator"
-        # Check if validator has already been constructed for another field
-        validate_fields = [field]
-        # Get the list of fields already being validated by this constraint
-        if validator_name in validators:
-            validator = validators.get(validator_name)
-            if validator:
-                validate_fields.extend(validator.decorator_info.fields)
-        # Get the list of fields already being validated by this constraint in base model
-        if base and validator_name in base.__pydantic_decorators__.field_validators:
-            validate_fields.extend(
-                base.__pydantic_decorators__.field_validators[
-                    validator_name
-                ].info.fields
-            )
-        # Add the current field to the list of validated fields
-        if constraint.expression:
-            validators[validator_name] = field_validator(
-                *validate_fields, mode="after"
-            )(
-                partial(
-                    fhir_validators.validate_element_constraint,
-                    expression=constraint.expression,
-                    human=constraint.human,
-                    key=constraint.key,
-                    severity=constraint.severity,
-                )
-            )
-        return validators
-
-    def _resolve_content_reference_type(
-        self, referenced_element: ElementDefinitionNode, structure_root: ElementDefinitionNode, 
-        resolving_paths: Optional[set] = None
-    ) -> type:
-        """
-        Recursively resolve the type for a content reference element.
+        safe_ext_field_name, ext_validation_alias = (
+            self._handle_python_reserved_keyword(f"{name}_ext")
+        )
+        return {safe_ext_field_name: self._construct_Pydantic_field(
+            get_complex_FHIR_type("Element", self.Config.FHIR_release if self.Config else "4.3.0"),
+            min_card=0,
+            max_card=1,
+            alias=f"_{name}",
+            validation_alias=ext_validation_alias,
+            default=None,
+            description=f"Placeholder element for {name} extensions",
+        )}
         
-        Args:
-            referenced_element: The element being referenced
-            structure_root: The root structure for context
-            resolving_paths: Set of paths currently being resolved (to prevent infinite recursion)
-            
-        Returns:
-            The resolved type for the referenced element
-        """
-        if resolving_paths is None:
-            resolving_paths = set()
-            
-        # Check for circular references
-        if referenced_element.path in resolving_paths:
-            warnings.warn(f"Circular reference detected for path: {referenced_element.path}. Using Any.")
-            return Any
-            
-        # Check if already in cache
-        if referenced_element.path in self.construction_cache:
-            return self.construction_cache[referenced_element.path]
-        
-        # Add current path to resolving set
-        resolving_paths.add(referenced_element.path)
-        
-        try:
-            # If the referenced element has children, create a backbone model for it
-            if referenced_element.children:
-                # Check if any children would cause circular references
-                for child_name, child_element in referenced_element.children.items():
-                    if child_element.contentReference:
-                        ref_path = child_element.contentReference.lstrip("#")
-                        if ref_path in resolving_paths:
-                            return ''.join([path[0].upper() + path[1:] for path in referenced_element.path.split(".")])
-                        
-                backbone_model_name = (
-                    capitalize(self.Config.resource_name if self.Config else "Unknown").strip()
-                    + ''.join([capitalize(label).strip() for label in referenced_element.path.split(".")[1:]])
-                )
-                
-                # Process the referenced element's children
-                field_subfields, subfield_validators, subfield_properties = (
-                    self._process_FHIR_structure_into_Pydantic_components(
-                        referenced_element, None, resolving_paths
-                    )
-                )
-                
-                # Handle extension slices for the referenced element
-                if (
-                    "extension" in referenced_element.children
-                    and referenced_element.children["extension"].slices
-                ):
-                    extension_slice_base_type = get_complex_FHIR_type(
-                        "Extension",
-                        self.Config.FHIR_release if self.Config else "4.3.0",
-                    )
-                    extension_type = Annotated[
-                        Union[
-                            tuple(
-                                [
-                                    *self._build_element_slice_models(
-                                        referenced_element.children["extension"],
-                                        extension_slice_base_type,
-                                    ),
-                                    extension_slice_base_type,
-                                ]
-                            )
-                        ],
-                        Field(union_mode="left_to_right"),
-                    ]
-
-                    # Get cardinality of extension element
-                    extension_min_card, extension_max_card = (
-                        self._parse_element_cardinality(referenced_element.children["extension"])
-                    )
-                    # Add slicing cardinality validator for field
-                    subfield_validators[
-                        f"extension_slicing_cardinality_validator"
-                    ] = field_validator("extension", mode="after")(
-                        partial(
-                            fhir_validators.validate_slicing_cardinalities,
-                            field_name="extension",
-                        )
-                    )
-                    field_subfields["extension"] = self._construct_Pydantic_field(
-                        extension_type, extension_min_card, extension_max_card
-                    )
-                
-                # Create the backbone model
-                field_type = self._create_model_with_properties(
-                    backbone_model_name,
-                    fields=field_subfields,
-                    base=(FHIRBaseModel,), 
-                    validators=subfield_validators,
-                    properties=subfield_properties,
-                    docstring=referenced_element.definition,
-                )
-                
-                # Cache the result
-                self.construction_cache[referenced_element.path] = field_type
-                return field_type
-            
-            # If the referenced element has types defined, resolve them
-            elif referenced_element.type:
-                field_types = [self._get_complex_FHIR_type(field_type) for field_type in referenced_element.type]
-                if len(field_types) > 1:
-                    return Union[tuple(field_types)]
-                else:
-                    return field_types[0]
-            
-            # Fallback to Any if we can't resolve the type
-            warnings.warn(f"Could not resolve type for content reference: {referenced_element.path}. Using Any.")
-            return Any
-            
-        finally:
-            # Always remove from resolving set when done
-            resolving_paths.discard(referenced_element.path)
-
     def _process_FHIR_structure_into_Pydantic_components(
-        self, structure: ElementDefinitionNode, base: Any | None = None, resolving_paths: Optional[set] = None
+        self, structure: ElementDefinitionNode, base: Any | None = None
     ) -> Tuple[
         Dict[str, Any],
-        Dict[str, Callable],
+        ResourceFactoryValidators,
         Dict[str, Callable[..., Any]],
     ]:
         """
@@ -947,94 +858,97 @@ class ResourceFactory:
 
         Returns:
             Tuple[dict, dict, dict]: A tuple containing fields, validators, and properties.
-        """
-        if resolving_paths is None:
-            resolving_paths = set()
-            
+        """            
         fields = {}
-        validators = {}
+        validators = ResourceFactoryValidators()
         properties = {}
         for name, element in structure.children.items():
+
+            # Prevent circular references
             if base and name in base.model_fields:
                 continue
+
             # Handle Python reserved keywords for field names early
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
             )
+            
+            #-------------------------------------
+            # Element content references
+            #-------------------------------------
             if element.contentReference:
-                reference_path = element.contentReference.lstrip("#")
-                referenced_element = structure.root
-                parts = reference_path.split(".")
-                for part in parts:
-                    if not referenced_element or not referenced_element.children:
-                        break
-                    referenced_element = referenced_element.children.get(part)
-                if not referenced_element:
-                    warnings.warn(f"Could not resolve content reference: {element.contentReference}. Assigning generic type for field {name}.")
-                    field_types = [Any]
-                else:
-                    # Check if we're already resolving this path (circular reference)
-                    if referenced_element.path in resolving_paths:
-                        warnings.warn(f"Circular content reference detected: {element.contentReference} -> {referenced_element.path}. Using Any.")
-                        field_types = [Any]
-                    else:
-                        # Use the new helper method to resolve the type recursively
-                        resolved_type = self._resolve_content_reference_type(referenced_element, structure.root, resolving_paths)
-                        field_types = [resolved_type]
-                        # Copy metadata from the referenced element
-                        element.min = element.min or referenced_element.min
-                        element.max = element.max or referenced_element.max 
-                        element.constraint = element.constraint or referenced_element.constraint
-            else:
-                # Parse the FHIR types of the element
-                field_types = (
-                    [self._get_complex_FHIR_type(field_type) for field_type in element.type]
-                    if element.type
-                    else []
-                )
-                # If has no type, skip element
-                if not field_types:
-                    continue
+                element = self._resolve_content_reference(element)
 
+            
+            #-------------------------------------
+            # Type resolution
+            #-------------------------------------
+            # Parse the FHIR types of the element
+            field_types = (
+                [self._get_complex_FHIR_type(field_type) for field_type in element.type]
+                if element.type
+                else []
+            )
+            # If element has no type, skip it
+            if not field_types:
+                continue
+
+            # Unify types into single annotation
+            field_type = Union[tuple(field_types)] if len(field_types) > 1 else field_types[0]
+
+
+            #-------------------------------------
+            # Cardinality
+            #-------------------------------------
             # Get cardinality of element
             min_card, max_card = self._parse_element_cardinality(element)
 
-            # Handle type choice elements
-            if "[x]" in name:
-                fields, validators, properties = self._process_choice_type_field(
-                    name,
+
+            #-------------------------------------
+            # Type choice elements
+            #-------------------------------------
+            if TYPE_CHOICE_SUFFIX in name:
+                basename = name.strip(TYPE_CHOICE_SUFFIX)
+                # Handle type choice elements
+                fields.update(self._construct_type_choice_fields(
+                    basename,
                     field_types,
-                    [min_card, max_card],
-                    fields,
-                    validators,
-                    properties,
-                    description=element.short,
+                    max_card,
+                    element.short,
+                ))
+                # Add validator to ensure only one of these fields is set
+                validators.add_type_choice_validator(
+                    field=basename,
+                    allowed_types=field_types,
+                    required=min_card > 0,
+                )
+                # Add property to access the values of the choice element without knowing the type set
+                properties[basename] = partial(
+                    fhir_validators.get_type_choice_value_by_base, base=basename
                 )
                 continue
-            # Handle number of element types
-            if len(field_types) > 1:
-                # Accept all types
-                field_type = Union[tuple(field_types)]
-            else:
-                # Get single type
-                field_type = field_types[0]
+            
             # Start by not setting any default value (important, 'None' implies optional in Pydantic)
             field_default = _Unset
-            # Check for pattern value constraints
-            if pattern_value := self._process_pattern_or_fixed_values(
-                element, "pattern"
-            ):
+
+            #-------------------------------------
+            # Pattern value constraints
+            #-------------------------------------
+            if pattern_value := self._process_pattern_or_fixed_values(element, "pattern"):
                 field_default = pattern_value
                 # Add the current field to the list of validated fields
-                validators[f"FHIR_{name}_pattern_constraint"] = field_validator(
+                validators.add(f"FHIR_{name}_pattern_constraint", field_validator(
                     safe_field_name, mode="after"
                 )(
                     partial(
                         fhir_validators.validate_FHIR_element_pattern,
                         pattern=pattern_value,
                     )
-                )
-            # Check for fixed value constraints
+                ))
+
+            #-------------------------------------
+            # Fixed value constraints
+            #-------------------------------------
             if fixed_value := self._process_pattern_or_fixed_values(element, "fixed"):
                 # Use enum with single choice since Literal definition does not work at runtime
                 singleChoice = Enum(
@@ -1044,35 +958,33 @@ class ResourceFactory:
                 )
                 field_default = fixed_value
                 field_type = singleChoice
-            # Process FHIR constraint invariants on the element
+                
+            #-------------------------------------
+            # Fixed value constraints
+            #-------------------------------------
             if constraints := element.constraint:
+                # Process FHIR constraint invariants on the element
                 for constraint in constraints:
-                    validators = self._add_element_constraint_validator(
-                        safe_field_name, constraint, base, validators
+                    validators.add_element_constraint_validator(
+                        safe_field_name, constraint, base
                     )
-            # Process FHIR slicing on the element, if present
+
+            #-------------------------------------
+            # Slicing
+            #-------------------------------------
             if element.slices:
-                field_type = Annotated[
-                    Union[
-                        tuple(
-                            [
-                                *self._build_element_slice_models(element, field_type),
-                                field_type,
-                            ]
-                        )
-                    ],
-                    Field(union_mode="left_to_right"),
-                ]
+                # Process FHIR slicing on the element
+                assert isinstance(field_type, type) and issubclass(field_type, BaseModel), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {element.path}"
+                field_type = self._construct_annotated_sliced_field(element.slices, field_type)
                 # Add slicing cardinality validator for field
-                validators[f"{name}_slicing_cardinality_validator"] = field_validator(
-                    safe_field_name, mode="after"
-                )(
-                    partial(
-                        fhir_validators.validate_slicing_cardinalities, field_name=name
-                    )
-                )
-            # Process element children, if present
+                validators.add_slicing_validator(field=safe_field_name)
+
+            #-------------------------------------
+            # Children elements
+            #-------------------------------------
             elif element.children:
+                # Process element children
+                assert isinstance(field_type, type) and issubclass(field_type, BaseModel), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {element.path}"
                 backbone_model_name = (
                     capitalize(
                         self.Config.resource_name if self.Config else "Unknown"
@@ -1081,9 +993,12 @@ class ResourceFactory:
                 )
                 field_subfields, subfield_validators, subfield_properties = (
                     self._process_FHIR_structure_into_Pydantic_components(
-                        element, field_type, resolving_paths
+                        element, field_type
                     )
                 )
+                #-------------------------------------
+                # Complex extensions
+                #-------------------------------------
                 if (
                     "extension" in element.children
                     and element.children["extension"].slices
@@ -1092,53 +1007,27 @@ class ResourceFactory:
                         "Extension",
                         self.Config.FHIR_release if self.Config else "4.3.0",
                     )
-                    extension_type = Annotated[
-                        Union[
-                            tuple(
-                                [
-                                    *self._build_element_slice_models(
-                                        element.children["extension"],
-                                        extension_slice_base_type,
-                                    ),
-                                    extension_slice_base_type,
-                                ]
-                            )
-                        ],
-                        Field(union_mode="left_to_right"),
-                    ]
+                    extension_type = self._construct_annotated_sliced_field(element.children["extension"].slices, extension_slice_base_type)
 
-                    self._build_element_slice_models(
-                        element.children["extension"],
-                        get_complex_FHIR_type(
-                            "Extension",
-                            self.Config.FHIR_release if self.Config else "4.3.0",
-                        ),
-                    )
                     # Get cardinality of extension element
                     extension_min_card, extension_max_card = (
                         self._parse_element_cardinality(element.children["extension"])
                     )
                     # Add slicing cardinality validator for field
-                    subfield_validators[
-                        f"extension_slicing_cardinality_validator"
-                    ] = field_validator("extension", mode="after")(
-                        partial(
-                            fhir_validators.validate_slicing_cardinalities,
-                            field_name="extension",
-                        )
-                    )
+                    subfield_validators.add_slicing_validator(field='extension')
                     field_subfields["extension"] = self._construct_Pydantic_field(
                         extension_type, extension_min_card, extension_max_card
                     )
-                field_type = self._create_model_with_properties(
+                field_type = self._construct_model_with_properties(
                     backbone_model_name,
                     fields=field_subfields,
                     base=(field_type,), 
-                    validators=subfield_validators,
+                    validators=subfield_validators.get_all(),
                     properties=subfield_properties,
                     docstring=element.definition,
                 )
-                self.construction_cache[element.path] = field_type
+                self.local_cache[backbone_model_name] = field_type
+                
             # Handle Python reserved keywords for field names
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
@@ -1152,23 +1041,16 @@ class ResourceFactory:
                 description=element.short,
                 validation_alias=validation_alias,
             )
-            # IF the field is of primitive type, add aliased field to accomodate their extensions
+
+            #-------------------------------------
+            # Primitive extensions
+            #-------------------------------------
             if hasattr(primitives, str(field_type)):
-                # Also handle keyword collision for extension fields
-                safe_ext_field_name, ext_validation_alias = (
-                    self._handle_python_reserved_keyword(f"{name}_ext")
-                )
-                fields[safe_ext_field_name] = self._construct_Pydantic_field(
-                    get_complex_FHIR_type("Element", self.Config.FHIR_release if self.Config else "4.3.0"),
-                    min_card=0,
-                    max_card=1,
-                    alias=f"_{name}",
-                    validation_alias=ext_validation_alias,
-                    default=field_default,
-                    description=f"Placeholder element for {name} extensions",
-                )
+                # If the field is of primitive type, add aliased field to accomodate their extensions
+                fields.update(self._construct_primitive_extension_field(name))
         return fields, validators, properties
 
+        
     def construct_resource_model(
         self,
         canonical_url: str | None = None,
@@ -1188,6 +1070,8 @@ class ResourceFactory:
         # If the model has been constructed before, return the cached model
         if canonical_url in self.construction_cache:
             return self.construction_cache[canonical_url]
+        self.paths_in_processing: set[str] = set()
+        self.local_cache: Dict[str, type[BaseModel]] = dict()
 
         # Resolve the FHIR structure definition
         _structure_definition = None
@@ -1245,16 +1129,16 @@ class ResourceFactory:
         )
         # Process resource-level constraints
         for constraint in structure.constraint or []:
-            validators = self._add_model_constraint_validator(constraint, validators)
+            validators.add_model_constraint_validator(constraint)
         if "contained" in fields:
-            validators["contained_FHIR_resource_validator"] = field_validator(
+            validators.add("contained_FHIR_resource_validator", field_validator(
                 "contained", mode="plain"
             )(
                 partial(
                     fhir_validators.validate_contained_resource,
                     release=self.Config.FHIR_release,
                 )
-            )
+            ))
         # If the resource has metadata, prefill the information
         if "meta" in fields:
             Meta = get_complex_FHIR_type(
@@ -1273,11 +1157,11 @@ class ResourceFactory:
                 ),
             )
         # Construct the Pydantic model representing the FHIR resource
-        model = self._create_model_with_properties(
+        model = self._construct_model_with_properties(
             self.Config.resource_name if self.Config else _structure_definition.name,
             fields=fields,
             base=(base_model,),
-            validators=validators,
+            validators=validators.get_all(),
             properties=properties,
             docstring=_structure_definition.description,
         )
@@ -1317,23 +1201,140 @@ class ResourceFactory:
             self._process_FHIR_structure_into_Pydantic_components(structure, base)
         )
         for constraint in structure.constraint or []:
-            validators = self._add_model_constraint_validator(constraint, validators)
+            validators.add_model_constraint_validator(constraint)
         model = create_model(
             self.Config.resource_name if self.Config else structure_definition["name"],
             **fields,
             __base__=base,
-            __validators__=validators,
+            __validators__=validators.get_all(),
         )
         model.__doc__ = structure.short
         for attribute, property_getter in properties.items():
             setattr(model, attribute, property(property_getter))
         return model
 
-    def clear_chache(self):
+    def clear_cache(self):
         """
         Clears the factory cache.
         """
         self.construction_cache = {}
+
+
+@dataclass
+class ResourceFactoryValidators:
+    """Container for resource-level validators."""
+    
+    _validators: dict = Field(default_factory=dict)
+
+    def get_all(self) -> dict:
+        return self._validators
+
+    def add(self, validator_name: str, validator: Any) -> None:
+        self._validators[validator_name] = validator
+
+    def add_model_constraint_validator(
+        self, constraint: ElementDefinitionConstraint
+    ):
+        """
+        Adds a model constraint validator based on the provided constraint.
+
+        Args:
+            constraint (dict): The constraint details including expression, human-readable description, key, and severity.
+        """
+        # Construct function name for validator
+        constraint_name = constraint.key.replace("-", "_")
+        validator_name = f"FHIR_{constraint_name}_constraint_model_validator"
+        # Add the current field to the list of validated fields
+        if constraint.expression:
+            self._validators[validator_name] = model_validator(mode="after")(
+                partial(
+                    fhir_validators.validate_model_constraint,
+                    expression=constraint.expression,
+                    human=constraint.human,
+                    key=constraint.key,
+                    severity=constraint.severity,
+                )
+            )
+
+    def add_element_constraint_validator(
+        self,
+        field: str,
+        constraint: ElementDefinitionConstraint,
+        base: Any,
+    ):
+        """
+        Adds a validator for a specific element constraint to the validators dictionary.
+
+        Args:
+            field (str): The field to validate.
+            constraint (dict): The details of the constraint including expression, human-readable description, key, and severity.
+            base (Any): The base model to check for existing validators.
+        """
+        # Construct function name for validator
+        constraint_name = constraint.key.replace("-", "_")
+        validator_name = f"FHIR_{constraint_name}_constraint_validator"
+        # Check if validator has already been constructed for another field
+        validate_fields = [field]
+        # Get the list of fields already being validated by this constraint
+        if validator_name in self._validators:
+            validator = self._validators.get(validator_name)
+            if validator:
+                validate_fields.extend(validator.decorator_info.fields)
+        # Get the list of fields already being validated by this constraint in base model
+        if base and validator_name in base.__pydantic_decorators__.field_validators:
+            validate_fields.extend(
+                base.__pydantic_decorators__.field_validators[
+                    validator_name
+                ].info.fields
+            )
+        # Add the current field to the list of validated fields
+        if constraint.expression:
+            self._validators[validator_name] = field_validator(
+                *validate_fields, mode="after"
+            )(
+                partial(
+                    fhir_validators.validate_element_constraint,
+                    expression=constraint.expression,
+                    human=constraint.human,
+                    key=constraint.key,
+                    severity=constraint.severity,
+                )
+            )
+
+    def add_slicing_validator(self, field: str):
+        """
+        Adds a validator to ensure that slicing rules are followed for sliced elements.
+        """
+        self._validators[f"{field}_slicing_cardinality_validator"] = field_validator(field, mode="after")(
+            partial(
+                fhir_validators.validate_slicing_cardinalities,
+                field_name=field,
+            )
+        )
+    
+    def add_type_choice_validator(
+        self,
+        field: str,
+        allowed_types: List[Union[str, type]],
+        required: bool = False,
+    ):
+        """
+        Adds a validator to ensure that the field's value matches one of the allowed types.
+
+        Args:
+            field (str): The field to validate.
+            allowed_types (List[Union[str, type]]): List of allowed types for the field.
+            required (bool): Whether the field is required. Defaults to `False`.
+        """
+        self._validators[f"{field}_type_choice_validator"] = model_validator(mode="after")(
+            partial(
+                fhir_validators.validate_type_choice_element,
+                field_types=allowed_types,
+                field_name_base=field,
+                required=required,
+            )
+        )
+
 
 
 # Create default factory instance
