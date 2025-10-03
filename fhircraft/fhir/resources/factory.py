@@ -496,7 +496,7 @@ class ResourceFactory:
                     )
         return list(root.children.values())
 
-    def _get_complex_FHIR_type(self, element_type: ElementDefinitionType | str) -> type | str:
+    def _resolve_FHIR_type(self, element_type: ElementDefinitionType | str) -> type | str:
         """
         Resolves and returns the Python type corresponding to a FHIR complex or primitive type
         based on the provided ElementDefinitionType.
@@ -691,7 +691,7 @@ class ResourceFactory:
         )
         if constrained_value:
             # Get the type of value that is constrained to a preset value
-            constrained_type = self._get_complex_FHIR_type(
+            constrained_type = self._resolve_FHIR_type(
                 constraint_attribute.replace(constraint_prefix, "")
             )
             # Parse the value
@@ -1004,7 +1004,7 @@ class ResourceFactory:
             #-------------------------------------
             # Parse the FHIR types of the element
             field_types = (
-                [self._get_complex_FHIR_type(field_type) for field_type in element.type]
+                [self._resolve_FHIR_type(field_type) for field_type in element.type]
                 if element.type
                 else []
             )
