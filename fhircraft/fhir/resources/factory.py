@@ -1078,7 +1078,7 @@ class ResourceFactory:
         if isinstance(structure_definition, StructureDefinition):
             _structure_definition = structure_definition
         elif isinstance(structure_definition, str):
-            _structure_definition = self.repository.__load_json_structure_definition(
+            _structure_definition = self.repository.load_from_files(
                 Path(structure_definition)
             )
         elif isinstance(structure_definition, dict):
