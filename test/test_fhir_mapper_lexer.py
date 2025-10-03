@@ -48,6 +48,7 @@ token_test_cases = (
     ("=", (("=", "EQUAL"),)),
     ("<", (("<", "LESS_THAN"),)),
     (">", ((">", "GREATER_THAN"),)),
+    ("==", (("==", "DOUBLE_EQUAL"),)),
     # ----------------- Literals -----------------
     ("true", (("true", "BOOLEAN"),)),
     ("false", (("false", "BOOLEAN"),)),
