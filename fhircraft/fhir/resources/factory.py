@@ -1174,7 +1174,7 @@ class ResourceFactory:
         self,
         canonical_url: str | None = None,
         structure_definition: Union[str, dict, StructureDefinition] | None = None,
-        base_model: type[ModelT] = FHIRBaseModel,
+        base_model: type[ModelT] | None = None,
     ) -> type[ModelT | BaseModel]:
         """
         Constructs a Pydantic model based on the provided FHIR structure definition.
@@ -1275,61 +1275,28 @@ class ResourceFactory:
                     )
                 ),
             )
+
+        # Check if a base model is provided, otherwise determine it from the StructureDefinition
+        if not (base := base_model):        
+            # Determine the base model to inherit from for the current resource
+            if base_canonical_url := _structure_definition.baseDefinition:
+                # TODO: Handle non-FHIRBaseModel bases
+                print('Base canonical URL:', base_canonical_url)
+                base = self.construction_cache.get(base_canonical_url, FHIRBaseModel)
+            else:
+                base = FHIRBaseModel
+
         # Construct the Pydantic model representing the FHIR resource
         model = self._construct_model_with_properties(
             self.Config.resource_name if self.Config else _structure_definition.name,
             fields=fields,
-            base=(base_model,),
+            base=(base,),
             validators=validators.get_all(),
             properties=properties,
             docstring=_structure_definition.description,
         )
         # Add the current model to the cache
         self.construction_cache[_structure_definition.url] = model
-        return model
-
-    def construct_dataelement_model(self, structure_definition):
-        if (
-            "snapshot" not in structure_definition
-            or "element" not in structure_definition["snapshot"]
-        ):
-            raise ValueError(
-                "Invalid StructureDefinition: Missing 'snapshot' or 'element' field"
-            )
-        elements = structure_definition["snapshot"]["element"]
-        nodes = self._build_element_tree_structure(elements)
-        assert (
-            len(nodes) == 1
-        ), "StructureDefinition snapshot must have exactly one root element."
-        structure = nodes[0]
-        # Configure the factory for the current FHIR environment
-        self.Config = self.FactoryConfig(
-            FHIR_release=get_FHIR_release_from_version(
-                structure_definition["fhirVersion"]
-            ),
-            resource_name=structure_definition["name"],
-        )
-        if "baseDefinition" in structure_definition:
-            base_name = structure_definition["baseDefinition"].replace(
-                "http://hl7.org/fhir/StructureDefinition/", ""
-            )
-            base = self.construction_cache.get(base_name)
-        else:
-            base = FHIRBaseModel
-        fields, validators, properties = (
-            self._process_FHIR_structure_into_Pydantic_components(structure, base)
-        )
-        for constraint in structure.constraint or []:
-            validators.add_model_constraint_validator(constraint)
-        model = create_model(
-            self.Config.resource_name if self.Config else structure_definition["name"],
-            **fields,
-            __base__=base,
-            __validators__=validators.get_all(),
-        )
-        model.__doc__ = structure.short
-        for attribute, property_getter in properties.items():
-            setattr(model, attribute, property(property_getter))
         return model
 
     def clear_cache(self):
