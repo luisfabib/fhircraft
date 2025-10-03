@@ -897,7 +897,7 @@ class ResourceFactory:
         parts = reference_path.split(".")
 
         # Detect cycles
-        if reference_path in self.paths_in_processing:
+        if reference_path in self.paths_in_processing or element.path.startswith(reference_path + "."):
             backbone_model_name = (
                 capitalize(
                     self.Config.resource_name if self.Config else "Unknown"
