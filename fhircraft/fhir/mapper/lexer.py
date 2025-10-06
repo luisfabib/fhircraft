@@ -121,6 +121,7 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         "DATETIME",
         "STRING",
         "RIGHT_ARROW",
+        "DOUBLE_EQUAL"
     ]
 
     def t_ignore_WHITESPACE(self, t):
@@ -183,6 +184,10 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         r"<<types>>|<<type\+>>"
         t.value = t.value.strip("<").strip(">")
         t.value = {"types": "types", "type+": "type-and-types"}[t.value]
+        return t
+    
+    def t_DOUBLE_EQUAL(self, t):
+        r"=="
         return t
 
     def t_DELIMITEDIDENTIFIER(self, t):

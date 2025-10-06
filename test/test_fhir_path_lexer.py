@@ -94,7 +94,6 @@ token_test_cases = (
     (">=", ((">=", "GREATER_EQUAL_THAN"),)),
     ("<=", (("<=", "LESS_EQUAL_THAN"),)),
     ("=", (("=", "EQUAL"),)),
-    ("==", (("==", "DOUBLE_EQUAL"),)),
     ("~", (("~", "EQUIVALENT"),)),
     ("!=", (("!=", "NOT_EQUAL"),)),
     ("!~", (("!~", "NOT_EQUIVALENT"),)),

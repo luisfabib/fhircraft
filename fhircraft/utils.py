@@ -1,6 +1,7 @@
 import inspect
 import json
 import os
+import sys
 import re
 from contextlib import contextmanager
 from typing import (
@@ -467,3 +468,15 @@ def is_list_field(field) -> bool:
         return False
 
     return _is_list_type(annotation)
+
+def model_rebuild_all():
+    """
+    Call model_rebuild() on all Pydantic models defined in the module where this function is called.
+    This is useful when models have forward references or need to be re-evaluated
+    after all classes have been defined.
+    """
+    caller_module_name = inspect.currentframe().f_back.f_globals["__name__"]
+    for name, obj in inspect.getmembers(sys.modules[caller_module_name], inspect.isclass):
+        # Only call model_rebuild for classes defined in the caller's module
+        if obj.__module__ == caller_module_name and hasattr(obj, "model_rebuild"):
+            obj.model_rebuild()

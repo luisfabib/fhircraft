@@ -17,6 +17,7 @@ from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
     StructureMap,
     StructureMapConst,
     StructureMapGroupRuleDependent,
+    StructureMapGroupRuleDependentParameter,
     StructureMapGroup,
     StructureMapGroupInput,
     StructureMapGroupRuleTargetParameter,
@@ -753,7 +754,10 @@ class FhirMappingLanguageParser(FhirPathParser):
             "dependent": [
                 StructureMapGroupRuleDependent(
                     name=invocation.get("name"),
-                    parameter=invocation.get("parameter"),
+                    parameter=[
+                        StructureMapGroupRuleDependentParameter.model_validate(param.model_dump()) 
+                        for param in invocation.get("parameter")
+                    ] if invocation.get("parameter") else None,
                 )
                 for invocation in p[2]
             ]
