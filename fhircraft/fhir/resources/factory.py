@@ -696,7 +696,7 @@ class ResourceFactory:
             )
             # Parse the value
             constrained_value = (
-                constrained_type.model_validate(constrained_value)
+                constrained_type.model_validate(constrained_value.model_dump() if isinstance(constrained_value, BaseModel) else constrained_value)
                 if inspect.isclass(constrained_type)
                 and issubclass(constrained_type, BaseModel)
                 else constrained_value
