@@ -358,7 +358,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
             raise RuntimeError(
                 f"Cannot load package {package_name} while internet access is disabled"
             )
-
+        
         # Determine version to load
         target_version = package_version
         if not target_version:
@@ -420,6 +420,18 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
         structure_def_count = 0
         errors = []
 
+        # First, look for package.json to find dependencies
+        package_obj = tar_file.extractfile('package.json')
+        if package_obj:
+            content = package_obj.read().decode("utf-8")
+            package_info = json.loads(content)
+            # Download dependencies first
+            for dependency, version in package_info.get("dependencies", {}).items():
+                try:
+                    self.load_package(dependency, version, fail_if_exists=False)
+                except Exception as e:
+                    errors.append(f"Failed to download and load dependency {dependency}: {e}")
+        
         for member in tar_file.getmembers():
             if not member.isfile():
                 continue
