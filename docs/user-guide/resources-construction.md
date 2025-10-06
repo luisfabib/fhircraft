@@ -82,7 +82,7 @@ Canonical URLs are globally unique identifiers for FHIR conformance resources. F
 
 ### Basic URL Resolution
 
-Canonical URLs provide a standardized way to reference FHIR structure definitions. Fhircraft can resolve these URLs automatically, checking local sources first and falling back to internet downloads when needed:
+Canonical URLs provide a standardized way to reference FHIR structure definitions. Fhircraft will attempt to resolve these URLs automatically, checking local sources first and falling back to internet downloads when needed:
 
 ```python
 from fhircraft.fhir.resources.factory import construct_resource_model
@@ -126,11 +126,11 @@ Fhircraft follows a prioritized lookup strategy for robust definition resolution
 
 ## FHIR Package Integration
 
-FHIR packages contain published specifications like US Core, International Patient Summary, and other Implementation Guides. Fhircraft automatically downloads, caches, and integrates these packages into your development workflow.
+FHIR packages contain published specifications like [US Core](https://build.fhir.org/ig/HL7/US-Core/), [International Patient Summary](https://build.fhir.org/ig/HL7/fhir-ips/), and other Implementation Guides. Fhircraft automatically downloads, caches, and integrates these packages into your development workflow.
 
 ### Quick Start with Packages
 
-The fastest way to get started with FHIR packages is to load a popular implementation guide like US Core. This example shows the complete workflow from package loading to model usage:
+The fastest way to get started with FHIR packages is to load a popular implementation guide like [US Core](https://build.fhir.org/ig/HL7/US-Core/). This example shows the complete workflow from package loading to model usage:
 
 ```python
 from fhircraft.fhir.resources.factory import ResourceFactory
@@ -188,6 +188,8 @@ IPSPatient = factory.construct_resource_model(
 ```
 
 ### Common FHIR Packages
+
+Fhircraft can download and extract any FHIR packages from the [FHIR Package Registry](https://registry.fhir.org/). Here is a collection of commonly used FHIR packages. 
 
 | Package | Description | Use Case |
 |---------|-------------|----------|

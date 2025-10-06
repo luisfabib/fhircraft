@@ -9,9 +9,9 @@ This is the foundational guide in the FHIR Resources section. Understanding thes
 
 This guide assumes familiarity with:
 
-- **Basic Python** and object-oriented programming
+- **[Basic Python](https://docs.python.org/3/tutorial/index.html)** and object-oriented programming
 - **[Pydantic fundamentals](https://docs.pydantic.dev/latest/)** - Validation and data models  
-- **FHIR basics** - Understanding of FHIR as a healthcare interoperability standard
+- **[FHIR basics](https://hl7.org/fhir/R4/index.html)** - Understanding of FHIR as a healthcare interoperability standard
 
 If you're new to Fhircraft, consider starting with the [FHIR Resources Overview](resources-overview.md) first.
 
@@ -206,7 +206,7 @@ class Observation(FHIRBaseModel):
 
 ### Slicing
 
-Slicing allows FHIR profiles to define specialized variations of repeating elements. Fhircraft represents each slice as a separate model (based on `FHIRSliceModel`, with its own fields and constraints) and uses type unions to accept any valid slice.
+[Slicing](https://hl7.org/fhir/R4/profiling.html#slicing) allows FHIR profiles to define specialized variations of repeating elements. Fhircraft represents each slice as a separate model (based on `FHIRSliceModel`, with its own fields and constraints) and uses type unions to accept any valid slice.
 
 Consider an `Observation.component` element sliced into string and integer variants:
 
@@ -387,60 +387,6 @@ patient = Patient(
 )
 ```
 
-### Extension Rules
-
-Fhircraft enforces FHIR extension rules automatically:
-- Extension URL is required
-- Must have either a value OR nested extensions, not both
-- Only one value type allowed per extension
-
-## Profiling and Custom Resources
-
-Create specialized FHIR resources using profiles and custom structure definitions.
-
-### Custom Profiles
-
-Build constrained versions of standard resources:
-
-```python
-from fhircraft.fhir.resources.factory import construct_resource_model
-
-# Define a patient profile with constraints
-profile_structure = {
-    "resourceType": "StructureDefinition",
-    "url": "http://example.org/MyPatientProfile",
-    "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
-    "derivation": "constraint"
-    # ... constraints go here
-}
-
-MyPatientProfile = construct_resource_model(
-    structure_definition=profile_structure
-)
-
-# Use with enhanced validation
-patient = MyPatientProfile(
-    name=[{"family": "Doe"}],
-    # Must conform to profile constraints
-)
-```
-
-### Multi-Release Support
-
-Fhircraft works with R4, R4B, and R5 simultaneously:
-
-```python
-# Specify FHIR release
-PatientR4 = construct_resource_model(
-    structure_definition=structure_def,
-    fhir_release="R4"
-)
-
-PatientR5 = construct_resource_model(
-    structure_definition=structure_def,
-    fhir_release="R5"
-)
-```
 
 ## What's Next?
 
