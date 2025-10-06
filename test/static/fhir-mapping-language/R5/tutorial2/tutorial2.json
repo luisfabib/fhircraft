@@ -1,0 +1,65 @@
+{
+  "resourceType": "StructureMap",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><pre>/// url = &quot;http://hl7.org/fhir/StructureMap/tutorial-step2&quot;\r\n/// name = &quot;tutorial-step2&quot;\r\n/// title = &quot;Tutorial Step 2&quot;\r\n/// status = &quot;draft&quot;\r\n\r\n/// description = &quot;&quot;&quot;\r\nTutorialStep2\r\n&quot;&quot;&quot;\r\nuses &quot;http://hl7.org/fhir/StructureDefinition/tutorial-left-2&quot; alias TLeft as source\r\nuses &quot;http://hl7.org/fhir/StructureDefinition/tutorial-right-2&quot; alias TRight as target\r\n\r\ngroup tutorial(source src : TLeft, target tgt : TRight) {\r\n  src.a1 as a -&gt; tgt.a2 = a &quot;rule_a&quot;;\r\n}\r\n\r\n</pre></div>"
+  },
+  "url": "http://hl7.org/fhir/StructureMap/tutorial-step2",
+  "name": "TutorialStep2",
+  "title": "Tutorial Step 2",
+  "status": "draft",
+  "structure": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/tutorial-left-2",
+      "mode": "source",
+      "alias": "TLeft"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/tutorial-right-2",
+      "mode": "target",
+      "alias": "TRight"
+    }
+  ],
+  "group": [
+    {
+      "name": "tutorial",
+      "input": [
+        {
+          "name": "src",
+          "type": "TLeft",
+          "mode": "source"
+        },
+        {
+          "name": "tgt",
+          "type": "TRight",
+          "mode": "target"
+        }
+      ],
+      "rule": [
+        {
+          "name": "rule_a",
+          "source": [
+            {
+              "context": "src",
+              "element": "a1",
+              "variable": "a"
+            }
+          ],
+          "target": [
+            {
+              "context": "tgt",
+              "contextType": "variable",
+              "element": "a2",
+              "transform": "copy",
+              "parameter": [
+                {
+                  "valueId": "a"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,34 @@ from fhircraft.fhir.path.exceptions import FhirPathLexerError
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 
 
-class FhirPathLexer:
+class MergeLexerMetaclass(type):
+    def __new__(metacls, name, bases, attrs):
+        base_literals = []
+        base_reserved_words = {}
+        base_tokens = []
+        for base in bases:
+            try:
+                base_literals.extend(base.literals)
+                base_reserved_words.update(base.reserved_words)
+                base_tokens.extend(base.tokens)
+            except AttributeError:
+                continue
+
+        try:
+            literals = attrs["literals"]
+            reserved_words = attrs["reserved_words"]
+            tokens = attrs["tokens"]
+        except KeyError:
+            pass
+        else:
+            attrs["literals"] = list(set(literals + base_literals))
+            attrs["reserved_words"] = base_reserved_words | reserved_words
+            attrs["tokens"] = list(set(base_tokens + tokens))
+
+        return super().__new__(metacls, name, bases, attrs)
+
+
+class FhirPathLexer(metaclass=MergeLexerMetaclass):
     """
     A Lexical analyzer for JsonPath.
 
@@ -45,7 +72,22 @@ class FhirPathLexer:
     # -------------------------------------------------------------------------------
     # Symbols provide structure to the language and allow symbolic invocation of common
     # operators such as addition. FHIRPath defines the following symbols:
-    literals = [".", ",", "[", "]", "(", ")", "{", "}", "+", "-", "*", "|", "/", "&"]
+    literals = [
+        ".",
+        ",",
+        "[",
+        "]",
+        "(",
+        ")",
+        "{",
+        "}",
+        "+",
+        "-",
+        "*",
+        "|",
+        "/",
+        "&",
+    ]
 
     reserved_words = {
         # operators (http://hl7.org/fhirpath/N1/#operator-precedence)
@@ -62,8 +104,6 @@ class FhirPathLexer:
             "or": "OR",
             "implies": "IMPLIES",
         },
-        **{operator: "INEQUALITY_OPERATOR" for operator in [">", "<", ">=", "<="]},
-        **{operator: "EQUALITY_OPERATOR" for operator in ["=", "~", "!=", "!~"]},
         # Boolean (http://hl7.org/fhirpath/N1/#boolean)
         # -------------------------------------------------------------------------------
         **{operator: "BOOLEAN" for operator in ["true", "false"]},
@@ -260,6 +300,14 @@ class FhirPathLexer:
         "STRING",
         "CONTEXTUAL_OPERATOR",
         "ENVIRONMENTAL_VARIABLE",
+        "GREATER_THAN",
+        "GREATER_EQUAL_THAN",
+        "LESS_THAN",
+        "LESS_EQUAL_THAN",
+        "EQUAL",
+        "NOT_EQUAL",
+        "EQUIVALENT",
+        "NOT_EQUIVALENT",
     ]
 
     def t_ignore_WHITESPACE(self, t):
@@ -297,7 +345,7 @@ class FhirPathLexer:
         # -------------------------------------------------------------------------------
         # A token introduced by a % refers to a value that is passed into the evaluation
         # engine by the calling environment.
-        r"\%(\w*)?"
+        r"(?:\%[a-zA-Z][a-zA-Z0-9\-]*|\%\`[a-zA-Z][a-zA-Z0-9\-][^\`]*\`)"
         return t
 
     def t_CONTEXTUAL_OPERATOR(self, t):
@@ -305,14 +353,6 @@ class FhirPathLexer:
         # -------------------------------------------------------------------------------
         # Special elements within a funciton that refere to the input collection under evalution
         r"\$(\w*)?"
-        return t
-
-    def t_INEQUALITY_OPERATOR(self, t):
-        r">=|<=|>|<"
-        return t
-
-    def t_EQUALITY_OPERATOR(self, t):
-        r"=|!=|~|!~"
         return t
 
     def t_DATETIME(self, t):
@@ -388,6 +428,38 @@ class FhirPathLexer:
             t.type = "IDENTIFIER"
         else:
             t.type = self.reserved_words.get(t.value, "IDENTIFIER")
+        return t
+
+    def t_NOT_EQUAL(self, t):
+        r"!="
+        return t
+
+    def t_NOT_EQUIVALENT(self, t):
+        r"!~"
+        return t
+
+    def t_GREATER_EQUAL_THAN(self, t):
+        r">="
+        return t
+
+    def t_LESS_EQUAL_THAN(self, t):
+        r"<="
+        return t
+
+    def t_LESS_THAN(self, t):
+        r"<"
+        return t
+
+    def t_GREATER_THAN(self, t):
+        r">"
+        return t
+
+    def t_EQUAL(self, t):
+        r"="
+        return t
+
+    def t_EQUIVALENT(self, t):
+        r"~"
         return t
 
     def t_error_invalid_function(self, t):

@@ -1,5 +1,6 @@
-from pydantic import Field, AfterValidator
-from typing import Union
+from typing import Callable, Union
+
+from pydantic import AfterValidator, Field
 from typing_extensions import Annotated, TypeAliasType
 
 Boolean = TypeAliasType(
@@ -141,16 +142,39 @@ Markdown = TypeAliasType(
     ],
 )
 
+
+def __integer_validator(criterion: Callable) -> Callable:
+    def _validate(value: str):
+        integer = int(value)
+        if not criterion(integer):
+            raise ValueError(f"Value {value} does not satisfy the comparison.")
+        return integer
+
+    return _validate
+
+
 UnsignedInt = TypeAliasType(
     "UnsignedInt",
     Union[
-        int, Annotated[str, Field(pattern=r"[0]|([1-9][0-9]*)"), AfterValidator(int)]
+        Annotated[int, Field(ge=0)],
+        Annotated[
+            str,
+            Field(pattern=r"[0]|([1-9][0-9]*)"),
+            AfterValidator(__integer_validator(lambda x: x >= 0)),
+        ],
     ],
 )
 
 PositiveInt = TypeAliasType(
     "PositiveInt",
-    Union[int, Annotated[str, Field(pattern=r"\+?[1-9][0-9]*"), AfterValidator(int)]],
+    Union[
+        Annotated[int, Field(gt=0)],
+        Annotated[
+            str,
+            Field(pattern=r"\+?[1-9][0-9]*"),
+            AfterValidator(__integer_validator(lambda x: x > 0)),
+        ],
+    ],
 )
 
 Uuid = TypeAliasType("Uuid", str)

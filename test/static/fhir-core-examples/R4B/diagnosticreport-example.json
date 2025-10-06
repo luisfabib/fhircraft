@@ -1,0 +1,105 @@
+{
+      "resourceType" : "DiagnosticReport",
+      "id" : "101",
+      "meta" : {
+        "tag" : [{
+          "system" : "http://example.org/fhir/CodeSystem/workflow-codes",
+          "code" : "01",
+          "display" : "Needs Review"
+        }],
+        "profile": [
+          "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
+        ],
+        "versionId": "4.3.0"
+      },
+      "text" : {
+        "status" : "generated",
+        "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n\t\t\t\t\t\t<h3>CBC Report for Wile. E. COYOTE (MRN: 23453) issued 3-Mar 2011 11:45</h3>\n\t\t\t\t\t\t<pre>\nTest                  Units       Value       Reference Range\nHaemoglobin           g/L         176         135 - 180\nRed Cell Count        x10*12/L    5.9         4.2 - 6.0\nHaematocrit                       0.55+       0.38 - 0.52\nMean Cell Volume      fL          99+         80 - 98\nMean Cell Haemoglobin pg          36+         27 - 35\nPlatelet Count        x10*9/L     444         150 - 450\nWhite Cell Count      x10*9/L     4.6         4.0 - 11.0\nNeutrophils           %           20\nNeutrophils           x10*9/L     0.9---      2.0 - 7.5\nLymphocytes           %           20\nLymphocytes           x10*9/L     0.9-        1.1 - 4.0\nMonocytes             %           20\nMonocytes             x10*9/L     0.9         0.2 - 1.0\nEosinophils           %           20\nEosinophils           x10*9/L     0.92++      0.04 - 0.40\nBasophils             %           20\nBasophils             x10*9/L     0.92+++     &lt;0.21\n      </pre>\n\t\t\t\t\t\t<p>Acme Laboratory, Inc signed: Dr Pete Pathologist</p>\n\t\t\t\t\t</div>"
+      },
+      "identifier" : [{
+        "system" : "http://acme.com/lab/reports",
+        "value" : "5234342"
+      }],
+      "status" : "final",
+      "category" : [{
+        "coding" : [{
+          "system" : "http://terminology.hl7.org/CodeSystem/v2-0074",
+          "code" : "HM"
+        }]
+      }],
+      "code" : {
+        "coding" : [{
+          "system" : "http://loinc.org",
+          "code" : "58410-2",
+          "display" : "Complete blood count (hemogram) panel - Blood by Automated count"
+        },
+        {
+          "code" : "CBC",
+          "display" : "MASTER FULL BLOOD COUNT"
+        }],
+        "text" : "Complete Blood Count"
+      },
+      "subject" : {
+        "reference" : "Patient/pat2"
+      },
+      "encounter" : {
+        "reference" : "Encounter/example"
+      },
+      "effectiveDateTime" : "2011-03-04T08:30:00+11:00",
+      "issued" : "2011-03-04T11:45:33+11:00",
+      "performer" : [{
+        "reference" : "Organization/1832473e-2fe0-452d-abe9-3cdb9879522f",
+        "display" : "Acme Laboratory, Inc"
+      }],
+      "result" : [{
+        "reference" : "Observation/r1"
+      },
+      {
+        "reference" : "Observation/r2"
+      },
+      {
+        "reference" : "Observation/r3"
+      },
+      {
+        "reference" : "Observation/r4"
+      },
+      {
+        "reference" : "Observation/r5"
+      },
+      {
+        "reference" : "Observation/r6"
+      },
+      {
+        "reference" : "Observation/r7"
+      },
+      {
+        "reference" : "Observation/r8"
+      },
+      {
+        "reference" : "Observation/r9"
+      },
+      {
+        "reference" : "Observation/r10"
+      },
+      {
+        "reference" : "Observation/r11"
+      },
+      {
+        "reference" : "Observation/r12"
+      },
+      {
+        "reference" : "Observation/r13"
+      },
+      {
+        "reference" : "Observation/r14"
+      },
+      {
+        "reference" : "Observation/r15"
+      },
+      {
+        "reference" : "Observation/r16"
+      },
+      {
+        "reference" : "Observation/r17"
+      }]
+    }

@@ -22,7 +22,7 @@ class FHIRComparisonOperator(FHIRPath, ABC):
         self.right = right
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right})"
 
     def __repr__(self):
         return (
@@ -50,7 +50,7 @@ class GreaterThan(FHIRComparisonOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         The greater than operator (>) returns true if the first operand is strictly greater than the second.
@@ -58,6 +58,8 @@ class GreaterThan(FHIRComparisonOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -66,11 +68,14 @@ class GreaterThan(FHIRComparisonOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if not left_value or not right_value:
             return []
         return [FHIRPathCollectionItem.wrap(left_value > right_value)]
+
+    def __str__(self):
+        return f"{self.left} > {self.right}"
 
 
 class LessThan(FHIRComparisonOperator):
@@ -89,7 +94,7 @@ class LessThan(FHIRComparisonOperator):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         The less than operator (<) returns true if the first operand is strictly less than the second.
@@ -97,6 +102,8 @@ class LessThan(FHIRComparisonOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -105,11 +112,14 @@ class LessThan(FHIRComparisonOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if not left_value or not right_value:
             return []
         return [FHIRPathCollectionItem.wrap(left_value < right_value)]
+
+    def __str__(self):
+        return f"{self.left} < {self.right}"
 
 
 class LessEqualThan(FHIRComparisonOperator):
@@ -128,7 +138,7 @@ class LessEqualThan(FHIRComparisonOperator):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         The less or equal operator (<=) returns true if the first operand is less than or equal to the second.
@@ -136,6 +146,8 @@ class LessEqualThan(FHIRComparisonOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -144,11 +156,14 @@ class LessEqualThan(FHIRComparisonOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if not left_value or not right_value:
             return []
         return [FHIRPathCollectionItem.wrap(left_value <= right_value)]
+
+    def __str__(self):
+        return f"{self.left} <= {self.right}"
 
 
 class GreaterEqualThan(FHIRComparisonOperator):
@@ -167,7 +182,7 @@ class GreaterEqualThan(FHIRComparisonOperator):
         self.right = right
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         The greater or equal operator (>=) returns true if the first operand is greater than or equal to the second.
@@ -175,6 +190,8 @@ class GreaterEqualThan(FHIRComparisonOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -183,11 +200,11 @@ class GreaterEqualThan(FHIRComparisonOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         left_value, right_value = evaluate_and_prepare_collection_values(
-            self, self.left, self.right, collection, create
+            self, self.left, self.right, collection, environment, create
         )
         if not left_value or not right_value:
             return []
         return [FHIRPathCollectionItem.wrap(left_value >= right_value)]
-        if not left_value or not right_value:
-            return []
-        return [FHIRPathCollectionItem.wrap(left_value >= right_value)]
+
+    def __str__(self):
+        return f"{self.left} >= {self.right}"

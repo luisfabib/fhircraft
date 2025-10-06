@@ -1,12 +1,12 @@
 import re
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Union, Dict
 
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 from fhircraft.utils import ensure_list
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection
+    from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollection, Literal
 
-from fhircraft.fhir.path.engine.literals import Quantity
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
 
@@ -56,12 +56,33 @@ def join_fhirpath(*segments: str) -> str:
     return ".".join((str(segment).strip(".") for segment in segments if segment != ""))
 
 
-def _underline_error_in_fhir_path(fhir_path, error, error_position):
-    return f'{fhir_path[:error_position+len(str(error))+15]}...\n{" "*error_position}{"—"*len(str(error))}'
+def _underline_error_in_fhir_path(text, error, error_position, line_number=None):
+    """
+    Underlines the error in a FHIR path string, supporting multiline strings and optional line number.
+
+    Args:
+        text (str): The FHIR path string (may be multiline).
+        error (Any): The error object or message.
+        error_position (int): The position (character index) of the error in the string.
+        line_number (int, optional): The line number where the error occurred (1-based).
+
+    Returns:
+        str: A string with the error underlined, optionally prefixed with the line number.
+    """
+    lines = text.splitlines()
+    if line_number is not None and 1 <= line_number <= len(lines):
+        line = lines[line_number - 1]
+        line_offset = sum(len(l) + 1 for l in lines[: line_number - 1])  # +1 for '\n'
+        error_pos_in_line = error_position - 1
+        underline = " " * error_pos_in_line + "—" * len(str(error))
+        return f'\nLine {line_number}: {line}\n{" " * (len(f"Line {line_number}: "))}{underline}'
+    else:
+        underline = " " * error_position + "—" * len(str(error))
+        return f"{text[:error_position+len(str(error))+15]}...\n{underline}"
 
 
 def import_fhirpath_engine():
-    from fhircraft.fhir.path import fhirpath
+    from fhircraft.fhir.path.parser import fhirpath
 
     return fhirpath
 
@@ -69,12 +90,13 @@ def import_fhirpath_engine():
 def evaluate_fhirpath_collection(
     fhir_path: Union["FHIRPath", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
+    environment: dict,
     create: bool = False,
 ) -> "FHIRPathCollection":
     from fhircraft.fhir.path.engine.core import FHIRPath, FHIRPathCollectionItem
 
     return (
-        [item for item in fhir_path.evaluate(collection, create)]
+        [item for item in fhir_path.evaluate(collection, environment, create)]
         if isinstance(fhir_path, FHIRPath)
         else [FHIRPathCollectionItem.wrap(item) for item in ensure_list(fhir_path)]
     )
@@ -84,6 +106,7 @@ def evaluate_left_right_expressions(
     left: Union["FHIRPath", "FHIRPathCollection"],
     right: Union["FHIRPath", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
+    environment: dict,
     create: "bool",
 ) -> tuple["FHIRPathCollection", "FHIRPathCollection"]:
     """
@@ -99,8 +122,8 @@ def evaluate_left_right_expressions(
     Returns:
         tuple[FHIRPathCollection, FHIRPathCollection]: A tuple containing the evaluated left and right collections of values.
     """
-    left_collection = evaluate_fhirpath_collection(left, collection, create)
-    right_collection = evaluate_fhirpath_collection(right, collection, create)
+    left_collection = evaluate_fhirpath_collection(left, collection, environment, create)
+    right_collection = evaluate_fhirpath_collection(right, collection, environment, create)
     return left_collection, right_collection
 
 
@@ -109,11 +132,13 @@ def evaluate_and_prepare_collection_values(
     left: Union["FHIRPath", "FHIRPathCollection"],
     right: Union["FHIRPath", "FHIRPathCollection"],
     collection: "FHIRPathCollection",
+    environment: dict,
     create=False,
     prevent_all_empty: bool = True,
 ) -> tuple[Any | None, Any | None]:
-
+    from fhircraft.fhir.path.engine.core import Literal
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
+        from fhircraft.fhir.path.engine.literals import Quantity
         return [
             (
                 Quantity(item.value.value, item.value.unit)
@@ -124,7 +149,7 @@ def evaluate_and_prepare_collection_values(
         ]
 
     left_collection, right_collection = evaluate_left_right_expressions(
-        left, right, collection, create
+        left, right, collection, environment, create
     )
     left_collection = _get_collection_values(left_collection)
     right_collection = _get_collection_values(right_collection)
@@ -144,4 +169,17 @@ def evaluate_and_prepare_collection_values(
             left_collection = [None]
         if len(right_collection) == 0:
             right_collection = [None]
-    return left_collection[0], right_collection[0]
+    left_value = left_collection[0]
+    right_value = right_collection[0]
+    if isinstance(left_value, Literal):
+        left_value = left_value.value
+    if isinstance(right_value, Literal):
+        right_value = right_value.value
+    return left_value, right_value
+
+
+def get_expression_context(environment: Dict[str, FHIRPathCollectionItem], item: FHIRPathCollectionItem, index: int) -> dict:
+    context = environment.copy()
+    context["$this"] = item
+    context["$index"] = FHIRPathCollectionItem.wrap(index)
+    return context

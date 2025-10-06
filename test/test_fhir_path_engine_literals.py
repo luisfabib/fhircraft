@@ -1,5 +1,3 @@
-import pytest
-
 from fhircraft.fhir.path.engine.literals import *
 
 

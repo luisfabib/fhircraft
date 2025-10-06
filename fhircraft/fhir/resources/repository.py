@@ -2,7 +2,10 @@ import json
 import tarfile
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar, Union
+
+# Define a type variable for the resource type
+T = TypeVar("T")
 
 import requests
 from packaging import version
@@ -17,24 +20,28 @@ from fhircraft.fhir.resources.definitions import StructureDefinition
 from fhircraft.utils import load_env_variables
 
 
-class StructureDefinitionRepository(ABC):
-    """Abstract base class for structure definition repositories."""
+class StructureDefinitionNotFoundError(FileNotFoundError):
+    """Raised when a required structure definition cannot be resolved."""
+
+    pass
+
+
+class AbstractRepository(ABC, Generic[T]):
+    """Abstract base class for generic repositories."""
 
     @abstractmethod
-    def get(
-        self, canonical_url: str, version: Optional[str] = None
-    ) -> StructureDefinition:
-        """Retrieve a structure definition by canonical URL and optional version."""
+    def get(self, canonical_url: str, version: Optional[str] = None) -> T:
+        """Retrieve a resource by canonical URL and optional version."""
         pass
 
     @abstractmethod
-    def add(self, structure_def: StructureDefinition) -> None:
-        """Add a structure definition to the repository."""
+    def add(self, resource: T) -> None:
+        """Add a resource to the repository."""
         pass
 
     @abstractmethod
     def has(self, canonical_url: str, version: Optional[str] = None) -> bool:
-        """Check if a structure definition exists in the repository."""
+        """Check if a resource exists in the repository."""
         pass
 
     @abstractmethod
@@ -68,7 +75,7 @@ class StructureDefinitionRepository(ABC):
         return base_url
 
 
-class HttpStructureDefinitionRepository(StructureDefinitionRepository):
+class HttpStructureDefinitionRepository(AbstractRepository[StructureDefinition]):
     """Repository that downloads structure definitions from the internet."""
 
     def __init__(self):
@@ -105,7 +112,7 @@ class HttpStructureDefinitionRepository(StructureDefinitionRepository):
                 f"Failed to download structure definition from {download_url}: {e}"
             )
 
-    def add(self, structure_def: StructureDefinition) -> None:
+    def add(self, resource: StructureDefinition) -> None:
         """HTTP repository doesn't support adding definitions."""
         raise NotImplementedError(
             "HttpStructureDefinitionRepository doesn't support adding definitions"
@@ -188,7 +195,7 @@ class HttpStructureDefinitionRepository(StructureDefinitionRepository):
         return StructureDefinition.model_validate(response.json())
 
 
-class PackageStructureDefinitionRepository(StructureDefinitionRepository):
+class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinition]):
     """Repository that can load FHIR packages from package registries."""
 
     def __init__(
@@ -244,18 +251,18 @@ class PackageStructureDefinitionRepository(StructureDefinitionRepository):
             f"Load the appropriate package first using load_package()."
         )
 
-    def add(self, structure_def: StructureDefinition) -> None:
+    def add(self, resource: StructureDefinition) -> None:
         """Add a structure definition to the repository."""
-        if not structure_def.url:
+        if not resource.url:
             raise ValueError(
                 "StructureDefinition must have a 'url' field to be added to the repository."
             )
 
-        base_url, version = self.parse_canonical_url(structure_def.url)
+        base_url, version = self.parse_canonical_url(resource.url)
 
         # Use the structure definition's version field if no version in URL
-        if not version and structure_def.version:
-            version = structure_def.version
+        if not version and resource.version:
+            version = resource.version
 
         if not version:
             raise ValueError(
@@ -267,7 +274,7 @@ class PackageStructureDefinitionRepository(StructureDefinitionRepository):
             self._local_definitions[base_url] = {}
 
         # Store the definition
-        self._local_definitions[base_url][version] = structure_def
+        self._local_definitions[base_url][version] = resource
 
         # Update latest version tracking
         self._update_latest_version(base_url, version)
@@ -519,7 +526,7 @@ class PackageStructureDefinitionRepository(StructureDefinitionRepository):
         self._loaded_packages.clear()
 
 
-class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
+class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinition]):
     """
     CompositeStructureDefinitionRepository provides a unified interface for managing, retrieving, and caching FHIR
     StructureDefinition resources from multiple sources, including local storage, FHIR packages, and online repositories.
@@ -622,18 +629,18 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
                 return structure_definition
 
         version_info = f" version {target_version}" if target_version else ""
-        raise RuntimeError(
+        raise StructureDefinitionNotFoundError(
             f"Structure definition not found for {base_url}{version_info}. Either load it locally, load the appropriate package, or enable internet access to download it."
         )
 
     def add(
-        self, structure_definition: StructureDefinition, fail_if_exists: bool = False
+        self, resource: StructureDefinition, fail_if_exists: bool = False
     ) -> None:
         """
         Adds a StructureDefinition to the local repository.
 
         Args:
-            structure_definition (StructureDefinition): The StructureDefinition instance to add.
+            resource (StructureDefinition): The StructureDefinition instance to add.
                 Must have a 'url' field, and a version either in the URL or in the 'version' field.
             fail_if_exists (bool, optional): If True, raises a ValueError if a StructureDefinition
                 with the same base URL and version already exists in the repository. Defaults to False.
@@ -644,16 +651,16 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
             ValueError: If a duplicate StructureDefinition is added and fail_if_exists is True.
 
         """
-        if not structure_definition.url:
+        if not resource.url:
             raise ValueError(
                 "StructureDefinition must have a 'url' field to be added to the repository."
             )
 
-        base_url, version = self.parse_canonical_url(structure_definition.url)
+        base_url, version = self.parse_canonical_url(resource.url)
 
         # Use the structure definition's version field if no version in URL
-        if not version and structure_definition.version:
-            version = structure_definition.version
+        if not version:
+            version = resource.version or resource.fhirVersion
 
         if not version:
             raise ValueError(
@@ -671,7 +678,7 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
             )
 
         # Store the definition
-        self._local_definitions[base_url][version] = structure_definition
+        self._local_definitions[base_url][version] = resource
 
         # Update latest version tracking
         self._update_latest_version(base_url, version)
@@ -816,7 +823,7 @@ class CompositeStructureDefinitionRepository(StructureDefinitionRepository):
             except Exception as e:
                 raise RuntimeError(f"Failed to load {file_path}: {e}")
 
-    def load_from_definitions(self, *definitions: Dict[str, Any]) -> None:
+    def load_from_definitions(self, *definitions: Dict[str, Any] | StructureDefinition) -> None:
         """
         Loads FHIR structure definitions from one or more pre-loaded dictionaries.
         Each dictionary in `definitions` should represent a FHIR StructureDefinition resource.

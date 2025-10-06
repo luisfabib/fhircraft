@@ -1,0 +1,83 @@
+{
+  "resourceType": "StructureMap",
+  "url": "http://hl7.org/fhir/StructureMap/tutorial9",
+  "name": "Tutorial",
+  "status": "draft",
+  "structure": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/tutorial-left-9",
+      "mode": "source",
+      "alias": "TLeft"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/tutorial-right-9",
+      "mode": "target",
+      "alias": "TRight"
+    }
+  ],
+  "group": [
+    {
+      "name": "tutorial",
+      "input": [
+        {
+          "name": "src",
+          "type": "TLeft",
+          "mode": "source"
+        },
+        {
+          "name": "tgt",
+          "type": "TRight",
+          "mode": "target"
+        }
+      ],
+      "rule": [
+        {
+          "source": [
+            {
+              "context": "src",
+              "element": "i",
+              "variable": "i",
+              "condition": "src.m < 2"
+            }
+          ],
+          "target": [
+            {
+              "context": "tgt",
+              "contextType": "variable",
+              "element": "j",
+              "transform": "copy",
+              "parameter": [
+                {
+                  "valueId": "i"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "source": [
+            {
+              "context": "src",
+              "element": "i",
+              "variable": "i",
+              "condition": "src.m >= 2"
+            }
+          ],
+          "target": [
+            {
+              "context": "tgt",
+              "contextType": "variable",
+              "element": "k",
+              "transform": "copy",
+              "parameter": [
+                {
+                  "valueId": "i"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

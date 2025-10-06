@@ -1,27 +1,19 @@
-# Fhircraft package modules
-import inspect
 import os
 import re
-
-# Standard modules
 from collections import defaultdict
+from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Union, get_args
+from importlib.metadata import version
+from typing import Any, Dict, ForwardRef, List, get_args
 
-# 3rd party package modules
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
 from pydantic import BaseModel
+from pydantic_core import PydanticUndefined
 
 from fhircraft.fhir.resources.factory import ResourceFactory
-from fhircraft.utils import ensure_list
+from fhircraft.utils import ensure_list, get_module_name
 
-
-def get_module_name(obj: Any) -> str:
-    module = inspect.getmodule(obj)
-    if module is None:
-        raise ValueError(f"The object {obj} does not belong to a module")
-    return module.__name__
-
+__all__ = ["generator", "generate_resource_model_code", "CodeGenerator"]
 
 FACTORY_MODULE = get_module_name(ResourceFactory)
 LEFT_TO_RIGHT_COMPLEX = "FieldInfo(annotation=NoneType, required=True, metadata=[_PydanticGeneralMetadata(union_mode='left_to_right')])"
@@ -31,6 +23,7 @@ LEFT_TO_RIGHT_SIMPLE = "Field(union_mode='left_to_right')"
 class CodeGenerator:
 
     import_statements: Dict[str, List[str]]
+    template: Template
     data: Dict
 
     def __init__(self):
@@ -39,6 +32,15 @@ class CodeGenerator:
         env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)
         env.filters["escapequotes"] = lambda s: s.replace('"', '\\"')
         self.template = env.get_template("resource_template.py.j2")
+
+    def _reset_state(self) -> None:
+        """
+        Resets the internal state of the CodeGenerator instance.
+        Clears the import statements and data dictionaries.
+        """
+        self.import_statements = defaultdict(list)
+        self.data = {}
+        self._processing_models = set()  # Track models being processed to prevent infinite recursion
 
     def _add_import_statement(self, obj: Any) -> None:
         """
@@ -56,6 +58,8 @@ class CodeGenerator:
         """
         # Get the name of the module and the object
         module_name = get_module_name(obj)
+        if isinstance(obj, ForwardRef): 
+            return None
         if (object_name := getattr(obj, "__name__", None)) is None:
             if (object_name := getattr(obj, "_name", None)) is None:
                 raise ValueError(f"Could not determine object name for import: {obj}")
@@ -87,7 +91,9 @@ class CodeGenerator:
                 type_obj, BaseModel
             ):
                 # If object was created by ResourceFactory, then serialize the model
-                self._serialize_model(type_obj)
+                # But only if we're not already processing it (to prevent infinite recursion)
+                if type_obj not in self._processing_models:
+                    self._serialize_model(type_obj)
             else:
                 # Otherwise, import the model's module
                 self._add_import_statement(type_obj)
@@ -102,62 +108,98 @@ class CodeGenerator:
         Args:
             model (BaseModel): The model to be serialized.
         """
-        model_base = model.__base__
-        # Add import statement for the base class the the model inherits
-        if model_base and model_base != BaseModel:
-            self._add_import_statement(model.__base__)
+        # Check if we're already processing this model or have already processed it
+        if model in self._processing_models or model in self.data:
+            return
+            
+        # Add to processing set to prevent infinite recursion
+        self._processing_models.add(model)
+        
+        try:
+            model_base = model.__base__
+            # Add import statement for the base class the the model inherits
+            if model_base and model_base != BaseModel:
+                self._add_import_statement(model.__base__)
 
-        subdata = {}
-        for field, info in model.model_fields.items():
-            if (
-                model.__base__
-                and field in model.__base__.model_fields
-                and all(
-                    [
-                        getattr(info, slot)
-                        == getattr(model.__base__.model_fields[field], slot)
-                        for slot in info.__slots__
-                        if not slot.startswith("_")
-                    ]
-                )
-            ):
-                continue
-            self._recursively_import_annotation_types(info.annotation)
-            annotation_string = repr(info.annotation)
+            subdata = {}
+            for field, info in model.model_fields.items():
+                if (
+                    model.__base__
+                    and field in model.__base__.model_fields
+                    and all(
+                        [
+                            getattr(info, slot)
+                            == getattr(model.__base__.model_fields[field], slot)
+                            for slot in info.__slots__
+                            if not slot.startswith("_")
+                        ]
+                    )
+                ):
+                    continue
+                self._recursively_import_annotation_types(info.annotation)
+                annotation_string = repr(info.annotation)
 
-            if isinstance(info.annotation, type(Enum)):
-                if "Literal" not in self.import_statements["typing"]:
-                    self.import_statements["typing"].append("Literal")
-                annotation_string = f"Literal['{info.annotation['fixedValue'].value}']"
+                # Handle forward references
+                if 'ForwardRef' in annotation_string:
+                    annotation_string = re.sub(r"ForwardRef\('(\w+)'\)", r"'\1'", annotation_string)
+                    
+                # Handle self-referencing models
+                elif not 'Literal' in annotation_string:
+                    annotation_string = re.sub(rf"\b{model.__name__}\b", f'"{model.__name__}"', annotation_string, 0)
 
-            subdata[field] = {
-                "annotation": annotation_string,
-                "description": info.description,
-                "alias": info.alias,
-                "default": info.default,
+                if isinstance(info.annotation, type(Enum)):
+                    if "Literal" not in self.import_statements["typing"]:
+                        self.import_statements["typing"].append("Literal")
+                    annotation_string = f"Literal['{info.annotation['fixedValue'].value}']"
+
+                default = "..."
+                default_factory = "..."
+                if isinstance(info.default, str):
+                    default = f'"{info.default}"'
+                elif isinstance(info.default, BaseModel):
+                    arguments = ", ".join(
+                        f"{key}={value!r}"
+                        for key, value in info.default.model_dump(exclude_none=True).items()
+                    )
+                    default_factory = f"lambda: {info.default.__class__.__name__}({arguments})"
+                elif info.default is not PydanticUndefined:
+                    default = repr(info.default)
+
+                subdata[field] = {
+                    "annotation": annotation_string,
+                    "description": info.description,
+                    "alias": info.alias,
+                    "default": default,
+                    "default_factory": default_factory,
+                }
+            model_properties = {
+                key: value.fget
+                for key, value in model.__dict__.items()
+                if isinstance(value, property)
             }
-        model_properties = {
-            key: value.fget
-            for key, value in model.__dict__.items()
-            if isinstance(value, property)
-        }
-        self.data.update({model: {"fields": subdata, "properties": model_properties}})
+            self.data.update({model: {"fields": subdata, "properties": model_properties}})
+        
+        finally:
+            # Always remove from processing set when done
+            self._processing_models.discard(model)
 
     def generate_resource_model_code(
-        self, resources: Union[BaseModel, List[BaseModel]]
+        self,
+        resources: type[BaseModel] | List[type[BaseModel]],
+        include_validators: bool = True,
     ) -> str:
         """
         Generate the source code for resource model(s) based on the input resources.
 
         Args:
             resources (Union[BaseModel, List[BaseModel]]): The resource(s) to generate the model code for.
+            include_validators (bool): Whether to include validators in the generated code (default: `True`). Recommended to be `True` for most use cases.
 
         Returns:
             str: The generated source code for the resource model(s).
         """
         # Reset the internal state of the generator
-        self.import_statements = defaultdict(list)
-        self.data = {}
+        self._reset_state()
         # Serialize the model information of the input resources
         for resource in ensure_list(resources):
             self._serialize_model(resource)
@@ -165,6 +207,11 @@ class CodeGenerator:
         source_code = self.template.render(
             data=self.data,
             imports=self.import_statements,
+            include_validators=include_validators,
+            metadata={
+                "version": version("fhircraft"),
+                "timestamp": datetime.now(),
+            },
         )
         # Replace the full module specification for any modules imported
         for module, objects in self.import_statements.items():
@@ -181,11 +228,6 @@ class CodeGenerator:
                 source_code = source_code.replace(match.group(1), "")
             source_code = source_code.replace(f"{FACTORY_MODULE}.", "")
         source_code = source_code.replace(LEFT_TO_RIGHT_COMPLEX, LEFT_TO_RIGHT_SIMPLE)
-
-        print(
-            f"Generated code for {len(self.data)} models with imports: {self.import_statements}"
-        )
-        print(source_code)
         return source_code
 
 

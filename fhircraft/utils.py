@@ -1,6 +1,7 @@
 import inspect
 import json
 import os
+import sys
 import re
 from contextlib import contextmanager
 from typing import (
@@ -424,3 +425,58 @@ def get_FHIR_release_from_version(version: str) -> str:
             f"FHIR version {version} is not supported. Supported versions are: "
             "DSTU2, STU3, R4, R4B, R5, and R6."
         )
+
+
+def get_module_name(obj: Any) -> str:
+    """
+    Returns the name of the module to which the given object belongs.
+
+    Args:
+        obj (Any): The object whose module name is to be retrieved.
+
+    Returns:
+        str: The name of the module containing the object.
+
+    Raises:
+        ValueError: If the object does not belong to any module.
+    """
+    module = inspect.getmodule(obj)
+    if module is None:
+        raise ValueError(f"The object {obj} does not belong to a module")
+    return module.__name__
+
+
+def is_list_field(field) -> bool:
+    """
+    Determines if a given Pydantic field or FieldInfo is a list type,
+    including Optional[List[T]] and Union[List[T], ...].
+    """
+    annotation = getattr(field, "annotation", None)
+    if annotation is None:
+        annotation = getattr(field, "outer_type_", None)
+    if annotation is None:
+        annotation = getattr(field, "type_", None)
+    if annotation is None:
+        return False
+
+    def _is_list_type(ann):
+        origin = getattr(ann, "__origin__", None)
+        if origin in (list, List):
+            return True
+        if origin is Union:
+            return any(_is_list_type(arg) for arg in getattr(ann, "__args__", ()))
+        return False
+
+    return _is_list_type(annotation)
+
+def model_rebuild_all():
+    """
+    Call model_rebuild() on all Pydantic models defined in the module where this function is called.
+    This is useful when models have forward references or need to be re-evaluated
+    after all classes have been defined.
+    """
+    caller_module_name = inspect.currentframe().f_back.f_globals["__name__"]
+    for name, obj in inspect.getmembers(sys.modules[caller_module_name], inspect.isclass):
+        # Only call model_rebuild for classes defined in the caller's module
+        if obj.__module__ == caller_module_name and hasattr(obj, "model_rebuild"):
+            obj.model_rebuild()

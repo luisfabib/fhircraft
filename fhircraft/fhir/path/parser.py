@@ -1,14 +1,18 @@
 import logging
 import os.path
+import traceback
+from typing import Any
 
 import ply.yacc
 
 import fhircraft.fhir.path.engine.additional as additional
+import fhircraft.fhir.path.engine.aggregates as aggregates
 import fhircraft.fhir.path.engine.boolean as boolean
 import fhircraft.fhir.path.engine.collection as collection
 import fhircraft.fhir.path.engine.combining as combining
 import fhircraft.fhir.path.engine.comparison as comparison
 import fhircraft.fhir.path.engine.conversion as conversion
+import fhircraft.fhir.path.engine.environment as environment
 import fhircraft.fhir.path.engine.equality as equality
 import fhircraft.fhir.path.engine.existence as existence
 import fhircraft.fhir.path.engine.filtering as filtering
@@ -21,10 +25,10 @@ import fhircraft.fhir.path.engine.types as types
 import fhircraft.fhir.path.engine.utility as utility
 from fhircraft.fhir.path.engine.core import (
     Element,
+    FHIRPath,
     Invocation,
     Literal,
-    Parent,
-    Root,
+    RootElement,
     This,
 )
 from fhircraft.fhir.path.exceptions import FhirPathLexerError, FhirPathParserError
@@ -79,7 +83,7 @@ class FhirPathParser:
             errorlog=logger,
         )
 
-    def parse(self, string, lexer=None):
+    def parse(self, string, lexer=None) -> FHIRPath | Any:
         self.string = string
         lexer = lexer or self.lexer_class()
         return self.parse_token_stream(lexer.tokenize(string))
@@ -99,20 +103,19 @@ class FhirPathParser:
 
     # ===================== PLY Parser specification =====================
     precedence = [
-        ("left", "."),
-        ("left", "[", "]"),
-        ("left", "+", "-", "&"),
-        ("left", "*", "/", "DIV", "MOD"),
-        ("left", "IS", "AS"),
-        ("left", "|"),
-        ("left", "INEQUALITY_OPERATOR"),
-        ("left", "EQUALITY_OPERATOR"),
-        ("left", "IN", "CONTAINS"),
-        ("left", "AND"),
-        ("left", "OR", "XOR"),
         ("left", "IMPLIES"),
+        ("left", "OR", "XOR"),
+        ("left", "AND"),
+        ("left", "IN", "CONTAINS"),
+        ("left", "EQUAL", "EQUIVALENT", "NOT_EQUIVALENT", "NOT_EQUAL"),
+        ("left", "GREATER_THAN", "LESS_THAN", "GREATER_EQUAL_THAN", "LESS_EQUAL_THAN"),
+        ("left", "|"),
+        ("left", "IS", "AS"),
+        ("left", "*", "/", "DIV", "MOD"),
+        ("left", "+", "-", "&"),
+        ("left", "[", "]"),
+        ("left", "."),
     ]
-    precedence.reverse()
 
     def p_error(self, t):
         if t is None:
@@ -123,19 +126,19 @@ class FhirPathParser:
             f'FHIRPath parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col)}'
         )
 
-    def p_term_expression(self, p):
+    def p_fhirpath_term_expression(self, p):
         """expression : term"""
         p[0] = p[1]
 
-    def p_invocation_expression(self, p):
+    def p_fhirpath_invocation_expression(self, p):
         "expression : expression '.' invocation"
         p[0] = Invocation(p[1], p[3])
 
-    def p_indexer_expression(self, p):
+    def p_fhirpath_indexer_expression(self, p):
         "expression : expression '[' expression ']'"
         p[0] = Invocation(p[1], subsetting.Index(p[3]))
 
-    def p_multiplicative_operation(self, p):
+    def p_fhirpath_multiplicative_operation(self, p):
         """expression : expression '*' expression
         | expression '/' expression
         | expression DIV expression
@@ -150,7 +153,7 @@ class FhirPathParser:
         elif op == "mod":
             p[0] = math.Mod(p[1], p[3])
 
-    def p_additive_operation(self, p):
+    def p_fhirpath_additive_operation(self, p):
         """expression : expression '+' expression
         | expression '-' expression
         | expression '&' expression"""
@@ -162,7 +165,7 @@ class FhirPathParser:
         elif op == "&":
             p[0] = strings.Concatenation(p[1], p[3])
 
-    def p_type_operation(self, p):
+    def p_fhirpath_type_operation(self, p):
         """expression : expression IS type_specifier
         | expression AS type_specifier"""
         op = p[2]
@@ -171,24 +174,15 @@ class FhirPathParser:
         elif op == "as":
             p[0] = types.As(p[1], p[3])
 
-    def p_union_operation(self, p):
+    def p_fhirpath_union_operation(self, p):
         """expression : expression '|' expression"""
         p[0] = collection.Union(p[1], p[3])
 
-    def p_inequality_operation(self, p):
-        """expression : expression INEQUALITY_OPERATOR expression"""
-        op = p[2]
-        if op == ">":
-            p[0] = comparison.GreaterThan(p[1], p[3])
-        elif op == ">=":
-            p[0] = comparison.GreaterEqualThan(p[1], p[3])
-        elif op == "<":
-            p[0] = comparison.LessThan(p[1], p[3])
-        elif op == "<=":
-            p[0] = comparison.LessEqualThan(p[1], p[3])
-
-    def p_equality_operation(self, p):
-        """expression : expression EQUALITY_OPERATOR expression"""
+    def p_fhirpath_equality_operation(self, p):
+        """expression : expression EQUAL expression
+        | expression EQUIVALENT expression
+        | expression NOT_EQUAL expression
+        | expression NOT_EQUIVALENT expression"""
         op = p[2]
         if op == "=":
             p[0] = equality.Equals(p[1], p[3])
@@ -199,7 +193,22 @@ class FhirPathParser:
         elif op == "!~":
             p[0] = equality.NotEquivalent(p[1], p[3])
 
-    def p_membership_operation(self, p):
+    def p_fhirpath_inequality_operation(self, p):
+        """expression : expression GREATER_THAN expression
+        | expression GREATER_EQUAL_THAN expression
+        | expression LESS_THAN expression
+        | expression LESS_EQUAL_THAN expression"""
+        op = p[2]
+        if op == ">":
+            p[0] = comparison.GreaterThan(p[1], p[3])
+        elif op == ">=":
+            p[0] = comparison.GreaterEqualThan(p[1], p[3])
+        elif op == "<":
+            p[0] = comparison.LessThan(p[1], p[3])
+        elif op == "<=":
+            p[0] = comparison.LessEqualThan(p[1], p[3])
+
+    def p_fhirpath_membership_fhirpath_operation(self, p):
         """expression : expression IN expression
         | expression CONTAINS expression"""
         op = p[2]
@@ -208,11 +217,11 @@ class FhirPathParser:
         elif op == "contains":
             p[0] = collection.Contains(p[1], p[3])
 
-    def p_and_operation(self, p):
+    def p_fhirpath_and_operation(self, p):
         """expression : expression AND expression"""
         p[0] = boolean.And(p[1], p[3])
 
-    def p_or_operation(self, p):
+    def p_fhirpath_or_operation(self, p):
         """expression : expression OR expression
         | expression XOR expression"""
         op = p[2]
@@ -221,22 +230,22 @@ class FhirPathParser:
         elif op == "xor":
             p[0] = boolean.Xor(p[1], p[3])
 
-    def p_implies_operation(self, p):
+    def p_fhirpath_implies_operation(self, p):
         """expression : expression IMPLIES expression"""
         p[0] = boolean.Implies(p[1], p[3])
 
-    def p_term(self, p):
+    def p_fhirpath_term(self, p):
         """term : invocation
         | literal
         | constant
         | parenthesized_expression"""
         p[0] = p[1]
 
-    def p_parenthesized_expression(self, p):
+    def p_fhirpath_parenthesized_expression(self, p):
         """parenthesized_expression : '(' expression ')'"""
         p[0] = p[2]
 
-    def p_invocation(self, p):
+    def p_fhirpath_invocation(self, p):
         """invocation : element
         | root
         | type_choice
@@ -244,54 +253,45 @@ class FhirPathParser:
         | contextual"""
         p[0] = p[1]
 
-    def p_root(self, p):
+    def p_fhirpath_root(self, p):
         """root : ROOT_NODE"""
-        p[0] = Root()
+        p[0] = RootElement(p[1])
 
-    def p_element(self, p):
+    def p_fhirpath_element(self, p):
         """element : identifier"""
         p[0] = Element(p[1])
 
-    def p_typechoice_invocation(self, p):
+    def p_fhirpath_typechoice_invocation(self, p):
         "type_choice : CHOICE_ELEMENT"
         p[0] = additional.TypeChoice(p[1])
 
-    def p_constant(self, p):
+    def p_fhirpath_constant(self, p):
         """constant : ENVIRONMENTAL_VARIABLE"""
-        if p[1] == "%context":
-            p[0] = This()
-        elif p[1] == "%resource":
-            p[0] = Parent()
-        elif p[1] == "%rootResource":
-            p[0] = Root()
-        else:
-            p[0] = p[1]
+        p[0] = environment.EnvironmentVariable(p[1])
 
-    def p_contextual(self, p):
+    def p_fhirpath_contextual(self, p):
         """contextual : CONTEXTUAL_OPERATOR"""
-        if p[1] == "$":
-            p[0] = Root()
-        elif p[1] == "$this":
-            p[0] = This()
+        if p[1] == "$this":
+            p[0] = environment.ContextualThis()
         elif p[1] == "$index":
-            raise NotImplementedError()
+            p[0] = environment.ContextualIndex()
         elif p[1] == "$total":
-            raise NotImplementedError()
+            p[0] = environment.ContextualTotal()
         else:
             raise FhirPathParserError(
                 f'FHIRPath parser error at {p.lineno(1)}:{p.lexpos(1)}: Invalid contextual operator "{p[1]}".\n{_underline_error_in_fhir_path(self.string, p[1], p.lexpos(1))}'
             )
 
-    def p_type_specifier(self, p):
+    def p_fhirpath_type_specifier(self, p):
         """type_specifier : identifier
         | ROOT_NODE"""
         p[0] = p[1]
 
-    def p_type_specifier_context(self, p):
+    def p_fhirpath_type_specifier_context(self, p):
         """type_specifier : type_specifier '.' identifier"""
         p[0] = f"{p[1]}.{p[3]}"
 
-    def p_function(self, p):
+    def p_fhirpath_function(self, p):
         """function : function_name '(' arguments ')'"""
 
         def check(args, function, nargs):
@@ -357,6 +357,26 @@ class FhirPathParser:
             p[0] = additional.GetValue()
         elif check(p, "htmlChecks", nargs=0):
             p[0] = additional.HtmlChecks()
+        elif check(p, "lowBoundary", nargs=0):
+            p[0] = additional.LowBoundary()
+        elif check(p, "highBoundary", nargs=0):
+            p[0] = additional.HighBoundary()
+        elif check(p, "elementDefinition", nargs=0):
+            p[0] = additional.ElementDefinition()
+        elif check(p, "slice", nargs=2):
+            p[0] = additional.Slice(*p[3])
+        elif check(p, "checkModifiers", nargs=1):
+            p[0] = additional.CheckModifiers(*p[3])
+        elif check(p, "conformsTo", nargs=1):
+            p[0] = additional.ConformsTo(*p[3])
+        elif check(p, "memberOf", nargs=1):
+            p[0] = additional.MemberOf(*p[3])
+        elif check(p, "subsumes", nargs=1):
+            p[0] = additional.Subsumes(*p[3])
+        elif check(p, "subsumedBy", nargs=1):
+            p[0] = additional.SubsumedBy(*p[3])
+        elif check(p, "comparable", nargs=1):
+            p[0] = additional.Comparable(*p[3])
         # -------------------------------------------------------------------------------
         # Subsetting
         # -------------------------------------------------------------------------------
@@ -451,25 +471,25 @@ class FhirPathParser:
         # Math
         # -------------------------------------------------------------------------------
         elif check(p, "abs", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Abs()
         elif check(p, "ceiling", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Ceiling()
         elif check(p, "exp", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Exp()
         elif check(p, "floor", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Floor()
         elif check(p, "ln", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Ln()
         elif check(p, "log", nargs=1):
-            raise NotImplementedError()
+            p[0] = math.Log(*p[3])
         elif check(p, "power", nargs=1):
-            raise NotImplementedError()
+            p[0] = math.Power(*p[3])
         elif check(p, "round", nargs=1):
-            raise NotImplementedError()
+            p[0] = math.Round(*p[3])
         elif check(p, "sqrt", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Sqrt()
         elif check(p, "truncate", nargs=0):
-            raise NotImplementedError()
+            p[0] = math.Truncate()
         # -------------------------------------------------------------------------------
         # Tree navigation
         # -------------------------------------------------------------------------------
@@ -500,13 +520,18 @@ class FhirPathParser:
             p[0] = types.LegacyIs(*p[3])
         elif check(p, "as", nargs=1):
             p[0] = types.LegacyAs(*p[3])
+        # -------------------------------------------------------------------------------
+        # Aggregation functions
+        # -------------------------------------------------------------------------------
+        elif check(p, "aggregate", nargs=[1, 2]):
+            p[0] = aggregates.Aggregate(*p[3])
         else:
             pos = self.string.find(str(p[1]))
             raise FhirPathParserError(
                 f'FHIRPath parser error at {p.lineno(1)}:{pos}: Invalid function "{p[1]}".\n{_underline_error_in_fhir_path(self.string,p[1], pos)}'
             )
 
-    def p_function_name(self, p):
+    def p_fhirpath_function_name(self, p):
         """function_name : identifier
         | CONTAINS
         | IN
@@ -515,23 +540,23 @@ class FhirPathParser:
         """
         p[0] = p[1]
 
-    def p_function_arguments(self, p):
+    def p_fhirpath_function_arguments(self, p):
         """arguments : expression
         | empty"""
         p[0] = [p[1]]
 
-    def p_function_arguments_list(self, p):
+    def p_fhirpath_function_arguments_list(self, p):
         """arguments : arguments ',' arguments"""
-        p[0] = ensure_list(p[1]) + ensure_list(p[2])
+        p[0] = ensure_list(p[1]) + ensure_list(p[3])
 
-    def p_identifier(self, p):
+    def p_fhirpath_identifier(self, p):
         """identifier : IDENTIFIER"""
         p[0] = p[1]
 
-    def p_literal(self, p):
+    def p_fhirpath_literal(self, p):
         """literal : number
+        | boolean
         | STRING
-        | BOOLEAN
         | date
         | time
         | datetime
@@ -539,37 +564,41 @@ class FhirPathParser:
         """
         p[0] = Literal(p[1])
 
-    def p_literal_empty(self, p):
+    def p_fhirpath_literal_empty(self, p):
         """literal : '{' '}'"""
         p[0] = Literal([])
 
-    def p_datetime(self, p):
+    def p_fhirpath_boolean(self, p):
+        "boolean : BOOLEAN"
+        p[0] = True if p[1] == "true" else False
+
+    def p_fhirpath_datetime(self, p):
         "datetime : DATETIME"
         p[0] = literals.DateTime(p[1])
 
-    def p_time(self, p):
+    def p_fhirpath_time(self, p):
         "time : TIME"
         p[0] = literals.Time(p[1])
 
-    def p_date(self, p):
+    def p_fhirpath_date(self, p):
         "date : DATE"
         p[0] = literals.Date(p[1])
 
-    def p_quantity(self, p):
+    def p_fhirpath_quantity(self, p):
         """quantity : number unit"""
         p[0] = literals.Quantity(p[1], p[2])
 
-    def p_unit(self, p):
+    def p_fhirpath_unit(self, p):
         """unit : STRING
         | CALENDAR_DURATION"""
         p[0] = p[1]
 
-    def p_number(self, p):
+    def p_fhirpath_number(self, p):
         """number : INTEGER
         | DECIMAL"""
         p[0] = p[1]
 
-    def p_empty(self, p):
+    def p_fhirpath_empty(self, p):
         """empty :"""
         p[0] = None
 
@@ -584,3 +613,9 @@ class IteratorToTokenStream:
             return next(self.iterator)
         except StopIteration:
             return None
+
+
+try:
+    fhirpath = FhirPathParser()
+except Exception as e:
+    print(traceback.format_exc())

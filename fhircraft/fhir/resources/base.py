@@ -3,6 +3,7 @@ from typing import ClassVar
 
 from pydantic import BaseModel, ValidationError
 from pydantic.fields import FieldInfo
+from pydantic_core import PydanticUndefined
 
 from fhircraft.fhir.path.mixin import FHIRPathMixin
 from fhircraft.utils import get_all_models_from_field
@@ -22,6 +23,30 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     def model_dump_json(self, *args, **kwargs):
         kwargs.update({"by_alias": True, "exclude_none": True})
         return super().model_dump_json(*args, **kwargs)
+
+    @classmethod 
+    def model_construct(cls, set_defaults=True, *args, **kwargs) -> object:
+        """
+        Constructs a model without running validation, with an option to set default values for fields that have them defined.
+
+        Args:
+            set_defaults (bool): Optional, if `True`, sets default values for fields that have them defined (default is `True`).
+
+        Returns:
+            instance (Self): An instance of the model.
+        """
+        instance = super().model_construct(*args, **kwargs)
+        if not set_defaults:
+            return instance
+        # Set default values for fields that have them defined
+        for field_name, field in cls.model_fields.items():
+            if getattr(instance, field_name, None) is not None:
+                continue
+            if field.default not in (PydanticUndefined, None):
+                setattr(instance, field_name, copy(field.default))
+            elif field.default_factory not in (PydanticUndefined, None):
+                setattr(instance, field_name, field.default_factory())
+        return instance
 
     @classmethod
     def model_construct_with_slices(cls, slice_copies: int = 9) -> object:
@@ -49,7 +74,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                     ]
                 )
             # Set the whole list of slices in the resource
-            collection = fhirpath.parse(element).evaluate_for(instance, create=True)
+            collection = fhirpath.parse(element).__evaluate_wrapped(
+                instance, create=True
+            )
             [item.set_literal(slice_resources) for item in collection]
         return instance
 
@@ -103,7 +130,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         for element, slices in cls.get_sliced_elements().items():
             valid_elements = [
                 col.value
-                for col in fhirpath.parse(element).evaluate_for(resource, create=True)
+                for col in fhirpath.parse(element).__evaluate_wrapped(
+                    resource, create=True
+                )
                 if col.value is not None
             ]
             new_valid_elements = []
@@ -125,9 +154,18 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                         if entry not in new_valid_elements:
                             new_valid_elements.append(entry)
             # Set the new list with only the valid slices
-            collection = fhirpath.parse(element).evaluate_for(resource, create=True)
+            collection = fhirpath.parse(element).__evaluate_wrapped(
+                resource, create=True
+            )
             [col.set_literal(new_valid_elements) for col in collection]
         return resource
+    
+    def __repr__(self) -> str:
+        repr_args = []
+        for fieldname in self.model_fields_set or self.__class__.model_fields:
+            value = getattr(self, fieldname)
+            repr_args.append(f'{fieldname}={value}')
+        return f"{self.__class__.__name__}({', '.join(repr_args)})"
 
 
 class FHIRSliceModel(FHIRBaseModel):
@@ -159,5 +197,4 @@ class FHIRSliceModel(FHIRBaseModel):
         Checks if the FHIRSliceModel instance has been modified by comparing it with a new instance constructed with slices.
         Returns `True` if the instance has been modified, `False` otherwise.
         """
-        return self != self.__class__.model_construct_with_slices()
         return self != self.__class__.model_construct_with_slices()

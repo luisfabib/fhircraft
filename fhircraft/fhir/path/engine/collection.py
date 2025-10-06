@@ -22,7 +22,7 @@ class FHIRCollectionOperator(FHIRPath):
         self.right = right
 
     def __str__(self):
-        return f"{self.__class__.__name__.lower()}({self.left.__str__(), self.right.__str__()})"
+        raise NotImplementedError("Subclasses must implement __str__ method.")
 
     def __repr__(self):
         return (
@@ -50,7 +50,7 @@ class Union(FHIRCollectionOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         Merge the two collections into a single collection, eliminating any duplicate values to
@@ -58,14 +58,21 @@ class Union(FHIRCollectionOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
         """
         left_collection, right_collection = evaluate_left_right_expressions(
-            self.left, self.right, collection, create=create
+            self.left, self.right, collection, environment, create=create
         )
-        return UnionFunction(left_collection).evaluate(right_collection)
+        return UnionFunction(left_collection).evaluate(
+            right_collection, environment, create
+        )
+
+    def __str__(self):
+        return f"{self.left} | {self.right}"
 
 
 class In(FHIRCollectionOperator):
@@ -78,7 +85,7 @@ class In(FHIRCollectionOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         If the left operand is a collection with a single item, this operator returns true if the item is in the
@@ -87,6 +94,8 @@ class In(FHIRCollectionOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -95,7 +104,7 @@ class In(FHIRCollectionOperator):
             FHIRPathRuntimeError: If the left expression evaluates to a non-singleton collection.
         """
         left_collection, right_collection = evaluate_left_right_expressions(
-            self.left, self.right, collection, create=create
+            self.left, self.right, collection, environment, create
         )
         if len(left_collection) == 0:
             return []
@@ -112,6 +121,9 @@ class In(FHIRCollectionOperator):
         ]
         return [FHIRPathCollectionItem.wrap(value in check_collection)]
 
+    def __str__(self):
+        return f"{self.left} in {self.right}"
+
 
 class Contains(FHIRCollectionOperator):
     """
@@ -123,7 +135,7 @@ class Contains(FHIRCollectionOperator):
     """
 
     def evaluate(
-        self, collection: FHIRPathCollection, create=False
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
         If the right operand is a collection with a single item, this operator returns true if the item is in the
@@ -132,6 +144,8 @@ class Contains(FHIRCollectionOperator):
 
         Args:
             collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
 
         Returns:
             FHIRPathCollection: The output collection.
@@ -140,7 +154,7 @@ class Contains(FHIRCollectionOperator):
             FHIRPathError: If the left expression evaluates to a non-singleton collection.
         """
         left_collection, right_collection = evaluate_left_right_expressions(
-            self.left, self.right, collection, create=create
+            self.left, self.right, collection, environment, create
         )
         if len(right_collection) == 0:
             return []
@@ -156,4 +170,6 @@ class Contains(FHIRCollectionOperator):
             for item in left_collection
         ]
         return [FHIRPathCollectionItem.wrap(value in check_collection)]
-        return [FHIRPathCollectionItem.wrap(value in check_collection)]
+
+    def __str__(self):
+        return f"{self.left} contains {self.right}"
