@@ -15,10 +15,10 @@
   ![FHIR Releases](https://img.shields.io/badge/FHIR-R4_R4B_R5-blue?style=flat&logo=fireship&logoColor=red&labelColor=%231e293b)
 
   <p align="center">
-    Fhircraft is a Python package that dynamically generates Pydantic FHIR (Fast Healthcare Interoperability Resources) resource models from FHIR specifications, enabling comprehensive data structuring, validation, and typing within Python. It also offers a fully functional FHIRPath engine and code generation features to facilitate integration with other systems.
+    Transform FHIR specifications into type-safe Python models with automatic validation, profile-friendly structures, and seamless integration. Build healthcare applications with confidence using Pydantic-powered FHIR resources, comprehensive FHIRPath querying, and declarative FHIR Mapping Language data transformation.
     <br />
     <br />
-    <a href="https://luisfabib.github.io/fhircraft "><strong>Explore the docs »</strong></a>
+    <a href="https://luisfabib.github.io/fhircraft"><strong>Explore the Documentation »</strong></a>
     <br />
     <br />
     <a href="https://github.com/luisfabib/fhircraft/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
@@ -30,110 +30,151 @@
 > [!WARNING]  
 > This package is under active development. Major and/or breaking changes are to be expected in future updates.
 
-## Why use Fhircraft?
+## ✨ Why Choose Fhircraft?
 
-- **Dynamic FHIR models** – Generate Pydantic FHIR resource models dynamically from FHIR specification; get all FHIR's data structuring, validation and typing in a pythonic way.
+### **Type Safety & Validation**
+Generate validated Pydantic models from core or profiled FHIR specifications. Catch data errors at development time with automatic constraint checking.
 
-- **Simple FHIR validation** – Perform complete parsing and validation of FHIR resources without leaving Python; avoid dealing with FHIR's often complex rules and constraints. 
+### **Pythonic FHIR Development**
+Work with FHIR resources using familiar Python and Pydantic patterns. No complex server infrastructure or XML parsing required - just clean, maintainable Python code.
 
-- **Pydantic core** – Profit from Pydantic's validation and (de)-serialization capabilities which have made it the most widely used data validation library for Python.     
+### **Multi-Release Support**
+Seamlessly work with FHIR R4, R4B, and R5 specifications. Load implementation guides and custom profiles from the global FHIR package registry.
 
-- **Code generator** – Leverage the code generation features of Fhircraft to write static Pydantic/Python code that can be integrated into other systems. 
+### **Integrated FHIRPath Engine**
+Query and manipulate FHIR data using the standard FHIRPath language with full Python integration. No external dependencies or separate query engines needed.
 
-- **Pythonic FHIRPath** – Fhircraft provides a fully functional, pythonic and compliant FHIRPath engine to easily work with FHIR resources without leaving Python.  
+### **FHIR Mapping Language**
+Transform data between different structures using the official FHIR Mapping Language. Convert legacy systems and external data into validated FHIR resources.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-## Usage 
+## Quick Start
 
 ### Prerequisites
 
-A valid installation of Python >3.10 is required.  
-
+- Python 3.10 or higher
+- pip package manager
 
 ### Installation
 
-To install `fhircraft`, you can download and install the package via `pip` (requires `pip` > 24.1):
+Install Fhircraft using pip:
 
 ```bash
 pip install fhircraft
 ``` 
 
-or install it from the source 
+Or install the latest development version:
 
 ```bash
 pip install git+https://github.com/luisfabib/fhircraft.git
 ```
 
-### Getting Started
+**Verify your installation:**
 
-This is a quick reference on how to quickly accomplish the most common tasks with Fhircraft:
+```python
+from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
 
-- #### Constructing FHIR Pydantic models 
+# This should work without errors
+Patient = get_fhir_resource_type("Patient")
+print("✓ Fhircraft installed successfully!")
+```
 
-  To generate a Pydantic model representation for a FHIR resource, use the `construct_resource_model` function. This function automatically creates a model based on the structure definition of the specified resource or profile.
-  For optimal control and security, it is recommended to manage FHIR structure definitions as local files. These files should be loaded into Python and parsed into dictionary objects.
-  
-  ``` python 
-    from fhircraft.fhir.resources.factory import construct_resource_model
-    from fhircraft.utils import load_file
-    patient_model = construct_resource_model(
-        structure_definition=load_file('FHIR_StructureDefinition_Patient.json')
-    )
-  ``` 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-- #### Generating Pydantic FHIR models' source code
+## Core Features
 
-  Fhircraft allows you to generate reusable source code for Pydantic FHIR models. By using the `generate_resource_model_code` function, you can obtain the source code (as a string) that defines the FHIR Pydantic model. This can be particularly useful for integrating the model into other projects or sharing it across different applications.
+### **Built-in FHIR Resources**
+Access pre-built Pydantic models for all standard FHIR resources across multiple versions:
 
+```python
+from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
 
-  ``` python
-  from fhircraft.fhir.resources.generator import generate_resource_model_code
-  source_code = generate_resource_model_code(patient_model)
-  ```
+# Get built-in Patient model for FHIR R5
+Patient = get_fhir_resource_type("Patient", "R5")
 
-  You can save the generated source code and reuse it as needed. Keep in mind that the code requires Fhircraft and its dependencies to be installed in order to function properly.
+# Create and validate a patient
+patient = Patient(
+    name=[{"given": ["Alice"], "family": "Johnson"}],
+    gender="female",
+    birthDate="1985-03-15"
+)
 
-- #### Validating FHIR payloads
+print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
+```
 
-  The generated Pydantic models can be used to validate FHIR payloads, ensuring that they conform to the structure and constraints of the specified resource or profile.
+### **FHIR Package Integration**
+Load implementation guides and custom profiles from the FHIR package registry:
 
-  ``` python
-  from fhircraft.utils import load_file
-  data = load_file('my_fhir_patient.json')
-  my_patient = patient_model.model_validate(data)
-  ```
+```python
+from fhircraft.fhir.resources.factory import factory
 
-  If the input data does not conform to the expected FHIR resource or profile, the Pydantic model will raise a `ValidationError`. If no error is raised, the FHIR payload is valid and successfully loaded into the model.
+# Load US Core Implementation Guide
+factory.load_package("hl7.fhir.us.core", "5.0.1")
 
+# Create US Core Patient model with enhanced validation
+USCorePatient = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+)
 
-- #### Model manipulation using FHIRPath
+# Use with US Core constraints
+patient = USCorePatient(
+    identifier=[{"system": "http://example.org/mrn", "value": "12345"}],
+    name=[{"family": "Doe", "given": ["John"]}],
+    gender="male"
+)
+```
 
-  Fhircraft provides a powerful FHIRPath engine with an enhanced interface for querying and modifying FHIR resources. You can parse FHIRPath expressions and use various methods to retrieve or update values based on your specific needs.
+### **FHIRPath Querying**
+Query and manipulate FHIR resources using the standard FHIRPath language:
 
-  ``` python
-  from fhircraft.fhir.path import fhirpath
-  
-  # Parse the FHIRPath expression
-  name_path = fhirpath.parse('Patient.name.family')
-  
-  # Get all family names as a list
-  all_names = name_path.values(my_patient)
-  
-  # Get the first family name safely
-  first_name = name_path.first(my_patient, default='Unknown')
-  
-  # Get exactly one family name (raises error if multiple)
-  single_name = name_path.single(my_patient)
-  
-  # Check if family names exist
-  has_name = name_path.exists(my_patient)
-  
-  # Count family names
-  name_count = name_path.count(my_patient)
-  
-  # Update family names
-  name_path.update_values(my_patient, 'NewFamilyName')
-  ```
+```python
+# Query patient data with FHIRPath
+family_names = patient.fhirpath_values("Patient.name.family")
+has_phone = patient.fhirpath_exists("Patient.telecom.where(system='phone')")
+
+# Update data using FHIRPath expressions
+patient.fhirpath_update_single("Patient.gender", "female")
+patient.fhirpath_update("Patient.name.given", ["Jane", "Marie"])
+
+print(f"Updated patient: {family_names[0]}, Phone: {has_phone}")
+```
+
+### **Data Transformation**
+Transform legacy data using the FHIR Mapping Language:
+
+```python
+from fhircraft.fhir.mapper import FHIRMapper
+
+# Legacy system data
+legacy_patient = {
+    "firstName": "Bob",
+    "lastName": "Smith", 
+    "dob": "1975-06-20",
+    "sex": "M"
+}
+
+# FHIR Mapping script
+mapping_script = """
+map 'http://example.org/legacy-to-fhir' = 'LegacyPatient'
+
+group main(source legacy, target patient: Patient) {
+    legacy.firstName -> patient.name.given;
+    legacy.lastName -> patient.name.family;
+    legacy.dob -> patient.birthDate;
+    legacy.sex where("$this = 'M'") -> patient.gender = 'male';
+    legacy.sex where("$this = 'F'") -> patient.gender = 'female';
+}
+"""
+
+# Execute transformation
+mapper = FHIRMapper()
+targets, metadata = mapper.execute_mapping(mapping_script, legacy_patient)
+fhir_patient = targets[0]
+
+print(f"Transformed: {fhir_patient.name[0].given[0]} {fhir_patient.name[0].family}")
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -151,17 +192,6 @@ If you have a suggestion that would make this better, please fork the repo and c
 5. Open a Pull Request (PR)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- ACKNOWLEDGMENTS -->
-## Support
-
-This project has been supported by the following institutions:
-
-- **University Hospital of Zurich**
-  
-  <a href="https://www.usz.ch/"><img src="docs/assets/images/usz-logo.png" width="20%"></a>
-
-
 
 <!-- LICENSE -->
 ## License
