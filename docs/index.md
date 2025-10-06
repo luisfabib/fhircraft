@@ -4,7 +4,7 @@ hide:
   - toc
 ---
 
-# Welcome
+# Welcome to
 
 <!-- PROJECT LOGO -->
 <img src="assets/images/logo-banner.png" style="width:35vw">
@@ -16,24 +16,43 @@ hide:
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
 ![FHIR Releases](https://img.shields.io/badge/FHIR-R4_R4B_R5-blue?style=flat&logo=fireship&logoColor=red&labelColor=%231e293b)
 
-Fhircraft is a Python package that dynamically generates Pydantic FHIR (Fast Healthcare Interoperability Resources) resource models from FHIR specifications, enabling comprehensive data structuring, validation, and typing within Python. It also offers a fully functional FHIRPath engine and code generation features to facilitate integration with other systems.
+Fhircraft transforms FHIR (Fast Healthcare Interoperability Resources) specifications into type-safe Python models using Pydantic. Build healthcare applications with automatic validation, intelligent code completion, and seamless integration with Python's ecosystem.
 
-[Installation :fontawesome-solid-paper-plane:](quickstart/installation.md){ .md-button }
-[Tutorial :fontawesome-solid-play:](quickstart/basics.md){ .md-button }
+[Get Started :fontawesome-solid-rocket:](quickstart/installation.md){ .md-button .md-button--primary }
+[Learn the Basics :fontawesome-solid-book-open:](quickstart/basics.md){ .md-button }
 
 !!! warning "Active development"
+  
+    Fhircraft is under active development. Expect breaking changes in future releases.
 
-    This package is under active development. Major and/or breaking changes are to be expected in future updates.
+
+## Why Choose Fhircraft?
+
+**Type Safety & Validation**
+
+Generate validated Pydantic models from FHIR specifications. Catch data errors at development time, not in production.
 
 
-## Why use Fhircraft?
+**Pythonic FHIR Development**
 
-- **Dynamic FHIR models** – Generate Pydantic FHIR resource models dynamically from FHIR specification; get all FHIR's data structuring, validation and typing in a pythonic way.
+Work with FHIR resources using familiar Python patterns. No need to learn complex FHIR server infrastructure.
 
-- **Simple FHIR validation** – Perform complete parsing and validation of FHIR resources without leaving Python; avoid dealing with FHIR's often complex rules and constraints. 
 
-- **Pydantic core** – Profit from Pydantic's validation and (de)-serialization capabilities which have made it the most widely used data validation library for Python.     
+**Multi-Release Support**
 
-- **Code generator** – Leverage the code generation features of Fhircraft to write static Pydantic/Python code that can be integrated into other systems. 
+Seamlessly work with FHIR R4, R4B, and R5. Switch between versions as your project requires.
 
-- **Pythonic FHIRPath** – Fhircraft provides a fully functional, pythonic and compliant FHIRPath engine to easily work with FHIR resources without leaving Python.  
+
+**FHIRPath Integration**
+
+Query and validate FHIR data using the standard FHIRPath language, fully integrated with Python.
+
+
+**Flexible Architecture**
+
+Use local files for security, remote URLs for convenience, or hybrid approaches for production systems.  
+
+
+**Mapping Integration**
+
+Leverage the the FHIR Mapping Language to define conversions between FHIR resources, fully integrated with Python.

@@ -1,53 +1,74 @@
 
-FHIRPath is a path-based navigation and extraction language, similar to XPath. It is designed to operate on hierarchical data models, enabling operations such as traversal, selection, and filtering of data. FHIRPath is particularly suited to the healthcare domain, where it is used extensively with HL7 Fast Healthcare Interoperability Resources (FHIR). The language's design was heavily influenced by the need to navigate paths, select specific data points, and formulate invariants within FHIR data models.
+# FHIRPath with Fhircraft
 
-Fhircraft provides a fully compliant FHIRPath engine that adheres to the FHIRPath Normative Release v2.0.0 (ANSI/HL7 NMN R1-2020). This engine allows users to parse and evaluate FHIRPath expressions against FHIR data structures.
+This guide is for developers who want to query and extract data from FHIR resources using FHIRPath expressions. You'll learn to navigate complex FHIR data structures, extract specific values, and validate resource content using the standard FHIRPath language.
 
-## Basics
+## Prerequisites
 
-### FHIRPath expressions
+Before diving into FHIRPath, make sure you understand:
 
-The Fhircraft FHIRPath engine can be accessed through the `fhircraft.fhir.path` module, where an initialized instance is available as `fhirpath`. This engine provides a `parse` method, which is used to convert string-based FHIRPath expressions into their corresponding Python representations.
+- **FHIR resource basics** from [FHIR Resources Overview](resources-overview.md)
+- **Creating resource instances** from [Resource Models](resources-models.md)
+- **Basic FHIRPath syntax** - See the [official FHIRPath specification](https://hl7.org/fhirpath/N1/)
 
-```python
-from fhircraft.fhir.path import fhirpath 
-expression = fhirpath.parse('Observation.value.unit')
-``` 
+## Overview
 
-The `expression` object represents the parsed FHIRPath expression in Python, which can then be used to evaluate the expression against FHIR-compliant Python objects.
+FHIRPath is a query language for FHIR data, similar to XPath for XML. Fhircraft provides a fully compliant FHIRPath engine that follows the FHIRPath specification v2.0.0, enabling you to work with FHIR data using familiar path-based expressions.
 
-!!! info "FHIRPath Expressions"
-    For a comprehensive guide on constructing FHIRPath expressions, refer to the official [FHIRPath documentation](https://hl7.org/fhirpath/N1/). 
+All Fhircraft resource models include built-in FHIRPath methods, making it seamless to query and update your FHIR resources directly in Python.
 
-## Using FHIRPath with Resource Objects
+## Basic Usage
 
-### FHIRPathMixin Interface
-
-For convenience when working with FHIR resource objects, Fhircraft provides a `FHIRPathMixin` class that adds FHIRPath methods directly to your resource instances. This is the recommended approach for most use cases as it provides a cleaner, more intuitive interface.
-
-When your resource classes inherit from `FHIRPathMixin`, you can call FHIRPath methods directly on resource instances:
+Start by parsing FHIRPath expressions and evaluating them against your FHIR data:
 
 ```python
-# Assuming your Patient class inherits from FHIRPathMixin
-my_patient = Patient(...)
+from fhircraft.fhir.path import fhirpath
 
-# Get all family names
-family_names = my_patient.fhirpath_values("Patient.name.family")
+# Parse a FHIRPath expression
+expression = fhirpath.parse('Patient.name.family')
 
-# Get a single gender value
-gender = my_patient.fhirpath_single("Patient.gender", default="unknown")
-
-# Get the first family name
-first_name = my_patient.fhirpath_first("Patient.name.family")
-
-# Check if patient has any phone numbers
-has_phone = my_patient.fhirpath_exists("Patient.telecom.where(system='phone')")
-
-# Update gender
-my_patient.fhirpath_update_single("Patient.gender", "other")
+# Later, evaluate against a Patient resource
+patient = Patient(name=[{"given": ["John"], "family": "Doe"}])
+family_names = expression.evaluate(patient)
+print(family_names)  # ["Doe"]
 ```
 
-The mixin provides all the same methods as the engine interface, but with a more convenient syntax. All examples in this guide can be adapted to use the mixin by replacing:
+**Learn more:** See the [FHIRPath specification](https://hl7.org/fhirpath/N1/) for expression syntax. 
+
+## Resource Integration
+
+Fhircraft resources automatically include FHIRPath methods, making it easy to query data directly:
+
+```python
+from fhircraft.fhir.resources.factory import construct_resource_model
+
+# Create a Patient model
+Patient = construct_resource_model(
+    canonical_url='http://hl7.org/fhir/StructureDefinition/Patient'
+)
+
+# Create a patient instance
+patient = Patient(
+    name=[{"given": ["Alice"], "family": "Johnson"}],
+    gender="female",
+    telecom=[{"system": "phone", "value": "555-0123"}]
+)
+
+# Query data using FHIRPath
+family_names = patient.fhirpath_values("Patient.name.family")
+print(family_names)  # ["Johnson"]
+
+gender = patient.fhirpath_single("Patient.gender")
+print(gender)  # "female"
+
+# Check conditions
+has_phone = patient.fhirpath_exists("Patient.telecom.where(system='phone')")
+print(has_phone)  # True
+
+# Get first matching result
+first_name = patient.fhirpath_first("Patient.name.given")
+print(first_name)  # "Alice"
+```
 
 ```python
 # Engine interface
@@ -320,6 +341,7 @@ if not debug_data['evaluation_success']:
 ```
 
 These debugging methods are particularly useful when:
+
 - Expressions don't return expected results
 - You need to understand the evaluation flow
 - Debugging complex nested expressions
@@ -375,4 +397,13 @@ if not debug_info['evaluation_success']:
     print(f"Evaluation failed: {debug_info['error']}")
 ```
 
+## What's Next?
 
+Now that you understand FHIRPath querying, explore these related topics:
+
+- **[Resource Models](resources-models.md)** - Create and validate FHIR resources to query with FHIRPath
+- **[FHIR Mapper](mapper.md)** - Transform external data and query results using FHIR Mapping Language
+- **[Resource Factory](resources-construction.md)** - Build custom models with enhanced FHIRPath capabilities
+- **[Pydantic FHIR](pydantic-representation.md)** - Understand the technical foundations of FHIRPath integration
+
+For comprehensive examples and integration patterns, see the [User Guide overview](overview.md).

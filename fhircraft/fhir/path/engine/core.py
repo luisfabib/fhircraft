@@ -18,7 +18,7 @@ FHIRPathCollection = List["FHIRPathCollectionItem"]
 class FHIRPath(ABC):
     """Abstract base class for FHIRPath expressions."""
 
-    def values(self, data, environment: dict | None = None) -> List[Any]:
+    def values(self, data: Any, environment: dict | None = None) -> List[Any]:
         """
         Evaluates the FHIRPath expression and returns all resulting values as a list.
 
@@ -32,7 +32,7 @@ class FHIRPath(ABC):
         collection = self.__evaluate_wrapped(data, environment=environment)
         return [item.value for item in collection]
 
-    def single(self, data, default=None, environment: dict | None = None) -> Any:
+    def single(self, data: Any, default: Any = None, environment: dict | None = None) -> Any:
         """
         Evaluates the FHIRPath expression and returns a single value.
 
@@ -58,7 +58,7 @@ class FHIRPath(ABC):
                 f"Use values() to retrieve multiple values or first() to get the first one."
             )
 
-    def first(self, data, default=None, environment: dict | None = None) -> Any:
+    def first(self, data: Any, default: Any = None, environment: dict | None = None) -> Any:
         """
         Evaluates the FHIRPath expression and returns the first value.
 
@@ -73,7 +73,7 @@ class FHIRPath(ABC):
         values = self.values(data, environment=environment)
         return values[0] if values else default
 
-    def last(self, data, default=None, environment: dict | None = None) -> Any:
+    def last(self, data: Any, default: Any = None, environment: dict | None = None) -> Any:
         """
         Evaluates the FHIRPath expression and returns the last value.
 
@@ -88,7 +88,7 @@ class FHIRPath(ABC):
         values = self.values(data, environment=environment)
         return values[-1] if values else default
 
-    def exists(self, data, environment: dict | None = None) -> bool:
+    def exists(self, data: Any, environment: dict | None = None) -> bool:
         """
         Checks if the FHIRPath expression matches any values in the data.
 
@@ -101,7 +101,7 @@ class FHIRPath(ABC):
         """
         return len(self.values(data, environment=environment)) > 0
 
-    def count(self, data, environment: dict | None = None) -> int:
+    def count(self, data: Any, environment: dict | None = None) -> int:
         """
         Returns the number of values that match the FHIRPath expression.
 
@@ -114,7 +114,7 @@ class FHIRPath(ABC):
         """
         return len(self.values(data, environment=environment))
 
-    def is_empty(self, data, environment: dict | None = None) -> bool:
+    def is_empty(self, data: Any, environment: dict | None = None) -> bool:
         """
         Checks if the FHIRPath expression matches no values in the data.
 
@@ -127,7 +127,7 @@ class FHIRPath(ABC):
         """
         return not self.exists(data, environment=environment)
 
-    def update_values(self, data, value, environment: dict | None = None) -> None:
+    def update_values(self, data: Any, value: Any, environment: dict | None = None) -> None:
         """
         Evaluates the FHIRPath expression and sets all matching locations to the given value.
 
@@ -147,7 +147,7 @@ class FHIRPath(ABC):
         for item in collection:
             item.set_value(value)
 
-    def update_single(self, data, value, environment: dict | None = None) -> None:
+    def update_single(self, data: Any, value: Any, environment: dict | None = None) -> None:
         """
         Evaluates the FHIRPath expression and sets a single matching location to the given value.
 
@@ -172,7 +172,7 @@ class FHIRPath(ABC):
         collection[0].set_value(value)
 
     def trace(
-        self, data, verbose: bool = False, environment: dict | None = None
+        self, data: Any, verbose: bool = False, environment: dict | None = None
     ) -> List[str]:
         """
         Returns a trace of evaluation steps for debugging purposes.
@@ -238,7 +238,7 @@ class FHIRPath(ABC):
 
         return trace_messages
 
-    def debug_info(self, data) -> dict:
+    def debug_info(self, data: Any) -> dict:
         """
         Returns debugging information about the evaluation.
 
@@ -246,7 +246,7 @@ class FHIRPath(ABC):
             data: The data to evaluate the FHIRPath expression against.
 
         Returns:
-            dict: A dictionary containing debugging information including:
+            (dict): A dictionary containing debugging information including:
                 - expression: String representation of the FHIRPath expression
                 - expression_type: Type of the FHIRPath expression
                 - input_data_type: Type of the input data
@@ -355,7 +355,7 @@ class FHIRPath(ABC):
         implementation of `evaluate`.
 
         Args:
-            **kwargs: Arbitrary keyword arguments passed to the superclass.
+            **kwargs (Dict): Arbitrary keyword arguments passed to the superclass.
 
         Raises:
             TypeError: If a non-abstract subclass does not override the `evaluate` method.
@@ -397,10 +397,10 @@ class FHIRPath(ABC):
         Determines and returns the appropriate child node in a path expression tree.
 
         Args:
-            child: The child node to be evaluated, which can be an instance of This, Root, or another node type.
+            child (FHIRPath): The child node to be evaluated, which can be an instance of This, Root, or another node type.
 
         Returns:
-            The resulting node
+            (FHIRPath) The resulting node
 
         Note:
             This method is used internally to manage navigation and invocation logic within the path engine.

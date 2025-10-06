@@ -33,7 +33,7 @@ class StringManipulationFunction(FHIRPathFunction):
             collection (FHIRPathCollection): Collection to be validated.
 
         Returns:
-            FHIRPathCollection: The output collection.
+            (FHIRPathCollection): The output collection.
 
         Raises:
             FHIRPathError: If input collection has more than one item.
