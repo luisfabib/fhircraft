@@ -191,6 +191,8 @@ Fhircraft automatically enforces all FHIR constraints, providing comprehensive v
 
 ### Basic Validation
 
+All FHIR resources are automatically validated when created. This example shows how validation works in practice, demonstrating both successful validation and how to handle validation failures:
+
 ```python
 from pydantic import ValidationError
 
@@ -209,6 +211,8 @@ except ValidationError as e:
 ```
 
 ### Handling Validation Errors
+
+For robust applications, it's important to handle validation errors gracefully and provide detailed feedback. This function demonstrates how to capture and report validation errors in a user-friendly format:
 
 ```python
 def create_patient_safely(patient_data: dict) -> tuple[bool, any]:
@@ -274,6 +278,8 @@ print("Valid quantity created")
 
 ### Accessing Resource Properties
 
+Once you have a resource instance, you can access its properties just like any Python object. This example shows how to read various types of data from a FHIR resource:
+
 ```python
 Patient = get_fhir_resource_type("Patient")
 patient = Patient(
@@ -296,6 +302,8 @@ else:
 ```
 
 ### Modifying Resource Data
+
+FHIR resources are mutable Python objects, so you can update their properties after creation. This is useful for building resources incrementally or updating data based on new information:
 
 ```python
 # Add contact information
@@ -320,6 +328,8 @@ print(f"Updated patient: {patient.name[0].family}, Active: {patient.active}")
 
 ### Basic Serialization
 
+Converting FHIR resources to and from JSON is essential for API communication and data storage. Fhircraft provides convenient methods for serialization that ensure FHIR compliance:
+
 ```python
 Patient = get_fhir_resource_type("Patient")
 patient = Patient(
@@ -339,6 +349,8 @@ print(f"Dictionary keys: {list(patient_dict.keys())}")
 ```
 
 ### Advanced Serialization Options
+
+For different use cases, you may need specific serialization formats or want to include/exclude certain fields. These options provide fine-grained control over the output:
 
 ```python
 # Pretty-formatted JSON for debugging
@@ -360,6 +372,8 @@ without_meta = patient.model_dump(exclude={'meta', 'text'}, exclude_none=True)
 ## Working with Multiple FHIR Versions
 
 ### Version-Specific Models
+
+Fhircraft supports multiple FHIR versions simultaneously. Each version has specific data types and validation rules, so you can work with the appropriate version for your use case:
 
 ```python
 # Create patients using different FHIR versions

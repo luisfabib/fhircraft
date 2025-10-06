@@ -365,6 +365,8 @@ These debugging methods are particularly useful when:
 
 ### Common Patterns
 
+Here are frequently used FHIRPath patterns that you'll find useful in everyday development. These examples show best practices for performance, safety, and maintainability:
+
 ```python
 from fhircraft.fhir.path import fhirpath
 

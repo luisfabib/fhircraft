@@ -2,8 +2,6 @@
 
 This guide is for developers who want to construct Pydantic models from FHIR structure definitions, implementation guides, and packages. You'll learn to use Fhircraft's factory system to build type-safe FHIR models from various sources, manage repositories, and handle complex scenarios like custom profiles and multiple FHIR versions.
 
-After reading this guide, you'll master the construction of FHIR models from specifications and understand how to organize and manage FHIR definitions in your applications.
-
 ## Prerequisites
 
 Before diving into this guide, make sure you understand:
@@ -84,6 +82,8 @@ Canonical URLs are globally unique identifiers for FHIR conformance resources. F
 
 ### Basic URL Resolution
 
+Canonical URLs provide a standardized way to reference FHIR structure definitions. Fhircraft can resolve these URLs automatically, checking local sources first and falling back to internet downloads when needed:
+
 ```python
 from fhircraft.fhir.resources.factory import construct_resource_model
 
@@ -129,6 +129,8 @@ Fhircraft follows a prioritized lookup strategy for robust definition resolution
 FHIR packages contain published specifications like US Core, International Patient Summary, and other Implementation Guides. Fhircraft automatically downloads, caches, and integrates these packages into your development workflow.
 
 ### Quick Start with Packages
+
+The fastest way to get started with FHIR packages is to load a popular implementation guide like US Core. This example shows the complete workflow from package loading to model usage:
 
 ```python
 from fhircraft.fhir.resources.factory import ResourceFactory
@@ -198,6 +200,8 @@ IPSPatient = factory.construct_resource_model(
 
 ### Package Management Operations
 
+Once you've loaded packages, you'll often need to inspect what's available, manage versions, or clean up when packages are no longer needed. These operations help you maintain control over your loaded packages:
+
 ```python
 # Check what packages are loaded
 packages = factory.get_loaded_packages()
@@ -217,6 +221,8 @@ print(f"Cache cleared, {len(factory.get_loaded_packages())} packages remaining")
 ```
 
 ### Error Handling for Package Operations
+
+Package loading can fail for various reasons - network issues, missing packages, or incorrect versions. Robust applications should handle these errors gracefully and provide helpful feedback:
 
 ```python
 from fhircraft.fhir.packages import PackageNotFoundError, FHIRPackageRegistryError
@@ -247,6 +253,8 @@ if success:
 ## Advanced Package Management
 
 ### Configuration Options
+
+For production applications or specialized environments, you may need to customize the factory behavior. These configuration options provide control over package sources, timeouts, and access permissions:
 
 ```python
 # Configure factory with custom settings
@@ -291,6 +299,8 @@ print(f"Downloaded package size: {len(package_data)} bytes")
 ```
 
 ### Working with Multiple Package Sources
+
+For complex applications, you might need to combine multiple sources of structure definitions - local files, different packages, and internet resources. The composite repository provides a unified interface:
 
 ```python
 from pathlib import Path
@@ -483,6 +493,8 @@ Patient = factory.construct_resource_model(
 
 ### Advanced Repository Operations
 
+The repository system provides fine-grained control over how definitions are loaded and managed. These operations are useful for dynamic loading, offline operation, and repository introspection:
+
 ```python
 from fhircraft.fhir.resources.factory import factory
 
@@ -580,6 +592,8 @@ def setup_production_factory() -> ResourceFactory:
 ```
 
 ### Error Handling and Validation
+
+Model construction can fail for various reasons - missing definitions, network issues, or invalid structure definitions. Implementing comprehensive error handling ensures your application remains stable:
 
 ```python
 def safe_model_construction(canonical_url: str) -> tuple[bool, any]:

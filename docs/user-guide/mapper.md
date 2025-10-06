@@ -158,6 +158,8 @@ patient = targets[0]  # Validated FHIR Patient resource
 
 ### Concatenation and String Operations
 
+FHIR Mapper supports various string operations and value combinations. This example demonstrates how to combine multiple source fields and apply conditional logic during transformation:
+
 ```python
 script = """
 map 'http://example.org/transform' = 'ValueTransform'
@@ -188,6 +190,8 @@ targets, _ = mapper.execute_mapping(script, source)
 
 ### Type Conversions and Formatting
 
+Often you'll need to convert data types or reformat values during mapping. This example shows how to construct dates from separate components and convert between different data formats:
+
 ```python
 script = """
 map 'http://example.org/convert' = 'TypeConvert'
@@ -210,6 +214,8 @@ group main(source src, target patient: Patient) {
 ## Complex Mappings
 
 ### Nested Object Transformations
+
+FHIR resources often contain nested objects and complex structures. This example demonstrates how to map data into FHIR's hierarchical structure, creating nested objects as needed:
 
 ```python
 script = """
@@ -337,6 +343,8 @@ targets, _ = mapper.execute_mapping(
 
 ### From Files and URLs
 
+For complex mappings or reusable transformations, you can store mapping definitions in files or load them from remote URLs. This approach promotes maintainability and sharing of mapping logic:
+
 ```python
 # Load from JSON file
 structure_map = mapper.load_structure_map("patient-mapping.json")
@@ -424,6 +432,8 @@ except ValidationError as e:
 
 ### Data Cleaning During Transformation
 
+Real-world data often requires cleaning and normalization. FHIR Mapper can perform data cleaning operations as part of the transformation process, ensuring clean, consistent output:
+
 ```python
 script = """
 map 'http://example.org/clean' = 'DataCleaning'
@@ -444,6 +454,8 @@ group main(source src, target patient: Patient) {
 ```
 
 ### Conditional Resource Creation
+
+Sometimes you only want to create resources when certain conditions are met. This pattern demonstrates conditional resource creation based on data availability and business rules:
 
 ```python
 script = """
