@@ -1,3 +1,4 @@
+import functools
 import os
 import re
 from collections import defaultdict
@@ -31,6 +32,7 @@ class CodeGenerator:
         file_loader = FileSystemLoader(os.path.dirname(os.path.abspath(__file__)))
         env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)
         env.filters["escapequotes"] = lambda s: s.replace('"', '\\"')
+        env.globals.update(ismodel=lambda obj: isinstance(obj, BaseModel))
         self.template = env.get_template("resource_template.py.j2")
 
     def _reset_state(self) -> None:
@@ -41,6 +43,29 @@ class CodeGenerator:
         self.import_statements = defaultdict(list)
         self.data = {}
         self._processing_models = set()  # Track models being processed to prevent infinite recursion
+
+    def _cleanup_function_argument(self, arg: Any) -> Any:
+        """
+        Cleans up function arguments for serialization or import statements.
+
+        Args:
+            arg (Any): The argument to clean up.
+
+        Returns:
+            Any: The cleaned-up argument.
+        """
+        if isinstance(arg, str):
+            escape_quotes = arg.replace('"', '\\"')
+            return f'"{escape_quotes}"'
+        elif isinstance(arg, BaseModel):
+            arguments = ", ".join(
+                f"{key}={value!r}"
+                for key, value in arg.model_dump(exclude_none=True).items()
+            )
+            self._add_import_statement(arg.__class__)
+            return f"{arg.__class__.__name__}({arguments})"
+        else:
+            return arg
 
     def _add_import_statement(self, obj: Any) -> None:
         """
@@ -164,21 +189,67 @@ class CodeGenerator:
                     default_factory = f"lambda: {info.default.__class__.__name__}({arguments})"
                 elif info.default is not PydanticUndefined:
                     default = repr(info.default)
+                elif info.default_factory is not None:
+                    default_factory = info.default_factory
 
                 subdata[field] = {
                     "annotation": annotation_string,
+                    "title": info.title,
                     "description": info.description,
                     "alias": info.alias,
                     "default": default,
                     "default_factory": default_factory,
                 }
-            model_properties = {
-                key: value.fget
-                for key, value in model.__dict__.items()
-                if isinstance(value, property)
-            }
-            self.data.update({model: {"fields": subdata, "properties": model_properties}})
-        
+
+            model_properties = {}
+            for key, value in model.__dict__.items():
+                if isinstance(value, property):
+                    if not value.fget:
+                        raise ValueError(f"Property {key} does not have a getter function.")
+                    if not isinstance(value.fget, functools.partial):  # type: ignore
+                        raise ValueError(
+                            f"Only partial functions are supported for properties in the code generator. Property {key} uses {type(value.fget)}."
+                        )
+                    self._add_import_statement(value.fget.func)
+                    model_properties[key] = dict(
+                        func=value.fget.func,
+                        args=[
+                            self._cleanup_function_argument(arg)
+                            for arg in value.fget.args
+                        ],
+                        keywords={
+                            k: self._cleanup_function_argument(v)
+                            for k, v in value.fget.keywords.items()
+                        }
+                    )
+
+            inherited_validator_functions = [
+                getattr(v.func,'__func__', v.func) 
+                for base in model.__bases__ 
+                for v in [*base.__pydantic_decorators__.field_validators.values(), *base.__pydantic_decorators__.model_validators.values()]
+            ]
+            
+            validators = {}
+            for mode, _validators in zip(['field', 'model'], [model.__pydantic_decorators__.field_validators, model.__pydantic_decorators__.model_validators]):
+                for name, validator in _validators.items():  
+                    if isinstance(validation_function:=getattr(validator.func,'__func__', validator.func), functools.partial): # type: ignore
+                        self._add_import_statement(validation_function.func)
+                        func_args = [self._cleanup_function_argument(arg) for arg in validation_function.args]
+                        func_kwargs = {key: self._cleanup_function_argument(arg) for key, arg in validation_function.keywords.items()}
+                    else:
+                        if validation_function in inherited_validator_functions:
+                            continue  # Skip inherited validators
+                        raise ValueError("Only partial functions are supported for validators in the code generator.")
+                    
+                    validators[name] = dict(
+                        mode=mode,
+                        info=validator.info,
+                        func=validation_function.func,
+                        args=func_args,
+                        keywords=func_kwargs,
+                    )
+
+            self.data.update({model: {"fields": subdata, "properties": model_properties, "validators": validators}})
         finally:
             # Always remove from processing set when done
             self._processing_models.discard(model)

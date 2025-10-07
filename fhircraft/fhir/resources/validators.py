@@ -3,11 +3,13 @@ import traceback
 import warnings
 
 # Standard modules
-from typing import Any, List, TypeVar, Union
+from typing import Any, List, TypeVar, Union, TYPE_CHECKING
 
 from pydantic import BaseModel, ValidationError
 
-from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+if TYPE_CHECKING:
+    from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+
 from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
 
 T = TypeVar("T", bound=BaseModel)
@@ -113,9 +115,9 @@ def validate_model_constraint(
 
 def validate_FHIR_element_pattern(
     cls: Any,
-    element: Union[FHIRBaseModel, List[FHIRBaseModel]],
-    pattern: Union[FHIRBaseModel, List[FHIRBaseModel]],
-) -> Union[FHIRBaseModel, List[FHIRBaseModel]]:
+    element: Union["FHIRBaseModel", List["FHIRBaseModel"]],
+    pattern: Union["FHIRBaseModel", List["FHIRBaseModel"]],
+) -> Union["FHIRBaseModel", List["FHIRBaseModel"]]:
     """
     Validate the FHIR element against a specified pattern and return the element if it fulfills the pattern.
 
@@ -186,7 +188,7 @@ def validate_type_choice_element(
 
 def validate_slicing_cardinalities(
     cls: Any, values: List[Any], field_name: str
-) -> List[FHIRSliceModel]:
+) -> List["FHIRSliceModel"]:
     """
     Validates the cardinalities of FHIR slices for a specific field within a FHIR resource.
 
@@ -201,6 +203,8 @@ def validate_slicing_cardinalities(
     Raises:
         AssertionError: If cardinality constraints are violated for any slice.
     """
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+
     slices = get_all_models_from_field(
         cls.model_fields[field_name], issubclass_of=FHIRSliceModel
     )
@@ -239,7 +243,7 @@ def get_type_choice_value_by_base(instance: BaseModel, base: str) -> Any:
 
 def validate_contained_resource(
     cls, resources: Any, release: str
-) -> List[FHIRBaseModel] | None:
+) -> List["FHIRBaseModel"] | None:
     """
     Validate that a contained resource is a valid FHIR resource.
 
@@ -255,7 +259,8 @@ def validate_contained_resource(
         TypeError: If the contained resource is not a FHIRBaseModel or a dict.
     """
     from fhircraft.fhir.resources.datatypes.utils import get_fhir_resource_type
-
+    from fhircraft.fhir.resources.base import FHIRBaseModel
+    
     if not resources:
         return None
     if not isinstance(resources, list):
