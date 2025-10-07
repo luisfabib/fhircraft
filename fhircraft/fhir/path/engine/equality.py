@@ -324,8 +324,8 @@ class NotEquivalent(FHIRPath):
         Args:
             collection (FHIRPathCollection): The input collection.
 
-        Args:
-            FHIRPathCollection): The output collection.
+        Returns:
+            (FHIRPathCollection): The output collection.
         """
         return [
             FHIRPathCollectionItem.wrap(

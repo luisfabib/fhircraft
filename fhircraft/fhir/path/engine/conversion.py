@@ -102,8 +102,6 @@ class FHIRTypeConversionFunction(FHIRPathFunction):
 
         Args:
             collection (FHIRPathCollection): Collection to be validated.
-            environment (dict): The environment context for the evaluation.
-            create (bool): Whether to create new elements during evaluation if necessary.
 
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.

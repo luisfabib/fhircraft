@@ -249,7 +249,8 @@ def validate_contained_resource(
 
     Args:
         cls (Any): Placeholder for an argument that is not used in the function.
-        resource (Any): The contained resource to validate.
+        resources (Any): The contained resource to validate.
+        release (str): The FHIR release version to use for validation.
 
     Returns:
         FHIRBaseModel: The validated contained resource.

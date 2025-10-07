@@ -1,50 +1,59 @@
 
-# Installation 
+# Installation
 
-These instructions will walk you through the steps to quickly install Fhircraft, outline its requirements, and provide instructions for setting up a development environment.
+This installation guide is for developers who want to add Fhircraft to their Python projects. You'll get Fhircraft running in your environment and be ready to build FHIR-compliant applications.
 
-## Quick Installation
+## Quick Install
 
-If you've got Python 3.10+ and `pip>24.1` installed, installing `fhircraft` is as simple as:
+Install Fhircraft using pip if you have Python 3.10+ installed:
 
 ```bash
 pip install fhircraft
-``` 
+```
 
-or install it from the source via:
+Or install the latest development version:
 
 ```bash
 pip install git+https://github.com/luisfabib/fhircraft.git
 ```
 
-## Requirements
+## System Requirements
 
-- Python 3.10 or newer
-- `pip` package manager
+**Required:**
 
-Optional (for advanced features):
+- Python 3.10 or higher
+- pip package manager
 
-- Internet access (to fetch FHIR StructureDefinitions by canonical URL)
-- Local FHIR StructureDefinition files (for offline model construction)
-- Familiarity with [:simple-pydantic: Pydantic](https://docs.pydantic.dev/latest/) is helpful but not required
+**Optional but recommended:**
 
-### Dependencies
+- Internet connection (for downloading FHIR specifications)
+- Basic familiarity with [Pydantic](https://docs.pydantic.dev/latest/) (Fhircraft's foundation)
 
-Fhircraft has the following core dependencies:
+## Verify Installation
 
-- **Pydantic** (≥2.7) - For data validation and serialization
-- **requests** - For fetching FHIR structure definitions via HTTP
-- **ply** (≥3.11) - For FHIRPath parsing
-- **jsonschema** (>4) - For JSON schema validation
-- **pyyaml** (6.0.1) - For YAML file support
-- **jsonpath-ng** (>1) - For JSON path operations
-- **jinja2** (≥3.1) - For code generation templates
+Test your installation by creating a simple FHIR model:
 
-You might need to update `pip` (generally recommended)
+```python
+from fhircraft.fhir.resources.factory import construct_resource_model
 
-```bash
-python -m pip install --upgrade pip
+# This should work without errors
+Patient = construct_resource_model(
+    canonical_url='http://hl7.org/fhir/StructureDefinition/Patient'
+)
+print("Fhircraft installed successfully!")
 ```
+
+## Dependencies
+
+Fhircraft automatically installs these dependencies:
+
+- **Pydantic** (≥2.7) - Data validation and serialization
+- **requests** - HTTP client for FHIR specifications
+- **ply** (≥3.11) - FHIRPath expression parsing
+- **jsonschema** (>4) - JSON schema validation
+- **PyYAML** - YAML file support
+- **jsonpath-ng** - JSON path operations
+- **Jinja2** (≥3.1) - Code generation
 
 ## Development installation
 

@@ -63,6 +63,7 @@ def validate_transform_parameters(
         def wrapper(
             scope: MappingScope, parameters: List[StructureMapParameter]
         ) -> Any:
+            error = ""
             if not signatures:
                 # No validation required
                 return func(scope)
@@ -82,6 +83,7 @@ def validate_transform_parameters(
                 else:
                     # All parameters match this signature
                     return func(scope, **transform_arguments)
+            # No signature matched
             raise RuleProcessingError(
                 f"Parameters did not match any valid signature for {func.__name__}. {error}"
             )
@@ -128,17 +130,17 @@ class MappingTransformer:
             "cp": self._cp_transform,
         }
 
-    def execute(self, name: str, scope, parameters):
+    def execute(self, name: str, scope: MappingScope, parameters: List[StructureMapParameter]) -> Any:
         """
         Executes a registered FHIR Mapping Language transform by name.
 
         Args:
-            name (str): The name of the transform to execute.
+            name: The name of the transform to execute.
             scope: The current execution scope or context for the transform.
             parameters: Parameters to be passed to the transform function.
 
         Returns:
-            The result of the executed transform function.
+            result (Any): The result of the executed transform function.
 
         Raises:
             MappingError: If the specified transform name is not registered.
@@ -384,7 +386,7 @@ class MappingTransformer:
         if concept_map.group is None:
             raise MappingError(f"Concept map '{map_name}' has no groups defined.")
         for group in concept_map.group:
-            for element in group.element:
+            for element in group.element or []:
                 if element.target is None:
                     continue
                 for element_target in element.target:
