@@ -16,5 +16,6 @@
               - [Resource Factory](user-guide/resources-construction.md)
           - [FHIR Path](user-guide/fhirpath.md)
           - [FHIR Mapper](user-guide/mapper.md)
+  - [Release Notes](changelog.md)
   - Reference
     -  ./reference/*
