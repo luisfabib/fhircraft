@@ -164,6 +164,8 @@ class CodeGenerator:
                     default_factory = f"lambda: {info.default.__class__.__name__}({arguments})"
                 elif info.default is not PydanticUndefined:
                     default = repr(info.default)
+                elif info.default_factory is not None:
+                    default_factory = info.default_factory
 
                 subdata[field] = {
                     "annotation": annotation_string,
