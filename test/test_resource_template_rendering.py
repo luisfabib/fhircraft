@@ -92,7 +92,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
 
-    def test_model_with_pattern_validator(self):
+    def test_model_with_field_validator(self):
         # Create model dynamically
         model = create_model('ModelWithPatternValidator',
             code=(CodeableConcept, Field(
@@ -102,7 +102,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 'FHIR_code_pattern_constraint': (
                     field_validator(*('code',), mode="after", check_fields=None)(
                         partial(fhir_validators.validate_FHIR_element_pattern, 
-                                pattern=CodeableConcept(coding=[Coding(system='http://loinc.org', display='Lifestyle', code='LA32823-9')])
+                                pattern=CodeableConcept(coding=[Coding(system='http://example.org', display='code', code='12345')])
                         )
                     )
                 )
@@ -119,11 +119,184 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             @classmethod
             def FHIR_code_pattern_constraint(cls, value):    
                 return validate_FHIR_element_pattern(cls, value,
-                    pattern=CodeableConcept(coding=[{'system': 'http://loinc.org', 'code': 'LA32823-9', 'display': 'Lifestyle'}]),
+                    pattern=CodeableConcept(coding=[{'system': 'http://example.org', 'code': '12345', 'display': 'code'}]),
                 )
         """
         self.assertBlockInCode(expected_block, model)
 
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_model_with_model_validator(self):
+        # Create model dynamically
+        model = create_model('ModelWithModelValidator',
+            code=(CodeableConcept, Field(
+                description="A code field with model constraint.",
+            )),
+            __validators__={
+                'FHIR_ele_1_constraint_model_validator': (
+                    model_validator(mode="after")(
+                        partial(fhir_validators.validate_model_constraint, 
+                                expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
+                                human="All FHIR elements must have a @value or children unless an empty Parameters resource",
+                                key="ele-1",
+                                severity="error",
+                        )
+                    )
+                )
+            }
+        )
+        # Expected code block
+        expected_block = """
+        class ModelWithModelValidator(BaseModel):
+            code: CodeableConcept = Field(
+                description="A code field with model constraint.",
+            )
+
+            @model_validator(mode="after")
+            def FHIR_ele_1_constraint_model_validator(self):
+                return validate_model_constraint(
+                    self,
+                    expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
+                    human="All FHIR elements must have a @value or children unless an empty Parameters resource",
+                    key="ele-1",
+                    severity="error",
+                )
+
+        """
+        self.assertBlockInCode(expected_block, model)
+
+    def test_model_with_field_title(self):
+        # Create model dynamically
+        model = create_model('ModelWithTitle',
+            code=(primitives.String, Field(title="Code Field", description="A code with title."))
+        )
+        expected_block = """
+        class ModelWithTitle(BaseModel):
+            code: String = Field(
+                title="Code Field",
+                description="A code with title.",
+            )
+        """
+        self.assertBlockInCode(expected_block, model)
+
+    def test_model_with_multiple_field_validators(self):
+        # Create model dynamically
+        model = create_model('ModelWithValidators',
+            codeA=(CodeableConcept, Field(description="A first code.")),
+            codeB=(CodeableConcept, Field(description="A second code.")),
+            __validators__={
+                'FHIR_codeA_pattern_constraint': (
+                    field_validator(*('codeA',), mode="after", check_fields=None)(
+                        partial(fhir_validators.validate_FHIR_element_pattern, 
+                                pattern=CodeableConcept(coding=[Coding(system='http://example.org', display='code-1', code='12345')])
+                        )
+                    )
+                ),
+                'FHIR_codeB_pattern_constraint': (
+                    field_validator(*('codeB',), mode="after", check_fields=None)(
+                        partial(fhir_validators.validate_FHIR_element_pattern, 
+                                pattern=CodeableConcept(coding=[Coding(system='http://example.org', display='code-2', code='67890')])
+                        )
+                    )
+                )
+            }
+        )
+        expected_block = """
+        class ModelWithValidators(BaseModel):
+            codeA: CodeableConcept = Field(
+                description="A first code.",
+            )
+            codeB: CodeableConcept = Field(
+                description="A second code.",
+            )
+
+            @field_validator(*('codeA',), mode="after", check_fields=None)
+            @classmethod
+            def FHIR_codeA_pattern_constraint(cls, value):    
+                return validate_FHIR_element_pattern(cls, value,
+                    pattern=CodeableConcept(coding=[{'system': 'http://example.org', 'code': '12345', 'display': 'code-1'}]),
+                )
+
+            @field_validator(*('codeB',), mode="after", check_fields=None)
+            @classmethod
+            def FHIR_codeB_pattern_constraint(cls, value):    
+                return validate_FHIR_element_pattern(cls, value,
+                    pattern=CodeableConcept(coding=[{'system': 'http://example.org', 'code': '67890', 'display': 'code-2'}]),
+                )
+        """
+        self.assertBlockInCode(expected_block, model)
+
+    def test_model_with_list_of_complex_types(self):
+        # Create model dynamically
+        model = create_model('ModelWithComplexList',
+            codings=(List[Coding], Field(default_factory=list, description="A list of Coding objects."))
+        )
+        expected_block = """
+        class ModelWithComplexList(BaseModel):
+            codings: List[Coding] = Field(
+                description="A list of Coding objects.",
+                default_factory=list,
+            )
+        """
+        self.assertBlockInCode(expected_block, model)
+
+
+    def test_model_with_docstring(self):
+        # Create model dynamically
+        model = create_model('ModelWithDocstring',
+            value=(primitives.String, Field(description="A string field.")),
+            __doc__="This is a model with a docstring."
+        )
+        expected_block = '''
+        class ModelWithDocstring(BaseModel):
+            """
+            This is a model with a docstring.
+            """
+            value: String = Field(
+                description="A string field.",
+            )
+
+        '''
+        self.assertBlockInCode(expected_block, model)
+
+        
+    def test_model_with_fixed_value_enum_field(self):
+        # Define an Enum
+        from enum import Enum
+        class Color(Enum):
+            fixedValue = 'red'
+        model = create_model('ModelWithEnum',
+            color=(Color, Field(description="A color enum."))
+        )
+        expected_block = """
+        class ModelWithEnum(BaseModel):
+            color: Literal['red'] = Field(
+                description="A color enum.",
+            )
+        """
+        self.assertBlockInCode(expected_block, model)
+
+    def test_model_with_property_method(self):
+        # Create model with a property
+        model = create_model('ModelWithProperty',
+            valueString=(primitives.String, Field(description="A value.")),
+            valueInteger=(primitives.Integer, Field(description="A value.")),
+        )
+        # Add a property method
+        setattr(model, 'value', property(partial(fhir_validators.get_type_choice_value_by_base, base='value')))
+            
+        expected_block = """
+        class ModelWithProperty(BaseModel):
+            valueString: String = Field(
+                description="A value.",
+            )
+            valueInteger: Integer = Field(
+                description="A value.",
+            )
+
+            @property 
+            def value(self):
+                return get_type_choice_value_by_base(self,
+                    base="value", 
+                )
+        """
+        self.assertBlockInCode(expected_block, model)

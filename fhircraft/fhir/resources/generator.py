@@ -194,6 +194,7 @@ class CodeGenerator:
 
                 subdata[field] = {
                     "annotation": annotation_string,
+                    "title": info.title,
                     "description": info.description,
                     "alias": info.alias,
                     "default": default,
@@ -209,7 +210,7 @@ class CodeGenerator:
             validators = {}
             for mode, _validators in zip(['field', 'model'], [model.__pydantic_decorators__.field_validators, model.__pydantic_decorators__.model_validators]):
                 for name, validator in _validators.items():  
-                    if isinstance(validation_function:=getattr(validator.func,'__func__'), functools.partial): # type: ignore
+                    if isinstance(validation_function:=getattr(validator.func,'__func__', validator.func), functools.partial): # type: ignore
                         self._add_import_statement(validation_function.func)
                         func_args = [self._cleanup_function_argument(arg) for arg in validation_function.args]
                         func_kwargs = {key: self._cleanup_function_argument(arg) for key, arg in validation_function.keywords.items()}

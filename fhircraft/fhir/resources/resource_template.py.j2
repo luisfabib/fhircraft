@@ -32,6 +32,9 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     {% endif %}
     {% for field, info in model_data.fields.items() %}
     {{ field }}: {{ info.annotation}} = Field(
+        {% if info.title %}
+        title="{{ info.title }}",
+        {% endif %}
         description={% if info.description %}{{ info.description|tojson }}{% else %}None{% endif %},
         {% if info.default != '...' %}
         default={{ info.default }},
@@ -75,7 +78,7 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     {% if validator.mode == "model" %}
     @model_validator(mode="{{ validator.info.mode }}")
     def {{ name }}(self):
-        return fhir_validators.{{ validator.func.__name__ }}( 
+        return {{ validator.func.__name__ }}( 
             self,
             {% for arg in validator.args %}
             {{ arg }},
