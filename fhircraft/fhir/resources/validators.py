@@ -203,6 +203,8 @@ def validate_slicing_cardinalities(
     Raises:
         AssertionError: If cardinality constraints are violated for any slice.
     """
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+
     slices = get_all_models_from_field(
         cls.model_fields[field_name], issubclass_of=FHIRSliceModel
     )

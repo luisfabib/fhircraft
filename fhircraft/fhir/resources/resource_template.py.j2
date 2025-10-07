@@ -47,16 +47,17 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
         {% endif %}
     )
     {% endfor %}
-    {% for property, property_getter in model_data.properties.items() %}
-    {% if property_getter.__class__.__name__ == 'partial'%}
+    {% for name, property in model_data.properties.items() %}
     @property 
-    def {{ property }}(self):
-        return {{ property_getter.func.__name__ }}(self, 
-            {% for arg, value in property_getter.keywords.items() %}
-            {{ arg }}="{{value}}",
+    def {{ name }}(self):
+        return {{ property.func.__name__ }}(self, 
+            {% for arg in property.args %}
+            {{ arg }},
+            {% endfor %}
+            {% for arg, value in property.keywords.items() %}
+            {{ arg }}={{ value }},
             {% endfor %}
         )
-    {% endif %}
     {% endfor %}
 
     {% for name, validator in model_data.validators.items() %}

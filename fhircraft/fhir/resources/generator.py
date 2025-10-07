@@ -200,13 +200,35 @@ class CodeGenerator:
                     "default": default,
                     "default_factory": default_factory,
                 }
-            model_properties = {
-                key: value.fget
-                for key, value in model.__dict__.items()
-                if isinstance(value, property)
-            }
 
+            model_properties = {}
+            for key, value in model.__dict__.items():
+                if isinstance(value, property):
+                    if not value.fget:
+                        raise ValueError(f"Property {key} does not have a getter function.")
+                    if not isinstance(value.fget, functools.partial):  # type: ignore
+                        raise ValueError(
+                            f"Only partial functions are supported for properties in the code generator. Property {key} uses {type(value.fget)}."
+                        )
+                    self._add_import_statement(value.fget.func)
+                    model_properties[key] = dict(
+                        func=value.fget.func,
+                        args=[
+                            self._cleanup_function_argument(arg)
+                            for arg in value.fget.args
+                        ],
+                        keywords={
+                            k: self._cleanup_function_argument(v)
+                            for k, v in value.fget.keywords.items()
+                        }
+                    )
 
+            inherited_validator_functions = [
+                getattr(v.func,'__func__', v.func) 
+                for base in model.__bases__ 
+                for v in [*base.__pydantic_decorators__.field_validators.values(), *base.__pydantic_decorators__.model_validators.values()]
+            ]
+            
             validators = {}
             for mode, _validators in zip(['field', 'model'], [model.__pydantic_decorators__.field_validators, model.__pydantic_decorators__.model_validators]):
                 for name, validator in _validators.items():  
@@ -215,6 +237,8 @@ class CodeGenerator:
                         func_args = [self._cleanup_function_argument(arg) for arg in validation_function.args]
                         func_kwargs = {key: self._cleanup_function_argument(arg) for key, arg in validation_function.keywords.items()}
                     else:
+                        if validation_function in inherited_validator_functions:
+                            continue  # Skip inherited validators
                         raise ValueError("Only partial functions are supported for validators in the code generator.")
                     
                     validators[name] = dict(
