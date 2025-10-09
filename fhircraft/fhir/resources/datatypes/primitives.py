@@ -2,6 +2,7 @@ from typing import Callable, Union
 
 from pydantic import AfterValidator, Field
 from typing_extensions import Annotated, TypeAliasType
+from datetime import datetime, date, time 
 
 Boolean = TypeAliasType(
     "Boolean",
@@ -74,40 +75,53 @@ TIMEZONE_REGEX = r"Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)"
 
 Instant = TypeAliasType(
     "Instant",
-    Annotated[
-        str,
-        Field(
-            pattern=rf"{YEAR_REGEX}-{MONTH_REGEX}-{DAY_REGEX}T{HOUR_REGEX}:{MINUTES_REGEX}:{SECONDS_REGEX}({TIMEZONE_REGEX})?"
-        ),
-    ],
+    Union[
+        Annotated[datetime, Field(), AfterValidator(lambda d: d.isoformat())],
+        Annotated[
+            str,
+            Field(
+                pattern=rf"{YEAR_REGEX}-{MONTH_REGEX}-{DAY_REGEX}T{HOUR_REGEX}:{MINUTES_REGEX}:{SECONDS_REGEX}({TIMEZONE_REGEX})?"
+            ),
+        ],
+    ]
 )
 
 Date = TypeAliasType(
     "Date",
-    Annotated[
-        str,
-        Field(pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?"),
-    ],
+    Union[
+        Annotated[date, Field(), AfterValidator(lambda d: d.isoformat())],
+        Annotated[
+            str,
+            Field(pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?"),
+        ],
+    ]
 )
+
 
 DateTime = TypeAliasType(
     "DateTime",
-    Annotated[
-        str,
-        Field(
-            pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?(T{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?)?"
-        ),
-    ],
+    Union[
+        Annotated[datetime, Field(), AfterValidator(lambda d: d.isoformat())],
+        Annotated[
+            str,
+            Field(
+                pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?(T{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?)?"
+            ),
+        ],
+    ]
 )
 
 Time = TypeAliasType(
     "Time",
-    Annotated[
-        str,
-        Field(
-            pattern=rf"{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?"
-        ),
-    ],
+    Union[
+        Annotated[time, Field(), AfterValidator(lambda t: t.isoformat())],
+        Annotated[
+            str,
+            Field(
+                pattern=rf"{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?"
+            ),
+        ],
+    ]
 )
 
 Code = TypeAliasType(
