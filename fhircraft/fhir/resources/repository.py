@@ -339,6 +339,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
         self,
         package_name: str,
         package_version: Optional[str] = None,
+        install_dependencies: bool = True,
         fail_if_exists: bool = False,
     ) -> None:
         """
@@ -347,6 +348,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
         Args:
             package_name: Name of the package (e.g., "hl7.fhir.us.core")
             package_version: Version of the package (defaults to latest)
+            install_dependencies: If True, checks and installs any dependencies of the package
             fail_if_exists: If True, raise error if package already loaded
 
         Raises:
@@ -392,7 +394,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
                 )
 
             try:
-                self._process_package_tar(result, package_name, target_version)
+                self._process_package_tar(result, package_name, target_version, install_dependencies)
             finally:
                 result.close()
 
