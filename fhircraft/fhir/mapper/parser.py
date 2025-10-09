@@ -12,7 +12,7 @@ from fhircraft.fhir.resources.datatypes.R5.resources.concept_map import (
     ConceptMapGroup,
     ConceptMapGroupElementTarget,
 )
-from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive_type
+from fhircraft.fhir.resources.datatypes.utils import is_date, is_datetime, is_time
 from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
     StructureMap,
     StructureMapConst,
@@ -47,15 +47,22 @@ def _parse_StructureMapGroupRuleTargetParameter(
         | primitives.Time
     ),
 ) -> StructureMapGroupRuleTargetParameter:
-    return StructureMapGroupRuleTargetParameter(
-        valueString=value if isinstance(value, str) else None,
-        valueInteger=value if isinstance(value, int) else None,
-        valueBoolean=value if isinstance(value, bool) else None,
-        valueDecimal=value if isinstance(value, float) else None,
-        valueDate=value if is_fhir_primitive_type(value, primitives.Date) else None,  # type: ignore
-        valueDateTime=value if is_fhir_primitive_type(value, primitives.DateTime) else None,  # type: ignore
-        valueTime=value if is_fhir_primitive_type(value, primitives.Time) else None,  # type: ignore
-    )
+    arg = {}
+    if isinstance(value, str):
+        arg["valueString"] = value
+    elif isinstance(value, int):
+        arg["valueInteger"] = value
+    elif isinstance(value, bool):
+        arg["valueBoolean"] = value
+    elif isinstance(value, float):
+        arg["valueDecimal"] = value
+    elif is_date(value):
+        arg["valueDate"] = value
+    elif is_datetime(value):
+        arg["valueDateTime"] = value
+    elif is_time(value):
+        arg["valueTime"] = value
+    return StructureMapGroupRuleTargetParameter(**arg)
 
 
 class FhirMappingLanguageParserError(Exception):
