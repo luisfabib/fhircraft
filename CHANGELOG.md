@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## [0.3.2] - 2025-10-09
+
+### Changed
+
+- Add an option `install_dependencies` to the `load_package` method ([#73](https://github.com/luisfabib/fhircraft/pull/73))
+
+### Fixed
+
+- Change the `pyyaml` dependency to allow newer versions ([#74](https://github.com/luisfabib/fhircraft/pull/72))
+- Update the `load_package` method to skip loading a dependency if it has already been loaded ([#73](https://github.com/luisfabib/fhircraft/pull/73))
+
+----------------- 
+
 ## [0.3.1] - 2025-10-09
 
 ### Fixed
@@ -137,6 +150,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release 🎉
 
+[0.3.2]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.2
+[0.3.1]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.1
 [0.3.0]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.0
 [0.2.0]: https://github.com/luisfabib/fhircraft/releases/tag/0.2.0
 [0.1.1]: https://github.com/luisfabib/fhircraft/releases/tag/0.1.1
