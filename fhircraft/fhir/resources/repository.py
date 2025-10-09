@@ -407,7 +407,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
             )
 
     def _process_package_tar(
-        self, tar_file: tarfile.TarFile, package_name: str, package_version: str
+        self, tar_file: tarfile.TarFile, package_name: str, package_version: str, install_dependencies: bool = True
     ) -> None:
         """
         Process a tar file and extract structure definitions.
@@ -421,28 +421,29 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
         errors = []
 
         # First, look for package.json to find dependencies
-        package_json_member = None
-        for member in tar_file.getmembers():
-            if member.name.endswith("package.json") and member.isfile():
-                package_json_member = member
-                break
-        if package_json_member:
-            try:
-                package_obj = tar_file.extractfile(package_json_member)
-                if package_obj:
-                    content = package_obj.read().decode("utf-8")
-                    package_info = json.loads(content)
-                    # Download dependencies
-                    for dependency, version in package_info.get("dependencies", {}).items():
-                        # Check if dependency has already been loaded
-                        if self.has_package(dependency, version):
-                            continue
-                        try:
-                            self.load_package(dependency, version, fail_if_exists=False)
-                        except Exception as e:
-                            errors.append(f"Failed to download and load dependency {dependency}: {e}")
-            except Exception as e:
-                errors.append(f"Error processing package.json looking for dependencies: {e}")
+        if install_dependencies:
+            package_json_member = None
+            for member in tar_file.getmembers():
+                if member.name.endswith("package.json") and member.isfile():
+                    package_json_member = member
+                    break
+            if package_json_member:
+                try:
+                    package_obj = tar_file.extractfile(package_json_member)
+                    if package_obj:
+                        content = package_obj.read().decode("utf-8")
+                        package_info = json.loads(content)
+                        # Download dependencies
+                        for dependency, version in package_info.get("dependencies", {}).items():
+                            # Check if dependency has already been loaded
+                            if self.has_package(dependency, version):
+                                continue
+                            try:
+                                self.load_package(dependency, version, fail_if_exists=False)
+                            except Exception as e:
+                                errors.append(f"Failed to download and load dependency {dependency}: {e}")
+                except Exception as e:
+                    errors.append(f"Error processing package.json looking for dependencies: {e}")
         
         for member in tar_file.getmembers():
             if not member.isfile():
