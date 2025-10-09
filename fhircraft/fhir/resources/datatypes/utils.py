@@ -10,6 +10,7 @@ import importlib
 import re
 
 from typing import TYPE_CHECKING, Any, Type, Union
+from datetime import datetime, date, time
 
 from pydantic import BaseModel, Field, ValidationError, create_model
 from typing_extensions import TypeAliasType
@@ -250,22 +251,22 @@ def is_base64binary(value: Any) -> bool:
 
 def is_instant(value: Any) -> bool:
     """Check if value is a valid FHIR Instant."""
-    return is_fhir_primitive_type(value, primitives.Instant)
+    return is_fhir_primitive_type(value, primitives.Instant) if isinstance(value, str) else isinstance(value, datetime)
 
 
 def is_date(value: Any) -> bool:
     """Check if value is a valid FHIR Date."""
-    return is_fhir_primitive_type(value, primitives.Date)
+    return is_fhir_primitive_type(value, primitives.Date) if isinstance(value, str) else isinstance(value, date) and not is_datetime(value)
 
 
 def is_datetime(value: Any) -> bool:
     """Check if value is a valid FHIR DateTime."""
-    return is_fhir_primitive_type(value, primitives.DateTime)
+    return is_fhir_primitive_type(value, primitives.DateTime) if isinstance(value, str) else isinstance(value, datetime) and not is_date(value)
 
 
 def is_time(value: Any) -> bool:
     """Check if value is a valid FHIR Time."""
-    return is_fhir_primitive_type(value, primitives.Time)
+    return is_fhir_primitive_type(value, primitives.Time) if isinstance(value, str) else isinstance(value, time) 
 
 
 def is_code(value: Any) -> bool:
