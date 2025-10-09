@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## [0.3.1] - 2025-10-09
+
+### Fixed
+
+- Fix extraction of `package.json` while processing FHIR package dependencies ([#72](https://github.com/luisfabib/fhircraft/pull/72), fixes [#71](https://github.com/luisfabib/fhircraft/pull/71))
+
+----------------- 
+
 ## [0.3.0] - 2025-10-07
 
 ### Added
