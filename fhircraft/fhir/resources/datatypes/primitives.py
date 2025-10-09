@@ -2,6 +2,7 @@ from typing import Callable, Union
 
 from pydantic import AfterValidator, Field
 from typing_extensions import Annotated, TypeAliasType
+from datetime import datetime, date, time 
 
 Boolean = TypeAliasType(
     "Boolean",
@@ -84,30 +85,39 @@ Instant = TypeAliasType(
 
 Date = TypeAliasType(
     "Date",
-    Annotated[
-        str,
-        Field(pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?"),
-    ],
+    Union[
+        date,
+        Annotated[
+            str,
+            Field(pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?"),
+        ],
+    ]
 )
 
 DateTime = TypeAliasType(
     "DateTime",
-    Annotated[
-        str,
-        Field(
-            pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?(T{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?)?"
-        ),
-    ],
+    Union[
+        datetime,
+        Annotated[
+            str,
+            Field(
+                pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?(T{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?)?"
+            ),
+        ],
+    ]
 )
 
 Time = TypeAliasType(
     "Time",
-    Annotated[
-        str,
-        Field(
-            pattern=rf"{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?"
-        ),
-    ],
+    Union[
+        time,
+        Annotated[
+            str,
+            Field(
+                pattern=rf"{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?"
+            ),
+        ],
+    ]
 )
 
 Code = TypeAliasType(
