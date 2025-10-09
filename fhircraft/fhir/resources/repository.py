@@ -434,6 +434,9 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
                     package_info = json.loads(content)
                     # Download dependencies
                     for dependency, version in package_info.get("dependencies", {}).items():
+                        # Check if dependency has already been loaded
+                        if self.has_package(dependency, version):
+                            continue
                         try:
                             self.load_package(dependency, version, fail_if_exists=False)
                         except Exception as e:
