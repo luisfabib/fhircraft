@@ -75,13 +75,29 @@ TIMEZONE_REGEX = r"Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)"
 
 Instant = TypeAliasType(
     "Instant",
-    Annotated[
-        str,
-        Field(
-            pattern=rf"{YEAR_REGEX}-{MONTH_REGEX}-{DAY_REGEX}T{HOUR_REGEX}:{MINUTES_REGEX}:{SECONDS_REGEX}({TIMEZONE_REGEX})?"
-        ),
-    ],
+    Union[
+        datetime,
+        Annotated[
+            str,
+            Field(
+                pattern=rf"{YEAR_REGEX}-{MONTH_REGEX}-{DAY_REGEX}T{HOUR_REGEX}:{MINUTES_REGEX}:{SECONDS_REGEX}({TIMEZONE_REGEX})?"
+            ),
+            AfterValidator(lambda x: datetime.fromisoformat(x.replace("Z", "+00:00")) if x else None),
+        ],
+    ]
 )
+
+def _date_validator(date: str | None) -> date | None:
+    if not date:
+        return None
+    if len(date.split('-')) == 3:
+        format = "%Y-%m-%d"
+    elif len(date.split('-')) == 2:
+        format = "%Y-%m"
+    else:
+        format = "%Y"
+    return datetime.strptime(date, format).date()
+
 
 Date = TypeAliasType(
     "Date",
@@ -90,9 +106,27 @@ Date = TypeAliasType(
         Annotated[
             str,
             Field(pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?"),
+            AfterValidator(lambda x: _date_validator(x)),
         ],
     ]
 )
+
+
+def _datetime_validator(date: str | None) -> date | None:
+    if not date:
+        return None
+    if not 'T' in date:
+        if len(date.split('-')) == 3:
+            format = "%Y-%m-%d"
+        elif len(date.split('-')) == 2:
+            format = "%Y-%m"
+        else:
+            format = "%Y"
+    else:
+        format = "%Y-%m-%dT%H:%M:%S.%f" if '.' in date else "%Y-%m-%dT%H:%M:%S"
+        if date.endswith('Z'):
+            date = date.replace('Z', '+00:00')
+    return datetime.strptime(date, format)
 
 DateTime = TypeAliasType(
     "DateTime",
@@ -103,6 +137,7 @@ DateTime = TypeAliasType(
             Field(
                 pattern=rf"{YEAR_REGEX}(-{MONTH_REGEX}(-{DAY_REGEX})?)?(T{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?)?"
             ),
+            AfterValidator(lambda x: _datetime_validator(x)),
         ],
     ]
 )
@@ -116,6 +151,7 @@ Time = TypeAliasType(
             Field(
                 pattern=rf"{HOUR_REGEX}(:{MINUTES_REGEX}(:{SECONDS_REGEX}({TIMEZONE_REGEX})?)?)?"
             ),
+            AfterValidator(lambda x: time.fromisoformat(x) if x else None),
         ],
     ]
 )
