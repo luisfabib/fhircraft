@@ -421,7 +421,6 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
         errors = []
 
         # First, look for package.json to find dependencies
-        package_obj = tar_file.extractfile('package/package.json')
         package_json_member = None
         for member in tar_file.getmembers():
             if member.name.endswith("package.json") and member.isfile():
