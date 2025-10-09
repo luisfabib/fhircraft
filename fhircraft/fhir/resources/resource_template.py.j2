@@ -47,6 +47,7 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
         {% endif %}
     )
     {% endfor %}
+    
     {% for name, property in model_data.properties.items() %}
     @property 
     def {{ name }}(self):
@@ -58,10 +59,9 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
             {{ arg }}={{ value }},
             {% endfor %}
         )
+        
     {% endfor %}
-
     {% for name, validator in model_data.validators.items() %}
-
     {% if validator.mode == "field" %}
     @field_validator(*{{ validator.info.fields }}, mode="{{ validator.info.mode }}", check_fields={{ validator.info.check_fields }})
     @classmethod
@@ -74,8 +74,8 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
             {{ arg }}={{ value }},
             {% endfor %}
         )
+        
     {% endif %}
-
     {% if validator.mode == "model" %}
     @model_validator(mode="{{ validator.info.mode }}")
     def {{ name }}(self):
@@ -88,8 +88,8 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
             {{ arg }}={{ value }},
             {% endfor %}
         )
+        
     {% endif %}
-
     {% endfor %}
 {% endfor %}
 
