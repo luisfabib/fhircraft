@@ -851,6 +851,8 @@ directories = (
 )
 
 
+@pytest.mark.filterwarnings("ignore:.*Pydantic serializer warnings.*")
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.parametrize("directory", directories)
 def test_parser_integration(directory):
     with open(
