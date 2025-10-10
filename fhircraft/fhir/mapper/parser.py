@@ -6,27 +6,28 @@ import ply.yacc
 import fhircraft.fhir.path.engine.literals as literals
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
+from fhircraft.fhir.path.parser import FhirPathParser
+from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
 from fhircraft.fhir.resources.datatypes.R5.resources.concept_map import (
     ConceptMap,
-    ConceptMapGroupElement,
     ConceptMapGroup,
+    ConceptMapGroupElement,
     ConceptMapGroupElementTarget,
 )
-from fhircraft.fhir.resources.datatypes.utils import is_date, is_datetime, is_time
 from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
     StructureMap,
     StructureMapConst,
-    StructureMapGroupRuleDependent,
-    StructureMapGroupRuleDependentParameter,
     StructureMapGroup,
     StructureMapGroupInput,
-    StructureMapGroupRuleTargetParameter,
     StructureMapGroupRule,
+    StructureMapGroupRuleDependent,
+    StructureMapGroupRuleDependentParameter,
     StructureMapGroupRuleSource,
-    StructureMapStructure,
     StructureMapGroupRuleTarget,
+    StructureMapGroupRuleTargetParameter,
+    StructureMapStructure,
 )
-from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
+from fhircraft.fhir.resources.datatypes.utils import is_date, is_datetime, is_time
 from fhircraft.utils import ensure_list
 
 logger = logging.getLogger(__name__)
@@ -69,9 +70,6 @@ class FhirMappingLanguageParserError(Exception):
     pass
 
 
-from fhircraft.fhir.path.parser import FhirPathParser
-
-
 class FhirMappingLanguageParser(FhirPathParser):
     """
     An LALR-parser for the FHIR Mapping Language
@@ -84,6 +82,7 @@ class FhirMappingLanguageParser(FhirPathParser):
             raise FhirMappingLanguageParserError(
                 "Docstrings have been removed! By design of PLY, "
             )
+        print("INIT FhirMappingLanguageParser")
 
         self.debug = debug
         self.lexer_class = (
@@ -115,9 +114,9 @@ class FhirMappingLanguageParser(FhirPathParser):
     def parse(self, string, lexer=None) -> StructureMap:
         self.string = string
         lexer = lexer or self.lexer_class()
-        self.structureMap = StructureMap.model_construct(
+        self.structureMap: StructureMap = StructureMap.model_construct(
             text={"div": string},
-        )
+        )  # type: ignore
         return self.parse_token_stream(lexer.tokenize(string))
 
     def is_valid(self, string):
@@ -149,7 +148,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         # Initialize the structure map with the map id
         self.structureMap.url = p[2]["url"]
         self.structureMap.name = p[2]["name"]
-        self.structureMap.status = 'draft'  # Default status
+        self.structureMap.status = "draft"  # Default status
 
         for attr, value in p[1].items():
             setattr(self.structureMap, attr, value)
@@ -254,7 +253,8 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_conceptmap_mapping(self, p):
         """m_conceptmap_mapping : m_identifier ':' m_conceptmap_code m_conceptmap_mapping_operator m_identifier ':' m_conceptmap_code"""
         p[0] = ConceptMapGroupElement(
-            code=p[3], target=[ConceptMapGroupElementTarget(code=p[7], relationship=p[4])]
+            code=p[3],
+            target=[ConceptMapGroupElementTarget(code=p[7], relationship=p[4])],
         )
 
     def p_conceptmap_code(self, p):
@@ -761,10 +761,16 @@ class FhirMappingLanguageParser(FhirPathParser):
             "dependent": [
                 StructureMapGroupRuleDependent(
                     name=invocation.get("name"),
-                    parameter=[
-                        StructureMapGroupRuleDependentParameter.model_validate(param.model_dump()) 
-                        for param in invocation.get("parameter")
-                    ] if invocation.get("parameter") else None,
+                    parameter=(
+                        [
+                            StructureMapGroupRuleDependentParameter.model_validate(
+                                param.model_dump()
+                            )
+                            for param in invocation.get("parameter")
+                        ]
+                        if invocation.get("parameter")
+                        else None
+                    ),
                 )
                 for invocation in p[2]
             ]

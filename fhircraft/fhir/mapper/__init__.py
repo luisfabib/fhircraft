@@ -27,9 +27,6 @@ from .parser import FhirMappingLanguageParser
 __all__ = [
     # High-level API
     "FHIRMapper",
-    "load_structure_map",
-    "parse_mapping_script",
-    "execute_mapping",
     # Lower-level components
     "StructureMap",
     "ConceptMap",

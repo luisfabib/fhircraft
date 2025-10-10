@@ -69,19 +69,6 @@ def __getattr__(name):
 
 
 __all__ = [
-    # High-level APIs (most commonly used)
-    "FHIRMapper",  # FHIR mapping and transformation
-    "FHIRPath",  # FHIRPath expression evaluation
-    "ResourceFactory",  # Construct FHIR resource models
-    # Core models
-    "FHIRBaseModel",  # Base class for FHIR resources
-    # Repository and definitions (for advanced users)
-    "CompositeStructureDefinitionRepository",
-    "StructureDefinition",
-    "ElementDefinition",
-    # FHIRPath components
-    "FHIRPathCollection",
-    "FHIRPathCollectionItem",
     # Utilities
     "get_FHIR_release_from_version",
     "capitalize",

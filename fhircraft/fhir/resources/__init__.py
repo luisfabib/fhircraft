@@ -57,21 +57,3 @@ def __getattr__(name):
 
         return construct_resource_model
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
-
-
-__all__ = [
-    # Core models
-    "FHIRBaseModel",
-    "FHIRSliceModel",
-    # Factory
-    "ResourceFactory",
-    "construct_resource_model",
-    # Repository classes
-    "CompositeStructureDefinitionRepository",
-    "HttpStructureDefinitionRepository",
-    "PackageStructureDefinitionRepository",
-    "configure_repository",
-    # Definitions
-    "StructureDefinition",
-    "ElementDefinition",
-]

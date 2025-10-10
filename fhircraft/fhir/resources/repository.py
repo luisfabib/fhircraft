@@ -395,7 +395,9 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
                 )
 
             try:
-                self._process_package_tar(result, package_name, target_version, install_dependencies)
+                self._process_package_tar(
+                    result, package_name, target_version, install_dependencies
+                )
             finally:
                 result.close()
 
@@ -410,7 +412,11 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
             )
 
     def _process_package_tar(
-        self, tar_file: tarfile.TarFile, package_name: str, package_version: str, install_dependencies: bool = True
+        self,
+        tar_file: tarfile.TarFile,
+        package_name: str,
+        package_version: str,
+        install_dependencies: bool = True,
     ) -> None:
         """
         Process a tar file and extract structure definitions.
@@ -437,17 +443,25 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
                         content = package_obj.read().decode("utf-8")
                         package_info = json.loads(content)
                         # Download dependencies
-                        for dependency, version in package_info.get("dependencies", {}).items():
+                        for dependency, version in package_info.get(
+                            "dependencies", {}
+                        ).items():
                             # Check if dependency has already been loaded
                             if self.has_package(dependency, version):
                                 continue
                             try:
-                                self.load_package(dependency, version, fail_if_exists=False)
+                                self.load_package(
+                                    dependency, version, fail_if_exists=False
+                                )
                             except Exception as e:
-                                errors.append(f"Failed to download and load dependency {dependency}: {e}")
+                                errors.append(
+                                    f"Failed to download and load dependency {dependency}: {e}"
+                                )
                 except Exception as e:
-                    errors.append(f"Error processing package.json looking for dependencies: {e}")
-        
+                    errors.append(
+                        f"Error processing package.json looking for dependencies: {e}"
+                    )
+
         for member in tar_file.getmembers():
             if not member.isfile():
                 continue
