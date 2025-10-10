@@ -1,3 +1,15 @@
+"""
+FHIR Mapper Module
+
+This module provides FHIR mapping and transformation functionality:
+- FHIRMapper: High-level interface for FHIR mapping operations
+- StructureMap: FHIR StructureMap resource model
+- ConceptMap: FHIR ConceptMap resource model
+
+Recommended imports:
+    from fhircraft.fhir.mapper import FHIRMapper
+"""
+
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -6,11 +18,11 @@ from urllib.request import urlopen
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
+from fhircraft.fhir.resources.datatypes.R5.resources.concept_map import ConceptMap
+from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMap
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 from .parser import FhirMappingLanguageParser
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMap
-from fhircraft.fhir.resources.datatypes.R5.resources.concept_map import ConceptMap
 
 __all__ = [
     # High-level API
@@ -98,6 +110,7 @@ class FHIRMapper:
 
         if isinstance(source, dict):
             from pprint import pprint
+
             pprint(source)
             return StructureMap.model_validate(source)
 
