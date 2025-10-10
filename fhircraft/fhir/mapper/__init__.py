@@ -106,9 +106,6 @@ class FHIRMapper:
             return source
 
         if isinstance(source, dict):
-            from pprint import pprint
-
-            pprint(source)
             return StructureMap.model_validate(source)
 
         if isinstance(source, (str, Path)):

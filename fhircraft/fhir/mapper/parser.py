@@ -82,7 +82,6 @@ class FhirMappingLanguageParser(FhirPathParser):
             raise FhirMappingLanguageParserError(
                 "Docstrings have been removed! By design of PLY, "
             )
-        print("INIT FhirMappingLanguageParser")
 
         self.debug = debug
         self.lexer_class = (
