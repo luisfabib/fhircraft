@@ -1,6 +1,7 @@
 
 from pydantic import BaseModel, create_model, Field
 import fhircraft.fhir.resources.datatypes.primitives as fhir_types
+from datetime import date, time, datetime
 import json 
 import pytest 
 
@@ -21,15 +22,22 @@ fhir_types_test_cases = (
     ('Canonical', 'example.com/resources/1234', 'example.com/resources/1234'),
     ('Base64Binary', 'aGVsbG8gd29yaw==', 'aGVsbG8gd29yaw=='),
     ('Instant', '2015-02-07T13:28:17.239', '2015-02-07T13:28:17.239'),
+    ('Instant', datetime(2015,2,7), '2015-02-07T00:00:00'),
+    ('Instant', datetime(2015,2,7, 13,28,17), '2015-02-07T13:28:17'),
     ('Date', '2015-02-07', '2015-02-07'),
     ('Date', '2015-02', '2015-02'),
     ('Date', '2015', '2015'),
+    ('Date', date(2015,2,7), '2015-02-07'),
     ('DateTime', '2015-02-07T13:28:17.239', '2015-02-07T13:28:17.239'),
     ('DateTime', '2015-02-07', '2015-02-07'),
     ('DateTime', '2015-02',  '2015-02'),
     ('DateTime', '2015', '2015'),
+    ('DateTime', datetime(2015,2,7), '2015-02-07T00:00:00'),
+    ('DateTime', datetime(2015,2,7, 13,28,17), '2015-02-07T13:28:17'),
     ('Time', '12:54', '12:54'),
     ('Time', '12:54:32', '12:54:32'),
+    ('Time', time(12,54), '12:54:00'),
+    ('Time', time(12,54,32), '12:54:32'),
     ('Code', 'code1234', 'code1234'),    
     ('Oid', 'urn:oid:1.2.3.4.5', 'urn:oid:1.2.3.4.5'),
     ('Id', 'ID.A.B.3.4.5', 'ID.A.B.3.4.5'),

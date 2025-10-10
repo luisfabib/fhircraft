@@ -10,6 +10,14 @@ from pathlib import Path
 from typing import Any, Dict
 from unittest.mock import MagicMock, Mock, mock_open, patch
 
+import tarfile
+import json
+from unittest import mock
+import pytest
+import io 
+from fhircraft.fhir.resources.repository import PackageStructureDefinitionRepository
+from fhircraft.fhir.resources.definitions import StructureDefinition
+
 import pytest
 
 from fhircraft.fhir.packages import FHIRPackageRegistryError, PackageNotFoundError
@@ -901,3 +909,111 @@ class TestCompositeRepositoryPackageIntegration:
         # Latest version should be from local (4.3.0 > 4.0.0)
         latest = repo.get("http://hl7.org/fhir/StructureDefinition/Patient")
         assert latest.version == "4.3.0"
+
+
+
+
+def make_tarfile_with_structuredefs(struct_defs, package_json=None):
+    """Helper to create an in-memory tarfile with StructureDefinition JSON files and optional package.json."""
+    tar_bytes = io.BytesIO()
+    with tarfile.open(fileobj=tar_bytes, mode="w") as tar:
+        # Add StructureDefinition files
+        for idx, struct_def in enumerate(struct_defs):
+            file_content = json.dumps(struct_def).encode("utf-8")
+            tarinfo = tarfile.TarInfo(name=f"package/StructureDefinition-{idx}.json")
+            tarinfo.size = len(file_content)
+            tar.addfile(tarinfo, io.BytesIO(file_content))
+        # Add package.json if provided
+        if package_json:
+            pkg_content = json.dumps(package_json).encode("utf-8")
+            tarinfo = tarfile.TarInfo(name="package/package.json")
+            tarinfo.size = len(pkg_content)
+            tar.addfile(tarinfo, io.BytesIO(pkg_content))
+    tar_bytes.seek(0)
+    # Return the BytesIO object so the caller can open the tarfile as needed
+    return tar_bytes
+
+def valid_structure_definition(url="http://example.org/StructureDefinition/test", version="1.0.0"):
+    return {
+        "resourceType": "StructureDefinition",
+        "url": url,
+        "version": version,
+        "name": "TestStructureDefinition",
+        "status": "active",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "derivation": "constraint"
+    }
+
+class TestProcessPackageTar:
+    def setup_method(self):
+        self.repo = PackageStructureDefinitionRepository()
+        # Patch self.add to track calls
+        self.add_patcher = mock.patch.object(self.repo, "add", wraps=self.repo.add)
+        self.mock_add = self.add_patcher.start()
+
+    def teardown_method(self):
+        self.add_patcher.stop()
+
+    def test_extracts_and_adds_structure_definitions(self):
+        struct_defs = [
+            valid_structure_definition(url="http://example.org/StructureDefinition/one", version="1.0.0"),
+            valid_structure_definition(url="http://example.org/StructureDefinition/two", version="2.0.0"),
+        ]
+        tar_bytes = make_tarfile_with_structuredefs(struct_defs)
+        with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
+            self.repo._process_package_tar(tar, "testpkg", "1.0.0")
+        # Should call add for each StructureDefinition
+        assert self.mock_add.call_count == 2
+        urls = [call.args[0].url for call in self.mock_add.call_args_list]
+        assert "http://example.org/StructureDefinition/one" in urls
+        assert "http://example.org/StructureDefinition/two" in urls
+
+    def test_raises_if_no_structure_definitions_found(self):
+        tar_bytes = make_tarfile_with_structuredefs([])
+        with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
+            with pytest.raises(RuntimeError, match="No StructureDefinition resources found"):
+                self.repo._process_package_tar(tar, "testpkg", "1.0.0")
+
+    def test_ignores_non_structuredefinition_json_files(self):
+        # Add a non-StructureDefinition JSON file
+        tar_bytes = io.BytesIO()
+        with tarfile.open(fileobj=tar_bytes, mode="w") as tar:
+            content = json.dumps({"resourceType": "Patient"}).encode("utf-8")
+            tarinfo = tarfile.TarInfo(name="package/Patient-1.json")
+            tarinfo.size = len(content)
+            tar.addfile(tarinfo, io.BytesIO(content))
+        tar_bytes.seek(0)
+        with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
+            with pytest.raises(RuntimeError, match="No StructureDefinition resources found"):
+                self.repo._process_package_tar(tar, "testpkg", "1.0.0")
+
+    def test_processes_package_json_and_loads_dependencies(self):
+        struct_defs = [valid_structure_definition()]
+        package_json = {"dependencies": {"dep.pkg": "1.2.3"}}
+        tar_bytes = make_tarfile_with_structuredefs(struct_defs, package_json=package_json)
+        # Patch load_package to track dependency loading
+        with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
+            with mock.patch.object(self.repo, "load_package") as mock_load_package:
+                self.repo._process_package_tar(tar, "testpkg", "1.0.0")
+                mock_load_package.assert_any_call("dep.pkg", "1.2.3", fail_if_exists=False)
+        # Should still add the StructureDefinition
+        assert self.mock_add.call_count == 1
+
+    def test_logs_errors_but_continues_on_partial_failure(self, capsys):
+        # One valid, one invalid StructureDefinition
+        struct_defs = [
+            valid_structure_definition(),
+            {"resourceType": "StructureDefinition", "invalid": "data"}
+        ]
+        tar_bytes = make_tarfile_with_structuredefs(struct_defs)
+        # Should not raise, but print a warning
+        with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
+            self.repo._process_package_tar(tar, "testpkg", "1.0.0")
+        captured = capsys.readouterr()
+        assert "Warning:" in captured.out
+        assert "Error processing" in captured.out
+        # Only one valid StructureDefinition added
+        assert self.mock_add.call_count == 1
