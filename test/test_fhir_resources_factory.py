@@ -38,10 +38,8 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", resource_name="Test"
+            FHIR_release="R4B", resource_name="Test", FHIR_version="4.3.0"
         )
-
-
 
 
 class TestConstructPydanticFieldWithValidationAlias(FactoryTestCase):

@@ -1,11 +1,12 @@
-import pytest
-import warnings 
-
+import warnings
 from typing import List, Optional, get_args
-from unittest import mock, TestCase
+from unittest import TestCase, mock
 
-from fhircraft.fhir.resources.factory import ElementDefinitionNode, ResourceFactory, FHIRSliceModel, ResourceFactoryValidators
-from pydantic import BaseModel
+import pytest
+from parameterized import parameterized, parameterized_class
+from pydantic import BaseModel, Field
+from pydantic.aliases import AliasChoices
+from pydantic.fields import FieldInfo
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 import fhircraft.fhir.resources.datatypes.R4B.complex_types as complex_types
@@ -17,11 +18,12 @@ from fhircraft.fhir.resources.definitions.element_definition import (
     ElementDefinition,
     ElementDefinitionType,
 )
-from parameterized import parameterized, parameterized_class
-from pydantic import Field
-from pydantic.aliases import AliasChoices
-from pydantic.fields import FieldInfo
-
+from fhircraft.fhir.resources.factory import (
+    ElementDefinitionNode,
+    FHIRSliceModel,
+    ResourceFactory,
+    ResourceFactoryValidators,
+)
 
 
 class FactoryTestCase(TestCase):
@@ -43,14 +45,13 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", resource_name="Test"
+            FHIR_release="R4B", resource_name="Test", FHIR_version="4.3.0"
         )
 
 
-
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 # _build_element_tree_structure()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
 
 
 class TestBuildElementTreeStructure(FactoryTestCase):
@@ -167,9 +168,11 @@ class TestBuildElementTreeStructure(FactoryTestCase):
         nodes = self.factory._build_element_tree_structure(elements)
         assert nodes == []
 
-#----------------------------------------------------------------
+
+# ----------------------------------------------------------------
 # _resolve_FHIR_type()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
+
 
 class TestGetComplexFhirType(FactoryTestCase):
     """
@@ -247,14 +250,16 @@ class TestGetComplexFhirType(FactoryTestCase):
             self.factory._resolve_FHIR_type("UnknownType")
 
 
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 # _construct_model_with_properties()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
+
 
 class TestConstructModelWithProperties(FactoryTestCase):
     """
     Unit tests for the _construct_model_with_properties method of the ResourceFactory.
     """
+
     # Dummy base model for inheritance
     class DummyBaseModel(BaseModel):
         pass
@@ -272,11 +277,11 @@ class TestConstructModelWithProperties(FactoryTestCase):
             model_name, properties, (self.DummyBaseModel,), dict(), dict()
         )
         assert issubclass(result, self.DummyBaseModel)
-        instance = result(field1="abc", field2=123) # type: ignore
+        instance = result(field1="abc", field2=123)  # type: ignore
         assert hasattr(instance, "field1")
-        assert instance.field1 == "abc" # type: ignore
+        assert instance.field1 == "abc"  # type: ignore
         assert hasattr(instance, "field2")
-        assert instance.field2 == 123 # type: ignore
+        assert instance.field2 == 123  # type: ignore
 
     def test_model_inherits_base_model(self):
         properties = {
@@ -286,7 +291,7 @@ class TestConstructModelWithProperties(FactoryTestCase):
         result = self.factory._construct_model_with_properties(
             model_name, properties, (self.DummyBaseModel,), dict(), dict()
         )
-        assert issubclass(result, self.DummyBaseModel) 
+        assert issubclass(result, self.DummyBaseModel)
 
     def test_model_fields_have_correct_defaults(self):
         properties = {
@@ -299,9 +304,9 @@ class TestConstructModelWithProperties(FactoryTestCase):
         )
         instance = result()
         assert hasattr(instance, "fieldX")
-        assert instance.fieldX == "defaultX" # type: ignore
+        assert instance.fieldX == "defaultX"  # type: ignore
         assert hasattr(instance, "fieldY")
-        assert instance.fieldY == 99 # type: ignore
+        assert instance.fieldY == 99  # type: ignore
 
     def test_model_fields_are_required_when_no_default(self):
         properties = {
@@ -322,9 +327,11 @@ class TestConstructModelWithProperties(FactoryTestCase):
         instance = result()
         assert isinstance(instance, result)
 
-#----------------------------------------------------------------
+
+# ----------------------------------------------------------------
 # _construct_Pydantic_field()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
+
 
 class TestConstructPydanticField(FactoryTestCase):
     """
@@ -373,9 +380,9 @@ class TestConstructPydanticField(FactoryTestCase):
         assert result[1].default is None
 
 
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 # _handle_python_reserved_keyword()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
 
 
 class TestHandlePythonReservedKeyword(FactoryTestCase):
@@ -462,9 +469,10 @@ class TestHandlePythonReservedKeyword(FactoryTestCase):
         assert validation_alias is None
 
 
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 # _process_pattern_or_fixed_values()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
+
 
 @parameterized_class(
     [
@@ -530,10 +538,10 @@ class TestProcessPatternOrFixedValues(FactoryTestCase):
         assert result is None
 
 
-
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 # _construct_type_choice_fields()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
+
 
 class TestProcessChoiceTypeField(FactoryTestCase):
     """
@@ -542,14 +550,18 @@ class TestProcessChoiceTypeField(FactoryTestCase):
 
     def setUp(self):
         super().setUp()
-        self.factory._handle_python_reserved_keyword = mock.Mock(side_effect=lambda name: (name, None))
+        self.factory._handle_python_reserved_keyword = mock.Mock(
+            side_effect=lambda name: (name, None)
+        )
 
     def test_single_choice_type_field(self):
         # Simulate a choice type element with one possible type
         element_types = [primitives.String]
         basename = "value"
         max_card = 1
-        fields = self.factory._construct_type_choice_fields(basename, element_types, max_card)
+        fields = self.factory._construct_type_choice_fields(
+            basename, element_types, max_card
+        )
         assert isinstance(fields, dict)
         assert "valueString" in fields
         field_type, field_info = fields["valueString"]
@@ -565,7 +577,9 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         ]
         basename = "value"
         max_card = 1
-        fields = self.factory._construct_type_choice_fields(basename, element_types, max_card)
+        fields = self.factory._construct_type_choice_fields(
+            basename, element_types, max_card
+        )
         assert isinstance(fields, dict)
         assert "valueString" in fields
         assert "valueBoolean" in fields
@@ -579,7 +593,9 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         element_types = [primitives.String]
         basename = "value"
         max_card = 99999
-        fields = self.factory._construct_type_choice_fields(basename, element_types, max_card)
+        fields = self.factory._construct_type_choice_fields(
+            basename, element_types, max_card
+        )
         assert "valueString" in fields
         field_type, field_info = fields["valueString"]
         assert field_type == Optional[List[primitives.String]]
@@ -590,14 +606,18 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         element_types = [primitives.Boolean]
         basename = "value"
         max_card = 1
-        fields = self.factory._construct_type_choice_fields(basename, element_types, max_card)
+        fields = self.factory._construct_type_choice_fields(
+            basename, element_types, max_card
+        )
         assert "valueBoolean" in fields
         field_type, field_info = fields["valueBoolean"]
         assert field_type == Optional[primitives.Boolean]
 
-#----------------------------------------------------------------
+
+# ----------------------------------------------------------------
 # _parse_element_cardinality()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
+
 
 class TestParseCardinalityConstraints(FactoryTestCase):
 
@@ -614,9 +634,11 @@ class TestParseCardinalityConstraints(FactoryTestCase):
         assert min_card == expected_min
         assert max_card == expected_max
 
-#----------------------------------------------------------------
+
+# ----------------------------------------------------------------
 # _construct_slice_model()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
+
 
 class TestConstructSliceModel(FactoryTestCase):
     """
@@ -644,19 +666,24 @@ class TestConstructSliceModel(FactoryTestCase):
     def setUp(self):
         super().setUp()
         # Mock methods in ResourceFactory that are called by _construct_slice_model
-        self.factory.construct_resource_model = mock.Mock(return_value=self.DummyFHIRSliceModel)
+        self.factory.construct_resource_model = mock.Mock(
+            return_value=self.DummyFHIRSliceModel
+        )
         self.factory._process_FHIR_structure_into_Pydantic_components = mock.Mock(
             return_value=({"field1": (str, None)}, ResourceFactoryValidators(), {})
         )
-        self.factory._construct_model_with_properties = mock.Mock(return_value=self.DummyFHIRSliceModel)
+        self.factory._construct_model_with_properties = mock.Mock(
+            return_value=self.DummyFHIRSliceModel
+        )
         self.factory._parse_element_cardinality = mock.Mock(return_value=(1, 99999))
 
     def test_construct_slice_model_with_profile(self):
         definition = self.DummyElementDefinitionNode(type_=[self.DummyType()])
-        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel) # type: ignore
+        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel)  # type: ignore
         # Assertions
         self.factory.construct_resource_model.assert_called_once_with(  # type: ignore
-            "http://example.org/fhir/StructureDefinition/DummySlice", base_model=FHIRSliceModel
+            "http://example.org/fhir/StructureDefinition/DummySlice",
+            base_model=FHIRSliceModel,
         )
         self.assertTrue(issubclass(result, self.DummyFHIRSliceModel))
         self.assertTrue(issubclass(result, FHIRSliceModel))
@@ -665,10 +692,10 @@ class TestConstructSliceModel(FactoryTestCase):
 
     def test_construct_slice_model_without_profile(self):
         definition = self.DummyElementDefinitionNode(type_=[])
-        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel) # type: ignore
-        self.factory._process_FHIR_structure_into_Pydantic_components.assert_called_once() # type: ignore
+        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel)  # type: ignore
+        self.factory._process_FHIR_structure_into_Pydantic_components.assert_called_once()  # type: ignore
         # Assertions
-        self.factory._construct_model_with_properties.assert_called_once() # type: ignore
+        self.factory._construct_model_with_properties.assert_called_once()  # type: ignore
         self.assertTrue(issubclass(result, self.DummyFHIRSliceModel))
         self.assertTrue(issubclass(result, FHIRSliceModel))
         self.assertEqual(result.min_cardinality, 1)
@@ -676,18 +703,19 @@ class TestConstructSliceModel(FactoryTestCase):
 
     def test_construct_slice_model_base_is_FHIRSliceModel(self):
         definition = self.DummyElementDefinitionNode(type_=[])
-        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyFHIRSliceModel) # type: ignore
+        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyFHIRSliceModel)  # type: ignore
         # Assertions
-        self.factory._construct_model_with_properties.assert_called() # type: ignore
+        self.factory._construct_model_with_properties.assert_called()  # type: ignore
         self.assertTrue(issubclass(result, self.DummyFHIRSliceModel))
         self.assertTrue(issubclass(result, FHIRSliceModel))
         self.assertEqual(result.min_cardinality, 1)
         self.assertEqual(result.max_cardinality, 99999)
 
 
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 # _construct_primitive_extension_field()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
+
 
 class TestConstructPrimitiveExtensionField(FactoryTestCase):
     """
@@ -697,7 +725,9 @@ class TestConstructPrimitiveExtensionField(FactoryTestCase):
     def setUp(self):
         super().setUp()
         # Patch _handle_python_reserved_keyword to avoid alias logic for simplicity
-        self.factory._handle_python_reserved_keyword = mock.Mock(side_effect=lambda name: (name, None))
+        self.factory._handle_python_reserved_keyword = mock.Mock(
+            side_effect=lambda name: (name, None)
+        )
 
     def test_creates_extension_field_for_primitive(self):
         field_name = "name"
@@ -714,7 +744,9 @@ class TestConstructPrimitiveExtensionField(FactoryTestCase):
         # Simulate a field name that is a Python reserved keyword
         field_name = "class"
         # Patch to simulate reserved keyword handling
-        self.factory._handle_python_reserved_keyword = mock.Mock(return_value=("class_", None))
+        self.factory._handle_python_reserved_keyword = mock.Mock(
+            return_value=("class_", None)
+        )
         fields = self.factory._construct_primitive_extension_field(field_name)
         assert "class_" in fields
         field = fields["class_"]
@@ -724,9 +756,9 @@ class TestConstructPrimitiveExtensionField(FactoryTestCase):
         assert field[1].default is None
 
 
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
 # _resolve_content_reference()
-# ---------------------------------------------------------------- 
+# ----------------------------------------------------------------
 class TestResolveContentReference(FactoryTestCase):
     """
     Unit tests for the _resolve_content_reference method of the ResourceFactory.
@@ -734,7 +766,7 @@ class TestResolveContentReference(FactoryTestCase):
 
     def setUp(self):
         super().setUp()
-        
+
         self.root = ElementDefinitionNode(
             id="__root__",
             path="__root__",
@@ -749,7 +781,7 @@ class TestResolveContentReference(FactoryTestCase):
             path="Patient",
             root=self.root,
             type=[ElementDefinitionType(code="Patient")],
-            children = {
+            children={
                 "gender": ElementDefinitionNode(
                     node_label="gender",
                     id="Patient.gender",
@@ -757,7 +789,7 @@ class TestResolveContentReference(FactoryTestCase):
                     root=self.root,
                     children={},
                     type=[ElementDefinitionType(code="string")],
-                    fixedString='female'
+                    fixedString="female",
                 ),
                 "name": ElementDefinitionNode(
                     node_label="name",
@@ -772,24 +804,24 @@ class TestResolveContentReference(FactoryTestCase):
                             path="Patient.name.given",
                             root=self.root,
                             children={},
-                            type=[ElementDefinitionType(code="string")]
-                        ),                        
+                            type=[ElementDefinitionType(code="string")],
+                        ),
                         "family": ElementDefinitionNode(
                             node_label="family",
                             id="Patient.name.family",
                             path="Patient.name.family",
                             root=self.root,
                             children={},
-                            type=[ElementDefinitionType(code="string")]
-                        ),  
+                            type=[ElementDefinitionType(code="string")],
+                        ),
                         "other": ElementDefinitionNode(
                             node_label="other",
                             id="Patient.name.other",
                             path="Patient.name.other",
                             root=self.root,
                             children={},
-                            contentReference="#Patient.gender.name"
-                        )
+                            contentReference="#Patient.gender.name",
+                        ),
                     },
                 ),
                 "address": ElementDefinitionNode(
@@ -798,16 +830,20 @@ class TestResolveContentReference(FactoryTestCase):
                     path="Patient.address",
                     root=self.root,
                     children={},
-                    type=[ElementDefinitionType(code="Address")]
+                    type=[ElementDefinitionType(code="Address")],
                 ),
-            }
+            },
         )
         self.root.children = {"Patient": self.mock_tree}
-        self.factory._build_element_tree_structure = mock.Mock(return_value=self.root)
 
     def test_resolves_valid_content_reference(self):
         # Simulate an element with a valid contentReference
-        element = ElementDefinitionNode(path='dummy', node_label='dummy', contentReference="#Patient.gender", root=self.root)
+        element = ElementDefinitionNode(
+            path="dummy",
+            node_label="dummy",
+            contentReference="#Patient.gender",
+            root=self.root,
+        )
 
         with warnings.catch_warnings():
             warnings.simplefilter("error")
@@ -815,12 +851,16 @@ class TestResolveContentReference(FactoryTestCase):
         assert isinstance(result, ElementDefinitionNode)
         assert result.node_label == "dummy"
         assert result.type == self.mock_tree.children["gender"].type
-        assert result.fixedString == 'female'
-
+        assert result.fixedString == "female"
 
     def test_resolves_valid_content_reference_with_children(self):
         # Simulate an element with a valid contentReference
-        element = ElementDefinitionNode(path='dummy', node_label='dummy', contentReference="#Patient.name", root=self.root)
+        element = ElementDefinitionNode(
+            path="dummy",
+            node_label="dummy",
+            contentReference="#Patient.name",
+            root=self.root,
+        )
 
         with warnings.catch_warnings():
             warnings.simplefilter("error")
@@ -832,7 +872,12 @@ class TestResolveContentReference(FactoryTestCase):
 
     def test_resolves_content_reference_to_root(self):
         # Reference to the root node
-        element = ElementDefinitionNode(path='dummy', node_label='dummy', contentReference="#Patient", root=self.root)
+        element = ElementDefinitionNode(
+            path="dummy",
+            node_label="dummy",
+            contentReference="#Patient",
+            root=self.root,
+        )
 
         with warnings.catch_warnings():
             warnings.simplefilter("error")
@@ -843,8 +888,34 @@ class TestResolveContentReference(FactoryTestCase):
 
     def test_returns_original_node_for_invalid_reference(self):
         # Reference to a non-existent node
-        element = ElementDefinitionNode(path='dummy', node_label='dummy', contentReference="#Patient.nonexistent", root=self.root)
+        element = ElementDefinitionNode(
+            path="dummy",
+            node_label="dummy",
+            contentReference="#Patient.nonexistent",
+            root=self.root,
+        )
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             result = self.factory._resolve_content_reference(element)
         assert result is element
+
+    def test_valid_url_content_reference(self):
+        # Reference to a valid URL
+        element = ElementDefinitionNode(
+            path="dummy",
+            node_label="dummy",
+            contentReference="http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
+            root=self.root,
+        )
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            result = self.factory._resolve_content_reference(element)
+        assert isinstance(result, ElementDefinitionNode)
+        assert result.node_label == "dummy"
+        assert result.type == [ElementDefinitionType(code="CodeableConcept")]
+        assert result.binding
+        assert (
+            result.binding.valueSet
+            == "http://hl7.org/fhir/ValueSet/observation-category"
+        )
