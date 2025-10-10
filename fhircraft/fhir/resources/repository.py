@@ -1,4 +1,5 @@
 import json
+import os
 import tarfile
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -17,7 +18,7 @@ from fhircraft.fhir.packages import (
     PackageNotFoundError,
 )
 from fhircraft.fhir.resources.definitions import StructureDefinition
-from fhircraft.utils import load_env_variables
+from fhircraft.utils import get_FHIR_release_from_version, load_env_variables
 
 
 class StructureDefinitionNotFoundError(FileNotFoundError):
@@ -358,7 +359,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
             raise RuntimeError(
                 f"Cannot load package {package_name} while internet access is disabled"
             )
-        
+
         # Determine version to load
         target_version = package_version
         if not target_version:
@@ -421,7 +422,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
         errors = []
 
         # First, look for package.json to find dependencies
-        package_obj = tar_file.extractfile('package.json')
+        package_obj = tar_file.extractfile("package.json")
         if package_obj:
             content = package_obj.read().decode("utf-8")
             package_info = json.loads(content)
@@ -430,8 +431,10 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
                 try:
                     self.load_package(dependency, version, fail_if_exists=False)
                 except Exception as e:
-                    errors.append(f"Failed to download and load dependency {dependency}: {e}")
-        
+                    errors.append(
+                        f"Failed to download and load dependency {dependency}: {e}"
+                    )
+
         for member in tar_file.getmembers():
             if not member.isfile():
                 continue
@@ -632,6 +635,34 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
                 # Package repository couldn't find it, continue to internet fallback
                 pass
 
+        # Last chance, lookg for canonical resource definition
+        # Try to find the resource in the local FHIR definitions bundle if available
+        current_file_path = Path(__file__).resolve()
+        profiles_path = (
+            current_file_path.parent
+            / "definitions"
+            / get_FHIR_release_from_version(version or "4.0.0")
+            / "profiles-resources.json"
+        )
+        if profiles_path.exists():
+            with open(profiles_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                entry = next(
+                    (
+                        entry
+                        for entry in data["entry"]
+                        if entry["resource"]["url"] == canonical_url
+                        and entry["resource"]["resourceType"] == "StructureDefinition"
+                    ),
+                    None,
+                )
+                if entry:
+                    structure_def = StructureDefinition.model_validate(
+                        entry["resource"]
+                    )
+                    self.add(structure_def)
+                    return structure_def
+
         # Fall back to internet if enabled
         if self._internet_enabled:
             structure_definition = self._http_repository.get(canonical_url, version)
@@ -645,9 +676,7 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
             f"Structure definition not found for {base_url}{version_info}. Either load it locally, load the appropriate package, or enable internet access to download it."
         )
 
-    def add(
-        self, resource: StructureDefinition, fail_if_exists: bool = False
-    ) -> None:
+    def add(self, resource: StructureDefinition, fail_if_exists: bool = False) -> None:
         """
         Adds a StructureDefinition to the local repository.
 
@@ -835,7 +864,9 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
             except Exception as e:
                 raise RuntimeError(f"Failed to load {file_path}: {e}")
 
-    def load_from_definitions(self, *definitions: Dict[str, Any] | StructureDefinition) -> None:
+    def load_from_definitions(
+        self, *definitions: Dict[str, Any] | StructureDefinition
+    ) -> None:
         """
         Loads FHIR structure definitions from one or more pre-loaded dictionaries.
         Each dictionary in `definitions` should represent a FHIR StructureDefinition resource.
