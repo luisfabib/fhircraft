@@ -11,11 +11,11 @@ from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
     StructureMapConst,
     StructureMapGroup,
     StructureMapGroupInput,
-    StructureMapGroupRuleTargetParameter,
     StructureMapGroupRule,
     StructureMapGroupRuleSource,
-    StructureMapStructure,
     StructureMapGroupRuleTarget,
+    StructureMapGroupRuleTargetParameter,
+    StructureMapStructure,
 )
 from fhircraft.fhir.resources.definitions.element_definition import (
     ElementDefinition,
@@ -54,6 +54,7 @@ EXAMPLES_DIRECTORY = "test/static/fhir-mapping-language/R5"
         ("tutorial13"),
     ],
 )
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_integration_tutorial_examples(directory):
     with open(
         os.path.join(
@@ -247,8 +248,12 @@ def create_simple_structure_map(map_content: str) -> StructureMap:
                 name="main",
                 typeMode="none",
                 input=[
-                    StructureMapGroupInput(name="src", type="SimpleSource", mode="source"),
-                    StructureMapGroupInput(name="tgt", type="SimpleTarget", mode="target"),
+                    StructureMapGroupInput(
+                        name="src", type="SimpleSource", mode="source"
+                    ),
+                    StructureMapGroupInput(
+                        name="tgt", type="SimpleTarget", mode="target"
+                    ),
                 ],
                 rule=[
                     # Rules will be added by the test cases
@@ -268,7 +273,9 @@ simple_mapping_test_cases = [
             StructureMapGroupRule(
                 name="mapName",
                 source=[
-                    StructureMapGroupRuleSource(context="src", element="name", variable="n")
+                    StructureMapGroupRuleSource(
+                        context="src", element="name", variable="n"
+                    )
                 ],
                 target=[
                     StructureMapGroupRuleTarget(
@@ -281,7 +288,11 @@ simple_mapping_test_cases = [
             ),
             StructureMapGroupRule(
                 name="mapAge",
-                source=[StructureMapGroupRuleSource(context="src", element="age", variable="a")],
+                source=[
+                    StructureMapGroupRuleSource(
+                        context="src", element="age", variable="a"
+                    )
+                ],
                 target=[
                     StructureMapGroupRuleTarget(
                         context="tgt",
@@ -301,7 +312,9 @@ simple_mapping_test_cases = [
             StructureMapGroupRule(
                 name="mapName",
                 source=[
-                    StructureMapGroupRuleSource(context="src", element="name", variable="n")
+                    StructureMapGroupRuleSource(
+                        context="src", element="name", variable="n"
+                    )
                 ],
                 target=[
                     StructureMapGroupRuleTarget(
@@ -314,7 +327,11 @@ simple_mapping_test_cases = [
             ),
             StructureMapGroupRule(
                 name="mapAge",
-                source=[StructureMapGroupRuleSource(context="src", element="age", variable="a")],
+                source=[
+                    StructureMapGroupRuleSource(
+                        context="src", element="age", variable="a"
+                    )
+                ],
                 target=[
                     StructureMapGroupRuleTarget(
                         context="tgt",
@@ -332,7 +349,9 @@ simple_mapping_test_cases = [
                         context="tgt",
                         element="status",
                         transform="copy",
-                        parameter=[StructureMapGroupRuleTargetParameter(valueString="active")],
+                        parameter=[
+                            StructureMapGroupRuleTargetParameter(valueString="active")
+                        ],
                     )
                 ],
             ),
@@ -346,7 +365,9 @@ simple_mapping_test_cases = [
             StructureMapGroupRule(
                 name="mapNameOnly",
                 source=[
-                    StructureMapGroupRuleSource(context="src", element="name", variable="n")
+                    StructureMapGroupRuleSource(
+                        context="src", element="name", variable="n"
+                    )
                 ],
                 target=[
                     StructureMapGroupRuleTarget(
@@ -372,7 +393,9 @@ simple_mapping_test_cases = [
                         context="tgt",
                         element="yearsOld",
                         transform="copy",
-                        parameter=[StructureMapGroupRuleTargetParameter(valueId="fixAge")],
+                        parameter=[
+                            StructureMapGroupRuleTargetParameter(valueId="fixAge")
+                        ],
                     )
                 ],
             )
@@ -389,6 +412,7 @@ def test_simple_mapping_scenarios(test_name, source_data, expected_target, rules
 
     # Create structure map with the provided rules
     structure_map = create_simple_structure_map("")
+    assert structure_map.group is not None, "Group should be initialized"
     structure_map.group[0].rule = rules
 
     repository = CompositeStructureDefinitionRepository(internet_enabled=False)
