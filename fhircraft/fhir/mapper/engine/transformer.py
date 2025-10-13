@@ -7,7 +7,6 @@ from typing import Any, Callable, List
 from pydantic import BaseModel
 
 import fhircraft.fhir.path.engine as fhirpath
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMapGroupRuleTargetParameter as StructureMapParameter
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
     CodeableConcept,
@@ -15,6 +14,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
     ContactPoint,
     Identifier,
     Quantity,
+)
+from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
+    StructureMapGroupRuleTargetParameter as StructureMapParameter,
 )
 
 from .exceptions import MappingError, RuleProcessingError
@@ -130,7 +132,9 @@ class MappingTransformer:
             "cp": self._cp_transform,
         }
 
-    def execute(self, name: str, scope: MappingScope, parameters: List[StructureMapParameter]) -> Any:
+    def execute(
+        self, name: str, scope: MappingScope, parameters: List[StructureMapParameter]
+    ) -> Any:
         """
         Executes a registered FHIR Mapping Language transform by name.
 
@@ -331,9 +335,12 @@ class MappingTransformer:
             Any exception raised by `scope.resolve_fhirpath` or the FHIRPath evaluation methods if the resource type or ID cannot be resolved.
         """
         source_fhirpath = scope.resolve_fhirpath(source)
-        resource_type = source_fhirpath._invoke(
-            fhirpath.Element("resourceType")
-        ).single(scope.get_instances()) or source_fhirpath.single(scope.get_instances()).__class__.__name__
+        resource_type = (
+            source_fhirpath._invoke(fhirpath.Element("resourceType")).single(
+                scope.get_instances()
+            )
+            or source_fhirpath.single(scope.get_instances()).__class__.__name__
+        )
         resource_id = source_fhirpath._invoke(fhirpath.Element("id")).single(
             scope.get_instances()
         )

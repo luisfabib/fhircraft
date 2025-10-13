@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, Any, Union, Dict
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 from fhircraft.utils import ensure_list
@@ -122,8 +122,12 @@ def evaluate_left_right_expressions(
     Returns:
         tuple[FHIRPathCollection, FHIRPathCollection]: A tuple containing the evaluated left and right collections of values.
     """
-    left_collection = evaluate_fhirpath_collection(left, collection, environment, create)
-    right_collection = evaluate_fhirpath_collection(right, collection, environment, create)
+    left_collection = evaluate_fhirpath_collection(
+        left, collection, environment, create
+    )
+    right_collection = evaluate_fhirpath_collection(
+        right, collection, environment, create
+    )
     return left_collection, right_collection
 
 
@@ -137,8 +141,10 @@ def evaluate_and_prepare_collection_values(
     prevent_all_empty: bool = True,
 ) -> tuple[Any | None, Any | None]:
     from fhircraft.fhir.path.engine.core import Literal
+
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
         from fhircraft.fhir.path.engine.literals import Quantity
+
         return [
             (
                 Quantity(item.value.value, item.value.unit)
@@ -178,7 +184,11 @@ def evaluate_and_prepare_collection_values(
     return left_value, right_value
 
 
-def get_expression_context(environment: Dict[str, FHIRPathCollectionItem], item: FHIRPathCollectionItem, index: int) -> dict:
+def get_expression_context(
+    environment: Dict[str, FHIRPathCollectionItem],
+    item: FHIRPathCollectionItem,
+    index: int,
+) -> dict:
     context = environment.copy()
     context["$this"] = item
     context["$index"] = FHIRPathCollectionItem.wrap(index)

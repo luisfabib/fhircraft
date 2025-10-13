@@ -61,7 +61,6 @@ class Aggregate(FHIRPathFunction):
             # Set up the environment for evaluating the expression
             context = get_expression_context(context, item, index)
             context["$total"] = context.get("$total", self.init if self.init else [])
-            print(context)
             # Evaluate the expression
             result = self.expression.evaluate([item], context, create=create)
             # Update the total variable for the next iteration

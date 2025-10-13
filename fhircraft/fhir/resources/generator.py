@@ -42,7 +42,9 @@ class CodeGenerator:
         """
         self.import_statements = defaultdict(list)
         self.data = {}
-        self._processing_models = set()  # Track models being processed to prevent infinite recursion
+        self._processing_models = (
+            set()
+        )  # Track models being processed to prevent infinite recursion
 
     def _cleanup_function_argument(self, arg: Any) -> Any:
         """
@@ -83,7 +85,7 @@ class CodeGenerator:
         """
         # Get the name of the module and the object
         module_name = get_module_name(obj)
-        if isinstance(obj, ForwardRef): 
+        if isinstance(obj, ForwardRef):
             return None
         if (object_name := getattr(obj, "__name__", None)) is None:
             if (object_name := getattr(obj, "_name", None)) is None:
@@ -136,10 +138,10 @@ class CodeGenerator:
         # Check if we're already processing this model or have already processed it
         if model in self._processing_models or model in self.data:
             return
-            
+
         # Add to processing set to prevent infinite recursion
         self._processing_models.add(model)
-        
+
         try:
             model_base = model.__base__
             # Add import statement for the base class the the model inherits
@@ -165,17 +167,26 @@ class CodeGenerator:
                 annotation_string = repr(info.annotation)
 
                 # Handle forward references
-                if 'ForwardRef' in annotation_string:
-                    annotation_string = re.sub(r"ForwardRef\('(\w+)'\)", r"'\1'", annotation_string)
-                    
+                if "ForwardRef" in annotation_string:
+                    annotation_string = re.sub(
+                        r"ForwardRef\('(\w+)'\)", r"'\1'", annotation_string
+                    )
+
                 # Handle self-referencing models
-                elif not 'Literal' in annotation_string:
-                    annotation_string = re.sub(rf"\b{model.__name__}\b", f'"{model.__name__}"', annotation_string, 0)
+                elif not "Literal" in annotation_string:
+                    annotation_string = re.sub(
+                        rf"\b{model.__name__}\b",
+                        f'"{model.__name__}"',
+                        annotation_string,
+                        0,
+                    )
 
                 if isinstance(info.annotation, type(Enum)):
                     if "Literal" not in self.import_statements["typing"]:
                         self.import_statements["typing"].append("Literal")
-                    annotation_string = f"Literal['{info.annotation['fixedValue'].value}']"
+                    annotation_string = (
+                        f"Literal['{info.annotation['fixedValue'].value}']"
+                    )
 
                 default = "..."
                 default_factory = "..."
@@ -184,9 +195,13 @@ class CodeGenerator:
                 elif isinstance(info.default, BaseModel):
                     arguments = ", ".join(
                         f"{key}={value!r}"
-                        for key, value in info.default.model_dump(exclude_none=True).items()
+                        for key, value in info.default.model_dump(
+                            exclude_none=True
+                        ).items()
                     )
-                    default_factory = f"lambda: {info.default.__class__.__name__}({arguments})"
+                    default_factory = (
+                        f"lambda: {info.default.__class__.__name__}({arguments})"
+                    )
                 elif info.default is not PydanticUndefined:
                     default = repr(info.default)
                 elif info.default_factory is not None:
@@ -205,7 +220,9 @@ class CodeGenerator:
             for key, value in model.__dict__.items():
                 if isinstance(value, property):
                     if not value.fget:
-                        raise ValueError(f"Property {key} does not have a getter function.")
+                        raise ValueError(
+                            f"Property {key} does not have a getter function."
+                        )
                     if not isinstance(value.fget, functools.partial):  # type: ignore
                         raise ValueError(
                             f"Only partial functions are supported for properties in the code generator. Property {key} uses {type(value.fget)}."
@@ -220,27 +237,44 @@ class CodeGenerator:
                         keywords={
                             k: self._cleanup_function_argument(v)
                             for k, v in value.fget.keywords.items()
-                        }
+                        },
                     )
 
             inherited_validator_functions = [
-                getattr(v.func,'__func__', v.func) 
-                for base in model.__bases__ 
-                for v in [*base.__pydantic_decorators__.field_validators.values(), *base.__pydantic_decorators__.model_validators.values()]
+                getattr(v.func, "__func__", v.func)
+                for base in model.__bases__
+                for v in [
+                    *base.__pydantic_decorators__.field_validators.values(),
+                    *base.__pydantic_decorators__.model_validators.values(),
+                ]
             ]
-            
+
             validators = {}
-            for mode, _validators in zip(['field', 'model'], [model.__pydantic_decorators__.field_validators, model.__pydantic_decorators__.model_validators]):
-                for name, validator in _validators.items():  
-                    if isinstance(validation_function:=getattr(validator.func,'__func__', validator.func), functools.partial): # type: ignore
+            for mode, _validators in zip(
+                ["field", "model"],
+                [
+                    model.__pydantic_decorators__.field_validators,
+                    model.__pydantic_decorators__.model_validators,
+                ],
+            ):
+                for name, validator in _validators.items():
+                    if isinstance(validation_function := getattr(validator.func, "__func__", validator.func), functools.partial):  # type: ignore
                         self._add_import_statement(validation_function.func)
-                        func_args = [self._cleanup_function_argument(arg) for arg in validation_function.args]
-                        func_kwargs = {key: self._cleanup_function_argument(arg) for key, arg in validation_function.keywords.items()}
+                        func_args = [
+                            self._cleanup_function_argument(arg)
+                            for arg in validation_function.args
+                        ]
+                        func_kwargs = {
+                            key: self._cleanup_function_argument(arg)
+                            for key, arg in validation_function.keywords.items()
+                        }
                     else:
                         if validation_function in inherited_validator_functions:
                             continue  # Skip inherited validators
-                        raise ValueError("Only partial functions are supported for validators in the code generator.")
-                    
+                        raise ValueError(
+                            "Only partial functions are supported for validators in the code generator."
+                        )
+
                     validators[name] = dict(
                         mode=mode,
                         info=validator.info,
@@ -249,7 +283,15 @@ class CodeGenerator:
                         keywords=func_kwargs,
                     )
 
-            self.data.update({model: {"fields": subdata, "properties": model_properties, "validators": validators}})
+            self.data.update(
+                {
+                    model: {
+                        "fields": subdata,
+                        "properties": model_properties,
+                        "validators": validators,
+                    }
+                }
+            )
         finally:
             # Always remove from processing set when done
             self._processing_models.discard(model)

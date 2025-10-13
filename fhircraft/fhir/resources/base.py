@@ -24,7 +24,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         kwargs.update({"by_alias": True, "exclude_none": True})
         return super().model_dump_json(*args, **kwargs)
 
-    @classmethod 
+    @classmethod
     def model_construct(cls, set_defaults=True, *args, **kwargs) -> object:
         """
         Constructs a model without running validation, with an option to set default values for fields that have them defined.
@@ -45,7 +45,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             if field.default not in (PydanticUndefined, None):
                 setattr(instance, field_name, copy(field.default))
             elif field.default_factory not in (PydanticUndefined, None):
-                setattr(instance, field_name, field.default_factory())
+                setattr(instance, field_name, field.default_factory)
         return instance
 
     @classmethod
@@ -159,12 +159,12 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             )
             [col.set_literal(new_valid_elements) for col in collection]
         return resource
-    
+
     def __repr__(self) -> str:
         repr_args = []
         for fieldname in self.model_fields_set or self.__class__.model_fields:
             value = getattr(self, fieldname)
-            repr_args.append(f'{fieldname}={value}')
+            repr_args.append(f"{fieldname}={value}")
         return f"{self.__class__.__name__}({', '.join(repr_args)})"
 
 
