@@ -8,9 +8,8 @@ and FHIRPath conversion functions use these utilities.
 
 import importlib
 import re
-
+from datetime import date, datetime, time
 from typing import TYPE_CHECKING, Any, Type, Union
-from datetime import datetime, date, time
 
 from pydantic import BaseModel, Field, ValidationError, create_model
 from typing_extensions import TypeAliasType
@@ -58,18 +57,24 @@ def get_fhir_resource_type(type_str: str, release="R4B") -> type:
 
     resource = getattr(resource_module, type_str, None)
     if not resource:
-        from fhircraft.fhir.resources.factory import factory
+        # Try to get from factory cache using lazy import to avoid circular dependency
+        try:
+            from fhircraft.fhir.resources import factory
 
-        resource = next(
-            (
-                model
-                for model in factory.construction_cache.values()
-                if model.__name__ == type_str
-                and release
-                == get_FHIR_release_from_version(getattr(model, "fhirVersion", ""))
-            ),
-            None,
-        )
+            resource = next(
+                (
+                    model
+                    for model in factory.factory.construction_cache.values()
+                    if model.__name__ == type_str
+                    and release
+                    == get_FHIR_release_from_version(getattr(model, "fhirVersion", ""))
+                ),
+                None,
+            )
+        except ImportError:
+            # Factory not available, which is fine - we'll just fail gracefully
+            pass
+
         if not resource:
             raise AttributeError(f"Unknown {release} FHIR resource type: {type_str}")
     return resource
@@ -251,22 +256,38 @@ def is_base64binary(value: Any) -> bool:
 
 def is_instant(value: Any) -> bool:
     """Check if value is a valid FHIR Instant."""
-    return is_fhir_primitive_type(value, primitives.Instant) if isinstance(value, str) else isinstance(value, datetime)
+    return (
+        is_fhir_primitive_type(value, primitives.Instant)
+        if isinstance(value, str)
+        else isinstance(value, datetime)
+    )
 
 
 def is_date(value: Any) -> bool:
     """Check if value is a valid FHIR Date."""
-    return is_fhir_primitive_type(value, primitives.Date) if isinstance(value, str) else isinstance(value, date) and not is_datetime(value)
+    return (
+        is_fhir_primitive_type(value, primitives.Date)
+        if isinstance(value, str)
+        else isinstance(value, date) and not is_datetime(value)
+    )
 
 
 def is_datetime(value: Any) -> bool:
     """Check if value is a valid FHIR DateTime."""
-    return is_fhir_primitive_type(value, primitives.DateTime) if isinstance(value, str) else isinstance(value, datetime) and not is_date(value)
+    return (
+        is_fhir_primitive_type(value, primitives.DateTime)
+        if isinstance(value, str)
+        else isinstance(value, datetime) and not is_date(value)
+    )
 
 
 def is_time(value: Any) -> bool:
     """Check if value is a valid FHIR Time."""
-    return is_fhir_primitive_type(value, primitives.Time) if isinstance(value, str) else isinstance(value, time) 
+    return (
+        is_fhir_primitive_type(value, primitives.Time)
+        if isinstance(value, str)
+        else isinstance(value, time)
+    )
 
 
 def is_code(value: Any) -> bool:

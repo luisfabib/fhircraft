@@ -121,7 +121,7 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         "DATETIME",
         "STRING",
         "RIGHT_ARROW",
-        "DOUBLE_EQUAL"
+        "DOUBLE_EQUAL",
     ]
 
     def t_ignore_WHITESPACE(self, t):
@@ -130,11 +130,10 @@ class FhirMappingLanguageLexer(FhirPathLexer):
             t.lexer.lineno += 1
             t.lexer.latest_newline = t.lexpos
 
-
     def t_METADATA_DECLARATION(self, t):
         r"\/\/\/"
         return t
-    
+
     def t_DOCUMENTATION(self, t):
         r"\/{2}(.*)"
         for substring in ["//", "/*", "*/"]:
@@ -185,7 +184,7 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         t.value = t.value.strip("<").strip(">")
         t.value = {"types": "types", "type+": "type-and-types"}[t.value]
         return t
-    
+
     def t_DOUBLE_EQUAL(self, t):
         r"=="
         return t

@@ -1,6 +1,7 @@
-from typing import Any, List, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List
 
 from fhircraft.fhir.path.utils import import_fhirpath_engine
+
 if TYPE_CHECKING:
     from fhircraft.fhir.path.parser import FhirPathParser
 
