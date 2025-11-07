@@ -194,7 +194,6 @@ class ResourceFactory:
 
         FHIR_release: str
         FHIR_version: str
-        resource_name: str
 
     def __init__(
         self,
@@ -880,7 +879,7 @@ class ResourceFactory:
         return min_card, max_card
 
     def _resolve_content_reference(
-        self, element: ElementDefinitionNode
+        self, element: ElementDefinitionNode, resource_name="Unknown"
     ) -> ElementDefinitionNode:
         """
         Resolves the content reference for a given ElementDefinitionNode by copying relevant fields
@@ -924,9 +923,7 @@ class ResourceFactory:
         if reference_path in self.paths_in_processing or element.path.startswith(
             reference_path + "."
         ):
-            backbone_model_name = capitalize(
-                self.Config.resource_name if self.Config else "Unknown"
-            ).strip() + "".join(
+            backbone_model_name = capitalize(resource_name).strip() + "".join(
                 [capitalize(label).strip() for label in reference_path.split(".")[1:]]
             )
             element.type = [ElementDefinitionType(code=backbone_model_name)]
@@ -1002,7 +999,10 @@ class ResourceFactory:
         }
 
     def _process_FHIR_structure_into_Pydantic_components(
-        self, structure: ElementDefinitionNode, base: Any | None = None
+        self,
+        structure: ElementDefinitionNode,
+        base: Any | None = None,
+        resource_name: str = "Unknown",
     ) -> Tuple[
         Dict[str, Any],
         ResourceFactoryValidators,
@@ -1037,7 +1037,7 @@ class ResourceFactory:
             # Element content references
             # -------------------------------------
             if element.contentReference:
-                element = self._resolve_content_reference(element)
+                element = self._resolve_content_reference(element, resource_name)
 
             # -------------------------------------
             # Type resolution
@@ -1155,14 +1155,12 @@ class ResourceFactory:
                 assert isinstance(field_type, type) and issubclass(
                     field_type, BaseModel
                 ), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {element.path}"
-                backbone_model_name = capitalize(
-                    self.Config.resource_name if self.Config else "Unknown"
-                ).strip() + "".join(
+                backbone_model_name = capitalize(resource_name).strip() + "".join(
                     [capitalize(label).strip() for label in element.path.split(".")[1:]]
                 )
                 field_subfields, subfield_validators, subfield_properties = (
                     self._process_FHIR_structure_into_Pydantic_components(
-                        element, field_type
+                        element, field_type, resource_name
                     )
                 )
                 # -------------------------------------
@@ -1292,11 +1290,12 @@ class ResourceFactory:
                 _structure_definition.fhirVersion or "4.3.0"
             ),
             FHIR_version=_structure_definition.fhirVersion or "4.3.0",
-            resource_name=_structure_definition.name,
         )
         # Process the FHIR resource's elements & constraints into Pydantic fields & validators
         fields, validators, properties = (
-            self._process_FHIR_structure_into_Pydantic_components(structure)
+            self._process_FHIR_structure_into_Pydantic_components(
+                structure, resource_name=_structure_definition.name
+            )
         )
         # Process resource-level constraints
         for constraint in structure.constraint or []:
@@ -1341,7 +1340,7 @@ class ResourceFactory:
 
         # Construct the Pydantic model representing the FHIR resource
         model = self._construct_model_with_properties(
-            self.Config.resource_name if self.Config else _structure_definition.name,
+            _structure_definition.name,
             fields=fields,
             base=(base,),
             validators=validators.get_all(),
