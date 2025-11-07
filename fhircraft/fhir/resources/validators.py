@@ -3,7 +3,7 @@ import traceback
 import warnings
 
 # Standard modules
-from typing import Any, List, TypeVar, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, TypeVar, Union
 
 from pydantic import BaseModel, ValidationError
 
@@ -116,8 +116,8 @@ def validate_model_constraint(
 def validate_FHIR_element_pattern(
     cls: Any,
     element: Union["FHIRBaseModel", List["FHIRBaseModel"]],
-    pattern: Union["FHIRBaseModel", List["FHIRBaseModel"]],
-) -> Union["FHIRBaseModel", List["FHIRBaseModel"]]:
+    pattern: Union["FHIRBaseModel", List["FHIRBaseModel"], Any],
+) -> Union["FHIRBaseModel", List["FHIRBaseModel"], Any]:
     """
     Validate the FHIR element against a specified pattern and return the element if it fulfills the pattern.
 
@@ -132,13 +132,18 @@ def validate_FHIR_element_pattern(
     Raises:
         AssertionError: If the element does not fulfill the specified pattern.
     """
+    from fhircraft.fhir.resources.base import FHIRBaseModel
+
     if isinstance(pattern, list):
         pattern = pattern[0]
     _element = element[0] if isinstance(element, list) else element
-    assert (
-        merge_dicts(_element.model_dump(), pattern.model_dump())
-        == _element.model_dump()
-    ), f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2)}"
+    if isinstance(_element, FHIRBaseModel):
+        assert (
+            merge_dicts(_element.model_dump(), pattern.model_dump())
+            == _element.model_dump()
+        ), f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2)}"
+    else:
+        assert _element == pattern, f"Value does not fulfill pattern: {pattern}"
     return element
 
 
@@ -258,9 +263,9 @@ def validate_contained_resource(
     Raises:
         TypeError: If the contained resource is not a FHIRBaseModel or a dict.
     """
-    from fhircraft.fhir.resources.datatypes.utils import get_fhir_resource_type
     from fhircraft.fhir.resources.base import FHIRBaseModel
-    
+    from fhircraft.fhir.resources.datatypes.utils import get_fhir_resource_type
+
     if not resources:
         return None
     if not isinstance(resources, list):

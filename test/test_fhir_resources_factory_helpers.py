@@ -45,7 +45,7 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", resource_name="Test", FHIR_version="4.3.0"
+            FHIR_release="R4B", FHIR_version="4.3.0"
         )
 
 
@@ -679,7 +679,7 @@ class TestConstructSliceModel(FactoryTestCase):
 
     def test_construct_slice_model_with_profile(self):
         definition = self.DummyElementDefinitionNode(type_=[self.DummyType()])
-        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel)  # type: ignore
+        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel, "Test")  # type: ignore
         # Assertions
         self.factory.construct_resource_model.assert_called_once_with(  # type: ignore
             "http://example.org/fhir/StructureDefinition/DummySlice",
@@ -692,7 +692,7 @@ class TestConstructSliceModel(FactoryTestCase):
 
     def test_construct_slice_model_without_profile(self):
         definition = self.DummyElementDefinitionNode(type_=[])
-        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel)  # type: ignore
+        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel, "Test")  # type: ignore
         self.factory._process_FHIR_structure_into_Pydantic_components.assert_called_once()  # type: ignore
         # Assertions
         self.factory._construct_model_with_properties.assert_called_once()  # type: ignore
@@ -703,7 +703,7 @@ class TestConstructSliceModel(FactoryTestCase):
 
     def test_construct_slice_model_base_is_FHIRSliceModel(self):
         definition = self.DummyElementDefinitionNode(type_=[])
-        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyFHIRSliceModel)  # type: ignore
+        result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyFHIRSliceModel, "Test")  # type: ignore
         # Assertions
         self.factory._construct_model_with_properties.assert_called()  # type: ignore
         self.assertTrue(issubclass(result, self.DummyFHIRSliceModel))
