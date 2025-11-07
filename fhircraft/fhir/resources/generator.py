@@ -60,12 +60,8 @@ class CodeGenerator:
             escape_quotes = arg.replace('"', '\\"')
             return f'"{escape_quotes}"'
         elif isinstance(arg, BaseModel):
-            arguments = ", ".join(
-                f"{key}={value!r}"
-                for key, value in arg.model_dump(exclude_none=True).items()
-            )
-            self._add_import_statement(arg.__class__)
-            return f"{arg.__class__.__name__}({arguments})"
+            self._add_constant_value_imports(arg)
+            return repr(arg)
         else:
             return arg
 
@@ -127,6 +123,19 @@ class CodeGenerator:
         # Repeat for any nested annotations
         for nested_annotation in get_args(annotation):
             self._recursively_import_annotation_types(nested_annotation)
+
+    def _add_constant_value_imports(self, instance: BaseModel):
+        self._recursively_import_annotation_types(instance.__class__)
+        for fieldname in sorted(
+            instance.model_fields_set or instance.__class__.model_fields
+        ):
+            value = getattr(instance, fieldname)
+            if isinstance(value, BaseModel):
+                self._add_constant_value_imports(value)
+            if isinstance(value, list):
+                for item in value:
+                    if isinstance(item, BaseModel):
+                        self._add_constant_value_imports(item)
 
     def _serialize_model(self, model: type[BaseModel]) -> None:
         """
@@ -193,13 +202,7 @@ class CodeGenerator:
                 if isinstance(info.default, str):
                     default = f'"{info.default}"'
                 elif isinstance(info.default, BaseModel):
-                    print("info.default:", info.default.__repr__())
-                    arguments = ", ".join(
-                        f"{key}={value!r}"
-                        for key, value in info.default.model_dump(
-                            exclude_none=True
-                        ).items()
-                    )
+                    self._add_constant_value_imports(info.default)
                     default_factory = f"lambda: {repr(info.default)}"
                 elif info.default is not PydanticUndefined:
                     default = repr(info.default)

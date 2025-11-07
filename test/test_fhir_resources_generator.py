@@ -138,6 +138,10 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             )
         """
         self.assertBlockInCode(expected_block, model)
+        self.assertBlockInCode(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept,Coding",
+            model,
+        )
 
     def test_model_with_field_validator(self):
         # Create model dynamically
@@ -179,10 +183,15 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             @classmethod
             def FHIR_code_pattern_constraint(cls, value):    
                 return validate_FHIR_element_pattern(cls, value,
-                    pattern=CodeableConcept(coding=[{'system': 'http://example.org', 'code': '12345', 'display': 'code'}]),
+                    pattern=CodeableConcept(coding=[Coding(code="12345",  display="code", system="http://example.org")]),
                 )
         """
         self.assertBlockInCode(expected_block, model)
+        # Check imports
+        self.assertBlockInCode(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept,Coding",
+            model,
+        )
 
     def test_model_with_model_validator(self):
         # Create model dynamically
@@ -300,17 +309,22 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             @classmethod
             def FHIR_codeA_pattern_constraint(cls, value):    
                 return validate_FHIR_element_pattern(cls, value,
-                    pattern=CodeableConcept(coding=[{'system': 'http://example.org', 'code': '12345', 'display': 'code-1'}]),
+                    pattern=CodeableConcept(coding=[Coding(code="12345", display="code-1", system="http://example.org")]),
                 )
 
             @field_validator(*('codeB',), mode="after", check_fields=None)
             @classmethod
             def FHIR_codeB_pattern_constraint(cls, value):    
                 return validate_FHIR_element_pattern(cls, value,
-                    pattern=CodeableConcept(coding=[{'system': 'http://example.org', 'code': '67890', 'display': 'code-2'}]),
+                    pattern=CodeableConcept(coding=[Coding(code="67890", display="code-2", system="http://example.org")]),
                 )
         """
         self.assertBlockInCode(expected_block, model)
+        # Check imports
+        self.assertBlockInCode(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept,Coding",
+            model,
+        )
 
     def test_model_with_list_of_complex_types(self):
         # Create model dynamically
