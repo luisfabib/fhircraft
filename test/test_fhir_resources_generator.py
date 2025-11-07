@@ -1,12 +1,16 @@
 import unittest
 from functools import partial
-from pydantic import BaseModel, Field, create_model as _create_model
-from typing import Optional, List
-from fhircraft.fhir.resources.generator import generate_resource_model_code
-from fhircraft.fhir.resources.datatypes import primitives 
-from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept, Coding
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
+from pydantic import create_model as _create_model
+from pydantic import field_validator, model_validator
+
 import fhircraft.fhir.resources.validators as fhir_validators
-from pydantic import Field, field_validator, model_validator, BaseModel
+from fhircraft.fhir.resources.datatypes import primitives
+from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept, Coding
+from fhircraft.fhir.resources.generator import generate_resource_model_code
+
 
 def create_model(*args, **kwargs):
     """
@@ -14,11 +18,13 @@ def create_model(*args, **kwargs):
     """
     return _create_model(*args, __base__=(BaseModel,), **kwargs)
 
+
 class TestJinjaTemplateRendering(unittest.TestCase):
 
     def _normalize(self, s):
         import re
-        return re.sub(r'\s+', ' ', s.strip())
+
+        return re.sub(r"\s+", " ", s.strip())
 
     def assertBlockInCode(self, expected_block, model):
         # Generate source code
@@ -26,13 +32,18 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         # Assert code block (normalized)
         norm_expected = self._normalize(expected_block)
         norm_code = self._normalize(code)
-        self.assertIn(norm_expected, norm_code, f'Expected block not found in generated code.\n\nExpected:\n{expected_block}\n\nGot:\n{code}')
+        self.assertIn(
+            norm_expected,
+            norm_code,
+            f"Expected block not found in generated code.\n\nExpected:\n{expected_block}\n\nGot:\n{code}",
+        )
 
     def test_simple_model(self):
         # Create model dynamically
-        model = create_model('SimpleModel',
+        model = create_model(
+            "SimpleModel",
             id=(primitives.String, Field(description="The unique identifier.")),
-            value=(primitives.Integer, Field(default=42, description="A value."))
+            value=(primitives.Integer, Field(default=42, description="A value.")),
         )
         # Expected code block
         expected_class = """
@@ -49,8 +60,12 @@ class TestJinjaTemplateRendering(unittest.TestCase):
 
     def test_model_with_alias(self):
         # Create model dynamically
-        model = create_model('ModelWithAlias',
-            name=(primitives.String, Field(alias="fullName", description="The person name."))
+        model = create_model(
+            "ModelWithAlias",
+            name=(
+                primitives.String,
+                Field(alias="fullName", description="The person name."),
+            ),
         )
         # Expected code block
         expected_block = """
@@ -64,8 +79,12 @@ class TestJinjaTemplateRendering(unittest.TestCase):
 
     def test_model_with_optional(self):
         # Create model dynamically
-        model = create_model('ModelWithOptional',
-            description=(Optional[primitives.String], Field(default=None, description="Optional description."))
+        model = create_model(
+            "ModelWithOptional",
+            description=(
+                Optional[primitives.String],
+                Field(default=None, description="Optional description."),
+            ),
         )
         # Expected code block
         expected_block = """
@@ -79,8 +98,12 @@ class TestJinjaTemplateRendering(unittest.TestCase):
 
     def test_model_with_list(self):
         # Create model dynamically
-        model = create_model('ModelWithList',
-            items=(List[primitives.Integer], Field(default_factory=list, description="A list of items."))
+        model = create_model(
+            "ModelWithList",
+            items=(
+                List[primitives.Integer],
+                Field(default_factory=list, description="A list of items."),
+            ),
         )
         # Expected code block
         expected_block = """
@@ -92,21 +115,58 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
 
+    def test_model_with_default_factory_model(self):
+        # Create model dynamically
+        model = create_model(
+            "ModelWithDefaultFactoryModel",
+            codes=(
+                CodeableConcept,
+                Field(
+                    default=CodeableConcept(
+                        coding=[Coding(code="12345", system="http://example.org")]
+                    ),
+                    description="A default CodeableConcept.",
+                ),
+            ),
+        )
+        # Expected code block
+        expected_block = """
+        class ModelWithDefaultFactoryModel(BaseModel):
+            codes: CodeableConcept = Field(
+                description="A default CodeableConcept.",
+                default_factory=lambda: CodeableConcept(coding=[Coding(code="12345", system="http://example.org")]),
+            )
+        """
+        self.assertBlockInCode(expected_block, model)
+
     def test_model_with_field_validator(self):
         # Create model dynamically
-        model = create_model('ModelWithPatternValidator',
-            code=(CodeableConcept, Field(
-                description="A code field with pattern constraint.",
-            )),
+        model = create_model(
+            "ModelWithPatternValidator",
+            code=(
+                CodeableConcept,
+                Field(
+                    description="A code field with pattern constraint.",
+                ),
+            ),
             __validators__={
-                'FHIR_code_pattern_constraint': (
-                    field_validator(*('code',), mode="after", check_fields=None)(
-                        partial(fhir_validators.validate_FHIR_element_pattern, 
-                                pattern=CodeableConcept(coding=[Coding(system='http://example.org', display='code', code='12345')])
+                "FHIR_code_pattern_constraint": (
+                    field_validator(*("code",), mode="after", check_fields=None)(
+                        partial(
+                            fhir_validators.validate_FHIR_element_pattern,
+                            pattern=CodeableConcept(
+                                coding=[
+                                    Coding(
+                                        system="http://example.org",
+                                        display="code",
+                                        code="12345",
+                                    )
+                                ]
+                            ),
                         )
                     )
                 )
-            }
+            },
         )
         # Expected code block
         expected_block = """
@@ -124,25 +184,29 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
 
-
     def test_model_with_model_validator(self):
         # Create model dynamically
-        model = create_model('ModelWithModelValidator',
-            code=(CodeableConcept, Field(
-                description="A code field with model constraint.",
-            )),
+        model = create_model(
+            "ModelWithModelValidator",
+            code=(
+                CodeableConcept,
+                Field(
+                    description="A code field with model constraint.",
+                ),
+            ),
             __validators__={
-                'FHIR_ele_1_constraint_model_validator': (
+                "FHIR_ele_1_constraint_model_validator": (
                     model_validator(mode="after")(
-                        partial(fhir_validators.validate_model_constraint, 
-                                expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-                                human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-                                key="ele-1",
-                                severity="error",
+                        partial(
+                            fhir_validators.validate_model_constraint,
+                            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
+                            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
+                            key="ele-1",
+                            severity="error",
                         )
                     )
                 )
-            }
+            },
         )
         # Expected code block
         expected_block = """
@@ -166,8 +230,12 @@ class TestJinjaTemplateRendering(unittest.TestCase):
 
     def test_model_with_field_title(self):
         # Create model dynamically
-        model = create_model('ModelWithTitle',
-            code=(primitives.String, Field(title="Code Field", description="A code with title."))
+        model = create_model(
+            "ModelWithTitle",
+            code=(
+                primitives.String,
+                Field(title="Code Field", description="A code with title."),
+            ),
         )
         expected_block = """
         class ModelWithTitle(BaseModel):
@@ -180,25 +248,44 @@ class TestJinjaTemplateRendering(unittest.TestCase):
 
     def test_model_with_multiple_field_validators(self):
         # Create model dynamically
-        model = create_model('ModelWithValidators',
+        model = create_model(
+            "ModelWithValidators",
             codeA=(CodeableConcept, Field(description="A first code.")),
             codeB=(CodeableConcept, Field(description="A second code.")),
             __validators__={
-                'FHIR_codeA_pattern_constraint': (
-                    field_validator(*('codeA',), mode="after", check_fields=None)(
-                        partial(fhir_validators.validate_FHIR_element_pattern, 
-                                pattern=CodeableConcept(coding=[Coding(system='http://example.org', display='code-1', code='12345')])
+                "FHIR_codeA_pattern_constraint": (
+                    field_validator(*("codeA",), mode="after", check_fields=None)(
+                        partial(
+                            fhir_validators.validate_FHIR_element_pattern,
+                            pattern=CodeableConcept(
+                                coding=[
+                                    Coding(
+                                        system="http://example.org",
+                                        display="code-1",
+                                        code="12345",
+                                    )
+                                ]
+                            ),
                         )
                     )
                 ),
-                'FHIR_codeB_pattern_constraint': (
-                    field_validator(*('codeB',), mode="after", check_fields=None)(
-                        partial(fhir_validators.validate_FHIR_element_pattern, 
-                                pattern=CodeableConcept(coding=[Coding(system='http://example.org', display='code-2', code='67890')])
+                "FHIR_codeB_pattern_constraint": (
+                    field_validator(*("codeB",), mode="after", check_fields=None)(
+                        partial(
+                            fhir_validators.validate_FHIR_element_pattern,
+                            pattern=CodeableConcept(
+                                coding=[
+                                    Coding(
+                                        system="http://example.org",
+                                        display="code-2",
+                                        code="67890",
+                                    )
+                                ]
+                            ),
                         )
                     )
-                )
-            }
+                ),
+            },
         )
         expected_block = """
         class ModelWithValidators(BaseModel):
@@ -227,8 +314,12 @@ class TestJinjaTemplateRendering(unittest.TestCase):
 
     def test_model_with_list_of_complex_types(self):
         # Create model dynamically
-        model = create_model('ModelWithComplexList',
-            codings=(List[Coding], Field(default_factory=list, description="A list of Coding objects."))
+        model = create_model(
+            "ModelWithComplexList",
+            codings=(
+                List[Coding],
+                Field(default_factory=list, description="A list of Coding objects."),
+            ),
         )
         expected_block = """
         class ModelWithComplexList(BaseModel):
@@ -239,12 +330,12 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
 
-
     def test_model_with_docstring(self):
         # Create model dynamically
-        model = create_model('ModelWithDocstring',
+        model = create_model(
+            "ModelWithDocstring",
             value=(primitives.String, Field(description="A string field.")),
-            __doc__="This is a model with a docstring."
+            __doc__="This is a model with a docstring.",
         )
         expected_block = '''
         class ModelWithDocstring(BaseModel):
@@ -258,14 +349,15 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         '''
         self.assertBlockInCode(expected_block, model)
 
-        
     def test_model_with_fixed_value_enum_field(self):
         # Define an Enum
         from enum import Enum
+
         class Color(Enum):
-            fixedValue = 'red'
-        model = create_model('ModelWithEnum',
-            color=(Color, Field(description="A color enum."))
+            fixedValue = "red"
+
+        model = create_model(
+            "ModelWithEnum", color=(Color, Field(description="A color enum."))
         )
         expected_block = """
         class ModelWithEnum(BaseModel):
@@ -277,13 +369,20 @@ class TestJinjaTemplateRendering(unittest.TestCase):
 
     def test_model_with_property_method(self):
         # Create model with a property
-        model = create_model('ModelWithProperty',
+        model = create_model(
+            "ModelWithProperty",
             valueString=(primitives.String, Field(description="A value.")),
             valueInteger=(primitives.Integer, Field(description="A value.")),
         )
         # Add a property method
-        setattr(model, 'value', property(partial(fhir_validators.get_type_choice_value_by_base, base='value')))
-            
+        setattr(
+            model,
+            "value",
+            property(
+                partial(fhir_validators.get_type_choice_value_by_base, base="value")
+            ),
+        )
+
         expected_block = """
         class ModelWithProperty(BaseModel):
             valueString: String = Field(

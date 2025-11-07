@@ -193,15 +193,14 @@ class CodeGenerator:
                 if isinstance(info.default, str):
                     default = f'"{info.default}"'
                 elif isinstance(info.default, BaseModel):
+                    print("info.default:", info.default.__repr__())
                     arguments = ", ".join(
                         f"{key}={value!r}"
                         for key, value in info.default.model_dump(
                             exclude_none=True
                         ).items()
                     )
-                    default_factory = (
-                        f"lambda: {info.default.__class__.__name__}({arguments})"
-                    )
+                    default_factory = f"lambda: {repr(info.default)}"
                 elif info.default is not PydanticUndefined:
                     default = repr(info.default)
                 elif info.default_factory is not None:
