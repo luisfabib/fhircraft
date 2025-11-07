@@ -759,7 +759,11 @@ class ResourceFactory:
         return fields
 
     def _construct_slice_model(
-        self, name: str, definition: ElementDefinitionNode, base: type[BaseModel]
+        self,
+        name: str,
+        definition: ElementDefinitionNode,
+        base: type[BaseModel],
+        base_name: str,
     ) -> type[FHIRSliceModel]:
         """
         Constructs a Pydantic model representing a FHIR slice based on the provided element definition.
@@ -788,13 +792,15 @@ class ResourceFactory:
             )
         else:
             # Construct the slice model's name
-            slice_model_name = capitalize(
+            slice_model_name = base_name + capitalize(
                 "".join([capitalize(word) for word in name.split("-")])
             )
             # Process and compile all subfields of the slice
             slice_subfields, slice_validators, slice_properties = (
                 self._process_FHIR_structure_into_Pydantic_components(
-                    definition, FHIRSliceModel, resource_name=slice_model_name
+                    definition,
+                    FHIRSliceModel,
+                    resource_name=slice_model_name,
                 )
             )
             # Construct the slice model
@@ -821,7 +827,10 @@ class ResourceFactory:
         return slice_model
 
     def _construct_annotated_sliced_field(
-        self, slices: Dict[str, ElementDefinitionNode], field_type: type[BaseModel]
+        self,
+        slices: Dict[str, ElementDefinitionNode],
+        field_type: type[BaseModel],
+        base_name: str,
     ) -> Annotated:
         """
         Constructs an annotated field representing a union of sliced models and the base field type.
@@ -839,7 +848,7 @@ class ResourceFactory:
                     [
                         *[
                             self._construct_slice_model(
-                                slice_name, slice_element, field_type
+                                slice_name, slice_element, field_type, base_name
                             )
                             for slice_name, slice_element in slices.items()
                         ],
@@ -1142,7 +1151,7 @@ class ResourceFactory:
                     field_type, BaseModel
                 ), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {element.path}"
                 field_type = self._construct_annotated_sliced_field(
-                    element.slices, field_type
+                    element.slices, field_type, base_name=resource_name
                 )
                 # Add slicing cardinality validator for field
                 validators.add_slicing_validator(field=safe_field_name)
@@ -1175,7 +1184,9 @@ class ResourceFactory:
                         self.Config.FHIR_release if self.Config else "4.3.0",
                     )
                     extension_type = self._construct_annotated_sliced_field(
-                        element.children["extension"].slices, extension_slice_base_type
+                        element.children["extension"].slices,
+                        extension_slice_base_type,
+                        base_name=resource_name,
                     )
 
                     # Get cardinality of extension element
