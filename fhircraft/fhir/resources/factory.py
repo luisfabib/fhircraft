@@ -794,7 +794,7 @@ class ResourceFactory:
             # Process and compile all subfields of the slice
             slice_subfields, slice_validators, slice_properties = (
                 self._process_FHIR_structure_into_Pydantic_components(
-                    definition, FHIRSliceModel
+                    definition, FHIRSliceModel, resource_name=slice_model_name
                 )
             )
             # Construct the slice model
@@ -1160,7 +1160,7 @@ class ResourceFactory:
                 )
                 field_subfields, subfield_validators, subfield_properties = (
                     self._process_FHIR_structure_into_Pydantic_components(
-                        element, field_type, resource_name
+                        element, field_type, resource_name=resource_name
                     )
                 )
                 # -------------------------------------
