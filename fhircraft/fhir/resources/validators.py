@@ -192,8 +192,8 @@ def validate_type_choice_element(
 
 
 def validate_slicing_cardinalities(
-    cls: Any, values: List[Any], field_name: str
-) -> List["FHIRSliceModel"]:
+    cls: Any, values: List[Any] | None, field_name: str
+) -> List["FHIRSliceModel"] | None:
     """
     Validates the cardinalities of FHIR slices for a specific field within a FHIR resource.
 
@@ -210,6 +210,8 @@ def validate_slicing_cardinalities(
     """
     from fhircraft.fhir.resources.base import FHIRSliceModel
 
+    if values is None:
+        return values
     slices = get_all_models_from_field(
         cls.model_fields[field_name], issubclass_of=FHIRSliceModel
     )
