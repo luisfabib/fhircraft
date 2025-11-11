@@ -160,12 +160,19 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             [col.set_literal(new_valid_elements) for col in collection]
         return resource
 
-    def __repr__(self) -> str:
+    def _get_repr_args(self) -> list[str]:
         repr_args = []
-        for fieldname in self.model_fields_set or self.__class__.model_fields:
+        for fieldname in sorted(self.model_fields_set or self.__class__.model_fields):
             value = getattr(self, fieldname)
+            if isinstance(value, BaseModel):
+                value = repr(value)
+            elif isinstance(value, str):
+                value = f'"{value}"'
             repr_args.append(f"{fieldname}={value}")
-        return f"{self.__class__.__name__}({', '.join(repr_args)})"
+        return repr_args
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({', '.join(self._get_repr_args())})"
 
 
 class FHIRSliceModel(FHIRBaseModel):
