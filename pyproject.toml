@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = 'fhircraft'
-version='0.3.3'
+version='0.3.4'
 description = "Fhircraft transforms FHIR (Fast Healthcare Interoperability Resources) specifications into type-safe Python models using Pydantic. Build healthcare applications with automatic validation, intelligent code completion, and seamless integration with Python's ecosystem."
 authors = [
     {name = 'Luis Fábregas-Ibáñez', email = 'luisfabib@gmail.com'},
