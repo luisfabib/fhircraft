@@ -7,6 +7,7 @@ from pydantic import create_model as _create_model
 from pydantic import field_validator, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
+from fhircraft.fhir.resources.base import FHIRSliceModel
 from fhircraft.fhir.resources.datatypes import primitives
 from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept, Coding
 from fhircraft.fhir.resources.generator import generate_resource_model_code
@@ -17,6 +18,13 @@ def create_model(*args, **kwargs):
     Helper function to create a Pydantic model dynamically.
     """
     return _create_model(*args, __base__=(BaseModel,), **kwargs)
+
+
+def create_slice_model(*args, **kwargs):
+    """
+    Helper function to create a Pydantic model dynamically.
+    """
+    return _create_model(*args, __base__=(FHIRSliceModel,), **kwargs)
 
 
 class TestJinjaTemplateRendering(unittest.TestCase):
@@ -377,6 +385,23 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         class ModelWithEnum(BaseModel):
             color: Literal['red'] = Field(
                 description="A color enum.",
+            )
+        """
+        self.assertBlockInCode(expected_block, model)
+
+    def test_model_with_sliced_field(self):
+
+        model = create_slice_model(
+            "Slice", valueString=(str, Field(description="A string value"))
+        )
+        model.min_cardinality = 0
+        model.max_cardinality = 2
+        expected_block = """
+        class Slice(FHIRSliceModel):
+            min_cardinality: ClassVar[int] = 0
+            max_cardinality: ClassVar[int] = 2
+            valueString: str = Field(
+                description="A string value",
             )
         """
         self.assertBlockInCode(expected_block, model)

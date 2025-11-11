@@ -9,7 +9,7 @@ from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
-from typing import Optional, Literal, Union
+from typing import Optional, Literal, Union, ClassVar
 from enum import Enum
 NoneType = type(None)
 
@@ -24,6 +24,10 @@ class {{ model.__name__ }}({{ model.__base__.__name__ }}):
     """
     {{ model.__doc__ }}
     """
+    {% endif %}
+    {% if model.__base__.__name__ == "FHIRSliceModel"%}
+    min_cardinality: ClassVar[int] = {{model.min_cardinality}}
+    max_cardinality: ClassVar[int] = {{model.max_cardinality}}
     {% endif %}
     {% if not model_data.fields %}
     pass
