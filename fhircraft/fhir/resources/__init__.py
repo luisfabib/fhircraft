@@ -12,48 +12,25 @@ Recommended imports:
     from fhircraft.fhir.resources import CompositeStructureDefinitionRepository
 """
 
+from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+from fhircraft.fhir.resources.definitions import ElementDefinition, StructureDefinition
+from fhircraft.fhir.resources.factory import ResourceFactory, construct_resource_model
+from fhircraft.fhir.resources.repository import (
+    CompositeStructureDefinitionRepository,
+    HttpStructureDefinitionRepository,
+    PackageStructureDefinitionRepository,
+    configure_repository,
+)
 
-# Use lazy imports to avoid circular dependencies
-def __getattr__(name):
-    """Lazy loading of resources components to avoid circular import issues."""
-    if name == "FHIRBaseModel":
-        from .base import FHIRBaseModel
-
-        return FHIRBaseModel
-    elif name == "FHIRSliceModel":
-        from .base import FHIRSliceModel
-
-        return FHIRSliceModel
-    elif name == "StructureDefinition":
-        from .definitions import StructureDefinition
-
-        return StructureDefinition
-    elif name == "ElementDefinition":
-        from .definitions import ElementDefinition
-
-        return ElementDefinition
-    elif name == "CompositeStructureDefinitionRepository":
-        from .repository import CompositeStructureDefinitionRepository
-
-        return CompositeStructureDefinitionRepository
-    elif name == "HttpStructureDefinitionRepository":
-        from .repository import HttpStructureDefinitionRepository
-
-        return HttpStructureDefinitionRepository
-    elif name == "PackageStructureDefinitionRepository":
-        from .repository import PackageStructureDefinitionRepository
-
-        return PackageStructureDefinitionRepository
-    elif name == "configure_repository":
-        from .repository import configure_repository
-
-        return configure_repository
-    elif name == "ResourceFactory":
-        from .factory import ResourceFactory
-
-        return ResourceFactory
-    elif name == "construct_resource_model":
-        from .factory import construct_resource_model
-
-        return construct_resource_model
-    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
+__all__ = [
+    "FHIRBaseModel",
+    "FHIRSliceModel",
+    "StructureDefinition",
+    "ElementDefinition",
+    "CompositeStructureDefinitionRepository",
+    "HttpStructureDefinitionRepository",
+    "PackageStructureDefinitionRepository",
+    "configure_repository",
+    "ResourceFactory",
+    "construct_resource_model",
+]

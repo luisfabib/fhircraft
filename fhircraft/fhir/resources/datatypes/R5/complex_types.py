@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from pydantic import Field, field_validator, model_validator
 
@@ -6,7 +6,6 @@ import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.utils import model_rebuild_all
-
 
 
 class Base(FHIRBaseModel):
@@ -6305,6 +6304,3 @@ class DomainResource(Resource):
             key="dom-6",
             severity="warning",
         )
-
-
-model_rebuild_all()

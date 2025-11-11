@@ -13,7 +13,6 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.path.utils import evaluate_fhirpath_collection
-from fhircraft.fhir.resources.datatypes import utils as type_utils
 
 
 class FHIRTypesOperator(FHIRPath):
@@ -42,6 +41,9 @@ class FHIRTypesOperator(FHIRPath):
         Validates the type specifier against the known FHIR types.
         Raises an error if the type specifier is not valid.
         """
+        # Laxy import to avoid circular dependencies
+        from fhircraft.fhir.resources.datatypes import utils as type_utils
+
         type_ = self.type_specifier
         # Handle the FHIRPath literal types as special cases
         if isinstance(value, fhirpath_literals.Quantity):
