@@ -15,9 +15,6 @@ from pydantic import BaseModel, Field, ValidationError, create_model
 from typing_extensions import TypeAliasType
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-import fhircraft.fhir.resources.datatypes.R4.complex_types as r4_complex_types
-import fhircraft.fhir.resources.datatypes.R4B.complex_types as r4b_complex_types
-import fhircraft.fhir.resources.datatypes.R5.complex_types as r5_complex_types
 from fhircraft.utils import get_FHIR_release_from_version
 
 if TYPE_CHECKING:
@@ -30,22 +27,19 @@ class FHIRTypeError(Exception):
     pass
 
 
-__complex_types_relases__ = {
-    "R4": r4_complex_types,
-    "R4B": r4b_complex_types,
-    "R5": r5_complex_types,
-}
-
-
 def get_fhir_primitive_type(type_str: str) -> type | None:
     return getattr(primitives, type_str, None)
 
 
 def get_complex_FHIR_type(type_str: str, release="R4B") -> type:
-    complex_FHIR_types = __complex_types_relases__.get(release)
-    if not complex_FHIR_types:
-        raise ValueError(f"Unsupported FHIR release: {release}")
-    return getattr(complex_FHIR_types, type_str)
+    # Dynamically import the complex types module for the specified FHIR release
+    complex_FHIR_types = importlib.import_module(
+        f"fhircraft.fhir.resources.datatypes.{release}.complex_types"
+    )
+    model: type[FHIRBaseModel] = getattr(complex_FHIR_types, type_str)
+    if not model.__pydantic_complete__:
+        model.model_rebuild()  # type: ignore
+    return model
 
 
 def get_fhir_resource_type(type_str: str, release="R4B") -> type:
@@ -537,14 +531,14 @@ def to_quantity(value: Any) -> Union[Any, None]:
                 val, unit = quantity_match.groups()
                 decimal_val = to_decimal(val)
                 if decimal_val is not None:
-                    return Quantity(value=decimal_val, unit=unit)
+                    return Quantity(value=decimal_val, unit=unit)  # type: ignore
             return None
         elif isinstance(value, (int, float)):
             # Simple numeric value becomes quantity with unit "1"
-            return Quantity(value=float(value), unit="1")
+            return Quantity(value=float(value), unit="1")  # type: ignore
         elif isinstance(value, bool):
             # Boolean to quantity: True=1.0, False=0.0
-            return Quantity(value=float(value), unit="1")
+            return Quantity(value=float(value), unit="1")  # type: ignore
         else:
             return None
     except Exception:

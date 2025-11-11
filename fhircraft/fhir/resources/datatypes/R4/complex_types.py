@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from pydantic import Field, field_validator, model_validator
 
@@ -6,6 +6,7 @@ import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.utils import model_rebuild_all
+
 
 class Element(FHIRBaseModel):
     """
@@ -4492,11 +4493,9 @@ class ProductShelfLife(BackboneElement):
         description="The shelf life time period can be specified using a numerical value for the period of time and its unit of time measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
-    specialPrecautionsForStorage: Optional[List["CodeableConcept"]] = (
-        Field(
-            description="Special precautions for storage, if any, can be specified using an appropriate controlled vocabulary The controlled term and the controlled term identifier shall be specified",
-            default=None,
-        )
+    specialPrecautionsForStorage: Optional[List["CodeableConcept"]] = Field(
+        description="Special precautions for storage, if any, can be specified using an appropriate controlled vocabulary The controlled term and the controlled term identifier shall be specified",
+        default=None,
     )
 
     @field_validator(
@@ -5987,6 +5986,3 @@ class DomainResource(Resource):
             key="dom-6",
             severity="warning",
         )
-
-
-model_rebuild_all()
