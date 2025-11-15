@@ -602,11 +602,9 @@ class Concatenation(FHIRPath):
             create,
             prevent_all_empty=False,
         )
-        left_value = left_value or [""]
-        right_value = right_value or [""]
-        left = left_value[0]
-        right = right_value[0]
-        return [FHIRPathCollectionItem.wrap(f"{left}{right}")]
+        left_value = left_value or ""
+        right_value = right_value or ""
+        return [FHIRPathCollectionItem.wrap(f"{left_value}{right_value}")]
 
     def __str__(self):
         return f"{self.left} & {self.right}"
