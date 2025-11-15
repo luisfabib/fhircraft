@@ -9,6 +9,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
     FHIRPathFunction,
     Literal,
+    RootElement,
     This,
 )
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
@@ -20,9 +21,21 @@ class FHIRTypesOperator(FHIRPath):
     Abstract class definition for the category of types FHIRPath operators.
     """
 
-    def __init__(self, left: FHIRPath | FHIRPathCollection, type_specifier: str):
+    def __init__(
+        self,
+        left: FHIRPath | FHIRPathCollection,
+        type_specifier: str | Literal | RootElement,
+    ):
+        self.type_specifier = (
+            type_specifier.type
+            if isinstance(type_specifier, RootElement)
+            else (
+                type_specifier
+                if isinstance(type_specifier, str)
+                else type_specifier.value
+            )
+        )
         self.left = left
-        self.type_specifier = type_specifier
 
     def _get_singleton_collection_value(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -130,9 +143,15 @@ class LegacyIs(FHIRPathFunction):
         type_specifier (str): Type specifier.
     """
 
-    def __init__(self, type_specifier: str | Literal):
+    def __init__(self, type_specifier: str | Literal | RootElement):
         self.type_specifier = (
-            type_specifier if isinstance(type_specifier, str) else type_specifier.value
+            type_specifier.type
+            if isinstance(type_specifier, RootElement)
+            else (
+                type_specifier
+                if isinstance(type_specifier, str)
+                else type_specifier.value
+            )
         )
 
     def evaluate(
@@ -196,11 +215,15 @@ class LegacyAs(FHIRPathFunction):
         type_specifier (str): Type specifier.
     """
 
-    def __init__(self, type_specifier: str | Literal):
+    def __init__(self, type_specifier: str | Literal | RootElement):
         self.type_specifier: str = (
             type_specifier.value
             if isinstance(type_specifier, Literal)
-            else type_specifier
+            else (
+                type_specifier.type
+                if isinstance(type_specifier, RootElement)
+                else type_specifier
+            )
         )
 
     def evaluate(
