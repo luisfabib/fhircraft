@@ -8,6 +8,7 @@ and FHIRPath conversion functions use these utilities.
 
 import importlib
 import re
+import warnings
 from datetime import date, datetime, time
 from typing import TYPE_CHECKING, Any, Type, Union
 
@@ -197,7 +198,9 @@ def is_fhir_resource_type(
 
     try:
         if hasattr(fhir_type, "model_validate"):
-            fhir_type.model_validate(value)  # type: ignore
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                fhir_type.model_validate(value)  # type: ignore
         return True
     except ValidationError as e:
         return False
