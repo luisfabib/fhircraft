@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Type
 from pydantic import BaseModel
 
 import fhircraft.fhir.path.engine as fhirpath
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
     StructureMapGroup,
     StructureMapGroupRule,
@@ -319,7 +319,9 @@ class FHIRMappingEngine:
         for rule in rules:
             self.process_rule(rule, group_scope)
 
-    def process_rule(self, rule: StructureMapGroupRule, scope: MappingScope) -> MappingScope:
+    def process_rule(
+        self, rule: StructureMapGroupRule, scope: MappingScope
+    ) -> MappingScope:
         """
         Processes a single StructureMap rule within the given mapping scope.
 
@@ -471,7 +473,9 @@ class FHIRMappingEngine:
             scope.finish_processing_rule(rule_name)
         return scope
 
-    def process_source(self, source: StructureMapGroupRuleSource, scope: MappingScope) -> str:
+    def process_source(
+        self, source: StructureMapGroupRuleSource, scope: MappingScope
+    ) -> str:
         """
         Processes a StructureMapGroupRuleSource object within a given MappingScope and returns the variable name
         associated with the resolved FHIRPath expression.

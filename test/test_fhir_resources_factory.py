@@ -14,7 +14,7 @@ from pydantic.aliases import AliasChoices
 from pydantic.fields import FieldInfo
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-import fhircraft.fhir.resources.datatypes.R4B.complex_types as complex_types
+import fhircraft.fhir.resources.datatypes.R4B.complex as complex
 from fhircraft.fhir.resources.definitions import (
     StructureDefinition,
     StructureDefinitionSnapshot,

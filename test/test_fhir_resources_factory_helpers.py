@@ -9,7 +9,7 @@ from pydantic.aliases import AliasChoices
 from pydantic.fields import FieldInfo
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-import fhircraft.fhir.resources.datatypes.R4B.complex_types as complex_types
+import fhircraft.fhir.resources.datatypes.R4B.complex as complex
 from fhircraft.fhir.resources.definitions import (
     StructureDefinition,
     StructureDefinitionSnapshot,
@@ -191,13 +191,13 @@ class TestGetComplexFhirType(FactoryTestCase):
     def test_parses_fhir_complex_datatype(self):
         element_type = ElementDefinitionType(code="Coding")
         result = self.factory._resolve_FHIR_type(element_type)
-        assert result == complex_types.Coding
+        assert result == complex.Coding
 
     def test_parses_fhir_complex_datatype_from_canonical_url(self):
         result = self.factory._resolve_FHIR_type(
             "http://hl7.org/fhir/StructureDefinition/Extension"
         )
-        assert result == complex_types.Extension
+        assert result == complex.Extension
 
     def test_parses_fhir_fhirpath_datatype(self):
         result = self.factory._resolve_FHIR_type(
@@ -504,12 +504,12 @@ class TestProcessPatternOrFixedValues(FactoryTestCase):
         [
             (
                 "Coding",
-                complex_types.Coding,
+                complex.Coding,
                 {"code": "1234", "system": "https://domain.org"},
             ),
             (
                 "Quantity",
-                complex_types.Quantity,
+                complex.Quantity,
                 {
                     "value": 23.45,
                     "unit": "mg",
@@ -519,7 +519,7 @@ class TestProcessPatternOrFixedValues(FactoryTestCase):
             ),
             (
                 "CodeableConcept",
-                complex_types.CodeableConcept,
+                complex.CodeableConcept,
                 {"coding": [{"code": "1234", "system": "https://domain.org"}]},
             ),
         ]
@@ -573,7 +573,7 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         element_types = [
             primitives.String,
             primitives.Boolean,
-            complex_types.Coding,
+            complex.Coding,
         ]
         basename = "value"
         max_card = 1
@@ -586,7 +586,7 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         assert "valueCoding" in fields
         assert fields["valueString"][0] == Optional[primitives.String]
         assert fields["valueBoolean"][0] == Optional[primitives.Boolean]
-        assert fields["valueCoding"][0] == Optional[complex_types.Coding]
+        assert fields["valueCoding"][0] == Optional[complex.Coding]
 
     def test_choice_type_with_list_cardinality(self):
         # Simulate a choice type element with list cardinality
@@ -736,7 +736,7 @@ class TestConstructPrimitiveExtensionField(FactoryTestCase):
         assert "name_ext" in fields
         field = fields["name_ext"]
         assert isinstance(field, tuple)
-        assert field[0] is Optional[complex_types.Element]
+        assert field[0] is Optional[complex.Element]
         assert isinstance(field[1], FieldInfo)
         assert field[1].default is None
 
@@ -751,7 +751,7 @@ class TestConstructPrimitiveExtensionField(FactoryTestCase):
         assert "class_" in fields
         field = fields["class_"]
         assert isinstance(field, tuple)
-        assert field[0] is Optional[complex_types.Element]
+        assert field[0] is Optional[complex.Element]
         assert isinstance(field[1], FieldInfo)
         assert field[1].default is None
 

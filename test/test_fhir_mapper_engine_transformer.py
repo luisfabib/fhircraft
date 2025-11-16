@@ -6,9 +6,11 @@ import pytest
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.transformer import MappingScope, MappingTransformer
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMapGroupRuleTargetParameter as StructureMapParameter
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
+    StructureMapGroupRuleTargetParameter as StructureMapParameter,
+)
 from fhircraft.fhir.path.engine import Element, Invocation
-from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Coding,
     ContactPoint,

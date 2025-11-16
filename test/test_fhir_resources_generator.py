@@ -9,7 +9,7 @@ from pydantic import field_validator, model_validator
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRSliceModel
 from fhircraft.fhir.resources.datatypes import primitives
-from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept, Coding
+from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding
 from fhircraft.fhir.resources.generator import generate_resource_model_code
 
 
@@ -147,7 +147,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept,Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept,Coding",
             model,
         )
 
@@ -197,7 +197,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         self.assertBlockInCode(expected_block, model)
         # Check imports
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept,Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept,Coding",
             model,
         )
 
@@ -330,11 +330,11 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         self.assertBlockInCode(expected_block, model)
         # Check imports
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex_types import CodeableConcept,Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept,Coding",
             model,
         )
 
-    def test_model_with_list_of_complex_types(self):
+    def test_model_with_list_of_complex(self):
         # Create model dynamically
         model = create_model(
             "ModelWithComplexList",

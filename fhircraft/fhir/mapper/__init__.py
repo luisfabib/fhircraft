@@ -18,8 +18,8 @@ from urllib.request import urlopen
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
-from fhircraft.fhir.resources.datatypes.R5.resources.concept_map import ConceptMap
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMap
+from fhircraft.fhir.resources.datatypes.R5.core.concept_map import ConceptMap
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import StructureMap
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 from .parser import FhirMappingLanguageParser

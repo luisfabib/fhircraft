@@ -35,7 +35,7 @@ def get_fhir_primitive_type(type_str: str) -> type | None:
 def get_complex_FHIR_type(type_str: str, release="R4B") -> type:
     # Dynamically import the complex types module for the specified FHIR release
     complex_FHIR_types = importlib.import_module(
-        f"fhircraft.fhir.resources.datatypes.{release}.complex_types"
+        f"fhircraft.fhir.resources.datatypes.{release}.complex"
     )
     model: type[FHIRBaseModel] = getattr(complex_FHIR_types, type_str)
     if not model.__pydantic_complete__:
@@ -47,7 +47,7 @@ def get_fhir_resource_type(type_str: str, release="R4B") -> type:
     # Convert CamelCase to snake_case for module lookup
     type_str_snake = re.sub(r"(?<!^)(?=[A-Z])", "_", type_str).lower()
     resource_module = importlib.import_module(
-        f"fhircraft.fhir.resources.datatypes.{release}.resources.{type_str_snake}"
+        f"fhircraft.fhir.resources.datatypes.{release}.core.{type_str_snake}"
     )
 
     resource = getattr(resource_module, type_str, None)
