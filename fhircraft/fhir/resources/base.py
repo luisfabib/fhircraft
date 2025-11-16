@@ -1,7 +1,7 @@
 from copy import copy
 from typing import ClassVar
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ConfigDict, ValidationError
 from pydantic.fields import FieldInfo
 from pydantic_core import PydanticUndefined
 
@@ -15,6 +15,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     Expands the Pydantic [BaseModel](https://docs.pydantic.dev/latest/api/base_model/) class with FHIR-specific methods.
     """
+
+    model_config = ConfigDict(defer_build=True)
 
     def model_dump(self, *args, **kwargs):
         kwargs.update({"by_alias": True, "exclude_none": True})
