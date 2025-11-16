@@ -1,0 +1,21 @@
+from pydantic import model_validator
+
+import fhircraft.fhir.resources.validators as fhir_validators
+from fhircraft.fhir.resources.datatypes.primitives import *
+from fhircraft.fhir.resources.datatypes.R4B.complex import Quantity
+
+
+class Duration(Quantity):
+    """
+    A length of time
+    """
+
+    @model_validator(mode="after")
+    def FHIR_drt_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="value.exists() implies ((system = %ucum) and code.exists())",
+            human="There SHALL be a code if there is a value and it SHALL be an expression of time.  If system is present, it SHALL be UCUM.",
+            key="drt-1",
+            severity="error",
+        )
