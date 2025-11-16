@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,44 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Boolean,DateTime,Markdown,Url,Canonical
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,ContactDetail,UsageContext,CodeableConcept,BackboneElement
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Boolean,
+    DateTime,
+    Markdown,
+    Url,
+    Canonical,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    ContactDetail,
+    UsageContext,
+    CodeableConcept,
+    BackboneElement,
+)
+
+
 class TerminologyCapabilitiesSoftware(BackboneElement):
     """
     Software that is covered by this terminology capability statement.  It is used when the statement describes the capabilities of a particular software version, independent of an installation.
     """
+
     name: Optional[String] = Field(
         description="A name the software is known by",
         default=None,
@@ -48,10 +70,24 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
         default=None,
         alias="_version",
     )
-    @field_validator(*('version', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "version",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -59,12 +95,11 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilitiesImplementation(BackboneElement):
     """
     Identifies a specific implementation instance that is described by the terminology capability statement - i.e. a particular installation, rather than the capabilities of a software program.
     """
+
     description: Optional[String] = Field(
         description="Describes this specific instance",
         default=None,
@@ -83,10 +118,24 @@ class TerminologyCapabilitiesImplementation(BackboneElement):
         default=None,
         alias="_url",
     )
-    @field_validator(*('url', 'description', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "url",
+            "description",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -94,12 +143,11 @@ class TerminologyCapabilitiesImplementation(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
     """
     Filter Properties supported.
     """
+
     code: Optional[Code] = Field(
         description="Code of the property supported",
         default=None,
@@ -118,10 +166,24 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
         default=None,
         alias="_op",
     )
-    @field_validator(*('op', 'code', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "op",
+            "code",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -129,12 +191,11 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
     """
     For the code system, a list of versions that are supported by the server.
     """
+
     code: Optional[String] = Field(
         description="Version identifier for this version",
         default=None,
@@ -184,10 +245,36 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         default=None,
         alias="_property",
     )
-    @field_validator(*('property_', 'filter', 'language', 'compositional', 'isDefault', 'code', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "property_",
+            "filter",
+            "language",
+            "compositional",
+            "isDefault",
+            "code",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -195,12 +282,11 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilitiesCodeSystem(BackboneElement):
     """
     Identifies a code system that is supported by the server. If there is a no code system URL, then this declares the general assumptions a client can make about support for any CodeSystem resource.
     """
+
     uri: Optional[Canonical] = Field(
         description="URI for the Code System",
         default=None,
@@ -223,10 +309,27 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         default=None,
         alias="_subsumption",
     )
-    @field_validator(*('subsumption', 'version', 'uri', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "subsumption",
+            "version",
+            "uri",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -234,12 +337,11 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilitiesExpansionParameter(BackboneElement):
     """
     Supported expansion parameter.
     """
+
     name: Optional[Code] = Field(
         description="Expansion Parameter name",
         default=None,
@@ -258,10 +360,24 @@ class TerminologyCapabilitiesExpansionParameter(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -269,12 +385,11 @@ class TerminologyCapabilitiesExpansionParameter(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilitiesExpansion(BackboneElement):
     """
     Information about the [ValueSet/$expand](valueset-operation-expand.html) operation.
     """
+
     hierarchical: Optional[Boolean] = Field(
         description="Whether the server can return nested value sets",
         default=None,
@@ -315,10 +430,33 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         default=None,
         alias="_textFilter",
     )
-    @field_validator(*('textFilter', 'parameter', 'incomplete', 'paging', 'hierarchical', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "textFilter",
+            "parameter",
+            "incomplete",
+            "paging",
+            "hierarchical",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -326,12 +464,11 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilitiesValidateCode(BackboneElement):
     """
     Information about the [ValueSet/$validate-code](valueset-operation-validate-code.html) operation.
     """
+
     translations: Optional[Boolean] = Field(
         description="Whether translations are validated",
         default=None,
@@ -341,10 +478,17 @@ class TerminologyCapabilitiesValidateCode(BackboneElement):
         default=None,
         alias="_translations",
     )
-    @field_validator(*('translations', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("translations", "modifierExtension", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -352,12 +496,11 @@ class TerminologyCapabilitiesValidateCode(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilitiesTranslation(BackboneElement):
     """
     Information about the [ConceptMap/$translate](conceptmap-operation-translate.html) operation.
     """
+
     needsMap: Optional[Boolean] = Field(
         description="Whether the client must identify the map",
         default=None,
@@ -367,10 +510,15 @@ class TerminologyCapabilitiesTranslation(BackboneElement):
         default=None,
         alias="_needsMap",
     )
-    @field_validator(*('needsMap', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("needsMap", "modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -378,12 +526,11 @@ class TerminologyCapabilitiesTranslation(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilitiesClosure(BackboneElement):
     """
     Whether the $closure operation is supported.
     """
+
     translation: Optional[Boolean] = Field(
         description="If cross-system closure is supported",
         default=None,
@@ -393,10 +540,17 @@ class TerminologyCapabilitiesClosure(BackboneElement):
         default=None,
         alias="_translation",
     )
-    @field_validator(*('translation', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("translation", "modifierExtension", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -404,12 +558,11 @@ class TerminologyCapabilitiesClosure(BackboneElement):
         )
 
 
-
- 
 class TerminologyCapabilities(FHIRBaseModel):
     """
     A TerminologyCapabilities resource documents a set of capabilities (behaviors) of a FHIR Terminology Server that may be used as a statement of actual server functionality or a statement of required or desired server implementation.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -421,7 +574,10 @@ class TerminologyCapabilities(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/TerminologyCapabilities']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/TerminologyCapabilities"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -623,50 +779,96 @@ class TerminologyCapabilities(FHIRBaseModel):
         description="Information about the [ConceptMap/$closure](conceptmap-operation-closure.html) operation",
         default=None,
     )
-    resourceType: Literal['TerminologyCapabilities'] = Field(
+    resourceType: Literal["TerminologyCapabilities"] = Field(
         description=None,
         default="TerminologyCapabilities",
     )
-    @field_validator(*('closure', 'translation', 'validateCode', 'codeSearch', 'expansion', 'codeSystem', 'lockedDate', 'implementation', 'software', 'kind', 'copyright', 'purpose', 'jurisdiction', 'useContext', 'description', 'contact', 'publisher', 'date', 'experimental', 'status', 'title', 'name', 'version', 'url', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "closure",
+            "translation",
+            "validateCode",
+            "codeSearch",
+            "expansion",
+            "codeSystem",
+            "lockedDate",
+            "implementation",
+            "software",
+            "kind",
+            "copyright",
+            "purpose",
+            "jurisdiction",
+            "useContext",
+            "description",
+            "contact",
+            "publisher",
+            "date",
+            "experimental",
+            "status",
+            "title",
+            "name",
+            "version",
+            "url",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('codeSystem',), mode="after", check_fields=None)
+    @field_validator(*("codeSystem",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_tcp_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_tcp_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="version.count() > 1 implies version.all(code.exists())",
             human="If there is more than one version, a version code must be defined",
             key="tcp-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -676,7 +878,7 @@ class TerminologyCapabilities(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -686,7 +888,7 @@ class TerminologyCapabilities(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -696,7 +898,7 @@ class TerminologyCapabilities(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -706,7 +908,7 @@ class TerminologyCapabilities(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
@@ -716,7 +918,7 @@ class TerminologyCapabilities(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_tcp_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
@@ -726,7 +928,7 @@ class TerminologyCapabilities(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_tcp_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(description.count() + software.count() + implementation.count()) > 0",
             human="A Capability Statement SHALL have at least one of description, software, or implementation element.",
@@ -736,7 +938,7 @@ class TerminologyCapabilities(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_tcp_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(kind != 'instance') or implementation.exists()",
             human="If kind = instance, implementation must be present and software may be present",
@@ -746,7 +948,7 @@ class TerminologyCapabilities(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_tcp_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(kind != 'capability') or (implementation.exists().not() and software.exists())",
             human="If kind = capability, implementation must be absent, software must be present",
@@ -756,12 +958,10 @@ class TerminologyCapabilities(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_tcp_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(kind!='requirements') or (implementation.exists().not() and software.exists().not())",
             human="If kind = requirements, implementation and software must be absent",
             key="tcp-5",
             severity="error",
         )
-
-

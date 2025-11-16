@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,55 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,DateTime,Markdown,UnsignedInt,Boolean,Decimal,Integer,Date,Time
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,CodeableConcept,Reference,Period,BackboneElement,Coding,Attachment,Quantity,Money,Timing,Annotation,Signature
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    DateTime,
+    Markdown,
+    UnsignedInt,
+    Boolean,
+    Decimal,
+    Integer,
+    Date,
+    Time,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    CodeableConcept,
+    Reference,
+    Period,
+    BackboneElement,
+    Coding,
+    Attachment,
+    Quantity,
+    Money,
+    Timing,
+    Annotation,
+    Signature,
+)
+
+
 class ContractContentDefinition(BackboneElement):
     """
     Precusory content developed with a focus and intent of supporting the formation a Contract instance, which may be associated with and transformable into a Contract.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Content structure and use",
         default=None,
@@ -69,10 +102,36 @@ class ContractContentDefinition(BackboneElement):
         default=None,
         alias="_copyright",
     )
-    @field_validator(*('copyright', 'publicationStatus', 'publicationDate', 'publisher', 'subType', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "copyright",
+            "publicationStatus",
+            "publicationDate",
+            "publisher",
+            "subType",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -80,12 +139,11 @@ class ContractContentDefinition(BackboneElement):
         )
 
 
-
- 
 class ContractTermSecurityLabel(BackboneElement):
     """
     Security labels that protect the handling of information about the term and its elements, which may be specifically identified..
     """
+
     number: Optional[List[UnsignedInt]] = Field(
         description="Link to Security Labels",
         default=None,
@@ -107,10 +165,30 @@ class ContractTermSecurityLabel(BackboneElement):
         description="Handling Instructions",
         default=None,
     )
-    @field_validator(*('control', 'category', 'classification', 'number', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "control",
+            "category",
+            "classification",
+            "number",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -118,12 +196,11 @@ class ContractTermSecurityLabel(BackboneElement):
         )
 
 
-
- 
 class ContractTermOfferParty(BackboneElement):
     """
     Offer Recipient.
     """
+
     reference: Optional[List[Reference]] = Field(
         description="Referenced entity",
         default=None,
@@ -132,10 +209,24 @@ class ContractTermOfferParty(BackboneElement):
         description="Participant engagement type",
         default=None,
     )
-    @field_validator(*('role', 'reference', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "role",
+            "reference",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -143,12 +234,11 @@ class ContractTermOfferParty(BackboneElement):
         )
 
 
-
- 
 class ContractTermOfferAnswer(BackboneElement):
     """
     Response to offer text.
     """
+
     valueBoolean: Optional[Boolean] = Field(
         description="The actual answer response",
         default=None,
@@ -197,28 +287,42 @@ class ContractTermOfferAnswer(BackboneElement):
         description="The actual answer response",
         default=None,
     )
-    @property 
+
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
 
-
-
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Decimal, Integer, Date, DateTime, Time, String, Uri, Attachment, Coding, Quantity, Reference],
+            field_types=[
+                Boolean,
+                Decimal,
+                Integer,
+                Date,
+                DateTime,
+                Time,
+                String,
+                Uri,
+                Attachment,
+                Coding,
+                Quantity,
+                Reference,
+            ],
             field_name_base="value",
             required=True,
         )
 
- 
+
 class ContractTermOffer(BackboneElement):
     """
     The matter of concern in the context of this provision of the agrement.
     """
+
     identifier: Optional[List[Identifier]] = Field(
         description="Offer business ID",
         default=None,
@@ -274,10 +378,48 @@ class ContractTermOffer(BackboneElement):
         default=None,
         alias="_securityLabelNumber",
     )
-    @field_validator(*('securityLabelNumber', 'linkId', 'text', 'answer', 'decisionMode', 'decision', 'type', 'topic', 'party', 'identifier', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "securityLabelNumber",
+            "linkId",
+            "text",
+            "answer",
+            "decisionMode",
+            "decision",
+            "type",
+            "topic",
+            "party",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -285,12 +427,11 @@ class ContractTermOffer(BackboneElement):
         )
 
 
-
- 
 class ContractTermAssetContext(BackboneElement):
     """
     Circumstance of the asset.
     """
+
     reference: Optional[Reference] = Field(
         description="Creator,custodian or owner",
         default=None,
@@ -308,10 +449,27 @@ class ContractTermAssetContext(BackboneElement):
         default=None,
         alias="_text",
     )
-    @field_validator(*('text', 'code', 'reference', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "text",
+            "code",
+            "reference",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -319,12 +477,11 @@ class ContractTermAssetContext(BackboneElement):
         )
 
 
-
- 
 class ContractTermAssetAnswer(BackboneElement):
     """
     Response to assets.
     """
+
     valueBoolean: Optional[Boolean] = Field(
         description="The actual answer response",
         default=None,
@@ -373,28 +530,42 @@ class ContractTermAssetAnswer(BackboneElement):
         description="The actual answer response",
         default=None,
     )
-    @property 
+
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
 
-
-
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Decimal, Integer, Date, DateTime, Time, String, Uri, Attachment, Coding, Quantity, Reference],
+            field_types=[
+                Boolean,
+                Decimal,
+                Integer,
+                Date,
+                DateTime,
+                Time,
+                String,
+                Uri,
+                Attachment,
+                Coding,
+                Quantity,
+                Reference,
+            ],
             field_name_base="value",
             required=True,
         )
 
- 
+
 class ContractTermAssetValuedItem(BackboneElement):
     """
     Contract Valued Item List.
     """
+
     entityCodeableConcept: Optional[CodeableConcept] = Field(
         description="Contract Valued Item Type",
         default=None,
@@ -490,37 +661,85 @@ class ContractTermAssetValuedItem(BackboneElement):
         default=None,
         alias="_securityLabelNumber",
     )
-    @property 
+
+    @property
     def entity(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="entity",
         )
-    @field_validator(*('securityLabelNumber', 'linkId', 'recipient', 'responsible', 'paymentDate', 'payment', 'net', 'points', 'factor', 'unitPrice', 'quantity', 'effectiveTime', 'identifier', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "securityLabelNumber",
+            "linkId",
+            "recipient",
+            "responsible",
+            "paymentDate",
+            "payment",
+            "net",
+            "points",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "effectiveTime",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def entity_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="entity",
             required=False,
         )
 
- 
+
 class ContractTermAsset(BackboneElement):
     """
     Contract Term Asset List.
     """
+
     scope: Optional[CodeableConcept] = Field(
         description="Range of asset",
         default=None,
@@ -601,10 +820,63 @@ class ContractTermAsset(BackboneElement):
         description="Contract Valued Item List",
         default=None,
     )
-    @field_validator(*('valuedItem', 'securityLabelNumber', 'answer', 'linkId', 'text', 'usePeriod', 'period', 'periodType', 'condition', 'context', 'relationship', 'subtype', 'typeReference', 'type', 'scope', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "valuedItem",
+            "securityLabelNumber",
+            "answer",
+            "linkId",
+            "text",
+            "usePeriod",
+            "period",
+            "periodType",
+            "condition",
+            "context",
+            "relationship",
+            "subtype",
+            "typeReference",
+            "type",
+            "scope",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -612,12 +884,11 @@ class ContractTermAsset(BackboneElement):
         )
 
 
-
- 
 class ContractTermActionSubject(BackboneElement):
     """
     Entity of the action.
     """
+
     reference: Optional[List[Reference]] = Field(
         description="Entity of the action",
         default=None,
@@ -626,10 +897,24 @@ class ContractTermActionSubject(BackboneElement):
         description="Role type of the agent",
         default=None,
     )
-    @field_validator(*('role', 'reference', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "role",
+            "reference",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -637,12 +922,11 @@ class ContractTermActionSubject(BackboneElement):
         )
 
 
-
- 
 class ContractTermAction(BackboneElement):
     """
     An actor taking a role in an activity for which it can be assigned some degree of responsibility for the activity taking place.
     """
+
     doNotPerform: Optional[Boolean] = Field(
         description="True if the term prohibits the  action",
         default=None,
@@ -775,37 +1059,106 @@ class ContractTermAction(BackboneElement):
         default=None,
         alias="_securityLabelNumber",
     )
-    @property 
+
+    @property
     def occurrence(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="occurrence",
         )
-    @field_validator(*('securityLabelNumber', 'note', 'reasonLinkId', 'reason', 'reasonReference', 'reasonCode', 'performerLinkId', 'performer', 'performerRole', 'performerType', 'requesterLinkId', 'requester', 'contextLinkId', 'context', 'status', 'linkId', 'intent', 'subject', 'type', 'doNotPerform', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "securityLabelNumber",
+            "note",
+            "reasonLinkId",
+            "reason",
+            "reasonReference",
+            "reasonCode",
+            "performerLinkId",
+            "performer",
+            "performerRole",
+            "performerType",
+            "requesterLinkId",
+            "requester",
+            "contextLinkId",
+            "context",
+            "status",
+            "linkId",
+            "intent",
+            "subject",
+            "type",
+            "doNotPerform",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def occurrence_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[DateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
         )
 
- 
+
 class ContractTerm(BackboneElement):
     """
     One or more Contract Provisions, which may be related and conveyed as a group, and may contain nested groups.
     """
+
     identifier: Optional[Identifier] = Field(
         description="Contract Term Number",
         default=None,
@@ -868,37 +1221,79 @@ class ContractTerm(BackboneElement):
         description="Nested Contract Term Group",
         default=None,
     )
-    @property 
+
+    @property
     def topic(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="topic",
         )
-    @field_validator(*('group', 'action', 'asset', 'offer', 'securityLabel', 'text', 'subType', 'type', 'applies', 'issued', 'identifier', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "group",
+            "action",
+            "asset",
+            "offer",
+            "securityLabel",
+            "text",
+            "subType",
+            "type",
+            "applies",
+            "issued",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def topic_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="topic",
             required=False,
         )
 
- 
+
 class ContractSigner(BackboneElement):
     """
     Parties with legal standing in the Contract, including the principal parties, the grantor(s) and grantee(s), which are any person or organization bound by the contract, and any ancillary parties, which facilitate the execution of the contract such as a notary or witness.
     """
+
     type: Optional[Coding] = Field(
         description="Contract Signatory Role",
         default=None,
@@ -911,10 +1306,27 @@ class ContractSigner(BackboneElement):
         description="Contract Documentation Signature",
         default=None,
     )
-    @field_validator(*('signature', 'party', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "signature",
+            "party",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -922,12 +1334,11 @@ class ContractSigner(BackboneElement):
         )
 
 
-
- 
 class ContractFriendly(BackboneElement):
     """
     The "patient friendly language" versionof the Contract in whole or in parts. "Patient friendly language" means the representation of the Contract and Contract Provisions in a manner that is readily accessible and understandable by a layperson in accordance with best practices for communication styles that ensure that those agreeing to or signing the Contract understand the roles, actions, obligations, responsibilities, and implication of the agreement.
     """
+
     contentAttachment: Optional[Attachment] = Field(
         description="Easily comprehended representation of this Contract",
         default=None,
@@ -936,28 +1347,29 @@ class ContractFriendly(BackboneElement):
         description="Easily comprehended representation of this Contract",
         default=None,
     )
-    @property 
+
+    @property
     def content(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="content",
         )
 
-
-
     @model_validator(mode="after")
     def content_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Attachment, Reference],
             field_name_base="content",
             required=True,
         )
 
- 
+
 class ContractLegal(BackboneElement):
     """
     List of Legal expressions or representations of this Contract.
     """
+
     contentAttachment: Optional[Attachment] = Field(
         description="Contract Legal Text",
         default=None,
@@ -966,28 +1378,29 @@ class ContractLegal(BackboneElement):
         description="Contract Legal Text",
         default=None,
     )
-    @property 
+
+    @property
     def content(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="content",
         )
 
-
-
     @model_validator(mode="after")
     def content_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Attachment, Reference],
             field_name_base="content",
             required=True,
         )
 
- 
+
 class ContractRule(BackboneElement):
     """
     List of Computable Policy Rule Language Representations of this Contract.
     """
+
     contentAttachment: Optional[Attachment] = Field(
         description="Computable Contract Rules",
         default=None,
@@ -996,28 +1409,29 @@ class ContractRule(BackboneElement):
         description="Computable Contract Rules",
         default=None,
     )
-    @property 
+
+    @property
     def content(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="content",
         )
 
-
-
     @model_validator(mode="after")
     def content_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Attachment, Reference],
             field_name_base="content",
             required=True,
         )
 
- 
+
 class Contract(FHIRBaseModel):
     """
     Legally enforceable, formally recorded unilateral or bilateral directive i.e., a policy or agreement.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1029,7 +1443,10 @@ class Contract(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/Contract']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/Contract"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -1250,50 +1667,105 @@ class Contract(FHIRBaseModel):
         description="Binding Contract",
         default=None,
     )
-    resourceType: Literal['Contract'] = Field(
+    resourceType: Literal["Contract"] = Field(
         description=None,
         default="Contract",
     )
-    @property 
+
+    @property
     def topic(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="topic",
         )
-    @property 
+
+    @property
     def legallyBinding(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="legallyBinding",
         )
-    @field_validator(*('rule', 'legal', 'friendly', 'signer', 'relevantHistory', 'supportingInfo', 'term', 'contentDefinition', 'subType', 'type', 'scope', 'author', 'alias', 'subtitle', 'title', 'name', 'site', 'domain', 'authority', 'subject', 'expirationType', 'applies', 'issued', 'contentDerivative', 'instantiatesUri', 'instantiatesCanonical', 'legalState', 'status', 'version', 'url', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "rule",
+            "legal",
+            "friendly",
+            "signer",
+            "relevantHistory",
+            "supportingInfo",
+            "term",
+            "contentDefinition",
+            "subType",
+            "type",
+            "scope",
+            "author",
+            "alias",
+            "subtitle",
+            "title",
+            "name",
+            "site",
+            "domain",
+            "authority",
+            "subject",
+            "expirationType",
+            "applies",
+            "issued",
+            "contentDerivative",
+            "instantiatesUri",
+            "instantiatesCanonical",
+            "legalState",
+            "status",
+            "version",
+            "url",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def topic_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="topic",
@@ -1302,7 +1774,7 @@ class Contract(FHIRBaseModel):
 
     @model_validator(mode="after")
     def legallyBinding_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Attachment, Reference],
             field_name_base="legallyBinding",
@@ -1311,7 +1783,7 @@ class Contract(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -1321,7 +1793,7 @@ class Contract(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -1331,7 +1803,7 @@ class Contract(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -1341,7 +1813,7 @@ class Contract(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -1351,12 +1823,10 @@ class Contract(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

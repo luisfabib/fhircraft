@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,82 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Boolean,DateTime,Markdown,Canonical,Id,Integer,Base64Binary,Date,Decimal,Instant,Oid,PositiveInt,Time,UnsignedInt,Url,Uuid
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,ContactDetail,UsageContext,CodeableConcept,BackboneElement,Address,Age,Annotation,Attachment,Coding,ContactPoint,Count,Distance,Duration,HumanName,Money,Period,Quantity,Range,Ratio,Reference,SampledData,Signature,Timing,Contributor,DataRequirement,Expression,ParameterDefinition,RelatedArtifact,TriggerDefinition,Dosage
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Boolean,
+    DateTime,
+    Markdown,
+    Canonical,
+    Id,
+    Integer,
+    Base64Binary,
+    Date,
+    Decimal,
+    Instant,
+    Oid,
+    PositiveInt,
+    Time,
+    UnsignedInt,
+    Url,
+    Uuid,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    ContactDetail,
+    UsageContext,
+    CodeableConcept,
+    BackboneElement,
+    Address,
+    Age,
+    Annotation,
+    Attachment,
+    Coding,
+    ContactPoint,
+    Count,
+    Distance,
+    Duration,
+    HumanName,
+    Money,
+    Period,
+    Quantity,
+    Range,
+    Ratio,
+    Reference,
+    SampledData,
+    Signature,
+    Timing,
+    Contributor,
+    DataRequirement,
+    Expression,
+    ParameterDefinition,
+    RelatedArtifact,
+    TriggerDefinition,
+    Dosage,
+)
+
+
 class StructureMapStructure(BackboneElement):
     """
     A structure definition used by this map. The structure definition may describe instances that are converted, or the instances that are produced.
     """
+
     url: Optional[Canonical] = Field(
         description="Canonical reference to structure definition",
         default=None,
@@ -66,10 +126,30 @@ class StructureMapStructure(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'alias', 'mode', 'url', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "alias",
+            "mode",
+            "url",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -77,12 +157,11 @@ class StructureMapStructure(BackboneElement):
         )
 
 
-
- 
 class StructureMapGroupInput(BackboneElement):
     """
     A name assigned to an instance of data. The instance must be provided when the mapping is invoked.
     """
+
     name: Optional[Id] = Field(
         description="Name for this instance of data",
         default=None,
@@ -119,10 +198,30 @@ class StructureMapGroupInput(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'mode', 'type', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "mode",
+            "type",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -130,12 +229,11 @@ class StructureMapGroupInput(BackboneElement):
         )
 
 
-
- 
 class StructureMapGroupRuleSource(BackboneElement):
     """
     Source inputs to the mapping.
     """
+
     context: Optional[Id] = Field(
         description="Type or variable this rule applies to",
         default=None,
@@ -426,37 +524,127 @@ class StructureMapGroupRuleSource(BackboneElement):
         default=None,
         alias="_logMessage",
     )
-    @property 
+
+    @property
     def defaultValue(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="defaultValue",
         )
-    @field_validator(*('logMessage', 'check', 'condition', 'variable', 'listMode', 'element', 'type', 'max', 'min', 'context', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "logMessage",
+            "check",
+            "condition",
+            "variable",
+            "listMode",
+            "element",
+            "type",
+            "max",
+            "min",
+            "context",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def defaultValue_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Base64Binary, Boolean, Canonical, Code, Date, DateTime, Decimal, Id, Instant, Integer, Markdown, Oid, PositiveInt, String, Time, UnsignedInt, Uri, Url, Uuid, Address, Age, Annotation, Attachment, CodeableConcept, Coding, ContactPoint, Count, Distance, Duration, HumanName, Identifier, Money, Period, Quantity, Range, Ratio, Reference, SampledData, Signature, Timing, ContactDetail, Contributor, DataRequirement, Expression, ParameterDefinition, RelatedArtifact, TriggerDefinition, UsageContext, Dosage, Meta],
+            field_types=[
+                Base64Binary,
+                Boolean,
+                Canonical,
+                Code,
+                Date,
+                DateTime,
+                Decimal,
+                Id,
+                Instant,
+                Integer,
+                Markdown,
+                Oid,
+                PositiveInt,
+                String,
+                Time,
+                UnsignedInt,
+                Uri,
+                Url,
+                Uuid,
+                Address,
+                Age,
+                Annotation,
+                Attachment,
+                CodeableConcept,
+                Coding,
+                ContactPoint,
+                Count,
+                Distance,
+                Duration,
+                HumanName,
+                Identifier,
+                Money,
+                Period,
+                Quantity,
+                Range,
+                Ratio,
+                Reference,
+                SampledData,
+                Signature,
+                Timing,
+                ContactDetail,
+                Contributor,
+                DataRequirement,
+                Expression,
+                ParameterDefinition,
+                RelatedArtifact,
+                TriggerDefinition,
+                UsageContext,
+                Dosage,
+                Meta,
+            ],
             field_name_base="defaultValue",
             required=False,
         )
 
- 
+
 class StructureMapGroupRuleTargetParameter(BackboneElement):
     """
     Parameters to the transform.
     """
+
     valueId: Optional[Id] = Field(
         description="Parameter value - variable or literal",
         default=None,
@@ -477,28 +665,29 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
         description="Parameter value - variable or literal",
         default=None,
     )
-    @property 
+
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
 
-
-
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Id, String, Boolean, Integer, Decimal],
             field_name_base="value",
             required=True,
         )
 
- 
+
 class StructureMapGroupRuleTarget(BackboneElement):
     """
     Content to create because of this mapping rule.
     """
+
     context: Optional[Id] = Field(
         description="Type or variable this rule applies to",
         default=None,
@@ -566,10 +755,42 @@ class StructureMapGroupRuleTarget(BackboneElement):
         description="Parameters to the transform",
         default=None,
     )
-    @field_validator(*('parameter', 'transform', 'listRuleId', 'listMode', 'variable', 'element', 'contextType', 'context', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "parameter",
+            "transform",
+            "listRuleId",
+            "listMode",
+            "variable",
+            "element",
+            "contextType",
+            "context",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -577,12 +798,11 @@ class StructureMapGroupRuleTarget(BackboneElement):
         )
 
 
-
- 
 class StructureMapGroupRuleDependent(BackboneElement):
     """
     Which other rules to apply in the context of this rule.
     """
+
     name: Optional[Id] = Field(
         description="Name of a rule or group to apply",
         default=None,
@@ -601,10 +821,24 @@ class StructureMapGroupRuleDependent(BackboneElement):
         default=None,
         alias="_variable",
     )
-    @field_validator(*('variable', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "variable",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -612,12 +846,11 @@ class StructureMapGroupRuleDependent(BackboneElement):
         )
 
 
-
- 
 class StructureMapGroupRule(BackboneElement):
     """
     Transform Rule from source to target.
     """
+
     name: Optional[Id] = Field(
         description="Name of the rule for internal references",
         default=None,
@@ -652,31 +885,60 @@ class StructureMapGroupRule(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'dependent', 'rule', 'target', 'source', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "dependent",
+            "rule",
+            "target",
+            "source",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-    @field_validator(*('target',), mode="after", check_fields=None)
+    @field_validator(*("target",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_smp_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_smp_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="element.exists() implies context.exists()",
             human="Can only have an element if you have a context",
             key="smp-1",
             severity="error",
         )
 
-    @field_validator(*('target',), mode="after", check_fields=None)
+    @field_validator(*("target",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_smp_2_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_smp_2_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="context.exists() implies contextType.exists()",
             human="Must have a contextType if you have a context",
             key="smp-2",
@@ -684,11 +946,11 @@ class StructureMapGroupRule(BackboneElement):
         )
 
 
- 
 class StructureMapGroup(BackboneElement):
     """
     Organizes the mapping into manageable chunks for human review/ease of maintenance.
     """
+
     name: Optional[Id] = Field(
         description="Human-readable label",
         default=None,
@@ -733,10 +995,36 @@ class StructureMapGroup(BackboneElement):
         description="Transform Rule from source to target",
         default=None,
     )
-    @field_validator(*('rule', 'input', 'documentation', 'typeMode', 'extends', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "rule",
+            "input",
+            "documentation",
+            "typeMode",
+            "extends",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -744,12 +1032,11 @@ class StructureMapGroup(BackboneElement):
         )
 
 
-
- 
 class StructureMap(FHIRBaseModel):
     """
     A Map of relationships between 2 structures that can be used to transform data.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -761,7 +1048,10 @@ class StructureMap(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/StructureMap']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/StructureMap"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -929,40 +1219,78 @@ class StructureMap(FHIRBaseModel):
         description="Named sections for reader convenience",
         default=None,
     )
-    resourceType: Literal['StructureMap'] = Field(
+    resourceType: Literal["StructureMap"] = Field(
         description=None,
         default="StructureMap",
     )
-    @field_validator(*('group', 'import_', 'structure', 'copyright', 'purpose', 'jurisdiction', 'useContext', 'description', 'contact', 'publisher', 'date', 'experimental', 'status', 'title', 'name', 'version', 'identifier', 'url', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "group",
+            "import_",
+            "structure",
+            "copyright",
+            "purpose",
+            "jurisdiction",
+            "useContext",
+            "description",
+            "contact",
+            "publisher",
+            "date",
+            "experimental",
+            "status",
+            "title",
+            "name",
+            "version",
+            "identifier",
+            "url",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -972,7 +1300,7 @@ class StructureMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -982,7 +1310,7 @@ class StructureMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -992,7 +1320,7 @@ class StructureMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -1002,7 +1330,7 @@ class StructureMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
@@ -1012,12 +1340,10 @@ class StructureMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_smp_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="smp-0",
             severity="warning",
         )
-
-

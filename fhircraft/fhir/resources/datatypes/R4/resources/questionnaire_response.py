@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,48 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Canonical,DateTime,Boolean,Decimal,Integer,Date,Time
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,Reference,BackboneElement,Attachment,Coding,Quantity
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Canonical,
+    DateTime,
+    Boolean,
+    Decimal,
+    Integer,
+    Date,
+    Time,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    Reference,
+    BackboneElement,
+    Attachment,
+    Coding,
+    Quantity,
+)
+
+
 class QuestionnaireResponseItemAnswer(BackboneElement):
     """
     The respondent's answer(s) to the question.
     """
+
     valueBoolean: Optional[Boolean] = Field(
         description="Single-valued answer to the question",
         default=None,
@@ -78,41 +104,60 @@ class QuestionnaireResponseItemAnswer(BackboneElement):
         description="Single-valued answer to the question",
         default=None,
     )
-    item: Optional[List['QuestionnaireResponseItem']] = Field(
+    item: Optional[List["QuestionnaireResponseItem"]] = Field(
         description="Nested groups and questions",
         default=None,
     )
-    @property 
+
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
-    @field_validator(*('item', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("item", "modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Decimal, Integer, Date, DateTime, Time, String, Uri, Attachment, Coding, Quantity, Reference],
+            field_types=[
+                Boolean,
+                Decimal,
+                Integer,
+                Date,
+                DateTime,
+                Time,
+                String,
+                Uri,
+                Attachment,
+                Coding,
+                Quantity,
+                Reference,
+            ],
             field_name_base="value",
             required=False,
         )
 
- 
+
 class QuestionnaireResponseItem(BackboneElement):
     """
     A group or question item from the original questionnaire for which answers are provided.
     """
+
     linkId: Optional[String] = Field(
         description="Pointer to specific item from Questionnaire",
         default=None,
@@ -148,10 +193,33 @@ class QuestionnaireResponseItem(BackboneElement):
         description="Nested questionnaire response items",
         default=None,
     )
-    @field_validator(*('item', 'answer', 'text', 'definition', 'linkId', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "item",
+            "answer",
+            "text",
+            "definition",
+            "linkId",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -159,12 +227,11 @@ class QuestionnaireResponseItem(BackboneElement):
         )
 
 
-
- 
 class QuestionnaireResponse(FHIRBaseModel):
     """
     A structured set of questions and their answers. The questions are ordered and grouped into coherent subsets, corresponding to the structure of the grouping of the questionnaire being responded to.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -176,7 +243,10 @@ class QuestionnaireResponse(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -271,50 +341,83 @@ class QuestionnaireResponse(FHIRBaseModel):
         description="Groups and questions",
         default=None,
     )
-    resourceType: Literal['QuestionnaireResponse'] = Field(
+    resourceType: Literal["QuestionnaireResponse"] = Field(
         description=None,
         default="QuestionnaireResponse",
     )
-    @field_validator(*('item', 'source', 'author', 'authored', 'encounter', 'subject', 'status', 'questionnaire', 'partOf', 'basedOn', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "item",
+            "source",
+            "author",
+            "authored",
+            "encounter",
+            "subject",
+            "status",
+            "questionnaire",
+            "partOf",
+            "basedOn",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_qrs_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_qrs_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(answer.exists() and item.exists()).not()",
             human="Nested item can't be beneath both item and answer",
             key="qrs-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -324,7 +427,7 @@ class QuestionnaireResponse(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -334,7 +437,7 @@ class QuestionnaireResponse(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -344,7 +447,7 @@ class QuestionnaireResponse(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -354,7 +457,7 @@ class QuestionnaireResponse(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",

@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,46 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Boolean,Markdown,Base64Binary
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,CodeableConcept,Reference,Quantity,BackboneElement,Ratio,Money,Dosage,Duration
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Boolean,
+    Markdown,
+    Base64Binary,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    CodeableConcept,
+    Reference,
+    Quantity,
+    BackboneElement,
+    Ratio,
+    Money,
+    Dosage,
+    Duration,
+)
+
+
 class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
     """
     Associated or related knowledge about a medication.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Category of medicationKnowledge",
         default=None,
@@ -38,10 +62,24 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
         description="Associated documentation about the associated medication knowledge",
         default=None,
     )
-    @field_validator(*('reference', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "reference",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -49,12 +87,11 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgeMonograph(BackboneElement):
     """
     Associated documentation about the medication.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="The category of medication document",
         default=None,
@@ -63,10 +100,24 @@ class MedicationKnowledgeMonograph(BackboneElement):
         description="Associated documentation about the medication",
         default=None,
     )
-    @field_validator(*('source', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "source",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -74,12 +125,11 @@ class MedicationKnowledgeMonograph(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgeIngredient(BackboneElement):
     """
     Identifies a particular constituent of interest in the product.
     """
+
     itemCodeableConcept: Optional[CodeableConcept] = Field(
         description="Medication(s) or substance(s) contained in the medication",
         default=None,
@@ -101,37 +151,52 @@ class MedicationKnowledgeIngredient(BackboneElement):
         description="Quantity of ingredient present",
         default=None,
     )
-    @property 
+
+    @property
     def item(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="item",
         )
-    @field_validator(*('strength', 'isActive', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "strength",
+            "isActive",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def item_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="item",
             required=True,
         )
 
- 
+
 class MedicationKnowledgeCost(BackboneElement):
     """
     The price of the medication.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="The category of the cost information",
         default=None,
@@ -149,10 +214,27 @@ class MedicationKnowledgeCost(BackboneElement):
         description="The price of the medication",
         default=None,
     )
-    @field_validator(*('cost', 'source', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "cost",
+            "source",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -160,12 +242,11 @@ class MedicationKnowledgeCost(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgeMonitoringProgram(BackboneElement):
     """
     The program under which the medication is reviewed.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Type of program under which the medication is monitored",
         default=None,
@@ -179,10 +260,24 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         default=None,
         alias="_name",
     )
-    @field_validator(*('name', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "name",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -190,12 +285,11 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
     """
     Dosage for the medication for the specific guidelines.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Type of dosage",
         default=None,
@@ -204,10 +298,24 @@ class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
         description="Dosage for the medication for the specific guidelines",
         default=None,
     )
-    @field_validator(*('dosage', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "dosage",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -215,12 +323,13 @@ class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
         )
 
 
-
- 
-class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(BackboneElement):
+class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(
+    BackboneElement
+):
     """
     Characteristics of the patient that are relevant to the administration guidelines (for example, height, weight, gender, etc.).
     """
+
     characteristicCodeableConcept: Optional[CodeableConcept] = Field(
         description="Specific characteristic that is relevant to the administration guideline",
         default=None,
@@ -238,37 +347,43 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(Backbone
         default=None,
         alias="_value",
     )
-    @property 
+
+    @property
     def characteristic(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="characteristic",
         )
-    @field_validator(*('value', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("value", "modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def characteristic_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Quantity],
             field_name_base="characteristic",
             required=True,
         )
 
- 
+
 class MedicationKnowledgeAdministrationGuidelines(BackboneElement):
     """
     Guidelines for the administration of the medication.
     """
+
     dosage: Optional[List[MedicationKnowledgeAdministrationGuidelinesDosage]] = Field(
         description="Dosage for the medication for the specific guidelines",
         default=None,
@@ -281,41 +396,58 @@ class MedicationKnowledgeAdministrationGuidelines(BackboneElement):
         description="Indication for use that apply to the specific administration guidelines",
         default=None,
     )
-    patientCharacteristics: Optional[List[MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics]] = Field(
+    patientCharacteristics: Optional[
+        List[MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics]
+    ] = Field(
         description="Characteristics of the patient that are relevant to the administration guidelines",
         default=None,
     )
-    @property 
+
+    @property
     def indication(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="indication",
         )
-    @field_validator(*('patientCharacteristics', 'dosage', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "patientCharacteristics",
+            "dosage",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def indication_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="indication",
             required=False,
         )
 
- 
+
 class MedicationKnowledgeMedicineClassification(BackboneElement):
     """
     Categorization of the medication within a formulary or classification system.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="The type of category for the medication (for example, therapeutic classification, therapeutic sub-classification)",
         default=None,
@@ -324,10 +456,24 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
         description="Specific category assigned to the medication",
         default=None,
     )
-    @field_validator(*('classification', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "classification",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -335,12 +481,11 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgePackaging(BackboneElement):
     """
     Information that only applies to packages (not products).
     """
+
     type: Optional[CodeableConcept] = Field(
         description="A code that defines the specific type of packaging that the medication can be found in",
         default=None,
@@ -349,10 +494,24 @@ class MedicationKnowledgePackaging(BackboneElement):
         description="The number of product units the package would contain if fully loaded",
         default=None,
     )
-    @field_validator(*('quantity', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "quantity",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -360,12 +519,11 @@ class MedicationKnowledgePackaging(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgeDrugCharacteristic(BackboneElement):
     """
     Specifies descriptive properties of the medicine, such as color, shape, imprints, etc.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Code specifying the type of characteristic of medication",
         default=None,
@@ -386,37 +544,43 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
         description="Description of the characteristic",
         default=None,
     )
-    @property 
+
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
-    @field_validator(*('type', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("type", "modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, String, Quantity, Base64Binary],
             field_name_base="value",
             required=False,
         )
 
- 
+
 class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
     """
     Specifies if changes are allowed when dispensing a medication from a regulatory perspective.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Specifies the type of substitution allowed",
         default=None,
@@ -430,10 +594,24 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
         default=None,
         alias="_allowed",
     )
-    @field_validator(*('allowed', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "allowed",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -441,20 +619,24 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgeRegulatorySchedule(BackboneElement):
     """
     Specifies the schedule of a medication in jurisdiction.
     """
+
     schedule: Optional[CodeableConcept] = Field(
         description="Specifies the specific drug schedule",
         default=None,
     )
-    @field_validator(*('schedule', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("schedule", "modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -462,12 +644,11 @@ class MedicationKnowledgeRegulatorySchedule(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
     """
     The maximum number of units of the medication that can be dispensed in a period.
     """
+
     quantity: Optional[Quantity] = Field(
         description="The maximum number of units of the medication that can be dispensed",
         default=None,
@@ -476,10 +657,24 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
         description="The period that applies to the maximum number of units",
         default=None,
     )
-    @field_validator(*('period', 'quantity', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "period",
+            "quantity",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -487,12 +682,11 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgeRegulatory(BackboneElement):
     """
     Regulatory information about a medication.
     """
+
     regulatoryAuthority: Optional[Reference] = Field(
         description="Specifies the authority of the regulation",
         default=None,
@@ -509,10 +703,30 @@ class MedicationKnowledgeRegulatory(BackboneElement):
         description="The maximum number of units of the medication that can be dispensed in a period",
         default=None,
     )
-    @field_validator(*('maxDispense', 'schedule', 'substitution', 'regulatoryAuthority', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "maxDispense",
+            "schedule",
+            "substitution",
+            "regulatoryAuthority",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -520,12 +734,11 @@ class MedicationKnowledgeRegulatory(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledgeKinetics(BackboneElement):
     """
     The time course of drug absorption, distribution, metabolism and excretion of a medication from the body.
     """
+
     areaUnderCurve: Optional[List[Quantity]] = Field(
         description="The drug concentration measured at certain discrete points in time",
         default=None,
@@ -538,10 +751,27 @@ class MedicationKnowledgeKinetics(BackboneElement):
         description="Time required for concentration in the body to decrease by half",
         default=None,
     )
-    @field_validator(*('halfLifePeriod', 'lethalDose50', 'areaUnderCurve', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "halfLifePeriod",
+            "lethalDose50",
+            "areaUnderCurve",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -549,12 +779,11 @@ class MedicationKnowledgeKinetics(BackboneElement):
         )
 
 
-
- 
 class MedicationKnowledge(FHIRBaseModel):
     """
     Information about a medication that is used to support knowledge.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -566,7 +795,10 @@ class MedicationKnowledge(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/MedicationKnowledge']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/MedicationKnowledge"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -636,7 +868,9 @@ class MedicationKnowledge(FHIRBaseModel):
         default=None,
         alias="_synonym",
     )
-    relatedMedicationKnowledge: Optional[List[MedicationKnowledgeRelatedMedicationKnowledge]] = Field(
+    relatedMedicationKnowledge: Optional[
+        List[MedicationKnowledgeRelatedMedicationKnowledge]
+    ] = Field(
         description="Associated or related medication information",
         default=None,
     )
@@ -677,11 +911,15 @@ class MedicationKnowledge(FHIRBaseModel):
         description="Program under which a medication is reviewed",
         default=None,
     )
-    administrationGuidelines: Optional[List[MedicationKnowledgeAdministrationGuidelines]] = Field(
+    administrationGuidelines: Optional[
+        List[MedicationKnowledgeAdministrationGuidelines]
+    ] = Field(
         description="Guidelines for administration of the medication",
         default=None,
     )
-    medicineClassification: Optional[List[MedicationKnowledgeMedicineClassification]] = Field(
+    medicineClassification: Optional[
+        List[MedicationKnowledgeMedicineClassification]
+    ] = Field(
         description="Categorization of the medication within a formulary or classification system",
         default=None,
     )
@@ -705,40 +943,82 @@ class MedicationKnowledge(FHIRBaseModel):
         description="The time course of drug absorption, distribution, metabolism and excretion of a medication from the body",
         default=None,
     )
-    resourceType: Literal['MedicationKnowledge'] = Field(
+    resourceType: Literal["MedicationKnowledge"] = Field(
         description=None,
         default="MedicationKnowledge",
     )
-    @field_validator(*('kinetics', 'regulatory', 'contraindication', 'drugCharacteristic', 'packaging', 'medicineClassification', 'administrationGuidelines', 'monitoringProgram', 'cost', 'intendedRoute', 'preparationInstruction', 'ingredient', 'monograph', 'productType', 'associatedMedication', 'relatedMedicationKnowledge', 'synonym', 'amount', 'doseForm', 'manufacturer', 'status', 'code', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "kinetics",
+            "regulatory",
+            "contraindication",
+            "drugCharacteristic",
+            "packaging",
+            "medicineClassification",
+            "administrationGuidelines",
+            "monitoringProgram",
+            "cost",
+            "intendedRoute",
+            "preparationInstruction",
+            "ingredient",
+            "monograph",
+            "productType",
+            "associatedMedication",
+            "relatedMedicationKnowledge",
+            "synonym",
+            "amount",
+            "doseForm",
+            "manufacturer",
+            "status",
+            "code",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -748,7 +1028,7 @@ class MedicationKnowledge(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -758,7 +1038,7 @@ class MedicationKnowledge(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -768,7 +1048,7 @@ class MedicationKnowledge(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -778,12 +1058,10 @@ class MedicationKnowledge(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

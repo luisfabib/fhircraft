@@ -4,25 +4,16 @@ from pydantic import Field, field_validator, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element, Period
+from fhircraft.fhir.resources.datatypes.R4.complex import Element
 
 
-class ContactPoint(Element):
+class Quantity(Element):
     """
-    Details of a Technology mediated contact point (phone, fax, email, etc.)
+    A measured or measurable amount
     """
 
-    system: Optional[Code] = Field(
-        description="phone | fax | email | pager | url | sms | other",
-        default=None,
-    )
-    system_ext: Optional[Element] = Field(
-        description="Placeholder element for system extensions",
-        default=None,
-        alias="_system",
-    )
-    value: Optional[String] = Field(
-        description="The actual contact point details",
+    value: Optional[Decimal] = Field(
+        description="Numerical value (with implicit precision)",
         default=None,
     )
     value_ext: Optional[Element] = Field(
@@ -30,36 +21,50 @@ class ContactPoint(Element):
         default=None,
         alias="_value",
     )
-    use: Optional[Code] = Field(
-        description="home | work | temp | old | mobile - purpose of this contact point",
+    comparator: Optional[Code] = Field(
+        description="\u003c | \u003c= | \u003e= | \u003e - how to understand the value",
         default=None,
     )
-    use_ext: Optional[Element] = Field(
-        description="Placeholder element for use extensions",
+    comparator_ext: Optional[Element] = Field(
+        description="Placeholder element for comparator extensions",
         default=None,
-        alias="_use",
+        alias="_comparator",
     )
-    rank: Optional[PositiveInt] = Field(
-        description="Specify preferred order of use (1 = highest)",
+    unit: Optional[String] = Field(
+        description="Unit representation",
         default=None,
     )
-    rank_ext: Optional[Element] = Field(
-        description="Placeholder element for rank extensions",
+    unit_ext: Optional[Element] = Field(
+        description="Placeholder element for unit extensions",
         default=None,
-        alias="_rank",
+        alias="_unit",
     )
-    period: Optional["Period"] = Field(
-        description="Time period when the contact point was/is in use",
+    system: Optional[Uri] = Field(
+        description="System that defines coded unit form",
         default=None,
+    )
+    system_ext: Optional[Element] = Field(
+        description="Placeholder element for system extensions",
+        default=None,
+        alias="_system",
+    )
+    code: Optional[Code] = Field(
+        description="Coded form of the unit",
+        default=None,
+    )
+    code_ext: Optional[Element] = Field(
+        description="Placeholder element for code extensions",
+        default=None,
+        alias="_code",
     )
 
     @field_validator(
         *(
-            "period",
-            "rank",
-            "use",
-            "value",
+            "code",
             "system",
+            "unit",
+            "comparator",
+            "value",
             "extension",
         ),
         mode="after",
@@ -99,11 +104,11 @@ class ContactPoint(Element):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpt_2_constraint_model_validator(self):
+    def FHIR_qty_3_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
-            expression="value.empty() or system.exists()",
-            human="A system is required if a value is provided.",
-            key="cpt-2",
+            expression="code.empty() or system.exists()",
+            human="If a code for the unit is present, the system SHALL also be present",
+            key="qty-3",
             severity="error",
         )

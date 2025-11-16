@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,38 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,PositiveInt
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,BackboneElement,Period,Coding,CodeableConcept,Reference,Duration
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, PositiveInt
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    BackboneElement,
+    Period,
+    Coding,
+    CodeableConcept,
+    Reference,
+    Duration,
+)
+
+
 class EncounterStatusHistory(BackboneElement):
     """
     The status history permits the encounter resource to contain the status history without needing to read through the historical versions of the resource, or even have the server store them.
     """
+
     status: Optional[Code] = Field(
         description="planned | arrived | triaged | in-progress | onleave | finished | cancelled +",
         default=None,
@@ -43,10 +59,24 @@ class EncounterStatusHistory(BackboneElement):
         description="The time that the episode was in the specified status",
         default=None,
     )
-    @field_validator(*('period', 'status', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "period",
+            "status",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -54,12 +84,11 @@ class EncounterStatusHistory(BackboneElement):
         )
 
 
-
- 
 class EncounterClassHistory(BackboneElement):
     """
     The class history permits the tracking of the encounters transitions without needing to go  through the resource history.  This would be used for a case where an admission starts of as an emergency encounter, then transitions into an inpatient scenario. Doing this and not restarting a new encounter ensures that any lab/diagnostic results can more easily follow the patient and not require re-processing and not get lost or cancelled during a kind of discharge from emergency to inpatient.
     """
+
     class_: Optional[Coding] = Field(
         description="inpatient | outpatient | ambulatory | emergency +",
         default=None,
@@ -68,10 +97,24 @@ class EncounterClassHistory(BackboneElement):
         description="The time that the episode was in the specified class",
         default=None,
     )
-    @field_validator(*('period', 'class_', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "period",
+            "class_",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -79,12 +122,11 @@ class EncounterClassHistory(BackboneElement):
         )
 
 
-
- 
 class EncounterParticipant(BackboneElement):
     """
     The list of people responsible for providing the service.
     """
+
     type: Optional[List[CodeableConcept]] = Field(
         description="Role of participant in encounter",
         default=None,
@@ -97,10 +139,27 @@ class EncounterParticipant(BackboneElement):
         description="Persons involved in the encounter other than the patient",
         default=None,
     )
-    @field_validator(*('individual', 'period', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "individual",
+            "period",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -108,12 +167,11 @@ class EncounterParticipant(BackboneElement):
         )
 
 
-
- 
 class EncounterDiagnosis(BackboneElement):
     """
     The list of diagnosis relevant to this encounter.
     """
+
     condition: Optional[Reference] = Field(
         description="The diagnosis or procedure relevant to the encounter",
         default=None,
@@ -131,10 +189,27 @@ class EncounterDiagnosis(BackboneElement):
         default=None,
         alias="_rank",
     )
-    @field_validator(*('rank', 'use', 'condition', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "rank",
+            "use",
+            "condition",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -142,12 +217,11 @@ class EncounterDiagnosis(BackboneElement):
         )
 
 
-
- 
 class EncounterHospitalization(BackboneElement):
     """
     Details about the admission to a healthcare service.
     """
+
     preAdmissionIdentifier: Optional[Identifier] = Field(
         description="Pre-admission identifier",
         default=None,
@@ -184,10 +258,45 @@ class EncounterHospitalization(BackboneElement):
         description="Category or kind of location after discharge",
         default=None,
     )
-    @field_validator(*('dischargeDisposition', 'destination', 'specialArrangement', 'specialCourtesy', 'dietPreference', 'reAdmission', 'admitSource', 'origin', 'preAdmissionIdentifier', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "dischargeDisposition",
+            "destination",
+            "specialArrangement",
+            "specialCourtesy",
+            "dietPreference",
+            "reAdmission",
+            "admitSource",
+            "origin",
+            "preAdmissionIdentifier",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -195,12 +304,11 @@ class EncounterHospitalization(BackboneElement):
         )
 
 
-
- 
 class EncounterLocation(BackboneElement):
     """
     List of locations where  the patient has been during this encounter.
     """
+
     location: Optional[Reference] = Field(
         description="Location the encounter takes place",
         default=None,
@@ -222,10 +330,30 @@ class EncounterLocation(BackboneElement):
         description="Time period during which the patient was present at the location",
         default=None,
     )
-    @field_validator(*('period', 'physicalType', 'status', 'location', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "period",
+            "physicalType",
+            "status",
+            "location",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -233,12 +361,11 @@ class EncounterLocation(BackboneElement):
         )
 
 
-
- 
 class Encounter(FHIRBaseModel):
     """
     An interaction between a patient and healthcare provider(s) for the purpose of providing healthcare service(s) or assessing the health status of a patient.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -250,7 +377,10 @@ class Encounter(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/Encounter']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/Encounter"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -383,40 +513,83 @@ class Encounter(FHIRBaseModel):
         description="Another Encounter this encounter is part of",
         default=None,
     )
-    resourceType: Literal['Encounter'] = Field(
+    resourceType: Literal["Encounter"] = Field(
         description=None,
         default="Encounter",
     )
-    @field_validator(*('partOf', 'serviceProvider', 'location', 'hospitalization', 'account', 'diagnosis', 'reasonReference', 'reasonCode', 'length', 'period', 'appointment', 'participant', 'basedOn', 'episodeOfCare', 'subject', 'priority', 'serviceType', 'type', 'classHistory', 'class_', 'statusHistory', 'status', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "partOf",
+            "serviceProvider",
+            "location",
+            "hospitalization",
+            "account",
+            "diagnosis",
+            "reasonReference",
+            "reasonCode",
+            "length",
+            "period",
+            "appointment",
+            "participant",
+            "basedOn",
+            "episodeOfCare",
+            "subject",
+            "priority",
+            "serviceType",
+            "type",
+            "classHistory",
+            "class_",
+            "statusHistory",
+            "status",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -426,7 +599,7 @@ class Encounter(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -436,7 +609,7 @@ class Encounter(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -446,7 +619,7 @@ class Encounter(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -456,12 +629,10 @@ class Encounter(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

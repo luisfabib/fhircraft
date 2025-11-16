@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,49 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,DateTime,PositiveInt,Decimal,Date,Boolean
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,CodeableConcept,Reference,Period,BackboneElement,Money,Address,Quantity,Attachment
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    DateTime,
+    PositiveInt,
+    Decimal,
+    Date,
+    Boolean,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    CodeableConcept,
+    Reference,
+    Period,
+    BackboneElement,
+    Money,
+    Address,
+    Quantity,
+    Attachment,
+)
+
+
 class ClaimResponseItemAdjudication(BackboneElement):
     """
     If this item is a group then the values here are a summary of the adjudication of the detail items. If this item is a simple product or service then this is the result of the adjudication of this item.
     """
+
     category: Optional[CodeableConcept] = Field(
         description="Type of adjudication information",
         default=None,
@@ -51,10 +78,30 @@ class ClaimResponseItemAdjudication(BackboneElement):
         default=None,
         alias="_value",
     )
-    @field_validator(*('value', 'amount', 'reason', 'category', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "value",
+            "amount",
+            "reason",
+            "category",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -62,12 +109,11 @@ class ClaimResponseItemAdjudication(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseItemDetailAdjudication(BackboneElement):
     """
     The adjudication results.
     """
+
     category: Optional[CodeableConcept] = Field(
         description="Type of adjudication information",
         default=None,
@@ -89,10 +135,30 @@ class ClaimResponseItemDetailAdjudication(BackboneElement):
         default=None,
         alias="_value",
     )
-    @field_validator(*('value', 'amount', 'reason', 'category', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "value",
+            "amount",
+            "reason",
+            "category",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -100,12 +166,11 @@ class ClaimResponseItemDetailAdjudication(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseItemDetailSubDetail(BackboneElement):
     """
     A sub-detail adjudication of a simple product or service.
     """
+
     subDetailSequence: Optional[PositiveInt] = Field(
         description="Claim sub-detail instance identifier",
         default=None,
@@ -128,10 +193,27 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
         description="Subdetail level adjudication details",
         default=None,
     )
-    @field_validator(*('adjudication', 'noteNumber', 'subDetailSequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "adjudication",
+            "noteNumber",
+            "subDetailSequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -139,12 +221,11 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseItemDetail(BackboneElement):
     """
     A claim detail. Either a simple (a product or service) or a 'group' of sub-details which are simple items.
     """
+
     detailSequence: Optional[PositiveInt] = Field(
         description="Claim detail instance identifier",
         default=None,
@@ -171,10 +252,30 @@ class ClaimResponseItemDetail(BackboneElement):
         description="Adjudication for claim sub-details",
         default=None,
     )
-    @field_validator(*('subDetail', 'adjudication', 'noteNumber', 'detailSequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "subDetail",
+            "adjudication",
+            "noteNumber",
+            "detailSequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -182,12 +283,11 @@ class ClaimResponseItemDetail(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseItem(BackboneElement):
     """
     A claim line. Either a simple (a product or service) or a 'group' of details which can also be a simple items or groups of sub-details.
     """
+
     itemSequence: Optional[PositiveInt] = Field(
         description="Claim item instance identifier",
         default=None,
@@ -214,10 +314,30 @@ class ClaimResponseItem(BackboneElement):
         description="Adjudication for claim details",
         default=None,
     )
-    @field_validator(*('detail', 'adjudication', 'noteNumber', 'itemSequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "detail",
+            "adjudication",
+            "noteNumber",
+            "itemSequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -225,12 +345,11 @@ class ClaimResponseItem(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseAddItemDetailSubDetail(BackboneElement):
     """
     The third-tier service adjudications for payor added services.
     """
+
     productOrService: Optional[CodeableConcept] = Field(
         description="Billing, service, product, or drug code",
         default=None,
@@ -273,10 +392,42 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Added items detail adjudication",
         default=None,
     )
-    @field_validator(*('adjudication', 'noteNumber', 'net', 'factor', 'unitPrice', 'quantity', 'modifier', 'productOrService', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "adjudication",
+            "noteNumber",
+            "net",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "modifier",
+            "productOrService",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -284,12 +435,11 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseAddItemDetail(BackboneElement):
     """
     The second-tier service adjudications for payor added services.
     """
+
     productOrService: Optional[CodeableConcept] = Field(
         description="Billing, service, product, or drug code",
         default=None,
@@ -336,10 +486,45 @@ class ClaimResponseAddItemDetail(BackboneElement):
         description="Insurer added line items",
         default=None,
     )
-    @field_validator(*('subDetail', 'adjudication', 'noteNumber', 'net', 'factor', 'unitPrice', 'quantity', 'modifier', 'productOrService', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "subDetail",
+            "adjudication",
+            "noteNumber",
+            "net",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "modifier",
+            "productOrService",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -347,12 +532,11 @@ class ClaimResponseAddItemDetail(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseAddItem(BackboneElement):
     """
     The first-tier service adjudications for payor added product or service lines.
     """
+
     itemSequence: Optional[List[PositiveInt]] = Field(
         description="Item sequence number",
         default=None,
@@ -462,31 +646,89 @@ class ClaimResponseAddItem(BackboneElement):
         description="Insurer added line details",
         default=None,
     )
-    @property 
+
+    @property
     def serviced(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="serviced",
         )
-    @property 
+
+    @property
     def location(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="location",
         )
-    @field_validator(*('detail', 'adjudication', 'noteNumber', 'subSite', 'bodySite', 'net', 'factor', 'unitPrice', 'quantity', 'programCode', 'modifier', 'productOrService', 'provider', 'subdetailSequence', 'detailSequence', 'itemSequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "detail",
+            "adjudication",
+            "noteNumber",
+            "subSite",
+            "bodySite",
+            "net",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "programCode",
+            "modifier",
+            "productOrService",
+            "provider",
+            "subdetailSequence",
+            "detailSequence",
+            "itemSequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def serviced_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Date, Period],
             field_name_base="serviced",
@@ -495,18 +737,19 @@ class ClaimResponseAddItem(BackboneElement):
 
     @model_validator(mode="after")
     def location_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Address, Reference],
             field_name_base="location",
             required=False,
         )
 
- 
+
 class ClaimResponseTotal(BackboneElement):
     """
     Categorized monetary totals for the adjudication.
     """
+
     category: Optional[CodeableConcept] = Field(
         description="Type of adjudication information",
         default=None,
@@ -515,10 +758,24 @@ class ClaimResponseTotal(BackboneElement):
         description="Financial total for the category",
         default=None,
     )
-    @field_validator(*('amount', 'category', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "amount",
+            "category",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -526,12 +783,11 @@ class ClaimResponseTotal(BackboneElement):
         )
 
 
-
- 
 class ClaimResponsePayment(BackboneElement):
     """
     Payment details for the adjudication of the claim.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Partial or complete payment",
         default=None,
@@ -561,10 +817,36 @@ class ClaimResponsePayment(BackboneElement):
         description="Business identifier for the payment",
         default=None,
     )
-    @field_validator(*('identifier', 'amount', 'date', 'adjustmentReason', 'adjustment', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "identifier",
+            "amount",
+            "date",
+            "adjustmentReason",
+            "adjustment",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -572,12 +854,11 @@ class ClaimResponsePayment(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseProcessNote(BackboneElement):
     """
     A note that describes or explains adjudication results in a human readable form.
     """
+
     number: Optional[PositiveInt] = Field(
         description="Note instance identifier",
         default=None,
@@ -609,10 +890,30 @@ class ClaimResponseProcessNote(BackboneElement):
         description="Language of the text",
         default=None,
     )
-    @field_validator(*('language', 'text', 'type', 'number', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "language",
+            "text",
+            "type",
+            "number",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -620,12 +921,11 @@ class ClaimResponseProcessNote(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseInsurance(BackboneElement):
     """
     Financial instruments for reimbursement for the health care products and services specified on the claim.
     """
+
     sequence: Optional[PositiveInt] = Field(
         description="Insurance instance identifier",
         default=None,
@@ -661,10 +961,33 @@ class ClaimResponseInsurance(BackboneElement):
         description="Adjudication results",
         default=None,
     )
-    @field_validator(*('claimResponse', 'businessArrangement', 'coverage', 'focal', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "claimResponse",
+            "businessArrangement",
+            "coverage",
+            "focal",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -672,12 +995,11 @@ class ClaimResponseInsurance(BackboneElement):
         )
 
 
-
- 
 class ClaimResponseError(BackboneElement):
     """
     Errors encountered during the processing of the adjudication.
     """
+
     itemSequence: Optional[PositiveInt] = Field(
         description="Item sequence number",
         default=None,
@@ -709,10 +1031,30 @@ class ClaimResponseError(BackboneElement):
         description="Error code detailing processing issues",
         default=None,
     )
-    @field_validator(*('code', 'subDetailSequence', 'detailSequence', 'itemSequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "code",
+            "subDetailSequence",
+            "detailSequence",
+            "itemSequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -720,12 +1062,11 @@ class ClaimResponseError(BackboneElement):
         )
 
 
-
- 
 class ClaimResponse(FHIRBaseModel):
     """
     This resource provides the adjudication details from the processing of a Claim resource.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -737,7 +1078,10 @@ class ClaimResponse(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/ClaimResponse']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/ClaimResponse"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -911,40 +1255,87 @@ class ClaimResponse(FHIRBaseModel):
         description="Processing errors",
         default=None,
     )
-    resourceType: Literal['ClaimResponse'] = Field(
+    resourceType: Literal["ClaimResponse"] = Field(
         description=None,
         default="ClaimResponse",
     )
-    @field_validator(*('error', 'insurance', 'communicationRequest', 'processNote', 'form', 'formCode', 'fundsReserve', 'payment', 'total', 'adjudication', 'addItem', 'item', 'payeeType', 'preAuthPeriod', 'preAuthRef', 'disposition', 'outcome', 'request', 'requestor', 'insurer', 'created', 'patient', 'use', 'subType', 'type', 'status', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "error",
+            "insurance",
+            "communicationRequest",
+            "processNote",
+            "form",
+            "formCode",
+            "fundsReserve",
+            "payment",
+            "total",
+            "adjudication",
+            "addItem",
+            "item",
+            "payeeType",
+            "preAuthPeriod",
+            "preAuthRef",
+            "disposition",
+            "outcome",
+            "request",
+            "requestor",
+            "insurer",
+            "created",
+            "patient",
+            "use",
+            "subType",
+            "type",
+            "status",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -954,7 +1345,7 @@ class ClaimResponse(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -964,7 +1355,7 @@ class ClaimResponse(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -974,7 +1365,7 @@ class ClaimResponse(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -984,12 +1375,10 @@ class ClaimResponse(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

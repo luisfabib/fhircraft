@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,44 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Boolean,DateTime,Markdown,Canonical
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,ContactDetail,UsageContext,CodeableConcept,BackboneElement
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Boolean,
+    DateTime,
+    Markdown,
+    Canonical,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    ContactDetail,
+    UsageContext,
+    CodeableConcept,
+    BackboneElement,
+)
+
+
 class ConceptMapGroupElementTargetDependsOn(BackboneElement):
     """
     A set of additional dependencies for this mapping to hold. This mapping is only applicable if the specified element can be resolved, and it has the specified value.
     """
+
     property_: Optional[Uri] = Field(
         description="Reference to property mapping depends on",
         default=None,
@@ -66,10 +88,30 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
         default=None,
         alias="_display",
     )
-    @field_validator(*('display', 'value', 'system', 'property_', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "display",
+            "value",
+            "system",
+            "property_",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -77,12 +119,11 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
         )
 
 
-
- 
 class ConceptMapGroupElementTargetProduct(BackboneElement):
     """
     A set of additional outcomes from this mapping to other elements. To properly execute this mapping, the specified element must be mapped to some data element or source that is in context. The mapping may still be useful without a place for the additional data elements, but the equivalence cannot be relied on.
     """
+
     property_: Optional[Uri] = Field(
         description="Reference to property mapping depends on",
         default=None,
@@ -119,10 +160,30 @@ class ConceptMapGroupElementTargetProduct(BackboneElement):
         default=None,
         alias="_display",
     )
-    @field_validator(*('display', 'value', 'system', 'property_', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "display",
+            "value",
+            "system",
+            "property_",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -130,12 +191,11 @@ class ConceptMapGroupElementTargetProduct(BackboneElement):
         )
 
 
-
- 
 class ConceptMapGroupElementTarget(BackboneElement):
     """
     A concept from the target value set that this concept maps to.
     """
+
     code: Optional[Code] = Field(
         description="Code that identifies the target element",
         default=None,
@@ -180,10 +240,36 @@ class ConceptMapGroupElementTarget(BackboneElement):
         description="Other concepts that this mapping also produces",
         default=None,
     )
-    @field_validator(*('product', 'dependsOn', 'comment', 'equivalence', 'display', 'code', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "product",
+            "dependsOn",
+            "comment",
+            "equivalence",
+            "display",
+            "code",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -191,12 +277,11 @@ class ConceptMapGroupElementTarget(BackboneElement):
         )
 
 
-
- 
 class ConceptMapGroupElement(BackboneElement):
     """
     Mappings for an individual concept in the source to one or more concepts in the target.
     """
+
     code: Optional[Code] = Field(
         description="Identifies element being mapped",
         default=None,
@@ -219,21 +304,39 @@ class ConceptMapGroupElement(BackboneElement):
         description="Concept in target system for element",
         default=None,
     )
-    @field_validator(*('target', 'display', 'code', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "target",
+            "display",
+            "code",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-    @field_validator(*('target',), mode="after", check_fields=None)
+    @field_validator(*("target",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_cmd_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_cmd_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="comment.exists() or equivalence.empty() or ((equivalence != 'narrower') and (equivalence != 'inexact'))",
             human="If the map is narrower or inexact, there SHALL be some comments",
             key="cmd-1",
@@ -241,11 +344,11 @@ class ConceptMapGroupElement(BackboneElement):
         )
 
 
- 
 class ConceptMapGroupUnmapped(BackboneElement):
     """
     What to do when there is no mapping for the source concept. "Unmapped" does not include codes that are unmatched, and the unmapped element is ignored in a code is specified to have equivalence = unmatched.
     """
+
     mode: Optional[Code] = Field(
         description="provided | fixed | other-map",
         default=None,
@@ -282,10 +385,30 @@ class ConceptMapGroupUnmapped(BackboneElement):
         default=None,
         alias="_url",
     )
-    @field_validator(*('url', 'display', 'code', 'mode', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "url",
+            "display",
+            "code",
+            "mode",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -293,12 +416,11 @@ class ConceptMapGroupUnmapped(BackboneElement):
         )
 
 
-
- 
 class ConceptMapGroup(BackboneElement):
     """
     A group of mappings that all have the same source and target system.
     """
+
     source: Optional[Uri] = Field(
         description="Source system where concepts to be mapped are defined",
         default=None,
@@ -343,31 +465,60 @@ class ConceptMapGroup(BackboneElement):
         description="What to do when there is no mapping for the source concept",
         default=None,
     )
-    @field_validator(*('unmapped', 'element', 'targetVersion', 'target', 'sourceVersion', 'source', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "unmapped",
+            "element",
+            "targetVersion",
+            "target",
+            "sourceVersion",
+            "source",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-    @field_validator(*('unmapped',), mode="after", check_fields=None)
+    @field_validator(*("unmapped",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_cmd_2_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_cmd_2_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(mode = 'fixed') implies code.exists()",
             human="If the mode is 'fixed', a code must be provided",
             key="cmd-2",
             severity="error",
         )
 
-    @field_validator(*('unmapped',), mode="after", check_fields=None)
+    @field_validator(*("unmapped",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_cmd_3_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_cmd_3_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(mode = 'other-map') implies url.exists()",
             human="If the mode is 'other-map', a url must be provided",
             key="cmd-3",
@@ -375,11 +526,11 @@ class ConceptMapGroup(BackboneElement):
         )
 
 
- 
 class ConceptMap(FHIRBaseModel):
     """
     A statement of relationships from one set of concepts to one or more other concepts - either concepts in code systems, or data element/data element concepts, or classes in class models.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -391,7 +542,10 @@ class ConceptMap(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/ConceptMap']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/ConceptMap"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -562,50 +716,90 @@ class ConceptMap(FHIRBaseModel):
         description="Same source and target systems",
         default=None,
     )
-    resourceType: Literal['ConceptMap'] = Field(
+    resourceType: Literal["ConceptMap"] = Field(
         description=None,
         default="ConceptMap",
     )
-    @property 
+
+    @property
     def source(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="source",
         )
-    @property 
+
+    @property
     def target(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="target",
         )
-    @field_validator(*('group', 'copyright', 'purpose', 'jurisdiction', 'useContext', 'description', 'contact', 'publisher', 'date', 'experimental', 'status', 'title', 'name', 'version', 'identifier', 'url', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "group",
+            "copyright",
+            "purpose",
+            "jurisdiction",
+            "useContext",
+            "description",
+            "contact",
+            "publisher",
+            "date",
+            "experimental",
+            "status",
+            "title",
+            "name",
+            "version",
+            "identifier",
+            "url",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def source_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Uri, Canonical],
             field_name_base="source",
@@ -614,7 +808,7 @@ class ConceptMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def target_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Uri, Canonical],
             field_name_base="target",
@@ -623,7 +817,7 @@ class ConceptMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_cmd_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
@@ -633,7 +827,7 @@ class ConceptMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -643,7 +837,7 @@ class ConceptMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -653,7 +847,7 @@ class ConceptMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -663,7 +857,7 @@ class ConceptMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -673,12 +867,10 @@ class ConceptMap(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

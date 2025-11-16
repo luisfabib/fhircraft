@@ -5,10 +5,10 @@ from pydantic import Field, field_validator, model_validator
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import *
 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element
+from fhircraft.fhir.resources.datatypes.R4.complex import Element
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.resources.datatypes.R4.complex_types import (
+    from fhircraft.fhir.resources.datatypes.R4.complex import (
         Age,
         Address,
         Annotation,

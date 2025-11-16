@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,49 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Canonical,Boolean,DateTime,Markdown,Date,Decimal
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,ContactDetail,UsageContext,CodeableConcept,Period,Reference,BackboneElement,Money
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Canonical,
+    Boolean,
+    DateTime,
+    Markdown,
+    Date,
+    Decimal,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    ContactDetail,
+    UsageContext,
+    CodeableConcept,
+    Period,
+    Reference,
+    BackboneElement,
+    Money,
+)
+
+
 class ChargeItemDefinitionApplicability(BackboneElement):
     """
     Expressions that describe applicability criteria for the billing code.
     """
+
     description: Optional[String] = Field(
         description="Natural language description of the condition",
         default=None,
@@ -57,10 +84,27 @@ class ChargeItemDefinitionApplicability(BackboneElement):
         default=None,
         alias="_expression",
     )
-    @field_validator(*('expression', 'language', 'description', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "expression",
+            "language",
+            "description",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -68,12 +112,11 @@ class ChargeItemDefinitionApplicability(BackboneElement):
         )
 
 
-
- 
 class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
     """
     Expressions that describe applicability criteria for the priceComponent.
     """
+
     description: Optional[String] = Field(
         description="Natural language description of the condition",
         default=None,
@@ -101,10 +144,27 @@ class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
         default=None,
         alias="_expression",
     )
-    @field_validator(*('expression', 'language', 'description', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "expression",
+            "language",
+            "description",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -112,12 +172,11 @@ class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
         )
 
 
-
- 
 class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
     """
     The price for a ChargeItem may be calculated as a base price with surcharges/deductions that apply in certain conditions. A ChargeItemDefinition resource that defines the prices, factors and conditions that apply to a billing code is currently under development. The priceComponent element can be used to offer transparency to the recipient of the Invoice of how the prices have been calculated.
     """
+
     type: Optional[Code] = Field(
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,
@@ -144,10 +203,30 @@ class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
         description="Monetary amount associated with this component",
         default=None,
     )
-    @field_validator(*('amount', 'factor', 'code', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "amount",
+            "factor",
+            "code",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -155,24 +234,41 @@ class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
         )
 
 
-
- 
 class ChargeItemDefinitionPropertyGroup(BackboneElement):
     """
     Group of properties which are applicable under the same conditions. If no applicability rules are established for the group, then all properties always apply.
     """
-    applicability: Optional[List[ChargeItemDefinitionPropertyGroupApplicability]] = Field(
-        description="Conditions under which the priceComponent is applicable",
-        default=None,
+
+    applicability: Optional[List[ChargeItemDefinitionPropertyGroupApplicability]] = (
+        Field(
+            description="Conditions under which the priceComponent is applicable",
+            default=None,
+        )
     )
-    priceComponent: Optional[List[ChargeItemDefinitionPropertyGroupPriceComponent]] = Field(
-        description="Components of total line item price",
-        default=None,
+    priceComponent: Optional[List[ChargeItemDefinitionPropertyGroupPriceComponent]] = (
+        Field(
+            description="Components of total line item price",
+            default=None,
+        )
     )
-    @field_validator(*('priceComponent', 'applicability', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "priceComponent",
+            "applicability",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -180,12 +276,11 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
         )
 
 
-
- 
 class ChargeItemDefinition(FHIRBaseModel):
     """
     The ChargeItemDefinition resource provides the properties that apply to the (billing) codes necessary to calculate costs and prices. The properties may differ largely depending on type and realm, therefore this resource gives only a rough structure and requires profiling for each type of billing code system.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -197,7 +292,10 @@ class ChargeItemDefinition(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -395,40 +493,83 @@ class ChargeItemDefinition(FHIRBaseModel):
         description="Group of properties which are applicable under the same conditions",
         default=None,
     )
-    resourceType: Literal['ChargeItemDefinition'] = Field(
+    resourceType: Literal["ChargeItemDefinition"] = Field(
         description=None,
         default="ChargeItemDefinition",
     )
-    @field_validator(*('propertyGroup', 'applicability', 'instance', 'code', 'effectivePeriod', 'lastReviewDate', 'approvalDate', 'copyright', 'jurisdiction', 'useContext', 'description', 'contact', 'publisher', 'date', 'experimental', 'status', 'replaces', 'partOf', 'derivedFromUri', 'title', 'version', 'identifier', 'url', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "propertyGroup",
+            "applicability",
+            "instance",
+            "code",
+            "effectivePeriod",
+            "lastReviewDate",
+            "approvalDate",
+            "copyright",
+            "jurisdiction",
+            "useContext",
+            "description",
+            "contact",
+            "publisher",
+            "date",
+            "experimental",
+            "status",
+            "replaces",
+            "partOf",
+            "derivedFromUri",
+            "title",
+            "version",
+            "identifier",
+            "url",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_cid_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
@@ -438,7 +579,7 @@ class ChargeItemDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -448,7 +589,7 @@ class ChargeItemDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -458,7 +599,7 @@ class ChargeItemDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -468,7 +609,7 @@ class ChargeItemDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -478,12 +619,10 @@ class ChargeItemDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

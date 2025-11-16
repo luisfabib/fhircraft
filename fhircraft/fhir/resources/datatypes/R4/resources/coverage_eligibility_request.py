@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,46 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Date,DateTime,PositiveInt,Boolean
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,CodeableConcept,Reference,Period,BackboneElement,Quantity,Money
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Date,
+    DateTime,
+    PositiveInt,
+    Boolean,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    CodeableConcept,
+    Reference,
+    Period,
+    BackboneElement,
+    Quantity,
+    Money,
+)
+
+
 class CoverageEligibilityRequestSupportingInfo(BackboneElement):
     """
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
     """
+
     sequence: Optional[PositiveInt] = Field(
         description="Information instance identifier",
         default=None,
@@ -52,10 +76,27 @@ class CoverageEligibilityRequestSupportingInfo(BackboneElement):
         default=None,
         alias="_appliesToAll",
     )
-    @field_validator(*('appliesToAll', 'information', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "appliesToAll",
+            "information",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -63,12 +104,11 @@ class CoverageEligibilityRequestSupportingInfo(BackboneElement):
         )
 
 
-
- 
 class CoverageEligibilityRequestInsurance(BackboneElement):
     """
     Financial instruments for reimbursement for the health care products and services.
     """
+
     focal: Optional[Boolean] = Field(
         description="Applicable coverage",
         default=None,
@@ -91,10 +131,27 @@ class CoverageEligibilityRequestInsurance(BackboneElement):
         default=None,
         alias="_businessArrangement",
     )
-    @field_validator(*('businessArrangement', 'coverage', 'focal', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "businessArrangement",
+            "coverage",
+            "focal",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -102,12 +159,11 @@ class CoverageEligibilityRequestInsurance(BackboneElement):
         )
 
 
-
- 
 class CoverageEligibilityRequestItemDiagnosis(BackboneElement):
     """
     Patient diagnosis for which care is sought.
     """
+
     diagnosisCodeableConcept: Optional[CodeableConcept] = Field(
         description="Nature of illness or problem",
         default=None,
@@ -116,28 +172,29 @@ class CoverageEligibilityRequestItemDiagnosis(BackboneElement):
         description="Nature of illness or problem",
         default=None,
     )
-    @property 
+
+    @property
     def diagnosis(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="diagnosis",
         )
 
-
-
     @model_validator(mode="after")
     def diagnosis_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="diagnosis",
             required=False,
         )
 
- 
+
 class CoverageEligibilityRequestItem(BackboneElement):
     """
     Service categories or billable services for which benefit details and/or an authorization prior to service delivery may be required by the payor.
     """
+
     supportingInfoSequence: Optional[List[PositiveInt]] = Field(
         description="Applicable exception or supporting information",
         default=None,
@@ -183,10 +240,48 @@ class CoverageEligibilityRequestItem(BackboneElement):
         description="Product or service details",
         default=None,
     )
-    @field_validator(*('detail', 'diagnosis', 'facility', 'unitPrice', 'quantity', 'provider', 'modifier', 'productOrService', 'category', 'supportingInfoSequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "detail",
+            "diagnosis",
+            "facility",
+            "unitPrice",
+            "quantity",
+            "provider",
+            "modifier",
+            "productOrService",
+            "category",
+            "supportingInfoSequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -194,12 +289,11 @@ class CoverageEligibilityRequestItem(BackboneElement):
         )
 
 
-
- 
 class CoverageEligibilityRequest(FHIRBaseModel):
     """
     The CoverageEligibilityRequest provides patient and insurance coverage information to an insurer for them to respond, in the form of an CoverageEligibilityResponse, with information regarding whether the stated coverage is valid and in-force and optionally to provide the insurance details of the policy.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -211,7 +305,12 @@ class CoverageEligibilityRequest(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/CoverageEligibilityRequest']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=[
+                "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityRequest"
+            ],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -322,45 +421,80 @@ class CoverageEligibilityRequest(FHIRBaseModel):
         description="Item to be evaluated for eligibiity",
         default=None,
     )
-    resourceType: Literal['CoverageEligibilityRequest'] = Field(
+    resourceType: Literal["CoverageEligibilityRequest"] = Field(
         description=None,
         default="CoverageEligibilityRequest",
     )
-    @property 
+
+    @property
     def serviced(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="serviced",
         )
-    @field_validator(*('item', 'insurance', 'supportingInfo', 'facility', 'insurer', 'provider', 'enterer', 'created', 'patient', 'purpose', 'priority', 'status', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "item",
+            "insurance",
+            "supportingInfo",
+            "facility",
+            "insurer",
+            "provider",
+            "enterer",
+            "created",
+            "patient",
+            "purpose",
+            "priority",
+            "status",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def serviced_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Date, Period],
             field_name_base="serviced",
@@ -369,7 +503,7 @@ class CoverageEligibilityRequest(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -379,7 +513,7 @@ class CoverageEligibilityRequest(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -389,7 +523,7 @@ class CoverageEligibilityRequest(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -399,7 +533,7 @@ class CoverageEligibilityRequest(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -409,12 +543,10 @@ class CoverageEligibilityRequest(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

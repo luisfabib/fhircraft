@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,55 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Boolean,DateTime,Markdown,Date,Canonical
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,CodeableConcept,Reference,ContactDetail,UsageContext,Period,RelatedArtifact,Timing,Age,Range,Duration,BackboneElement,Quantity,Dosage,Expression
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Boolean,
+    DateTime,
+    Markdown,
+    Date,
+    Canonical,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    CodeableConcept,
+    Reference,
+    ContactDetail,
+    UsageContext,
+    Period,
+    RelatedArtifact,
+    Timing,
+    Age,
+    Range,
+    Duration,
+    BackboneElement,
+    Quantity,
+    Dosage,
+    Expression,
+)
+
+
 class ActivityDefinitionParticipant(BackboneElement):
     """
     Indicates who should participate in performing the action described.
     """
+
     type: Optional[Code] = Field(
         description="patient | practitioner | related-person | device",
         default=None,
@@ -43,10 +76,24 @@ class ActivityDefinitionParticipant(BackboneElement):
         description="E.g. Nurse, Surgeon, Parent, etc.",
         default=None,
     )
-    @field_validator(*('role', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "role",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -54,12 +101,11 @@ class ActivityDefinitionParticipant(BackboneElement):
         )
 
 
-
- 
 class ActivityDefinitionDynamicValue(BackboneElement):
     """
     Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the request resource that would contain the result.
     """
+
     path: Optional[String] = Field(
         description="The path to the element to be set dynamically",
         default=None,
@@ -73,10 +119,24 @@ class ActivityDefinitionDynamicValue(BackboneElement):
         description="An expression that provides the dynamic value for the customization",
         default=None,
     )
-    @field_validator(*('expression', 'path', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "expression",
+            "path",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -84,12 +144,11 @@ class ActivityDefinitionDynamicValue(BackboneElement):
         )
 
 
-
- 
 class ActivityDefinition(FHIRBaseModel):
     """
     This resource allows for the definition of some activity to be performed, independent of a particular patient, practitioner, or other performance context.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -101,7 +160,10 @@ class ActivityDefinition(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/ActivityDefinition']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/ActivityDefinition"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -459,55 +521,124 @@ class ActivityDefinition(FHIRBaseModel):
         description="Dynamic aspects of the definition",
         default=None,
     )
-    resourceType: Literal['ActivityDefinition'] = Field(
+    resourceType: Literal["ActivityDefinition"] = Field(
         description=None,
         default="ActivityDefinition",
     )
-    @property 
+
+    @property
     def subject(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="subject",
         )
-    @property 
+
+    @property
     def timing(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="timing",
         )
-    @property 
+
+    @property
     def product(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="product",
         )
-    @field_validator(*('dynamicValue', 'transform', 'observationResultRequirement', 'observationRequirement', 'specimenRequirement', 'bodySite', 'dosage', 'quantity', 'participant', 'location', 'doNotPerform', 'priority', 'intent', 'code', 'profile', 'kind', 'library', 'relatedArtifact', 'endorser', 'reviewer', 'editor', 'author', 'topic', 'effectivePeriod', 'lastReviewDate', 'approvalDate', 'copyright', 'usage', 'purpose', 'jurisdiction', 'useContext', 'description', 'contact', 'publisher', 'date', 'experimental', 'status', 'subtitle', 'title', 'name', 'version', 'identifier', 'url', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "dynamicValue",
+            "transform",
+            "observationResultRequirement",
+            "observationRequirement",
+            "specimenRequirement",
+            "bodySite",
+            "dosage",
+            "quantity",
+            "participant",
+            "location",
+            "doNotPerform",
+            "priority",
+            "intent",
+            "code",
+            "profile",
+            "kind",
+            "library",
+            "relatedArtifact",
+            "endorser",
+            "reviewer",
+            "editor",
+            "author",
+            "topic",
+            "effectivePeriod",
+            "lastReviewDate",
+            "approvalDate",
+            "copyright",
+            "usage",
+            "purpose",
+            "jurisdiction",
+            "useContext",
+            "description",
+            "contact",
+            "publisher",
+            "date",
+            "experimental",
+            "status",
+            "subtitle",
+            "title",
+            "name",
+            "version",
+            "identifier",
+            "url",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def subject_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="subject",
@@ -516,7 +647,7 @@ class ActivityDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def timing_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Timing, DateTime, Age, Period, Range, Duration],
             field_name_base="timing",
@@ -525,7 +656,7 @@ class ActivityDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def product_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Reference, CodeableConcept],
             field_name_base="product",
@@ -534,7 +665,7 @@ class ActivityDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_adf_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
@@ -544,7 +675,7 @@ class ActivityDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -554,7 +685,7 @@ class ActivityDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -564,7 +695,7 @@ class ActivityDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -574,7 +705,7 @@ class ActivityDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -584,12 +715,10 @@ class ActivityDefinition(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

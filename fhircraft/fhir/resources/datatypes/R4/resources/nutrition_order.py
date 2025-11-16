@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,45 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Canonical,DateTime
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,Reference,CodeableConcept,BackboneElement,Timing,Quantity,Ratio,Annotation
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Canonical,
+    DateTime,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    Reference,
+    CodeableConcept,
+    BackboneElement,
+    Timing,
+    Quantity,
+    Ratio,
+    Annotation,
+)
+
+
 class NutritionOrderOralDietNutrient(BackboneElement):
     """
     Class that defines the quantity and type of nutrient modifications (for example carbohydrate, fiber or sodium) required for the oral diet.
     """
+
     modifier: Optional[CodeableConcept] = Field(
         description="Type of nutrient that is being modified",
         default=None,
@@ -38,10 +61,24 @@ class NutritionOrderOralDietNutrient(BackboneElement):
         description="Quantity of the specified nutrient",
         default=None,
     )
-    @field_validator(*('amount', 'modifier', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "amount",
+            "modifier",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -49,12 +86,11 @@ class NutritionOrderOralDietNutrient(BackboneElement):
         )
 
 
-
- 
 class NutritionOrderOralDietTexture(BackboneElement):
     """
     Class that describes any texture modifications required for the patient to safely consume various types of solid foods.
     """
+
     modifier: Optional[CodeableConcept] = Field(
         description="Code to indicate how to alter the texture of the foods, e.g. pureed",
         default=None,
@@ -63,10 +99,24 @@ class NutritionOrderOralDietTexture(BackboneElement):
         description="Concepts that are used to identify an entity that is ingested for nutritional purposes",
         default=None,
     )
-    @field_validator(*('foodType', 'modifier', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "foodType",
+            "modifier",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -74,12 +124,11 @@ class NutritionOrderOralDietTexture(BackboneElement):
         )
 
 
-
- 
 class NutritionOrderOralDiet(BackboneElement):
     """
     Diet given orally in contrast to enteral (tube) feeding.
     """
+
     type: Optional[List[CodeableConcept]] = Field(
         description="Type of oral diet or diet restrictions that describe what can be consumed orally",
         default=None,
@@ -109,10 +158,36 @@ class NutritionOrderOralDiet(BackboneElement):
         default=None,
         alias="_instruction",
     )
-    @field_validator(*('instruction', 'fluidConsistencyType', 'texture', 'nutrient', 'schedule', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "instruction",
+            "fluidConsistencyType",
+            "texture",
+            "nutrient",
+            "schedule",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -120,12 +195,11 @@ class NutritionOrderOralDiet(BackboneElement):
         )
 
 
-
- 
 class NutritionOrderSupplement(BackboneElement):
     """
     Oral nutritional products given in order to add further nutritional value to the patient's diet.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Type of supplement product requested",
         default=None,
@@ -156,10 +230,33 @@ class NutritionOrderSupplement(BackboneElement):
         default=None,
         alias="_instruction",
     )
-    @field_validator(*('instruction', 'quantity', 'schedule', 'productName', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "instruction",
+            "quantity",
+            "schedule",
+            "productName",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -167,12 +264,11 @@ class NutritionOrderSupplement(BackboneElement):
         )
 
 
-
- 
 class NutritionOrderEnteralFormulaAdministration(BackboneElement):
     """
     Formula administration instructions as structured data.  This repeating structure allows for changing the administration rate or volume over time for both bolus and continuous feeding.  An example of this would be an instruction to increase the rate of continuous feeding every 2 hours.
     """
+
     schedule: Optional[Timing] = Field(
         description="Scheduled frequency of enteral feeding",
         default=None,
@@ -189,37 +285,52 @@ class NutritionOrderEnteralFormulaAdministration(BackboneElement):
         description="Speed with which the formula is provided per period of time",
         default=None,
     )
-    @property 
+
+    @property
     def rate(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="rate",
         )
-    @field_validator(*('quantity', 'schedule', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "quantity",
+            "schedule",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def rate_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Quantity, Ratio],
             field_name_base="rate",
             required=False,
         )
 
- 
+
 class NutritionOrderEnteralFormula(BackboneElement):
     """
     Feeding provided through the gastrointestinal tract via a tube, catheter, or stoma that delivers nutrition distal to the oral cavity.
     """
+
     baseFormulaType: Optional[CodeableConcept] = Field(
         description="Type of enteral or infant formula",
         default=None,
@@ -271,10 +382,45 @@ class NutritionOrderEnteralFormula(BackboneElement):
         default=None,
         alias="_administrationInstruction",
     )
-    @field_validator(*('administrationInstruction', 'maxVolumeToDeliver', 'administration', 'routeofAdministration', 'caloricDensity', 'additiveProductName', 'additiveType', 'baseFormulaProductName', 'baseFormulaType', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "administrationInstruction",
+            "maxVolumeToDeliver",
+            "administration",
+            "routeofAdministration",
+            "caloricDensity",
+            "additiveProductName",
+            "additiveType",
+            "baseFormulaProductName",
+            "baseFormulaType",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -282,12 +428,11 @@ class NutritionOrderEnteralFormula(BackboneElement):
         )
 
 
-
- 
 class NutritionOrder(FHIRBaseModel):
     """
     A request to supply a diet, formula feeding (enteral) or oral nutritional supplement to a patient/resident.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -299,7 +444,10 @@ class NutritionOrder(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/NutritionOrder']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/NutritionOrder"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -433,40 +581,77 @@ class NutritionOrder(FHIRBaseModel):
         description="Comments",
         default=None,
     )
-    resourceType: Literal['NutritionOrder'] = Field(
+    resourceType: Literal["NutritionOrder"] = Field(
         description=None,
         default="NutritionOrder",
     )
-    @field_validator(*('note', 'enteralFormula', 'supplement', 'oralDiet', 'excludeFoodModifier', 'foodPreferenceModifier', 'allergyIntolerance', 'orderer', 'dateTime', 'encounter', 'patient', 'intent', 'status', 'instantiates', 'instantiatesUri', 'instantiatesCanonical', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "note",
+            "enteralFormula",
+            "supplement",
+            "oralDiet",
+            "excludeFoodModifier",
+            "foodPreferenceModifier",
+            "allergyIntolerance",
+            "orderer",
+            "dateTime",
+            "encounter",
+            "patient",
+            "intent",
+            "status",
+            "instantiates",
+            "instantiatesUri",
+            "instantiatesCanonical",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -476,7 +661,7 @@ class NutritionOrder(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -486,7 +671,7 @@ class NutritionOrder(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -496,7 +681,7 @@ class NutritionOrder(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -506,7 +691,7 @@ class NutritionOrder(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
@@ -516,12 +701,10 @@ class NutritionOrder(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_nor_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="oralDiet.exists() or supplement.exists() or enteralFormula.exists()",
             human="Nutrition Order SHALL contain either Oral Diet , Supplement, or Enteral Formula class",
             key="nor-1",
             severity="warning",
         )
-
-

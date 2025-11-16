@@ -4,30 +4,41 @@ from pydantic import Field, field_validator, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element, Coding
+from fhircraft.fhir.resources.datatypes.R4.complex import Element, ContactDetail
 
 
-class CodeableConcept(Element):
+class Contributor(Element):
     """
-    Concept - reference to a terminology or just  text
+    Contributor information
     """
 
-    coding: Optional[List[Coding]] = Field(
-        description="Code defined by a terminology system",
+    type: Optional[Code] = Field(
+        description="author | editor | reviewer | endorser",
         default=None,
     )
-    text: Optional[String] = Field(
-        description="Plain text representation of the concept",
+    type_ext: Optional[Element] = Field(
+        description="Placeholder element for type extensions",
+        default=None,
+        alias="_type",
+    )
+    name: Optional[String] = Field(
+        description="Who contributed the content",
         default=None,
     )
-    text_ext: Optional[Element] = Field(
-        description="Placeholder element for text extensions",
+    name_ext: Optional[Element] = Field(
+        description="Placeholder element for name extensions",
         default=None,
-        alias="_text",
+        alias="_name",
+    )
+    contact: Optional[List["ContactDetail"]] = Field(
+        description="Contact details of the contributor",
+        default=None,
     )
 
     @field_validator(
-        *("text", "coding", "extension", "extension"), mode="after", check_fields=None
+        *("contact", "name", "type", "extension", "extension", "extension"),
+        mode="after",
+        check_fields=None,
     )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):

@@ -1,47 +1,33 @@
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional
 
 from pydantic import Field, field_validator, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element, Reference
+from fhircraft.fhir.resources.datatypes.R4.complex import Element, Coding
 
 
-class Annotation(Element):
+class CodeableConcept(Element):
     """
-    Text node with attribution
+    Concept - reference to a terminology or just  text
     """
 
-    authorReference: Optional["Reference"] = Field(
-        description="Individual responsible for the annotation",
+    coding: Optional[List[Coding]] = Field(
+        description="Code defined by a terminology system",
         default=None,
     )
-    authorString: Optional[String] = Field(
-        description="Individual responsible for the annotation",
+    text: Optional[String] = Field(
+        description="Plain text representation of the concept",
         default=None,
     )
-    time: Optional[DateTime] = Field(
-        description="When the annotation was made",
-        default=None,
-    )
-    time_ext: Optional["Element"] = Field(
-        description="Placeholder element for time extensions",
-        default=None,
-        alias="_time",
-    )
-    text: Optional[Markdown] = Field(
-        description="The annotation  - text content (as markdown)",
-        default=None,
-    )
-    text_ext: Optional["Element"] = Field(
+    text_ext: Optional[Element] = Field(
         description="Placeholder element for text extensions",
         default=None,
         alias="_text",
     )
 
     @field_validator(
-        *("text", "time", "extension", "extension"), mode="after", check_fields=None
+        *("text", "coding", "extension", "extension"), mode="after", check_fields=None
     )
     @classmethod
     def FHIR_ele_1_constraint_validator(cls, value):
@@ -74,19 +60,4 @@ class Annotation(Element):
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def author_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=["Reference", String],
-            field_name_base="author",
-        )
-
-    @property
-    def author(self):
-        return fhir_validators.get_type_choice_value_by_base(
-            self,
-            base="author",
         )

@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,53 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Canonical,Boolean,DateTime,Markdown,Date,Decimal,Integer,Time
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,ContactDetail,UsageContext,CodeableConcept,Period,Coding,BackboneElement,Quantity,Reference,Attachment
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Canonical,
+    Boolean,
+    DateTime,
+    Markdown,
+    Date,
+    Decimal,
+    Integer,
+    Time,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    ContactDetail,
+    UsageContext,
+    CodeableConcept,
+    Period,
+    Coding,
+    BackboneElement,
+    Quantity,
+    Reference,
+    Attachment,
+)
+
+
 class QuestionnaireItemEnableWhen(BackboneElement):
     """
     A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
     """
+
     question: Optional[String] = Field(
         description="Question that determines whether item is enabled",
         default=None,
@@ -88,37 +119,63 @@ class QuestionnaireItemEnableWhen(BackboneElement):
         description="Value for question comparison based on operator",
         default=None,
     )
-    @property 
+
+    @property
     def answer(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="answer",
         )
-    @field_validator(*('operator', 'question', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "operator",
+            "question",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def answer_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Decimal, Integer, Date, DateTime, Time, String, Coding, Quantity, Reference],
+            field_types=[
+                Boolean,
+                Decimal,
+                Integer,
+                Date,
+                DateTime,
+                Time,
+                String,
+                Coding,
+                Quantity,
+                Reference,
+            ],
             field_name_base="answer",
             required=True,
         )
 
- 
+
 class QuestionnaireItemAnswerOption(BackboneElement):
     """
     One of the permitted answers for a "choice" or "open-choice" question.
     """
+
     valueInteger: Optional[Integer] = Field(
         description="Answer value",
         default=None,
@@ -152,37 +209,45 @@ class QuestionnaireItemAnswerOption(BackboneElement):
         default=None,
         alias="_initialSelected",
     )
-    @property 
+
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
-    @field_validator(*('initialSelected', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("initialSelected", "modifierExtension", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Integer, Date, Time, String, Coding, Reference],
             field_name_base="value",
             required=True,
         )
 
- 
+
 class QuestionnaireItemInitial(BackboneElement):
     """
     One or more values that should be pre-populated in the answer when initially rendering the questionnaire for user input.
     """
+
     valueBoolean: Optional[Boolean] = Field(
         description="Actual value for initializing the question",
         default=None,
@@ -231,28 +296,42 @@ class QuestionnaireItemInitial(BackboneElement):
         description="Actual value for initializing the question",
         default=None,
     )
-    @property 
+
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
 
-
-
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
-            field_types=[Boolean, Decimal, Integer, Date, DateTime, Time, String, Uri, Attachment, Coding, Quantity, Reference],
+            field_types=[
+                Boolean,
+                Decimal,
+                Integer,
+                Date,
+                DateTime,
+                Time,
+                String,
+                Uri,
+                Attachment,
+                Coding,
+                Quantity,
+                Reference,
+            ],
             field_name_base="value",
             required=True,
         )
 
- 
+
 class QuestionnaireItem(BackboneElement):
     """
     A particular question, question grouping or display text that is part of the questionnaire.
     """
+
     linkId: Optional[String] = Field(
         description="Unique id for item in questionnaire",
         default=None,
@@ -276,7 +355,7 @@ class QuestionnaireItem(BackboneElement):
         default=None,
     )
     prefix: Optional[String] = Field(
-        description="E.g. \"1(a)\", \"2.5.3\"",
+        description='E.g. "1(a)", "2.5.3"',
         default=None,
     )
     prefix_ext: Optional[Element] = Field(
@@ -372,21 +451,78 @@ class QuestionnaireItem(BackboneElement):
         description="Nested questionnaire items",
         default=None,
     )
-    @field_validator(*('item', 'initial', 'answerOption', 'answerValueSet', 'maxLength', 'readOnly', 'repeats', 'required', 'enableBehavior', 'enableWhen', 'type', 'text', 'prefix', 'code', 'definition', 'linkId', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "item",
+            "initial",
+            "answerOption",
+            "answerValueSet",
+            "maxLength",
+            "readOnly",
+            "repeats",
+            "required",
+            "enableBehavior",
+            "enableWhen",
+            "type",
+            "text",
+            "prefix",
+            "code",
+            "definition",
+            "linkId",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-    @field_validator(*('enableWhen',), mode="after", check_fields=None)
+    @field_validator(*("enableWhen",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_7_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_7_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="operator = 'exists' implies (answer is Boolean)",
             human="If the operator is 'exists', the value must be a boolean",
             key="que-7",
@@ -394,11 +530,11 @@ class QuestionnaireItem(BackboneElement):
         )
 
 
- 
 class Questionnaire(FHIRBaseModel):
     """
     A structured set of questions intended to guide the collection of answers from end-users. Questionnaires provide detailed control over order, presentation, phraseology and grouping to allow coherent, consistent data collection.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -410,7 +546,10 @@ class Questionnaire(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/Questionnaire']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/Questionnaire"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -609,150 +748,214 @@ class Questionnaire(FHIRBaseModel):
         description="Questions and sections within the Questionnaire",
         default=None,
     )
-    resourceType: Literal['Questionnaire'] = Field(
+    resourceType: Literal["Questionnaire"] = Field(
         description=None,
         default="Questionnaire",
     )
-    @field_validator(*('item', 'code', 'effectivePeriod', 'lastReviewDate', 'approvalDate', 'copyright', 'purpose', 'jurisdiction', 'useContext', 'description', 'contact', 'publisher', 'date', 'subjectType', 'experimental', 'status', 'derivedFrom', 'title', 'name', 'version', 'identifier', 'url', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "item",
+            "code",
+            "effectivePeriod",
+            "lastReviewDate",
+            "approvalDate",
+            "copyright",
+            "purpose",
+            "jurisdiction",
+            "useContext",
+            "description",
+            "contact",
+            "publisher",
+            "date",
+            "subjectType",
+            "experimental",
+            "status",
+            "derivedFrom",
+            "title",
+            "name",
+            "version",
+            "identifier",
+            "url",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(type='group' implies item.empty().not()) and (type.trace('type')='display' implies item.trace('item').empty())",
             human="Group items must have nested items, display items cannot have nested items",
             key="que-1",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_3_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_3_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="type!='display' or code.empty()",
-            human="Display items cannot have a \"code\" asserted",
+            human='Display items cannot have a "code" asserted',
             key="que-3",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_4_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_4_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="answerOption.empty() or answerValueSet.empty()",
             human="A question cannot have both answerOption and answerValueSet",
             key="que-4",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_5_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_5_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(type ='choice' or type = 'open-choice' or type = 'decimal' or type = 'integer' or type = 'date' or type = 'dateTime' or type = 'time' or type = 'string' or type = 'quantity') or (answerValueSet.empty() and answerOption.empty())",
             human="Only 'choice' and 'open-choice' items can have answerValueSet",
             key="que-5",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_6_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_6_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="type!='display' or (required.empty() and repeats.empty())",
             human="Required and repeat aren't permitted for display items",
             key="que-6",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_8_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_8_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(type!='group' and type!='display') or initial.empty()",
             human="Initial values can't be specified for groups or display items",
             key="que-8",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_9_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_9_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="type!='display' or readOnly.empty()",
-            human="Read-only can't be specified for \"display\" items",
+            human='Read-only can\'t be specified for "display" items',
             key="que-9",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_10_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_10_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(type in ('boolean' | 'decimal' | 'integer' | 'string' | 'text' | 'url' | 'open-choice')) or maxLength.empty()",
             human="Maximum length can only be declared for simple question types",
             key="que-10",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_11_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_11_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="answerOption.empty() or initial.empty()",
             human="If one or more answerOption is present, initial[x] must be missing",
             key="que-11",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_12_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_12_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="enableWhen.count() > 2 implies enableBehavior.exists()",
             human="If there are more than one enableWhen, enableBehavior must be specified",
             key="que-12",
             severity="error",
         )
 
-    @field_validator(*('item',), mode="after", check_fields=None)
+    @field_validator(*("item",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_que_13_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_que_13_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="repeats=true or initial.count() <= 1",
             human="Can only have multiple initial values for repeating items",
             key="que-13",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -762,7 +965,7 @@ class Questionnaire(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -772,7 +975,7 @@ class Questionnaire(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -782,7 +985,7 @@ class Questionnaire(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -792,7 +995,7 @@ class Questionnaire(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
@@ -802,7 +1005,7 @@ class Questionnaire(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_que_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
@@ -812,12 +1015,10 @@ class Questionnaire(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_que_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="descendants().linkId.isDistinct()",
             human="The link ids for groups and questions must be unique within the questionnaire",
             key="que-2",
             severity="error",
         )
-
-

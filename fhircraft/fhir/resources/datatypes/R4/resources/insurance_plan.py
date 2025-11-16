@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,41 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,PositiveInt
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,CodeableConcept,Period,Reference,BackboneElement,HumanName,ContactPoint,Address,Quantity,Money
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, PositiveInt
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    CodeableConcept,
+    Period,
+    Reference,
+    BackboneElement,
+    HumanName,
+    ContactPoint,
+    Address,
+    Quantity,
+    Money,
+)
+
+
 class InsurancePlanContact(BackboneElement):
     """
     The contact for the health insurance product for a certain purpose.
     """
+
     purpose: Optional[CodeableConcept] = Field(
         description="The type of contact",
         default=None,
@@ -46,10 +65,30 @@ class InsurancePlanContact(BackboneElement):
         description="Visiting or postal addresses for the contact",
         default=None,
     )
-    @field_validator(*('address', 'telecom', 'name', 'purpose', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "address",
+            "telecom",
+            "name",
+            "purpose",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -57,12 +96,11 @@ class InsurancePlanContact(BackboneElement):
         )
 
 
-
- 
 class InsurancePlanCoverageBenefitLimit(BackboneElement):
     """
     The specific limits on the benefit.
     """
+
     value: Optional[Quantity] = Field(
         description="Maximum value allowed",
         default=None,
@@ -71,10 +109,24 @@ class InsurancePlanCoverageBenefitLimit(BackboneElement):
         description="Benefit limit details",
         default=None,
     )
-    @field_validator(*('code', 'value', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "code",
+            "value",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -82,12 +134,11 @@ class InsurancePlanCoverageBenefitLimit(BackboneElement):
         )
 
 
-
- 
 class InsurancePlanCoverageBenefit(BackboneElement):
     """
     Specific benefits under this type of coverage.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Type of benefit",
         default=None,
@@ -105,10 +156,27 @@ class InsurancePlanCoverageBenefit(BackboneElement):
         description="Benefit limits",
         default=None,
     )
-    @field_validator(*('limit', 'requirement', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "limit",
+            "requirement",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -116,12 +184,11 @@ class InsurancePlanCoverageBenefit(BackboneElement):
         )
 
 
-
- 
 class InsurancePlanCoverage(BackboneElement):
     """
     Details about the coverage offered by the insurance product.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Type of coverage",
         default=None,
@@ -134,10 +201,27 @@ class InsurancePlanCoverage(BackboneElement):
         description="List of benefits",
         default=None,
     )
-    @field_validator(*('benefit', 'network', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "benefit",
+            "network",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -145,12 +229,11 @@ class InsurancePlanCoverage(BackboneElement):
         )
 
 
-
- 
 class InsurancePlanPlanGeneralCost(BackboneElement):
     """
     Overall costs associated with the plan.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Type of cost",
         default=None,
@@ -177,10 +260,30 @@ class InsurancePlanPlanGeneralCost(BackboneElement):
         default=None,
         alias="_comment",
     )
-    @field_validator(*('comment', 'cost', 'groupSize', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "comment",
+            "cost",
+            "groupSize",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -188,12 +291,11 @@ class InsurancePlanPlanGeneralCost(BackboneElement):
         )
 
 
-
- 
 class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
     """
     List of the costs associated with a specific benefit.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Type of cost",
         default=None,
@@ -210,10 +312,30 @@ class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
         description="The actual cost value",
         default=None,
     )
-    @field_validator(*('value', 'qualifiers', 'applicability', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "value",
+            "qualifiers",
+            "applicability",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -221,12 +343,11 @@ class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
         )
 
 
-
- 
 class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
     """
     List of the specific benefits under this category of benefit.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Type of specific benefit",
         default=None,
@@ -235,10 +356,24 @@ class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
         description="List of the costs",
         default=None,
     )
-    @field_validator(*('cost', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "cost",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -246,12 +381,11 @@ class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
         )
 
 
-
- 
 class InsurancePlanPlanSpecificCost(BackboneElement):
     """
     Costs associated with the coverage provided by the product.
     """
+
     category: Optional[CodeableConcept] = Field(
         description="General category of benefit",
         default=None,
@@ -260,10 +394,24 @@ class InsurancePlanPlanSpecificCost(BackboneElement):
         description="Benefits list",
         default=None,
     )
-    @field_validator(*('benefit', 'category', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "benefit",
+            "category",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -271,12 +419,11 @@ class InsurancePlanPlanSpecificCost(BackboneElement):
         )
 
 
-
- 
 class InsurancePlanPlan(BackboneElement):
     """
     Details about an insurance plan.
     """
+
     identifier: Optional[List[Identifier]] = Field(
         description="Business Identifier for Product",
         default=None,
@@ -301,10 +448,36 @@ class InsurancePlanPlan(BackboneElement):
         description="Specific costs",
         default=None,
     )
-    @field_validator(*('specificCost', 'generalCost', 'network', 'coverageArea', 'type', 'identifier', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "specificCost",
+            "generalCost",
+            "network",
+            "coverageArea",
+            "type",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -312,12 +485,11 @@ class InsurancePlanPlan(BackboneElement):
         )
 
 
-
- 
 class InsurancePlan(FHIRBaseModel):
     """
     Details of a Health Insurance product/plan provided by an organization.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -329,7 +501,10 @@ class InsurancePlan(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/InsurancePlan']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/InsurancePlan"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -436,40 +611,74 @@ class InsurancePlan(FHIRBaseModel):
         description="Plan details",
         default=None,
     )
-    resourceType: Literal['InsurancePlan'] = Field(
+    resourceType: Literal["InsurancePlan"] = Field(
         description=None,
         default="InsurancePlan",
     )
-    @field_validator(*('plan', 'coverage', 'network', 'endpoint', 'contact', 'coverageArea', 'administeredBy', 'ownedBy', 'period', 'alias', 'name', 'type', 'status', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "plan",
+            "coverage",
+            "network",
+            "endpoint",
+            "contact",
+            "coverageArea",
+            "administeredBy",
+            "ownedBy",
+            "period",
+            "alias",
+            "name",
+            "type",
+            "status",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -479,7 +688,7 @@ class InsurancePlan(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -489,7 +698,7 @@ class InsurancePlan(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -499,7 +708,7 @@ class InsurancePlan(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -509,7 +718,7 @@ class InsurancePlan(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
@@ -519,12 +728,10 @@ class InsurancePlan(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_ipn_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(identifier.count() + name.count()) > 0",
             human="The organization SHALL at least have a name or an idendtifier, and possibly more than one",
             key="ipn-1",
             severity="error",
         )
-
-

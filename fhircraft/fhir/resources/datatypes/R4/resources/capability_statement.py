@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,47 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Boolean,DateTime,Markdown,Canonical,Url,UnsignedInt
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,ContactDetail,UsageContext,CodeableConcept,BackboneElement,Reference,Coding
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Boolean,
+    DateTime,
+    Markdown,
+    Canonical,
+    Url,
+    UnsignedInt,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    ContactDetail,
+    UsageContext,
+    CodeableConcept,
+    BackboneElement,
+    Reference,
+    Coding,
+)
+
+
 class CapabilityStatementSoftware(BackboneElement):
     """
     Software that is covered by this capability statement.  It is used when the capability statement describes the capabilities of a particular software version, independent of an installation.
     """
+
     name: Optional[String] = Field(
         description="A name the software is known by",
         default=None,
@@ -57,10 +82,27 @@ class CapabilityStatementSoftware(BackboneElement):
         default=None,
         alias="_releaseDate",
     )
-    @field_validator(*('releaseDate', 'version', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "releaseDate",
+            "version",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -68,12 +110,11 @@ class CapabilityStatementSoftware(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementImplementation(BackboneElement):
     """
     Identifies a specific implementation instance that is described by the capability statement - i.e. a particular installation, rather than the capabilities of a software program.
     """
+
     description: Optional[String] = Field(
         description="Describes this specific instance",
         default=None,
@@ -96,10 +137,27 @@ class CapabilityStatementImplementation(BackboneElement):
         description="Organization that manages the data",
         default=None,
     )
-    @field_validator(*('custodian', 'url', 'description', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "custodian",
+            "url",
+            "description",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -107,12 +165,11 @@ class CapabilityStatementImplementation(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementRestSecurity(BackboneElement):
     """
     Information about security implementation from an interface perspective - what a client needs to know.
     """
+
     cors: Optional[Boolean] = Field(
         description="Adds CORS Headers (http://enable-cors.org/)",
         default=None,
@@ -135,10 +192,27 @@ class CapabilityStatementRestSecurity(BackboneElement):
         default=None,
         alias="_description",
     )
-    @field_validator(*('description', 'service', 'cors', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "description",
+            "service",
+            "cors",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -146,12 +220,11 @@ class CapabilityStatementRestSecurity(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementRestResourceInteraction(BackboneElement):
     """
     Identifies a restful operation supported by the solution.
     """
+
     code: Optional[Code] = Field(
         description="read | vread | update | patch | delete | history-instance | history-type | create | search-type",
         default=None,
@@ -170,10 +243,24 @@ class CapabilityStatementRestResourceInteraction(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'code', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "code",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -181,12 +268,11 @@ class CapabilityStatementRestResourceInteraction(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementRestResourceSearchParam(BackboneElement):
     """
     Search parameters for implementations to support and/or make use of - either references to ones defined in the specification, or additional ones defined for/by the implementation.
     """
+
     name: Optional[String] = Field(
         description="Name of search parameter",
         default=None,
@@ -223,10 +309,30 @@ class CapabilityStatementRestResourceSearchParam(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'type', 'definition', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "type",
+            "definition",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -234,12 +340,11 @@ class CapabilityStatementRestResourceSearchParam(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementRestResourceOperation(BackboneElement):
     """
     Definition of an operation or a named query together with its parameters and their meaning and type. Consult the definition of the operation for details about how to invoke the operation, and the parameters.
     """
+
     name: Optional[String] = Field(
         description="Name by which the operation/query is invoked",
         default=None,
@@ -267,10 +372,27 @@ class CapabilityStatementRestResourceOperation(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'definition', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "definition",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -278,12 +400,11 @@ class CapabilityStatementRestResourceOperation(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementRestResource(BackboneElement):
     """
     A specification of the restful capabilities of the solution for a specific resource type.
     """
+
     type: Optional[Code] = Field(
         description="A resource type that is supported",
         default=None,
@@ -422,10 +543,69 @@ class CapabilityStatementRestResource(BackboneElement):
         description="Definition of a resource operation",
         default=None,
     )
-    @field_validator(*('operation', 'searchParam', 'searchRevInclude', 'searchInclude', 'referencePolicy', 'conditionalDelete', 'conditionalUpdate', 'conditionalRead', 'conditionalCreate', 'updateCreate', 'readHistory', 'versioning', 'interaction', 'documentation', 'supportedProfile', 'profile', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "operation",
+            "searchParam",
+            "searchRevInclude",
+            "searchInclude",
+            "referencePolicy",
+            "conditionalDelete",
+            "conditionalUpdate",
+            "conditionalRead",
+            "conditionalCreate",
+            "updateCreate",
+            "readHistory",
+            "versioning",
+            "interaction",
+            "documentation",
+            "supportedProfile",
+            "profile",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -433,12 +613,11 @@ class CapabilityStatementRestResource(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementRestInteraction(BackboneElement):
     """
     A specification of restful operations supported by the system.
     """
+
     code: Optional[Code] = Field(
         description="transaction | batch | search-system | history-system",
         default=None,
@@ -457,10 +636,24 @@ class CapabilityStatementRestInteraction(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'code', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "code",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -468,12 +661,11 @@ class CapabilityStatementRestInteraction(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementRestSearchParam(BackboneElement):
     """
     Search parameters that are supported for searching all resources for implementations to support and/or make use of - either references to ones defined in the specification, or additional ones defined for/by the implementation.
     """
+
     name: Optional[String] = Field(
         description="Name of search parameter",
         default=None,
@@ -510,10 +702,30 @@ class CapabilityStatementRestSearchParam(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'type', 'definition', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "type",
+            "definition",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -521,12 +733,11 @@ class CapabilityStatementRestSearchParam(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementRestOperation(BackboneElement):
     """
     Definition of an operation or a named query together with its parameters and their meaning and type.
     """
+
     name: Optional[String] = Field(
         description="Name by which the operation/query is invoked",
         default=None,
@@ -554,10 +765,27 @@ class CapabilityStatementRestOperation(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    @field_validator(*('documentation', 'definition', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "documentation",
+            "definition",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -565,12 +793,11 @@ class CapabilityStatementRestOperation(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementRest(BackboneElement):
     """
     A definition of the restful capabilities of the solution, if any.
     """
+
     mode: Optional[Code] = Field(
         description="client | server",
         default=None,
@@ -618,21 +845,54 @@ class CapabilityStatementRest(BackboneElement):
         default=None,
         alias="_compartment",
     )
-    @field_validator(*('compartment', 'operation', 'searchParam', 'interaction', 'resource', 'security', 'documentation', 'mode', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "compartment",
+            "operation",
+            "searchParam",
+            "interaction",
+            "resource",
+            "security",
+            "documentation",
+            "mode",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-    @field_validator(*('resource',), mode="after", check_fields=None)
+    @field_validator(*("resource",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_cpb_12_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_cpb_12_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="searchParam.select(name).isDistinct()",
             human="Search parameter names must be unique in the context of a resource.",
             key="cpb-12",
@@ -640,11 +900,11 @@ class CapabilityStatementRest(BackboneElement):
         )
 
 
- 
 class CapabilityStatementMessagingEndpoint(BackboneElement):
     """
     An endpoint (network accessible address) to which messages and/or replies are to be sent.
     """
+
     protocol: Optional[Coding] = Field(
         description="http | ftp | mllp +",
         default=None,
@@ -658,10 +918,24 @@ class CapabilityStatementMessagingEndpoint(BackboneElement):
         default=None,
         alias="_address",
     )
-    @field_validator(*('address', 'protocol', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "address",
+            "protocol",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -669,12 +943,11 @@ class CapabilityStatementMessagingEndpoint(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementMessagingSupportedMessage(BackboneElement):
     """
     References to message definitions for messages this system can send or receive.
     """
+
     mode: Optional[Code] = Field(
         description="sender | receiver",
         default=None,
@@ -693,10 +966,24 @@ class CapabilityStatementMessagingSupportedMessage(BackboneElement):
         default=None,
         alias="_definition",
     )
-    @field_validator(*('definition', 'mode', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "definition",
+            "mode",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -704,12 +991,11 @@ class CapabilityStatementMessagingSupportedMessage(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementMessaging(BackboneElement):
     """
     A description of the messaging capabilities of the solution.
     """
+
     endpoint: Optional[List[CapabilityStatementMessagingEndpoint]] = Field(
         description="Where messages should be sent",
         default=None,
@@ -732,14 +1018,36 @@ class CapabilityStatementMessaging(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    supportedMessage: Optional[List[CapabilityStatementMessagingSupportedMessage]] = Field(
-        description="Messages supported by this system",
-        default=None,
+    supportedMessage: Optional[List[CapabilityStatementMessagingSupportedMessage]] = (
+        Field(
+            description="Messages supported by this system",
+            default=None,
+        )
     )
-    @field_validator(*('supportedMessage', 'documentation', 'reliableCache', 'endpoint', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "supportedMessage",
+            "documentation",
+            "reliableCache",
+            "endpoint",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -747,12 +1055,11 @@ class CapabilityStatementMessaging(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatementDocument(BackboneElement):
     """
     A document definition.
     """
+
     mode: Optional[Code] = Field(
         description="producer | consumer",
         default=None,
@@ -780,10 +1087,27 @@ class CapabilityStatementDocument(BackboneElement):
         default=None,
         alias="_profile",
     )
-    @field_validator(*('profile', 'documentation', 'mode', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "profile",
+            "documentation",
+            "mode",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -791,12 +1115,11 @@ class CapabilityStatementDocument(BackboneElement):
         )
 
 
-
- 
 class CapabilityStatement(FHIRBaseModel):
     """
     A Capability Statement documents a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR that may be used as a statement of actual server functionality or a statement of required or desired server implementation.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -808,7 +1131,10 @@ class CapabilityStatement(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/CapabilityStatement']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/CapabilityStatement"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -1038,50 +1364,98 @@ class CapabilityStatement(FHIRBaseModel):
         description="Document definition",
         default=None,
     )
-    resourceType: Literal['CapabilityStatement'] = Field(
+    resourceType: Literal["CapabilityStatement"] = Field(
         description=None,
         default="CapabilityStatement",
     )
-    @field_validator(*('document', 'messaging', 'rest', 'implementationGuide', 'patchFormat', 'format', 'fhirVersion', 'implementation', 'software', 'imports', 'instantiates', 'kind', 'copyright', 'purpose', 'jurisdiction', 'useContext', 'description', 'contact', 'publisher', 'date', 'experimental', 'status', 'title', 'name', 'version', 'url', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "document",
+            "messaging",
+            "rest",
+            "implementationGuide",
+            "patchFormat",
+            "format",
+            "fhirVersion",
+            "implementation",
+            "software",
+            "imports",
+            "instantiates",
+            "kind",
+            "copyright",
+            "purpose",
+            "jurisdiction",
+            "useContext",
+            "description",
+            "contact",
+            "publisher",
+            "date",
+            "experimental",
+            "status",
+            "title",
+            "name",
+            "version",
+            "url",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('rest',), mode="after", check_fields=None)
+    @field_validator(*("rest",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_cpb_9_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_cpb_9_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="resource.select(type).isDistinct()",
             human="A given resource can only be described once per RESTful mode.",
             key="cpb-9",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_cpb_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
@@ -1091,7 +1465,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_cpb_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="rest.exists() or messaging.exists() or document.exists()",
             human="A Capability Statement SHALL have at least one of REST, messaging or document element.",
@@ -1101,7 +1475,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_cpb_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(description.count() + software.count() + implementation.count()) > 0",
             human="A Capability Statement SHALL have at least one of description, software, or implementation element.",
@@ -1111,7 +1485,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_cpb_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="messaging.endpoint.empty() or kind = 'instance'",
             human="Messaging end-point is required (and is only permitted) when a statement is for an implementation.",
@@ -1121,7 +1495,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_cpb_7_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="document.select(profile&mode).isDistinct()",
             human="The set of documents must be unique by the combination of profile and mode.",
@@ -1131,7 +1505,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_cpb_14_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(kind != 'instance') or implementation.exists()",
             human="If kind = instance, implementation must be present and software may be present",
@@ -1141,7 +1515,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_cpb_15_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(kind != 'capability') or (implementation.exists().not() and software.exists())",
             human="If kind = capability, implementation must be absent, software must be present",
@@ -1151,7 +1525,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_cpb_16_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="(kind!='requirements') or (implementation.exists().not() and software.exists().not())",
             human="If kind = requirements, implementation and software must be absent",
@@ -1161,7 +1535,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -1171,7 +1545,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -1181,7 +1555,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -1191,7 +1565,7 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -1201,12 +1575,10 @@ class CapabilityStatement(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

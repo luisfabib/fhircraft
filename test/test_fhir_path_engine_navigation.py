@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.navigation import *
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element as El, Extension
+from fhircraft.fhir.resources.datatypes.R4.complex import Element as El, Extension
 
 env = dict()
 
@@ -46,9 +46,11 @@ def test_children_returns_correct_elements_dict():
     assert result[1].value == 2
     assert result[2].value == 3
 
+
 def test_children_string_representation():
     expression = Children()
     assert str(expression) == "children()"
+
 
 # -------------
 # Descendants
@@ -82,6 +84,7 @@ def test_descendants_returns_correct_elements():
     assert result[6].value == 6
     assert result[5].value == 5
     assert result[6].value == 6
+
 
 def test_descendants_string_representation():
     expression = Descendants()

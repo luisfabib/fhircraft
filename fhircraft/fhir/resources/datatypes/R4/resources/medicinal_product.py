@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,37 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,DateTime
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,CodeableConcept,Coding,MarketingStatus,Reference,BackboneElement
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    CodeableConcept,
+    Coding,
+    MarketingStatus,
+    Reference,
+    BackboneElement,
+)
+
+
 class MedicinalProductNameNamePart(BackboneElement):
     """
     Coding words or phrases of the name.
     """
+
     part: Optional[String] = Field(
         description="A fragment of a product name",
         default=None,
@@ -43,10 +58,24 @@ class MedicinalProductNameNamePart(BackboneElement):
         description="Idenifying type for this part of the name (e.g. strength part)",
         default=None,
     )
-    @field_validator(*('type', 'part', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "type",
+            "part",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -54,12 +83,11 @@ class MedicinalProductNameNamePart(BackboneElement):
         )
 
 
-
- 
 class MedicinalProductNameCountryLanguage(BackboneElement):
     """
     Country where the name applies.
     """
+
     country: Optional[CodeableConcept] = Field(
         description="Country code for where this name applies",
         default=None,
@@ -72,10 +100,27 @@ class MedicinalProductNameCountryLanguage(BackboneElement):
         description="Language code for this name",
         default=None,
     )
-    @field_validator(*('language', 'jurisdiction', 'country', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "language",
+            "jurisdiction",
+            "country",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -83,12 +128,11 @@ class MedicinalProductNameCountryLanguage(BackboneElement):
         )
 
 
-
- 
 class MedicinalProductName(BackboneElement):
     """
     The product's name, including full name and possibly coded parts.
     """
+
     productName: Optional[String] = Field(
         description="The full product name",
         default=None,
@@ -106,10 +150,27 @@ class MedicinalProductName(BackboneElement):
         description="Country where the name applies",
         default=None,
     )
-    @field_validator(*('countryLanguage', 'namePart', 'productName', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "countryLanguage",
+            "namePart",
+            "productName",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -117,12 +178,11 @@ class MedicinalProductName(BackboneElement):
         )
 
 
-
- 
 class MedicinalProductManufacturingBusinessOperation(BackboneElement):
     """
     An operation applied to the product, for manufacturing or adminsitrative purpose.
     """
+
     operationType: Optional[CodeableConcept] = Field(
         description="The type of manufacturing operation",
         default=None,
@@ -152,10 +212,36 @@ class MedicinalProductManufacturingBusinessOperation(BackboneElement):
         description="A regulator which oversees the operation",
         default=None,
     )
-    @field_validator(*('regulator', 'manufacturer', 'confidentialityIndicator', 'effectiveDate', 'authorisationReferenceNumber', 'operationType', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "regulator",
+            "manufacturer",
+            "confidentialityIndicator",
+            "effectiveDate",
+            "authorisationReferenceNumber",
+            "operationType",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -163,12 +249,11 @@ class MedicinalProductManufacturingBusinessOperation(BackboneElement):
         )
 
 
-
- 
 class MedicinalProductSpecialDesignation(BackboneElement):
     """
     Indicates if the medicinal product has an orphan designation for the treatment of a rare disease.
     """
+
     identifier: Optional[List[Identifier]] = Field(
         description="Identifier for the designation, or procedure number",
         default=None,
@@ -206,37 +291,64 @@ class MedicinalProductSpecialDesignation(BackboneElement):
         description="Animal species for which this applies",
         default=None,
     )
-    @property 
+
+    @property
     def indication(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="indication",
         )
-    @field_validator(*('species', 'date', 'status', 'intendedUse', 'type', 'identifier', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "species",
+            "date",
+            "status",
+            "intendedUse",
+            "type",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def indication_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="indication",
             required=False,
         )
 
- 
+
 class MedicinalProduct(FHIRBaseModel):
     """
     Detailed definition of a medicinal product, typically for uses other than direct patient care (e.g. regulatory use).
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -248,7 +360,10 @@ class MedicinalProduct(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/MedicinalProduct']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/MedicinalProduct"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -361,7 +476,9 @@ class MedicinalProduct(FHIRBaseModel):
         description="Reference to another product, e.g. for linking authorised to investigational product",
         default=None,
     )
-    manufacturingBusinessOperation: Optional[List[MedicinalProductManufacturingBusinessOperation]] = Field(
+    manufacturingBusinessOperation: Optional[
+        List[MedicinalProductManufacturingBusinessOperation]
+    ] = Field(
         description="An operation applied to the product, for manufacturing or adminsitrative purpose",
         default=None,
     )
@@ -369,40 +486,80 @@ class MedicinalProduct(FHIRBaseModel):
         description="Indicates if the medicinal product has an orphan designation for the treatment of a rare disease",
         default=None,
     )
-    resourceType: Literal['MedicinalProduct'] = Field(
+    resourceType: Literal["MedicinalProduct"] = Field(
         description=None,
         default="MedicinalProduct",
     )
-    @field_validator(*('specialDesignation', 'manufacturingBusinessOperation', 'crossReference', 'name', 'clinicalTrial', 'contact', 'masterFile', 'attachedDocument', 'packagedMedicinalProduct', 'pharmaceuticalProduct', 'marketingStatus', 'productClassification', 'paediatricUseIndicator', 'specialMeasures', 'additionalMonitoringIndicator', 'legalStatusOfSupply', 'combinedPharmaceuticalDoseForm', 'domain', 'type', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "specialDesignation",
+            "manufacturingBusinessOperation",
+            "crossReference",
+            "name",
+            "clinicalTrial",
+            "contact",
+            "masterFile",
+            "attachedDocument",
+            "packagedMedicinalProduct",
+            "pharmaceuticalProduct",
+            "marketingStatus",
+            "productClassification",
+            "paediatricUseIndicator",
+            "specialMeasures",
+            "additionalMonitoringIndicator",
+            "legalStatusOfSupply",
+            "combinedPharmaceuticalDoseForm",
+            "domain",
+            "type",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -412,7 +569,7 @@ class MedicinalProduct(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -422,7 +579,7 @@ class MedicinalProduct(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -432,7 +589,7 @@ class MedicinalProduct(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -442,12 +599,10 @@ class MedicinalProduct(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

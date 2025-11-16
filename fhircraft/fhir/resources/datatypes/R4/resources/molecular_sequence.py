@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,43 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Integer,Decimal,Boolean
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,Reference,Quantity,BackboneElement,CodeableConcept
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Integer,
+    Decimal,
+    Boolean,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    Reference,
+    Quantity,
+    BackboneElement,
+    CodeableConcept,
+)
+
+
 class MolecularSequenceReferenceSeq(BackboneElement):
     """
     A sequence that is used as a reference to describe variants that are present in a sequence analyzed.
     """
+
     chromosome: Optional[CodeableConcept] = Field(
         description="Chromosome containing genetic finding",
         default=None,
@@ -96,10 +117,45 @@ class MolecularSequenceReferenceSeq(BackboneElement):
         default=None,
         alias="_windowEnd",
     )
-    @field_validator(*('windowEnd', 'windowStart', 'strand', 'referenceSeqString', 'referenceSeqPointer', 'referenceSeqId', 'orientation', 'genomeBuild', 'chromosome', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "windowEnd",
+            "windowStart",
+            "strand",
+            "referenceSeqString",
+            "referenceSeqPointer",
+            "referenceSeqId",
+            "orientation",
+            "genomeBuild",
+            "chromosome",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -107,12 +163,11 @@ class MolecularSequenceReferenceSeq(BackboneElement):
         )
 
 
-
- 
 class MolecularSequenceVariant(BackboneElement):
     """
     The definition of variant here originates from Sequence ontology ([variant_of](http://www.sequenceontology.org/browser/current_svn/term/variant_of)). This element can represent amino acid or nucleic sequence change(including insertion,deletion,SNP,etc.)  It can represent some complex mutation or segment variation with the assist of CIGAR string.
     """
+
     start: Optional[Integer] = Field(
         description="Start position of the variant on the  reference sequence",
         default=None,
@@ -162,10 +217,36 @@ class MolecularSequenceVariant(BackboneElement):
         description="Pointer to observed variant information",
         default=None,
     )
-    @field_validator(*('variantPointer', 'cigar', 'referenceAllele', 'observedAllele', 'end', 'start', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "variantPointer",
+            "cigar",
+            "referenceAllele",
+            "observedAllele",
+            "end",
+            "start",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -173,12 +254,11 @@ class MolecularSequenceVariant(BackboneElement):
         )
 
 
-
- 
 class MolecularSequenceQualityRoc(BackboneElement):
     """
     Receiver Operator Characteristic (ROC) Curve  to give sensitivity/specificity tradeoff.
     """
+
     score: Optional[List[Integer]] = Field(
         description="Genotype quality score",
         default=None,
@@ -242,10 +322,39 @@ class MolecularSequenceQualityRoc(BackboneElement):
         default=None,
         alias="_fMeasure",
     )
-    @field_validator(*('fMeasure', 'sensitivity', 'precision', 'numFN', 'numFP', 'numTP', 'score', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "fMeasure",
+            "sensitivity",
+            "precision",
+            "numFN",
+            "numFP",
+            "numTP",
+            "score",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -253,12 +362,11 @@ class MolecularSequenceQualityRoc(BackboneElement):
         )
 
 
-
- 
 class MolecularSequenceQuality(BackboneElement):
     """
     An experimental feature attribute that defines the quality of the feature in a quantitative way, such as a phred quality score ([SO:0001686](http://www.sequenceontology.org/browser/current_svn/term/SO:0001686)).
     """
+
     type: Optional[Code] = Field(
         description="indel | snp | unknown",
         default=None,
@@ -374,10 +482,63 @@ class MolecularSequenceQuality(BackboneElement):
         description="Receiver Operator Characteristic (ROC) Curve",
         default=None,
     )
-    @field_validator(*('roc', 'fScore', 'recall', 'precision', 'gtFP', 'queryFP', 'truthFN', 'queryTP', 'truthTP', 'method', 'score', 'end', 'start', 'standardSequence', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "roc",
+            "fScore",
+            "recall",
+            "precision",
+            "gtFP",
+            "queryFP",
+            "truthFN",
+            "queryTP",
+            "truthTP",
+            "method",
+            "score",
+            "end",
+            "start",
+            "standardSequence",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -385,12 +546,11 @@ class MolecularSequenceQuality(BackboneElement):
         )
 
 
-
- 
 class MolecularSequenceRepository(BackboneElement):
     """
     Configurations of the external repository. The repository shall store target's observedSeq or records related with target's observedSeq.
     """
+
     type: Optional[Code] = Field(
         description="directlink | openapi | login | oauth | other",
         default=None,
@@ -445,10 +605,36 @@ class MolecularSequenceRepository(BackboneElement):
         default=None,
         alias="_readsetId",
     )
-    @field_validator(*('readsetId', 'variantsetId', 'datasetId', 'name', 'url', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "readsetId",
+            "variantsetId",
+            "datasetId",
+            "name",
+            "url",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -456,12 +642,11 @@ class MolecularSequenceRepository(BackboneElement):
         )
 
 
-
- 
 class MolecularSequenceStructureVariantOuter(BackboneElement):
     """
     Structural variant outer.
     """
+
     start: Optional[Integer] = Field(
         description="Structural variant outer start",
         default=None,
@@ -480,10 +665,24 @@ class MolecularSequenceStructureVariantOuter(BackboneElement):
         default=None,
         alias="_end",
     )
-    @field_validator(*('end', 'start', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "end",
+            "start",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -491,12 +690,11 @@ class MolecularSequenceStructureVariantOuter(BackboneElement):
         )
 
 
-
- 
 class MolecularSequenceStructureVariantInner(BackboneElement):
     """
     Structural variant inner.
     """
+
     start: Optional[Integer] = Field(
         description="Structural variant inner start",
         default=None,
@@ -515,10 +713,24 @@ class MolecularSequenceStructureVariantInner(BackboneElement):
         default=None,
         alias="_end",
     )
-    @field_validator(*('end', 'start', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "end",
+            "start",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -526,12 +738,11 @@ class MolecularSequenceStructureVariantInner(BackboneElement):
         )
 
 
-
- 
 class MolecularSequenceStructureVariant(BackboneElement):
     """
     Information about chromosome structure variation.
     """
+
     variantType: Optional[CodeableConcept] = Field(
         description="Structural variant change type",
         default=None,
@@ -562,10 +773,33 @@ class MolecularSequenceStructureVariant(BackboneElement):
         description="Structural variant inner",
         default=None,
     )
-    @field_validator(*('inner', 'outer', 'length', 'exact', 'variantType', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "inner",
+            "outer",
+            "length",
+            "exact",
+            "variantType",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -573,12 +807,11 @@ class MolecularSequenceStructureVariant(BackboneElement):
         )
 
 
-
- 
 class MolecularSequence(FHIRBaseModel):
     """
     Raw data describing a biological sequence.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -590,7 +823,10 @@ class MolecularSequence(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/MolecularSequence']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/MolecularSequence"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -710,60 +946,100 @@ class MolecularSequence(FHIRBaseModel):
         description="Structural variant",
         default=None,
     )
-    resourceType: Literal['MolecularSequence'] = Field(
+    resourceType: Literal["MolecularSequence"] = Field(
         description=None,
         default="MolecularSequence",
     )
-    @field_validator(*('structureVariant', 'pointer', 'repository', 'readCoverage', 'quality', 'observedSeq', 'variant', 'referenceSeq', 'quantity', 'performer', 'device', 'specimen', 'patient', 'coordinateSystem', 'type', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "structureVariant",
+            "pointer",
+            "repository",
+            "readCoverage",
+            "quality",
+            "observedSeq",
+            "variant",
+            "referenceSeq",
+            "quantity",
+            "performer",
+            "device",
+            "specimen",
+            "patient",
+            "coordinateSystem",
+            "type",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('referenceSeq',), mode="after", check_fields=None)
+    @field_validator(*("referenceSeq",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_msq_5_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_msq_5_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(chromosome.empty() and genomeBuild.empty()) or (chromosome.exists() and genomeBuild.exists())",
             human="GenomeBuild and chromosome must be both contained if either one of them is contained",
             key="msq-5",
             severity="error",
         )
 
-    @field_validator(*('referenceSeq',), mode="after", check_fields=None)
+    @field_validator(*("referenceSeq",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_msq_6_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_msq_6_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="(genomeBuild.count()+referenceSeqId.count()+ referenceSeqPointer.count()+ referenceSeqString.count()) = 1",
             human="Have and only have one of the following elements in referenceSeq : 1. genomeBuild ; 2 referenceSeqId; 3. referenceSeqPointer;  4. referenceSeqString;",
             key="msq-6",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -773,7 +1049,7 @@ class MolecularSequence(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -783,7 +1059,7 @@ class MolecularSequence(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -793,7 +1069,7 @@ class MolecularSequence(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -803,7 +1079,7 @@ class MolecularSequence(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
@@ -813,12 +1089,10 @@ class MolecularSequence(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_msq_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="coordinateSystem = 1 or coordinateSystem = 0",
             human="Only 0 and 1 are valid for coordinateSystem",
             key="msq-3",
             severity="error",
         )
-
-

@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,41 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,Decimal,DateTime,Markdown
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,Reference,BackboneElement
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    Decimal,
+    DateTime,
+    Markdown,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    Reference,
+    BackboneElement,
+)
+
+
 class TestReportParticipant(BackboneElement):
     """
     A participant in the test execution, either the execution engine, a client, or a server.
     """
+
     type: Optional[Code] = Field(
         description="test-engine | client | server",
         default=None,
@@ -57,10 +76,27 @@ class TestReportParticipant(BackboneElement):
         default=None,
         alias="_display",
     )
-    @field_validator(*('display', 'uri', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "display",
+            "uri",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -68,12 +104,11 @@ class TestReportParticipant(BackboneElement):
         )
 
 
-
- 
 class TestReportSetupActionOperation(BackboneElement):
     """
     The operation performed.
     """
+
     result: Optional[Code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
@@ -101,10 +136,27 @@ class TestReportSetupActionOperation(BackboneElement):
         default=None,
         alias="_detail",
     )
-    @field_validator(*('detail', 'message', 'result', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "detail",
+            "message",
+            "result",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -112,12 +164,11 @@ class TestReportSetupActionOperation(BackboneElement):
         )
 
 
-
- 
 class TestReportSetupActionAssert(BackboneElement):
     """
     The results of the assertion performed on the previous operations.
     """
+
     result: Optional[Code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
@@ -145,10 +196,27 @@ class TestReportSetupActionAssert(BackboneElement):
         default=None,
         alias="_detail",
     )
-    @field_validator(*('detail', 'message', 'result', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "detail",
+            "message",
+            "result",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -156,12 +224,11 @@ class TestReportSetupActionAssert(BackboneElement):
         )
 
 
-
- 
 class TestReportSetupAction(BackboneElement):
     """
     Action would contain either an operation or an assertion.
     """
+
     operation: Optional[TestReportSetupActionOperation] = Field(
         description="The operation to perform",
         default=None,
@@ -170,10 +237,24 @@ class TestReportSetupAction(BackboneElement):
         description="The assertion to perform",
         default=None,
     )
-    @field_validator(*('assert_', 'operation', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "assert_",
+            "operation",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -181,31 +262,36 @@ class TestReportSetupAction(BackboneElement):
         )
 
 
-
- 
 class TestReportSetup(BackboneElement):
     """
     The results of the series of required setup operations before the tests were executed.
     """
+
     action: Optional[List[TestReportSetupAction]] = Field(
         description="A setup operation or assert that was executed",
         default=None,
     )
-    @field_validator(*('action', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("action", "modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-    @field_validator(*('action',), mode="after", check_fields=None)
+    @field_validator(*("action",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_inv_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_inv_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="operation.exists() xor assert.exists()",
             human="Setup action SHALL contain either an operation or assert but not both.",
             key="inv-1",
@@ -213,11 +299,11 @@ class TestReportSetup(BackboneElement):
         )
 
 
- 
 class TestReportTestActionOperation(BackboneElement):
     """
     An operation would involve a REST request to a server.
     """
+
     result: Optional[Code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
@@ -245,10 +331,27 @@ class TestReportTestActionOperation(BackboneElement):
         default=None,
         alias="_detail",
     )
-    @field_validator(*('detail', 'message', 'result', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "detail",
+            "message",
+            "result",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -256,12 +359,11 @@ class TestReportTestActionOperation(BackboneElement):
         )
 
 
-
- 
 class TestReportTestActionAssert(BackboneElement):
     """
     The results of the assertion performed on the previous operations.
     """
+
     result: Optional[Code] = Field(
         description="pass | skip | fail | warning | error",
         default=None,
@@ -289,10 +391,27 @@ class TestReportTestActionAssert(BackboneElement):
         default=None,
         alias="_detail",
     )
-    @field_validator(*('detail', 'message', 'result', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "detail",
+            "message",
+            "result",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -300,12 +419,11 @@ class TestReportTestActionAssert(BackboneElement):
         )
 
 
-
- 
 class TestReportTestAction(BackboneElement):
     """
     Action would contain either an operation or an assertion.
     """
+
     operation: Optional[TestReportTestActionOperation] = Field(
         description="The operation performed",
         default=None,
@@ -314,10 +432,24 @@ class TestReportTestAction(BackboneElement):
         description="The assertion performed",
         default=None,
     )
-    @field_validator(*('assert_', 'operation', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "assert_",
+            "operation",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -325,12 +457,11 @@ class TestReportTestAction(BackboneElement):
         )
 
 
-
- 
 class TestReportTest(BackboneElement):
     """
     A test executed from the test script.
     """
+
     name: Optional[String] = Field(
         description="Tracking/logging name of this test",
         default=None,
@@ -353,21 +484,39 @@ class TestReportTest(BackboneElement):
         description="A test operation or assert that was performed",
         default=None,
     )
-    @field_validator(*('action', 'description', 'name', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "action",
+            "description",
+            "name",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-    @field_validator(*('action',), mode="after", check_fields=None)
+    @field_validator(*("action",), mode="after", check_fields=None)
     @classmethod
-    def FHIR_inv_2_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_inv_2_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="operation.exists() xor assert.exists()",
             human="Test action SHALL contain either an operation or assert but not both.",
             key="inv-2",
@@ -375,19 +524,26 @@ class TestReportTest(BackboneElement):
         )
 
 
- 
 class TestReportTeardownAction(BackboneElement):
     """
     The teardown action will only contain an operation.
     """
+
     operation: Optional[TestReportSetupActionOperation] = Field(
         description="The teardown operation performed",
         default=None,
     )
-    @field_validator(*('operation', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("operation", "modifierExtension", "extension"),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -395,20 +551,24 @@ class TestReportTeardownAction(BackboneElement):
         )
 
 
-
- 
 class TestReportTeardown(BackboneElement):
     """
     The results of the series of operations required to clean up after all the tests were executed (successfully or otherwise).
     """
+
     action: Optional[List[TestReportTeardownAction]] = Field(
         description="One or more teardown operations performed",
         default=None,
     )
-    @field_validator(*('action', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("action", "modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -416,12 +576,11 @@ class TestReportTeardown(BackboneElement):
         )
 
 
-
- 
 class TestReport(FHIRBaseModel):
     """
     A summary of information based on the results of executing a TestScript.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -433,7 +592,10 @@ class TestReport(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/TestReport']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/TestReport"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -547,40 +709,72 @@ class TestReport(FHIRBaseModel):
         description="The results of running the series of required clean up steps",
         default=None,
     )
-    resourceType: Literal['TestReport'] = Field(
+    resourceType: Literal["TestReport"] = Field(
         description=None,
         default="TestReport",
     )
-    @field_validator(*('teardown', 'test', 'setup', 'participant', 'issued', 'tester', 'score', 'result', 'testScript', 'status', 'name', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "teardown",
+            "test",
+            "setup",
+            "participant",
+            "issued",
+            "tester",
+            "score",
+            "result",
+            "testScript",
+            "status",
+            "name",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -590,7 +784,7 @@ class TestReport(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -600,7 +794,7 @@ class TestReport(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -610,7 +804,7 @@ class TestReport(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -620,12 +814,10 @@ class TestReport(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-

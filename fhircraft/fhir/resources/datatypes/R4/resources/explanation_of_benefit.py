@@ -6,6 +6,7 @@ from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
+
 # Pydantic modules
 from pydantic import Field, field_validator, model_validator, BaseModel
 from pydantic.fields import FieldInfo
@@ -13,23 +14,51 @@ from pydantic.fields import FieldInfo
 # Standard modules
 from typing import Optional, Literal, Union
 from enum import Enum
+
 NoneType = type(None)
 
-# Dynamic modules 
- 
-from fhircraft.fhir.resources.base import FHIRBaseModel
- 
-from typing import Optional,List,Literal
- 
-from fhircraft.fhir.resources.datatypes.primitives import String,Uri,Code,DateTime,PositiveInt,Boolean,Date,Decimal,UnsignedInt
- 
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Element,Meta,Narrative,Resource,Extension,Identifier,CodeableConcept,Reference,Period,BackboneElement,Quantity,Attachment,Coding,Address,Money
+# Dynamic modules
 
- 
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from typing import Optional, List, Literal
+
+from fhircraft.fhir.resources.datatypes.primitives import (
+    String,
+    Uri,
+    Code,
+    DateTime,
+    PositiveInt,
+    Boolean,
+    Date,
+    Decimal,
+    UnsignedInt,
+)
+
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Element,
+    Meta,
+    Narrative,
+    Resource,
+    Extension,
+    Identifier,
+    CodeableConcept,
+    Reference,
+    Period,
+    BackboneElement,
+    Quantity,
+    Attachment,
+    Coding,
+    Address,
+    Money,
+)
+
+
 class ExplanationOfBenefitRelated(BackboneElement):
     """
     Other claims which are related to this claim such as prior submissions or claims for related services or for the same event.
     """
+
     claim: Optional[Reference] = Field(
         description="Reference to the related claim",
         default=None,
@@ -42,10 +71,27 @@ class ExplanationOfBenefitRelated(BackboneElement):
         description="File or case reference",
         default=None,
     )
-    @field_validator(*('reference', 'relationship', 'claim', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "reference",
+            "relationship",
+            "claim",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -53,12 +99,11 @@ class ExplanationOfBenefitRelated(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitPayee(BackboneElement):
     """
     The party to be reimbursed for cost of the products and services according to the terms of the policy.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Category of recipient",
         default=None,
@@ -67,10 +112,24 @@ class ExplanationOfBenefitPayee(BackboneElement):
         description="Recipient reference",
         default=None,
     )
-    @field_validator(*('party', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "party",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -78,12 +137,11 @@ class ExplanationOfBenefitPayee(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitCareTeam(BackboneElement):
     """
     The members of the team who provided the products and services.
     """
+
     sequence: Optional[PositiveInt] = Field(
         description="Order of care team",
         default=None,
@@ -114,10 +172,33 @@ class ExplanationOfBenefitCareTeam(BackboneElement):
         description="Practitioner credential or specialization",
         default=None,
     )
-    @field_validator(*('qualification', 'role', 'responsible', 'provider', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "qualification",
+            "role",
+            "responsible",
+            "provider",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -125,12 +206,11 @@ class ExplanationOfBenefitCareTeam(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitSupportingInfo(BackboneElement):
     """
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
     """
+
     sequence: Optional[PositiveInt] = Field(
         description="Information instance identifier",
         default=None,
@@ -180,31 +260,53 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
         description="Explanation for the information",
         default=None,
     )
-    @property 
+
+    @property
     def timing(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="timing",
         )
-    @property 
+
+    @property
     def value(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="value",
         )
-    @field_validator(*('reason', 'code', 'category', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "reason",
+            "code",
+            "category",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def timing_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Date, Period],
             field_name_base="timing",
@@ -213,18 +315,19 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
 
     @model_validator(mode="after")
     def value_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Boolean, String, Quantity, Attachment, Reference],
             field_name_base="value",
             required=False,
         )
 
- 
+
 class ExplanationOfBenefitDiagnosis(BackboneElement):
     """
     Information about diagnoses relevant to the claim items.
     """
+
     sequence: Optional[PositiveInt] = Field(
         description="Diagnosis instance identifier",
         default=None,
@@ -254,37 +357,58 @@ class ExplanationOfBenefitDiagnosis(BackboneElement):
         description="Package billing code",
         default=None,
     )
-    @property 
+
+    @property
     def diagnosis(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="diagnosis",
         )
-    @field_validator(*('packageCode', 'onAdmission', 'type', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "packageCode",
+            "onAdmission",
+            "type",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def diagnosis_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="diagnosis",
             required=True,
         )
 
- 
+
 class ExplanationOfBenefitProcedure(BackboneElement):
     """
     Procedures performed on the patient relevant to the billing items with the claim.
     """
+
     sequence: Optional[PositiveInt] = Field(
         description="Procedure instance identifier",
         default=None,
@@ -319,37 +443,58 @@ class ExplanationOfBenefitProcedure(BackboneElement):
         description="Unique device identifier",
         default=None,
     )
-    @property 
+
+    @property
     def procedure(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="procedure",
         )
-    @field_validator(*('udi', 'date', 'type', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "udi",
+            "date",
+            "type",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def procedure_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="procedure",
             required=True,
         )
 
- 
+
 class ExplanationOfBenefitInsurance(BackboneElement):
     """
     Financial instruments for reimbursement for the health care products and services specified on the claim.
     """
+
     focal: Optional[Boolean] = Field(
         description="Coverage to be used for adjudication",
         default=None,
@@ -372,10 +517,27 @@ class ExplanationOfBenefitInsurance(BackboneElement):
         default=None,
         alias="_preAuthRef",
     )
-    @field_validator(*('preAuthRef', 'coverage', 'focal', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "preAuthRef",
+            "coverage",
+            "focal",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -383,12 +545,11 @@ class ExplanationOfBenefitInsurance(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitAccident(BackboneElement):
     """
     Details of a accident which resulted in injuries which required the products and services listed in the claim.
     """
+
     date: Optional[Date] = Field(
         description="When the incident occurred",
         default=None,
@@ -410,37 +571,52 @@ class ExplanationOfBenefitAccident(BackboneElement):
         description="Where the event occurred",
         default=None,
     )
-    @property 
+
+    @property
     def location(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="location",
         )
-    @field_validator(*('type', 'date', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "type",
+            "date",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def location_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Address, Reference],
             field_name_base="location",
             required=False,
         )
 
- 
+
 class ExplanationOfBenefitItemAdjudication(BackboneElement):
     """
     If this item is a group then the values here are a summary of the adjudication of the detail items. If this item is a simple product or service then this is the result of the adjudication of this item.
     """
+
     category: Optional[CodeableConcept] = Field(
         description="Type of adjudication information",
         default=None,
@@ -462,10 +638,30 @@ class ExplanationOfBenefitItemAdjudication(BackboneElement):
         default=None,
         alias="_value",
     )
-    @field_validator(*('value', 'amount', 'reason', 'category', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "value",
+            "amount",
+            "reason",
+            "category",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -473,12 +669,11 @@ class ExplanationOfBenefitItemAdjudication(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitItemDetailAdjudication(BackboneElement):
     """
     The adjudication results.
     """
+
     category: Optional[CodeableConcept] = Field(
         description="Type of adjudication information",
         default=None,
@@ -500,10 +695,30 @@ class ExplanationOfBenefitItemDetailAdjudication(BackboneElement):
         default=None,
         alias="_value",
     )
-    @field_validator(*('value', 'amount', 'reason', 'category', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "value",
+            "amount",
+            "reason",
+            "category",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -511,12 +726,11 @@ class ExplanationOfBenefitItemDetailAdjudication(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
     """
     Third-tier of goods and services.
     """
+
     sequence: Optional[PositiveInt] = Field(
         description="Product or service provided",
         default=None,
@@ -584,10 +798,57 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="Subdetail level adjudication details",
         default=None,
     )
-    @field_validator(*('adjudication', 'noteNumber', 'udi', 'net', 'factor', 'unitPrice', 'quantity', 'programCode', 'modifier', 'productOrService', 'category', 'revenue', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "adjudication",
+            "noteNumber",
+            "udi",
+            "net",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "programCode",
+            "modifier",
+            "productOrService",
+            "category",
+            "revenue",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -595,12 +856,11 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitItemDetail(BackboneElement):
     """
     Second-tier of goods and services.
     """
+
     sequence: Optional[PositiveInt] = Field(
         description="Product or service provided",
         default=None,
@@ -672,10 +932,60 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="Additional items",
         default=None,
     )
-    @field_validator(*('subDetail', 'adjudication', 'noteNumber', 'udi', 'net', 'factor', 'unitPrice', 'quantity', 'programCode', 'modifier', 'productOrService', 'category', 'revenue', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "subDetail",
+            "adjudication",
+            "noteNumber",
+            "udi",
+            "net",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "programCode",
+            "modifier",
+            "productOrService",
+            "category",
+            "revenue",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -683,12 +993,11 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitItem(BackboneElement):
     """
     A claim line. Either a simple (a product or service) or a 'group' of details which can also be a simple items or groups of sub-details.
     """
+
     sequence: Optional[PositiveInt] = Field(
         description="Item instance identifier",
         default=None,
@@ -828,31 +1137,104 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Additional items",
         default=None,
     )
-    @property 
+
+    @property
     def serviced(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="serviced",
         )
-    @property 
+
+    @property
     def location(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="location",
         )
-    @field_validator(*('detail', 'adjudication', 'noteNumber', 'encounter', 'subSite', 'bodySite', 'udi', 'net', 'factor', 'unitPrice', 'quantity', 'programCode', 'modifier', 'productOrService', 'category', 'revenue', 'informationSequence', 'procedureSequence', 'diagnosisSequence', 'careTeamSequence', 'sequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "detail",
+            "adjudication",
+            "noteNumber",
+            "encounter",
+            "subSite",
+            "bodySite",
+            "udi",
+            "net",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "programCode",
+            "modifier",
+            "productOrService",
+            "category",
+            "revenue",
+            "informationSequence",
+            "procedureSequence",
+            "diagnosisSequence",
+            "careTeamSequence",
+            "sequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def serviced_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Date, Period],
             field_name_base="serviced",
@@ -861,18 +1243,19 @@ class ExplanationOfBenefitItem(BackboneElement):
 
     @model_validator(mode="after")
     def location_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Address, Reference],
             field_name_base="location",
             required=False,
         )
 
- 
+
 class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
     """
     The third-tier service adjudications for payor added services.
     """
+
     productOrService: Optional[CodeableConcept] = Field(
         description="Billing, service, product, or drug code",
         default=None,
@@ -915,10 +1298,42 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         description="Added items adjudication",
         default=None,
     )
-    @field_validator(*('adjudication', 'noteNumber', 'net', 'factor', 'unitPrice', 'quantity', 'modifier', 'productOrService', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "adjudication",
+            "noteNumber",
+            "net",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "modifier",
+            "productOrService",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -926,12 +1341,11 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitAddItemDetail(BackboneElement):
     """
     The second-tier service adjudications for payor added services.
     """
+
     productOrService: Optional[CodeableConcept] = Field(
         description="Billing, service, product, or drug code",
         default=None,
@@ -978,10 +1392,45 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         description="Insurer added line items",
         default=None,
     )
-    @field_validator(*('subDetail', 'adjudication', 'noteNumber', 'net', 'factor', 'unitPrice', 'quantity', 'modifier', 'productOrService', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "subDetail",
+            "adjudication",
+            "noteNumber",
+            "net",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "modifier",
+            "productOrService",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -989,12 +1438,11 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitAddItem(BackboneElement):
     """
     The first-tier service adjudications for payor added product or service lines.
     """
+
     itemSequence: Optional[List[PositiveInt]] = Field(
         description="Item sequence number",
         default=None,
@@ -1104,31 +1552,89 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Insurer added line items",
         default=None,
     )
-    @property 
+
+    @property
     def serviced(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="serviced",
         )
-    @property 
+
+    @property
     def location(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="location",
         )
-    @field_validator(*('detail', 'adjudication', 'noteNumber', 'subSite', 'bodySite', 'net', 'factor', 'unitPrice', 'quantity', 'programCode', 'modifier', 'productOrService', 'provider', 'subDetailSequence', 'detailSequence', 'itemSequence', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "detail",
+            "adjudication",
+            "noteNumber",
+            "subSite",
+            "bodySite",
+            "net",
+            "factor",
+            "unitPrice",
+            "quantity",
+            "programCode",
+            "modifier",
+            "productOrService",
+            "provider",
+            "subDetailSequence",
+            "detailSequence",
+            "itemSequence",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def serviced_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Date, Period],
             field_name_base="serviced",
@@ -1137,18 +1643,19 @@ class ExplanationOfBenefitAddItem(BackboneElement):
 
     @model_validator(mode="after")
     def location_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[CodeableConcept, Address, Reference],
             field_name_base="location",
             required=False,
         )
 
- 
+
 class ExplanationOfBenefitTotal(BackboneElement):
     """
     Categorized monetary totals for the adjudication.
     """
+
     category: Optional[CodeableConcept] = Field(
         description="Type of adjudication information",
         default=None,
@@ -1157,10 +1664,24 @@ class ExplanationOfBenefitTotal(BackboneElement):
         description="Financial total for the category",
         default=None,
     )
-    @field_validator(*('amount', 'category', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "amount",
+            "category",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -1168,12 +1689,11 @@ class ExplanationOfBenefitTotal(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitPayment(BackboneElement):
     """
     Payment details for the adjudication of the claim.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Partial or complete payment",
         default=None,
@@ -1203,10 +1723,36 @@ class ExplanationOfBenefitPayment(BackboneElement):
         description="Business identifier for the payment",
         default=None,
     )
-    @field_validator(*('identifier', 'amount', 'date', 'adjustmentReason', 'adjustment', 'type', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "identifier",
+            "amount",
+            "date",
+            "adjustmentReason",
+            "adjustment",
+            "type",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -1214,12 +1760,11 @@ class ExplanationOfBenefitPayment(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitProcessNote(BackboneElement):
     """
     A note that describes or explains adjudication results in a human readable form.
     """
+
     number: Optional[PositiveInt] = Field(
         description="Note instance identifier",
         default=None,
@@ -1251,10 +1796,30 @@ class ExplanationOfBenefitProcessNote(BackboneElement):
         description="Language of the text",
         default=None,
     )
-    @field_validator(*('language', 'text', 'type', 'number', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "language",
+            "text",
+            "type",
+            "number",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -1262,12 +1827,11 @@ class ExplanationOfBenefitProcessNote(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
     """
     Benefits Used to date.
     """
+
     type: Optional[CodeableConcept] = Field(
         description="Benefit classification",
         default=None,
@@ -1292,31 +1856,38 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
         description="Benefits used",
         default=None,
     )
-    @property 
+
+    @property
     def allowed(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="allowed",
         )
-    @property 
+
+    @property
     def used(self):
-        return fhir_validators.get_type_choice_value_by_base(self, 
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
             base="used",
         )
-    @field_validator(*('type', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *("type", "modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-
-
     @model_validator(mode="after")
     def allowed_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[UnsignedInt, String, Money],
             field_name_base="allowed",
@@ -1325,18 +1896,19 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
 
     @model_validator(mode="after")
     def used_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element( 
+        return fhir_validators.validate_type_choice_element(
             self,
             field_types=[UnsignedInt, Money],
             field_name_base="used",
             required=False,
         )
 
- 
+
 class ExplanationOfBenefitBenefitBalance(BackboneElement):
     """
     Balance by Benefit Category.
     """
+
     category: Optional[CodeableConcept] = Field(
         description="Benefit classification",
         default=None,
@@ -1384,10 +1956,42 @@ class ExplanationOfBenefitBenefitBalance(BackboneElement):
         description="Benefit Summary",
         default=None,
     )
-    @field_validator(*('financial', 'term', 'unit', 'network', 'description', 'name', 'excluded', 'category', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension', 'modifierExtension', 'extension'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "financial",
+            "term",
+            "unit",
+            "network",
+            "description",
+            "name",
+            "excluded",
+            "category",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+            "modifierExtension",
+            "extension",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -1395,12 +1999,11 @@ class ExplanationOfBenefitBenefitBalance(BackboneElement):
         )
 
 
-
- 
 class ExplanationOfBenefit(FHIRBaseModel):
     """
     This resource provides: the claim details; adjudication details from the processing of a Claim; and optionally account balance information, for informing the subscriber of the benefits provided.
     """
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1412,7 +2015,10 @@ class ExplanationOfBenefit(FHIRBaseModel):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(versionId='4.0.1', profile=['http://hl7.org/fhir/StructureDefinition/ExplanationOfBenefit']),
+        default_factory=lambda: Meta(
+            versionId="4.0.1",
+            profile=["http://hl7.org/fhir/StructureDefinition/ExplanationOfBenefit"],
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -1655,40 +2261,103 @@ class ExplanationOfBenefit(FHIRBaseModel):
         description="Balance by Benefit Category",
         default=None,
     )
-    resourceType: Literal['ExplanationOfBenefit'] = Field(
+    resourceType: Literal["ExplanationOfBenefit"] = Field(
         description=None,
         default="ExplanationOfBenefit",
     )
-    @field_validator(*('benefitBalance', 'benefitPeriod', 'processNote', 'form', 'formCode', 'payment', 'total', 'adjudication', 'addItem', 'item', 'accident', 'insurance', 'precedence', 'procedure', 'diagnosis', 'supportingInfo', 'careTeam', 'preAuthRefPeriod', 'preAuthRef', 'disposition', 'outcome', 'claimResponse', 'claim', 'facility', 'referral', 'payee', 'originalPrescription', 'prescription', 'related', 'fundsReserve', 'fundsReserveRequested', 'priority', 'provider', 'insurer', 'enterer', 'created', 'billablePeriod', 'patient', 'use', 'subType', 'type', 'status', 'identifier', 'modifierExtension', 'extension', 'text', 'language', 'implicitRules', 'meta'), mode="after", check_fields=None)
+
+    @field_validator(
+        *(
+            "benefitBalance",
+            "benefitPeriod",
+            "processNote",
+            "form",
+            "formCode",
+            "payment",
+            "total",
+            "adjudication",
+            "addItem",
+            "item",
+            "accident",
+            "insurance",
+            "precedence",
+            "procedure",
+            "diagnosis",
+            "supportingInfo",
+            "careTeam",
+            "preAuthRefPeriod",
+            "preAuthRef",
+            "disposition",
+            "outcome",
+            "claimResponse",
+            "claim",
+            "facility",
+            "referral",
+            "payee",
+            "originalPrescription",
+            "prescription",
+            "related",
+            "fundsReserve",
+            "fundsReserveRequested",
+            "priority",
+            "provider",
+            "insurer",
+            "enterer",
+            "created",
+            "billablePeriod",
+            "patient",
+            "use",
+            "subType",
+            "type",
+            "status",
+            "identifier",
+            "modifierExtension",
+            "extension",
+            "text",
+            "language",
+            "implicitRules",
+            "meta",
+        ),
+        mode="after",
+        check_fields=None,
+    )
     @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ele_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*('modifierExtension', 'extension'), mode="after", check_fields=None)
+    @field_validator(
+        *("modifierExtension", "extension"), mode="after", check_fields=None
+    )
     @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):    
-        return fhir_validators.validate_element_constraint(cls, value, 
+    def FHIR_ext_1_constraint_validator(cls, value):
+        return fhir_validators.validate_element_constraint(
+            cls,
+            value,
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*('contained',), mode="plain", check_fields=None)
+    @field_validator(*("contained",), mode="plain", check_fields=None)
     @classmethod
-    def contained_FHIR_resource_validator(cls, value):    
-        return fhir_validators.validate_contained_resource(cls, value, 
+    def contained_FHIR_resource_validator(cls, value):
+        return fhir_validators.validate_contained_resource(
+            cls,
+            value,
             release="R4",
         )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.contained.empty()",
             human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
@@ -1698,7 +2367,7 @@ class ExplanationOfBenefit(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
             human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
@@ -1708,7 +2377,7 @@ class ExplanationOfBenefit(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
@@ -1718,7 +2387,7 @@ class ExplanationOfBenefit(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="contained.meta.security.empty()",
             human="If a resource is contained in another resource, it SHALL NOT have a security label",
@@ -1728,12 +2397,10 @@ class ExplanationOfBenefit(FHIRBaseModel):
 
     @model_validator(mode="after")
     def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint( 
+        return fhir_validators.validate_model_constraint(
             self,
             expression="text.`div`.exists()",
             human="A resource should have narrative for robust management",
             key="dom-6",
             severity="warning",
         )
-
-
