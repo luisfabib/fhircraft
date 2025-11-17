@@ -147,7 +147,11 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept,Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
+            model,
+        )
+        self.assertBlockInCode(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
             model,
         )
 
@@ -197,7 +201,11 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         self.assertBlockInCode(expected_block, model)
         # Check imports
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept,Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
+            model,
+        )
+        self.assertBlockInCode(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
             model,
         )
 
@@ -330,7 +338,11 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         self.assertBlockInCode(expected_block, model)
         # Check imports
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept,Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
+            model,
+        )
+        self.assertBlockInCode(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
             model,
         )
 
