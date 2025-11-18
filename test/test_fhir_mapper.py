@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper import FHIRMapper
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import StructureMap
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import StructureMap
 
 from .test_fhir_mapper_engine import (
     create_simple_source_structure_definition,

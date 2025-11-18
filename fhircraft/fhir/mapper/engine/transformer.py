@@ -8,14 +8,14 @@ from pydantic import BaseModel
 
 import fhircraft.fhir.path.engine as fhirpath
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
-from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Coding,
     ContactPoint,
     Identifier,
     Quantity,
 )
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMapGroupRuleTargetParameter as StructureMapParameter,
 )
 

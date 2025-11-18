@@ -12,7 +12,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.strings import Upper
 
-from fhircraft.fhir.resources.datatypes.R4.resources.patient import Patient
+from fhircraft.fhir.resources.datatypes.R4.core.patient import Patient
 
 from dataclasses import dataclass
 from typing import List, Optional
@@ -25,6 +25,7 @@ from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
 env = dict()
 
+
 class TestRoot(TestCase):
 
     def test_evaluate_returns_collection_unchanged(self):
@@ -34,23 +35,22 @@ class TestRoot(TestCase):
             FHIRPathCollectionItem(value=MockPatient()),
             FHIRPathCollectionItem(value=MockPatient()),
         ]
-        result = RootElement('Patient').evaluate(items, env)
+        result = RootElement("Patient").evaluate(items, env)
         assert result == items
         assert all(isinstance(item, FHIRPathCollectionItem) for item in result)
 
     def test_evaluate_empty_collection_returns_empty_list(self):
         # Root().evaluate([]) should return []
-        result = RootElement('Patient').evaluate([], env)
+        result = RootElement("Patient").evaluate([], env)
         assert result == []
 
     def test_raises_error_for_wrong_type(self):
         item = FHIRPathCollectionItem(value=MockPatient())
         with pytest.raises(FHIRPathError):
-            RootElement('Condition').evaluate([item], env)
-
+            RootElement("Condition").evaluate([item], env)
 
     def test_root_string_representation(self):
-        expression = RootElement('Patient')
+        expression = RootElement("Patient")
         assert str(expression) == "Patient"
 
 
@@ -131,6 +131,7 @@ class TestThis(TestCase):
         expression = This()
         assert str(expression) == ""
 
+
 class TestElement(TestCase):
 
     def setUp(self):
@@ -200,12 +201,14 @@ class TestElement(TestCase):
         result = Element("status").evaluate(self.collection, env, create=False)
         assert result[0].parent == self.collection[0]
 
+
 def test_children_returns_correct_primitive_extension():
     ext = dict(extension=[dict(url="http://example.com/ext", value="Extension Value")])
     resource = dict(fieldA=1, fieldB_ext=ext)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Element('fieldB').evaluate(collection, env)
+    result = Element("fieldB").evaluate(collection, env)
     assert result[0].value == ext
+
 
 class TestInvocation(TestCase):
 
@@ -224,14 +227,14 @@ class TestInvocation(TestCase):
     def test_evaluate_empty_collection_returns_empty_list(self):
         result = Invocation(Element("status"), Upper()).evaluate([], env)
         assert result == []
-    
+
     def test_invocation_string_representation(self):
         expression = Invocation(Element("left"), Element("right"))
         assert str(expression) == "left.right"
 
 
 class TestLiteral(TestCase):
-    
+
     def test_evaluate_returns_single_value_for_multiple_collection_items(self):
         items = [
             FHIRPathCollectionItem(value="a"),
@@ -260,9 +263,9 @@ class TestLiteral(TestCase):
         result = literal.evaluate(items, env)
         assert len(result) == 1
         assert result[0].value is None
-    
+
     def test_literal_string_representation(self):
-        assert str(Literal("foo")) == "\'foo\'"
+        assert str(Literal("foo")) == "'foo'"
         assert str(Literal(120)) == "120"
         assert str(Literal(True)) == "true"
 

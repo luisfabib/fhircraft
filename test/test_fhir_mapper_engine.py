@@ -6,7 +6,7 @@ import pytest
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.core import FHIRMappingEngine
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
     StructureMapConst,
     StructureMapGroup,

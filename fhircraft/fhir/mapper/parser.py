@@ -8,13 +8,13 @@ import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
 from fhircraft.fhir.path.parser import FhirPathParser
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
-from fhircraft.fhir.resources.datatypes.R5.resources.concept_map import (
+from fhircraft.fhir.resources.datatypes.R5.core.concept_map import (
     ConceptMap,
     ConceptMapGroup,
     ConceptMapGroupElement,
     ConceptMapGroupElementTarget,
 )
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import (
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
     StructureMapConst,
     StructureMapGroup,

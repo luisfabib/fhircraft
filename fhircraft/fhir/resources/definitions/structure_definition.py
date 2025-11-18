@@ -30,7 +30,7 @@ from fhircraft.fhir.resources.datatypes.primitives import (
     String,
     Uri,
 )
-from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     CodeableConcept,
     Coding,

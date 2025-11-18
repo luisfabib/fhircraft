@@ -41,7 +41,7 @@ from fhircraft.fhir.resources.datatypes.primitives import (
     Url,
     Uuid,
 )
-from fhircraft.fhir.resources.datatypes.R4B.complex_types import (
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Address,
     Age,
     Annotation,

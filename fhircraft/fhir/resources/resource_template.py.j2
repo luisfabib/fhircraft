@@ -14,9 +14,9 @@ from enum import Enum
 NoneType = type(None)
 
 # Dynamic modules 
-{% for module, objects in imports.items() %} 
+{% for module, objects in imports.items() -%} 
 from {{ module }} import {{ objects|join(',')}}
-{% endfor %}
+{% endfor -%}
 
 {% for model, model_data in data.items() %} 
 class {{ model.__name__ }}({{ model.__base__.__name__ }}):

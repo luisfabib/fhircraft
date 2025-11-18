@@ -6,7 +6,7 @@ import pytest
 
 from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
 from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
-from fhircraft.fhir.resources.datatypes.R5.resources.structure_map import *
+from fhircraft.fhir.resources.datatypes.R5.core.structure_map import *
 
 
 def add_rules_to_basic_map(rules, documentation=None):
