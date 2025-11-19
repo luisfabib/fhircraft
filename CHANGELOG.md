@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+----------------- 
+
+## [0.3.5] - 2025-11-19
+
+### Changed
+
+- Updated `FHIRBaseModel` to use `ConfigDict(defer_build=True)` for deferred building, largely improving import times of Pydantic-heavy modules such as `fhircraft.resources.datatypes` ([#95](https://github.com/luisfabib/fhircraft/pull/95))
+- Changed the import path for complex types from `complex_types` to `complex` and for core resources from `resources` to `core` ([#95](https://github.com/luisfabib/fhircraft/pull/95))
+
+### Fixed
+
+- Updated the Jinja resource template to add the missing `min_cardinality` and `max_cardinality` class variables for models inheriting from `FHIRSliceModel` ([#85](https://github.com/luisfabib/fhircraft/pull/85))
+- Fixed a bug in `validate_slicing_cardinalities` raising an error when no slices are provided and the value is `None` ([#86](https://github.com/luisfabib/fhircraft/pull/86))
+- Fixed the FHIRPath concatenation operation (`&`) to ensure the complete strings are concatenated and not just the initial characters ([#90](https://github.com/luisfabib/fhircraft/pull/90))
+- Fixed a bug in the FHIRPath `Is`, `As`, `LegacyIs`, and `LegacyAs` classes when providing core FHIR resources as target types ([#92](https://github.com/luisfabib/fhircraft/pull/92))
+- Added a validator to the `Bundle` resource models to ensure that `Bundle.entry.resource` entries are properly resolved and validated with the appropriate resource model without loosing any data ([#94](https://github.com/luisfabib/fhircraft/pull/94))
+- Reorganized the complex type models for all releases to fix many of the `{model.__name__} is not fully defined` errors caused by recursive relations between complex datatype models when importing datatypes or resources ([#95](https://github.com/luisfabib/fhircraft/pull/95))
 
 ----------------- 
 
@@ -42,9 +59,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refine the import and add lazy module loading to fix circular import errors raised when importing certain modules or components ([#80](https://github.com/luisfabib/fhircraft/pull/80))
 - Remove unnecessary print/debug statements and redundant imports ([#80](https://github.com/luisfabib/fhircraft/pull/80))
 - Suppress (expected) warnings raised during the test suite ([#80](https://github.com/luisfabib/fhircraft/pull/80))
-
-* Bug Fixes for Type Resolution, Field Construction, and Content References in Resource Factory and Generator by @luisfabib in https://github.com/luisfabib/fhircraft/pull/82
-* Resolve circular import issues and optimize FHIR resource loading by @luisfabib in https://github.com/luisfabib/fhircraft/pull/83
 
 
 ----------------- 
@@ -191,6 +205,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release 🎉
 
+[0.3.5]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.5
 [0.3.4]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.4
 [0.3.3]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.3
 [0.3.2]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.2
