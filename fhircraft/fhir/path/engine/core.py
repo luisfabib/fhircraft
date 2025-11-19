@@ -761,24 +761,20 @@ class Element(FHIRPath):
     ) -> FHIRPathCollection:
         child_collection = self._get_collection_by_label(collection, self.label, create)
         if not child_collection:
-            print(f"Getting {self.label}_ext")
             child_collection = self._get_collection_by_label(
                 collection, f"{self.label}_ext", create
             )
         if not child_collection and self.label in ["id", "extension"]:
             child_collection = []
-            print("Gettings primtive extension/id elements", collection)
             for item in collection:
                 if not item.parent:
                     continue
-                print(f"Creating extension/id for parent element: {item.path}")
                 _collection = self._get_collection_by_label(
                     [item.parent], f"{item.path}_ext", create
                 )
                 child_collection.extend(
                     self._get_collection_by_label(_collection, self.label, create)
                 )
-        print(f"Element.evaluate: {self.label} -> {child_collection}")
         return child_collection
 
     def __str__(self):

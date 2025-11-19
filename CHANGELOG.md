@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+----------------- 
+
+## [0.3.6] - 2025-11-19
+
+### Changed
+
+- Update return type of `model_construct` to `Self` to fix type hinting of return value for all `FHIRBaseModel` classes ([#99](https://github.com/luisfabib/fhircraft/pull/99))
+
+ ### Fixed
+
+- Improved handling of empty collections in FHIRPath `Is` and `As` operators to avoid errors on runtime ([#98](https://github.com/luisfabib/fhircraft/pull/98))
+- Fixed the FHIRPath `replace()` fucntion to allowing empty strings `''` to be used for the substitution instead of returning an empty collection ([#100](https://github.com/luisfabib/fhircraft/pull/100))
+- Improved the FHIRPath engine better handle cases where the primitive extension/id elements are requested ([#102](https://github.com/luisfabib/fhircraft/pull/102))
+
 ----------------- 
 
 ## [0.3.5] - 2025-11-19
@@ -27,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.4] - 2025-11-11
 
-## Fixed
+### Fixed
 - Fixed processing of pattern and fixed values for both primitive and complex FHIR types ([#82](https://github.com/luisfabib/fhircraft/pull/82))
 - Resolved bugs in type choice field construction, ensuring all possible types are supported and correctly named ([#82](https://github.com/luisfabib/fhircraft/pull/82))
 - Corrected slice model construction, ensuring that slice names do not conflict within a model or with other models by prepending the parent model's name to the slice name ([#82](https://github.com/luisfabib/fhircraft/pull/82))
@@ -205,6 +220,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release 🎉
 
+[0.3.6]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.6
 [0.3.5]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.5
 [0.3.4]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.4
 [0.3.3]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.3
