@@ -32,7 +32,9 @@ class FHIRPath(ABC):
         collection = self.__evaluate_wrapped(data, environment=environment)
         return [item.value for item in collection]
 
-    def single(self, data: Any, default: Any = None, environment: dict | None = None) -> Any:
+    def single(
+        self, data: Any, default: Any = None, environment: dict | None = None
+    ) -> Any:
         """
         Evaluates the FHIRPath expression and returns a single value.
 
@@ -58,7 +60,9 @@ class FHIRPath(ABC):
                 f"Use values() to retrieve multiple values or first() to get the first one."
             )
 
-    def first(self, data: Any, default: Any = None, environment: dict | None = None) -> Any:
+    def first(
+        self, data: Any, default: Any = None, environment: dict | None = None
+    ) -> Any:
         """
         Evaluates the FHIRPath expression and returns the first value.
 
@@ -73,7 +77,9 @@ class FHIRPath(ABC):
         values = self.values(data, environment=environment)
         return values[0] if values else default
 
-    def last(self, data: Any, default: Any = None, environment: dict | None = None) -> Any:
+    def last(
+        self, data: Any, default: Any = None, environment: dict | None = None
+    ) -> Any:
         """
         Evaluates the FHIRPath expression and returns the last value.
 
@@ -127,7 +133,9 @@ class FHIRPath(ABC):
         """
         return not self.exists(data, environment=environment)
 
-    def update_values(self, data: Any, value: Any, environment: dict | None = None) -> None:
+    def update_values(
+        self, data: Any, value: Any, environment: dict | None = None
+    ) -> None:
         """
         Evaluates the FHIRPath expression and sets all matching locations to the given value.
 
@@ -147,7 +155,9 @@ class FHIRPath(ABC):
         for item in collection:
             item.set_value(value)
 
-    def update_single(self, data: Any, value: Any, environment: dict | None = None) -> None:
+    def update_single(
+        self, data: Any, value: Any, environment: dict | None = None
+    ) -> None:
         """
         Evaluates the FHIRPath expression and sets a single matching location to the given value.
 
@@ -749,9 +759,27 @@ class Element(FHIRPath):
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
-        return self._get_collection_by_label(
-            collection, self.label, create
-        ) or self._get_collection_by_label(collection, f"{self.label}_ext", create)
+        child_collection = self._get_collection_by_label(collection, self.label, create)
+        if not child_collection:
+            print(f"Getting {self.label}_ext")
+            child_collection = self._get_collection_by_label(
+                collection, f"{self.label}_ext", create
+            )
+        if not child_collection and self.label in ["id", "extension"]:
+            child_collection = []
+            print("Gettings primtive extension/id elements", collection)
+            for item in collection:
+                if not item.parent:
+                    continue
+                print(f"Creating extension/id for parent element: {item.path}")
+                _collection = self._get_collection_by_label(
+                    [item.parent], f"{item.path}_ext", create
+                )
+                child_collection.extend(
+                    self._get_collection_by_label(_collection, self.label, create)
+                )
+        print(f"Element.evaluate: {self.label} -> {child_collection}")
+        return child_collection
 
     def __str__(self):
         return self.label
