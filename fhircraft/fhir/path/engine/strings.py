@@ -349,19 +349,46 @@ class Replace(StringManipulationFunction):
         substitution (str): String to substitute `pattern` with.
     """
 
-    def __init__(self, pattern: str | Literal, substitution: str | Literal):
+    def __init__(
+        self,
+        pattern: str | Literal | FHIRPathCollection,
+        substitution: str | Literal | FHIRPathCollection,
+    ):
         if isinstance(pattern, str):
-            pattern = Literal(pattern)
-        if not isinstance(pattern, Literal):
+            self.pattern = Literal(pattern)
+        elif isinstance(pattern, list):
+            if len(pattern) > 0 and isinstance(pattern[0], FHIRPathCollectionItem):
+                self.pattern = (
+                    Literal(pattern[0])
+                    if not isinstance(pattern[0], Literal)
+                    else pattern[0]
+                )
+            else:
+                self.pattern = None
+        elif isinstance(pattern, Literal):
+            self.pattern = pattern
+        else:
             raise FHIRPathError("Replace() pattern argument must be a string literal.")
+
         if isinstance(substitution, str):
-            substitution = Literal(substitution)
-        if not isinstance(substitution, Literal):
+            self.substitution = Literal(substitution)
+        elif isinstance(substitution, list):
+            if len(substitution) > 0 and isinstance(
+                substitution[0], FHIRPathCollectionItem
+            ):
+                self.substitution = (
+                    Literal(substitution[0])
+                    if not isinstance(substitution[0], Literal)
+                    else substitution[0]
+                )
+            else:
+                self.substitution = None
+        elif isinstance(substitution, Literal):
+            self.substitution = substitution
+        else:
             raise FHIRPathError(
                 "Replace() substitution argument must be a string literal."
             )
-        self.pattern = pattern
-        self.substitution = substitution
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -386,7 +413,7 @@ class Replace(StringManipulationFunction):
             FHIRPathError: If the item in the input collection is not a string.
         """
         self.validate_collection(collection)
-        if not collection or not self.substitution.value:
+        if not collection or self.substitution is None or self.pattern is None:
             return []
         return [
             FHIRPathCollectionItem.wrap(
