@@ -76,6 +76,11 @@ def test_is_returns_correct_boolean(left, type_specifier, expected):
     assert result[0].value == expected
 
 
+def test_is_returns_empty_for_empty_collection():
+    result = Is(Invocation(Element("left"), GetValue()), "String").evaluate([], env)
+    assert result == []
+
+
 def test_is_string_representation():
     expression = Is(Element("field"), "String")
     assert str(expression) == "field is String"
@@ -86,6 +91,11 @@ def test_legacy_is_returns_correct_boolean(left, type_specifier, expected):
     collection = [FHIRPathCollectionItem(value=left)]
     result = LegacyIs(type_specifier).evaluate(collection, env)
     assert result[0].value == expected
+
+
+def test_legacy_is_returns_empty_for_empty_collection():
+    result = LegacyIs("String").evaluate([], env)
+    assert result == []
 
 
 def test_legacy_is_string_representation():
@@ -105,6 +115,11 @@ def test_as_returns_correct_boolean(expected, type_specifier, equal):
     assert result[0].value == expected if equal else result == []
 
 
+def test_as_returns_empty_for_empty_collection():
+    result = As(This(), "String").evaluate([], env)
+    assert result == []
+
+
 def test_as_string_representation():
     expression = As(Element("field"), "String")
     assert str(expression) == "field as String"
@@ -115,6 +130,11 @@ def test_legacy_as_returns_correct_boolean(expected, type_specifier, equal):
     collection = [FHIRPathCollectionItem(value=expected)]
     result = LegacyAs(type_specifier).evaluate(collection, env)
     assert result[0].value == expected if equal else result == []
+
+
+def test_legacy_as_returns_empty_for_empty_collection():
+    result = LegacyAs("String").evaluate([], env)
+    assert result == []
 
 
 def test_legacy_as_string_representation():
