@@ -242,6 +242,12 @@ def test_replace_pattern():
     assert result == [FHIRPathCollectionItem(value="yourSubstringValue")]
 
 
+def test_replace_empty_substitution():
+    collection = [FHIRPathCollectionItem(value="Patient/123")]
+    result = Replace("Patient/", "").evaluate(collection, env)
+    assert result == [FHIRPathCollectionItem(value="123")]
+
+
 def test_replace_all_patterns():
     collection = [FHIRPathCollectionItem(value="mySubstringmyValue")]
     result = Replace("my", "your").evaluate(collection, env)
