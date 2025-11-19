@@ -43,6 +43,8 @@ class FHIRTypesOperator(FHIRPath):
         left_collection = evaluate_fhirpath_collection(
             self.left, collection, environment, create
         )
+        if len(left_collection) == 0:
+            return None
         if len(left_collection) > 1:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} expected a singleton collection for the left expression, instead got a {len(collection)}-items collection."
@@ -194,6 +196,8 @@ class As(FHIRTypesOperator):
             FHIRPathRuntimeError: If either expression evaluates to a non-singleton collection.
         """
         value = self._get_singleton_collection_value(collection, environment, create)
+        if value is None:
+            return []
         return (
             [FHIRPathCollectionItem.wrap(value)]
             if self._validate_type_specifier(value)
