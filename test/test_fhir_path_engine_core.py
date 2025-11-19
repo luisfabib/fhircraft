@@ -139,6 +139,9 @@ class TestElement(TestCase):
             def __init__(self):
                 self.status = "active"
                 self.valueString = None
+                self.valueString_ext = {
+                    type("Extension", (), {"valueId": "id1"})(),
+                }
                 self.identifier = [
                     type("Identifier", (), {"value": "id1"})(),
                     type("Identifier", (), {"value": "id2"})(),
@@ -203,11 +206,37 @@ class TestElement(TestCase):
 
 
 def test_children_returns_correct_primitive_extension():
-    ext = dict(extension=[dict(url="http://example.com/ext", value="Extension Value")])
-    resource = dict(fieldA=1, fieldB_ext=ext)
+    ext = dict(
+        extension=[
+            dict(
+                value="Extension Value",
+                url="http://example.com/ext",
+            )
+        ]
+    )
+    resource = dict(fieldA=1, fieldB="invalid", fieldB_ext=ext)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Element("fieldB").evaluate(collection, env)
-    assert result[0].value == ext
+    result = Invocation(Element("fieldB"), Element("extension")).evaluate(
+        collection, env
+    )
+    assert result[0].value["value"] == ext["extension"][0]["value"]
+
+
+def test_deep_children_returns_correct_primitive_extension():
+    ext = dict(
+        extension=[
+            dict(
+                value="Extension Value",
+                url="http://example.com/ext",
+            )
+        ]
+    )
+    resource = dict(fieldA=1, fieldB=dict(fieldC="invalid", fieldC_ext=ext))
+    collection = [FHIRPathCollectionItem(value=resource)]
+    result = Invocation(
+        Invocation(Element("fieldB"), Element("fieldC")), Element("extension")
+    ).evaluate(collection, env)
+    assert result[0].value["value"] == ext["extension"][0]["value"]
 
 
 class TestInvocation(TestCase):
