@@ -1,5 +1,6 @@
 from copy import copy
 from typing import ClassVar
+from typing_extensions import Self
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 from pydantic.fields import FieldInfo
@@ -27,7 +28,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return super().model_dump_json(*args, **kwargs)
 
     @classmethod
-    def model_construct(cls, set_defaults=True, *args, **kwargs) -> object:
+    def model_construct(cls, set_defaults=True, *args, **kwargs) -> Self:
         """
         Constructs a model without running validation, with an option to set default values for fields that have them defined.
 
