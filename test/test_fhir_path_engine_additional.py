@@ -1,7 +1,10 @@
 from collections import namedtuple
 
+import pytest
+
 from fhircraft.fhir.path.engine.additional import *
 from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.path.engine.literals import Date, DateTime
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
 env = dict()
@@ -40,6 +43,19 @@ def test_extension_selects_correct_extension_by_url():
 # HasValue
 # -------------
 
+has_value_cases = (
+    "ABC",
+    123,
+    1.23,
+    True,
+    False,
+    Date("@2012"),
+    Date("@2012-01"),
+    DateTime("@2012-01-01T10:30"),
+    DateTime("@2012-01-01T10:30:12.312"),
+    "1 year",
+)
+
 
 def test_hasvalue_returns_false_for_empty_collection():
     collection = []
@@ -47,19 +63,32 @@ def test_hasvalue_returns_false_for_empty_collection():
     assert result[0].value == False
 
 
-def test_hasvaslue_returns_true_for_singleton_collection_with_value():
-    collection = [FHIRPathCollectionItem(value=1)]
+@pytest.mark.parametrize("value", has_value_cases)
+def test_hasvalue_returns_true_for_singleton_collection_with_primitive_value(value):
+    collection = [FHIRPathCollectionItem(value=value)]
     result = HasValue().evaluate(collection, env)
     assert result[0].value == True
 
 
-def test_hasvaslue_returns_true_for_singleton_collection_without_value():
+def test_hasvalue_returns_false_for_singleton_collection_without_primitive_value():
+    collection = [
+        FHIRPathCollectionItem(
+            value=get_complex_FHIR_type("Extension")(
+                url="http://domain.org/extension1", valueInteger=1
+            )
+        )
+    ]
+    result = HasValue().evaluate(collection, env)
+    assert result[0].value == False
+
+
+def test_hasvalue_returns_true_for_singleton_collection_without_value():
     collection = [FHIRPathCollectionItem(value=None)]
     result = HasValue().evaluate(collection, env)
     assert result[0].value == False
 
 
-def test_hasvaslue_returns_false_for_collection_with_multiple_items():
+def test_hasvalue_returns_false_for_collection_with_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     result = HasValue().evaluate(collection, env)
     assert result[0].value == False
@@ -69,6 +98,19 @@ def test_hasvaslue_returns_false_for_collection_with_multiple_items():
 # GetValue
 # -------------
 
+get_value_cases = (
+    "ABC",
+    123,
+    1.23,
+    True,
+    False,
+    Date("@2012"),
+    Date("@2012-01"),
+    DateTime("@2012-01-01T10:30"),
+    DateTime("@2012-01-01T10:30:12.312"),
+    "1 year",
+)
+
 
 def test_getvalue_returns_empty_for_empty_collection():
     collection = []
@@ -76,10 +118,23 @@ def test_getvalue_returns_empty_for_empty_collection():
     assert result == []
 
 
-def test_getvalue_returns_true_for_singleton_collection_with_value():
-    collection = [FHIRPathCollectionItem(value=1)]
+@pytest.mark.parametrize("value", get_value_cases)
+def test_getvalue_returns_value_for_singleton_collection_with_primitive_value(value):
+    collection = [FHIRPathCollectionItem(value=value)]
     result = GetValue().evaluate(collection, env)
-    assert result[0].value == 1
+    assert result[0].value == value
+
+
+def test_getvalue_returns_empty_for_singleton_collection_without_primitive_value():
+    collection = [
+        FHIRPathCollectionItem(
+            value=get_complex_FHIR_type("Extension")(
+                url="http://domain.org/extension1", valueInteger=1
+            )
+        )
+    ]
+    result = GetValue().evaluate(collection, env)
+    assert result == []
 
 
 def test_getvalue_returns_empty_for_collection_with_multiple_items():

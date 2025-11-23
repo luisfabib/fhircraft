@@ -75,6 +75,20 @@ def get_fhir_resource_type(type_str: str, release="R4B") -> type:
     return resource
 
 
+def is_fhir_primitive(value: Any) -> bool:
+    """Check if a value is a FHIR primitive type."""
+    primitive_types = tuple(
+        getattr(primitives, name)
+        for name in dir(primitives)
+        if not name.startswith("_")
+        and isinstance(getattr(primitives, name), TypeAliasType)
+    )
+    return any(
+        is_fhir_primitive_type(value, ptype, raise_on_error=False)
+        for ptype in primitive_types
+    )
+
+
 # Type checking functions
 def is_fhir_primitive_type(
     value: Any, fhir_type: Type | TypeAliasType | str, raise_on_error: bool = True
