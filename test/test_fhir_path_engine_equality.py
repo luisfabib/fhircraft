@@ -43,8 +43,8 @@ def test_equals_returns_correct_boolean(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Equals(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
@@ -59,8 +59,8 @@ def test_notequals_returns_correct_boolean(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = NotEquals(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     assert result != [FHIRPathCollectionItem(value=expected)]
 
@@ -110,8 +110,8 @@ def test_equivalent_returns_correct_boolean(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Equivalent(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
@@ -126,8 +126,8 @@ def test_notequivalent_returns_correct_boolean(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = NotEquivalent(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     assert result != [FHIRPathCollectionItem(value=expected)]
 

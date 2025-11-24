@@ -21,8 +21,9 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.equality import Equals
 from fhircraft.fhir.path.engine.filtering import Where
-from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.utils import ensure_list, load_url
+from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive, to_date
 
 
 class Extension(FHIRPathFunction):
@@ -136,12 +137,17 @@ class HasValue(FHIRPathFunction):
             collection (FHIRPathCollection): The output collection.
         """
         if len(collection) != 1:
-            has_value = False
+            has_primitive_value = False
         else:
-            # TODO: add check for primitive
-            item = collection[0]
-            has_value = item.value is not None
-        return [FHIRPathCollectionItem.wrap(has_value)]
+            value = collection[0].value
+            if isinstance(value, Date):
+                value = value.to_date()
+            elif isinstance(value, Time):
+                value = value.to_time()
+            elif isinstance(value, DateTime):
+                value = value.to_datetime()
+            has_primitive_value = value is not None and is_fhir_primitive(value)
+        return [FHIRPathCollectionItem.wrap(has_primitive_value)]
 
 
 class GetValue(FHIRPathFunction):
@@ -164,11 +170,20 @@ class GetValue(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        if not HasValue().evaluate(collection, environment, create=create):
-            return []
         if len(collection) != 1:
             return []
-        return [collection[0]]
+        else:
+            value = collection[0].value
+            if isinstance(value, Date):
+                value = value.to_date()
+            elif isinstance(value, Time):
+                value = value.to_time()
+            elif isinstance(value, DateTime):
+                value = value.to_datetime()
+
+            has_primitive_value = value is not None and is_fhir_primitive(value)
+            print(value, has_primitive_value)
+            return [FHIRPathCollectionItem.wrap(value)] if has_primitive_value else []
 
 
 class Resolve(FHIRPathFunction):

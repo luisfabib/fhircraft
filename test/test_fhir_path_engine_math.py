@@ -26,8 +26,8 @@ def test_addition_returns_correct_value(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Addition(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
@@ -53,8 +53,8 @@ def test_subtraction_returns_correct_value(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Subtraction(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
@@ -81,8 +81,8 @@ def test_multiplication_returns_correct_value(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Multiplication(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
@@ -111,8 +111,8 @@ def test_division_returns_correct_value(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Division(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
@@ -141,8 +141,8 @@ def test_div_returns_correct_value(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Div(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     result = result[0].value if len(result) == 1 else result
     assert result == expected
@@ -168,8 +168,8 @@ def test_mod_returns_correct_value(left, right, expected):
     resource = namedtuple("Resource", ["left", "right"])(left=left, right=right)
     collection = [FHIRPathCollectionItem(value=resource)]
     result = Mod(
-        Invocation(Element("left"), GetValue()),
-        Invocation(Element("right"), GetValue()),
+        Element("left"),
+        Element("right"),
     ).evaluate(collection, env)
     assert round(result[0].value, 4) == round(expected, 4)
 

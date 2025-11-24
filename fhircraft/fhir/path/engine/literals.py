@@ -117,6 +117,8 @@ class Date(FHIRPathLiteralType):
                 return op(self.to_date(), other.to_date())
             else:
                 return []
+        elif isinstance(other, date):
+            return op(self.to_date(), other)
         else:
             raise TypeError("Comparisons only supported between Date objects")
 
@@ -203,6 +205,8 @@ class Time(FHIRPathLiteralType):
                 return op(self.to_time(), other.to_time())
             else:
                 return []
+        elif isinstance(other, time):
+            return op(self.to_time(), other)
         else:
             raise TypeError("Comparisons only supported between Date objects")
 
@@ -309,6 +313,8 @@ class DateTime(FHIRPathLiteralType):
                 return op(self.to_datetime(), other.to_datetime())
             else:
                 return []
+        elif isinstance(other, datetime):
+            return op(self.to_datetime(), other)
         else:
             raise TypeError("Comparisons only supported between Date objects")
 

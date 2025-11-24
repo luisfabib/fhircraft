@@ -70,14 +70,12 @@ test_cases = (
 def test_is_returns_correct_boolean(left, type_specifier, expected):
     resource = namedtuple("Resource", ["left"])(left=left)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Is(Invocation(Element("left"), GetValue()), type_specifier).evaluate(
-        collection, env
-    )
+    result = Is(Element("left"), type_specifier).evaluate(collection, env)
     assert result[0].value == expected
 
 
 def test_is_returns_empty_for_empty_collection():
-    result = Is(Invocation(Element("left"), GetValue()), "String").evaluate([], env)
+    result = Is(Element("left"), "String").evaluate([], env)
     assert result == []
 
 
