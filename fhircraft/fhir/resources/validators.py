@@ -5,7 +5,7 @@ import warnings
 # Standard modules
 from typing import TYPE_CHECKING, Any, List, TypeVar, Union
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
@@ -282,7 +282,7 @@ def validate_contained_resource(
             )
             validated_resources.append(resourceModel.model_validate(resource))
         else:
-            raise ValidationError(
+            raise TypeError(
                 "Contained resource must be a FHIRBaseModel or a dict, and must have a 'resourceType' property."
             )
 
