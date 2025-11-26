@@ -379,12 +379,29 @@ class FHIRPath(ABC):
     def __evaluate_wrapped(
         self, data: Any, environment: dict | None = None, create=False
     ) -> FHIRPathCollection:
+        # Determine %resource and %rootResource from parent tracking if available
+        resource = data
+        root_resource = data
+
+        # Check if data has parent tracking attributes (from FHIRBaseModel)
+        if hasattr(data, "_resource") and hasattr(data, "_root_resource"):
+            res = getattr(data, "_resource", None)
+            root = getattr(data, "_root_resource", None)
+
+            # %resource: the immediate parent resource (not just any parent, but a resource type)
+            # If _resource is None, fallback to data itself
+            if res is not None:
+                resource = res
+            
+            # %rootResource: the top-level resource
+            if root is not None:
+                root_resource = root
+
         environment = (environment or dict()) | {
             "%ucum": FHIRPathCollectionItem.wrap("http://unitsofmeasure.org"),
             "%context": FHIRPathCollectionItem.wrap(data),
-            # TODO: Add support for %resource and %rootResource when evaluating within a contained resource context
-            "%resource": FHIRPathCollectionItem.wrap(data),
-            "%rootResource": FHIRPathCollectionItem.wrap(data),
+            "%resource": FHIRPathCollectionItem.wrap(resource),
+            "%rootResource": FHIRPathCollectionItem.wrap(root_resource),
         }
         # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
