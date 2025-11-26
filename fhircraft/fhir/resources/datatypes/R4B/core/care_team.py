@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     ContactPoint,
     Annotation,
+    DomainResource,
 )
 
 
@@ -91,7 +92,7 @@ class CareTeamParticipant(BackboneElement):
         )
 
 
-class CareTeam(FHIRBaseModel):
+class CareTeam(DomainResource):
     """
     The Care Team includes all the people and organizations who plan to participate in the coordination and delivery of care for a patient.
     """

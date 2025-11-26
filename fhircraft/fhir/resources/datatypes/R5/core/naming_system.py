@@ -45,6 +45,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     RelatedArtifact,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -139,7 +140,7 @@ class NamingSystemUniqueId(BackboneElement):
         )
 
 
-class NamingSystem(FHIRBaseModel):
+class NamingSystem(DomainResource):
     """
     A curated namespace that issues unique symbols within that namespace for the identification of concepts, people, devices, etc.  Represents a "System" used within the Identifier and Coding data types.
     """

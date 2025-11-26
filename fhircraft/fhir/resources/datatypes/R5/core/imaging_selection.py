@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     CodeableReference,
     Coding,
+    DomainResource,
 )
 
 
@@ -262,7 +263,7 @@ class ImagingSelectionInstance(BackboneElement):
         )
 
 
-class ImagingSelection(FHIRBaseModel):
+class ImagingSelection(DomainResource):
     """
     A selection of DICOM SOP instances and/or frames within a single Study and Series. This might include additional specifics such as an image region, an Observation UID or a Segmentation Number, allowing linkage to an Observation Resource or transferring this information along with the ImagingStudy Resource.
     """

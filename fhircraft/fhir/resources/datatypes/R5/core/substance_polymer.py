@@ -40,6 +40,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     Quantity,
     Attachment,
+    DomainResource,
 )
 
 
@@ -387,7 +388,7 @@ class SubstancePolymerRepeat(BackboneElement):
         )
 
 
-class SubstancePolymer(FHIRBaseModel):
+class SubstancePolymer(DomainResource):
     """
     Properties of a substance specific to it being a polymer.
     """

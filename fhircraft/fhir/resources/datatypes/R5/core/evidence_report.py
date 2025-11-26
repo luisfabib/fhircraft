@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Range,
     Period,
     ContactDetail,
+    DomainResource,
 )
 
 
@@ -401,7 +402,7 @@ class EvidenceReportSection(BackboneElement):
         )
 
 
-class EvidenceReport(FHIRBaseModel):
+class EvidenceReport(DomainResource):
     """
     The EvidenceReport Resource is a specialized container for a collection of resources and codeable concepts, adapted to support compositions of Evidence, EvidenceVariable, and Citation resources and related concepts.
     """

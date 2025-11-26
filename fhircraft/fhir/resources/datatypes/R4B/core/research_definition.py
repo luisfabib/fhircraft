@@ -45,10 +45,11 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     UsageContext,
     Period,
     RelatedArtifact,
+    DomainResource,
 )
 
 
-class ResearchDefinition(FHIRBaseModel):
+class ResearchDefinition(DomainResource):
     """
     The ResearchDefinition resource describes the conditional state (population and any exposures being compared within the population) and outcome (if specified) that the knowledge (evidence, assertion, recommendation) is about.
     """

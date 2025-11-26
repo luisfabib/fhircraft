@@ -80,6 +80,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     TriggerDefinition,
     UsageContext,
     Dosage,
+    DomainResource,
 )
 
 
@@ -907,7 +908,7 @@ class TaskOutput(BackboneElement):
         )
 
 
-class Task(FHIRBaseModel):
+class Task(DomainResource):
     """
     A task to be performed.
     """

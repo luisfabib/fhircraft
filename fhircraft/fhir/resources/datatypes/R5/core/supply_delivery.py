@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Period,
     Timing,
+    DomainResource,
 )
 
 
@@ -88,7 +89,7 @@ class SupplyDeliverySuppliedItem(BackboneElement):
         )
 
 
-class SupplyDelivery(FHIRBaseModel):
+class SupplyDelivery(DomainResource):
     """
     Record of delivery of what is supplied.
     """

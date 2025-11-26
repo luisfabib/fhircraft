@@ -33,10 +33,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     CodeableConcept,
     Reference,
     Period,
+    DomainResource,
 )
 
 
-class Flag(FHIRBaseModel):
+class Flag(DomainResource):
     """
     Prospective warnings of potential issues when providing care to the patient.
     """

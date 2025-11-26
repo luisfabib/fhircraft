@@ -31,10 +31,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Extension,
     Identifier,
     Reference,
+    DomainResource,
 )
 
 
-class EnrollmentResponse(FHIRBaseModel):
+class EnrollmentResponse(DomainResource):
     """
     This resource provides enrollment and plan details from the processing of an EnrollmentRequest resource.
     """

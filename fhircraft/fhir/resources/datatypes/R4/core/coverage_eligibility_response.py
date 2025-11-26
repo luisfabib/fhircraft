@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     BackboneElement,
     CodeableConcept,
     Money,
+    DomainResource,
 )
 
 
@@ -388,7 +389,7 @@ class CoverageEligibilityResponseError(BackboneElement):
         )
 
 
-class CoverageEligibilityResponse(FHIRBaseModel):
+class CoverageEligibilityResponse(DomainResource):
     """
     This resource provides eligibility and plan details from the processing of an CoverageEligibilityRequest resource.
     """

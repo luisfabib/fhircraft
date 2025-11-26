@@ -44,6 +44,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     Quantity,
     Reference,
+    DomainResource,
 )
 
 
@@ -271,7 +272,7 @@ class ConditionDefinitionPlan(BackboneElement):
         )
 
 
-class ConditionDefinition(FHIRBaseModel):
+class ConditionDefinition(DomainResource):
     """
     A definition of a condition and information relevant to managing it.
     """

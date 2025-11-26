@@ -44,10 +44,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Period,
     RelatedArtifact,
     Reference,
+    DomainResource,
 )
 
 
-class Evidence(FHIRBaseModel):
+class Evidence(DomainResource):
     """
     The Evidence resource describes the conditional state (population and any exposures being compared within the population) and outcome (if specified) that the knowledge (evidence, assertion, recommendation) is about.
     """

@@ -52,6 +52,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     TriggerDefinition,
     Duration,
     Timing,
+    DomainResource,
 )
 
 
@@ -218,7 +219,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
         )
 
 
-class EvidenceVariable(FHIRBaseModel):
+class EvidenceVariable(DomainResource):
     """
     The EvidenceVariable resource describes a "PICO" element that knowledge (evidence, assertion, recommendation) is about.
     """

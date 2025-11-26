@@ -44,6 +44,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Money,
     Dosage,
     Duration,
+    DomainResource,
 )
 
 
@@ -787,7 +788,7 @@ class MedicationKnowledgeKinetics(BackboneElement):
         )
 
 
-class MedicationKnowledge(FHIRBaseModel):
+class MedicationKnowledge(DomainResource):
     """
     Information about a medication that is used to support knowledge.
     """

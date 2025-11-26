@@ -44,6 +44,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     BackboneElement,
     Reference,
+    DomainResource,
 )
 
 
@@ -832,7 +833,7 @@ class ExampleScenarioProcess(BackboneElement):
         )
 
 
-class ExampleScenario(FHIRBaseModel):
+class ExampleScenario(DomainResource):
     """
     A walkthrough of a workflow showing the interaction between systems and the instances shared, possibly including the evolution of instances over time.
     """

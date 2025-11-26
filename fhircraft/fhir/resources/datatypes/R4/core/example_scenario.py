@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     UsageContext,
     CodeableConcept,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -672,7 +673,7 @@ class ExampleScenarioProcess(BackboneElement):
         )
 
 
-class ExampleScenario(FHIRBaseModel):
+class ExampleScenario(DomainResource):
     """
     Example of workflow instance.
     """

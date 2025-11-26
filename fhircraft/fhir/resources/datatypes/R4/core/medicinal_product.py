@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     MarketingStatus,
     Reference,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -342,7 +343,7 @@ class MedicinalProductSpecialDesignation(BackboneElement):
         )
 
 
-class MedicinalProduct(FHIRBaseModel):
+class MedicinalProduct(DomainResource):
     """
     Detailed definition of a medicinal product, typically for uses other than direct patient care (e.g. regulatory use).
     """

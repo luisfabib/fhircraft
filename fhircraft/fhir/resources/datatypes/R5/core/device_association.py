@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     Period,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -82,7 +83,7 @@ class DeviceAssociationOperation(BackboneElement):
         )
 
 
-class DeviceAssociation(FHIRBaseModel):
+class DeviceAssociation(DomainResource):
     """
     A record of association of a device.
     """

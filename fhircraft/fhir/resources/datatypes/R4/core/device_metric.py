@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Reference,
     Timing,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -97,7 +98,7 @@ class DeviceMetricCalibration(BackboneElement):
         )
 
 
-class DeviceMetric(FHIRBaseModel):
+class DeviceMetric(DomainResource):
     """
     Describes a measurement, calculation or setting capability of a medical device.
     """

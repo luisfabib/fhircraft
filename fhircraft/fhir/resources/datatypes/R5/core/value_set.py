@@ -48,6 +48,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     RelatedArtifact,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -1457,7 +1458,7 @@ class ValueSetScope(BackboneElement):
         )
 
 
-class ValueSet(FHIRBaseModel):
+class ValueSet(DomainResource):
     """
     A ValueSet resource instance specifies a set of codes drawn from one or more code systems, intended for use in a particular context. Value sets link between [[[CodeSystem]]] definitions and their use in [coded elements](terminologies.html).
     """

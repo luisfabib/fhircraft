@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Ratio,
     Annotation,
+    DomainResource,
 )
 
 
@@ -624,7 +625,7 @@ class NutritionOrderEnteralFormula(BackboneElement):
         )
 
 
-class NutritionOrder(FHIRBaseModel):
+class NutritionOrder(DomainResource):
     """
     A request to supply a diet, formula feeding (enteral) or oral nutritional supplement to a patient/resident.
     """

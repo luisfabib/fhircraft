@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Range,
     Annotation,
+    DomainResource,
 )
 
 
@@ -160,7 +161,7 @@ class RiskAssessmentPrediction(BackboneElement):
         )
 
 
-class RiskAssessment(FHIRBaseModel):
+class RiskAssessment(DomainResource):
     """
     An assessment of the likely outcome(s) for a patient or other subject as well as the likelihood of each outcome.
     """

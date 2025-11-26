@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Money,
     Annotation,
+    DomainResource,
 )
 
 
@@ -275,7 +276,7 @@ class InvoiceTotalPriceComponent(BackboneElement):
         )
 
 
-class Invoice(FHIRBaseModel):
+class Invoice(DomainResource):
     """
     Invoice containing collected ChargeItems from an Account with calculated individual and total price for Billing purpose.
     """

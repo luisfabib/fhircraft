@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     CodeableReference,
     Reference,
+    DomainResource,
 )
 
 
@@ -157,7 +158,7 @@ class EpisodeOfCareDiagnosis(BackboneElement):
         )
 
 
-class EpisodeOfCare(FHIRBaseModel):
+class EpisodeOfCare(DomainResource):
     """
     An association between a patient and an organization / healthcare provider(s) during which time encounters may occur. The managing organization assumes a level of responsibility for the patient during this time.
     """

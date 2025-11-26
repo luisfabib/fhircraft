@@ -84,6 +84,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Availability,
     ExtendedContactDetail,
     Dosage,
+    DomainResource,
 )
 
 
@@ -951,7 +952,7 @@ class TransportOutput(BackboneElement):
         )
 
 
-class Transport(FHIRBaseModel):
+class Transport(DomainResource):
     """
     Record of transport.
     """

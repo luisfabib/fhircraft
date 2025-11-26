@@ -40,6 +40,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     Period,
     Reference,
+    DomainResource,
 )
 
 
@@ -119,7 +120,7 @@ class ResearchSubjectProgress(BackboneElement):
         )
 
 
-class ResearchSubject(FHIRBaseModel):
+class ResearchSubject(DomainResource):
     """
     A ResearchSubject is a participant or object which is the recipient of investigative activities in a research study.
     """

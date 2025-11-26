@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Reference,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -131,7 +132,7 @@ class AdverseEventSuspectEntity(BackboneElement):
         )
 
 
-class AdverseEvent(FHIRBaseModel):
+class AdverseEvent(DomainResource):
     """
     Actual or  potential/avoided event causing unintended physical injury resulting from or contributed to by medical care, a research study or other healthcare setting factors that requires additional monitoring, treatment, or hospitalization, or that results in death.
     """

@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Range,
     BackboneElement,
     Annotation,
+    DomainResource,
 )
 
 
@@ -123,7 +124,7 @@ class ConditionEvidence(BackboneElement):
         )
 
 
-class Condition(FHIRBaseModel):
+class Condition(DomainResource):
     """
     A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
     """

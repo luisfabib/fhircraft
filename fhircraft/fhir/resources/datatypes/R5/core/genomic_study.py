@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Annotation,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -391,7 +392,7 @@ class GenomicStudyAnalysis(BackboneElement):
         )
 
 
-class GenomicStudy(FHIRBaseModel):
+class GenomicStudy(DomainResource):
     """
     A set of analyses performed to analyze and generate genomic data.
     """

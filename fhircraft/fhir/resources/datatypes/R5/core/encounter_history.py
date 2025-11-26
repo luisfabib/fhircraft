@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     Duration,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -77,7 +78,7 @@ class EncounterHistoryLocation(BackboneElement):
         )
 
 
-class EncounterHistory(FHIRBaseModel):
+class EncounterHistory(DomainResource):
     """
     A record of significant events/milestones key data throughout the history of an Encounter
     """

@@ -51,6 +51,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity,
     Reference,
     Attachment,
+    DomainResource,
 )
 
 
@@ -623,7 +624,7 @@ class QuestionnaireItem(BackboneElement):
         )
 
 
-class Questionnaire(FHIRBaseModel):
+class Questionnaire(DomainResource):
     """
     A structured set of questions intended to guide the collection of answers from end-users. Questionnaires provide detailed control over order, presentation, phraseology and grouping to allow coherent, consistent data collection.
     """

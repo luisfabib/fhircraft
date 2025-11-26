@@ -44,6 +44,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     Availability,
     VirtualServiceDetail,
+    DomainResource,
 )
 
 
@@ -107,7 +108,7 @@ class LocationPosition(BackboneElement):
         )
 
 
-class Location(FHIRBaseModel):
+class Location(DomainResource):
     """
     Details and position information for a place where services are provided and resources and participants may be stored, found, contained, or accommodated.
     """

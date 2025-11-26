@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Identifier,
     Quantity,
     Range,
+    DomainResource,
 )
 
 
@@ -234,7 +235,7 @@ class SubstanceReferenceInformationTarget(BackboneElement):
         )
 
 
-class SubstanceReferenceInformation(FHIRBaseModel):
+class SubstanceReferenceInformation(DomainResource):
     """
     Todo.
     """

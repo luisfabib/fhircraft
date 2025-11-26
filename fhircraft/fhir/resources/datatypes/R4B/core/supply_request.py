@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Range,
     Period,
     Timing,
+    DomainResource,
 )
 
 
@@ -108,7 +109,7 @@ class SupplyRequestParameter(BackboneElement):
         )
 
 
-class SupplyRequest(FHIRBaseModel):
+class SupplyRequest(DomainResource):
     """
     A record of a request for a medication, substance or device used in the healthcare setting.
     """

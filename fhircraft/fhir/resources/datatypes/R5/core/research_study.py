@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Period,
     Annotation,
+    DomainResource,
 )
 
 
@@ -466,7 +467,7 @@ class ResearchStudyOutcomeMeasure(BackboneElement):
         )
 
 
-class ResearchStudy(FHIRBaseModel):
+class ResearchStudy(DomainResource):
     """
     A scientific study of nature that sometimes includes processes involved in health and disease. For example, clinical trials are research studies that involve people. These studies may be related to new ways to screen, prevent, diagnose, and treat disease. They may also study certain outcomes and certain groups of people by looking at data collected in the past or future.
     """

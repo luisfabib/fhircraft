@@ -38,6 +38,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     ContactPoint,
     Annotation,
+    DomainResource,
 )
 
 
@@ -335,7 +336,7 @@ class DeviceDefinitionMaterial(BackboneElement):
         )
 
 
-class DeviceDefinition(FHIRBaseModel):
+class DeviceDefinition(DomainResource):
     """
     The characteristics, operational status and capabilities of a medical-related component of a medical device.
     """

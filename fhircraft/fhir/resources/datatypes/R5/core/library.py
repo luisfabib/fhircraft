@@ -48,10 +48,11 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     ParameterDefinition,
     DataRequirement,
     Attachment,
+    DomainResource,
 )
 
 
-class Library(FHIRBaseModel):
+class Library(DomainResource):
     """
     The Library resource is a general-purpose container for knowledge asset definitions. It can be used to describe and expose existing knowledge assets such as logic libraries and information model descriptions, as well as to describe a collection of knowledge assets.
     """

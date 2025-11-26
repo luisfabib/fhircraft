@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     Quantity,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -97,7 +98,7 @@ class DeviceMetricCalibration(BackboneElement):
         )
 
 
-class DeviceMetric(FHIRBaseModel):
+class DeviceMetric(DomainResource):
     """
     Describes a measurement, calculation or setting capability of a device.  The DeviceMetric resource is derived from the ISO/IEEE 11073-10201 Domain Information Model standard, but is more widely applicable.
     """

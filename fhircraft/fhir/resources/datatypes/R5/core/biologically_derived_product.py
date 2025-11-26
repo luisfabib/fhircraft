@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Ratio,
     Attachment,
+    DomainResource,
 )
 
 
@@ -218,7 +219,7 @@ class BiologicallyDerivedProductProperty(BackboneElement):
         )
 
 
-class BiologicallyDerivedProduct(FHIRBaseModel):
+class BiologicallyDerivedProduct(DomainResource):
     """
     A biological material originating from a biological entity intended to be transplanted or infused into another (possibly the same) biological entity.
     """

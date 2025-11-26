@@ -49,6 +49,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Annotation,
     Address,
     Duration,
+    DomainResource,
 )
 
 
@@ -446,7 +447,7 @@ class InventoryItemInstance(BackboneElement):
         )
 
 
-class InventoryItem(FHIRBaseModel):
+class InventoryItem(DomainResource):
     """
     functional description of an inventory item used in inventory and supply-related workflows.
     """

@@ -45,6 +45,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Range,
     Duration,
+    DomainResource,
 )
 
 
@@ -567,7 +568,7 @@ class MeasureReportGroup(BackboneElement):
         )
 
 
-class MeasureReport(FHIRBaseModel):
+class MeasureReport(DomainResource):
     """
     The MeasureReport resource contains the results of the calculation of a measure; and optionally a reference to the resources involved in that calculation.
     """

@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Annotation,
     BackboneElement,
     Coding,
+    DomainResource,
 )
 
 
@@ -452,7 +453,7 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         )
 
 
-class Appointment(FHIRBaseModel):
+class Appointment(DomainResource):
     """
     A booking of a healthcare event among patient(s), practitioner(s), related person(s) and/or device(s) for a specific date/time. This may result in one or more Encounter(s).
     """

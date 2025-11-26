@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     BackboneElement,
     Coding,
+    DomainResource,
 )
 
 
@@ -433,7 +434,7 @@ class CodeSystemConcept(BackboneElement):
         )
 
 
-class CodeSystem(FHIRBaseModel):
+class CodeSystem(DomainResource):
     """
     The CodeSystem resource is used to declare the existence of and describe a code system or code system supplement and its key properties, and optionally define a part or all of its content.
     """

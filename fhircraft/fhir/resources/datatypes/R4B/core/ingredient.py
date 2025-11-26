@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableReference,
     Ratio,
     RatioRange,
+    DomainResource,
 )
 
 
@@ -318,7 +319,7 @@ class IngredientSubstance(BackboneElement):
         )
 
 
-class Ingredient(FHIRBaseModel):
+class Ingredient(DomainResource):
     """
     An ingredient of a manufactured item or pharmaceutical product.
     """

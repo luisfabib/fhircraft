@@ -35,10 +35,11 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     CodeableConcept,
     Annotation,
+    DomainResource,
 )
 
 
-class DeviceUseStatement(FHIRBaseModel):
+class DeviceUseStatement(DomainResource):
     """
     A record of a device being used by a patient where the record is the result of a report from the patient or another clinician.
     """

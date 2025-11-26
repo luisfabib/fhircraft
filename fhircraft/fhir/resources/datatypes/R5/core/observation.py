@@ -52,6 +52,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     SampledData,
     Attachment,
     Annotation,
+    DomainResource,
 )
 
 
@@ -425,7 +426,7 @@ class ObservationComponent(BackboneElement):
         )
 
 
-class Observation(FHIRBaseModel):
+class Observation(DomainResource):
     """
     Measurements and simple assertions made about a patient, device or other subject.
     """

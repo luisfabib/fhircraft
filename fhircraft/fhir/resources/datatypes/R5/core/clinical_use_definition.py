@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Expression,
     Range,
+    DomainResource,
 )
 
 
@@ -469,7 +470,7 @@ class ClinicalUseDefinitionWarning(BackboneElement):
         )
 
 
-class ClinicalUseDefinition(FHIRBaseModel):
+class ClinicalUseDefinition(DomainResource):
     """
     A single issue - either an indication, contraindication, interaction or an undesirable effect for a medicinal product, medication, device or procedure.
     """

@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     CodeableConcept,
     BackboneElement,
     Population,
+    DomainResource,
 )
 
 
@@ -87,7 +88,7 @@ class MedicinalProductContraindicationOtherTherapy(BackboneElement):
         )
 
 
-class MedicinalProductContraindication(FHIRBaseModel):
+class MedicinalProductContraindication(DomainResource):
     """
     The clinical particulars - indications, contraindications etc. of a medicinal product, including for regulatory purposes.
     """

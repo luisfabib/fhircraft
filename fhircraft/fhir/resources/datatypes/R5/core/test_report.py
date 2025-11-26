@@ -39,6 +39,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Extension,
     Identifier,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -670,7 +671,7 @@ class TestReportTeardown(BackboneElement):
         )
 
 
-class TestReport(FHIRBaseModel):
+class TestReport(DomainResource):
     """
     A summary of information based on the results of executing a TestScript.
     """

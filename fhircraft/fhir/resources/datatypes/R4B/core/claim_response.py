@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Address,
     Quantity,
     Attachment,
+    DomainResource,
 )
 
 
@@ -1065,7 +1066,7 @@ class ClaimResponseError(BackboneElement):
         )
 
 
-class ClaimResponse(FHIRBaseModel):
+class ClaimResponse(DomainResource):
     """
     This resource provides the adjudication details from the processing of a Claim resource.
     """

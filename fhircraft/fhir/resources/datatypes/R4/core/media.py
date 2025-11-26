@@ -43,10 +43,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Period,
     Attachment,
     Annotation,
+    DomainResource,
 )
 
 
-class Media(FHIRBaseModel):
+class Media(DomainResource):
     """
     A photo, video, or audio recording acquired or used in healthcare. The actual content may be inline or provided by direct reference.
     """

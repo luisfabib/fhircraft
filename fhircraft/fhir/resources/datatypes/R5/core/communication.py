@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     Attachment,
     Annotation,
+    DomainResource,
 )
 
 
@@ -80,7 +81,7 @@ class CommunicationPayload(BackboneElement):
         )
 
 
-class Communication(FHIRBaseModel):
+class Communication(DomainResource):
     """
     A clinical or business level record of information being transmitted or shared; e.g. an alert that was sent to a responsible provider, a public health agency communication to a provider/reporter in response to a case report for a reportable condition.
     """

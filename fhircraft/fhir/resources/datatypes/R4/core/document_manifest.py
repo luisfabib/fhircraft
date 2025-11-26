@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     CodeableConcept,
     Reference,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -74,7 +75,7 @@ class DocumentManifestRelated(BackboneElement):
         )
 
 
-class DocumentManifest(FHIRBaseModel):
+class DocumentManifest(DomainResource):
     """
     A collection of documents compiled for a purpose together with metadata that applies to the collection.
     """

@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     BackboneElement,
     Coding,
+    DomainResource,
 )
 
 
@@ -178,7 +179,7 @@ class SubscriptionParameter(BackboneElement):
         )
 
 
-class Subscription(FHIRBaseModel):
+class Subscription(DomainResource):
     """
     The subscription resource describes a particular client's request to be notified about a SubscriptionTopic.
     """

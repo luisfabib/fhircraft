@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Duration,
     Attachment,
     CodeableReference,
+    DomainResource,
 )
 
 
@@ -367,7 +368,7 @@ class PackagedProductDefinitionPackage(BackboneElement):
         )
 
 
-class PackagedProductDefinition(FHIRBaseModel):
+class PackagedProductDefinition(DomainResource):
     """
     A medically related item or items, in a container or package.
     """

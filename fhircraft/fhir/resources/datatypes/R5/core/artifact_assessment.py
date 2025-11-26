@@ -44,6 +44,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     Quantity,
     RelatedArtifact,
+    DomainResource,
 )
 
 
@@ -143,7 +144,7 @@ class ArtifactAssessmentContent(BackboneElement):
         )
 
 
-class ArtifactAssessment(FHIRBaseModel):
+class ArtifactAssessment(DomainResource):
     """
     This Resource provides one or more comments, classifiers or ratings about a Resource and supports attribution and rights management metadata for the added content.
     """

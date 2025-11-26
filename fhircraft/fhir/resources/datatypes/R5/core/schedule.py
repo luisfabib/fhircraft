@@ -40,10 +40,11 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Reference,
     Period,
+    DomainResource,
 )
 
 
-class Schedule(FHIRBaseModel):
+class Schedule(DomainResource):
     """
     A container for slots of time that may be available for booking appointments.
     """

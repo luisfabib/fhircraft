@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Quantity,
     Annotation,
+    DomainResource,
 )
 
 
@@ -265,7 +266,7 @@ class VisionPrescriptionLensSpecification(BackboneElement):
         )
 
 
-class VisionPrescription(FHIRBaseModel):
+class VisionPrescription(DomainResource):
     """
     An authorization for the provision of glasses and/or contact lenses to a patient.
     """

@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Reference,
     Duration,
     Range,
+    DomainResource,
 )
 
 
@@ -334,7 +335,7 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         )
 
 
-class SpecimenDefinition(FHIRBaseModel):
+class SpecimenDefinition(DomainResource):
     """
     A kind of specimen with associated set of requirements.
     """

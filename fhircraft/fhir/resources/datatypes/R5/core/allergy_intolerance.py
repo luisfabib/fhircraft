@@ -38,6 +38,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     Annotation,
     CodeableReference,
+    DomainResource,
 )
 
 
@@ -167,7 +168,7 @@ class AllergyIntoleranceReaction(BackboneElement):
         )
 
 
-class AllergyIntolerance(FHIRBaseModel):
+class AllergyIntolerance(DomainResource):
     """
     Risk of harmful or undesirable, physiological response which is unique to an individual and associated with exposure to a substance.
     """

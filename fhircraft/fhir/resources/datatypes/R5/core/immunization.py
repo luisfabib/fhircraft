@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     BackboneElement,
     Annotation,
+    DomainResource,
 )
 
 
@@ -251,7 +252,7 @@ class ImmunizationProtocolApplied(BackboneElement):
         )
 
 
-class Immunization(FHIRBaseModel):
+class Immunization(DomainResource):
     """
     Describes the event of a patient being administered a vaccine or a record of an immunization as reported by a patient, a clinician or another party.
     """

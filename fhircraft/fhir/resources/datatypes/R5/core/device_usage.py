@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     CodeableReference,
     Annotation,
+    DomainResource,
 )
 
 
@@ -78,7 +79,7 @@ class DeviceUsageAdherence(BackboneElement):
         )
 
 
-class DeviceUsage(FHIRBaseModel):
+class DeviceUsage(DomainResource):
     """
     A record of a device being used by a patient where the record is the result of a report from the patient or a clinician.
     """

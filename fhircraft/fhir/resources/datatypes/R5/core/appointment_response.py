@@ -41,10 +41,11 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Identifier,
     Reference,
     CodeableConcept,
+    DomainResource,
 )
 
 
-class AppointmentResponse(FHIRBaseModel):
+class AppointmentResponse(DomainResource):
     """
     A reply to an appointment request for a patient and/or practitioner(s), such as a confirmation or rejection.
     """

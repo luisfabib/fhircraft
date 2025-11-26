@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity,
     BackboneElement,
     Population,
+    DomainResource,
 )
 
 
@@ -88,7 +89,7 @@ class MedicinalProductIndicationOtherTherapy(BackboneElement):
         )
 
 
-class MedicinalProductIndication(FHIRBaseModel):
+class MedicinalProductIndication(DomainResource):
     """
     Indication for the Medicinal Product.
     """

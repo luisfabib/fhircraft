@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Reference,
     BackboneElement,
     Money,
+    DomainResource,
 )
 
 
@@ -274,7 +275,7 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
         )
 
 
-class ChargeItemDefinition(FHIRBaseModel):
+class ChargeItemDefinition(DomainResource):
     """
     The ChargeItemDefinition resource provides the properties that apply to the (billing) codes necessary to calculate costs and prices. The properties may differ largely depending on type and realm, therefore this resource gives only a rough structure and requires profiling for each type of billing code system.
     """

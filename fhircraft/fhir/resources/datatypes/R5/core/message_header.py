@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     ContactPoint,
     CodeableConcept,
     Identifier,
+    DomainResource,
 )
 
 
@@ -269,7 +270,7 @@ class MessageHeaderResponse(BackboneElement):
         )
 
 
-class MessageHeader(FHIRBaseModel):
+class MessageHeader(DomainResource):
     """
     The header for a message exchange that is either requesting or responding to an action.  The reference(s) that are the subject of the action as well as other information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.
     """

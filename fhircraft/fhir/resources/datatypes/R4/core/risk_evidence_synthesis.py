@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     RelatedArtifact,
     Reference,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -364,7 +365,7 @@ class RiskEvidenceSynthesisCertainty(BackboneElement):
         )
 
 
-class RiskEvidenceSynthesis(FHIRBaseModel):
+class RiskEvidenceSynthesis(DomainResource):
     """
     The RiskEvidenceSynthesis resource describes the likelihood of an outcome in a population plus exposure state where the risk estimate is derived from a combination of research studies.
     """

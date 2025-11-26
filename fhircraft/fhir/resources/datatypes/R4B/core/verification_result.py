@@ -40,6 +40,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Timing,
     BackboneElement,
     Signature,
+    DomainResource,
 )
 
 
@@ -266,7 +267,7 @@ class VerificationResultValidator(BackboneElement):
         )
 
 
-class VerificationResult(FHIRBaseModel):
+class VerificationResult(DomainResource):
     """
     Describes validation requirements, source(s), status and dates for one or more elements.
     """

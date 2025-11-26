@@ -39,6 +39,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     BackboneElement,
     SubstanceAmount,
     Attachment,
+    DomainResource,
 )
 
 
@@ -357,7 +358,7 @@ class SubstancePolymerRepeat(BackboneElement):
         )
 
 
-class SubstancePolymer(FHIRBaseModel):
+class SubstancePolymer(DomainResource):
     """
     Todo.
     """

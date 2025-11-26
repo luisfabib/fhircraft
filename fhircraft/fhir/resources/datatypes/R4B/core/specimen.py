@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Duration,
     Quantity,
     Annotation,
+    DomainResource,
 )
 
 
@@ -319,7 +320,7 @@ class SpecimenContainer(BackboneElement):
         )
 
 
-class Specimen(FHIRBaseModel):
+class Specimen(DomainResource):
     """
     A sample to be used for analysis.
     """

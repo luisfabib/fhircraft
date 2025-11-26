@@ -39,6 +39,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     ContactDetail,
     UsageContext,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -102,7 +103,7 @@ class CompartmentDefinitionResource(BackboneElement):
         )
 
 
-class CompartmentDefinition(FHIRBaseModel):
+class CompartmentDefinition(DomainResource):
     """
     A compartment definition that defines how resources are accessed on a server.
     """

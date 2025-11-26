@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Reference,
     Attachment,
+    DomainResource,
 )
 
 
@@ -355,7 +356,7 @@ class BodyStructureExcludedStructure(BackboneElement):
         )
 
 
-class BodyStructure(FHIRBaseModel):
+class BodyStructure(DomainResource):
     """
     Record details about an anatomical structure.  This resource may be used when a coded concept does not provide the necessary detail needed for the use case.
     """

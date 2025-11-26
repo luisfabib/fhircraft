@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     UsageContext,
     CodeableConcept,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -294,7 +295,7 @@ class GraphDefinitionLink(BackboneElement):
         )
 
 
-class GraphDefinition(FHIRBaseModel):
+class GraphDefinition(DomainResource):
     """
     A formal computable definition of a graph of resources - that is, a coherent set of resources that form a graph by following references. The Graph Definition resource defines a set and makes rules about the set.
     """

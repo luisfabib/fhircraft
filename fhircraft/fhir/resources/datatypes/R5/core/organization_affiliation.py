@@ -34,10 +34,11 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     CodeableConcept,
     ExtendedContactDetail,
+    DomainResource,
 )
 
 
-class OrganizationAffiliation(FHIRBaseModel):
+class OrganizationAffiliation(DomainResource):
     """
     Defines an affiliation/assotiation/relationship between 2 distinct organizations, that is not a part-of relationship/sub-division relationship.
     """

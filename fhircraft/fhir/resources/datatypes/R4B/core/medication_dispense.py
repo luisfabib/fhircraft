@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Annotation,
     Dosage,
+    DomainResource,
 )
 
 
@@ -140,7 +141,7 @@ class MedicationDispenseSubstitution(BackboneElement):
         )
 
 
-class MedicationDispense(FHIRBaseModel):
+class MedicationDispense(DomainResource):
     """
     Indicates that a medication product is to be or has been dispensed for a named person/patient.  This includes a description of the medication product (supply) provided and the instructions for administering the medication.  The medication dispense is the result of a pharmacy system responding to a medication order.
     """

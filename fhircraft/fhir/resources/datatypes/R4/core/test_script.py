@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     BackboneElement,
     Coding,
     Reference,
+    DomainResource,
 )
 
 
@@ -1952,7 +1953,7 @@ class TestScriptTeardown(BackboneElement):
         )
 
 
-class TestScript(FHIRBaseModel):
+class TestScript(DomainResource):
     """
     A structured set of tests against a FHIR server or client implementation to determine compliance against the FHIR specification.
     """

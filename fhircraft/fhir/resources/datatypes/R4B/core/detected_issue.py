@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Reference,
     Period,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -125,7 +126,7 @@ class DetectedIssueMitigation(BackboneElement):
         )
 
 
-class DetectedIssue(FHIRBaseModel):
+class DetectedIssue(DomainResource):
     """
     Indicates an actual or potential clinical issue with or between one or more active or proposed clinical actions for a patient; e.g. Drug-drug interaction, Ineffective treatment frequency, Procedure-condition conflict, etc.
     """

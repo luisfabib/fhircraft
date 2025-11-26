@@ -48,6 +48,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Age,
     Period,
     Timing,
+    DomainResource,
 )
 
 
@@ -411,7 +412,7 @@ class RequestGroupAction(BackboneElement):
         )
 
 
-class RequestGroup(FHIRBaseModel):
+class RequestGroup(DomainResource):
     """
     A group of related requests that can be used to capture intended activities that have inter-dependencies such as "give this medication after that one".
     """

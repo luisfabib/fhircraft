@@ -48,6 +48,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     UsageContext,
     CodeableConcept,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -909,7 +910,7 @@ class StructureMapGroup(BackboneElement):
         )
 
 
-class StructureMap(FHIRBaseModel):
+class StructureMap(DomainResource):
     """
     A Map of relationships between 2 structures that can be used to transform data.
     """

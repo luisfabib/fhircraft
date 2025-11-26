@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Quantity,
     Attachment,
+    DomainResource,
 )
 
 
@@ -115,7 +116,7 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
         )
 
 
-class ManufacturedItemDefinition(FHIRBaseModel):
+class ManufacturedItemDefinition(DomainResource):
     """
     The definition and characteristics of a medicinal manufactured item, such as a tablet or capsule, as contained in a packaged medicinal product.
     """

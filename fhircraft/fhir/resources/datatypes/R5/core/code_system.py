@@ -49,6 +49,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     RelatedArtifact,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -455,7 +456,7 @@ class CodeSystemConcept(BackboneElement):
         )
 
 
-class CodeSystem(FHIRBaseModel):
+class CodeSystem(DomainResource):
     """
     The CodeSystem resource is used to declare the existence of and describe a code system or code system supplement and its key properties, and optionally define a part or all of its content.
     """

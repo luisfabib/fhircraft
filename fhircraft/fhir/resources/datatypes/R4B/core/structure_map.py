@@ -80,6 +80,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     RelatedArtifact,
     TriggerDefinition,
     Dosage,
+    DomainResource,
 )
 
 
@@ -1150,7 +1151,7 @@ class StructureMapGroup(BackboneElement):
         )
 
 
-class StructureMap(FHIRBaseModel):
+class StructureMap(DomainResource):
     """
     A Map of relationships between 2 structures that can be used to transform data.
     """

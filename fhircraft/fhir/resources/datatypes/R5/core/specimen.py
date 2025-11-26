@@ -38,6 +38,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     CodeableReference,
     Annotation,
+    DomainResource,
 )
 
 
@@ -334,7 +335,7 @@ class SpecimenContainer(BackboneElement):
         )
 
 
-class Specimen(FHIRBaseModel):
+class Specimen(DomainResource):
     """
     A sample to be used for analysis.
     """

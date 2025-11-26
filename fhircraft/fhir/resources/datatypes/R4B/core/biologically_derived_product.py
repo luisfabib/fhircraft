@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Reference,
     BackboneElement,
     Period,
+    DomainResource,
 )
 
 
@@ -318,7 +319,7 @@ class BiologicallyDerivedProductStorage(BackboneElement):
         )
 
 
-class BiologicallyDerivedProduct(FHIRBaseModel):
+class BiologicallyDerivedProduct(DomainResource):
     """
         A material substance originating from a biological entity intended to be transplanted or infused
     into another (possibly the same) biological entity.

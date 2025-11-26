@@ -32,10 +32,11 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Identifier,
     Period,
     Reference,
+    DomainResource,
 )
 
 
-class ResearchSubject(FHIRBaseModel):
+class ResearchSubject(DomainResource):
     """
     A physical entity which is the primary unit of operational and/or administrative interest in a study.
     """

@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Range,
     BackboneElement,
     Annotation,
+    DomainResource,
 )
 
 
@@ -129,7 +130,7 @@ class ProcedureFocalDevice(BackboneElement):
         )
 
 
-class Procedure(FHIRBaseModel):
+class Procedure(DomainResource):
     """
     An action that is or was performed on or for a patient. This can be a physical intervention like an operation, or less invasive like long term services, counseling, or hypnotherapy.
     """

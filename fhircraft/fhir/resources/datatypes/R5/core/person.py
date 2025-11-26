@@ -44,6 +44,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Attachment,
     BackboneElement,
     Reference,
+    DomainResource,
 )
 
 
@@ -133,7 +134,7 @@ class PersonLink(BackboneElement):
         )
 
 
-class Person(FHIRBaseModel):
+class Person(DomainResource):
     """
     Demographics and administrative information about a person independent of a specific health-related context.
     """

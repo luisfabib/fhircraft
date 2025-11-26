@@ -84,6 +84,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Availability,
     ExtendedContactDetail,
     Dosage,
+    DomainResource,
 )
 
 
@@ -989,7 +990,7 @@ class TaskOutput(BackboneElement):
         )
 
 
-class Task(FHIRBaseModel):
+class Task(DomainResource):
     """
     A task to be performed.
     """

@@ -43,10 +43,11 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     ContactDetail,
     UsageContext,
     CodeableConcept,
+    DomainResource,
 )
 
 
-class ActorDefinition(FHIRBaseModel):
+class ActorDefinition(DomainResource):
     """
     The ActorDefinition resource is used to describe an actor - a human or an application that plays a role in data exchange, and that may have obligations associated with the role the actor plays.
     """

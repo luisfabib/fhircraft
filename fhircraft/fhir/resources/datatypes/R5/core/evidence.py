@@ -50,6 +50,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     Quantity,
     Range,
+    DomainResource,
 )
 
 
@@ -672,7 +673,7 @@ class EvidenceCertainty(BackboneElement):
         )
 
 
-class Evidence(FHIRBaseModel):
+class Evidence(DomainResource):
     """
     The Evidence Resource provides a machine-interpretable expression of an evidence concept including the evidence variables (e.g., population, exposures/interventions, comparators, outcomes, measured variables, confounding variables), the statistics, and the certainty of this evidence.
     """

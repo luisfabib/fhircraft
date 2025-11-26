@@ -31,10 +31,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Extension,
     Identifier,
     Reference,
+    DomainResource,
 )
 
 
-class EnrollmentRequest(FHIRBaseModel):
+class EnrollmentRequest(DomainResource):
     """
     This resource provides the insurance enrollment details to the insurer regarding a specified coverage.
     """

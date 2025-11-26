@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Reference,
     BackboneElement,
     Period,
+    DomainResource,
 )
 
 
@@ -114,7 +115,7 @@ class AppointmentParticipant(BackboneElement):
         )
 
 
-class Appointment(FHIRBaseModel):
+class Appointment(DomainResource):
     """
     A booking of a healthcare event among patient(s), practitioner(s), related person(s) and/or device(s) for a specific date/time. This may result in one or more Encounter(s).
     """

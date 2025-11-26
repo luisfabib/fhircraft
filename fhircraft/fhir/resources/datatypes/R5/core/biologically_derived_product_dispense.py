@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     Quantity,
     Annotation,
+    DomainResource,
 )
 
 
@@ -76,7 +77,7 @@ class BiologicallyDerivedProductDispensePerformer(BackboneElement):
         )
 
 
-class BiologicallyDerivedProductDispense(FHIRBaseModel):
+class BiologicallyDerivedProductDispense(DomainResource):
     """
     A record of dispensation of a biologically derived product.
     """

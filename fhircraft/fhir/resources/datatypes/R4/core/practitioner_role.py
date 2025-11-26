@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     CodeableConcept,
     ContactPoint,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -159,7 +160,7 @@ class PractitionerRoleNotAvailable(BackboneElement):
         )
 
 
-class PractitionerRole(FHIRBaseModel):
+class PractitionerRole(DomainResource):
     """
     A specific set of Roles/Locations/specialties/services that a practitioner may perform at an organization for a period of time.
     """

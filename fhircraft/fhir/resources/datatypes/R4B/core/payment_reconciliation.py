@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Money,
     BackboneElement,
     CodeableConcept,
+    DomainResource,
 )
 
 
@@ -191,7 +192,7 @@ class PaymentReconciliationProcessNote(BackboneElement):
         )
 
 
-class PaymentReconciliation(FHIRBaseModel):
+class PaymentReconciliation(DomainResource):
     """
     This resource provides the details including amount of a payment and allocates the payment items being paid.
     """

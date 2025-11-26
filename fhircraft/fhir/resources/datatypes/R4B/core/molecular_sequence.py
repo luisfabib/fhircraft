@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     BackboneElement,
     CodeableConcept,
+    DomainResource,
 )
 
 
@@ -805,7 +806,7 @@ class MolecularSequenceStructureVariant(BackboneElement):
         )
 
 
-class MolecularSequence(FHIRBaseModel):
+class MolecularSequence(DomainResource):
     """
     Raw data describing a biological sequence.
     """

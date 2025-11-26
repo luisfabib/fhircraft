@@ -35,10 +35,11 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     ContactPoint,
     Period,
     CodeableConcept,
+    DomainResource,
 )
 
 
-class Endpoint(FHIRBaseModel):
+class Endpoint(DomainResource):
     """
     The technical details of an endpoint that can be used for electronic services, such as for web services providing XDS.b or a REST endpoint for another FHIR server. This may include any security context information.
     """

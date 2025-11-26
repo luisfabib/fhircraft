@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     CodeableReference,
     Annotation,
+    DomainResource,
 )
 
 
@@ -142,7 +143,7 @@ class InventoryReportInventoryListing(BackboneElement):
         )
 
 
-class InventoryReport(FHIRBaseModel):
+class InventoryReport(DomainResource):
     """
     A report of inventory or stock items.
     """

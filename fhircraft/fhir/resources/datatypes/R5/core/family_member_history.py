@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Range,
     CodeableReference,
     Annotation,
+    DomainResource,
 )
 
 
@@ -284,7 +285,7 @@ class FamilyMemberHistoryProcedure(BackboneElement):
         )
 
 
-class FamilyMemberHistory(FHIRBaseModel):
+class FamilyMemberHistory(DomainResource):
     """
     Significant health conditions for a person related to the patient relevant in the context of care for the patient.
     """

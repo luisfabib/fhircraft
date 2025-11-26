@@ -49,6 +49,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Coding,
     Address,
     Money,
+    DomainResource,
 )
 
 
@@ -2037,7 +2038,7 @@ class ExplanationOfBenefitBenefitBalance(BackboneElement):
         )
 
 
-class ExplanationOfBenefit(FHIRBaseModel):
+class ExplanationOfBenefit(DomainResource):
     """
     This resource provides: the claim details; adjudication details from the processing of a Claim; and optionally account balance information, for informing the subscriber of the benefits provided.
     """

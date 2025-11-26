@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Coding,
     Quantity,
+    DomainResource,
 )
 
 
@@ -265,7 +266,7 @@ class QuestionnaireResponseItem(BackboneElement):
         )
 
 
-class QuestionnaireResponse(FHIRBaseModel):
+class QuestionnaireResponse(DomainResource):
     """
     A structured set of questions and their answers. The questions are ordered and grouped into coherent subsets, corresponding to the structure of the grouping of the questionnaire being responded to.
     """

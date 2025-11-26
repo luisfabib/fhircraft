@@ -38,6 +38,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Reference,
     CodeableConcept,
+    DomainResource,
 )
 
 
@@ -103,7 +104,7 @@ class SubscriptionStatusNotificationEvent(BackboneElement):
         )
 
 
-class SubscriptionStatus(FHIRBaseModel):
+class SubscriptionStatus(DomainResource):
     """
     The SubscriptionStatus resource describes the state of a Subscription during notifications.
     """

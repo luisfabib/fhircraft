@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     BackboneElement,
     Reference,
+    DomainResource,
 )
 
 
@@ -429,7 +430,7 @@ class AuditEventEntity(BackboneElement):
         )
 
 
-class AuditEvent(FHIRBaseModel):
+class AuditEvent(DomainResource):
     """
     A record of an event made for purposes of maintaining a security log. Typical uses include detection of intrusion attempts and monitoring for inappropriate usage.
     """

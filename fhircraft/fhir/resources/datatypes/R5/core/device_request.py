@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     Timing,
     Annotation,
+    DomainResource,
 )
 
 
@@ -112,7 +113,7 @@ class DeviceRequestParameter(BackboneElement):
         )
 
 
-class DeviceRequest(FHIRBaseModel):
+class DeviceRequest(DomainResource):
     """
     Represents a request a device to be provided to a specific patient. The device may be an implantable device to be subsequently implanted, or an external assistive device, such as a walker, to be delivered and subsequently be used.
     """

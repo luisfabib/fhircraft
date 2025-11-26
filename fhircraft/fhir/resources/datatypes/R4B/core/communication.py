@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Attachment,
     Annotation,
+    DomainResource,
 )
 
 
@@ -84,7 +85,7 @@ class CommunicationPayload(BackboneElement):
         )
 
 
-class Communication(FHIRBaseModel):
+class Communication(DomainResource):
     """
     An occurrence of information being transmitted; e.g. an alert that was sent to a responsible provider, a public health agency that was notified about a reportable condition.
     """

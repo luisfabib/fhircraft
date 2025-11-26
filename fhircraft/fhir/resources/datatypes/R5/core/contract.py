@@ -54,6 +54,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Annotation,
     Signature,
+    DomainResource,
 )
 
 
@@ -1492,7 +1493,7 @@ class ContractRule(BackboneElement):
         )
 
 
-class Contract(FHIRBaseModel):
+class Contract(DomainResource):
     """
     Legally enforceable, formally recorded unilateral or bilateral directive i.e., a policy or agreement.
     """

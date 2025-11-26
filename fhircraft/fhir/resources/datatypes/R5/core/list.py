@@ -40,6 +40,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Narrative,
     Reference,
     Resource,
+    DomainResource,
 )
 
 
@@ -105,7 +106,7 @@ class ListEntry(BackboneElement):
         )
 
 
-class List(FHIRBaseModel):
+class List(DomainResource):
     """
     A List is a curated collection of resources, for things such as problem lists, allergy lists, facility list, organization list, etc.
     """

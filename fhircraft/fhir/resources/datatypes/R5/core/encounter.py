@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     VirtualServiceDetail,
     Duration,
+    DomainResource,
 )
 
 
@@ -286,7 +287,7 @@ class EncounterLocation(BackboneElement):
         )
 
 
-class Encounter(FHIRBaseModel):
+class Encounter(DomainResource):
     """
     An interaction between healthcare provider(s), and/or patient(s) for the purpose of providing healthcare service(s) or assessing the health status of patient(s).
     """

@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Ratio,
     Duration,
+    DomainResource,
 )
 
 
@@ -299,7 +300,7 @@ class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
         )
 
 
-class AdministrableProductDefinition(FHIRBaseModel):
+class AdministrableProductDefinition(DomainResource):
     """
     A medicinal product in the final form which is suitable for administering to a patient (after any mixing of multiple components, dissolution etc. has been performed).
     """

@@ -38,6 +38,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     ContactPoint,
     Annotation,
+    DomainResource,
 )
 
 
@@ -110,7 +111,7 @@ class CareTeamParticipant(BackboneElement):
         )
 
 
-class CareTeam(FHIRBaseModel):
+class CareTeam(DomainResource):
     """
     The Care Team includes all the people and organizations who plan to participate in the coordination and delivery of care.
     """

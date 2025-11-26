@@ -38,10 +38,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Identifier,
     Reference,
     CodeableConcept,
+    DomainResource,
 )
 
 
-class ImmunizationEvaluation(FHIRBaseModel):
+class ImmunizationEvaluation(DomainResource):
     """
     Describes a comparison of an immunization event against published recommendations to determine if the administration is "valid" in relation to those  recommendations.
     """

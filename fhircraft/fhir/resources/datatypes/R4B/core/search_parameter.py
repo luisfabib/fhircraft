@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     UsageContext,
     CodeableConcept,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -92,7 +93,7 @@ class SearchParameterComponent(BackboneElement):
         )
 
 
-class SearchParameter(FHIRBaseModel):
+class SearchParameter(DomainResource):
     """
     A search parameter that defines a named search item that can be used to search/filter on a resource.
     """

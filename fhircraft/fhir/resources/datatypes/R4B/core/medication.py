@@ -40,6 +40,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Reference,
     Ratio,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -158,7 +159,7 @@ class MedicationBatch(BackboneElement):
         )
 
 
-class Medication(FHIRBaseModel):
+class Medication(DomainResource):
     """
     This resource is primarily used for the identification and definition of a medication for the purposes of prescribing, dispensing, and administering a medication as well as for making statements about medication use.
     """

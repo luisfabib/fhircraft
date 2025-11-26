@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Reference,
     BackboneElement,
     HumanName,
+    DomainResource,
 )
 
 
@@ -91,7 +92,7 @@ class OrganizationContact(BackboneElement):
         )
 
 
-class Organization(FHIRBaseModel):
+class Organization(DomainResource):
     """
     A formally or informally recognized grouping of people or organizations formed for the purpose of achieving some form of collective action.  Includes companies, institutions, corporations, departments, community groups, healthcare practice groups, payer/insurer, etc.
     """

@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     Money,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -244,7 +245,7 @@ class PaymentReconciliationProcessNote(BackboneElement):
         )
 
 
-class PaymentReconciliation(FHIRBaseModel):
+class PaymentReconciliation(DomainResource):
     """
     This resource provides the details including amount of a payment and allocates the payment items being paid.
     """

@@ -48,6 +48,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     Timing,
     Annotation,
+    DomainResource,
 )
 
 
@@ -212,7 +213,7 @@ class ServiceRequestPatientInstruction(BackboneElement):
         )
 
 
-class ServiceRequest(FHIRBaseModel):
+class ServiceRequest(DomainResource):
     """
     A record of a request for service such as diagnostic investigations, treatments, or operations to be performed.
     """

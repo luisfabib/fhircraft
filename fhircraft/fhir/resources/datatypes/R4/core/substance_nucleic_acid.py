@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     BackboneElement,
     Attachment,
     Identifier,
+    DomainResource,
 )
 
 
@@ -253,7 +254,7 @@ class SubstanceNucleicAcidSubunit(BackboneElement):
         )
 
 
-class SubstanceNucleicAcid(FHIRBaseModel):
+class SubstanceNucleicAcid(DomainResource):
     """
     Nucleic acids are defined by three distinct elements: the base, sugar and linkage. Individual substance/moiety IDs will be created for each of these elements. The nucleotide sequence will be always entered in the 5’-3’ direction.
     """

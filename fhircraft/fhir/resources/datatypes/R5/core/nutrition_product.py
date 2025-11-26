@@ -45,6 +45,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Attachment,
     Identifier,
     Annotation,
+    DomainResource,
 )
 
 
@@ -304,7 +305,7 @@ class NutritionProductInstance(BackboneElement):
         )
 
 
-class NutritionProduct(FHIRBaseModel):
+class NutritionProduct(DomainResource):
     """
     A food or supplement that is consumed by patients.
     """

@@ -33,10 +33,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity,
     Reference,
     ProdCharacteristic,
+    DomainResource,
 )
 
 
-class MedicinalProductManufactured(FHIRBaseModel):
+class MedicinalProductManufactured(DomainResource):
     """
     The manufactured item as contained in the packaged medicinal product.
     """

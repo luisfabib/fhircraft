@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Reference,
     Duration,
+    DomainResource,
 )
 
 
@@ -359,7 +360,7 @@ class EncounterLocation(BackboneElement):
         )
 
 
-class Encounter(FHIRBaseModel):
+class Encounter(DomainResource):
     """
     An interaction between a patient and healthcare provider(s) for the purpose of providing healthcare service(s) or assessing the health status of a patient.
     """

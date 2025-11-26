@@ -39,10 +39,11 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     CodeableReference,
     Reference,
+    DomainResource,
 )
 
 
-class Slot(FHIRBaseModel):
+class Slot(DomainResource):
     """
     A slot of time on a schedule that may be available for booking appointments.
     """

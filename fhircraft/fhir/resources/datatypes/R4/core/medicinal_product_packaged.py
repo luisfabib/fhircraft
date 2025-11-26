@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity,
     ProdCharacteristic,
     ProductShelfLife,
+    DomainResource,
 )
 
 
@@ -186,7 +187,7 @@ class MedicinalProductPackagedPackageItem(BackboneElement):
         )
 
 
-class MedicinalProductPackaged(FHIRBaseModel):
+class MedicinalProductPackaged(DomainResource):
     """
     A medicinal product in a container or package.
     """

@@ -32,10 +32,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Reference,
     CodeableConcept,
     Population,
+    DomainResource,
 )
 
 
-class MedicinalProductUndesirableEffect(FHIRBaseModel):
+class MedicinalProductUndesirableEffect(DomainResource):
     """
     Describe the undesirable effects of the medicinal product.
     """

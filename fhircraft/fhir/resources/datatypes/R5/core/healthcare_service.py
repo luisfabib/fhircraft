@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     ExtendedContactDetail,
     BackboneElement,
     Availability,
+    DomainResource,
 )
 
 
@@ -88,7 +89,7 @@ class HealthcareServiceEligibility(BackboneElement):
         )
 
 
-class HealthcareService(FHIRBaseModel):
+class HealthcareService(DomainResource):
     """
     The details of a healthcare service available at a location or in a catalog.  In the case where there is a hierarchy of services (for example, Lab -> Pathology -> Wound Cultures), this can be represented using a set of linked HealthcareServices.
     """

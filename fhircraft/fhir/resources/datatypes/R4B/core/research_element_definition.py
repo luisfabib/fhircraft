@@ -50,6 +50,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     DataRequirement,
     Duration,
     Timing,
+    DomainResource,
 )
 
 
@@ -276,7 +277,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         )
 
 
-class ResearchElementDefinition(FHIRBaseModel):
+class ResearchElementDefinition(DomainResource):
     """
     The ResearchElementDefinition resource describes a "PICO" element that knowledge (evidence, assertion, recommendation) is about.
     """

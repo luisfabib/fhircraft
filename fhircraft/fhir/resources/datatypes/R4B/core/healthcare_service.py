@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     ContactPoint,
     BackboneElement,
     Period,
+    DomainResource,
 )
 
 
@@ -204,7 +205,7 @@ class HealthcareServiceNotAvailable(BackboneElement):
         )
 
 
-class HealthcareService(FHIRBaseModel):
+class HealthcareService(DomainResource):
     """
     The details of a healthcare service available at a location.
     """

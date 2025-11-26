@@ -50,6 +50,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Duration,
     Ratio,
     Attachment,
+    DomainResource,
 )
 
 
@@ -1062,7 +1063,7 @@ class MedicationKnowledgeDefinitional(BackboneElement):
         )
 
 
-class MedicationKnowledge(FHIRBaseModel):
+class MedicationKnowledge(DomainResource):
     """
     Information about a medication that is used to support knowledge.
     """

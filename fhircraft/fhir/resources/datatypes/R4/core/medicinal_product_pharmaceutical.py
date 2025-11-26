@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity,
     Ratio,
     Duration,
+    DomainResource,
 )
 
 
@@ -246,7 +247,7 @@ class MedicinalProductPharmaceuticalRouteOfAdministration(BackboneElement):
         )
 
 
-class MedicinalProductPharmaceutical(FHIRBaseModel):
+class MedicinalProductPharmaceutical(DomainResource):
     """
     A pharmaceutical product described in terms of its composition and dose form.
     """

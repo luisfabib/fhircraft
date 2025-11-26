@@ -51,6 +51,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Annotation,
     UsageContext,
+    DomainResource,
 )
 
 
@@ -1077,7 +1078,7 @@ class DeviceDefinitionChargeItem(BackboneElement):
         )
 
 
-class DeviceDefinition(FHIRBaseModel):
+class DeviceDefinition(DomainResource):
     """
     This is a specialized resource that defines the characteristics and capabilities of a device.
     """

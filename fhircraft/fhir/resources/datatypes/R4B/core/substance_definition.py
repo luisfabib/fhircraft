@@ -45,6 +45,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Attachment,
     Ratio,
+    DomainResource,
 )
 
 
@@ -873,7 +874,7 @@ class SubstanceDefinitionSourceMaterial(BackboneElement):
         )
 
 
-class SubstanceDefinition(FHIRBaseModel):
+class SubstanceDefinition(DomainResource):
     """
     The detailed description of a substance, typically at a level beyond what is used for prescribing.
     """

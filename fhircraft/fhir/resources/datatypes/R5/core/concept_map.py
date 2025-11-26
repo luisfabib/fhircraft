@@ -49,6 +49,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     RelatedArtifact,
     BackboneElement,
     Quantity,
+    DomainResource,
 )
 
 
@@ -972,7 +973,7 @@ class ConceptMapGroup(BackboneElement):
         )
 
 
-class ConceptMap(FHIRBaseModel):
+class ConceptMap(DomainResource):
     """
     A statement of relationships from one set of concepts to one or more other concepts - either concepts in code systems, or data element/data element concepts, or classes in class models.
     """

@@ -45,6 +45,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     CodeableReference,
     Money,
+    DomainResource,
 )
 
 
@@ -395,7 +396,7 @@ class AccountBalance(BackboneElement):
         )
 
 
-class Account(FHIRBaseModel):
+class Account(DomainResource):
     """
     A financial tool for tracking value accrued for a particular purpose.  In the healthcare field, used to track charges for a patient, cost centers, etc.
     """

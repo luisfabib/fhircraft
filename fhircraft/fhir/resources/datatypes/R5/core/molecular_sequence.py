@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     CodeableConcept,
     Range,
+    DomainResource,
 )
 
 
@@ -317,7 +318,7 @@ class MolecularSequenceRelative(BackboneElement):
         )
 
 
-class MolecularSequence(FHIRBaseModel):
+class MolecularSequence(DomainResource):
     """
     Representation of a molecular sequence.
     """

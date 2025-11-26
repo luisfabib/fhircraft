@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     Coding,
     Expression,
+    DomainResource,
 )
 
 
@@ -273,7 +274,7 @@ class PermissionRule(BackboneElement):
         )
 
 
-class Permission(FHIRBaseModel):
+class Permission(DomainResource):
     """
     Permission resource holds access rules for a given data and context.
     """

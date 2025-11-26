@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     ContactPoint,
     Annotation,
+    DomainResource,
 )
 
 
@@ -327,7 +328,7 @@ class DeviceProperty(BackboneElement):
         )
 
 
-class Device(FHIRBaseModel):
+class Device(DomainResource):
     """
     A type of a manufactured item that is used in the provision of healthcare without being substantially changed through that activity. The device may be a medical or non-medical device.
     """

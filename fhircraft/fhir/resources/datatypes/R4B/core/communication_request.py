@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Period,
     Annotation,
+    DomainResource,
 )
 
 
@@ -85,7 +86,7 @@ class CommunicationRequestPayload(BackboneElement):
         )
 
 
-class CommunicationRequest(FHIRBaseModel):
+class CommunicationRequest(DomainResource):
     """
     A request to convey information; e.g. the CDS system proposes that an alert be sent to a responsible provider, the CDS system proposes that the public health agency be notified about a reportable condition.
     """

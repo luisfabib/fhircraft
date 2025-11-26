@@ -48,6 +48,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     Quantity,
     Attachment,
+    DomainResource,
 )
 
 
@@ -421,7 +422,7 @@ class MedicinalProductDefinitionCharacteristic(BackboneElement):
         )
 
 
-class MedicinalProductDefinition(FHIRBaseModel):
+class MedicinalProductDefinition(DomainResource):
     """
     Detailed definition of a medicinal product, typically for uses other than direct patient care (e.g. regulatory use, drug catalogs, to support prescribing, adverse events management etc.).
     """

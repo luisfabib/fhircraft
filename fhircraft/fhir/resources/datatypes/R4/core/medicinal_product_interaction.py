@@ -32,6 +32,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Reference,
     BackboneElement,
     CodeableConcept,
+    DomainResource,
 )
 
 
@@ -66,7 +67,7 @@ class MedicinalProductInteractionInteractant(BackboneElement):
         )
 
 
-class MedicinalProductInteraction(FHIRBaseModel):
+class MedicinalProductInteraction(DomainResource):
     """
     The interactions of the medicinal product with other medicinal products, or other forms of interactions.
     """

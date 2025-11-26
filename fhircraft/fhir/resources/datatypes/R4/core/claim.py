@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Attachment,
     Address,
     Money,
+    DomainResource,
 )
 
 
@@ -1134,7 +1135,7 @@ class ClaimItem(BackboneElement):
         )
 
 
-class Claim(FHIRBaseModel):
+class Claim(DomainResource):
     """
     A provider issued list of professional services and products which have been provided, or are to be provided, to a patient which is sent to an insurer for reimbursement.
     """

@@ -50,6 +50,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     HumanName,
     Address,
     ContactPoint,
+    DomainResource,
 )
 
 
@@ -1591,7 +1592,7 @@ class CitationCitedArtifact(BackboneElement):
         )
 
 
-class Citation(FHIRBaseModel):
+class Citation(DomainResource):
     """
     The Citation Resource enables reference to any knowledge artifact for purposes of identification and attribution. The Citation Resource supports existing reference structures and developing publication practices such as versioning, expressing complex contributorship roles, and referencing computable resources.
     """

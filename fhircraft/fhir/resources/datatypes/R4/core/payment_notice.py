@@ -39,10 +39,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Reference,
     Money,
     CodeableConcept,
+    DomainResource,
 )
 
 
-class PaymentNotice(FHIRBaseModel):
+class PaymentNotice(DomainResource):
     """
     This resource provides the status of the payment for goods and services rendered, and the request and response resource references.
     """

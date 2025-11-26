@@ -43,6 +43,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Address,
     BackboneElement,
     Reference,
+    DomainResource,
 )
 
 
@@ -178,7 +179,7 @@ class LocationHoursOfOperation(BackboneElement):
         )
 
 
-class Location(FHIRBaseModel):
+class Location(DomainResource):
     """
     Details and position information for a physical place where services are provided and resources and participants may be stored, found, contained, or accommodated.
     """

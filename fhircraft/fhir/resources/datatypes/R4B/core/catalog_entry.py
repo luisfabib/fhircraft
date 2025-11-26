@@ -40,6 +40,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Reference,
     Period,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -86,7 +87,7 @@ class CatalogEntryRelatedEntry(BackboneElement):
         )
 
 
-class CatalogEntry(FHIRBaseModel):
+class CatalogEntry(DomainResource):
     """
     Catalog entries are wrappers that contextualize items included in a catalog.
     """

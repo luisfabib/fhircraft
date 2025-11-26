@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     BackboneElement,
     Reference,
+    DomainResource,
 )
 
 
@@ -188,7 +189,7 @@ class RequirementsStatement(BackboneElement):
         )
 
 
-class Requirements(FHIRBaseModel):
+class Requirements(DomainResource):
     """
     The Requirements resource is used to describe an actor - a human or an application that plays a role in data exchange, and that may have obligations associated with the role the actor plays.
     """

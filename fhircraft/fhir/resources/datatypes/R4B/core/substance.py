@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Ratio,
     Reference,
+    DomainResource,
 )
 
 
@@ -137,7 +138,7 @@ class SubstanceIngredient(BackboneElement):
         )
 
 
-class Substance(FHIRBaseModel):
+class Substance(DomainResource):
     """
     A homogeneous material with a definite composition.
     """

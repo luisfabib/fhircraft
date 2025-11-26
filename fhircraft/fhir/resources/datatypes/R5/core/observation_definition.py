@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     BackboneElement,
     Range,
+    DomainResource,
 )
 
 
@@ -395,7 +396,7 @@ class ObservationDefinitionComponent(BackboneElement):
         )
 
 
-class ObservationDefinition(FHIRBaseModel):
+class ObservationDefinition(DomainResource):
     """
     Set of definitional characteristics for a kind of observation or measurement produced or consumed by an orderable health care service.
     """

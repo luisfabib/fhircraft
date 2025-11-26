@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     CodeableConcept,
     Period,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -170,7 +171,7 @@ class MedicinalProductAuthorizationProcedure(BackboneElement):
         )
 
 
-class MedicinalProductAuthorization(FHIRBaseModel):
+class MedicinalProductAuthorization(DomainResource):
     """
     The regulatory authorization of a medicinal product.
     """

@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Range,
     Ratio,
+    DomainResource,
 )
 
 
@@ -573,7 +574,7 @@ class AuditEventEntity(BackboneElement):
         )
 
 
-class AuditEvent(FHIRBaseModel):
+class AuditEvent(DomainResource):
     """
     A record of an event relevant for purposes such as operations, privacy, security, maintenance, and performance analysis.
     """

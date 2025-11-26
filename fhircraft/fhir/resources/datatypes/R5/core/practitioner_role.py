@@ -35,10 +35,11 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     ExtendedContactDetail,
     Availability,
+    DomainResource,
 )
 
 
-class PractitionerRole(FHIRBaseModel):
+class PractitionerRole(DomainResource):
     """
     A specific set of Roles/Locations/specialties/services that a practitioner may perform, or has performed at an organization during a period of time.
     """

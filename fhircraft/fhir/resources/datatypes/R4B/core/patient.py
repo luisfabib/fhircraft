@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Reference,
     Period,
+    DomainResource,
 )
 
 
@@ -213,7 +214,7 @@ class PatientLink(BackboneElement):
         )
 
 
-class Patient(FHIRBaseModel):
+class Patient(DomainResource):
     """
     Demographics and other administrative information about an individual or animal receiving care or other health-related services.
     """

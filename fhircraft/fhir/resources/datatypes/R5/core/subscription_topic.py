@@ -45,6 +45,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     Period,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -422,7 +423,7 @@ class SubscriptionTopicNotificationShape(BackboneElement):
         )
 
 
-class SubscriptionTopic(FHIRBaseModel):
+class SubscriptionTopic(DomainResource):
     """
     Describes a stream of resource state changes identified by trigger criteria and annotated with labels useful to filter projections from this topic.
     """

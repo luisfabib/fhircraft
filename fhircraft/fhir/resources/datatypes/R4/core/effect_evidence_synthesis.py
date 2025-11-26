@@ -47,6 +47,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     RelatedArtifact,
     Reference,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -409,7 +410,7 @@ class EffectEvidenceSynthesisCertainty(BackboneElement):
         )
 
 
-class EffectEvidenceSynthesis(FHIRBaseModel):
+class EffectEvidenceSynthesis(DomainResource):
     """
     The EffectEvidenceSynthesis resource describes the difference in an outcome between exposures states in a population where the effect estimate is derived from a combination of research studies.
     """

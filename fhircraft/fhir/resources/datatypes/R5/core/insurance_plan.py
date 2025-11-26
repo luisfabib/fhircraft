@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     Quantity,
     Money,
+    DomainResource,
 )
 
 
@@ -429,7 +430,7 @@ class InsurancePlanPlan(BackboneElement):
         )
 
 
-class InsurancePlan(FHIRBaseModel):
+class InsurancePlan(DomainResource):
     """
     Details of a Health Insurance product/plan provided by an organization.
     """

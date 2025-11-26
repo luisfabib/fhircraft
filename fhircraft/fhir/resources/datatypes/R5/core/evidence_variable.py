@@ -53,6 +53,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Expression,
     Quantity,
     Range,
+    DomainResource,
 )
 
 
@@ -555,7 +556,7 @@ class EvidenceVariableCategory(BackboneElement):
         )
 
 
-class EvidenceVariable(FHIRBaseModel):
+class EvidenceVariable(DomainResource):
     """
     The EvidenceVariable resource describes an element that knowledge (Evidence) is about.
     """

@@ -45,6 +45,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Ratio,
     Duration,
     Annotation,
+    DomainResource,
 )
 
 
@@ -169,7 +170,7 @@ class GoalTarget(BackboneElement):
         )
 
 
-class Goal(FHIRBaseModel):
+class Goal(DomainResource):
     """
     Describes the intended objective(s) for a patient, group or organization care, for example, weight loss, restoring an activity of daily living, obtaining herd immunity via immunization, meeting a process improvement objective, etc.
     """

@@ -40,10 +40,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Reference,
     Annotation,
     DataRequirement,
+    DomainResource,
 )
 
 
-class GuidanceResponse(FHIRBaseModel):
+class GuidanceResponse(DomainResource):
     """
     A guidance response is the formal response to a guidance request, including any output parameters returned by the evaluation, as well as the description of any proposed actions to be taken.
     """

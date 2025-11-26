@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     ContactPoint,
     Period,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -81,7 +82,7 @@ class EndpointPayload(BackboneElement):
         )
 
 
-class Endpoint(FHIRBaseModel):
+class Endpoint(DomainResource):
     """
     The technical details of an endpoint that can be used for electronic services, such as for web services providing XDS.b, a REST endpoint for another FHIR server, or a s/Mime email address. This may include any security context information.
     """

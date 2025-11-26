@@ -31,6 +31,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Extension,
     BackboneElement,
     CodeableConcept,
+    DomainResource,
 )
 
 
@@ -125,7 +126,7 @@ class OperationOutcomeIssue(BackboneElement):
         )
 
 
-class OperationOutcome(FHIRBaseModel):
+class OperationOutcome(DomainResource):
     """
     A collection of error, warning, or information messages that result from a system action.
     """

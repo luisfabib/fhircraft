@@ -42,6 +42,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     UsageContext,
     CodeableConcept,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -330,7 +331,7 @@ class OperationDefinitionOverload(BackboneElement):
         )
 
 
-class OperationDefinition(FHIRBaseModel):
+class OperationDefinition(DomainResource):
     """
     A formal computable definition of an operation (on the RESTful interface) or a named query (using the search interaction).
     """

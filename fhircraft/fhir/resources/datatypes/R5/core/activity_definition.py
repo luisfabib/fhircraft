@@ -55,6 +55,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Dosage,
     Expression,
+    DomainResource,
 )
 
 
@@ -170,7 +171,7 @@ class ActivityDefinitionDynamicValue(BackboneElement):
         )
 
 
-class ActivityDefinition(FHIRBaseModel):
+class ActivityDefinition(DomainResource):
     """
     This resource allows for the definition of some activity to be performed, independent of a particular patient, practitioner, or other performance context.
     """

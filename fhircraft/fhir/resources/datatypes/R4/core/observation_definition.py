@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     BackboneElement,
     Range,
     Reference,
+    DomainResource,
 )
 
 
@@ -201,7 +202,7 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
         )
 
 
-class ObservationDefinition(FHIRBaseModel):
+class ObservationDefinition(DomainResource):
     """
     Set of definitional characteristics for a kind of observation or measurement produced or consumed by an orderable health care service.
     """

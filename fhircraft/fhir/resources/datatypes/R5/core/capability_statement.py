@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     BackboneElement,
     Reference,
+    DomainResource,
 )
 
 
@@ -1126,7 +1127,7 @@ class CapabilityStatementDocument(BackboneElement):
         )
 
 
-class CapabilityStatement(FHIRBaseModel):
+class CapabilityStatement(DomainResource):
     """
     A Capability Statement documents a set of capabilities (behaviors) of a FHIR Server or Client for a particular version of FHIR that may be used as a statement of actual server functionality or a statement of required or desired server implementation.
     """

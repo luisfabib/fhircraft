@@ -45,6 +45,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     BackboneElement,
     CodeableReference,
+    DomainResource,
 )
 
 
@@ -414,7 +415,7 @@ class TestPlanTestCase(BackboneElement):
         )
 
 
-class TestPlan(FHIRBaseModel):
+class TestPlan(DomainResource):
     """
     A plan for executing testing on an artifact or specifications
     """

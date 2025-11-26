@@ -39,6 +39,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     BackboneElement,
     CodeableConcept,
+    DomainResource,
 )
 
 
@@ -215,7 +216,7 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         )
 
 
-class ImmunizationRecommendation(FHIRBaseModel):
+class ImmunizationRecommendation(DomainResource):
     """
     A patient's point-in-time set of recommendations (i.e. forecasting) according to a published schedule with optional supporting justification.
     """

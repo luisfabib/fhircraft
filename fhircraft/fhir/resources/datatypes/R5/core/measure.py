@@ -48,6 +48,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     RelatedArtifact,
     BackboneElement,
     Expression,
+    DomainResource,
 )
 
 
@@ -613,7 +614,7 @@ class MeasureSupplementalData(BackboneElement):
         )
 
 
-class Measure(FHIRBaseModel):
+class Measure(DomainResource):
     """
     The Measure resource provides the definition of a quality measure.
     """

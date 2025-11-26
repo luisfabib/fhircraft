@@ -51,6 +51,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Age,
     Period,
     Timing,
+    DomainResource,
 )
 
 
@@ -794,7 +795,7 @@ class RequestOrchestrationAction(BackboneElement):
         )
 
 
-class RequestOrchestration(FHIRBaseModel):
+class RequestOrchestration(DomainResource):
     """
     A set of related requests that can be used to capture intended activities that have inter-dependencies such as "give this medication after that one".
     """

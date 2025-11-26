@@ -46,10 +46,11 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     RelatedArtifact,
     TriggerDefinition,
+    DomainResource,
 )
 
 
-class EventDefinition(FHIRBaseModel):
+class EventDefinition(DomainResource):
     """
     The EventDefinition resource provides a reusable description of when a particular event can occur.
     """

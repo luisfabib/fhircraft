@@ -44,6 +44,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     CodeableConcept,
     Period,
     Reference,
+    DomainResource,
 )
 
 
@@ -99,7 +100,7 @@ class PractitionerQualification(BackboneElement):
         )
 
 
-class Practitioner(FHIRBaseModel):
+class Practitioner(DomainResource):
     """
     A person who is directly or indirectly involved in the provisioning of healthcare.
     """

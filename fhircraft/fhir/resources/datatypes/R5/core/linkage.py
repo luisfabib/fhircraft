@@ -31,6 +31,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Extension,
     Reference,
     BackboneElement,
+    DomainResource,
 )
 
 
@@ -77,7 +78,7 @@ class LinkageItem(BackboneElement):
         )
 
 
-class Linkage(FHIRBaseModel):
+class Linkage(DomainResource):
     """
     Identifies two or more records (resource instances) that refer to the same real-world "occurrence".
     """
