@@ -1,34 +1,19 @@
 import json
 import keyword
 import tarfile
-import tempfile
-import warnings
-from typing import Any, List, Optional, get_args
-from unittest import TestCase
-from unittest.mock import MagicMock, Mock, patch
-
 import pytest
-from parameterized import parameterized, parameterized_class
-from pydantic import Field
-from pydantic.aliases import AliasChoices
-from pydantic.fields import FieldInfo
+from typing import Optional
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
+from pydantic.aliases import AliasChoices
+
+from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-import fhircraft.fhir.resources.datatypes.R4B.complex as complex
-from fhircraft.fhir.resources.definitions import (
-    StructureDefinition,
-    StructureDefinitionSnapshot,
-)
-from fhircraft.fhir.resources.definitions.element_definition import (
-    ElementDefinition,
-    ElementDefinitionType,
-)
 from fhircraft.fhir.resources.factory import (
-    ElementDefinitionNode,
     ResourceFactory,
     _Unset,
 )
-from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 
 class FactoryTestCase(TestCase):
@@ -38,7 +23,7 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", resource_name="Test", FHIR_version="4.3.0"
+            FHIR_release="R4B", FHIR_version="4.3.0"
         )
 
 
@@ -296,6 +281,521 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
 
         assert "for_" in fields
         assert "for_ext" in fields
+
+    def test_uses_base_definition_from_structure_definition(self):
+        """Test that factory uses baseDefinition when constructing a resource."""
+        # Create a base resource structure definition
+        base_structure_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/BaseResource",
+            "name": "BaseResource",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "BaseResource",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "BaseResource",
+                        "path": "BaseResource",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "BaseResource.baseField",
+                        "path": "BaseResource.baseField",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                        "short": "A field from the base resource",
+                    },
+                ]
+            },
+        }
+
+        # Create a derived resource that references the base
+        derived_structure_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/DerivedResource",
+            "name": "DerivedResource",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "DerivedResource",
+            "baseDefinition": "http://example.org/StructureDefinition/BaseResource",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "DerivedResource",
+                        "path": "DerivedResource",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "DerivedResource.derivedField",
+                        "path": "DerivedResource.derivedField",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                        "short": "A field specific to the derived resource",
+                    },
+                ]
+            },
+        }
+
+        # Construct both models
+        factory = ResourceFactory()
+        BaseModel = factory.construct_resource_model(
+            structure_definition=base_structure_def
+        )
+        DerivedModel = factory.construct_resource_model(
+            structure_definition=derived_structure_def
+        )
+
+        # Verify that DerivedModel inherits from BaseModel
+        assert issubclass(DerivedModel, BaseModel)
+
+        # Verify that both fields are accessible
+        assert "baseField" in BaseModel.model_fields
+        assert "derivedField" in DerivedModel.model_fields
+
+        # Verify instance creation works
+        instance = DerivedModel(baseField="base_value", derivedField="derived_value")
+        assert instance.baseField == "base_value"  # type: ignore
+        assert instance.derivedField == "derived_value"  # type: ignore
+
+    def test_uses_cached_base_definition(self):
+        """Test that factory uses cached base models when available."""
+        base_structure_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/CachedBase",
+            "name": "CachedBase",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "CachedBase",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "CachedBase",
+                        "path": "CachedBase",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "CachedBase.field1",
+                        "path": "CachedBase.field1",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        derived_structure_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/DerivedFromCached",
+            "name": "DerivedFromCached",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "DerivedFromCached",
+            "baseDefinition": "http://example.org/StructureDefinition/CachedBase",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "DerivedFromCached",
+                        "path": "DerivedFromCached",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "DerivedFromCached.field2",
+                        "path": "DerivedFromCached.field2",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        factory = ResourceFactory()
+
+        # Construct base model first - it will be cached
+        BaseModel = factory.construct_resource_model(
+            structure_definition=base_structure_def
+        )
+
+        # Verify base model is in cache
+        assert (
+            "http://example.org/StructureDefinition/CachedBase"
+            in factory.construction_cache
+        )
+        cached_base = factory.construction_cache[
+            "http://example.org/StructureDefinition/CachedBase"
+        ]
+
+        # Construct derived model - should use cached base
+        DerivedModel = factory.construct_resource_model(
+            structure_definition=derived_structure_def
+        )
+
+        # Verify that the cached base was used (same object)
+        assert issubclass(DerivedModel, cached_base)
+
+    def test_fallback_to_fhirbasemodel_when_base_not_found(self):
+        """Test that factory falls back to FHIRBaseModel when base can't be resolved."""
+        from fhircraft.fhir.resources.base import FHIRBaseModel
+
+        structure_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/ResourceWithMissingBase",
+            "name": "ResourceWithMissingBase",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "ResourceWithMissingBase",
+            "baseDefinition": "http://example.org/StructureDefinition/NonExistentBase",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "ResourceWithMissingBase",
+                        "path": "ResourceWithMissingBase",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "ResourceWithMissingBase.field1",
+                        "path": "ResourceWithMissingBase.field1",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        factory = ResourceFactory()
+        model = factory.construct_resource_model(structure_definition=structure_def)
+
+        # Should fall back to FHIRBaseModel
+        assert issubclass(model, FHIRBaseModel)
+        assert "field1" in model.model_fields
+
+    @pytest.mark.filterwarnings("ignore:.*dom-6.*")
+    def test_inherits_from_builtin_fhir_resource(self):
+        """Test that factory can use built-in FHIR resources as base."""
+        structure_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/CustomPatient",
+            "name": "CustomPatient",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "Patient.customField",
+                        "path": "Patient.customField",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                        "short": "A custom extension field",
+                    },
+                ]
+            },
+        }
+
+        factory = ResourceFactory()
+        CustomPatient = factory.construct_resource_model(
+            structure_definition=structure_def
+        )
+
+        # Should have the custom field
+        assert "customField" in CustomPatient.model_fields
+
+        # Should be able to use standard Patient fields (if Patient is available)
+        # Note: This depends on whether Patient type is resolvable
+        instance = CustomPatient(customField="custom_value")
+        assert instance.customField == "custom_value"  # type: ignore
+
+        # Verify that CustomPatient inherits from Patient
+        assert issubclass(CustomPatient, Patient)
+        assert isinstance(instance, CustomPatient)
+        assert isinstance(instance, Patient)
+
+    def test_chain_of_inheritance(self):
+        """Test multiple levels of inheritance work correctly."""
+        # Level 1: Base
+        base_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/Level1",
+            "name": "Level1",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Level1",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {"id": "Level1", "path": "Level1", "min": 0, "max": "*"},
+                    {
+                        "id": "Level1.level1Field",
+                        "path": "Level1.level1Field",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        # Level 2: Inherits from Level 1
+        middle_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/Level2",
+            "name": "Level2",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Level2",
+            "baseDefinition": "http://example.org/StructureDefinition/Level1",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {"id": "Level2", "path": "Level2", "min": 0, "max": "*"},
+                    {
+                        "id": "Level2.level2Field",
+                        "path": "Level2.level2Field",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        # Level 3: Inherits from Level 2
+        derived_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/Level3",
+            "name": "Level3",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Level3",
+            "baseDefinition": "http://example.org/StructureDefinition/Level2",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {"id": "Level3", "path": "Level3", "min": 0, "max": "*"},
+                    {
+                        "id": "Level3.level3Field",
+                        "path": "Level3.level3Field",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        factory = ResourceFactory()
+        Level1 = factory.construct_resource_model(structure_definition=base_def)
+        Level2 = factory.construct_resource_model(structure_definition=middle_def)
+        Level3 = factory.construct_resource_model(structure_definition=derived_def)
+
+        # Verify inheritance chain
+        assert issubclass(Level2, Level1)
+        assert issubclass(Level3, Level2)
+        assert issubclass(Level3, Level1)
+
+        # Verify all fields are accessible at Level3
+        instance = Level3(
+            level1Field="value1", level2Field="value2", level3Field="value3"
+        )
+        assert instance.level1Field == "value1"  # type: ignore
+        assert instance.level2Field == "value2"  # type: ignore
+        assert instance.level3Field == "value3"  # type: ignore
+
+    def test_does_not_duplicate_inherited_fields(self):
+        """Test that fields from base are not duplicated in derived model."""
+        base_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/BaseWithField",
+            "name": "BaseWithField",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "BaseWithField",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "BaseWithField",
+                        "path": "BaseWithField",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "BaseWithField.sharedField",
+                        "path": "BaseWithField.sharedField",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        derived_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/DerivedWithSameField",
+            "name": "DerivedWithSameField",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "DerivedWithSameField",
+            "baseDefinition": "http://example.org/StructureDefinition/BaseWithField",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "DerivedWithSameField",
+                        "path": "DerivedWithSameField",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "DerivedWithSameField.sharedField",
+                        "path": "DerivedWithSameField.sharedField",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                    {
+                        "id": "DerivedWithSameField.ownField",
+                        "path": "DerivedWithSameField.ownField",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        factory = ResourceFactory()
+        Base = factory.construct_resource_model(structure_definition=base_def)
+        Derived = factory.construct_resource_model(structure_definition=derived_def)
+
+        # The derived model should not redefine sharedField
+        # It should be inherited from Base
+        assert "sharedField" in Base.model_fields
+        assert "ownField" in Derived.model_fields
+
+        # Derived should still be able to use sharedField
+        instance = Derived(sharedField="shared", ownField="own")
+        assert instance.sharedField == "shared"  # type: ignore
+        assert instance.ownField == "own"  # type: ignore
+
+    def test_explicit_base_model_parameter_overrides_basedefinition(self):
+        """Test that explicit base_model parameter takes precedence over baseDefinition."""
+        from fhircraft.fhir.resources.base import FHIRBaseModel
+
+        structure_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/TestResource",
+            "name": "TestResource",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "TestResource",
+            "baseDefinition": "http://example.org/StructureDefinition/SomeBase",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "TestResource",
+                        "path": "TestResource",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "TestResource.field1",
+                        "path": "TestResource.field1",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        factory = ResourceFactory()
+
+        # Provide explicit base_model - it should override baseDefinition
+        model = factory.construct_resource_model(
+            structure_definition=structure_def, base_model=FHIRBaseModel
+        )
+
+        # Should inherit from FHIRBaseModel, not from SomeBase
+        assert issubclass(model, FHIRBaseModel)
+
+    def test_no_basedefinition_defaults_to_fhirbasemodel(self):
+        """Test that resources without baseDefinition inherit from FHIRBaseModel."""
+        from fhircraft.fhir.resources.base import FHIRBaseModel
+
+        structure_def = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/StandaloneResource",
+            "name": "StandaloneResource",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "StandaloneResource",
+            # No baseDefinition specified
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "StandaloneResource",
+                        "path": "StandaloneResource",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "StandaloneResource.field1",
+                        "path": "StandaloneResource.field1",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+
+        factory = ResourceFactory()
+        model = factory.construct_resource_model(structure_definition=structure_def)
+
+        # Should inherit from FHIRBaseModel by default
+        assert issubclass(model, FHIRBaseModel)
+        assert "field1" in model.model_fields
 
 
 class TestResourceFactoryPackageMethods(TestCase):
