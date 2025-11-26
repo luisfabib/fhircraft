@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+import pytest
 
 from fhircraft.fhir.mapper import FHIRMapper
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import StructureMap
@@ -41,6 +42,7 @@ def test_parse_mapping_script():
     assert structure_map.url == "http://example.org/test"
 
 
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_load_structure_map_from_dict():
     """Test loading structure map from dictionary."""
     map_dict = {

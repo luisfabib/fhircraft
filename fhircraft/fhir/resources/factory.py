@@ -24,6 +24,7 @@ from typing_extensions import Annotated
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 
 # Internal modules
+from fhircraft.fhir.resources.datatypes.utils import get_fhir_resource_type
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
@@ -537,26 +538,37 @@ class ResourceFactory:
             # Check if type is a FHIR complex datatype
             return get_complex_FHIR_type(element_type_code, self.Config.FHIR_release)
         except (ModuleNotFoundError, AttributeError):
-            if isinstance(element_type, ElementDefinitionType) and element_type.profile:
-                # Try to resolve custom type from profile URL
-                if type_structure_definition := self.resolve_structure_definition(
-                    element_type.profile[0]
+            try:
+                return get_fhir_resource_type(
+                    element_type_code, self.Config.FHIR_release
+                )
+            except (ModuleNotFoundError, AttributeError):
+                if (
+                    isinstance(element_type, ElementDefinitionType)
+                    and element_type.profile
                 ):
-                    return self.construct_resource_model(
-                        structure_definition=type_structure_definition,
-                        base_model=FHIRBaseModel,
-                    )
+                    # Try to resolve custom type from profile URL
+                    if type_structure_definition := self.resolve_structure_definition(
+                        element_type.profile[0]
+                    ):
+                        return self.construct_resource_model(
+                            structure_definition=type_structure_definition,
+                            base_model=FHIRBaseModel,
+                        )
+                    else:
+                        raise RuntimeError(
+                            f"Could not resolve the canonical URL '{element_type.profile[0]}' for the FHIR type '{element_type_code}'. Please add the resource to the factory repository."
+                        )
+                elif (
+                    isinstance(element_type, ElementDefinitionType)
+                    and element_type.code
+                ):
+                    return self.local_cache.get(element_type.code, element_type.code)
+
                 else:
                     raise RuntimeError(
-                        f"Could not resolve the canonical URL '{element_type.profile[0]}' for the FHIR type '{element_type_code}'. Please add the resource to the factory repository."
+                        f"Could not resolve FHIR type '{element_type_code}' and no profile canonical URL provided in the element definition"
                     )
-            elif isinstance(element_type, ElementDefinitionType) and element_type.code:
-                return self.local_cache.get(element_type.code, element_type.code)
-
-            else:
-                raise RuntimeError(
-                    f"Could not resolve FHIR type '{element_type_code}' and no profile canonical URL provided in the element definition"
-                )
 
     def _construct_model_with_properties(
         self,
@@ -1339,7 +1351,6 @@ class ResourceFactory:
                     description="Metadata about the resource.",
                     default=Meta(
                         profile=[_structure_definition.url],
-                        versionId=_structure_definition.version,
                     ),
                 ),
             )
@@ -1348,9 +1359,13 @@ class ResourceFactory:
         if not (base := base_model):
             # Determine the base model to inherit from for the current resource
             if base_canonical_url := _structure_definition.baseDefinition:
-                # TODO: Handle non-FHIRBaseModel bases
-                print("Base canonical URL:", base_canonical_url)
-                base = self.construction_cache.get(base_canonical_url, FHIRBaseModel)
+                if not (base := self.construction_cache.get(base_canonical_url)):
+                    try:
+                        base = self._resolve_FHIR_type(base_canonical_url)
+                        assert inspect.isclass(base) and issubclass(base, FHIRBaseModel)
+                    except:
+                        base = FHIRBaseModel
+
             else:
                 base = FHIRBaseModel
 

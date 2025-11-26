@@ -407,6 +407,7 @@ simple_mapping_test_cases = [
 @pytest.mark.parametrize(
     "test_name,source_data,expected_target,rules", simple_mapping_test_cases
 )
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_simple_mapping_scenarios(test_name, source_data, expected_target, rules):
     """Test simple mapping scenarios with basic source and target resources."""
 
