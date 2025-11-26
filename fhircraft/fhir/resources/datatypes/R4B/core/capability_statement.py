@@ -1130,10 +1130,7 @@ class CapabilityStatement(DomainResource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            versionId="4.3.0",
-            profile=["http://hl7.org/fhir/StructureDefinition/CapabilityStatement"],
-        ),
+        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/CapabilityStatement"]),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",

@@ -472,10 +472,7 @@ class CodeSystem(DomainResource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            versionId="5.0.0",
-            profile=["http://hl7.org/fhir/StructureDefinition/CodeSystem"],
-        ),
+        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/CodeSystem"]),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",

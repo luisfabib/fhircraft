@@ -376,10 +376,7 @@ class Encounter(DomainResource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            versionId="4.0.1",
-            profile=["http://hl7.org/fhir/StructureDefinition/Encounter"],
-        ),
+        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/Encounter"]),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
