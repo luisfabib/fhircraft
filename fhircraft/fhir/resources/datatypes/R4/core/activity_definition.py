@@ -452,6 +452,11 @@ class ActivityDefinition(FHIRBaseModel):
         description="When activity is to occur",
         default=None,
     )
+    timingDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for timingDateTime extensions",
+        default=None,
+        alias="_timingDateTime",
+    )
     timingAge: Optional[Age] = Field(
         description="When activity is to occur",
         default=None,

@@ -63,6 +63,11 @@ class BiologicallyDerivedProductCollection(BackboneElement):
         description="Time of product collection",
         default=None,
     )
+    collectedDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for collectedDateTime extensions",
+        default=None,
+        alias="_collectedDateTime",
+    )
     collectedPeriod: Optional[Period] = Field(
         description="Time of product collection",
         default=None,
@@ -134,6 +139,11 @@ class BiologicallyDerivedProductProcessing(BackboneElement):
         description="Time of processing",
         default=None,
     )
+    timeDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for timeDateTime extensions",
+        default=None,
+        alias="_timeDateTime",
+    )
     timePeriod: Optional[Period] = Field(
         description="Time of processing",
         default=None,
@@ -199,6 +209,11 @@ class BiologicallyDerivedProductManipulation(BackboneElement):
     timeDateTime: Optional[DateTime] = Field(
         description="Time of manipulation",
         default=None,
+    )
+    timeDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for timeDateTime extensions",
+        default=None,
+        alias="_timeDateTime",
     )
     timePeriod: Optional[Period] = Field(
         description="Time of manipulation",

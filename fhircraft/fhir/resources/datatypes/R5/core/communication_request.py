@@ -222,6 +222,11 @@ class CommunicationRequest(FHIRBaseModel):
         description="When scheduled",
         default=None,
     )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
+    )
     occurrencePeriod: Optional[Period] = Field(
         description="When scheduled",
         default=None,

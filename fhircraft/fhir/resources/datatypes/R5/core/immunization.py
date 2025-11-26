@@ -375,9 +375,19 @@ class Immunization(FHIRBaseModel):
         description="Vaccine administration date",
         default=None,
     )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
+    )
     occurrenceString: Optional[String] = Field(
         description="Vaccine administration date",
         default=None,
+    )
+    occurrenceString_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceString extensions",
+        default=None,
+        alias="_occurrenceString",
     )
     primarySource: Optional[Boolean] = Field(
         description="Indicates context the data was captured in",

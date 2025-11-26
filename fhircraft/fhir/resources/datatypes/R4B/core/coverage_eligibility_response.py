@@ -61,9 +61,19 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
         description="Benefits allowed",
         default=None,
     )
+    allowedUnsignedInt_ext: Optional[Element] = Field(
+        description="Placeholder element for allowedUnsignedInt extensions",
+        default=None,
+        alias="_allowedUnsignedInt",
+    )
     allowedString: Optional[String] = Field(
         description="Benefits allowed",
         default=None,
+    )
+    allowedString_ext: Optional[Element] = Field(
+        description="Placeholder element for allowedString extensions",
+        default=None,
+        alias="_allowedString",
     )
     allowedMoney: Optional[Money] = Field(
         description="Benefits allowed",
@@ -73,9 +83,19 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
         description="Benefits used",
         default=None,
     )
+    usedUnsignedInt_ext: Optional[Element] = Field(
+        description="Placeholder element for usedUnsignedInt extensions",
+        default=None,
+        alias="_usedUnsignedInt",
+    )
     usedString: Optional[String] = Field(
         description="Benefits used",
         default=None,
+    )
+    usedString_ext: Optional[Element] = Field(
+        description="Placeholder element for usedString extensions",
+        default=None,
+        alias="_usedString",
     )
     usedMoney: Optional[Money] = Field(
         description="Benefits used",
@@ -456,6 +476,11 @@ class CoverageEligibilityResponse(FHIRBaseModel):
     servicedDate: Optional[Date] = Field(
         description="Estimated date or dates of service",
         default=None,
+    )
+    servicedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for servicedDate extensions",
+        default=None,
+        alias="_servicedDate",
     )
     servicedPeriod: Optional[Period] = Field(
         description="Estimated date or dates of service",

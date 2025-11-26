@@ -483,6 +483,11 @@ class PlanDefinitionAction(BackboneElement):
         description="Type of individual the action is focused on",
         default=None,
     )
+    subjectCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for subjectCanonical extensions",
+        default=None,
+        alias="_subjectCanonical",
+    )
     trigger: Optional[List[TriggerDefinition]] = Field(
         description="When the action should be triggered",
         default=None,
@@ -506,6 +511,11 @@ class PlanDefinitionAction(BackboneElement):
     timingDateTime: Optional[DateTime] = Field(
         description="When the action should take place",
         default=None,
+    )
+    timingDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for timingDateTime extensions",
+        default=None,
+        alias="_timingDateTime",
     )
     timingAge: Optional[Age] = Field(
         description="When the action should take place",
@@ -584,9 +594,19 @@ class PlanDefinitionAction(BackboneElement):
         description="Description of the activity to be performed",
         default=None,
     )
+    definitionCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for definitionCanonical extensions",
+        default=None,
+        alias="_definitionCanonical",
+    )
     definitionUri: Optional[Uri] = Field(
         description="Description of the activity to be performed",
         default=None,
+    )
+    definitionUri_ext: Optional[Element] = Field(
+        description="Placeholder element for definitionUri extensions",
+        default=None,
+        alias="_definitionUri",
     )
     transform: Optional[Canonical] = Field(
         description="Transform to apply the template",
@@ -881,6 +901,11 @@ class PlanDefinition(FHIRBaseModel):
     subjectCanonical: Optional[Canonical] = Field(
         description="Type of individual the plan definition is focused on",
         default=None,
+    )
+    subjectCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for subjectCanonical extensions",
+        default=None,
+        alias="_subjectCanonical",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",

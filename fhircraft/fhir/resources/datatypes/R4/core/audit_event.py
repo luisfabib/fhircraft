@@ -283,9 +283,19 @@ class AuditEventEntityDetail(BackboneElement):
         description="Property value",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueBase64Binary: Optional[Base64Binary] = Field(
         description="Property value",
         default=None,
+    )
+    valueBase64Binary_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBase64Binary extensions",
+        default=None,
+        alias="_valueBase64Binary",
     )
 
     @property

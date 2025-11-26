@@ -266,6 +266,11 @@ class Provenance(FHIRBaseModel):
         description="When the activity occurred",
         default=None,
     )
+    occurredDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurredDateTime extensions",
+        default=None,
+        alias="_occurredDateTime",
+    )
     recorded: Optional[Instant] = Field(
         description="When the activity was recorded / updated",
         default=None,

@@ -181,6 +181,11 @@ class MedicationStatement(FHIRBaseModel):
         description="The date/time or interval when the medication is/was/will be taken",
         default=None,
     )
+    effectiveDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for effectiveDateTime extensions",
+        default=None,
+        alias="_effectiveDateTime",
+    )
     effectivePeriod: Optional[Period] = Field(
         description="The date/time or interval when the medication is/was/will be taken",
         default=None,

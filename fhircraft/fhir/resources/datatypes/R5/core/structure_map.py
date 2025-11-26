@@ -410,33 +410,73 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueId_ext: Optional[Element] = Field(
+        description="Placeholder element for valueId extensions",
+        default=None,
+        alias="_valueId",
+    )
     valueString: Optional[String] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
+    )
     valueDate: Optional[Date] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
     )
     valueTime: Optional[Time] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
     )
 
     @property
@@ -568,33 +608,73 @@ class StructureMapGroupRuleDependentParameter(BackboneElement):
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueId_ext: Optional[Element] = Field(
+        description="Placeholder element for valueId extensions",
+        default=None,
+        alias="_valueId",
+    )
     valueString: Optional[String] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
+    )
     valueDate: Optional[Date] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
     )
     valueTime: Optional[Time] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
     )
 
     @property
@@ -911,6 +991,11 @@ class StructureMap(FHIRBaseModel):
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
+    )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",

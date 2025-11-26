@@ -68,6 +68,11 @@ class BiologicallyDerivedProductCollection(BackboneElement):
         description="Time of product collection",
         default=None,
     )
+    collectedDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for collectedDateTime extensions",
+        default=None,
+        alias="_collectedDateTime",
+    )
     collectedPeriod: Optional[Period] = Field(
         description="Time of product collection",
         default=None,
@@ -126,9 +131,19 @@ class BiologicallyDerivedProductProperty(BackboneElement):
         description="Property values",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Property values",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueCodeableConcept: Optional[CodeableConcept] = Field(
         description="Property values",
@@ -153,6 +168,11 @@ class BiologicallyDerivedProductProperty(BackboneElement):
     valueString: Optional[String] = Field(
         description="Property values",
         default=None,
+    )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="Property values",

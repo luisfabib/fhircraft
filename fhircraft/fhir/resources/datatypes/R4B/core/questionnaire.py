@@ -83,29 +83,64 @@ class QuestionnaireItemEnableWhen(BackboneElement):
         description="Value for question comparison based on operator",
         default=None,
     )
+    answerBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for answerBoolean extensions",
+        default=None,
+        alias="_answerBoolean",
+    )
     answerDecimal: Optional[Decimal] = Field(
         description="Value for question comparison based on operator",
         default=None,
+    )
+    answerDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for answerDecimal extensions",
+        default=None,
+        alias="_answerDecimal",
     )
     answerInteger: Optional[Integer] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
+    answerInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for answerInteger extensions",
+        default=None,
+        alias="_answerInteger",
+    )
     answerDate: Optional[Date] = Field(
         description="Value for question comparison based on operator",
         default=None,
+    )
+    answerDate_ext: Optional[Element] = Field(
+        description="Placeholder element for answerDate extensions",
+        default=None,
+        alias="_answerDate",
     )
     answerDateTime: Optional[DateTime] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
+    answerDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for answerDateTime extensions",
+        default=None,
+        alias="_answerDateTime",
+    )
     answerTime: Optional[Time] = Field(
         description="Value for question comparison based on operator",
         default=None,
     )
+    answerTime_ext: Optional[Element] = Field(
+        description="Placeholder element for answerTime extensions",
+        default=None,
+        alias="_answerTime",
+    )
     answerString: Optional[String] = Field(
         description="Value for question comparison based on operator",
         default=None,
+    )
+    answerString_ext: Optional[Element] = Field(
+        description="Placeholder element for answerString extensions",
+        default=None,
+        alias="_answerString",
     )
     answerCoding: Optional[Coding] = Field(
         description="Value for question comparison based on operator",
@@ -180,17 +215,37 @@ class QuestionnaireItemAnswerOption(BackboneElement):
         description="Answer value",
         default=None,
     )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
+    )
     valueDate: Optional[Date] = Field(
         description="Answer value",
         default=None,
+    )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
     )
     valueTime: Optional[Time] = Field(
         description="Answer value",
         default=None,
     )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
+    )
     valueString: Optional[String] = Field(
         description="Answer value",
         default=None,
+    )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueCoding: Optional[Coding] = Field(
         description="Answer value",
@@ -252,33 +307,73 @@ class QuestionnaireItemInitial(BackboneElement):
         description="Actual value for initializing the question",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueDecimal: Optional[Decimal] = Field(
         description="Actual value for initializing the question",
         default=None,
+    )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
     )
     valueInteger: Optional[Integer] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
+    )
     valueDate: Optional[Date] = Field(
         description="Actual value for initializing the question",
         default=None,
+    )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
     )
     valueDateTime: Optional[DateTime] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
+    )
     valueTime: Optional[Time] = Field(
         description="Actual value for initializing the question",
         default=None,
+    )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
     )
     valueString: Optional[String] = Field(
         description="Actual value for initializing the question",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueUri: Optional[Uri] = Field(
         description="Actual value for initializing the question",
         default=None,
+    )
+    valueUri_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUri extensions",
+        default=None,
+        alias="_valueUri",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="Actual value for initializing the question",

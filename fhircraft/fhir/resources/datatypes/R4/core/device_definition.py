@@ -404,6 +404,11 @@ class DeviceDefinition(FHIRBaseModel):
         description="Name of device manufacturer",
         default=None,
     )
+    manufacturerString_ext: Optional[Element] = Field(
+        description="Placeholder element for manufacturerString extensions",
+        default=None,
+        alias="_manufacturerString",
+    )
     manufacturerReference: Optional[Reference] = Field(
         description="Name of device manufacturer",
         default=None,

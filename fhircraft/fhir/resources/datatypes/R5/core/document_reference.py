@@ -151,9 +151,19 @@ class DocumentReferenceContentProfile(BackboneElement):
         description="Code|uri|canonical",
         default=None,
     )
+    valueUri_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUri extensions",
+        default=None,
+        alias="_valueUri",
+    )
     valueCanonical: Optional[Canonical] = Field(
         description="Code|uri|canonical",
         default=None,
+    )
+    valueCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for valueCanonical extensions",
+        default=None,
+        alias="_valueCanonical",
     )
 
     @property

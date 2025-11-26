@@ -180,6 +180,11 @@ class DeviceUsage(FHIRBaseModel):
         description="How often  the device was used",
         default=None,
     )
+    timingDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for timingDateTime extensions",
+        default=None,
+        alias="_timingDateTime",
+    )
     dateAsserted: Optional[DateTime] = Field(
         description="When the statement was made (and recorded)",
         default=None,

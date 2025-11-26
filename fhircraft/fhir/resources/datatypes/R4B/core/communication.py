@@ -55,6 +55,11 @@ class CommunicationPayload(BackboneElement):
         description="Message part content",
         default=None,
     )
+    contentString_ext: Optional[Element] = Field(
+        description="Placeholder element for contentString extensions",
+        default=None,
+        alias="_contentString",
+    )
     contentAttachment: Optional[Attachment] = Field(
         description="Message part content",
         default=None,

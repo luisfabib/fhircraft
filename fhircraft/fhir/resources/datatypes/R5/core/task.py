@@ -190,41 +190,91 @@ class TaskInput(BackboneElement):
         description="Content to use in performing the task",
         default=None,
     )
+    valueBase64Binary_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBase64Binary extensions",
+        default=None,
+        alias="_valueBase64Binary",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="Content to use in performing the task",
         default=None,
+    )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
     )
     valueCanonical: Optional[Canonical] = Field(
         description="Content to use in performing the task",
         default=None,
     )
+    valueCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for valueCanonical extensions",
+        default=None,
+        alias="_valueCanonical",
+    )
     valueCode: Optional[Code] = Field(
         description="Content to use in performing the task",
         default=None,
+    )
+    valueCode_ext: Optional[Element] = Field(
+        description="Placeholder element for valueCode extensions",
+        default=None,
+        alias="_valueCode",
     )
     valueDate: Optional[Date] = Field(
         description="Content to use in performing the task",
         default=None,
     )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Content to use in performing the task",
         default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="Content to use in performing the task",
         default=None,
     )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
+    )
     valueId: Optional[Id] = Field(
         description="Content to use in performing the task",
         default=None,
+    )
+    valueId_ext: Optional[Element] = Field(
+        description="Placeholder element for valueId extensions",
+        default=None,
+        alias="_valueId",
     )
     valueInstant: Optional[Instant] = Field(
         description="Content to use in performing the task",
         default=None,
     )
+    valueInstant_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInstant extensions",
+        default=None,
+        alias="_valueInstant",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Content to use in performing the task",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueInteger64: Optional[Integer64] = Field(
         description="Content to use in performing the task",
@@ -234,37 +284,82 @@ class TaskInput(BackboneElement):
         description="Content to use in performing the task",
         default=None,
     )
+    valueMarkdown_ext: Optional[Element] = Field(
+        description="Placeholder element for valueMarkdown extensions",
+        default=None,
+        alias="_valueMarkdown",
+    )
     valueOid: Optional[Oid] = Field(
         description="Content to use in performing the task",
         default=None,
+    )
+    valueOid_ext: Optional[Element] = Field(
+        description="Placeholder element for valueOid extensions",
+        default=None,
+        alias="_valueOid",
     )
     valuePositiveInt: Optional[PositiveInt] = Field(
         description="Content to use in performing the task",
         default=None,
     )
+    valuePositiveInt_ext: Optional[Element] = Field(
+        description="Placeholder element for valuePositiveInt extensions",
+        default=None,
+        alias="_valuePositiveInt",
+    )
     valueString: Optional[String] = Field(
         description="Content to use in performing the task",
         default=None,
+    )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueTime: Optional[Time] = Field(
         description="Content to use in performing the task",
         default=None,
     )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
+    )
     valueUnsignedInt: Optional[UnsignedInt] = Field(
         description="Content to use in performing the task",
         default=None,
+    )
+    valueUnsignedInt_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUnsignedInt extensions",
+        default=None,
+        alias="_valueUnsignedInt",
     )
     valueUri: Optional[Uri] = Field(
         description="Content to use in performing the task",
         default=None,
     )
+    valueUri_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUri extensions",
+        default=None,
+        alias="_valueUri",
+    )
     valueUrl: Optional[Url] = Field(
         description="Content to use in performing the task",
         default=None,
     )
+    valueUrl_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUrl extensions",
+        default=None,
+        alias="_valueUrl",
+    )
     valueUuid: Optional[Uuid] = Field(
         description="Content to use in performing the task",
         default=None,
+    )
+    valueUuid_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUuid extensions",
+        default=None,
+        alias="_valueUuid",
     )
     valueAddress: Optional[Address] = Field(
         description="Content to use in performing the task",
@@ -502,41 +597,91 @@ class TaskOutput(BackboneElement):
         description="Result of output",
         default=None,
     )
+    valueBase64Binary_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBase64Binary extensions",
+        default=None,
+        alias="_valueBase64Binary",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="Result of output",
         default=None,
+    )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
     )
     valueCanonical: Optional[Canonical] = Field(
         description="Result of output",
         default=None,
     )
+    valueCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for valueCanonical extensions",
+        default=None,
+        alias="_valueCanonical",
+    )
     valueCode: Optional[Code] = Field(
         description="Result of output",
         default=None,
+    )
+    valueCode_ext: Optional[Element] = Field(
+        description="Placeholder element for valueCode extensions",
+        default=None,
+        alias="_valueCode",
     )
     valueDate: Optional[Date] = Field(
         description="Result of output",
         default=None,
     )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Result of output",
         default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="Result of output",
         default=None,
     )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
+    )
     valueId: Optional[Id] = Field(
         description="Result of output",
         default=None,
+    )
+    valueId_ext: Optional[Element] = Field(
+        description="Placeholder element for valueId extensions",
+        default=None,
+        alias="_valueId",
     )
     valueInstant: Optional[Instant] = Field(
         description="Result of output",
         default=None,
     )
+    valueInstant_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInstant extensions",
+        default=None,
+        alias="_valueInstant",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Result of output",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueInteger64: Optional[Integer64] = Field(
         description="Result of output",
@@ -546,37 +691,82 @@ class TaskOutput(BackboneElement):
         description="Result of output",
         default=None,
     )
+    valueMarkdown_ext: Optional[Element] = Field(
+        description="Placeholder element for valueMarkdown extensions",
+        default=None,
+        alias="_valueMarkdown",
+    )
     valueOid: Optional[Oid] = Field(
         description="Result of output",
         default=None,
+    )
+    valueOid_ext: Optional[Element] = Field(
+        description="Placeholder element for valueOid extensions",
+        default=None,
+        alias="_valueOid",
     )
     valuePositiveInt: Optional[PositiveInt] = Field(
         description="Result of output",
         default=None,
     )
+    valuePositiveInt_ext: Optional[Element] = Field(
+        description="Placeholder element for valuePositiveInt extensions",
+        default=None,
+        alias="_valuePositiveInt",
+    )
     valueString: Optional[String] = Field(
         description="Result of output",
         default=None,
+    )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueTime: Optional[Time] = Field(
         description="Result of output",
         default=None,
     )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
+    )
     valueUnsignedInt: Optional[UnsignedInt] = Field(
         description="Result of output",
         default=None,
+    )
+    valueUnsignedInt_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUnsignedInt extensions",
+        default=None,
+        alias="_valueUnsignedInt",
     )
     valueUri: Optional[Uri] = Field(
         description="Result of output",
         default=None,
     )
+    valueUri_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUri extensions",
+        default=None,
+        alias="_valueUri",
+    )
     valueUrl: Optional[Url] = Field(
         description="Result of output",
         default=None,
     )
+    valueUrl_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUrl extensions",
+        default=None,
+        alias="_valueUrl",
+    )
     valueUuid: Optional[Uuid] = Field(
         description="Result of output",
         default=None,
+    )
+    valueUuid_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUuid extensions",
+        default=None,
+        alias="_valueUuid",
     )
     valueAddress: Optional[Address] = Field(
         description="Result of output",

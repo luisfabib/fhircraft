@@ -127,6 +127,11 @@ class CanonicalResource(FHIRBaseModel):
         description="How to compare versions",
         default=None,
     )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
+    )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,

@@ -88,6 +88,11 @@ class FamilyMemberHistoryCondition(BackboneElement):
         description="When condition first manifested",
         default=None,
     )
+    onsetString_ext: Optional[Element] = Field(
+        description="Placeholder element for onsetString extensions",
+        default=None,
+        alias="_onsetString",
+    )
     note: Optional[List[Annotation]] = Field(
         description="Extra information about condition",
         default=None,
@@ -267,9 +272,19 @@ class FamilyMemberHistory(FHIRBaseModel):
         description="(approximate) date of birth",
         default=None,
     )
+    bornDate_ext: Optional[Element] = Field(
+        description="Placeholder element for bornDate extensions",
+        default=None,
+        alias="_bornDate",
+    )
     bornString: Optional[String] = Field(
         description="(approximate) date of birth",
         default=None,
+    )
+    bornString_ext: Optional[Element] = Field(
+        description="Placeholder element for bornString extensions",
+        default=None,
+        alias="_bornString",
     )
     ageAge: Optional[Age] = Field(
         description="(approximate) age",
@@ -282,6 +297,11 @@ class FamilyMemberHistory(FHIRBaseModel):
     ageString: Optional[String] = Field(
         description="(approximate) age",
         default=None,
+    )
+    ageString_ext: Optional[Element] = Field(
+        description="Placeholder element for ageString extensions",
+        default=None,
+        alias="_ageString",
     )
     estimatedAge: Optional[Boolean] = Field(
         description="Age is estimated?",
@@ -296,6 +316,11 @@ class FamilyMemberHistory(FHIRBaseModel):
         description="Dead? How old/when?",
         default=None,
     )
+    deceasedBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for deceasedBoolean extensions",
+        default=None,
+        alias="_deceasedBoolean",
+    )
     deceasedAge: Optional[Age] = Field(
         description="Dead? How old/when?",
         default=None,
@@ -308,9 +333,19 @@ class FamilyMemberHistory(FHIRBaseModel):
         description="Dead? How old/when?",
         default=None,
     )
+    deceasedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for deceasedDate extensions",
+        default=None,
+        alias="_deceasedDate",
+    )
     deceasedString: Optional[String] = Field(
         description="Dead? How old/when?",
         default=None,
+    )
+    deceasedString_ext: Optional[Element] = Field(
+        description="Placeholder element for deceasedString extensions",
+        default=None,
+        alias="_deceasedString",
     )
     reasonCode: Optional[List[CodeableConcept]] = Field(
         description="Why was family member history performed?",

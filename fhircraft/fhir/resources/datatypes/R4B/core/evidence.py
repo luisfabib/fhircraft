@@ -766,6 +766,11 @@ class Evidence(FHIRBaseModel):
         description="Citation for this evidence",
         default=None,
     )
+    citeAsMarkdown_ext: Optional[Element] = Field(
+        description="Placeholder element for citeAsMarkdown extensions",
+        default=None,
+        alias="_citeAsMarkdown",
+    )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",
         default=None,

@@ -106,6 +106,11 @@ class InvoiceLineItem(BackboneElement):
         description="Service data or period",
         default=None,
     )
+    servicedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for servicedDate extensions",
+        default=None,
+        alias="_servicedDate",
+    )
     servicedPeriod: Optional[Period] = Field(
         description="Service data or period",
         default=None,
@@ -289,6 +294,11 @@ class Invoice(FHIRBaseModel):
     periodDate: Optional[Date] = Field(
         description="Billing date or period",
         default=None,
+    )
+    periodDate_ext: Optional[Element] = Field(
+        description="Placeholder element for periodDate extensions",
+        default=None,
+        alias="_periodDate",
     )
     periodPeriod: Optional[Period] = Field(
         description="Billing date or period",

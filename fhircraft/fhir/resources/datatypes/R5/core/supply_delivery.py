@@ -182,6 +182,11 @@ class SupplyDelivery(FHIRBaseModel):
         description="When event occurred",
         default=None,
     )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
+    )
     occurrencePeriod: Optional[Period] = Field(
         description="When event occurred",
         default=None,

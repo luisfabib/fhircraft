@@ -268,6 +268,11 @@ class CodeSystemConceptProperty(BackboneElement):
         description="Value of the property for this concept",
         default=None,
     )
+    valueCode_ext: Optional[Element] = Field(
+        description="Placeholder element for valueCode extensions",
+        default=None,
+        alias="_valueCode",
+    )
     valueCoding: Optional[Coding] = Field(
         description="Value of the property for this concept",
         default=None,
@@ -276,21 +281,46 @@ class CodeSystemConceptProperty(BackboneElement):
         description="Value of the property for this concept",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Value of the property for this concept",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the property for this concept",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Value of the property for this concept",
         default=None,
     )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
+    )
     valueDecimal: Optional[Decimal] = Field(
         description="Value of the property for this concept",
         default=None,
+    )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
     )
 
     @property

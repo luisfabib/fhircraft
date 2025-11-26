@@ -221,6 +221,11 @@ class Condition(FHIRBaseModel):
         description="Estimated or actual date,  date-time, or age",
         default=None,
     )
+    onsetDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for onsetDateTime extensions",
+        default=None,
+        alias="_onsetDateTime",
+    )
     onsetAge: Optional[Age] = Field(
         description="Estimated or actual date,  date-time, or age",
         default=None,
@@ -237,9 +242,19 @@ class Condition(FHIRBaseModel):
         description="Estimated or actual date,  date-time, or age",
         default=None,
     )
+    onsetString_ext: Optional[Element] = Field(
+        description="Placeholder element for onsetString extensions",
+        default=None,
+        alias="_onsetString",
+    )
     abatementDateTime: Optional[DateTime] = Field(
         description="When in resolution/remission",
         default=None,
+    )
+    abatementDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for abatementDateTime extensions",
+        default=None,
+        alias="_abatementDateTime",
     )
     abatementAge: Optional[Age] = Field(
         description="When in resolution/remission",
@@ -256,6 +271,11 @@ class Condition(FHIRBaseModel):
     abatementString: Optional[String] = Field(
         description="When in resolution/remission",
         default=None,
+    )
+    abatementString_ext: Optional[Element] = Field(
+        description="Placeholder element for abatementString extensions",
+        default=None,
+        alias="_abatementString",
     )
     recordedDate: Optional[DateTime] = Field(
         description="Date condition was first recorded",

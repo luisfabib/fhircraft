@@ -211,6 +211,11 @@ class ServiceRequest(FHIRBaseModel):
         description="When service should occur",
         default=None,
     )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
+    )
     occurrencePeriod: Optional[Period] = Field(
         description="When service should occur",
         default=None,
@@ -222,6 +227,11 @@ class ServiceRequest(FHIRBaseModel):
     asNeededBoolean: Optional[Boolean] = Field(
         description="Preconditions for service",
         default=None,
+    )
+    asNeededBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for asNeededBoolean extensions",
+        default=None,
+        alias="_asNeededBoolean",
     )
     asNeededCodeableConcept: Optional[CodeableConcept] = Field(
         description="Preconditions for service",

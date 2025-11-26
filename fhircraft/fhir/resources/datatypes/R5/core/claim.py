@@ -149,6 +149,11 @@ class ClaimEvent(BackboneElement):
         description="Occurance date or period",
         default=None,
     )
+    whenDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for whenDateTime extensions",
+        default=None,
+        alias="_whenDateTime",
+    )
     whenPeriod: Optional[Period] = Field(
         description="Occurance date or period",
         default=None,
@@ -280,6 +285,11 @@ class ClaimSupportingInfo(BackboneElement):
         description="When it occurred",
         default=None,
     )
+    timingDate_ext: Optional[Element] = Field(
+        description="Placeholder element for timingDate extensions",
+        default=None,
+        alias="_timingDate",
+    )
     timingPeriod: Optional[Period] = Field(
         description="When it occurred",
         default=None,
@@ -288,9 +298,19 @@ class ClaimSupportingInfo(BackboneElement):
         description="Data to be provided",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueString: Optional[String] = Field(
         description="Data to be provided",
         default=None,
+    )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Data to be provided",
@@ -1103,6 +1123,11 @@ class ClaimItem(BackboneElement):
     servicedDate: Optional[Date] = Field(
         description="Date or dates of service or product delivery",
         default=None,
+    )
+    servicedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for servicedDate extensions",
+        default=None,
+        alias="_servicedDate",
     )
     servicedPeriod: Optional[Period] = Field(
         description="Date or dates of service or product delivery",

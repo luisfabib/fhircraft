@@ -253,25 +253,55 @@ class InventoryItemCharacteristic(BackboneElement):
         description="The value of the attribute",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueInteger: Optional[Integer] = Field(
         description="The value of the attribute",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="The value of the attribute",
         default=None,
     )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="The value of the attribute",
         default=None,
+    )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
     )
     valueUrl: Optional[Url] = Field(
         description="The value of the attribute",
         default=None,
     )
+    valueUrl_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUrl extensions",
+        default=None,
+        alias="_valueUrl",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="The value of the attribute",
         default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="The value of the attribute",

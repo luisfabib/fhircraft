@@ -380,6 +380,11 @@ class CoverageEligibilityRequest(FHIRBaseModel):
         description="Estimated date or dates of service",
         default=None,
     )
+    servicedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for servicedDate extensions",
+        default=None,
+        alias="_servicedDate",
+    )
     servicedPeriod: Optional[Period] = Field(
         description="Estimated date or dates of service",
         default=None,

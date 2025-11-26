@@ -79,6 +79,11 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="What code or expression defines members?",
         default=None,
     )
+    definitionCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for definitionCanonical extensions",
+        default=None,
+        alias="_definitionCanonical",
+    )
     definitionCodeableConcept: Optional[CodeableConcept] = Field(
         description="What code or expression defines members?",
         default=None,
@@ -111,6 +116,11 @@ class EvidenceVariableCharacteristic(BackboneElement):
     participantEffectiveDateTime: Optional[DateTime] = Field(
         description="What time period do participants cover",
         default=None,
+    )
+    participantEffectiveDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for participantEffectiveDateTime extensions",
+        default=None,
+        alias="_participantEffectiveDateTime",
     )
     participantEffectivePeriod: Optional[Period] = Field(
         description="What time period do participants cover",

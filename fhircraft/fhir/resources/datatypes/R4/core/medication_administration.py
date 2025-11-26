@@ -283,6 +283,11 @@ class MedicationAdministration(FHIRBaseModel):
         description="Start and end time of administration",
         default=None,
     )
+    effectiveDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for effectiveDateTime extensions",
+        default=None,
+        alias="_effectiveDateTime",
+    )
     effectivePeriod: Optional[Period] = Field(
         description="Start and end time of administration",
         default=None,

@@ -220,6 +220,11 @@ class ClinicalUseDefinitionIndication(BackboneElement):
         description="Timing or duration information",
         default=None,
     )
+    durationString_ext: Optional[Element] = Field(
+        description="Placeholder element for durationString extensions",
+        default=None,
+        alias="_durationString",
+    )
     undesirableEffect: Optional[List[Reference]] = Field(
         description="An unwanted side effect or negative outcome of the subject of this resource when being used for this indication",
         default=None,

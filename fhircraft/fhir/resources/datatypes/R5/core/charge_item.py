@@ -194,6 +194,11 @@ class ChargeItem(FHIRBaseModel):
         description="When the charged service was applied",
         default=None,
     )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
+    )
     occurrencePeriod: Optional[Period] = Field(
         description="When the charged service was applied",
         default=None,

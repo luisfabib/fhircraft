@@ -274,77 +274,172 @@ class StructureMapGroupRuleSource(BackboneElement):
         description="Default value if no value exists",
         default=None,
     )
+    defaultValueBase64Binary_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueBase64Binary extensions",
+        default=None,
+        alias="_defaultValueBase64Binary",
+    )
     defaultValueBoolean: Optional[Boolean] = Field(
         description="Default value if no value exists",
         default=None,
+    )
+    defaultValueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueBoolean extensions",
+        default=None,
+        alias="_defaultValueBoolean",
     )
     defaultValueCanonical: Optional[Canonical] = Field(
         description="Default value if no value exists",
         default=None,
     )
+    defaultValueCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueCanonical extensions",
+        default=None,
+        alias="_defaultValueCanonical",
+    )
     defaultValueCode: Optional[Code] = Field(
         description="Default value if no value exists",
         default=None,
+    )
+    defaultValueCode_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueCode extensions",
+        default=None,
+        alias="_defaultValueCode",
     )
     defaultValueDate: Optional[Date] = Field(
         description="Default value if no value exists",
         default=None,
     )
+    defaultValueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueDate extensions",
+        default=None,
+        alias="_defaultValueDate",
+    )
     defaultValueDateTime: Optional[DateTime] = Field(
         description="Default value if no value exists",
         default=None,
+    )
+    defaultValueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueDateTime extensions",
+        default=None,
+        alias="_defaultValueDateTime",
     )
     defaultValueDecimal: Optional[Decimal] = Field(
         description="Default value if no value exists",
         default=None,
     )
+    defaultValueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueDecimal extensions",
+        default=None,
+        alias="_defaultValueDecimal",
+    )
     defaultValueId: Optional[Id] = Field(
         description="Default value if no value exists",
         default=None,
+    )
+    defaultValueId_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueId extensions",
+        default=None,
+        alias="_defaultValueId",
     )
     defaultValueInstant: Optional[Instant] = Field(
         description="Default value if no value exists",
         default=None,
     )
+    defaultValueInstant_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueInstant extensions",
+        default=None,
+        alias="_defaultValueInstant",
+    )
     defaultValueInteger: Optional[Integer] = Field(
         description="Default value if no value exists",
         default=None,
+    )
+    defaultValueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueInteger extensions",
+        default=None,
+        alias="_defaultValueInteger",
     )
     defaultValueMarkdown: Optional[Markdown] = Field(
         description="Default value if no value exists",
         default=None,
     )
+    defaultValueMarkdown_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueMarkdown extensions",
+        default=None,
+        alias="_defaultValueMarkdown",
+    )
     defaultValueOid: Optional[Oid] = Field(
         description="Default value if no value exists",
         default=None,
+    )
+    defaultValueOid_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueOid extensions",
+        default=None,
+        alias="_defaultValueOid",
     )
     defaultValuePositiveInt: Optional[PositiveInt] = Field(
         description="Default value if no value exists",
         default=None,
     )
+    defaultValuePositiveInt_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValuePositiveInt extensions",
+        default=None,
+        alias="_defaultValuePositiveInt",
+    )
     defaultValueString: Optional[String] = Field(
         description="Default value if no value exists",
         default=None,
+    )
+    defaultValueString_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueString extensions",
+        default=None,
+        alias="_defaultValueString",
     )
     defaultValueTime: Optional[Time] = Field(
         description="Default value if no value exists",
         default=None,
     )
+    defaultValueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueTime extensions",
+        default=None,
+        alias="_defaultValueTime",
+    )
     defaultValueUnsignedInt: Optional[UnsignedInt] = Field(
         description="Default value if no value exists",
         default=None,
+    )
+    defaultValueUnsignedInt_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueUnsignedInt extensions",
+        default=None,
+        alias="_defaultValueUnsignedInt",
     )
     defaultValueUri: Optional[Uri] = Field(
         description="Default value if no value exists",
         default=None,
     )
+    defaultValueUri_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueUri extensions",
+        default=None,
+        alias="_defaultValueUri",
+    )
     defaultValueUrl: Optional[Url] = Field(
         description="Default value if no value exists",
         default=None,
     )
+    defaultValueUrl_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueUrl extensions",
+        default=None,
+        alias="_defaultValueUrl",
+    )
     defaultValueUuid: Optional[Uuid] = Field(
         description="Default value if no value exists",
         default=None,
+    )
+    defaultValueUuid_ext: Optional[Element] = Field(
+        description="Placeholder element for defaultValueUuid extensions",
+        default=None,
+        alias="_defaultValueUuid",
     )
     defaultValueAddress: Optional[Address] = Field(
         description="Default value if no value exists",
@@ -649,21 +744,46 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueId_ext: Optional[Element] = Field(
+        description="Placeholder element for valueId extensions",
+        default=None,
+        alias="_valueId",
+    )
     valueString: Optional[String] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Parameter value - variable or literal",
         default=None,
     )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
+    )
     valueDecimal: Optional[Decimal] = Field(
         description="Parameter value - variable or literal",
         default=None,
+    )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
     )
 
     @property

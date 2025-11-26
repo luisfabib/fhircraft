@@ -238,6 +238,11 @@ class RequestGroupAction(BackboneElement):
         description="When the action should take place",
         default=None,
     )
+    timingDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for timingDateTime extensions",
+        default=None,
+        alias="_timingDateTime",
+    )
     timingAge: Optional[Age] = Field(
         description="When the action should take place",
         default=None,

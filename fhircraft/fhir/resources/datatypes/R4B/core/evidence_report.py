@@ -72,6 +72,11 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
         description="Characteristic value",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueQuantity: Optional[Quantity] = Field(
         description="Characteristic value",
         default=None,
@@ -439,6 +444,11 @@ class EvidenceReport(FHIRBaseModel):
     citeAsMarkdown: Optional[Markdown] = Field(
         description="Citation for this report",
         default=None,
+    )
+    citeAsMarkdown_ext: Optional[Element] = Field(
+        description="Placeholder element for citeAsMarkdown extensions",
+        default=None,
+        alias="_citeAsMarkdown",
     )
     type: Optional[CodeableConcept] = Field(
         description="Kind of report",

@@ -66,6 +66,11 @@ class ClaimResponseEvent(BackboneElement):
         description="Occurance date or period",
         default=None,
     )
+    whenDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for whenDateTime extensions",
+        default=None,
+        alias="_whenDateTime",
+    )
     whenPeriod: Optional[Period] = Field(
         description="Occurance date or period",
         default=None,
@@ -903,6 +908,11 @@ class ClaimResponseAddItem(BackboneElement):
     servicedDate: Optional[Date] = Field(
         description="Date or dates of service or product delivery",
         default=None,
+    )
+    servicedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for servicedDate extensions",
+        default=None,
+        alias="_servicedDate",
     )
     servicedPeriod: Optional[Period] = Field(
         description="Date or dates of service or product delivery",

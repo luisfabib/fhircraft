@@ -203,6 +203,11 @@ class CitationRelatesTo(BackboneElement):
         description="The article or artifact that the Citation Resource is related to",
         default=None,
     )
+    targetUri_ext: Optional[Element] = Field(
+        description="Placeholder element for targetUri extensions",
+        default=None,
+        alias="_targetUri",
+    )
     targetIdentifier: Optional[Identifier] = Field(
         description="The article or artifact that the Citation Resource is related to",
         default=None,
@@ -527,6 +532,11 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
     targetUri: Optional[Uri] = Field(
         description="The article or artifact that the cited artifact is related to",
         default=None,
+    )
+    targetUri_ext: Optional[Element] = Field(
+        description="Placeholder element for targetUri extensions",
+        default=None,
+        alias="_targetUri",
     )
     targetIdentifier: Optional[Identifier] = Field(
         description="The article or artifact that the cited artifact is related to",

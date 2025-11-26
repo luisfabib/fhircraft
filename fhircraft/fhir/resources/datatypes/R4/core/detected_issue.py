@@ -216,6 +216,11 @@ class DetectedIssue(FHIRBaseModel):
         description="When identified",
         default=None,
     )
+    identifiedDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for identifiedDateTime extensions",
+        default=None,
+        alias="_identifiedDateTime",
+    )
     identifiedPeriod: Optional[Period] = Field(
         description="When identified",
         default=None,

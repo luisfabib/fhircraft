@@ -343,13 +343,28 @@ class DeviceProperty(BackboneElement):
         description="Value of the property",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the property",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Value of the property",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueRange: Optional[Range] = Field(
         description="Value of the property",

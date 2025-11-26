@@ -221,6 +221,11 @@ class ArtifactAssessment(FHIRBaseModel):
         description="How to cite the comment or rating",
         default=None,
     )
+    citeAsMarkdown_ext: Optional[Element] = Field(
+        description="Placeholder element for citeAsMarkdown extensions",
+        default=None,
+        alias="_citeAsMarkdown",
+    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
@@ -265,9 +270,19 @@ class ArtifactAssessment(FHIRBaseModel):
         description="The artifact assessed, commented upon or rated",
         default=None,
     )
+    artifactCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for artifactCanonical extensions",
+        default=None,
+        alias="_artifactCanonical",
+    )
     artifactUri: Optional[Uri] = Field(
         description="The artifact assessed, commented upon or rated",
         default=None,
+    )
+    artifactUri_ext: Optional[Element] = Field(
+        description="Placeholder element for artifactUri extensions",
+        default=None,
+        alias="_artifactUri",
     )
     content: Optional[List[ArtifactAssessmentContent]] = Field(
         description="Comment, classifier, or rating content",

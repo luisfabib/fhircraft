@@ -95,6 +95,11 @@ class SubstanceSpecificationMoiety(BackboneElement):
         description="Quantitative value for this moiety",
         default=None,
     )
+    amountString_ext: Optional[Element] = Field(
+        description="Placeholder element for amountString extensions",
+        default=None,
+        alias="_amountString",
+    )
 
     @property
     def amount(self):
@@ -185,6 +190,11 @@ class SubstanceSpecificationProperty(BackboneElement):
     amountString: Optional[String] = Field(
         description="Quantitative value for this property",
         default=None,
+    )
+    amountString_ext: Optional[Element] = Field(
+        description="Placeholder element for amountString extensions",
+        default=None,
+        alias="_amountString",
     )
 
     @property
@@ -810,6 +820,11 @@ class SubstanceSpecificationRelationship(BackboneElement):
     amountString: Optional[String] = Field(
         description="A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other",
         default=None,
+    )
+    amountString_ext: Optional[Element] = Field(
+        description="Placeholder element for amountString extensions",
+        default=None,
+        alias="_amountString",
     )
     amountRatioLowLimit: Optional[Ratio] = Field(
         description="For use when the numeric",

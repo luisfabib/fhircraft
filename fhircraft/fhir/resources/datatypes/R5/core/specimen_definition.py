@@ -123,6 +123,11 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Minimum volume",
         default=None,
     )
+    minimumVolumeString_ext: Optional[Element] = Field(
+        description="Placeholder element for minimumVolumeString extensions",
+        default=None,
+        alias="_minimumVolumeString",
+    )
     additive: Optional[List[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
         description="Additive associated with container",
         default=None,
@@ -443,6 +448,11 @@ class SpecimenDefinition(FHIRBaseModel):
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
+    )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",

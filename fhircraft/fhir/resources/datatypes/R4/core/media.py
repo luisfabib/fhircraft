@@ -147,6 +147,11 @@ class Media(FHIRBaseModel):
         description="When Media was collected",
         default=None,
     )
+    createdDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for createdDateTime extensions",
+        default=None,
+        alias="_createdDateTime",
+    )
     createdPeriod: Optional[Period] = Field(
         description="When Media was collected",
         default=None,

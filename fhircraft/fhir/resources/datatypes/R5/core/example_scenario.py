@@ -267,9 +267,19 @@ class ExampleScenarioInstance(BackboneElement):
         description="Rules instance adheres to",
         default=None,
     )
+    structureProfileCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for structureProfileCanonical extensions",
+        default=None,
+        alias="_structureProfileCanonical",
+    )
     structureProfileUri: Optional[Uri] = Field(
         description="Rules instance adheres to",
         default=None,
+    )
+    structureProfileUri_ext: Optional[Element] = Field(
+        description="Placeholder element for structureProfileUri extensions",
+        default=None,
+        alias="_structureProfileUri",
     )
     title: Optional[String] = Field(
         description="Label for instance",
@@ -904,6 +914,11 @@ class ExampleScenario(FHIRBaseModel):
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
+    )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",

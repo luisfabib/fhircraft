@@ -348,9 +348,19 @@ class MedicinalProductDefinitionCharacteristic(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="A value for the characteristic",
         default=None,
+    )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",

@@ -318,6 +318,11 @@ class NutritionIntake(FHIRBaseModel):
         description="The date/time or interval when the food or fluid is/was consumed",
         default=None,
     )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
+    )
     occurrencePeriod: Optional[Period] = Field(
         description="The date/time or interval when the food or fluid is/was consumed",
         default=None,
@@ -334,6 +339,11 @@ class NutritionIntake(FHIRBaseModel):
     reportedBoolean: Optional[Boolean] = Field(
         description="Person or organization that provided the information about the consumption of this food or fluid",
         default=None,
+    )
+    reportedBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for reportedBoolean extensions",
+        default=None,
+        alias="_reportedBoolean",
     )
     reportedReference: Optional[Reference] = Field(
         description="Person or organization that provided the information about the consumption of this food or fluid",

@@ -856,9 +856,19 @@ class TestScriptSetupActionAssertRequirement(BackboneElement):
         description="Link or reference to the testing requirement",
         default=None,
     )
+    linkUri_ext: Optional[Element] = Field(
+        description="Placeholder element for linkUri extensions",
+        default=None,
+        alias="_linkUri",
+    )
     linkCanonical: Optional[Canonical] = Field(
         description="Link or reference to the testing requirement",
         default=None,
+    )
+    linkCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for linkCanonical extensions",
+        default=None,
+        alias="_linkCanonical",
     )
 
     @property
@@ -1595,9 +1605,19 @@ class TestScriptSetupActionAssertRequirement(BackboneElement):
         description="Link or reference to the testing requirement",
         default=None,
     )
+    linkUri_ext: Optional[Element] = Field(
+        description="Placeholder element for linkUri extensions",
+        default=None,
+        alias="_linkUri",
+    )
     linkCanonical: Optional[Canonical] = Field(
         description="Link or reference to the testing requirement",
         default=None,
+    )
+    linkCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for linkCanonical extensions",
+        default=None,
+        alias="_linkCanonical",
     )
 
     @property
@@ -2233,6 +2253,11 @@ class TestScript(FHIRBaseModel):
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
+    )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
