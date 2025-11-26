@@ -276,7 +276,7 @@ def validate_contained_resource(
     for i, resource in enumerate(resources):
         if isinstance(resource, FHIRBaseModel):
             validated_resources.append(resource)
-        if isinstance(resource, dict) and "resourceType" in resource:
+        elif isinstance(resource, dict) and "resourceType" in resource:
             resourceModel = get_fhir_resource_type(
                 resource["resourceType"], release=release
             )
