@@ -1,13 +1,107 @@
 from copy import copy
-from typing import ClassVar
+from typing import Any, ClassVar, Union
 from typing_extensions import Self
 
-from pydantic import BaseModel, ConfigDict, ValidationError
-from pydantic.fields import FieldInfo
+from pydantic import BaseModel, ConfigDict, ValidationError, PrivateAttr
 from pydantic_core import PydanticUndefined
 
 from fhircraft.fhir.path.mixin import FHIRPathMixin
 from fhircraft.utils import get_all_models_from_field
+
+
+class FHIRList(list):
+    """
+    Custom list wrapper that maintains parent context on mutations.
+
+    This list automatically propagates _parent, _root_resource, _resource, and _index context
+    to FHIRBaseModel items when they are added via append, extend, insert, or __setitem__.
+    """
+
+    def __init__(self, items=None, parent=None, root=None, resource=None):
+        """Initialize FHIRList with items and context."""
+        super().__init__(items or [])
+        self._parent = parent
+        self._root = root
+        self._resource = resource
+        self._propagate_context()
+
+    def _propagate_context(self):
+        """Propagate context to all current items and their nested children."""
+        # Only propagate if we have a parent (otherwise we don't have context yet)
+        if self._parent is None:
+            return
+
+        for index, item in enumerate(self):
+            if isinstance(item, FHIRBaseModel):
+                item._set_resource_context(
+                    parent=self._parent,
+                    root=self._root,
+                    resource=self._resource,
+                    index=index,
+                )
+
+    def append(self, item):
+        """Append item and propagate context."""
+        super().append(item)
+        if isinstance(item, FHIRBaseModel):
+            # Index is the last position
+            index = len(self) - 1
+            item._set_resource_context(
+                parent=self._parent,
+                root=self._root,
+                resource=self._resource,
+                index=index,
+            )
+
+    def extend(self, items):
+        """Extend list and propagate context to new items."""
+        start_index = len(self)
+        super().extend(items)
+        # Only propagate to newly added items
+        for offset, item in enumerate(items):
+            if isinstance(item, FHIRBaseModel):
+                item._set_resource_context(
+                    parent=self._parent,
+                    root=self._root,
+                    resource=self._resource,
+                    index=start_index + offset,
+                )
+
+    def insert(self, index, item):
+        """Insert item and propagate context."""
+        super().insert(index, item)
+        if isinstance(item, FHIRBaseModel):
+            item._set_resource_context(
+                parent=self._parent,
+                root=self._root,
+                resource=self._resource,
+                index=index,
+            )
+        # Re-index all items after insertion point
+        for i in range(index + 1, len(self)):
+            if isinstance(self[i], FHIRBaseModel):
+                object.__setattr__(self[i], "_index", i)
+
+    def __setitem__(self, index, item):
+        """Set item and propagate context."""
+        super().__setitem__(index, item)
+        if isinstance(item, FHIRBaseModel):
+            # Handle single item
+            if isinstance(index, int):
+                item._set_resource_context(
+                    parent=self._parent,
+                    root=self._root,
+                    resource=self._resource,
+                    index=index,
+                )
+            else:
+                # Handle slice assignment - can't easily track indices
+                # So we re-propagate to all items
+                self._propagate_context()
+        elif isinstance(item, list):
+            # Handle slice assignment like lst[1:3] = [...]
+            # Re-propagate to all items to fix indices
+            self._propagate_context()
 
 
 class FHIRBaseModel(BaseModel, FHIRPathMixin):
@@ -18,6 +112,133 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     """
 
     model_config = ConfigDict(defer_build=True)
+
+    _parent: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
+    _root_resource: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
+    _resource: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
+    _index: Union[int, None] = PrivateAttr(default=None)
+
+    def model_post_init(self, context: Any) -> None:
+        """Initialize model and set up parent tracking."""
+        # After construction, propagate context to all nested fields
+        self._set_resource_context()
+
+    def __setattr__(self, name: str, value: Any):
+        """Override to propagate context when fields are assigned after construction."""
+        # Call parent __setattr__ first
+        super().__setattr__(name, value)
+
+        # Only propagate context for actual fields (not private attributes)
+        if not name.startswith("_"):
+            # Propagate context to newly assigned value
+            self._propagate_context_to_value(value)
+
+    def _set_resource_context(
+        self,
+        parent: Union["FHIRBaseModel", None] = None,
+        root: Union["FHIRBaseModel", None] = None,
+        resource: Union["FHIRBaseModel", None] = None,
+        index: Union[int, None] = None,
+    ):
+        """
+        Set parent and root resource context for this instance.
+
+        Args:
+            parent: The parent FHIRBaseModel instance (if this is a nested field)
+            root: The root resource instance (top-level resource)
+            resource: The immediate parent resource instance (has resourceType)
+            index: The index of this instance in a list (if applicable)
+        """
+        # Set parent
+        object.__setattr__(self, "_parent", parent)
+
+        # Set index
+        object.__setattr__(self, "_index", index)
+
+        # Set root: if root is provided, use it; otherwise if parent exists, use parent's root; otherwise self is root
+        if root is not None:
+            object.__setattr__(self, "_root_resource", root)
+        elif parent is not None and hasattr(parent, "_root_resource"):
+            object.__setattr__(
+                self, "_root_resource", getattr(parent, "_root_resource", parent)
+            )
+        else:
+            # This instance is the root
+            object.__setattr__(self, "_root_resource", self)
+
+        # Set resource: if this instance is a resource, it becomes the _resource
+        # otherwise inherit from parent or explicit resource parameter
+        if hasattr(self, "resourceType"):
+            # This is a resource itself
+            object.__setattr__(self, "_resource", self)
+        elif resource is not None:
+            # Explicit resource provided
+            object.__setattr__(self, "_resource", resource)
+        elif parent is not None and hasattr(parent, "_resource"):
+            # Inherit resource from parent
+            object.__setattr__(self, "_resource", getattr(parent, "_resource", None))
+        else:
+            # No resource context
+            object.__setattr__(self, "_resource", None)
+
+        # Propagate context to all nested fields
+        for field_name in self.__class__.model_fields:
+            value = getattr(self, field_name, None)
+            if value is not None:
+                self._propagate_context_to_value(value)
+
+    def _propagate_context_to_value(self, value: Any):
+        """
+        Propagate parent context to a field value.
+
+        Args:
+            value: The field value (can be FHIRBaseModel, list, or other)
+        """
+        if isinstance(value, FHIRBaseModel):
+            # Single FHIR model - set context
+            # Determine resource: if self is a resource, use self; otherwise use self's _resource
+            resource_context = (
+                self
+                if hasattr(self, "resourceType")
+                else getattr(self, "_resource", None)
+            )
+            value._set_resource_context(
+                parent=self,
+                root=getattr(self, "_root_resource", self),
+                resource=resource_context,
+                index=None,
+            )
+        elif isinstance(value, list):
+            # Convert to FHIRList if not already
+            if not isinstance(value, FHIRList):
+                # Replace the list with FHIRList
+                resource_context = (
+                    self
+                    if hasattr(self, "resourceType")
+                    else getattr(self, "_resource", None)
+                )
+                fhir_list = FHIRList(
+                    value,
+                    parent=self,
+                    root=getattr(self, "_root_resource", self),
+                    resource=resource_context,
+                )
+                # Find which field this list belongs to and replace it
+                for field_name in self.__class__.model_fields:
+                    if getattr(self, field_name, None) is value:
+                        object.__setattr__(self, field_name, fhir_list)
+                        break
+            else:
+                # Update context of existing FHIRList
+                resource_context = (
+                    self
+                    if hasattr(self, "resourceType")
+                    else getattr(self, "_resource", None)
+                )
+                value._parent = self
+                value._root = getattr(self, "_root_resource", self)
+                value._resource = resource_context
+                value._propagate_context()
 
     def model_dump(self, *args, **kwargs):
         kwargs.update({"by_alias": True, "exclude_none": True})
@@ -39,8 +260,12 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             instance (Self): An instance of the model.
         """
         instance = super().model_construct(*args, **kwargs)
+
         if not set_defaults:
+            # Still need to set context even if not setting defaults
+            instance._set_resource_context()
             return instance
+
         # Set default values for fields that have them defined
         for field_name, field in cls.model_fields.items():
             if getattr(instance, field_name, None) is not None:
@@ -49,7 +274,65 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 setattr(instance, field_name, copy(field.default))
             elif field.default_factory not in (PydanticUndefined, None):
                 setattr(instance, field_name, field.default_factory)
+
+        # Set context after all fields are set
+        instance._set_resource_context()
         return instance
+
+    def model_copy(
+        self, *, update: dict[str, Any] | None = None, deep: bool = False
+    ) -> Self:
+        """
+        Override model_copy to reset parent context on copied instance.
+
+        Args:
+            update: Optional dict of field updates to apply to the copy
+            deep: Whether to perform a deep copy
+
+        Returns:
+            A copied instance with reset parent context
+        """
+        # Avoid calling __deepcopy__ since model_copy(deep=True) calls it without memo
+        # Instead, let Pydantic do the copy, then reset context
+        copied: Self = BaseModel.model_copy(self, update=update, deep=deep)  # type: ignore
+        # Reset context - copied instance should be a new root
+        copied._set_resource_context()
+        return copied
+
+    def __deepcopy__(self, memo: dict) -> Self:
+        """
+        Override deepcopy to handle circular parent references properly.
+
+        Args:
+            memo: Dictionary for tracking already copied objects
+
+        Returns:
+            A deep copied instance with reset parent context
+        """
+        # Simple approach: serialize and deserialize to get a deep copy
+        # This avoids recursion issues and properly handles all Pydantic internals
+        data = self.model_dump()
+        copied = self.__class__.model_validate(data)
+
+        # Register in memo
+        memo[id(self)] = copied
+
+        # Context is automatically set during model_validate via __init__
+        return copied
+
+    def __eq__(self, other):
+        """
+        Override equality to exclude tracking attributes from comparison.
+
+        This prevents infinite recursion when comparing models with circular
+        parent references via _parent and _root_resource.
+        """
+        if not isinstance(other, self.__class__):
+            return False
+
+        # Compare only the actual field values, not tracking attributes
+        # We use model_dump to get just the field data without private attributes
+        return self.model_dump() == other.model_dump()
 
     @classmethod
     def model_construct_with_slices(cls, slice_copies: int = 9) -> object:
