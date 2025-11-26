@@ -12,7 +12,7 @@ import warnings
 from datetime import date, datetime, time
 from typing import TYPE_CHECKING, Any, Type, Union
 
-from pydantic import BaseModel, Field, ValidationError, create_model
+from pydantic import TypeAdapter, Field, ValidationError, create_model
 from typing_extensions import TypeAliasType
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
@@ -75,20 +75,6 @@ def get_fhir_resource_type(type_str: str, release="R4B") -> type:
     return resource
 
 
-def is_fhir_primitive(value: Any) -> bool:
-    """Check if a value is a FHIR primitive type."""
-    primitive_types = tuple(
-        getattr(primitives, name)
-        for name in dir(primitives)
-        if not name.startswith("_")
-        and isinstance(getattr(primitives, name), TypeAliasType)
-    )
-    return any(
-        is_fhir_primitive_type(value, ptype, raise_on_error=False)
-        for ptype in primitive_types
-    )
-
-
 # Type checking functions
 def is_fhir_primitive_type(
     value: Any, fhir_type: Type | TypeAliasType | str, raise_on_error: bool = True
@@ -127,27 +113,14 @@ def is_fhir_primitive_type(
             return False
 
     # For TypeAliasType, use Pydantic validation
-    if isinstance(fhir_type, TypeAliasType):
-        try:
-            # Create a temporary model with the field type
-            TestModel = create_model("TestModel", field=(fhir_type, Field()))
-            TestModel(field=value)
-            return True
-        except ValidationError:
-            return False
-
-    # For complex types, try instantiation
+    if not isinstance(fhir_type, TypeAliasType):
+        raise FHIRTypeError(f"fhir_type must be a TypeAliasType or string name")
     try:
-        if hasattr(fhir_type, "model_validate"):
-            if isinstance(value, dict):
-                fhir_type.model_validate(value)  # type: ignore
-            else:
-                fhir_type(value)  # type: ignore
-            return True
-    except (ValidationError, TypeError):
+        ta = TypeAdapter(fhir_type)
+        ta.validate_python(value)
+        return True
+    except ValidationError:
         return False
-
-    return False
 
 
 def is_fhir_complex_type(
@@ -279,7 +252,7 @@ def is_date(value: Any) -> bool:
     return (
         is_fhir_primitive_type(value, primitives.Date)
         if isinstance(value, str)
-        else isinstance(value, date) and not is_datetime(value)
+        else isinstance(value, date) and not isinstance(value, datetime)
     )
 
 
@@ -288,7 +261,7 @@ def is_datetime(value: Any) -> bool:
     return (
         is_fhir_primitive_type(value, primitives.DateTime)
         if isinstance(value, str)
-        else isinstance(value, datetime) and not is_date(value)
+        else isinstance(value, datetime)
     )
 
 
@@ -334,6 +307,31 @@ def is_positive_int(value: Any) -> bool:
 def is_uuid(value: Any) -> bool:
     """Check if value is a valid FHIR Uuid."""
     return is_fhir_primitive_type(value, primitives.Uuid)
+
+
+def is_fhir_primitive(value: Any) -> bool:
+    """Check if a value is a FHIR primitive type."""
+    return (
+        is_string(value)
+        or is_boolean(value)
+        or is_integer(value)
+        or is_decimal(value)
+        or is_date(value)
+        or is_datetime(value)
+        or is_time(value)
+        or is_code(value)
+        or is_uri(value)
+        or is_url(value)
+        or is_canonical(value)
+        or is_base64binary(value)
+        or is_instant(value)
+        or is_oid(value)
+        or is_id(value)
+        or is_markdown(value)
+        or is_unsigned_int(value)
+        or is_positive_int(value)
+        or is_uuid(value)
+    )
 
 
 # Type conversion functions with core logic
