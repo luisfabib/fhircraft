@@ -6,6 +6,7 @@ from fhircraft.fhir.resources.base import FHIRBaseModel
 
 
 class MockPatient(FHIRBaseModel):
+    resourceType: str = "Patient"
     id: str
     contained: list
 
@@ -15,6 +16,7 @@ class MockReference(FHIRBaseModel):
 
 
 class MockObservation(FHIRBaseModel):
+    resourceType: str = "Observation"
     subject: MockReference
 
 
