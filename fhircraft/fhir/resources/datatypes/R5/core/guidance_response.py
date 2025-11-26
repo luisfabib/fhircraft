@@ -113,9 +113,19 @@ class GuidanceResponse(FHIRBaseModel):
         description="What guidance was requested",
         default=None,
     )
+    moduleUri_ext: Optional[Element] = Field(
+        description="Placeholder element for moduleUri extensions",
+        default=None,
+        alias="_moduleUri",
+    )
     moduleCanonical: Optional[Canonical] = Field(
         description="What guidance was requested",
         default=None,
+    )
+    moduleCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for moduleCanonical extensions",
+        default=None,
+        alias="_moduleCanonical",
     )
     moduleCodeableConcept: Optional[CodeableConcept] = Field(
         description="What guidance was requested",

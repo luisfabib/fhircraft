@@ -173,9 +173,19 @@ class TestReportSetupActionAssertRequirement(BackboneElement):
         description="Link or reference to the testing requirement",
         default=None,
     )
+    linkUri_ext: Optional[Element] = Field(
+        description="Placeholder element for linkUri extensions",
+        default=None,
+        alias="_linkUri",
+    )
     linkCanonical: Optional[Canonical] = Field(
         description="Link or reference to the testing requirement",
         default=None,
+    )
+    linkCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for linkCanonical extensions",
+        default=None,
+        alias="_linkCanonical",
     )
 
     @property
@@ -406,9 +416,19 @@ class TestReportSetupActionAssertRequirement(BackboneElement):
         description="Link or reference to the testing requirement",
         default=None,
     )
+    linkUri_ext: Optional[Element] = Field(
+        description="Placeholder element for linkUri extensions",
+        default=None,
+        alias="_linkUri",
+    )
     linkCanonical: Optional[Canonical] = Field(
         description="Link or reference to the testing requirement",
         default=None,
+    )
+    linkCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for linkCanonical extensions",
+        default=None,
+        alias="_linkCanonical",
     )
 
     @property

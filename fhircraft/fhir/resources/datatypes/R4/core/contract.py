@@ -243,33 +243,73 @@ class ContractTermOfferAnswer(BackboneElement):
         description="The actual answer response",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueDecimal: Optional[Decimal] = Field(
         description="The actual answer response",
         default=None,
+    )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
     )
     valueInteger: Optional[Integer] = Field(
         description="The actual answer response",
         default=None,
     )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
+    )
     valueDate: Optional[Date] = Field(
         description="The actual answer response",
         default=None,
+    )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
     )
     valueDateTime: Optional[DateTime] = Field(
         description="The actual answer response",
         default=None,
     )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
+    )
     valueTime: Optional[Time] = Field(
         description="The actual answer response",
         default=None,
+    )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
     )
     valueString: Optional[String] = Field(
         description="The actual answer response",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueUri: Optional[Uri] = Field(
         description="The actual answer response",
         default=None,
+    )
+    valueUri_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUri extensions",
+        default=None,
+        alias="_valueUri",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="The actual answer response",
@@ -486,33 +526,73 @@ class ContractTermAssetAnswer(BackboneElement):
         description="The actual answer response",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueDecimal: Optional[Decimal] = Field(
         description="The actual answer response",
         default=None,
+    )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
     )
     valueInteger: Optional[Integer] = Field(
         description="The actual answer response",
         default=None,
     )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
+    )
     valueDate: Optional[Date] = Field(
         description="The actual answer response",
         default=None,
+    )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
     )
     valueDateTime: Optional[DateTime] = Field(
         description="The actual answer response",
         default=None,
     )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
+    )
     valueTime: Optional[Time] = Field(
         description="The actual answer response",
         default=None,
+    )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
     )
     valueString: Optional[String] = Field(
         description="The actual answer response",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueUri: Optional[Uri] = Field(
         description="The actual answer response",
         default=None,
+    )
+    valueUri_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUri extensions",
+        default=None,
+        alias="_valueUri",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="The actual answer response",
@@ -977,6 +1057,11 @@ class ContractTermAction(BackboneElement):
     occurrenceDateTime: Optional[DateTime] = Field(
         description="When action happens",
         default=None,
+    )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When action happens",

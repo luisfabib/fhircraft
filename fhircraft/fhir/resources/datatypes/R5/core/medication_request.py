@@ -191,6 +191,11 @@ class MedicationRequestSubstitution(BackboneElement):
         description="Whether substitution is allowed or not",
         default=None,
     )
+    allowedBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for allowedBoolean extensions",
+        default=None,
+        alias="_allowedBoolean",
+    )
     allowedCodeableConcept: Optional[CodeableConcept] = Field(
         description="Whether substitution is allowed or not",
         default=None,

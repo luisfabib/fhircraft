@@ -61,6 +61,11 @@ class MolecularSequenceRelativeStartingSequence(BackboneElement):
         description="The reference sequence that represents the starting sequence",
         default=None,
     )
+    sequenceString_ext: Optional[Element] = Field(
+        description="Placeholder element for sequenceString extensions",
+        default=None,
+        alias="_sequenceString",
+    )
     sequenceReference: Optional[Reference] = Field(
         description="The reference sequence that represents the starting sequence",
         default=None,

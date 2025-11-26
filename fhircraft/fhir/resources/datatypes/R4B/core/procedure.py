@@ -249,6 +249,11 @@ class Procedure(FHIRBaseModel):
         description="When the procedure was performed",
         default=None,
     )
+    performedDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for performedDateTime extensions",
+        default=None,
+        alias="_performedDateTime",
+    )
     performedPeriod: Optional[Period] = Field(
         description="When the procedure was performed",
         default=None,
@@ -256,6 +261,11 @@ class Procedure(FHIRBaseModel):
     performedString: Optional[String] = Field(
         description="When the procedure was performed",
         default=None,
+    )
+    performedString_ext: Optional[Element] = Field(
+        description="Placeholder element for performedString extensions",
+        default=None,
+        alias="_performedString",
     )
     performedAge: Optional[Age] = Field(
         description="When the procedure was performed",

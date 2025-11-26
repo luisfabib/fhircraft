@@ -73,6 +73,11 @@ class SupplyRequestParameter(BackboneElement):
         description="Value of detail",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
 
     @property
     def value(self):
@@ -205,6 +210,11 @@ class SupplyRequest(FHIRBaseModel):
     occurrenceDateTime: Optional[DateTime] = Field(
         description="When the request should be fulfilled",
         default=None,
+    )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When the request should be fulfilled",

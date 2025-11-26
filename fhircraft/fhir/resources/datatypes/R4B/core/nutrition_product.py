@@ -143,6 +143,11 @@ class NutritionProductProductCharacteristic(BackboneElement):
         description="The value of the characteristic",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueQuantity: Optional[Quantity] = Field(
         description="The value of the characteristic",
         default=None,
@@ -151,6 +156,11 @@ class NutritionProductProductCharacteristic(BackboneElement):
         description="The value of the characteristic",
         default=None,
     )
+    valueBase64Binary_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBase64Binary extensions",
+        default=None,
+        alias="_valueBase64Binary",
+    )
     valueAttachment: Optional[Attachment] = Field(
         description="The value of the characteristic",
         default=None,
@@ -158,6 +168,11 @@ class NutritionProductProductCharacteristic(BackboneElement):
     valueBoolean: Optional[Boolean] = Field(
         description="The value of the characteristic",
         default=None,
+    )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
     )
 
     @property

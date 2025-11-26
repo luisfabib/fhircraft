@@ -68,6 +68,11 @@ class PaymentReconciliationAllocation(BackboneElement):
         description="Sub-element of the subject",
         default=None,
     )
+    targetItemString_ext: Optional[Element] = Field(
+        description="Placeholder element for targetItemString extensions",
+        default=None,
+        alias="_targetItemString",
+    )
     targetItemIdentifier: Optional[Identifier] = Field(
         description="Sub-element of the subject",
         default=None,
@@ -75,6 +80,11 @@ class PaymentReconciliationAllocation(BackboneElement):
     targetItemPositiveInt: Optional[PositiveInt] = Field(
         description="Sub-element of the subject",
         default=None,
+    )
+    targetItemPositiveInt_ext: Optional[Element] = Field(
+        description="Placeholder element for targetItemPositiveInt extensions",
+        default=None,
+        alias="_targetItemPositiveInt",
     )
     encounter: Optional[Reference] = Field(
         description="Applied-to encounter",

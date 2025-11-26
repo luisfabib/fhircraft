@@ -331,13 +331,28 @@ class ImplementationGuideDefinitionPage(BackboneElement):
         description="Source for page",
         default=None,
     )
+    sourceUrl_ext: Optional[Element] = Field(
+        description="Placeholder element for sourceUrl extensions",
+        default=None,
+        alias="_sourceUrl",
+    )
     sourceString: Optional[String] = Field(
         description="Source for page",
         default=None,
     )
+    sourceString_ext: Optional[Element] = Field(
+        description="Placeholder element for sourceString extensions",
+        default=None,
+        alias="_sourceString",
+    )
     sourceMarkdown: Optional[Markdown] = Field(
         description="Source for page",
         default=None,
+    )
+    sourceMarkdown_ext: Optional[Element] = Field(
+        description="Placeholder element for sourceMarkdown extensions",
+        default=None,
+        alias="_sourceMarkdown",
     )
     name: Optional[Url] = Field(
         description="Name of the page when published",
@@ -872,6 +887,11 @@ class ImplementationGuide(FHIRBaseModel):
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
+    )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",

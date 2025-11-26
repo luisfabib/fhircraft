@@ -119,6 +119,11 @@ class MedicinalProductAuthorizationProcedure(BackboneElement):
         description="Date of procedure",
         default=None,
     )
+    dateDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for dateDateTime extensions",
+        default=None,
+        alias="_dateDateTime",
+    )
     application: Optional[List["MedicinalProductAuthorizationProcedure"]] = Field(
         description="Applcations submitted to obtain a marketing authorization",
         default=None,

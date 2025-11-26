@@ -83,6 +83,11 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueQuantity: Optional[Quantity] = Field(
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
@@ -98,6 +103,11 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
     valueId: Optional[Id] = Field(
         description="Defines the characteristic when coupled with characteristic.type",
         default=None,
+    )
+    valueId_ext: Optional[Element] = Field(
+        description="Placeholder element for valueId extensions",
+        default=None,
+        alias="_valueId",
     )
     offset: Optional[CodeableConcept] = Field(
         description="Reference point for valueQuantity or valueRange",
@@ -235,9 +245,19 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
         description="The event used as a base point (reference point) in time",
         default=None,
     )
+    eventDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for eventDateTime extensions",
+        default=None,
+        alias="_eventDateTime",
+    )
     eventId: Optional[Id] = Field(
         description="The event used as a base point (reference point) in time",
         default=None,
+    )
+    eventId_ext: Optional[Element] = Field(
+        description="Placeholder element for eventId extensions",
+        default=None,
+        alias="_eventId",
     )
     quantity: Optional[Quantity] = Field(
         description="Used to express the observation at a defined amount of time before or after the event",
@@ -617,6 +637,11 @@ class EvidenceVariable(FHIRBaseModel):
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
+    )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",

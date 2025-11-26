@@ -113,6 +113,11 @@ class ExplanationOfBenefitEvent(BackboneElement):
         description="Occurance date or period",
         default=None,
     )
+    whenDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for whenDateTime extensions",
+        default=None,
+        alias="_whenDateTime",
+    )
     whenPeriod: Optional[Period] = Field(
         description="Occurance date or period",
         default=None,
@@ -282,6 +287,11 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
         description="When it occurred",
         default=None,
     )
+    timingDate_ext: Optional[Element] = Field(
+        description="Placeholder element for timingDate extensions",
+        default=None,
+        alias="_timingDate",
+    )
     timingPeriod: Optional[Period] = Field(
         description="When it occurred",
         default=None,
@@ -290,9 +300,19 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
         description="Data to be provided",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueString: Optional[String] = Field(
         description="Data to be provided",
         default=None,
+    )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueQuantity: Optional[Quantity] = Field(
         description="Data to be provided",
@@ -1338,6 +1358,11 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Date or dates of service or product delivery",
         default=None,
     )
+    servicedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for servicedDate extensions",
+        default=None,
+        alias="_servicedDate",
+    )
     servicedPeriod: Optional[Period] = Field(
         description="Date or dates of service or product delivery",
         default=None,
@@ -1922,6 +1947,11 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Date or dates of service or product delivery",
         default=None,
     )
+    servicedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for servicedDate extensions",
+        default=None,
+        alias="_servicedDate",
+    )
     servicedPeriod: Optional[Period] = Field(
         description="Date or dates of service or product delivery",
         default=None,
@@ -2293,9 +2323,19 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
         description="Benefits allowed",
         default=None,
     )
+    allowedUnsignedInt_ext: Optional[Element] = Field(
+        description="Placeholder element for allowedUnsignedInt extensions",
+        default=None,
+        alias="_allowedUnsignedInt",
+    )
     allowedString: Optional[String] = Field(
         description="Benefits allowed",
         default=None,
+    )
+    allowedString_ext: Optional[Element] = Field(
+        description="Placeholder element for allowedString extensions",
+        default=None,
+        alias="_allowedString",
     )
     allowedMoney: Optional[Money] = Field(
         description="Benefits allowed",
@@ -2304,6 +2344,11 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
     usedUnsignedInt: Optional[UnsignedInt] = Field(
         description="Benefits used",
         default=None,
+    )
+    usedUnsignedInt_ext: Optional[Element] = Field(
+        description="Placeholder element for usedUnsignedInt extensions",
+        default=None,
+        alias="_usedUnsignedInt",
     )
     usedMoney: Optional[Money] = Field(
         description="Benefits used",

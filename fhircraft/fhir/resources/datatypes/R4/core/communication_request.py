@@ -56,6 +56,11 @@ class CommunicationRequestPayload(BackboneElement):
         description="Message part content",
         default=None,
     )
+    contentString_ext: Optional[Element] = Field(
+        description="Placeholder element for contentString extensions",
+        default=None,
+        alias="_contentString",
+    )
     contentAttachment: Optional[Attachment] = Field(
         description="Message part content",
         default=None,
@@ -211,6 +216,11 @@ class CommunicationRequest(FHIRBaseModel):
     occurrenceDateTime: Optional[DateTime] = Field(
         description="When scheduled",
         default=None,
+    )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When scheduled",

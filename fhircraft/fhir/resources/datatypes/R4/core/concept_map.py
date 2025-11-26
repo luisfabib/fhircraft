@@ -700,17 +700,37 @@ class ConceptMap(FHIRBaseModel):
         description="The source value set that contains the concepts that are being mapped",
         default=None,
     )
+    sourceUri_ext: Optional[Element] = Field(
+        description="Placeholder element for sourceUri extensions",
+        default=None,
+        alias="_sourceUri",
+    )
     sourceCanonical: Optional[Canonical] = Field(
         description="The source value set that contains the concepts that are being mapped",
         default=None,
+    )
+    sourceCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for sourceCanonical extensions",
+        default=None,
+        alias="_sourceCanonical",
     )
     targetUri: Optional[Uri] = Field(
         description="The target value set which provides context for the mappings",
         default=None,
     )
+    targetUri_ext: Optional[Element] = Field(
+        description="Placeholder element for targetUri extensions",
+        default=None,
+        alias="_targetUri",
+    )
     targetCanonical: Optional[Canonical] = Field(
         description="The target value set which provides context for the mappings",
         default=None,
+    )
+    targetCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for targetCanonical extensions",
+        default=None,
+        alias="_targetCanonical",
     )
     group: Optional[List[ConceptMapGroup]] = Field(
         description="Same source and target systems",

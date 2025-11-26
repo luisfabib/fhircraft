@@ -278,6 +278,11 @@ class ActivityDefinition(FHIRBaseModel):
         description="Type of individual the activity definition is intended for",
         default=None,
     )
+    subjectCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for subjectCanonical extensions",
+        default=None,
+        alias="_subjectCanonical",
+    )
     date: Optional[DateTime] = Field(
         description="Date last changed",
         default=None,
@@ -455,6 +460,11 @@ class ActivityDefinition(FHIRBaseModel):
     timingDateTime: Optional[DateTime] = Field(
         description="When activity is to occur",
         default=None,
+    )
+    timingDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for timingDateTime extensions",
+        default=None,
+        alias="_timingDateTime",
     )
     timingAge: Optional[Age] = Field(
         description="When activity is to occur",

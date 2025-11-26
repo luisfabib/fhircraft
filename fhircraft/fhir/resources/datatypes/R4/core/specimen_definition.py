@@ -110,6 +110,11 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         description="Minimum volume",
         default=None,
     )
+    minimumVolumeString_ext: Optional[Element] = Field(
+        description="Placeholder element for minimumVolumeString extensions",
+        default=None,
+        alias="_minimumVolumeString",
+    )
     additive: Optional[List[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
         description="Additive associated with container",
         default=None,

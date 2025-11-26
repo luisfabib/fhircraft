@@ -755,6 +755,11 @@ class Evidence(FHIRBaseModel):
         description="How to compare versions",
         default=None,
     )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
+    )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
@@ -784,6 +789,11 @@ class Evidence(FHIRBaseModel):
     citeAsMarkdown: Optional[Markdown] = Field(
         description="Citation for this evidence",
         default=None,
+    )
+    citeAsMarkdown_ext: Optional[Element] = Field(
+        description="Placeholder element for citeAsMarkdown extensions",
+        default=None,
+        alias="_citeAsMarkdown",
     )
     status: Optional[Code] = Field(
         description="draft | active | retired | unknown",

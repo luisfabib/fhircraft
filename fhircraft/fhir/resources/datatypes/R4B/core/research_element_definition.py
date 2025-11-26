@@ -68,6 +68,11 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="What code or expression defines members?",
         default=None,
     )
+    definitionCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for definitionCanonical extensions",
+        default=None,
+        alias="_definitionCanonical",
+    )
     definitionExpression: Optional[Expression] = Field(
         description="What code or expression defines members?",
         default=None,
@@ -106,6 +111,11 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
         description="What time period does the study cover",
         default=None,
     )
+    studyEffectiveDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for studyEffectiveDateTime extensions",
+        default=None,
+        alias="_studyEffectiveDateTime",
+    )
     studyEffectivePeriod: Optional[Period] = Field(
         description="What time period does the study cover",
         default=None,
@@ -143,6 +153,11 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
     participantEffectiveDateTime: Optional[DateTime] = Field(
         description="What time period do participants cover",
         default=None,
+    )
+    participantEffectiveDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for participantEffectiveDateTime extensions",
+        default=None,
+        alias="_participantEffectiveDateTime",
     )
     participantEffectivePeriod: Optional[Period] = Field(
         description="What time period do participants cover",

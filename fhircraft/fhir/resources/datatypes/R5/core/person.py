@@ -233,9 +233,19 @@ class Person(FHIRBaseModel):
         description="Indicates if the individual is deceased or not",
         default=None,
     )
+    deceasedBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for deceasedBoolean extensions",
+        default=None,
+        alias="_deceasedBoolean",
+    )
     deceasedDateTime: Optional[DateTime] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
+    )
+    deceasedDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for deceasedDateTime extensions",
+        default=None,
+        alias="_deceasedDateTime",
     )
     address: Optional[List[Address]] = Field(
         description="One or more addresses for the person",

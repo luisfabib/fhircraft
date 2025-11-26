@@ -61,6 +61,11 @@ class RiskAssessmentPrediction(BackboneElement):
         description="Likelihood of specified outcome",
         default=None,
     )
+    probabilityDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for probabilityDecimal extensions",
+        default=None,
+        alias="_probabilityDecimal",
+    )
     probabilityRange: Optional[Range] = Field(
         description="Likelihood of specified outcome",
         default=None,
@@ -253,6 +258,11 @@ class RiskAssessment(FHIRBaseModel):
     occurrenceDateTime: Optional[DateTime] = Field(
         description="When was assessment made?",
         default=None,
+    )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
     )
     occurrencePeriod: Optional[Period] = Field(
         description="When was assessment made?",

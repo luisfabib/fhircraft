@@ -245,9 +245,19 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         description="Is an example/What is this an example of?",
         default=None,
     )
+    exampleBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for exampleBoolean extensions",
+        default=None,
+        alias="_exampleBoolean",
+    )
     exampleCanonical: Optional[Canonical] = Field(
         description="Is an example/What is this an example of?",
         default=None,
+    )
+    exampleCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for exampleCanonical extensions",
+        default=None,
+        alias="_exampleCanonical",
     )
     groupingId: Optional[Id] = Field(
         description="Grouping this is part of",
@@ -316,6 +326,11 @@ class ImplementationGuideDefinitionPage(BackboneElement):
     nameUrl: Optional[Url] = Field(
         description="Where to find that page",
         default=None,
+    )
+    nameUrl_ext: Optional[Element] = Field(
+        description="Placeholder element for nameUrl extensions",
+        default=None,
+        alias="_nameUrl",
     )
     nameReference: Optional[Reference] = Field(
         description="Where to find that page",
@@ -567,9 +582,19 @@ class ImplementationGuideManifestResource(BackboneElement):
         description="Is an example/What is this an example of?",
         default=None,
     )
+    exampleBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for exampleBoolean extensions",
+        default=None,
+        alias="_exampleBoolean",
+    )
     exampleCanonical: Optional[Canonical] = Field(
         description="Is an example/What is this an example of?",
         default=None,
+    )
+    exampleCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for exampleCanonical extensions",
+        default=None,
+        alias="_exampleCanonical",
     )
     relativePath: Optional[Url] = Field(
         description="Relative path for page in IG",

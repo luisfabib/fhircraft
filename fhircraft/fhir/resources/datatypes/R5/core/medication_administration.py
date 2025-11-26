@@ -282,6 +282,11 @@ class MedicationAdministration(FHIRBaseModel):
         description="Specific date/time or interval of time during which the administration took place (or did not take place)",
         default=None,
     )
+    occurenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurenceDateTime extensions",
+        default=None,
+        alias="_occurenceDateTime",
+    )
     occurencePeriod: Optional[Period] = Field(
         description="Specific date/time or interval of time during which the administration took place (or did not take place)",
         default=None,

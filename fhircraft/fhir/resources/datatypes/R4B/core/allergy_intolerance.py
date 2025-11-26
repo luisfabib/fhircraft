@@ -240,6 +240,11 @@ class AllergyIntolerance(FHIRBaseModel):
         description="When allergy or intolerance was identified",
         default=None,
     )
+    onsetDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for onsetDateTime extensions",
+        default=None,
+        alias="_onsetDateTime",
+    )
     onsetAge: Optional[Age] = Field(
         description="When allergy or intolerance was identified",
         default=None,
@@ -255,6 +260,11 @@ class AllergyIntolerance(FHIRBaseModel):
     onsetString: Optional[String] = Field(
         description="When allergy or intolerance was identified",
         default=None,
+    )
+    onsetString_ext: Optional[Element] = Field(
+        description="Placeholder element for onsetString extensions",
+        default=None,
+        alias="_onsetString",
     )
     recordedDate: Optional[DateTime] = Field(
         description="Date first version of the resource instance was recorded",

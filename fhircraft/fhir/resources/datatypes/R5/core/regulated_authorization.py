@@ -71,6 +71,11 @@ class RegulatedAuthorizationCase(BackboneElement):
         description="Relevant date for this case",
         default=None,
     )
+    dateDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for dateDateTime extensions",
+        default=None,
+        alias="_dateDateTime",
+    )
     application: Optional[List["RegulatedAuthorizationCase"]] = Field(
         description="Applications submitted to obtain a regulated authorization. Steps within the longer running case or procedure",
         default=None,

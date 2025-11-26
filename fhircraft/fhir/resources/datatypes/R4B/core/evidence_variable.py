@@ -132,6 +132,11 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="What code or expression defines members?",
         default=None,
     )
+    definitionCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for definitionCanonical extensions",
+        default=None,
+        alias="_definitionCanonical",
+    )
     definitionCodeableConcept: Optional[CodeableConcept] = Field(
         description="What code or expression defines members?",
         default=None,

@@ -536,6 +536,11 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
         description="Description of the characteristic",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueQuantity: Optional[Quantity] = Field(
         description="Description of the characteristic",
         default=None,
@@ -543,6 +548,11 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
     valueBase64Binary: Optional[Base64Binary] = Field(
         description="Description of the characteristic",
         default=None,
+    )
+    valueBase64Binary_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBase64Binary extensions",
+        default=None,
+        alias="_valueBase64Binary",
     )
 
     @property

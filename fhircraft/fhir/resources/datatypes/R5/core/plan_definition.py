@@ -89,13 +89,28 @@ class PlanDefinitionGoalTarget(BackboneElement):
         description="The target value to be achieved",
         default=None,
     )
+    detailString_ext: Optional[Element] = Field(
+        description="Placeholder element for detailString extensions",
+        default=None,
+        alias="_detailString",
+    )
     detailBoolean: Optional[Boolean] = Field(
         description="The target value to be achieved",
         default=None,
     )
+    detailBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for detailBoolean extensions",
+        default=None,
+        alias="_detailBoolean",
+    )
     detailInteger: Optional[Integer] = Field(
         description="The target value to be achieved",
         default=None,
+    )
+    detailInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for detailInteger extensions",
+        default=None,
+        alias="_detailInteger",
     )
     detailRatio: Optional[Ratio] = Field(
         description="The target value to be achieved",
@@ -797,6 +812,11 @@ class PlanDefinitionAction(BackboneElement):
         description="Type of individual the action is focused on",
         default=None,
     )
+    subjectCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for subjectCanonical extensions",
+        default=None,
+        alias="_subjectCanonical",
+    )
     trigger: Optional[List[TriggerDefinition]] = Field(
         description="When the action should be triggered",
         default=None,
@@ -894,9 +914,19 @@ class PlanDefinitionAction(BackboneElement):
         description="Description of the activity to be performed",
         default=None,
     )
+    definitionCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for definitionCanonical extensions",
+        default=None,
+        alias="_definitionCanonical",
+    )
     definitionUri: Optional[Uri] = Field(
         description="Description of the activity to be performed",
         default=None,
+    )
+    definitionUri_ext: Optional[Element] = Field(
+        description="Placeholder element for definitionUri extensions",
+        default=None,
+        alias="_definitionUri",
     )
     transform: Optional[Canonical] = Field(
         description="Transform to apply the template",
@@ -1165,6 +1195,11 @@ class PlanDefinition(FHIRBaseModel):
         description="How to compare versions",
         default=None,
     )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
+    )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
@@ -1229,6 +1264,11 @@ class PlanDefinition(FHIRBaseModel):
     subjectCanonical: Optional[Canonical] = Field(
         description="Type of individual the plan definition is focused on",
         default=None,
+    )
+    subjectCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for subjectCanonical extensions",
+        default=None,
+        alias="_subjectCanonical",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",
@@ -1375,6 +1415,11 @@ class PlanDefinition(FHIRBaseModel):
     asNeededBoolean: Optional[Boolean] = Field(
         description="Preconditions for service",
         default=None,
+    )
+    asNeededBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for asNeededBoolean extensions",
+        default=None,
+        alias="_asNeededBoolean",
     )
     asNeededCodeableConcept: Optional[CodeableConcept] = Field(
         description="Preconditions for service",

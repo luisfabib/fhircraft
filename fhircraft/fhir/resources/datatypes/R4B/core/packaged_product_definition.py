@@ -107,6 +107,11 @@ class PackagedProductDefinitionPackageShelfLifeStorage(BackboneElement):
         description="The shelf life time period can be specified using a numerical value for the period of time and its unit of time measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,
     )
+    periodString_ext: Optional[Element] = Field(
+        description="Placeholder element for periodString extensions",
+        default=None,
+        alias="_periodString",
+    )
     specialPrecautionsForStorage: Optional[List[CodeableConcept]] = Field(
         description="Special precautions for storage, if any, can be specified using an appropriate controlled vocabulary. The controlled term and the controlled term identifier shall be specified",
         default=None,
@@ -173,9 +178,19 @@ class PackagedProductDefinitionPackageProperty(BackboneElement):
         description="A value for the characteristic",
         default=None,
     )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="A value for the characteristic",
         default=None,
+    )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the characteristic",

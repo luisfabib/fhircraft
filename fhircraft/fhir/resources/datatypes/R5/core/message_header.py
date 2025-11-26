@@ -55,6 +55,11 @@ class MessageHeaderDestination(BackboneElement):
         description="Actual destination address or Endpoint resource",
         default=None,
     )
+    endpointUrl_ext: Optional[Element] = Field(
+        description="Placeholder element for endpointUrl extensions",
+        default=None,
+        alias="_endpointUrl",
+    )
     endpointReference: Optional[Reference] = Field(
         description="Actual destination address or Endpoint resource",
         default=None,
@@ -128,6 +133,11 @@ class MessageHeaderSource(BackboneElement):
     endpointUrl: Optional[Url] = Field(
         description="Actual source address or Endpoint resource",
         default=None,
+    )
+    endpointUrl_ext: Optional[Element] = Field(
+        description="Placeholder element for endpointUrl extensions",
+        default=None,
+        alias="_endpointUrl",
     )
     endpointReference: Optional[Reference] = Field(
         description="Actual source address or Endpoint resource",
@@ -323,6 +333,11 @@ class MessageHeader(FHIRBaseModel):
     eventCanonical: Optional[Canonical] = Field(
         description="Event code or link to EventDefinition",
         default=None,
+    )
+    eventCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for eventCanonical extensions",
+        default=None,
+        alias="_eventCanonical",
     )
     destination: Optional[List[MessageHeaderDestination]] = Field(
         description="Message destination application(s)",

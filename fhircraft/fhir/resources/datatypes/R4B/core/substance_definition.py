@@ -97,6 +97,11 @@ class SubstanceDefinitionMoiety(BackboneElement):
         description="Quantitative value for this moiety",
         default=None,
     )
+    amountString_ext: Optional[Element] = Field(
+        description="Placeholder element for amountString extensions",
+        default=None,
+        alias="_amountString",
+    )
     measurementType: Optional[CodeableConcept] = Field(
         description="The measurement type of the quantitative value",
         default=None,
@@ -178,9 +183,19 @@ class SubstanceDefinitionProperty(BackboneElement):
         description="A value for the property",
         default=None,
     )
+    valueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="A value for the property",
         default=None,
+    )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="A value for the property",
@@ -717,6 +732,11 @@ class SubstanceDefinitionRelationship(BackboneElement):
     amountString: Optional[String] = Field(
         description="A numeric factor for the relationship, e.g. that a substance salt has some percentage of active substance in relation to some other",
         default=None,
+    )
+    amountString_ext: Optional[Element] = Field(
+        description="Placeholder element for amountString extensions",
+        default=None,
+        alias="_amountString",
     )
     ratioHighLimitAmount: Optional[Ratio] = Field(
         description="For use when the numeric has an uncertain range",

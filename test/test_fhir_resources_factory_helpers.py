@@ -613,6 +613,45 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         field_type, field_info = fields["valueBoolean"]
         assert field_type == Optional[primitives.Boolean]
 
+    def test_primitive_type_creates_extension_field(self):
+        # Test that when a primitive type is in the choice, an extension field is also created
+        element_types = [primitives.DateTime]
+        basename = "deceased"
+        max_card = 1
+        fields = self.factory._construct_type_choice_fields(
+            basename, element_types, max_card
+        )
+        # Should have both the main field and the extension field
+        assert "deceasedDateTime" in fields
+        assert "deceasedDateTime_ext" in fields
+        
+        # Verify the main field
+        field_type, field_info = fields["deceasedDateTime"]
+        assert field_type == Optional[primitives.DateTime]
+        
+        # Verify the extension field
+        ext_field_type, ext_field_info = fields["deceasedDateTime_ext"]
+        assert ext_field_type == Optional[complex.Element]
+        assert ext_field_info.alias == "_deceasedDateTime"
+
+    def test_mixed_primitive_and_complex_types_create_extension_only_for_primitives(self):
+        # Test that extension fields are only created for primitive types
+        element_types = [primitives.Boolean, primitives.DateTime, complex.CodeableConcept]
+        basename = "value"
+        max_card = 1
+        fields = self.factory._construct_type_choice_fields(
+            basename, element_types, max_card
+        )
+        # Should have main fields for all types
+        assert "valueBoolean" in fields
+        assert "valueDateTime" in fields
+        assert "valueCodeableConcept" in fields
+        
+        # Should have extension fields only for primitives
+        assert "valueBoolean_ext" in fields
+        assert "valueDateTime_ext" in fields
+        assert "valueCodeableConcept_ext" not in fields
+
 
 # ----------------------------------------------------------------
 # _parse_element_cardinality()

@@ -253,6 +253,11 @@ class ActivityDefinition(FHIRBaseModel):
         description="How to compare versions",
         default=None,
     )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
+    )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
@@ -313,6 +318,11 @@ class ActivityDefinition(FHIRBaseModel):
     subjectCanonical: Optional[Canonical] = Field(
         description="Type of individual the activity definition is intended for",
         default=None,
+    )
+    subjectCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for subjectCanonical extensions",
+        default=None,
+        alias="_subjectCanonical",
     )
     date: Optional[DateTime] = Field(
         description="Date last changed",
@@ -512,6 +522,11 @@ class ActivityDefinition(FHIRBaseModel):
     asNeededBoolean: Optional[Boolean] = Field(
         description="Preconditions for service",
         default=None,
+    )
+    asNeededBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for asNeededBoolean extensions",
+        default=None,
+        alias="_asNeededBoolean",
     )
     asNeededCodeableConcept: Optional[CodeableConcept] = Field(
         description="Preconditions for service",

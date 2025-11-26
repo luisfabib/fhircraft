@@ -149,6 +149,11 @@ class TestPlanTestCaseTestRunScript(BackboneElement):
         description="The actual content of the cases - references to TestScripts or externally defined content",
         default=None,
     )
+    sourceString_ext: Optional[Element] = Field(
+        description="Placeholder element for sourceString extensions",
+        default=None,
+        alias="_sourceString",
+    )
     sourceReference: Optional[Reference] = Field(
         description="The actual content of the cases - references to TestScripts or externally defined content",
         default=None,
@@ -244,6 +249,11 @@ class TestPlanTestCaseTestData(BackboneElement):
     sourceString: Optional[String] = Field(
         description="Pointer to a definition of test resources - narrative or structured e.g. synthetic data generation, etc",
         default=None,
+    )
+    sourceString_ext: Optional[Element] = Field(
+        description="Placeholder element for sourceString extensions",
+        default=None,
+        alias="_sourceString",
     )
     sourceReference: Optional[Reference] = Field(
         description="Pointer to a definition of test resources - narrative or structured e.g. synthetic data generation, etc",
@@ -486,6 +496,11 @@ class TestPlan(FHIRBaseModel):
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
+    )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",

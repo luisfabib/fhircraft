@@ -584,6 +584,11 @@ class ClaimResponseAddItem(BackboneElement):
         description="Date or dates of service or product delivery",
         default=None,
     )
+    servicedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for servicedDate extensions",
+        default=None,
+        alias="_servicedDate",
+    )
     servicedPeriod: Optional[Period] = Field(
         description="Date or dates of service or product delivery",
         default=None,

@@ -250,6 +250,11 @@ class MessageDefinition(FHIRBaseModel):
         description="How to compare versions",
         default=None,
     )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
+    )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",
         default=None,
@@ -390,6 +395,11 @@ class MessageDefinition(FHIRBaseModel):
     eventUri: Optional[Uri] = Field(
         description="Event code  or link to the EventDefinition",
         default=None,
+    )
+    eventUri_ext: Optional[Element] = Field(
+        description="Placeholder element for eventUri extensions",
+        default=None,
+        alias="_eventUri",
     )
     category: Optional[Code] = Field(
         description="consequence | currency | notification",

@@ -55,6 +55,11 @@ class SpecimenCollection(BackboneElement):
         description="Collection time",
         default=None,
     )
+    collectedDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for collectedDateTime extensions",
+        default=None,
+        alias="_collectedDateTime",
+    )
     collectedPeriod: Optional[Period] = Field(
         description="Collection time",
         default=None,
@@ -174,6 +179,11 @@ class SpecimenProcessing(BackboneElement):
     timeDateTime: Optional[DateTime] = Field(
         description="Date and time of specimen processing",
         default=None,
+    )
+    timeDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for timeDateTime extensions",
+        default=None,
+        alias="_timeDateTime",
     )
     timePeriod: Optional[Period] = Field(
         description="Date and time of specimen processing",

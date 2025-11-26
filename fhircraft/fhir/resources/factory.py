@@ -756,6 +756,11 @@ class ResourceFactory:
                 description=description,
                 validation_alias=validation_alias,
             )
+            # If the field type is a FHIR primitive, add the extension field
+            if hasattr(primitives, str(field_type)):
+                fields.update(
+                    self._construct_primitive_extension_field(typed_field_name)
+                )
         return fields
 
     def _construct_slice_model(

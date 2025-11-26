@@ -731,29 +731,64 @@ class ValueSetExpansionParameter(BackboneElement):
         description="Value of the named parameter",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the named parameter",
         default=None,
+    )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
     )
     valueInteger: Optional[Integer] = Field(
         description="Value of the named parameter",
         default=None,
     )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
+    )
     valueDecimal: Optional[Decimal] = Field(
         description="Value of the named parameter",
         default=None,
+    )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
     )
     valueUri: Optional[Uri] = Field(
         description="Value of the named parameter",
         default=None,
     )
+    valueUri_ext: Optional[Element] = Field(
+        description="Placeholder element for valueUri extensions",
+        default=None,
+        alias="_valueUri",
+    )
     valueCode: Optional[Code] = Field(
         description="Value of the named parameter",
         default=None,
     )
+    valueCode_ext: Optional[Element] = Field(
+        description="Placeholder element for valueCode extensions",
+        default=None,
+        alias="_valueCode",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Value of the named parameter",
         default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
     )
 
     @property
@@ -915,6 +950,11 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
         description="Value of the subproperty for this concept",
         default=None,
     )
+    valueCode_ext: Optional[Element] = Field(
+        description="Placeholder element for valueCode extensions",
+        default=None,
+        alias="_valueCode",
+    )
     valueCoding: Optional[Coding] = Field(
         description="Value of the subproperty for this concept",
         default=None,
@@ -923,21 +963,46 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
         description="Value of the subproperty for this concept",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Value of the subproperty for this concept",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Value of the subproperty for this concept",
         default=None,
     )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
+    )
     valueDecimal: Optional[Decimal] = Field(
         description="Value of the subproperty for this concept",
         default=None,
+    )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
     )
 
     @property
@@ -989,6 +1054,11 @@ class ValueSetExpansionContainsProperty(BackboneElement):
         description="Value of the property for this concept",
         default=None,
     )
+    valueCode_ext: Optional[Element] = Field(
+        description="Placeholder element for valueCode extensions",
+        default=None,
+        alias="_valueCode",
+    )
     valueCoding: Optional[Coding] = Field(
         description="Value of the property for this concept",
         default=None,
@@ -997,21 +1067,46 @@ class ValueSetExpansionContainsProperty(BackboneElement):
         description="Value of the property for this concept",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Value of the property for this concept",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of the property for this concept",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Value of the property for this concept",
         default=None,
     )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
+    )
     valueDecimal: Optional[Decimal] = Field(
         description="Value of the property for this concept",
         default=None,
+    )
+    valueDecimal_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
     )
     subProperty: Optional[List[ValueSetExpansionContainsPropertySubProperty]] = Field(
         description="SubProperty value for the concept",
@@ -1444,6 +1539,11 @@ class ValueSet(FHIRBaseModel):
     versionAlgorithmString: Optional[String] = Field(
         description="How to compare versions",
         default=None,
+    )
+    versionAlgorithmString_ext: Optional[Element] = Field(
+        description="Placeholder element for versionAlgorithmString extensions",
+        default=None,
+        alias="_versionAlgorithmString",
     )
     versionAlgorithmCoding: Optional[Coding] = Field(
         description="How to compare versions",

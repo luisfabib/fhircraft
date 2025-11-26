@@ -76,13 +76,28 @@ class GoalTarget(BackboneElement):
         description="The target value to be achieved",
         default=None,
     )
+    detailString_ext: Optional[Element] = Field(
+        description="Placeholder element for detailString extensions",
+        default=None,
+        alias="_detailString",
+    )
     detailBoolean: Optional[Boolean] = Field(
         description="The target value to be achieved",
         default=None,
     )
+    detailBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for detailBoolean extensions",
+        default=None,
+        alias="_detailBoolean",
+    )
     detailInteger: Optional[Integer] = Field(
         description="The target value to be achieved",
         default=None,
+    )
+    detailInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for detailInteger extensions",
+        default=None,
+        alias="_detailInteger",
     )
     detailRatio: Optional[Ratio] = Field(
         description="The target value to be achieved",
@@ -91,6 +106,11 @@ class GoalTarget(BackboneElement):
     dueDate: Optional[Date] = Field(
         description="Reach goal on or before",
         default=None,
+    )
+    dueDate_ext: Optional[Element] = Field(
+        description="Placeholder element for dueDate extensions",
+        default=None,
+        alias="_dueDate",
     )
     dueDuration: Optional[Duration] = Field(
         description="Reach goal on or before",
@@ -251,6 +271,11 @@ class Goal(FHIRBaseModel):
     startDate: Optional[Date] = Field(
         description="When goal pursuit begins",
         default=None,
+    )
+    startDate_ext: Optional[Element] = Field(
+        description="Placeholder element for startDate extensions",
+        default=None,
+        alias="_startDate",
     )
     startCodeableConcept: Optional[CodeableConcept] = Field(
         description="When goal pursuit begins",

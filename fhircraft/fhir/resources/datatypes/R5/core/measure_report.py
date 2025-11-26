@@ -152,6 +152,11 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
         description="The stratum component value, e.g. male",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueQuantity: Optional[Quantity] = Field(
         description="The stratum component value, e.g. male",
         default=None,
@@ -294,6 +299,11 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         description="The stratum value, e.g. male",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueQuantity: Optional[Quantity] = Field(
         description="The stratum value, e.g. male",
         default=None,
@@ -321,6 +331,11 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
     measureScoreDateTime: Optional[DateTime] = Field(
         description="What score this stratum achieved",
         default=None,
+    )
+    measureScoreDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for measureScoreDateTime extensions",
+        default=None,
+        alias="_measureScoreDateTime",
     )
     measureScoreCodeableConcept: Optional[CodeableConcept] = Field(
         description="What score this stratum achieved",
@@ -478,6 +493,11 @@ class MeasureReportGroup(BackboneElement):
     measureScoreDateTime: Optional[DateTime] = Field(
         description="What score this group achieved",
         default=None,
+    )
+    measureScoreDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for measureScoreDateTime extensions",
+        default=None,
+        alias="_measureScoreDateTime",
     )
     measureScoreCodeableConcept: Optional[CodeableConcept] = Field(
         description="What score this group achieved",

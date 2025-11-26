@@ -263,6 +263,11 @@ class Procedure(FHIRBaseModel):
         description="When the procedure occurred or is occurring",
         default=None,
     )
+    occurrenceDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceDateTime extensions",
+        default=None,
+        alias="_occurrenceDateTime",
+    )
     occurrencePeriod: Optional[Period] = Field(
         description="When the procedure occurred or is occurring",
         default=None,
@@ -270,6 +275,11 @@ class Procedure(FHIRBaseModel):
     occurrenceString: Optional[String] = Field(
         description="When the procedure occurred or is occurring",
         default=None,
+    )
+    occurrenceString_ext: Optional[Element] = Field(
+        description="Placeholder element for occurrenceString extensions",
+        default=None,
+        alias="_occurrenceString",
     )
     occurrenceAge: Optional[Age] = Field(
         description="When the procedure occurred or is occurring",
@@ -299,6 +309,11 @@ class Procedure(FHIRBaseModel):
     reportedBoolean: Optional[Boolean] = Field(
         description="Reported rather than primary record",
         default=None,
+    )
+    reportedBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for reportedBoolean extensions",
+        default=None,
+        alias="_reportedBoolean",
     )
     reportedReference: Optional[Reference] = Field(
         description="Reported rather than primary record",

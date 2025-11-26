@@ -305,6 +305,11 @@ class MessageHeader(FHIRBaseModel):
         description="Code for the event this message represents or link to event definition",
         default=None,
     )
+    eventUri_ext: Optional[Element] = Field(
+        description="Placeholder element for eventUri extensions",
+        default=None,
+        alias="_eventUri",
+    )
     destination: Optional[List[MessageHeaderDestination]] = Field(
         description="Message destination application(s)",
         default=None,

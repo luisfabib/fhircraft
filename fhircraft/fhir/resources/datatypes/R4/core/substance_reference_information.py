@@ -219,6 +219,11 @@ class SubstanceReferenceInformationTarget(BackboneElement):
         description="Todo",
         default=None,
     )
+    amountString_ext: Optional[Element] = Field(
+        description="Placeholder element for amountString extensions",
+        default=None,
+        alias="_amountString",
+    )
     amountType: Optional[CodeableConcept] = Field(
         description="Todo",
         default=None,

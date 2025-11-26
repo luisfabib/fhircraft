@@ -131,6 +131,11 @@ class CarePlanActivityDetail(BackboneElement):
         description="When activity is to occur",
         default=None,
     )
+    scheduledString_ext: Optional[Element] = Field(
+        description="Placeholder element for scheduledString extensions",
+        default=None,
+        alias="_scheduledString",
+    )
     location: Optional[Reference] = Field(
         description="Where it should happen",
         default=None,

@@ -450,9 +450,19 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
         description="The source of the classification",
         default=None,
     )
+    sourceString_ext: Optional[Element] = Field(
+        description="Placeholder element for sourceString extensions",
+        default=None,
+        alias="_sourceString",
+    )
     sourceUri: Optional[Uri] = Field(
         description="The source of the classification",
         default=None,
+    )
+    sourceUri_ext: Optional[Element] = Field(
+        description="Placeholder element for sourceUri extensions",
+        default=None,
+        alias="_sourceUri",
     )
     classification: Optional[List[CodeableConcept]] = Field(
         description="Specific category assigned to the medication",
@@ -939,6 +949,11 @@ class MedicationKnowledgeDefinitionalDrugCharacteristic(BackboneElement):
         description="Description of the characteristic",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueQuantity: Optional[Quantity] = Field(
         description="Description of the characteristic",
         default=None,
@@ -946,6 +961,11 @@ class MedicationKnowledgeDefinitionalDrugCharacteristic(BackboneElement):
     valueBase64Binary: Optional[Base64Binary] = Field(
         description="Description of the characteristic",
         default=None,
+    )
+    valueBase64Binary_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBase64Binary extensions",
+        default=None,
+        alias="_valueBase64Binary",
     )
     valueAttachment: Optional[Attachment] = Field(
         description="Description of the characteristic",

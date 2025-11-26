@@ -140,17 +140,37 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         description="Recommended dose number within series",
         default=None,
     )
+    doseNumberPositiveInt_ext: Optional[Element] = Field(
+        description="Placeholder element for doseNumberPositiveInt extensions",
+        default=None,
+        alias="_doseNumberPositiveInt",
+    )
     doseNumberString: Optional[String] = Field(
         description="Recommended dose number within series",
         default=None,
+    )
+    doseNumberString_ext: Optional[Element] = Field(
+        description="Placeholder element for doseNumberString extensions",
+        default=None,
+        alias="_doseNumberString",
     )
     seriesDosesPositiveInt: Optional[PositiveInt] = Field(
         description="Recommended number of doses for immunity",
         default=None,
     )
+    seriesDosesPositiveInt_ext: Optional[Element] = Field(
+        description="Placeholder element for seriesDosesPositiveInt extensions",
+        default=None,
+        alias="_seriesDosesPositiveInt",
+    )
     seriesDosesString: Optional[String] = Field(
         description="Recommended number of doses for immunity",
         default=None,
+    )
+    seriesDosesString_ext: Optional[Element] = Field(
+        description="Placeholder element for seriesDosesString extensions",
+        default=None,
+        alias="_seriesDosesString",
     )
     supportingImmunization: Optional[List[Reference]] = Field(
         description="Past immunizations supporting recommendation",

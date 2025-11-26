@@ -313,9 +313,19 @@ class Patient(FHIRBaseModel):
         description="Indicates if the individual is deceased or not",
         default=None,
     )
+    deceasedBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for deceasedBoolean extensions",
+        default=None,
+        alias="_deceasedBoolean",
+    )
     deceasedDateTime: Optional[DateTime] = Field(
         description="Indicates if the individual is deceased or not",
         default=None,
+    )
+    deceasedDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for deceasedDateTime extensions",
+        default=None,
+        alias="_deceasedDateTime",
     )
     address: Optional[List[Address]] = Field(
         description="An address for the individual",
@@ -329,9 +339,19 @@ class Patient(FHIRBaseModel):
         description="Whether patient is part of a multiple birth",
         default=None,
     )
+    multipleBirthBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for multipleBirthBoolean extensions",
+        default=None,
+        alias="_multipleBirthBoolean",
+    )
     multipleBirthInteger: Optional[Integer] = Field(
         description="Whether patient is part of a multiple birth",
         default=None,
+    )
+    multipleBirthInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for multipleBirthInteger extensions",
+        default=None,
+        alias="_multipleBirthInteger",
     )
     photo: Optional[List[Attachment]] = Field(
         description="Image of the patient",

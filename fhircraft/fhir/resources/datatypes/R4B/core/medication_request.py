@@ -176,6 +176,11 @@ class MedicationRequestSubstitution(BackboneElement):
         description="Whether substitution is allowed or not",
         default=None,
     )
+    allowedBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for allowedBoolean extensions",
+        default=None,
+        alias="_allowedBoolean",
+    )
     allowedCodeableConcept: Optional[CodeableConcept] = Field(
         description="Whether substitution is allowed or not",
         default=None,
@@ -322,6 +327,11 @@ class MedicationRequest(FHIRBaseModel):
     reportedBoolean: Optional[Boolean] = Field(
         description="Reported rather than primary record",
         default=None,
+    )
+    reportedBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for reportedBoolean extensions",
+        default=None,
+        alias="_reportedBoolean",
     )
     reportedReference: Optional[Reference] = Field(
         description="Reported rather than primary record",

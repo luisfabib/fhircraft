@@ -289,13 +289,28 @@ class ObservationComponent(BackboneElement):
         description="Actual component result",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="Actual component result",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Actual component result",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueRange: Optional[Range] = Field(
         description="Actual component result",
@@ -313,9 +328,19 @@ class ObservationComponent(BackboneElement):
         description="Actual component result",
         default=None,
     )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Actual component result",
         default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
     )
     valuePeriod: Optional[Period] = Field(
         description="Actual component result",
@@ -465,6 +490,11 @@ class Observation(FHIRBaseModel):
         description="Instantiates FHIR ObservationDefinition",
         default=None,
     )
+    instantiatesCanonical_ext: Optional[Element] = Field(
+        description="Placeholder element for instantiatesCanonical extensions",
+        default=None,
+        alias="_instantiatesCanonical",
+    )
     instantiatesReference: Optional[Reference] = Field(
         description="Instantiates FHIR ObservationDefinition",
         default=None,
@@ -514,6 +544,11 @@ class Observation(FHIRBaseModel):
         description="Clinically relevant time/time-period for observation",
         default=None,
     )
+    effectiveDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for effectiveDateTime extensions",
+        default=None,
+        alias="_effectiveDateTime",
+    )
     effectivePeriod: Optional[Period] = Field(
         description="Clinically relevant time/time-period for observation",
         default=None,
@@ -525,6 +560,11 @@ class Observation(FHIRBaseModel):
     effectiveInstant: Optional[Instant] = Field(
         description="Clinically relevant time/time-period for observation",
         default=None,
+    )
+    effectiveInstant_ext: Optional[Element] = Field(
+        description="Placeholder element for effectiveInstant extensions",
+        default=None,
+        alias="_effectiveInstant",
     )
     issued: Optional[Instant] = Field(
         description="Date/Time this version was made available",
@@ -551,13 +591,28 @@ class Observation(FHIRBaseModel):
         description="Actual result",
         default=None,
     )
+    valueString_ext: Optional[Element] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="Actual result",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Actual result",
         default=None,
+    )
+    valueInteger_ext: Optional[Element] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueRange: Optional[Range] = Field(
         description="Actual result",
@@ -575,9 +630,19 @@ class Observation(FHIRBaseModel):
         description="Actual result",
         default=None,
     )
+    valueTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Actual result",
         default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
     )
     valuePeriod: Optional[Period] = Field(
         description="Actual result",

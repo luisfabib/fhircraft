@@ -62,6 +62,11 @@ class CoverageEligibilityRequestEvent(BackboneElement):
         description="Occurance date or period",
         default=None,
     )
+    whenDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for whenDateTime extensions",
+        default=None,
+        alias="_whenDateTime",
+    )
     whenPeriod: Optional[Period] = Field(
         description="Occurance date or period",
         default=None,
@@ -432,6 +437,11 @@ class CoverageEligibilityRequest(FHIRBaseModel):
     servicedDate: Optional[Date] = Field(
         description="Estimated date or dates of service",
         default=None,
+    )
+    servicedDate_ext: Optional[Element] = Field(
+        description="Placeholder element for servicedDate extensions",
+        default=None,
+        alias="_servicedDate",
     )
     servicedPeriod: Optional[Period] = Field(
         description="Estimated date or dates of service",

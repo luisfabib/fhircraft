@@ -374,6 +374,11 @@ class MessageDefinition(FHIRBaseModel):
         description="Event code  or link to the EventDefinition",
         default=None,
     )
+    eventUri_ext: Optional[Element] = Field(
+        description="Placeholder element for eventUri extensions",
+        default=None,
+        alias="_eventUri",
+    )
     category: Optional[Code] = Field(
         description="consequence | currency | notification",
         default=None,

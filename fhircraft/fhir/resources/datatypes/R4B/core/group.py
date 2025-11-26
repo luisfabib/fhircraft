@@ -64,6 +64,11 @@ class GroupCharacteristic(BackboneElement):
         description="Value held by characteristic",
         default=None,
     )
+    valueBoolean_ext: Optional[Element] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
+    )
     valueQuantity: Optional[Quantity] = Field(
         description="Value held by characteristic",
         default=None,
