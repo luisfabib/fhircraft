@@ -1351,7 +1351,6 @@ class ResourceFactory:
                     description="Metadata about the resource.",
                     default=Meta(
                         profile=[_structure_definition.url],
-                        versionId=_structure_definition.version,
                     ),
                 ),
             )
