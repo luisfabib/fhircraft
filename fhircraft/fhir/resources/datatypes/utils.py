@@ -10,6 +10,7 @@ import importlib
 import re
 import warnings
 from datetime import date, datetime, time
+from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Type, Union
 
 from pydantic import TypeAdapter, Field, ValidationError, create_model
@@ -26,6 +27,10 @@ class FHIRTypeError(Exception):
     """Raised when type checking or conversion fails."""
 
     pass
+
+
+# Cache for TypeAdapter instances to avoid repeated creation
+_type_adapter_cache: dict[int, TypeAdapter] = {}
 
 
 def get_fhir_primitive_type(type_str: str) -> type | None:
@@ -115,9 +120,14 @@ def is_fhir_primitive_type(
     # For TypeAliasType, use Pydantic validation
     if not isinstance(fhir_type, TypeAliasType):
         raise FHIRTypeError(f"fhir_type must be a TypeAliasType or string name")
+
+    # Use cached TypeAdapter to avoid recreating it on every call
+    type_id = id(fhir_type)
+    if type_id not in _type_adapter_cache:
+        _type_adapter_cache[type_id] = TypeAdapter(fhir_type)
+
     try:
-        ta = TypeAdapter(fhir_type)
-        ta.validate_python(value)
+        _type_adapter_cache[type_id].validate_python(value)
         return True
     except ValidationError:
         return False
