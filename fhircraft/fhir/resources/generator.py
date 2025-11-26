@@ -57,8 +57,17 @@ class CodeGenerator:
             Any: The cleaned-up argument.
         """
         if isinstance(arg, str):
-            escape_quotes = arg.replace('"', '\\"')
-            return f'"{escape_quotes}"'
+            # Check if the string contains newlines
+            if "\n" in arg:
+                # Use triple-quoted strings for multi-line strings
+                # Escape backslashes first, then any existing triple quotes
+                escaped_str = arg.replace("\\", "\\\\").replace('"""', r"\"\"\"")
+                return f'"""{escaped_str}"""'
+            else:
+                # Use regular double-quoted strings for single-line strings
+                # Escape backslashes first, then double quotes
+                escaped_str = arg.replace("\\", "\\\\").replace('"', '\\"')
+                return f'"{escaped_str}"'
         elif isinstance(arg, BaseModel):
             self._add_constant_value_imports(arg)
             return repr(arg)

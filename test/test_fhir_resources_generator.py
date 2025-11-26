@@ -450,3 +450,136 @@ class TestJinjaTemplateRendering(unittest.TestCase):
                 )
         """
         self.assertBlockInCode(expected_block, model)
+
+    def test_model_with_multiline_expression(self):
+        # Create model with multiline FHIRPath expression
+        multiline_expression = """extension.where(url = 'http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality').exists() and
+      extension.where(url = 'http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality').value.exists() and
+      extension.where(url = 'http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-modality').value.coding.exists(system = 'http://snomed.info/sct' and code = '10611004')
+   implies
+      extension.where(url = 'http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-technique').exists()"""
+
+        model = create_model(
+            "ModelWithMultilineExpression",
+            code=(
+                CodeableConcept,
+                Field(description="A code field with multiline constraint."),
+            ),
+            __validators__={
+                "FHIR_TechniquesForProtonBeamModality_constraint_model_validator": (
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_model_constraint,
+                            expression=multiline_expression,
+                            human="Allowed Techniques for Proton Beam Modality",
+                            key="TechniquesForProtonBeamModality",
+                            severity="error",
+                        )
+                    )
+                )
+            },
+        )
+
+        # Generate the code
+        code = generate_resource_model_code(model)
+
+        # Verify that triple quotes are used for multiline expression
+        self.assertIn(
+            'expression="""extension.where',
+            code,
+            "Multiline expression should use triple quotes",
+        )
+        self.assertIn("extension.where(url", code)
+        self.assertIn("TechniquesForProtonBeamModality", code)
+
+        # Verify the code is valid Python by attempting to compile it
+        try:
+            compile(code, "<generated>", "exec")
+        except SyntaxError as e:
+            self.fail(
+                f"Generated code has syntax error: {e}\n\nGenerated code:\n{code}"
+            )
+
+    def test_model_with_string_containing_quotes(self):
+        # Create model with expression containing double quotes
+        expression_with_quotes = 'This is a "quoted" string'
+
+        model = create_model(
+            "ModelWithQuotedString",
+            code=(
+                CodeableConcept,
+                Field(description="A code field."),
+            ),
+            __validators__={
+                "FHIR_test_constraint": (
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_model_constraint,
+                            expression=expression_with_quotes,
+                            human="Test with quotes",
+                            key="test-1",
+                            severity="error",
+                        )
+                    )
+                )
+            },
+        )
+
+        # Generate the code
+        code = generate_resource_model_code(model)
+
+        # Verify that quotes are properly escaped
+        self.assertIn(
+            'expression="This is a \\"quoted\\" string"',
+            code,
+            "Double quotes should be escaped in single-line strings",
+        )
+
+        # Verify the code is valid Python
+        try:
+            compile(code, "<generated>", "exec")
+        except SyntaxError as e:
+            self.fail(
+                f"Generated code has syntax error: {e}\n\nGenerated code:\n{code}"
+            )
+
+    def test_model_with_string_containing_backslashes(self):
+        # Create model with expression containing backslashes
+        expression_with_backslashes = "C:\\path\\to\\file"
+
+        model = create_model(
+            "ModelWithBackslashes",
+            code=(
+                CodeableConcept,
+                Field(description="A code field."),
+            ),
+            __validators__={
+                "FHIR_test_constraint": (
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_model_constraint,
+                            expression=expression_with_backslashes,
+                            human="Test with backslashes",
+                            key="test-1",
+                            severity="error",
+                        )
+                    )
+                )
+            },
+        )
+
+        # Generate the code
+        code = generate_resource_model_code(model)
+
+        # Verify the code is valid Python and backslashes are properly handled
+        try:
+            compile(code, "<generated>", "exec")
+        except SyntaxError as e:
+            self.fail(
+                f"Generated code has syntax error: {e}\n\nGenerated code:\n{code}"
+            )
+
+        # Execute the code and verify the string value is preserved
+        namespace = {}
+        exec(code, namespace)
+        # The expression string should be preserved correctly
