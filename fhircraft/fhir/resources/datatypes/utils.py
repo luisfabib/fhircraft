@@ -252,7 +252,7 @@ def is_date(value: Any) -> bool:
     return (
         is_fhir_primitive_type(value, primitives.Date)
         if isinstance(value, str)
-        else isinstance(value, date) and not is_datetime(value)
+        else isinstance(value, date) and not isinstance(value, datetime)
     )
 
 
@@ -261,7 +261,7 @@ def is_datetime(value: Any) -> bool:
     return (
         is_fhir_primitive_type(value, primitives.DateTime)
         if isinstance(value, str)
-        else isinstance(value, datetime) and not is_date(value)
+        else isinstance(value, datetime)
     )
 
 
