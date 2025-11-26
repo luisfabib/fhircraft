@@ -18,6 +18,7 @@ from fhircraft.fhir.resources.datatypes.utils import (  # Type checking function
     is_date,
     is_datetime,
     is_decimal,
+    is_fhir_primitive,
     is_fhir_primitive_type,
     is_fhir_complex_type,
     is_fhir_resource_type,
@@ -95,6 +96,19 @@ def test_is_decimal(value, expected):
 )
 def test_is_string(value, expected):
     assert is_string(value) == expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("http://example.com", True),
+        ("https://example.com/resource", True),
+        ("ftp://example.com/file", True),
+        (123, False),
+    ],
+)
+def test_is_uri(value, expected):
+    assert is_uri(value) == expected
 
 
 @pytest.mark.parametrize(
@@ -287,6 +301,22 @@ def test_utility_functions():
 )
 def test_is_fhir_primitive_type(value, fhir_type, expected):
     assert is_fhir_primitive_type(value, fhir_type) == expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("true", True),
+        (123, True),
+        ("2023-12-25", True),
+        ("http://example.com", True),  # URI
+        ("10:30:00", True),  # Time
+        ("12.34", True),  # Decimal
+        (Coding(code="123", system="example.com"), False),
+    ],
+)
+def test_is_fhir_primitive(value, expected):
+    assert is_fhir_primitive(value) == expected
 
 
 @pytest.mark.parametrize(
