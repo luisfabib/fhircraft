@@ -103,10 +103,15 @@ class TestPolymorphicSerialization:
         patient = MockModel(anyResource=resource)
 
         # Temporarily disable polymorphic serialization
-        patient_dict = patient.model_dump(polymorphic=False)
+        original_setting = MockModel._enable_polymorphic_serialization
+        try:
+            MockModel._enable_polymorphic_serialization = False
+            patient_dict = patient.model_dump()
 
-        # The valueString field should be lost when polymorphic serialization is disabled
-        assert "valueString" not in patient_dict["anyResource"]
+            # The valueString field should be lost when polymorphic serialization is disabled
+            assert "valueString" not in patient_dict["anyResource"]
+        finally:
+            MockModel._enable_polymorphic_serialization = original_setting
 
     def test_polymorphic_serialization_with_none_values(self):
         """Test polymorphic serialization handles None values correctly."""
@@ -196,14 +201,19 @@ class TestPolymorphicDeserialization:
         }
 
         # Temporarily disable polymorphic deserialization
-        patient = MockModel.model_validate(data, polymorphic=False)
+        original_setting = MockModel._enable_polymorphic_deserialization
+        try:
+            MockModel._enable_polymorphic_deserialization = False
+            patient = MockModel.model_validate(data)
 
-        # Should be base MockResource type, not MockStringSpecializedResource
-        assert isinstance(patient.anyResource, MockResource)
-        assert not isinstance(
-            patient.anyResource,
-            (MockStringSpecializedResource, MockIntegerSpecializedResource),
-        )
+            # Should be base MockResource type, not MockStringSpecializedResource
+            assert isinstance(patient.anyResource, MockResource)
+            assert not isinstance(
+                patient.anyResource,
+                (MockStringSpecializedResource, MockIntegerSpecializedResource),
+            )
+        finally:
+            MockModel._enable_polymorphic_deserialization = original_setting
 
     def test_round_trip_serialization_deserialization(self):
         """Test that data survives round-trip serialization and deserialization."""
@@ -631,7 +641,7 @@ class TestPolymorphicEdgeCases:
             )
 
             # With polymorphic serialization disabled, custom fields might be lost
-            serialized = container.model_dump(polymorphic=False)
+            serialized = container.model_dump()
 
             # The exact behavior depends on implementation, but it should not crash
             assert serialized["id"] == "config-test"

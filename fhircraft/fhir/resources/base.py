@@ -48,11 +48,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     @classmethod
     def _validate_polymorphic_fields(cls, value: Any, info) -> Any:
         """Apply polymorphic deserialization to FHIR fields during validation."""
-        # Check if polymorphic deserialization is enabled both globally and in context
-        context_polymorphic = (
-            info.context.get("polymorphic", True) if info.context else True
-        )
-        if not cls._enable_polymorphic_deserialization or not context_polymorphic:
+        # Check if polymorphic deserialization is enabled
+        if not cls._enable_polymorphic_deserialization:
             return value
 
         # Only process if we have field info
@@ -81,6 +78,42 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 pass
 
         return value
+
+    @model_serializer(mode="wrap")
+    def _serialize_polymorphic_fields(self, serializer, info) -> Any:
+        """Apply polymorphic serialization to FHIR fields during serialization."""
+        # Check if polymorphic serialization is enabled
+        if not self._enable_polymorphic_serialization:
+            return serializer(self)
+
+        # Get the base serialization with warnings suppressed
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning)
+            warnings.filterwarnings(
+                "ignore", message=".*Pydantic serializer warnings.*"
+            )
+            warnings.filterwarnings(
+                "ignore", message=".*PydanticSerializationUnexpectedValue.*"
+            )
+            data = serializer(self)
+
+        # Apply polymorphic serialization to FHIR fields
+        for field_name, field_info in self.__class__.model_fields.items():
+            if field_name in data:
+                value = getattr(self, field_name, None)
+                if value is not None:
+                    base_type = self._get_field_base_type(field_info)
+                    if (
+                        base_type != object
+                        and hasattr(base_type, "__mro__")
+                        and issubclass(base_type, FHIRBaseModel)
+                    ):
+                        # Apply polymorphic serialization to this field
+                        data[field_name] = self._serialize_fhir_field_polymorphically(
+                            value
+                        )
+
+        return data
 
     @classmethod
     @lru_cache(maxsize=256)
@@ -244,78 +277,13 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 value._resource = resource_context
                 value._propagate_context()
 
-    def model_dump_json(self, polymorphic=True, *args, **kwargs):
+    def model_dump_json(self, *args, **kwargs):
         kwargs.update({"by_alias": True, "exclude_none": True})
+        return super().model_dump_json(*args, **kwargs)
 
-        if not polymorphic or not self._enable_polymorphic_serialization:
-            return super().model_dump_json(*args, **kwargs)
-
-        json_kwargs = {
-            k: v
-            for k, v in kwargs.items()
-            if k in ["indent", "separators", "ensure_ascii"]
-        }
-        model_kwargs = {
-            k: v
-            for k, v in kwargs.items()
-            if k not in ["indent", "separators", "ensure_ascii"]
-        }
-
-        # Suppress Pydantic serialization warnings for polymorphic fields
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=UserWarning)
-            warnings.filterwarnings(
-                "ignore", message=".*Pydantic serializer warnings.*"
-            )
-            warnings.filterwarnings(
-                "ignore", message=".*PydanticSerializationUnexpectedValue.*"
-            )
-            data = self.model_dump(
-                polymorphic=polymorphic,
-                *args,
-                **model_kwargs,
-            )
-
-        return json.dumps(data, **json_kwargs)
-
-    def model_dump(self, polymorphic=True, *args, **kwargs):
+    def model_dump(self, *args, **kwargs):
         kwargs.update({"by_alias": True, "exclude_none": True})
-
-        if not polymorphic or not self._enable_polymorphic_serialization:
-            return super().model_dump(*args, **kwargs)
-
-        # Suppress Pydantic serialization warnings for polymorphic fields
-        import warnings
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=UserWarning)
-            warnings.filterwarnings(
-                "ignore", message=".*Pydantic serializer warnings.*"
-            )
-            warnings.filterwarnings(
-                "ignore", message=".*PydanticSerializationUnexpectedValue.*"
-            )
-
-            # Get the base serialization
-            data = super().model_dump(*args, **kwargs)
-
-        # Apply polymorphic serialization to fields that need it
-        for field_name, field_info in self.__class__.model_fields.items():
-            if field_name in data:
-                value = getattr(self, field_name, None)
-                if value is not None:
-                    base_type = self._get_field_base_type(field_info)
-                    if (
-                        base_type != object
-                        and hasattr(base_type, "__mro__")
-                        and issubclass(base_type, FHIRBaseModel)
-                    ):
-                        # Apply polymorphic serialization to this field
-                        data[field_name] = self._serialize_fhir_field_polymorphically(
-                            value
-                        )
-
-        return data
+        return super().model_dump(*args, **kwargs)
 
     def _serialize_fhir_field_polymorphically(self, value: Any) -> Any:
         """Serialize FHIR fields polymorphically to preserve runtime type information."""
@@ -371,75 +339,19 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     @classmethod
     def model_validate(
-        cls, obj, *, strict=None, from_attributes=None, context=None, polymorphic=True
+        cls, obj, *, strict=None, from_attributes=None, context=None
     ) -> Self:
-        """Override model_validate to support polymorphic deserialization."""
-        if not polymorphic or not cls._enable_polymorphic_deserialization:
-            # Pass polymorphic flag through context to field validators
-            if context is None:
-                context = {}
-            context = {**context, "polymorphic": polymorphic}
-            return super().model_validate(
-                obj, strict=strict, from_attributes=from_attributes, context=context
-            )
-
-        # Try to find a more specific subclass for this object
-        subclasses = cls._get_all_subclasses(cls)
-        for subclass in subclasses:
-            try:
-                # Pass polymorphic flag through context for nested validation
-                nested_context = context or {}
-                nested_context = {**nested_context, "polymorphic": False}
-                return subclass.model_validate(
-                    obj,
-                    strict=strict,
-                    from_attributes=from_attributes,
-                    context=nested_context,
-                    polymorphic=False,
-                )
-            except (ValidationError, ValueError, TypeError):
-                continue
-
-        # No subclass worked, validate with current class but process nested fields polymorphically
-        instance = super().model_validate(
+        """Override model_validate to provide default kwargs for FHIR resources."""
+        return super().model_validate(
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
 
-        # Apply polymorphic processing to nested FHIR fields
-        for field_name, field_info in cls.model_fields.items():
-            if field_name in obj:
-                value = obj[field_name]
-                if value is not None:
-                    base_type = cls._get_field_base_type(field_info)
-                    if base_type != object and issubclass(base_type, FHIRBaseModel):
-                        try:
-                            processed_value = cls._deserialize_polymorphically(
-                                value, base_type
-                            )
-                            if processed_value != value:
-                                setattr(instance, field_name, processed_value)
-                        except Exception:
-                            pass
-
-        return instance
-
     @classmethod
     def model_validate_json(
-        cls, json_data, *, strict=None, context=None, polymorphic=True
+        cls, json_data, *, strict=None, context=None
     ) -> Self:
-        """Override model_validate_json to support polymorphic deserialization."""
-        # First parse the JSON to a dict
-        import json
-
-        if isinstance(json_data, (bytes, str)):
-            obj = json.loads(json_data)
-        else:
-            obj = json_data
-
-        # Then use our polymorphic model_validate
-        return cls.model_validate(
-            obj, strict=strict, context=context, polymorphic=polymorphic
-        )
+        """Override model_validate_json to provide default kwargs for FHIR resources."""
+        return super().model_validate_json(json_data, strict=strict, context=context)
 
     @classmethod
     def _deserialize_polymorphically(cls, value: Any, base_type: Type) -> Any:
@@ -454,10 +366,34 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             subclasses = cls._get_all_subclasses(base_type)
             for subclass in subclasses:
                 try:
-                    return subclass.model_validate(value, polymorphic=False)
+                    # Temporarily disable polymorphic deserialization to prevent recursion
+                    original_setting = subclass._enable_polymorphic_deserialization
+                    subclass._enable_polymorphic_deserialization = False
+                    try:
+                        result = subclass.model_validate(value)
+                        subclass._enable_polymorphic_deserialization = original_setting
+                        return result
+                    except:
+                        subclass._enable_polymorphic_deserialization = original_setting
+                        raise
                 except (ValidationError, ValueError, TypeError):
-                    # If specific class fails, fall back to base type
-                    pass
+                    # If specific class fails, continue trying other subclasses
+                    continue
+
+            # If no subclass worked, try the base type as fallback
+            try:
+                original_setting = base_type._enable_polymorphic_deserialization
+                base_type._enable_polymorphic_deserialization = False
+                try:
+                    result = base_type.model_validate(value)
+                    base_type._enable_polymorphic_deserialization = original_setting
+                    return result
+                except:
+                    base_type._enable_polymorphic_deserialization = original_setting
+                    raise
+            except (ValidationError, ValueError, TypeError):
+                # If base type also fails, return original value
+                pass
 
         return value
 
