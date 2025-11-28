@@ -392,7 +392,7 @@ class FHIRPath(ABC):
             # If _resource is None, fallback to data itself
             if res is not None:
                 resource = res
-            
+
             # %rootResource: the top-level resource
             if root is not None:
                 root_resource = root
@@ -948,3 +948,66 @@ class RootElement(FHIRPath):
 
     def __hash__(self):
         return hash(self.type)
+
+
+class TypeSpecifier(FHIRPath):
+    """
+    A type specifier is an identifier that must resolve to the name of a type in a model.
+    Type specifiers can have qualifiers, e.g. FHIR.Patient, where the qualifier is the name of the model.
+
+    Attributes:
+        specifier (str): The type specifier string.
+        namespace (Optional[str]): The namespace of the type specifier, by default "FHIR".
+    """
+
+    def __init__(self, specifier: str):
+        if "." in specifier:
+            namespace, specifier = specifier.split(".", 1)
+        else:
+            namespace = None
+        self.specifier: str = specifier
+        self.namespace: str | None = namespace
+
+    def evaluate(
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+    ) -> FHIRPathCollection:
+        """
+        Evaluate the input collection to assert that the entries are valid FHIR resources of the given type.
+
+        Args:
+            collection (Collection): The collection of items to be evaluated.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
+
+        Returns:
+            collection (Collection): The same collection after validation.
+        """
+        from fhircraft.fhir.resources.datatypes.utils import get_fhir_type
+
+        namespace = self.namespace or "FHIR"
+        if namespace == "FHIR":
+            self.specifier = self.specifier[0].upper() + self.specifier[1:]
+            type = get_fhir_type(self.specifier)
+        else:
+            raise NameError(
+                f"Unknown namespace '{self.namespace}' for type specifier '{self.specifier}'"
+            )
+        return [FHIRPathCollectionItem(value=type)]
+
+    def __str__(self):
+        return (
+            self.namespace + "." + self.specifier if self.namespace else self.specifier
+        )
+
+    def __repr__(self):
+        return f'TypeSpecifier("{self.namespace}.{self.specifier}")'
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, TypeSpecifier)
+            and self.namespace == other.namespace
+            and self.specifier == other.specifier
+        )
+
+    def __hash__(self):
+        return hash((self.namespace, self.specifier))

@@ -80,6 +80,42 @@ def get_fhir_resource_type(type_str: str, release="R4B") -> type:
     return resource
 
 
+def get_fhir_type(type_str: str, release="R4B") -> type:
+    """
+    Get the FHIR type (primitive, complex, or resource) by its string name.
+
+    Args:
+        type_str (str): The FHIR type name.
+        release (str): The FHIR release version (default: "R4B").
+
+    Returns:
+        type: The corresponding FHIR type class.
+
+    Raises:
+        AttributeError: If the type is not found.
+    """
+    # First check for primitive types
+    primitive_type = get_fhir_primitive_type(type_str)
+    if primitive_type:
+        return primitive_type
+
+    # Next check for complex types
+    try:
+        complex_type = get_complex_FHIR_type(type_str, release)
+        return complex_type
+    except AttributeError:
+        pass
+
+    # Finally check for resource types
+    try:
+        resource_type = get_fhir_resource_type(type_str, release)
+        return resource_type
+    except AttributeError:
+        pass
+
+    raise AttributeError(f"Unknown FHIR type: {type_str}")
+
+
 # Type checking functions
 def is_fhir_primitive_type(
     value: Any, fhir_type: Type | TypeAliasType | str, raise_on_error: bool = True

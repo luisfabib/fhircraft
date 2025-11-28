@@ -7,6 +7,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollection,
     FHIRPathFunction,
     This,
+    TypeSpecifier,
 )
 from fhircraft.fhir.path.engine.types import As
 from fhircraft.fhir.path.utils import get_expression_context
@@ -182,7 +183,7 @@ class OfType(FHIRPathFunction):
         type (class): Type class
     """
 
-    def __init__(self, _type: str):
+    def __init__(self, _type: TypeSpecifier):
         self.type = _type
 
     def evaluate(

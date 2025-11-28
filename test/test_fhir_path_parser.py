@@ -246,11 +246,6 @@ parser_test_cases = (
     ("parent.toChars()", Invocation(Element("parent"), ToChars())),
     ("left & right ", Concatenation(Element("left"), Element("right"))),
     # ----------------------------------
-    # Types legacy functions
-    # ----------------------------------
-    ("parent.is('String')", Invocation(Element("parent"), LegacyIs(Literal("String")))),
-    ("parent.as('String')", Invocation(Element("parent"), LegacyAs(Literal("String")))),
-    # ----------------------------------
     # Math functions
     # ----------------------------------
     ("parent.abs()", Invocation(Element("parent"), Abs())),
@@ -338,11 +333,24 @@ parser_test_cases = (
     # ----------------------------------
     # Types Operators
     # ----------------------------------
-    ("A is String", Is(Element("A"), "String")),
-    ("A is Observation", Is(Element("A"), "Observation")),
-    ("A is System.String", Is(Element("A"), "System.String")),
-    ("A as String", As(Element("A"), "String")),
-    ("A as System.String", As(Element("A"), "System.String")),
+    ("A is string", Is(Element("A"), TypeSpecifier("string"))),
+    ("A is canonical", Is(Element("A"), TypeSpecifier("canonical"))),
+    ("A is Observation", Is(Element("A"), TypeSpecifier("Observation"))),
+    ("A is System.String", Is(Element("A"), TypeSpecifier("System.String"))),
+    ("A as string", As(Element("A"), TypeSpecifier("string"))),
+    ("A as System.String", As(Element("A"), TypeSpecifier("System.String"))),
+    (
+        "A.is(string)",
+        Invocation(Element("A"), LegacyIs(TypeSpecifier("string"))),
+    ),
+    (
+        "A.as(string)",
+        Invocation(Element("A"), LegacyAs(TypeSpecifier("string"))),
+    ),
+    (
+        "A.ofType(string)",
+        Invocation(Element("A"), OfType(TypeSpecifier("string"))),
+    ),
     # ----------------------------------
     # Boolean Operators
     # ----------------------------------
