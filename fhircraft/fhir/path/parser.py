@@ -30,6 +30,7 @@ from fhircraft.fhir.path.engine.core import (
     Literal,
     RootElement,
     This,
+    TypeSpecifier,
 )
 from fhircraft.fhir.path.exceptions import FhirPathLexerError, FhirPathParserError
 from fhircraft.fhir.path.lexer import FhirPathLexer
@@ -285,11 +286,11 @@ class FhirPathParser:
     def p_fhirpath_type_specifier(self, p):
         """type_specifier : identifier
         | ROOT_NODE"""
-        p[0] = p[1]
+        p[0] = TypeSpecifier(p[1])
 
     def p_fhirpath_type_specifier_context(self, p):
-        """type_specifier : type_specifier '.' identifier"""
-        p[0] = f"{p[1]}.{p[3]}"
+        """type_specifier : identifier '.' identifier"""
+        p[0] = TypeSpecifier(f"{p[1]}.{p[3]}")
 
     def p_fhirpath_function(self, p):
         """function : function_name '(' arguments ')'"""
@@ -342,8 +343,6 @@ class FhirPathParser:
             p[0] = filtering.Select(*p[3])
         elif check(p, "repeat", nargs=1):
             p[0] = filtering.Repeat(*p[3])
-        elif check(p, "ofType", nargs=1):
-            p[0] = filtering.OfType(*p[3])
         # -------------------------------------------------------------------------------
         # Additional functions
         # -------------------------------------------------------------------------------
@@ -514,13 +513,6 @@ class FhirPathParser:
         elif check(p, "today", nargs=0):
             p[0] = utility.Today()
         # -------------------------------------------------------------------------------
-        # Type functions
-        # -------------------------------------------------------------------------------
-        elif check(p, "is", nargs=1):
-            p[0] = types.LegacyIs(*p[3])
-        elif check(p, "as", nargs=1):
-            p[0] = types.LegacyAs(*p[3])
-        # -------------------------------------------------------------------------------
         # Aggregation functions
         # -------------------------------------------------------------------------------
         elif check(p, "aggregate", nargs=[1, 2]):
@@ -531,12 +523,24 @@ class FhirPathParser:
                 f'FHIRPath parser error at {p.lineno(1)}:{pos}: Invalid function "{p[1]}".\n{_underline_error_in_fhir_path(self.string,p[1], pos)}'
             )
 
+    def p_fhirpath_type_function(self, p):
+        """function : OFTYPE '(' type_specifier ')'
+        | IS '(' type_specifier ')'
+        | AS '(' type_specifier ')'"""
+        # -------------------------------------------------------------------------------
+        # Type functions
+        # -------------------------------------------------------------------------------
+        if p[1] == "ofType":
+            p[0] = filtering.OfType(p[3])
+        elif p[1] == "is":
+            p[0] = types.LegacyIs(p[3])
+        elif p[1] == "as":
+            p[0] = types.LegacyAs(p[3])
+
     def p_fhirpath_function_name(self, p):
         """function_name : identifier
         | CONTAINS
         | IN
-        | AS
-        | IS
         """
         p[0] = p[1]
 

@@ -14,91 +14,95 @@ env = dict()
 # -------------
 
 test_cases = (
-    ("ABC", "String", True),
-    ("123", "String", True),
-    ("", "String", True),
-    (123, "String", False),
+    ("ABC", "string", True),
+    ("123", "string", True),
+    ("", "string", True),
+    (123, "string", False),
     # Integer type checking
-    (12, "Integer", True),
-    ("12", "Integer", True),
-    (-12, "Integer", True),
+    (12, "integer", True),
+    ("12", "integer", True),
+    (-12, "integer", True),
     # UnsignedInt type checking
-    (12, "UnsignedInt", True),
-    ("12", "UnsignedInt", True),
-    (0, "UnsignedInt", True),
-    (-12, "UnsignedInt", False),
-    ("-12", "UnsignedInt", False),
+    (12, "unsignedInt", True),
+    ("12", "unsignedInt", True),
+    (0, "unsignedInt", True),
+    (-12, "unsignedInt", False),
+    ("-12", "unsignedInt", False),
     # PositiveInt type checking
-    (12, "PositiveInt", True),
-    ("12", "PositiveInt", True),
-    (0, "PositiveInt", False),
-    (-12, "PositiveInt", False),
-    ("-12", "PositiveInt", False),
+    (12, "positiveInt", True),
+    ("12", "positiveInt", True),
+    (0, "positiveInt", False),
+    (-12, "positiveInt", False),
+    ("-12", "positiveInt", False),
     # Decimal type checking
-    (23, "Decimal", True),
-    (23.32, "Decimal", True),
-    ("23.32", "Decimal", True),
-    ("23", "Decimal", True),
+    (23, "decimal", True),
+    (23.32, "decimal", True),
+    ("23.32", "decimal", True),
+    ("23", "decimal", True),
     # Boolean type checking
-    (True, "Boolean", True),
-    ("true", "Boolean", True),
-    (False, "Boolean", True),
-    ("false", "Boolean", True),
-    ("invalid", "Boolean", False),
-    (Date("@2024"), "Date", True),
+    (True, "boolean", True),
+    ("true", "boolean", True),
+    (False, "boolean", True),
+    ("false", "boolean", True),
+    ("invalid", "boolean", False),
+    (Date("@2024"), "date", True),
     (Quantity(12, "g"), "Quantity", True),
     # Root element type checking
     (
         dict(id="123", resourceType="Observation"),
-        RootElement(type="Observation"),
+        "Observation",
         True,
     ),
     (
         dict(id="123", resourceType="Patient"),
-        RootElement(type="Patient"),
+        "Patient",
         True,
     ),
     (
         dict(id="123", resourceType="Condition"),
-        RootElement(type="Observation"),
+        "Observation",
         False,
     ),
 )
 
 
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.parametrize("left, type_specifier, expected", test_cases)
 def test_is_returns_correct_boolean(left, type_specifier, expected):
     resource = namedtuple("Resource", ["left"])(left=left)
     collection = [FHIRPathCollectionItem(value=resource)]
-    result = Is(Element("left"), type_specifier).evaluate(collection, env)
+    result = Is(Element("left"), TypeSpecifier(type_specifier)).evaluate(
+        collection, env
+    )
     assert result[0].value == expected
 
 
 def test_is_returns_empty_for_empty_collection():
-    result = Is(Element("left"), "String").evaluate([], env)
+    result = Is(Element("left"), TypeSpecifier("string")).evaluate([], env)
     assert result == []
 
 
 def test_is_string_representation():
-    expression = Is(Element("field"), "String")
-    assert str(expression) == "field is String"
+    expression = Is(Element("field"), TypeSpecifier("string"))
+    assert str(expression) == "field is string"
 
 
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.parametrize("left, type_specifier, expected", test_cases)
 def test_legacy_is_returns_correct_boolean(left, type_specifier, expected):
     collection = [FHIRPathCollectionItem(value=left)]
-    result = LegacyIs(type_specifier).evaluate(collection, env)
+    result = LegacyIs(TypeSpecifier(type_specifier)).evaluate(collection, env)
     assert result[0].value == expected
 
 
 def test_legacy_is_returns_empty_for_empty_collection():
-    result = LegacyIs("String").evaluate([], env)
+    result = LegacyIs(TypeSpecifier("string")).evaluate([], env)
     assert result == []
 
 
 def test_legacy_is_string_representation():
-    expression = LegacyIs("String")
-    assert str(expression) == "is(String)"
+    expression = LegacyIs(TypeSpecifier("string"))
+    assert str(expression) == "is(string)"
 
 
 # -------------
@@ -106,35 +110,37 @@ def test_legacy_is_string_representation():
 # -------------
 
 
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.parametrize("expected, type_specifier, equal", test_cases)
 def test_as_returns_correct_boolean(expected, type_specifier, equal):
     collection = [FHIRPathCollectionItem(value=expected)]
-    result = As(This(), type_specifier).evaluate(collection, env)
+    result = As(This(), TypeSpecifier(type_specifier)).evaluate(collection, env)
     assert result[0].value == expected if equal else result == []
 
 
 def test_as_returns_empty_for_empty_collection():
-    result = As(This(), "String").evaluate([], env)
+    result = As(This(), TypeSpecifier("string")).evaluate([], env)
     assert result == []
 
 
 def test_as_string_representation():
-    expression = As(Element("field"), "String")
-    assert str(expression) == "field as String"
+    expression = As(Element("field"), TypeSpecifier("string"))
+    assert str(expression) == "field as string"
 
 
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.parametrize("expected, type_specifier, equal", test_cases)
 def test_legacy_as_returns_correct_boolean(expected, type_specifier, equal):
     collection = [FHIRPathCollectionItem(value=expected)]
-    result = LegacyAs(type_specifier).evaluate(collection, env)
+    result = LegacyAs(TypeSpecifier(type_specifier)).evaluate(collection, env)
     assert result[0].value == expected if equal else result == []
 
 
 def test_legacy_as_returns_empty_for_empty_collection():
-    result = LegacyAs("String").evaluate([], env)
+    result = LegacyAs(TypeSpecifier("string")).evaluate([], env)
     assert result == []
 
 
 def test_legacy_as_string_representation():
-    expression = LegacyAs("String")
-    assert str(expression) == "as(String)"
+    expression = LegacyAs(TypeSpecifier("string"))
+    assert str(expression) == "as(string)"

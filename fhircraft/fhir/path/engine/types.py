@@ -10,6 +10,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathFunction,
     Literal,
     RootElement,
+    TypeSpecifier,
     This,
 )
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
@@ -24,17 +25,9 @@ class FHIRTypesOperator(FHIRPath):
     def __init__(
         self,
         left: FHIRPath | FHIRPathCollection,
-        type_specifier: str | Literal | RootElement,
+        type_specifier: TypeSpecifier,
     ):
-        self.type_specifier = (
-            type_specifier.type
-            if isinstance(type_specifier, RootElement)
-            else (
-                type_specifier
-                if isinstance(type_specifier, str)
-                else type_specifier.value
-            )
-        )
+        self.type_specifier = type_specifier
         self.left = left
 
     def _get_singleton_collection_value(
@@ -59,16 +52,16 @@ class FHIRTypesOperator(FHIRPath):
         # Laxy import to avoid circular dependencies
         from fhircraft.fhir.resources.datatypes import utils as type_utils
 
-        type_ = self.type_specifier
+        type_ = self.type_specifier.evaluate([], {}, True)[0].value
         # Handle the FHIRPath literal types as special cases
         if isinstance(value, fhirpath_literals.Quantity):
-            return type_ == "Quantity"
+            return type_.__name__ == "Quantity"
         elif isinstance(value, fhirpath_literals.Date):
-            return type_ == "Date"
+            return type_.__name__ == "Date"
         elif isinstance(value, fhirpath_literals.DateTime):
-            return type_ == "DateTime"
+            return type_.__name__ == "DateTime"
         elif isinstance(value, fhirpath_literals.Time):
-            return type_ == "Time"
+            return type_.__name__ == "Time"
         else:
             try:
                 return type_utils.is_fhir_primitive_type(value, type_)
@@ -145,16 +138,8 @@ class LegacyIs(FHIRPathFunction):
         type_specifier (str): Type specifier.
     """
 
-    def __init__(self, type_specifier: str | Literal | RootElement):
-        self.type_specifier = (
-            type_specifier.type
-            if isinstance(type_specifier, RootElement)
-            else (
-                type_specifier
-                if isinstance(type_specifier, str)
-                else type_specifier.value
-            )
-        )
+    def __init__(self, type_specifier: TypeSpecifier):
+        self.type_specifier = type_specifier
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -219,16 +204,8 @@ class LegacyAs(FHIRPathFunction):
         type_specifier (str): Type specifier.
     """
 
-    def __init__(self, type_specifier: str | Literal | RootElement):
-        self.type_specifier: str = (
-            type_specifier.value
-            if isinstance(type_specifier, Literal)
-            else (
-                type_specifier.type
-                if isinstance(type_specifier, RootElement)
-                else type_specifier
-            )
-        )
+    def __init__(self, type_specifier: TypeSpecifier):
+        self.type_specifier: TypeSpecifier = type_specifier
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False

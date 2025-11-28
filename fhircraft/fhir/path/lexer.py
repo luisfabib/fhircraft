@@ -103,6 +103,7 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
             "xor": "XOR",
             "or": "OR",
             "implies": "IMPLIES",
+            "ofType": "OFTYPE",
         },
         # Boolean (http://hl7.org/fhirpath/N1/#boolean)
         # -------------------------------------------------------------------------------

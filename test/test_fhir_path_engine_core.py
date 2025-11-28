@@ -20,10 +20,42 @@ from unittest import TestCase
 
 import pytest
 
-from fhircraft.fhir.path.engine.core import Element, Invocation, RootElement
+from fhircraft.fhir.path.engine.core import (
+    Element,
+    Invocation,
+    RootElement,
+    TypeSpecifier,
+)
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 
+from fhircraft.fhir.resources.datatypes.R4B import core, complex
+from fhircraft.fhir.resources.datatypes import primitives
+
 env = dict()
+
+
+@pytest.mark.parametrize(
+    "type_specifier,expected_value",
+    [
+        # Primitive types
+        ("string", primitives.String),
+        ("canonical", primitives.Canonical),
+        ("url", primitives.Url),
+        ("dateTime", primitives.DateTime),
+        ("markdown", primitives.Markdown),
+        # DomainResource types
+        ("Patient", core.Patient),
+        ("Observation", core.Observation),
+        # Complex Types
+        ("Quantity", complex.Quantity),
+        ("CodeableConcept", complex.CodeableConcept),
+    ],
+)
+def test_type_specifier_evaluates_correctly(type_specifier, expected_value):
+    type_spec = TypeSpecifier(type_specifier)
+    result = type_spec.evaluate([], env)
+    assert len(result) == 1
+    assert result[0].value == expected_value
 
 
 class TestRoot(TestCase):

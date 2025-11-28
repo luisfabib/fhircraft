@@ -124,16 +124,16 @@ def test_ofType_returns_filtered_collection_by_type(expected, type):
         FHIRPathCollectionItem(value=Date("@2024")),
         FHIRPathCollectionItem(value=Quantity(12, "g")),
     ]
-    result = OfType(type).evaluate(collection, env)
+    result = OfType(TypeSpecifier(type)).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=expected)]
 
 
 def test_ofType_returns_empty_for_empty_collection():
     collection = []
-    result = OfType("String").evaluate(collection, env)
+    result = OfType(TypeSpecifier("String")).evaluate(collection, env)
     assert result == []
 
 
 def test_ofType_string_representation():
-    expression = OfType("Patient")
+    expression = OfType(TypeSpecifier("Patient"))
     assert str(expression) == "ofType(Patient)"
