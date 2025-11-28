@@ -182,7 +182,6 @@ class GetValue(FHIRPathFunction):
                 value = value.to_datetime()
 
             has_primitive_value = value is not None and is_fhir_primitive(value)
-            print(value, has_primitive_value)
             return [FHIRPathCollectionItem.wrap(value)] if has_primitive_value else []
 
 

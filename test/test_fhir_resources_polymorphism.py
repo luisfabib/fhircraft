@@ -227,10 +227,8 @@ class TestPolymorphicDeserialization:
 
         # Serialize
         serialized_dict = original_instance.model_dump()
-        print(serialized_dict)
         # Deserialize
         deserialized_instance = MockModel.model_validate(serialized_dict)
-        print(deserialized_instance)
 
         deserialized_resource = deserialized_instance.anyResource
         # Verify round-trip preserved the data
