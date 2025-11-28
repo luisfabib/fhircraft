@@ -97,7 +97,9 @@ class Communication(DomainResource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/Communication"]),
+        default_factory=lambda: Meta(
+            profile=["http://hl7.org/fhir/StructureDefinition/Communication"]
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -313,15 +315,6 @@ class Communication(DomainResource):
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
-        )
-
-    @field_validator(*("contained",), mode="plain", check_fields=None)
-    @classmethod
-    def contained_FHIR_resource_validator(cls, value):
-        return fhir_validators.validate_contained_resource(
-            cls,
-            value,
-            release="R5",
         )
 
     @model_validator(mode="after")

@@ -640,7 +640,9 @@ class Questionnaire(DomainResource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/Questionnaire"]),
+        default_factory=lambda: Meta(
+            profile=["http://hl7.org/fhir/StructureDefinition/Questionnaire"]
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -1069,15 +1071,6 @@ class Questionnaire(DomainResource):
             human="Can only have multiple initial values for repeating items",
             key="que-13",
             severity="error",
-        )
-
-    @field_validator(*("contained",), mode="plain", check_fields=None)
-    @classmethod
-    def contained_FHIR_resource_validator(cls, value):
-        return fhir_validators.validate_contained_resource(
-            cls,
-            value,
-            release="R4B",
         )
 
     @model_validator(mode="after")

@@ -312,7 +312,9 @@ class Composition(DomainResource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/Composition"]),
+        default_factory=lambda: Meta(
+            profile=["http://hl7.org/fhir/StructureDefinition/Composition"]
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -519,15 +521,6 @@ class Composition(DomainResource):
             human="A section can only have an emptyReason if it is empty",
             key="cmp-2",
             severity="error",
-        )
-
-    @field_validator(*("contained",), mode="plain", check_fields=None)
-    @classmethod
-    def contained_FHIR_resource_validator(cls, value):
-        return fhir_validators.validate_contained_resource(
-            cls,
-            value,
-            release="R4B",
         )
 
     @model_validator(mode="after")
