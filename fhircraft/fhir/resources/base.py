@@ -1,107 +1,21 @@
 from copy import copy
-from typing import Any, ClassVar, Union
+from functools import lru_cache
+from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args
 from typing_extensions import Self
 
-from pydantic import BaseModel, ConfigDict, ValidationError, PrivateAttr
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    ValidationError,
+    PrivateAttr,
+    field_serializer,
+    field_validator,
+    model_serializer,
+)
 from pydantic_core import PydanticUndefined
 
 from fhircraft.fhir.path.mixin import FHIRPathMixin
 from fhircraft.utils import get_all_models_from_field
-
-
-class FHIRList(list):
-    """
-    Custom list wrapper that maintains parent context on mutations.
-
-    This list automatically propagates _parent, _root_resource, _resource, and _index context
-    to FHIRBaseModel items when they are added via append, extend, insert, or __setitem__.
-    """
-
-    def __init__(self, items=None, parent=None, root=None, resource=None):
-        """Initialize FHIRList with items and context."""
-        super().__init__(items or [])
-        self._parent = parent
-        self._root = root
-        self._resource = resource
-        self._propagate_context()
-
-    def _propagate_context(self):
-        """Propagate context to all current items and their nested children."""
-        # Only propagate if we have a parent (otherwise we don't have context yet)
-        if self._parent is None:
-            return
-
-        for index, item in enumerate(self):
-            if isinstance(item, FHIRBaseModel):
-                item._set_resource_context(
-                    parent=self._parent,
-                    root=self._root,
-                    resource=self._resource,
-                    index=index,
-                )
-
-    def append(self, item):
-        """Append item and propagate context."""
-        super().append(item)
-        if isinstance(item, FHIRBaseModel):
-            # Index is the last position
-            index = len(self) - 1
-            item._set_resource_context(
-                parent=self._parent,
-                root=self._root,
-                resource=self._resource,
-                index=index,
-            )
-
-    def extend(self, items):
-        """Extend list and propagate context to new items."""
-        start_index = len(self)
-        super().extend(items)
-        # Only propagate to newly added items
-        for offset, item in enumerate(items):
-            if isinstance(item, FHIRBaseModel):
-                item._set_resource_context(
-                    parent=self._parent,
-                    root=self._root,
-                    resource=self._resource,
-                    index=start_index + offset,
-                )
-
-    def insert(self, index, item):
-        """Insert item and propagate context."""
-        super().insert(index, item)
-        if isinstance(item, FHIRBaseModel):
-            item._set_resource_context(
-                parent=self._parent,
-                root=self._root,
-                resource=self._resource,
-                index=index,
-            )
-        # Re-index all items after insertion point
-        for i in range(index + 1, len(self)):
-            if isinstance(self[i], FHIRBaseModel):
-                object.__setattr__(self[i], "_index", i)
-
-    def __setitem__(self, index, item):
-        """Set item and propagate context."""
-        super().__setitem__(index, item)
-        if isinstance(item, FHIRBaseModel):
-            # Handle single item
-            if isinstance(index, int):
-                item._set_resource_context(
-                    parent=self._parent,
-                    root=self._root,
-                    resource=self._resource,
-                    index=index,
-                )
-            else:
-                # Handle slice assignment - can't easily track indices
-                # So we re-propagate to all items
-                self._propagate_context()
-        elif isinstance(item, list):
-            # Handle slice assignment like lst[1:3] = [...]
-            # Re-propagate to all items to fix indices
-            self._propagate_context()
 
 
 class FHIRBaseModel(BaseModel, FHIRPathMixin):
@@ -113,6 +27,11 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     model_config = ConfigDict(defer_build=True)
 
+    # Configuration for polymorphic behavior
+    _enable_polymorphic_serialization: ClassVar[bool] = True
+    _enable_polymorphic_deserialization: ClassVar[bool] = True
+
+    # Parent tracking attributes
     _parent: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
     _root_resource: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
     _resource: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
@@ -122,6 +41,78 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         """Initialize model and set up parent tracking."""
         # After construction, propagate context to all nested fields
         self._set_resource_context()
+
+    @classmethod
+    @lru_cache(maxsize=256)
+    def _get_all_subclasses(cls, base_class: Type) -> List[Type]:
+        """Get all subclasses of a base class recursively, with caching."""
+        subclasses = []
+        for subclass in base_class.__subclasses__():
+            subclasses.append(subclass)
+            subclasses.extend(cls._get_all_subclasses(subclass))
+        return subclasses
+
+    @classmethod
+    def _find_best_matching_subclass(
+        cls, data: Dict[str, Any], base_class: Type
+    ) -> Type:
+        """Find the best matching subclass for the given data."""
+        if not isinstance(data, dict):
+            return base_class
+
+        # If data has a resourceType, try to match by that first
+        resource_type = data.get("resourceType")
+        if resource_type:
+            # Try to find exact match by class name
+            for subclass in cls._get_all_subclasses(base_class):
+                if subclass.__name__ == resource_type:
+                    return subclass
+
+        # Fall back to validation-based matching
+        subclasses = [base_class] + cls._get_all_subclasses(base_class)
+
+        # Sort by specificity (more specific classes first)
+        subclasses.sort(key=lambda c: len(c.model_fields), reverse=True)
+
+        for subclass in subclasses:
+            try:
+                # Try to validate with this subclass
+                subclass.model_validate(data)
+                return subclass
+            except (ValidationError, ValueError, TypeError):
+                continue
+
+        # If nothing validates, return the base class
+        return base_class
+
+    @classmethod
+    def _get_field_base_type(cls, field_info: Any) -> Type:
+        """Extract the base type from a field annotation."""
+        annotation = (
+            field_info.annotation if hasattr(field_info, "annotation") else field_info
+        )
+
+        # Handle Optional[List[SomeType]] -> SomeType
+        origin = get_origin(annotation)
+        if origin is Union:  # Optional case
+            args = get_args(annotation)
+            # Find the non-None type
+            non_none_types = [arg for arg in args if arg is not type(None)]
+            if non_none_types:
+                annotation = non_none_types[0]
+                origin = get_origin(annotation)
+
+        # Handle List[SomeType] -> SomeType
+        if origin in (list, List):
+            args = get_args(annotation)
+            if args:
+                annotation = args[0]
+
+        # Return the final type
+        if isinstance(annotation, type):
+            return annotation
+
+        return object  # Fallback
 
     def __setattr__(self, name: str, value: Any):
         """Override to propagate context when fields are assigned after construction."""
@@ -240,13 +231,103 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 value._resource = resource_context
                 value._propagate_context()
 
-    def model_dump(self, *args, **kwargs):
+    def model_dump_json(self, polymorphic=True, *args, **kwargs):
         kwargs.update({"by_alias": True, "exclude_none": True})
-        return super().model_dump(*args, **kwargs)
 
-    def model_dump_json(self, *args, **kwargs):
+        if not polymorphic or not self._enable_polymorphic_serialization:
+            return super().model_dump_json(*args, **kwargs)
+
+        # Use our polymorphic model_dump and convert to JSON
+        import json
+        import warnings
+
+        json_kwargs = {
+            k: v
+            for k, v in kwargs.items()
+            if k in ["indent", "separators", "ensure_ascii"]
+        }
+        model_kwargs = {
+            k: v
+            for k, v in kwargs.items()
+            if k not in ["indent", "separators", "ensure_ascii"]
+        }
+
+        # Suppress Pydantic serialization warnings for polymorphic fields
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning)
+            warnings.filterwarnings(
+                "ignore", message=".*Pydantic serializer warnings.*"
+            )
+            warnings.filterwarnings(
+                "ignore", message=".*PydanticSerializationUnexpectedValue.*"
+            )
+            data = self.model_dump(
+                polymorphic=polymorphic,
+                *args,
+                **model_kwargs,
+            )
+
+        return json.dumps(data, **json_kwargs)
+
+    def model_dump(self, polymorphic=True, *args, **kwargs):
         kwargs.update({"by_alias": True, "exclude_none": True})
-        return super().model_dump_json(*args, **kwargs)
+
+        if not polymorphic or not self._enable_polymorphic_serialization:
+            return super().model_dump(*args, **kwargs)
+
+        # Suppress Pydantic serialization warnings for polymorphic fields
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning)
+            warnings.filterwarnings(
+                "ignore", message=".*Pydantic serializer warnings.*"
+            )
+            warnings.filterwarnings(
+                "ignore", message=".*PydanticSerializationUnexpectedValue.*"
+            )
+
+            # Get the base serialization
+            data = super().model_dump(*args, **kwargs)
+
+        # Apply polymorphic serialization to fields that need it
+        for field_name, field_info in self.__class__.model_fields.items():
+            if field_name in data:
+                value = getattr(self, field_name, None)
+                if value is not None:
+                    base_type = self._get_field_base_type(field_info)
+                    if (
+                        base_type != object
+                        and hasattr(base_type, "__mro__")
+                        and issubclass(base_type, FHIRBaseModel)
+                    ):
+                        # Apply polymorphic serialization to this field
+                        data[field_name] = self._serialize_fhir_field_polymorphically(
+                            value
+                        )
+
+        return data
+
+    def _serialize_fhir_field_polymorphically(self, value: Any) -> Any:
+        """Serialize FHIR fields polymorphically to preserve runtime type information."""
+        # Handle lists/sequences
+        if isinstance(value, (list, tuple)):
+            return [self._serialize_fhir_field_polymorphically(item) for item in value]
+
+        # Handle FHIR models - serialize them using their runtime type
+        if isinstance(value, FHIRBaseModel):
+            # Temporarily disable polymorphic serialization to avoid recursion
+            original_setting = value.__class__._enable_polymorphic_serialization
+            try:
+                value.__class__._enable_polymorphic_serialization = False
+                result = value.model_dump()
+                value.__class__._enable_polymorphic_serialization = original_setting
+                return result
+            except:
+                value.__class__._enable_polymorphic_serialization = original_setting
+                return value.model_dump()
+
+        return value
 
     @classmethod
     def model_construct(cls, set_defaults=True, *args, **kwargs) -> Self:
@@ -278,6 +359,86 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         # Set context after all fields are set
         instance._set_resource_context()
         return instance
+
+    @classmethod
+    def model_validate(
+        cls, obj, *, strict=None, from_attributes=None, context=None, polymorphic=True
+    ) -> Self:
+        """Override model_validate to support polymorphic deserialization."""
+        if (
+            not polymorphic
+            or not cls._enable_polymorphic_deserialization
+            or not isinstance(obj, dict)
+        ):
+            return super().model_validate(
+                obj, strict=strict, from_attributes=from_attributes, context=context
+            )
+
+        # First, validate normally to get basic structure
+        instance = super().model_validate(
+            obj, strict=strict, from_attributes=from_attributes, context=context
+        )
+
+        # Then apply polymorphic deserialization to nested fields
+        for field_name, field_info in cls.model_fields.items():
+            if field_name in obj:
+                value = obj[field_name]
+                if value is not None:
+                    base_type = cls._get_field_base_type(field_info)
+                    if base_type != object and issubclass(base_type, FHIRBaseModel):
+                        try:
+                            processed_value = cls._deserialize_polymorphically(
+                                value, base_type
+                            )
+                            # Only set if we got a different (more specific) type
+                            if processed_value != value and isinstance(
+                                processed_value, FHIRBaseModel
+                            ):
+                                setattr(instance, field_name, processed_value)
+                        except Exception:
+                            # If polymorphic deserialization fails, keep original
+                            pass
+
+        return instance
+
+    @classmethod
+    def model_validate_json(
+        cls, json_data, *, strict=None, context=None, polymorphic=True
+    ) -> Self:
+        """Override model_validate_json to support polymorphic deserialization."""
+        # First parse the JSON to a dict
+        import json
+
+        if isinstance(json_data, (bytes, str)):
+            obj = json.loads(json_data)
+        else:
+            obj = json_data
+
+        # Then use our polymorphic model_validate
+        return cls.model_validate(
+            obj, strict=strict, context=context, polymorphic=polymorphic
+        )
+
+    @classmethod
+    def _deserialize_polymorphically(cls, value: Any, base_type: Type) -> Any:
+        """Deserialize a value using the best matching subclass."""
+        # Handle lists
+        if isinstance(value, list):
+            return [cls._deserialize_polymorphically(item, base_type) for item in value]
+
+        # Handle dictionaries (potential FHIR objects)
+        if isinstance(value, dict):
+            # Find the best matching subclass
+            best_class = cls._find_best_matching_subclass(value, base_type)
+            if best_class != base_type:
+                # Use the more specific class for deserialization
+                try:
+                    return best_class.model_validate(value)
+                except (ValidationError, ValueError, TypeError):
+                    # If specific class fails, fall back to base type
+                    pass
+
+        return value
 
     def model_copy(
         self, *, update: dict[str, Any] | None = None, deep: bool = False
@@ -491,3 +652,98 @@ class FHIRSliceModel(FHIRBaseModel):
         Returns `True` if the instance has been modified, `False` otherwise.
         """
         return self != self.__class__.model_construct_with_slices()
+
+
+class FHIRList(list):
+    """
+    Custom list wrapper that maintains parent context on mutations.
+
+    This list automatically propagates _parent, _root_resource, _resource, and _index context
+    to FHIRBaseModel items when they are added via append, extend, insert, or __setitem__.
+    """
+
+    def __init__(self, items=None, parent=None, root=None, resource=None):
+        """Initialize FHIRList with items and context."""
+        super().__init__(items or [])
+        self._parent = parent
+        self._root = root
+        self._resource = resource
+        self._propagate_context()
+
+    def _propagate_context(self):
+        """Propagate context to all current items and their nested children."""
+        # Only propagate if we have a parent (otherwise we don't have context yet)
+        if self._parent is None:
+            return
+
+        for index, item in enumerate(self):
+            if isinstance(item, FHIRBaseModel):
+                item._set_resource_context(
+                    parent=self._parent,
+                    root=self._root,
+                    resource=self._resource,
+                    index=index,
+                )
+
+    def append(self, item):
+        """Append item and propagate context."""
+        super().append(item)
+        if isinstance(item, FHIRBaseModel):
+            # Index is the last position
+            index = len(self) - 1
+            item._set_resource_context(
+                parent=self._parent,
+                root=self._root,
+                resource=self._resource,
+                index=index,
+            )
+
+    def extend(self, items):
+        """Extend list and propagate context to new items."""
+        start_index = len(self)
+        super().extend(items)
+        # Only propagate to newly added items
+        for offset, item in enumerate(items):
+            if isinstance(item, FHIRBaseModel):
+                item._set_resource_context(
+                    parent=self._parent,
+                    root=self._root,
+                    resource=self._resource,
+                    index=start_index + offset,
+                )
+
+    def insert(self, index, item):
+        """Insert item and propagate context."""
+        super().insert(index, item)
+        if isinstance(item, FHIRBaseModel):
+            item._set_resource_context(
+                parent=self._parent,
+                root=self._root,
+                resource=self._resource,
+                index=index,
+            )
+        # Re-index all items after insertion point
+        for i in range(index + 1, len(self)):
+            if isinstance(self[i], FHIRBaseModel):
+                object.__setattr__(self[i], "_index", i)
+
+    def __setitem__(self, index, item):
+        """Set item and propagate context."""
+        super().__setitem__(index, item)
+        if isinstance(item, FHIRBaseModel):
+            # Handle single item
+            if isinstance(index, int):
+                item._set_resource_context(
+                    parent=self._parent,
+                    root=self._root,
+                    resource=self._resource,
+                    index=index,
+                )
+            else:
+                # Handle slice assignment - can't easily track indices
+                # So we re-propagate to all items
+                self._propagate_context()
+        elif isinstance(item, list):
+            # Handle slice assignment like lst[1:3] = [...]
+            # Re-propagate to all items to fix indices
+            self._propagate_context()
