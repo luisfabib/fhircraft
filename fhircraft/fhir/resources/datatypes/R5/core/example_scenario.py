@@ -849,7 +849,9 @@ class ExampleScenario(DomainResource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/ExampleScenario"]),
+        default_factory=lambda: Meta(
+            profile=["http://hl7.org/fhir/StructureDefinition/ExampleScenario"]
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -1220,15 +1222,6 @@ class ExampleScenario(DomainResource):
             human="Processes must have steps if ExampleScenario status is active or required",
             key="exs-5",
             severity="error",
-        )
-
-    @field_validator(*("contained",), mode="plain", check_fields=None)
-    @classmethod
-    def contained_FHIR_resource_validator(cls, value):
-        return fhir_validators.validate_contained_resource(
-            cls,
-            value,
-            release="R5",
         )
 
     @model_validator(mode="after")

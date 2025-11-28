@@ -1328,16 +1328,6 @@ class ResourceFactory:
         # Process resource-level constraints
         for constraint in structure.constraint or []:
             validators.add_model_constraint_validator(constraint)
-        if "contained" in fields:
-            validators.add(
-                "contained_FHIR_resource_validator",
-                field_validator("contained", mode="plain")(
-                    partial(
-                        fhir_validators.validate_contained_resource,
-                        release=self.Config.FHIR_release,
-                    )
-                ),
-            )
         # If the resource has metadata, prefill the information
         if "meta" in fields:
             Meta = get_complex_FHIR_type(
