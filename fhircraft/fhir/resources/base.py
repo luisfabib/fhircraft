@@ -1,5 +1,7 @@
 from copy import copy
 from functools import lru_cache
+import json
+import warnings
 from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args
 from typing_extensions import Self
 
@@ -51,39 +53,6 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             subclasses.append(subclass)
             subclasses.extend(cls._get_all_subclasses(subclass))
         return subclasses
-
-    @classmethod
-    def _find_best_matching_subclass(
-        cls, data: Dict[str, Any], base_class: Type
-    ) -> Type:
-        """Find the best matching subclass for the given data."""
-        if not isinstance(data, dict):
-            return base_class
-
-        # If data has a resourceType, try to match by that first
-        resource_type = data.get("resourceType")
-        if resource_type:
-            # Try to find exact match by class name
-            for subclass in cls._get_all_subclasses(base_class):
-                if subclass.__name__ == resource_type:
-                    return subclass
-
-        # Fall back to validation-based matching
-        subclasses = [base_class] + cls._get_all_subclasses(base_class)
-
-        # Sort by specificity (more specific classes first)
-        subclasses.sort(key=lambda c: len(c.model_fields), reverse=True)
-
-        for subclass in subclasses:
-            try:
-                # Try to validate with this subclass
-                subclass.model_validate(data)
-                return subclass
-            except (ValidationError, ValueError, TypeError):
-                continue
-
-        # If nothing validates, return the base class
-        return base_class
 
     @classmethod
     def _get_field_base_type(cls, field_info: Any) -> Type:
@@ -237,10 +206,6 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         if not polymorphic or not self._enable_polymorphic_serialization:
             return super().model_dump_json(*args, **kwargs)
 
-        # Use our polymorphic model_dump and convert to JSON
-        import json
-        import warnings
-
         json_kwargs = {
             k: v
             for k, v in kwargs.items()
@@ -365,21 +330,31 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         cls, obj, *, strict=None, from_attributes=None, context=None, polymorphic=True
     ) -> Self:
         """Override model_validate to support polymorphic deserialization."""
-        if (
-            not polymorphic
-            or not cls._enable_polymorphic_deserialization
-            or not isinstance(obj, dict)
-        ):
+        if not polymorphic or not cls._enable_polymorphic_deserialization:
             return super().model_validate(
                 obj, strict=strict, from_attributes=from_attributes, context=context
             )
 
-        # First, validate normally to get basic structure
+        # Try to find a more specific subclass for this object
+        subclasses = cls._get_all_subclasses(cls)
+        for subclass in subclasses:
+            try:
+                return subclass.model_validate(
+                    obj,
+                    strict=strict,
+                    from_attributes=from_attributes,
+                    context=context,
+                    polymorphic=False,
+                )
+            except (ValidationError, ValueError, TypeError):
+                continue
+
+        # No subclass worked, validate with current class but process nested fields polymorphically
         instance = super().model_validate(
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
 
-        # Then apply polymorphic deserialization to nested fields
+        # Apply polymorphic processing to nested FHIR fields
         for field_name, field_info in cls.model_fields.items():
             if field_name in obj:
                 value = obj[field_name]
@@ -390,13 +365,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                             processed_value = cls._deserialize_polymorphically(
                                 value, base_type
                             )
-                            # Only set if we got a different (more specific) type
-                            if processed_value != value and isinstance(
-                                processed_value, FHIRBaseModel
-                            ):
+                            if processed_value != value:
                                 setattr(instance, field_name, processed_value)
                         except Exception:
-                            # If polymorphic deserialization fails, keep original
                             pass
 
         return instance
@@ -429,11 +400,10 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         # Handle dictionaries (potential FHIR objects)
         if isinstance(value, dict):
             # Find the best matching subclass
-            best_class = cls._find_best_matching_subclass(value, base_type)
-            if best_class != base_type:
-                # Use the more specific class for deserialization
+            subclasses = cls._get_all_subclasses(base_type)
+            for subclass in subclasses:
                 try:
-                    return best_class.model_validate(value)
+                    return subclass.model_validate(value, polymorphic=False)
                 except (ValidationError, ValueError, TypeError):
                     # If specific class fails, fall back to base type
                     pass

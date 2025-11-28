@@ -228,26 +228,6 @@ class TestPolymorphicUtilityMethods:
         assert MockStringSpecializedResource in subclasses1
         assert MockIntegerSpecializedResource in subclasses1
 
-    def test_find_best_matching_subclass_with_resource_type(self):
-        """Test subclass matching based on resourceType field."""
-        data = {
-            "resourceType": "MockStringSpecializedResource",
-            "id": "test-match",
-            "status": "final",
-        }
-
-        best_match = FHIRBaseModel._find_best_matching_subclass(data, MockResource)
-        assert best_match == MockStringSpecializedResource
-
-    def test_find_best_matching_subclass_fallback(self):
-        """Test subclass matching fallback behavior."""
-        data = {"id": "test-fallback", "unknownField": "value"}
-
-        # Should fall back to base class (or first available subclass in some cases)
-        best_match = FHIRBaseModel._find_best_matching_subclass(data, MockResource)
-        # Accept either MockResource or any of its subclasses as fallback behavior
-        assert issubclass(best_match, MockResource)
-
 
 # Completely independent mock classes for complex testing to avoid subclass interference
 class ComplexBaseResource(FHIRBaseModel):
