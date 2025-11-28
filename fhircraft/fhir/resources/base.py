@@ -47,11 +47,17 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     @classmethod
     @lru_cache(maxsize=256)
     def _get_all_subclasses(cls, base_class: Type) -> List[Type]:
-        """Get all subclasses of a base class recursively, with caching."""
+        """Get all subclasses of a base class recursively, with caching.
+
+        Returns subclasses in depth-first order, with most specialized classes first.
+        This ensures polymorphic deserialization tries the most specific matches first.
+        """
         subclasses = []
         for subclass in base_class.__subclasses__():
-            subclasses.append(subclass)
+            # Add specialized subclasses first (depth-first)
             subclasses.extend(cls._get_all_subclasses(subclass))
+            # Then add the current subclass
+            subclasses.append(subclass)
         return subclasses
 
     @classmethod
