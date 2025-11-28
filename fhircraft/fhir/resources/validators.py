@@ -61,7 +61,7 @@ def _validate_FHIR_element_constraint(
             NotImplementedError,
         ) as e:
             warnings.warn(
-                f"Warning: FHIRPath raised {e.__class__.__name__} for expression: {expression}. {traceback.format_exc()}"
+                f"Warning: FHIRPath raised {e.__class__.__name__} for expression: [{key}] -> {expression}. {traceback.format_exc()}"
             )
     return value
 

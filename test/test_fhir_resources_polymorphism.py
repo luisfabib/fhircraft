@@ -140,6 +140,23 @@ class TestPolymorphicDeserialization:
         assert instance.anyResource.id == "test-string"
         assert instance.anyResource.valueString == "deserialized_value"
 
+    def test_contained_resource_polymorphic_assignment_deserialization(self):
+        """Test that contained resources are deserialized to their correct types."""
+        data = {
+            "anyResource": {
+                "id": "test-string",
+                "valueString": "deserialized_value",
+            }
+        }
+
+        # Deserialize
+        instance = MockModel(**data)  # type: ignore
+
+        # Check that polymorphic deserialization worked by checking resource type and fields
+        assert isinstance(instance.anyResource, MockStringSpecializedResource)
+        assert instance.anyResource.id == "test-string"
+        assert instance.anyResource.valueString == "deserialized_value"
+
     def test_contained_resource_polymorphic__json_deserialization(self):
         """Test that contained resources are deserialized to their correct types."""
         data = {

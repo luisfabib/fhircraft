@@ -44,6 +44,44 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         # After construction, propagate context to all nested fields
         self._set_resource_context()
 
+    @field_validator("*", mode="before")
+    @classmethod
+    def _validate_polymorphic_fields(cls, value: Any, info) -> Any:
+        """Apply polymorphic deserialization to FHIR fields during validation."""
+        # Check if polymorphic deserialization is enabled both globally and in context
+        context_polymorphic = (
+            info.context.get("polymorphic", True) if info.context else True
+        )
+        if not cls._enable_polymorphic_deserialization or not context_polymorphic:
+            return value
+
+        # Only process if we have field info
+        if not hasattr(info, "field_name") or not info.field_name:
+            return value
+
+        field_name = info.field_name
+
+        # Get field info from model fields
+        if field_name not in cls.model_fields:
+            return value
+
+        field_info = cls.model_fields[field_name]
+        base_type = cls._get_field_base_type(field_info)
+
+        # Only apply to FHIR fields
+        if (
+            base_type != object
+            and hasattr(base_type, "__mro__")
+            and issubclass(base_type, FHIRBaseModel)
+        ):
+            try:
+                return cls._deserialize_polymorphically(value, base_type)
+            except Exception:
+                # If polymorphic deserialization fails, return original value
+                pass
+
+        return value
+
     @classmethod
     @lru_cache(maxsize=256)
     def _get_all_subclasses(cls, base_class: Type) -> List[Type]:
@@ -337,6 +375,10 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     ) -> Self:
         """Override model_validate to support polymorphic deserialization."""
         if not polymorphic or not cls._enable_polymorphic_deserialization:
+            # Pass polymorphic flag through context to field validators
+            if context is None:
+                context = {}
+            context = {**context, "polymorphic": polymorphic}
             return super().model_validate(
                 obj, strict=strict, from_attributes=from_attributes, context=context
             )
@@ -345,11 +387,14 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         subclasses = cls._get_all_subclasses(cls)
         for subclass in subclasses:
             try:
+                # Pass polymorphic flag through context for nested validation
+                nested_context = context or {}
+                nested_context = {**nested_context, "polymorphic": False}
                 return subclass.model_validate(
                     obj,
                     strict=strict,
                     from_attributes=from_attributes,
-                    context=context,
+                    context=nested_context,
                     polymorphic=False,
                 )
             except (ValidationError, ValueError, TypeError):

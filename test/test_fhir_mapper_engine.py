@@ -62,7 +62,7 @@ def test_integration_tutorial_examples(directory):
         ),
         encoding="utf8",
     ) as file:
-        structure_map = StructureMap(**json.load(file))
+        structure_map = StructureMap.model_validate(json.load(file))
     structure_definitions = []
     for _, _, files in os.walk(
         os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), directory)
