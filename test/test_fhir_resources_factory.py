@@ -912,3 +912,454 @@ class TestResourceFactoryPackageMethods(TestCase):
             self.factory_with_packages.load_package("test.package")
 
         self.assertIn("internet access is disabled", str(context.exception).lower())
+
+
+class TestSliceModelInheritance(FactoryTestCase):
+    """
+    Test slice model inheritance functionality to ensure slice models inherit from both FHIRSliceModel and original element type.
+
+    This test class addresses the issue where slice models created by _construct_slice_model
+    during processing of sliced elements only inherit from FHIRSliceModel and not from the original element type.
+
+    Current Issue:
+    - When processing a resource with sliced elements (e.g., Patient with sliced extensions)
+    - The _construct_slice_model method creates slices that only inherit from FHIRSliceModel
+    - This breaks type compatibility because slices can't be used as the original type (Extension)
+
+    Expected Behavior:
+    - Slice models should inherit from BOTH their original element type AND FHIRSliceModel
+    - This enables: isinstance(slice, Extension) AND isinstance(slice, FHIRSliceModel)
+    - Provides access to both original type functionality and slice-specific functionality
+
+    Test Coverage:
+    - Resources with sliced extension elements
+    - Resources with sliced backbone elements
+    - Proper inheritance from both original type and FHIRSliceModel
+    - Assignment compatibility and type checking
+    - Slice-specific cardinality and validation functionality
+    """
+
+    @pytest.mark.filterwarnings("ignore:.*dom-6.*")
+    def test_resource_with_sliced_extensions_processes_correctly(self):
+        """Test that a resource with sliced extensions is processed without errors."""
+        # Create a Patient resource with sliced extensions
+        patient_with_sliced_extensions = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/fhir/StructureDefinition/PatientWithSlicedExtensions",
+            "name": "PatientWithSlicedExtensions",
+            "status": "active",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "fhirVersion": "4.3.0",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "Patient.extension",
+                        "path": "Patient.extension",
+                        "slicing": {
+                            "discriminator": [{"type": "value", "path": "url"}],
+                            "rules": "open",
+                        },
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "Extension"}],
+                    },
+                    {
+                        "id": "Patient.extension:birthPlace",
+                        "path": "Patient.extension",
+                        "sliceName": "birthPlace",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "Extension"}],
+                        "short": "Birth place extension slice",
+                    },
+                    {
+                        "id": "Patient.extension:birthPlace.url",
+                        "path": "Patient.extension.url",
+                        "min": 1,
+                        "max": "1",
+                        "type": [{"code": "uri"}],
+                        "fixedUri": "http://hl7.org/fhir/StructureDefinition/patient-birthPlace",
+                    },
+                    {
+                        "id": "Patient.extension:birthPlace.valueAddress",
+                        "path": "Patient.extension.valueAddress",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "Address"}],
+                    },
+                ]
+            },
+        }
+
+        # Construct the Patient model with sliced extensions
+        PatientModel = self.factory.construct_resource_model(
+            structure_definition=patient_with_sliced_extensions
+        )
+
+        # The sliced resource should still be a valid Patient model
+        from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
+
+        assert issubclass(PatientModel, Patient), "Model should inherit from Patient"
+
+        # At minimum, there should be an extension field
+        assert (
+            "extension" in PatientModel.model_fields
+        ), "Model should have extension field"
+
+        # The model should be constructable
+        instance = PatientModel()
+        assert isinstance(instance, Patient), "Instance should be a Patient"
+
+    def test_construct_slice_model_creates_dual_inheritance(self):
+        """Test that _construct_slice_model creates models with dual inheritance."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.base import FHIRSliceModel
+
+        # Create a mock element definition for an extension slice
+        class MockElementDefinition:
+            def __init__(self):
+                self.type = []  # Empty type forces dynamic creation
+                self.short = "Test extension slice"
+                self.min = 0
+                self.max = "1"
+                self.children = {}  # No child elements
+
+        mock_definition = MockElementDefinition()
+
+        # Call _construct_slice_model directly
+        slice_model = self.factory._construct_slice_model(
+            name="test-extension-slice",
+            definition=mock_definition,  # type: ignore
+            base=Extension,
+            base_name="TestExtension",
+        )
+
+        # Verify dual inheritance
+        assert issubclass(slice_model, Extension), "Slice should inherit from Extension"
+        assert issubclass(
+            slice_model, FHIRSliceModel
+        ), "Slice should inherit from FHIRSliceModel"
+
+        # Verify it has slice cardinality attributes
+        assert hasattr(slice_model, "min_cardinality")
+        assert hasattr(slice_model, "max_cardinality")
+        assert slice_model.min_cardinality == 0
+        assert slice_model.max_cardinality == 1
+
+        # Test instance creation and type checking (need to provide a value for Extension validation)
+        instance = slice_model(url="http://example.com/test", valueString="test value")
+        assert isinstance(instance, Extension), "Instance should be Extension"
+        assert isinstance(instance, FHIRSliceModel), "Instance should be FHIRSliceModel"
+
+    def test_construct_slice_model_with_backbone_element_base(self):
+        """Test that _construct_slice_model works with BackboneElement base."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex import BackboneElement
+        from fhircraft.fhir.resources.base import FHIRSliceModel
+
+        # Create a mock element definition for a backbone element slice
+        class MockElementDefinition:
+            def __init__(self):
+                self.type = []
+                self.short = "Test backbone element slice"
+                self.min = 1
+                self.max = "3"
+                self.children = {}
+
+        mock_definition = MockElementDefinition()
+
+        # Call _construct_slice_model with BackboneElement base
+        slice_model = self.factory._construct_slice_model(
+            name="test-backbone-slice",
+            definition=mock_definition,  # type: ignore
+            base=BackboneElement,
+            base_name="TestBackbone",
+        )
+
+        # Verify dual inheritance
+        assert issubclass(
+            slice_model, BackboneElement
+        ), "Slice should inherit from BackboneElement"
+        assert issubclass(
+            slice_model, FHIRSliceModel
+        ), "Slice should inherit from FHIRSliceModel"
+
+        # Verify cardinality
+        assert slice_model.min_cardinality == 1
+        assert slice_model.max_cardinality == 3
+
+        # Test instance creation
+        instance = slice_model()
+        assert isinstance(
+            instance, BackboneElement
+        ), "Instance should be BackboneElement"
+        assert isinstance(instance, FHIRSliceModel), "Instance should be FHIRSliceModel"
+
+    def test_slice_model_maintains_original_type_functionality(self):
+        """Test that slice models maintain all functionality from their original type."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.base import FHIRSliceModel
+
+        # Create a mock element definition
+        class MockElementDefinition:
+            def __init__(self):
+                self.type = []
+                self.short = "Extension with value"
+                self.min = 0
+                self.max = "1"
+                self.children = {}
+
+        mock_definition = MockElementDefinition()
+
+        # Create slice model
+        ExtensionSlice = self.factory._construct_slice_model(
+            name="simple-extension-slice",
+            definition=mock_definition,  # type: ignore
+            base=Extension,
+            base_name="SimpleExtension",
+        )
+
+        # Create instance
+        instance = ExtensionSlice(
+            url="http://example.org/test",  # type: ignore
+            valueInteger=42,  # type: ignore
+        )
+
+        # Should have Extension functionality
+        assert hasattr(instance, "url")
+        assert instance.url == "http://example.org/test"  # type: ignore
+        assert hasattr(instance, "valueInteger")
+        assert instance.valueInteger == 42  # type: ignore
+
+        # Should also have FHIRSliceModel functionality
+        assert hasattr(instance, "min_cardinality")
+        assert hasattr(instance, "max_cardinality")
+        assert hasattr(instance, "is_FHIR_complete")
+        assert hasattr(instance, "has_been_modified")
+
+        # Should have access to both class hierarchies
+        assert isinstance(instance, Extension)
+        assert isinstance(instance, FHIRSliceModel)
+
+    def test_slice_model_with_complex_inheritance_chain(self):
+        """Test slice models work correctly with complex inheritance chains."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.datatypes.R4B.complex import Element
+        from fhircraft.fhir.resources.base import FHIRSliceModel
+
+        # Create a mock element definition
+        class MockElementDefinition:
+            def __init__(self):
+                self.type = []
+                self.short = "Complex extension slice"
+                self.min = 1
+                self.max = "1"
+                self.children = {}
+
+        mock_definition = MockElementDefinition()
+
+        # Extension inherits from Element, which may inherit from other classes
+        ExtensionSlice = self.factory._construct_slice_model(
+            name="complex-extension-slice",
+            definition=mock_definition,  # type: ignore
+            base=Extension,
+            base_name="ComplexExtension",
+        )
+
+        # Should inherit from all the proper classes in the chain
+        assert issubclass(ExtensionSlice, Extension)
+        assert issubclass(ExtensionSlice, Element)
+        assert issubclass(ExtensionSlice, FHIRSliceModel)
+
+        # Test MRO (Method Resolution Order) makes sense
+        mro = ExtensionSlice.__mro__
+        assert Extension in mro
+        assert Element in mro
+        assert FHIRSliceModel in mro
+
+        # Create instance and verify it works
+        instance = ExtensionSlice(
+            url="http://example.org/test", valueString="test value"  # type: ignore
+        )
+        assert isinstance(instance, Extension)
+        assert isinstance(instance, Element)
+        assert isinstance(instance, FHIRSliceModel)
+
+    def test_slice_models_can_be_used_in_union_types(self):
+        """Test that slice models work correctly in Union type validations."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.base import FHIRSliceModel
+        from typing import Union, List, Optional
+        from pydantic import BaseModel, Field
+
+        # Create mock element definitions
+        class MockElementDefinition:
+            def __init__(self, short_desc):
+                self.type = []
+                self.short = short_desc
+                self.min = 0
+                self.max = "1"
+                self.children = {}
+
+        # Create two different Extension slices using _construct_slice_model
+        ExtensionSliceA = self.factory._construct_slice_model(
+            name="extension-a-slice",
+            definition=MockElementDefinition("Extension A slice"),  # type: ignore
+            base=Extension,
+            base_name="ExtensionA",
+        )
+
+        ExtensionSliceB = self.factory._construct_slice_model(
+            name="extension-b-slice",
+            definition=MockElementDefinition("Extension B slice"),  # type: ignore
+            base=Extension,
+            base_name="ExtensionB",
+        )
+
+        # Create a test model with a Union field that should accept either slice or base Extension
+        class TestModel(BaseModel):
+            extensions: Optional[
+                List[Union[ExtensionSliceA, ExtensionSliceB, Extension]]  # type: ignore
+            ] = Field(default=None)
+
+        # Test that both slices can be used in the Union
+        slice_a = ExtensionSliceA(
+            url="http://example.org/extension-a",  # type: ignore
+            valueString="test",  # type: ignore
+        )
+        slice_b = ExtensionSliceB(
+            url="http://example.org/extension-b",  # type: ignore
+            valueInteger=123,  # type: ignore
+        )
+
+        # This should work if slices properly inherit from Extension
+        test_instance = TestModel(extensions=[slice_a, slice_b])
+        assert test_instance.extensions is not None
+        assert len(test_instance.extensions) == 2
+        assert isinstance(test_instance.extensions[0], ExtensionSliceA)
+        assert isinstance(test_instance.extensions[0], Extension)
+        assert isinstance(test_instance.extensions[1], ExtensionSliceB)
+        assert isinstance(test_instance.extensions[1], Extension)
+
+    def test_slice_model_cardinality_preserved(self):
+        """Test that slice models preserve cardinality information from FHIRSliceModel."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.base import FHIRSliceModel
+
+        # Create mock element definition with custom cardinality
+        class MockElementDefinition:
+            def __init__(self):
+                self.type = []
+                self.short = "Extension with custom cardinality"
+                self.min = 2  # Custom cardinality
+                self.max = "5"
+                self.children = {}
+
+        mock_definition = MockElementDefinition()
+
+        ExtensionSlice = self.factory._construct_slice_model(
+            name="cardinality-extension-slice",
+            definition=mock_definition,  # type: ignore
+            base=Extension,
+            base_name="CardinalityExtension",
+        )
+
+        # Should have custom cardinality from the slice definition
+        assert hasattr(ExtensionSlice, "min_cardinality")
+        assert hasattr(ExtensionSlice, "max_cardinality")
+        assert ExtensionSlice.min_cardinality == 2
+        assert ExtensionSlice.max_cardinality == 5
+
+        # Should still be proper Extension and FHIRSliceModel
+        assert issubclass(ExtensionSlice, Extension)
+        assert issubclass(ExtensionSlice, FHIRSliceModel)
+
+    @pytest.mark.filterwarnings("ignore:.*dom-6.*")
+    def test_slice_models_can_be_assigned_to_original_type_fields(self):
+        """Test that slice models can be assigned to fields expecting the original type."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
+
+        # Create a mock element definition
+        class MockElementDefinition:
+            def __init__(self):
+                self.type = []
+                self.short = "Patient extension slice"
+                self.min = 0
+                self.max = "1"
+                self.children = {}
+
+        mock_definition = MockElementDefinition()
+
+        # Create extension slice
+        ExtensionSlice = self.factory._construct_slice_model(
+            name="patient-extension-slice",
+            definition=mock_definition,  # type: ignore
+            base=Extension,
+            base_name="PatientExtension",
+        )
+
+        # Create an instance of the slice
+        extension_instance = ExtensionSlice(
+            url="http://example.org/patient-extension",
+            valueString="test value",
+        )
+
+        # Should be able to assign the slice to a Patient's extension field
+        # This tests the core issue: slice should be usable as Extension
+        patient = Patient(extension=[extension_instance])  # type: ignore
+        assert patient.extension is not None
+        assert len(patient.extension) == 1
+        assert patient.extension[0] == extension_instance
+
+        # The extension should also be usable as a regular Extension type
+        regular_extension_field: Extension = extension_instance
+        assert regular_extension_field.url == "http://example.org/patient-extension"
+
+    def test_slice_models_preserve_method_resolution_order(self):
+        """Test that slice models have proper method resolution order."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.datatypes.R4B.complex import Element
+        from fhircraft.fhir.resources.base import FHIRSliceModel
+
+        # Create a mock element definition
+        class MockElementDefinition:
+            def __init__(self):
+                self.type = []
+                self.short = "Test MRO slice"
+                self.min = 0
+                self.max = "1"
+                self.children = {}
+
+        mock_definition = MockElementDefinition()
+
+        # Create slice model
+        ExtensionSlice = self.factory._construct_slice_model(
+            name="mro-test-slice",
+            definition=mock_definition,  # type: ignore
+            base=Extension,
+            base_name="MROTestExtension",
+        )
+
+        # Test MRO (Method Resolution Order) is sensible
+        mro = ExtensionSlice.__mro__
+
+        # Should include both inheritance paths
+        assert Extension in mro, "Extension should be in MRO"
+        assert Element in mro, "Element should be in MRO"
+        assert FHIRSliceModel in mro, "FHIRSliceModel should be in MRO"
+
+        # Extension should come before FHIRSliceModel in MRO for proper method resolution
+        extension_idx = mro.index(Extension)
+        fhir_slice_idx = mro.index(FHIRSliceModel)
+        assert (
+            extension_idx < fhir_slice_idx
+        ), "Extension should come before FHIRSliceModel in MRO"

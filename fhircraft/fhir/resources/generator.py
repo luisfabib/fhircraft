@@ -146,6 +146,53 @@ class CodeGenerator:
                     if isinstance(item, BaseModel):
                         self._add_constant_value_imports(item)
 
+    def _group_imports_by_common_parent(self) -> Dict[str, List[str]]:
+        """
+        Groups imports by their common parent modules to reduce redundancy.
+
+        For example, transforms:
+        {
+            'fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept': ['CodeableConcept'],
+            'fhircraft.fhir.resources.datatypes.R4B.complex.coding': ['Coding']
+        }
+
+        Into:
+        {
+            'fhircraft.fhir.resources.datatypes.R4B.complex': ['CodeableConcept', 'Coding']
+        }
+
+        Returns:
+            Dict[str, List[str]]: Grouped imports by common parent modules.
+        """
+        if not self.import_statements:
+            return {}
+
+        # First, collect all module paths and their objects
+        module_objects = {}
+        for full_module, objects in self.import_statements.items():
+            # For modules that end with the object name, remove the last part
+            # e.g., 'fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept' -> 'fhircraft.fhir.resources.datatypes.R4B.complex'
+            parts = full_module.split(".")
+            if len(objects) == 1 and parts[-1].lower().replace("_", "") == objects[
+                0
+            ].lower().replace("_", ""):
+                # This is a module that ends with the class name
+                parent_module = ".".join(parts[:-1])
+                if parent_module not in module_objects:
+                    module_objects[parent_module] = []
+                module_objects[parent_module].extend(objects)
+            else:
+                # This is a regular module import
+                if full_module not in module_objects:
+                    module_objects[full_module] = []
+                module_objects[full_module].extend(objects)
+
+        # Sort objects within each module for consistent output
+        for module in module_objects:
+            module_objects[module] = sorted(list(set(module_objects[module])))
+
+        return module_objects
+
     def _serialize_model(self, model: type[BaseModel]) -> None:
         """
         Serialize the model by extracting information about its fields and properties.
@@ -327,10 +374,13 @@ class CodeGenerator:
         # Serialize the model information of the input resources
         for resource in ensure_list(resources):
             self._serialize_model(resource)
+        # Group imports by common parent modules
+        grouped_imports = self._group_imports_by_common_parent()
+
         # Render the source code using Jinja2
         source_code = self.template.render(
             data=self.data,
-            imports=self.import_statements,
+            imports=grouped_imports,
             include_validators=include_validators,
             metadata={
                 "version": version("fhircraft"),
@@ -338,19 +388,46 @@ class CodeGenerator:
             },
         )
         # Replace the full module specification for any modules imported
-        for module, objects in self.import_statements.items():
-            module = module.replace(".", r"\.")
-            for regex in [
-                rf"(\<class \'{module}\.(\w*)\'\>)",
-                r"(\<class \'(\w*)\'\>)",
-            ]:
-                for match in re.finditer(regex, source_code):
-                    source_code = source_code.replace(match.group(1), match.group(2))
+        # First, collect all imported objects for class name cleanup
+        all_imported_objects = set()
+        for objects in grouped_imports.values():
+            all_imported_objects.update(objects)
+
+        for module, objects in grouped_imports.items():
+            module_escaped = module.replace(".", r"\.")
+            # Remove module prefixes for imported objects
             for match in re.finditer(
-                rf"({module}\.)({'|'.join(objects)})", source_code
+                rf"({module_escaped}\.)({'|'.join(objects)})", source_code
             ):
                 source_code = source_code.replace(match.group(1), "")
-            source_code = source_code.replace(f"{FACTORY_MODULE}.", "")
+
+        # Also handle original import statements for any remaining references
+        for module, objects in self.import_statements.items():
+            module_escaped = module.replace(".", r"\.")
+            for match in re.finditer(
+                rf"({module_escaped}\.)({'|'.join(objects)})", source_code
+            ):
+                source_code = source_code.replace(match.group(1), "")
+
+        # Clean up class representations for all imported objects
+        for obj_name in all_imported_objects:
+            # Replace <class 'ObjectName'> with ObjectName
+            source_code = re.sub(
+                rf"<class '{re.escape(obj_name)}'>", obj_name, source_code
+            )
+            # Also handle cases with module prefixes
+            source_code = re.sub(
+                rf"<class '[\w.]*\.{re.escape(obj_name)}'>", obj_name, source_code
+            )
+
+        # Clean up built-in types that aren't in imports
+        builtin_types = ["str", "int", "float", "bool", "list", "dict", "tuple", "set"]
+        for builtin_type in builtin_types:
+            source_code = re.sub(
+                rf"<class '{re.escape(builtin_type)}'>", builtin_type, source_code
+            )
+
+        source_code = source_code.replace(f"{FACTORY_MODULE}.", "")
         source_code = source_code.replace(LEFT_TO_RIGHT_COMPLEX, LEFT_TO_RIGHT_SIMPLE)
         return source_code
 

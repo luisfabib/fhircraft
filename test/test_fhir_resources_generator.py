@@ -147,11 +147,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
-            model,
-        )
-        self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding",
             model,
         )
 
@@ -201,11 +197,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         self.assertBlockInCode(expected_block, model)
         # Check imports
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
-            model,
-        )
-        self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding",
             model,
         )
 
@@ -338,11 +330,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         self.assertBlockInCode(expected_block, model)
         # Check imports
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
-            model,
-        )
-        self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding",
             model,
         )
 
@@ -412,6 +400,35 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         class Slice(FHIRSliceModel):
             min_cardinality: ClassVar[int] = 0
             max_cardinality: ClassVar[int] = 2
+            valueString: str = Field(
+                description="A string value",
+            )
+        """
+        self.assertBlockInCode(expected_block, model)
+
+    def test_model_with_multiple_inheritance_slice(self):
+        """Test that slice models with multiple inheritance generate correctly."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.base import FHIRSliceModel
+
+        # Create a model with multiple inheritance (Extension + FHIRSliceModel)
+        model = _create_model(
+            "ExtensionSlice",
+            url=(str, Field(description="Extension URL")),
+            valueString=(str, Field(description="A string value")),
+            __base__=(Extension, FHIRSliceModel),
+        )
+        assert issubclass(model, FHIRSliceModel)
+        model.min_cardinality = 1
+        model.max_cardinality = 1
+
+        expected_block = """
+        class ExtensionSlice(Extension, FHIRSliceModel):
+            min_cardinality: ClassVar[int] = 1
+            max_cardinality: ClassVar[int] = 1
+            url: str = Field(
+                description="Extension URL",
+            )
             valueString: str = Field(
                 description="A string value",
             )
@@ -583,3 +600,30 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         namespace = {}
         exec(code, namespace)
         # The expression string should be preserved correctly
+
+    def test_import_grouping_by_common_parent(self):
+        """Test that imports are grouped by their common parent modules."""
+        # Create model with types from the same module
+        model = create_model(
+            "ModelWithGroupedImports",
+            concept=(CodeableConcept, Field(description="A concept")),
+            coding=(Coding, Field(description="A coding")),
+        )
+
+        code = generate_resource_model_code(model)
+
+        # Should generate grouped import instead of individual imports
+        self.assertBlockInCode(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding",
+            model,
+        )
+
+        # Should NOT have individual imports
+        self.assertNotIn(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
+            code,
+        )
+        self.assertNotIn(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
+            code,
+        )
