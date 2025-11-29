@@ -147,11 +147,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
-            model,
-        )
-        self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding",
             model,
         )
 
@@ -201,11 +197,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         self.assertBlockInCode(expected_block, model)
         # Check imports
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
-            model,
-        )
-        self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding",
             model,
         )
 
@@ -338,11 +330,7 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         self.assertBlockInCode(expected_block, model)
         # Check imports
         self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
-            model,
-        )
-        self.assertBlockInCode(
-            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding",
             model,
         )
 
@@ -612,3 +600,30 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         namespace = {}
         exec(code, namespace)
         # The expression string should be preserved correctly
+
+    def test_import_grouping_by_common_parent(self):
+        """Test that imports are grouped by their common parent modules."""
+        # Create model with types from the same module
+        model = create_model(
+            "ModelWithGroupedImports",
+            concept=(CodeableConcept, Field(description="A concept")),
+            coding=(Coding, Field(description="A coding")),
+        )
+
+        code = generate_resource_model_code(model)
+
+        # Should generate grouped import instead of individual imports
+        self.assertBlockInCode(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Coding",
+            model,
+        )
+
+        # Should NOT have individual imports
+        self.assertNotIn(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.codeable_concept import CodeableConcept",
+            code,
+        )
+        self.assertNotIn(
+            "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
+            code,
+        )
