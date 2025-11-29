@@ -11,7 +11,18 @@ import warnings
 from enum import Enum
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    Generic,
+)
 
 # Pydantic modules
 from pydantic import BaseModel, Field, create_model, field_validator, model_validator
@@ -40,6 +51,7 @@ from fhircraft.utils import capitalize, ensure_list, get_FHIR_release_from_versi
 
 ModelT = TypeVar("ModelT", bound="BaseModel")
 SlicedModelT = TypeVar("SlicedModelT", bound="FHIRSliceModel")
+
 
 _Unset: Any = PydanticUndefined
 
@@ -779,9 +791,9 @@ class ResourceFactory:
         self,
         name: str,
         definition: ElementDefinitionNode,
-        base: type[BaseModel],
+        base: type[ModelT],
         base_name: str,
-    ) -> type[FHIRSliceModel]:
+    ) -> Any:
         """
         Constructs a Pydantic model representing a FHIR slice based on the provided element definition.
 

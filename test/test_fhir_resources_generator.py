@@ -418,6 +418,35 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
 
+    def test_model_with_multiple_inheritance_slice(self):
+        """Test that slice models with multiple inheritance generate correctly."""
+        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
+        from fhircraft.fhir.resources.base import FHIRSliceModel
+
+        # Create a model with multiple inheritance (Extension + FHIRSliceModel)
+        model = _create_model(
+            "ExtensionSlice",
+            url=(str, Field(description="Extension URL")),
+            valueString=(str, Field(description="A string value")),
+            __base__=(Extension, FHIRSliceModel),
+        )
+        assert issubclass(model, FHIRSliceModel)
+        model.min_cardinality = 1
+        model.max_cardinality = 1
+
+        expected_block = """
+        class ExtensionSlice(Extension, FHIRSliceModel):
+            min_cardinality: ClassVar[int] = 1
+            max_cardinality: ClassVar[int] = 1
+            url: str = Field(
+                description="Extension URL",
+            )
+            valueString: str = Field(
+                description="A string value",
+            )
+        """
+        self.assertBlockInCode(expected_block, model)
+
     def test_model_with_property_method(self):
         # Create model with a property
         model = create_model(
