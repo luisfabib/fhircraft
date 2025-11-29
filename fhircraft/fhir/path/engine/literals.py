@@ -1,10 +1,16 @@
 import operator
+from pathlib import Path
 import re
 import warnings
 from abc import ABC
 from dataclasses import dataclass
 from datetime import date, datetime, time
 from typing import Optional, Union
+from pint import UnitRegistry, Quantity as PintQuantity
+
+# Load the Pint unit registry with UCUM definitions
+ureg = UnitRegistry()
+ureg.load_definitions(Path(__file__).resolve().parent / "ucum_to_pint.txt")
 
 
 class FHIRPathLiteralType(ABC):
@@ -16,20 +22,31 @@ class Quantity(FHIRPathLiteralType):
     value: Union[int, float]
     unit: Optional[str]
 
-    def __comparison__(self, other, op):
-        if self.unit == other.unit:
-            return op(self.value, other.value)
-        else:
-            warnings.warn(
-                f"Cannot perform operation {op.__name__} on quantities with different units: {self.unit} and {other.unit}. Returning empty collection."
+    def __comparison__(self, other, op) -> bool:
+        if isinstance(other, Quantity):
+            return op(
+                self.value * ureg(self.unit or ""), other.value * ureg(other.unit or "")
             )
-            return []
+        elif isinstance(other, (int, float)) and self.unit in (None, "1"):
+            return op(self.value, other)
+        else:
+            raise TypeError(f"Comparisons with {type(other)} not supported")
 
-    def __math__(self, other, op) -> "Quantity":
-        return Quantity(op(self.value, other.value), self.unit)
+    def __math__(self, other, op) -> PintQuantity:
+        if isinstance(other, Quantity):
+            return op(
+                self.value * ureg(self.unit or ""), other.value * ureg(other.unit or "")
+            )
+        elif isinstance(other, (int, float)):
+            return op(self.value, other)
+        else:
+            raise TypeError(f"Operations with {type(other)} not supported")
 
     def __abs__(self):
         return Quantity(abs(self.value), self.unit)
+
+    def __eq__(self, other):
+        return self.__comparison__(other, operator.eq)
 
     def __lt__(self, other):
         return self.__comparison__(other, operator.lt)
@@ -44,40 +61,39 @@ class Quantity(FHIRPathLiteralType):
         return self.__comparison__(other, operator.ge)
 
     def __add__(self, other):
-        if not self.unit == other.unit:
-            raise ValueError(
-                f"Cannot perform addition on quantities with different units: {self.unit} and {other.unit}."
-            )
-        return self.__math__(other, operator.add)
+        result = self.__math__(other, operator.add)
+        return Quantity(
+            value=result.to(self.unit).magnitude,
+            unit=self.unit,
+        )
 
     def __sub__(self, other):
-        if not self.unit == other.unit:
-            raise ValueError(
-                f"Cannot perform subtraction on quantities with different units: {self.unit} and {other.unit}."
-            )
-        return self.__math__(other, operator.sub)
+        result = self.__math__(other, operator.sub)
+        return Quantity(
+            value=result.to(self.unit).magnitude,
+            unit=self.unit,
+        )
 
     def __mul__(self, other):
         result = self.__math__(other, operator.mul)
-        result.unit = f"{self.unit}*{other.unit}"
-        return result
-
-    def __truediv__(self, other):
-        result = self.__math__(other, operator.truediv)
-        if self.unit == other.unit:
-            result.unit = "1"
-        else:
-            result.unit = f"{self.unit}/{other.unit}"
-        return result
+        return Quantity(
+            value=result.magnitude,
+            unit=f"{self.unit}*{other.unit}",
+        )
 
     def __floordiv__(self, other):
         result = self.__math__(other, operator.floordiv)
-        if self.unit == other.unit:
-            result.unit = "1"
-        else:
-            result.unit = f"{self.unit}/{other.unit}"
+        return Quantity(
+            value=result.magnitude,
+            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "1",
+        )
 
-        return result
+    def __truediv__(self, other):
+        result = self.__math__(other, operator.truediv)
+        return Quantity(
+            value=result.magnitude,
+            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "1",
+        )
 
 
 @dataclass
