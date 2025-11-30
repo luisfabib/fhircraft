@@ -131,8 +131,6 @@ div_cases = (
     (5, 2, 2),
     (5.5, 0.7, 7),
     (5, 0, []),
-    (Quantity(4, "mg"), Quantity(2, "mg"), Quantity(2, "1")),
-    (Quantity(4, "mg"), Quantity(2, "L"), Quantity(2, "mg/L")),
 )
 
 

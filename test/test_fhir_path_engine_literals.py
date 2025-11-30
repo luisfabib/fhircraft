@@ -8,27 +8,42 @@ def test_fhirpath_type_quantity_init():
 
 def test_fhirpath_type_quantity_eq():
     assert Quantity(value=1, unit="m") == Quantity(value=1, unit="m")
+    assert Quantity(value=1, unit="m") == Quantity(value=100, unit="cm")
+    assert Quantity(value=1, unit="km") == Quantity(value=100000, unit="cm")
 
 
 def test_fhirpath_type_quantity_gt():
     assert Quantity(value=2, unit="m") > Quantity(value=1, unit="m")
+    assert Quantity(value=2, unit="m") > Quantity(value=100, unit="cm")
+    assert Quantity(value=1, unit="km") > Quantity(value=1, unit="m")
 
 
 def test_fhirpath_type_quantity_lt():
     assert Quantity(value=1, unit="m") < Quantity(value=2, unit="m")
+    assert Quantity(value=1, unit="m") < Quantity(value=200, unit="cm")
+    assert Quantity(value=1, unit="m") < Quantity(value=1, unit="km")
 
 
 def test_fhirpath_type_quantity_ge():
     assert Quantity(value=2, unit="m") >= Quantity(value=1, unit="m")
+    assert Quantity(value=1, unit="km") >= Quantity(value=1, unit="m")
 
 
 def test_fhirpath_type_quantity_le():
     assert Quantity(value=1, unit="m") <= Quantity(value=2, unit="m")
+    assert Quantity(value=1, unit="m") <= Quantity(value=200, unit="cm")
+    assert Quantity(value=1, unit="m") <= Quantity(value=1, unit="km")
 
 
 def test_fhirpath_type_quantity_add():
     assert Quantity(value=2, unit="m") + Quantity(value=2, unit="m") == Quantity(
         value=4, unit="m"
+    )
+    assert Quantity(value=2, unit="m") + Quantity(value=2, unit="cm") == Quantity(
+        value=2.02, unit="m"
+    )
+    assert Quantity(value=1, unit="g") + Quantity(value=1, unit="kg") == Quantity(
+        value=1001, unit="g"
     )
 
 
@@ -36,11 +51,20 @@ def test_fhirpath_type_quantity_sub():
     assert Quantity(value=2, unit="m") - Quantity(value=2, unit="m") == Quantity(
         value=0, unit="m"
     )
+    assert Quantity(value=2, unit="m") - Quantity(value=20, unit="cm") == Quantity(
+        value=1.8, unit="m"
+    )
+    assert Quantity(value=1, unit="kg") - Quantity(value=500, unit="g") == Quantity(
+        value=0.5, unit="kg"
+    )
 
 
 def test_fhirpath_type_quantity_prod():
     assert Quantity(value=3, unit="m") * Quantity(value=2, unit="s") == Quantity(
         value=6, unit="m*s"
+    )
+    assert Quantity(value=3, unit="m") * Quantity(value=2, unit="m") == Quantity(
+        value=6, unit="m*m"
     )
 
 
@@ -58,10 +82,6 @@ def test_fhirpath_type_quantity_div_same_unit():
 
 def test_fhirpath_type_quantity_abs():
     assert abs(Quantity(value=-3, unit="m")) == Quantity(value=3, unit="m")
-
-
-def test_fhirpath_type_quantity_different_units():
-    assert (Quantity(value=1, unit="cm") <= Quantity(value=2, unit="m")) == []
 
 
 def test_fhirpath_type_date_init():

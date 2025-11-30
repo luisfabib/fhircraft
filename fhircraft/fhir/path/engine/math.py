@@ -235,14 +235,14 @@ class Division(FHIRMathOperator):
         )
         if left_value is None or right_value is None:
             return []
-        if right_value == 0:
-            return []
-        elif isinstance(left_value, (int, float)) and isinstance(
-            right_value, (int, float)
+        if (isinstance(right_value, Quantity) and right_value.value == 0) or (
+            isinstance(right_value, (int, float)) and right_value == 0
         ):
-            return [FHIRPathCollectionItem.wrap(left_value / right_value)]
-        elif isinstance(left_value, (Quantity)) and isinstance(right_value, (Quantity)):
-            return [FHIRPathCollectionItem.wrap(left_value / right_value)]
+            return []
+        elif isinstance(left_value, (int, float, Quantity)) and isinstance(
+            right_value, (int, float, Quantity)
+        ):
+            return [FHIRPathCollectionItem.wrap(left_value / right_value)]  # type: ignore
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
@@ -283,17 +283,15 @@ class Div(FHIRMathOperator):
         )
         if left_value is None or right_value is None:
             return []
-        if right_value == 0:
-            return []
         elif isinstance(left_value, (int, float)) and isinstance(
             right_value, (int, float)
         ):
-            return [FHIRPathCollectionItem.wrap(left_value // right_value)]
-        elif isinstance(left_value, (Quantity)) and isinstance(right_value, (Quantity)):
-            return [FHIRPathCollectionItem.wrap(left_value // right_value)]
+            if right_value == 0:
+                return []
+            return [FHIRPathCollectionItem.wrap(left_value // right_value)]  # type: ignore
         else:
             raise FHIRPathRuntimeError(
-                f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
+                f"FHIRPath operator {self.__str__()} cannot perform truncated division between {type(left_value).__name__} and {type(right_value).__name__}."
             )
 
     def __str__(self):
