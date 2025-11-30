@@ -8,6 +8,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## [0.4.0] - 2025-11-30
+
+### Added
+
+- Implement polymorphic serialization and deserialization support in `FHIRBaseModel` to preserve runtime type information for FHIR resources, ensuring specialized fields are not lost during serialization ([#123](https://github.com/luisfabib/fhircraft/pull/123))
+- Add new FHIRPath `TypeSpecifier` class for handling type identifiers with namespace support including qualified type names like `FHIR.Patient` and `System.String` ([#124](https://github.com/luisfabib/fhircraft/pull/124))
+- Implement unit conversion and handling for FHIRPath `Quantity` using the Pint library with UCUM unit definitions support, enabling robust unit-aware arithmetic and comparison FHIRPath operations ([#126](https://github.com/luisfabib/fhircraft/pull/126))
+
+### Changed
+
+- Update FHIRPath `is`, `as`, `ofType()`, and legacy type functions to use `TypeSpecifier` objects instead of plain strings for improved type handling ([#124](https://github.com/luisfabib/fhircraft/pull/124))
+- Improve import consolidation in generated code to reduce verbosity by grouping multiple individual import lines into single grouped imports ([#125](https://github.com/luisfabib/fhircraft/pull/125))
+
+### Fixed
+
+- Fix contained resource serialization to preserve specialized model schemas instead of being reduced to generic base models ([#123](https://github.com/luisfabib/fhircraft/pull/123), fixes [#120](https://github.com/luisfabib/fhircraft/issues/120))
+- Fix Jinja2 template to properly handle models with multiple base classes by iterating over `model.__bases__` instead of using only `model.__base__` ([#125](https://github.com/luisfabib/fhircraft/pull/125), fixes [#121](https://github.com/luisfabib/fhircraft/issues/121))
+- Fix FHIRPath arithmetic and comparison operations between `Quantity` instances with different but convertible units ([#126](https://github.com/luisfabib/fhircraft/pull/126), fixes [#36](https://github.com/luisfabib/fhircraft/issues/36))
+
+### Removed
+
+- Remove obsolete `contained_FHIR_resource_validator` method and its assignments, superseded by polymorphic functionality ([#123](https://github.com/luisfabib/fhircraft/pull/123))
+
+----------------- 
+
 ## [0.3.7] - 2025-11-26
 
 ### Added
@@ -241,6 +266,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release 🎉
 
+[0.4.0]: https://github.com/luisfabib/fhircraft/releases/tag/0.4.0
 [0.3.7]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.7
 [0.3.6]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.6
 [0.3.5]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.5

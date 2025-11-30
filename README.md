@@ -5,17 +5,18 @@
 <br />
 <div align="center">
   <a href="https://github.com/luisfabib/fhircraft">
-    <img src="docs/assets/images/logo-banner.png" width="50%">
+    <img src="https://github.com/luisfabib/fhircraft/blob/main/docs/assets/images/logo-banner.png?raw=true" width="50%">
   </a>
 
   ![PyPI - Version](https://img.shields.io/pypi/v/fhircraft?style=flat&logo=pypi&label=PyPI%20Release&labelColor=%231e293b)
   ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/fhircraft?style=flat-square&logo=python&labelColor=%231e293b)
-  [![license](https://img.shields.io/github/license/luisfabib/fhircraft.svg)](https://github.com/luisfabib/fhircraft/blob/main/LICENSE)
   [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
   ![FHIR Releases](https://img.shields.io/badge/FHIR-R4_R4B_R5-blue?style=flat&logo=fireship&logoColor=red&labelColor=%231e293b)
 
+---
   <p align="center">
-    Transform FHIR specifications into type-safe Python models with automatic validation, profile-friendly structures, and seamless integration. Build healthcare applications with confidence using Pydantic-powered FHIR resources, comprehensive FHIRPath querying, and declarative FHIR Mapping Language data transformation.
+    <b>Pythonic healthcare interoperability</b><br>
+    A comprehensive Python toolkit for working with FHIR healthcare data standards using Pydantic models from core and profiled FHIR specifications, all without external dependencies or complex server infrastructure.
     <br />
     <br />
     <a href="https://luisfabib.github.io/fhircraft"><strong>Explore the Documentation »</strong></a>
@@ -27,25 +28,21 @@
   </p>
 </div>
 
+---
 > [!WARNING]  
 > This package is under active development. Major and/or breaking changes are to be expected in future updates.
 
-## ✨ Why Choose Fhircraft?
+## Key Features
 
-### **Type Safety & Validation**
-Generate validated Pydantic models from core or profiled FHIR specifications. Catch data errors at development time with automatic constraint checking.
+* Automatic validation of FHIR resources using Pydantic models generated directly from FHIR structure definitions. Catch schema violations and constraint failures without any dedicated servers.
 
-### **Pythonic FHIR Development**
-Work with FHIR resources using familiar Python and Pydantic patterns. No complex server infrastructure or XML parsing required - just clean, maintainable Python code.
+* Work with FHIR data as standard Python objects. No XML parsing, no external FHIR servers required. Access and modify healthcare data using familiar Python syntax and patterns.
 
-### **Multi-Release Support**
-Seamlessly work with FHIR R4, R4B, and R5 specifications. Load implementation guides and custom profiles from the global FHIR package registry.
+* Supports FHIR R4, R4B, and R5 out of the box. Load implementation guides and custom profiles directly from the FHIR package registry to work with specialized healthcare data models.
 
-### **Integrated FHIRPath Engine**
-Query and manipulate FHIR data using the standard FHIRPath language with full Python integration. No external dependencies or separate query engines needed.
+* Execute FHIRPath expressions directly on Python objects. Query complex nested healthcare data structures using the standard FHIR query language without additional tooling.
 
-### **FHIR Mapping Language**
-Transform data between different structures using the official FHIR Mapping Language. Convert legacy systems and external data into validated FHIR resources.
+* Implement healthcare data transformations using the official FHIR Mapping Language. Convert between different data formats while maintaining semantic integrity and validation.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -55,23 +52,21 @@ Transform data between different structures using the official FHIR Mapping Lang
 ### Prerequisites
 
 - Python 3.10 or higher
-- pip package manager
 
 ### Installation
 
-Install Fhircraft using pip:
+Install Fhircraft using your package manager of choice. To download the latest release using the `pip` manager:
 
 ```bash
 pip install fhircraft
 ``` 
-
-Or install the latest development version:
+or install the latest development version:
 
 ```bash
 pip install git+https://github.com/luisfabib/fhircraft.git
 ```
 
-**Verify your installation:**
+To verify your installation:
 
 ```python
 from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
@@ -83,10 +78,10 @@ print("✓ Fhircraft installed successfully!")
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Core Features
+## Demo
 
 ### **Built-in FHIR Resources**
-Access pre-built Pydantic models for all standard FHIR resources across multiple versions:
+Work with pre-generated Pydantic models for all standard FHIR resources. Each model includes full validation rules from the FHIR specification:
 
 ```python
 from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
@@ -105,7 +100,7 @@ print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
 ```
 
 ### **FHIR Package Integration**
-Load implementation guides and custom profiles from the FHIR package registry:
+Extend base FHIR models with implementation guide profiles loaded directly from the official FHIR package registry:
 
 ```python
 from fhircraft.fhir.resources.factory import factory
@@ -127,7 +122,7 @@ patient = USCorePatient(
 ```
 
 ### **FHIRPath Querying**
-Query and manipulate FHIR resources using the standard FHIRPath language:
+Execute FHIRPath expressions directly on FHIR resource instances to extract, filter, and validate healthcare data:
 
 ```python
 # Query patient data with FHIRPath
@@ -142,7 +137,7 @@ print(f"Updated patient: {family_names[0]}, Phone: {has_phone}")
 ```
 
 ### **Data Transformation**
-Transform legacy data using the FHIR Mapping Language:
+Convert external data sources into valid FHIR resources using declarative mapping scripts:
 
 ```python
 from fhircraft.fhir.mapper import FHIRMapper
@@ -181,22 +176,18 @@ print(f"Transformed: {fhir_patient.name[0].given[0]} {fhir_patient.name[0].famil
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**. Checkout the [Contributing Guide](https://luisfabib.github.io/fhircraft/community/contributing/) for more details. Thanks to all our contributors!
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/amazing_feature`)
-3. Commit your Changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the Branch (`git push origin feature/amazing_feature`)
-5. Open a Pull Request (PR)
+<img src="https://contrib.rocks/image?repo=luisfabib/fhircraft">
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See [LICENSE](https://github.com/luisfabib/fhircraft?tab=MIT-1-ov-file) for more information.
+This project is distributed under the MIT License. See [LICENSE](https://github.com/luisfabib/fhircraft?tab=MIT-1-ov-file) for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
