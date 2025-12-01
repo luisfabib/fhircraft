@@ -1,6 +1,7 @@
 import inspect
 import logging
 import typing
+import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial
@@ -987,16 +988,14 @@ class TypeSpecifier(FHIRPath):
         namespace = self.namespace or "FHIR"
         if namespace == "FHIR":
             self.specifier = self.specifier[0].upper() + self.specifier[1:]
-            for release in ('R4', 'R4B', 'R5'):
-                try:
-                    type = get_fhir_type(self.specifier, release=release)
-                    break
-                except AttributeError:
-                    continue
-            else:
-                raise NameError(
-                    f"Unknown FHIR type '{self.specifier}'."
+            release = environment.get("%fhirRelease")
+            if not release:
+                warnings.warn(
+                    "No %fhirRelease found in environment. Defaulting to R4 for type resolution.",
+                    UserWarning,
                 )
+                release = "R4"
+            type = get_fhir_type(self.specifier, release=release)
         else:
             raise NameError(
                 f"Unknown namespace '{self.namespace}' for type specifier '{self.specifier}'"
