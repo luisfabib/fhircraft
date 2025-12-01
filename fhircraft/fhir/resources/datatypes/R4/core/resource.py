@@ -30,6 +30,7 @@ class Resource(FHIRBaseModel):
     """
     This is the base resource type for everything.
     """
+    _fhir_release="R4"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

@@ -14,6 +14,7 @@ class Element(FHIRBaseModel):
     """
     Base for all elements
     """
+    _fhir_release = "R4"
 
     id: Optional[String] = Field(
         description="Unique id for inter-element referencing",

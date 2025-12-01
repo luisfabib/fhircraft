@@ -14,6 +14,7 @@ class Resource(FHIRBaseModel):
     """
     Base Resource
     """
+    _fhir_release = "R4"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

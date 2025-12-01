@@ -441,7 +441,7 @@ class BundleEntry(BackboneElement):
         )
 
 
-class Bundle(FHIRBaseModel):
+class Bundle(Resource):
     """
     A container for a collection of resources.
     """

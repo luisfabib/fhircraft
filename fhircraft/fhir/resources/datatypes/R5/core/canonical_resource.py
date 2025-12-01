@@ -44,7 +44,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 
 
-class CanonicalResource(FHIRBaseModel):
+class CanonicalResource(Resource):
     """
     Common Interface declaration for conformance and knowledge artifact resources.
     """

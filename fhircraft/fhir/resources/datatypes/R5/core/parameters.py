@@ -514,7 +514,7 @@ class ParametersParameter(BackboneElement):
         )
 
 
-class Parameters(FHIRBaseModel):
+class Parameters(Resource):
     """
     This resource is used to pass information into and back from an operation (whether invoked directly from REST or within a messaging environment).  It is not persisted or allowed to be referenced by other resources except as described in the definition of the Parameters resource.
     """

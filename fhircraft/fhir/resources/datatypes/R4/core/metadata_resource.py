@@ -46,6 +46,7 @@ class MetadataResource(FHIRBaseModel):
     """
     Common Ancestor declaration for conformance and knowledge artifact resources.
     """
+    _fhir_release="R4"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

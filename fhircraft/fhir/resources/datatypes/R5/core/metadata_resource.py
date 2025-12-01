@@ -45,9 +45,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     RelatedArtifact,
 )
+from .canonical_resource import CanonicalResource
 
-
-class MetadataResource(FHIRBaseModel):
+class MetadataResource(CanonicalResource):
     """
     Common Interface declaration for conformance and knowledge artifact resources.
     """

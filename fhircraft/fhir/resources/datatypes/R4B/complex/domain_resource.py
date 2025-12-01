@@ -15,6 +15,7 @@ class DomainResource(Resource):
     """
     A resource with narrative, extensions, and contained resources
     """
+    _fhir_release = "R4B"
 
     text: Optional[Narrative] = Field(
         description="Text summary of the resource, for human interpretation",

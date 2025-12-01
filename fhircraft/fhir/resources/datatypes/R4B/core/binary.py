@@ -28,10 +28,10 @@ from fhircraft.fhir.resources.datatypes.primitives import (
     Base64Binary,
 )
 
-from fhircraft.fhir.resources.datatypes.R4B.complex import Element, Meta, Reference
+from fhircraft.fhir.resources.datatypes.R4B.complex import Element, Meta, Reference, Resource
 
 
-class Binary(FHIRBaseModel):
+class Binary(Resource):
     """
     A resource that represents the data of a single raw artifact as digital content accessible in its native format.  A Binary resource can contain any content, whether text, image, pdf, zip archive, etc.
     """
