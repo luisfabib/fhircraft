@@ -31,7 +31,7 @@ from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.resources.datatypes.R4 import core, complex
 from fhircraft.fhir.resources.datatypes import primitives
 
-env = dict()
+env = {'%fhirRelease': "R4"}
 
 
 @pytest.mark.parametrize(

@@ -2,12 +2,11 @@ from collections import namedtuple
 
 import pytest
 
-from fhircraft.fhir.path.engine.additional import GetValue
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.literals import Date, Quantity
 from fhircraft.fhir.path.engine.types import *
 
-env = dict()
+env = {'%fhirRelease': "R4"}
 
 # -------------
 # Is

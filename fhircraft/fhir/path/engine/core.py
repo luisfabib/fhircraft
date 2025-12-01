@@ -383,7 +383,8 @@ class FHIRPath(ABC):
         # Determine %resource and %rootResource from parent tracking if available
         resource = data
         root_resource = data
-
+        fhir_release = getattr(data, "_fhir_release", None) 
+        
         # Check if data has parent tracking attributes (from FHIRBaseModel)
         if hasattr(data, "_resource") and hasattr(data, "_root_resource"):
             res = getattr(data, "_resource", None)
@@ -403,6 +404,7 @@ class FHIRPath(ABC):
             "%context": FHIRPathCollectionItem.wrap(data),
             "%resource": FHIRPathCollectionItem.wrap(resource),
             "%rootResource": FHIRPathCollectionItem.wrap(root_resource),
+            "%fhirRelease": FHIRPathCollectionItem.wrap(fhir_release),
         }
         # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
@@ -989,6 +991,8 @@ class TypeSpecifier(FHIRPath):
         if namespace == "FHIR":
             self.specifier = self.specifier[0].upper() + self.specifier[1:]
             release = environment.get("%fhirRelease")
+            if release:
+                release = release.value if isinstance(release, FHIRPathCollectionItem) else release
             if not release:
                 warnings.warn(
                     "No %fhirRelease found in environment. Defaulting to R4 for type resolution.",
