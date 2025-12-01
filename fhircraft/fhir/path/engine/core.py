@@ -987,7 +987,16 @@ class TypeSpecifier(FHIRPath):
         namespace = self.namespace or "FHIR"
         if namespace == "FHIR":
             self.specifier = self.specifier[0].upper() + self.specifier[1:]
-            type = get_fhir_type(self.specifier)
+            for release in ('R4', 'R4B', 'R5'):
+                try:
+                    type = get_fhir_type(self.specifier, release=release)
+                    break
+                except AttributeError:
+                    continue
+            else:
+                raise NameError(
+                    f"Unknown FHIR type '{self.specifier}'."
+                )
         else:
             raise NameError(
                 f"Unknown namespace '{self.namespace}' for type specifier '{self.specifier}'"
@@ -1000,7 +1009,7 @@ class TypeSpecifier(FHIRPath):
         )
 
     def __repr__(self):
-        return f'TypeSpecifier("{self.namespace}.{self.specifier}")'
+        return f'TypeSpecifier("{self.namespace}.{self.specifier}")' if self.namespace else f'TypeSpecifier("{self.specifier}")'
 
     def __eq__(self, other):
         return (
