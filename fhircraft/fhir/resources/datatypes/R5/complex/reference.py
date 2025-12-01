@@ -103,6 +103,8 @@ class Reference(DataType):
 
     @model_validator(mode="after")
     def FHIR_ref_2_constraint_model_validator(self):
+        if getattr(self, "_resource", None) == self:
+            return self
         return fhir_validators.validate_model_constraint(
             self,
             expression="reference.exists() or identifier.exists() or display.exists() or extension.exists()",

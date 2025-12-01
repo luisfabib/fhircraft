@@ -94,9 +94,11 @@ class Reference(Element):
 
     @model_validator(mode="after")
     def FHIR_ref_1_constraint_model_validator(self):
+        if getattr(self, "_resource", None) == self:
+            return self
         return fhir_validators.validate_model_constraint(
             self,
-            expression="%rootResource.is(Reference) or reference.startsWith('#').not() or (reference.substring(1).trace('url') in %rootResource.contained.id.trace('ids'))",
+            expression="reference.startsWith('#').not() or (reference.substring(1).trace('url') in %rootResource.contained.id.trace('ids'))",
             human="SHALL have a contained resource if a local reference is provided",
             key="ref-1",
             severity="error",
