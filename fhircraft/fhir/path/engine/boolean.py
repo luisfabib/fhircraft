@@ -112,9 +112,7 @@ class And(FHIRPath):
         return f"{self.left} and {self.right}"
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__name__}({self.left!s}, {self.right!s})"
-        )
+        return f"{self.__class__.__name__}({self.left!s}, {self.right!s})"
 
     def __eq__(self, other):
         return (
@@ -179,9 +177,7 @@ class Or(FHIRPath):
         return f"{self.left} or {self.right}"
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__name__}({self.left!s}, {self.right!s})"
-        )
+        return f"{self.__class__.__name__}({self.left!s}, {self.right!s})"
 
     def __eq__(self, other):
         return (
@@ -234,9 +230,7 @@ class Xor(FHIRPath):
         return f"{self.left} xor {self.right}"
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__name__}({self.left!s}, {self.right!s})"
-        )
+        return f"{self.__class__.__name__}({self.left!s}, {self.right!s})"
 
     def __eq__(self, other):
         return (
@@ -315,9 +309,7 @@ class Implies(FHIRPath):
         return f"{self.left} implies {self.right}"
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__name__}({self.left!s}, {self.right!s})"
-        )
+        return f"{self.__class__.__name__}({self.left!s}, {self.right!s})"
 
     def __eq__(self, other):
         return (

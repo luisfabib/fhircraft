@@ -44,7 +44,9 @@ class FHIRTypesOperator(FHIRPath):
             )
         return left_collection[0].value
 
-    def _validate_type_specifier(self, value: Any, environment: dict, create: bool) -> bool:
+    def _validate_type_specifier(
+        self, value: Any, environment: dict, create: bool
+    ) -> bool:
         """
         Validates the type specifier against the known FHIR types.
         Raises an error if the type specifier is not valid.
@@ -121,7 +123,11 @@ class Is(FHIRTypesOperator):
         value = self._get_singleton_collection_value(collection, environment, create)
         if value is None:
             return []
-        return [FHIRPathCollectionItem.wrap(self._validate_type_specifier(value, environment, create))]
+        return [
+            FHIRPathCollectionItem.wrap(
+                self._validate_type_specifier(value, environment, create)
+            )
+        ]
 
     def __str__(self):
         return f"{self.left} is {self.type_specifier}"
