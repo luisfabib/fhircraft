@@ -93,7 +93,7 @@ class Reference(Element):
 
     @model_validator(mode="after")
     def FHIR_ref_1_constraint_model_validator(self):
-        if getattr(self, "_resource", None) == self:
+        if not self._root_resource or self._root_resource == self:
             return self
         return fhir_validators.validate_model_constraint(
             self,
