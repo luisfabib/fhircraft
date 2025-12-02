@@ -73,7 +73,8 @@ class Exists(FHIRPathFunction):
         return f'{self.__class__.__name__.lower()}({self.criteria.__str__() if self.criteria else ""})'
 
     def __repr__(self):
-        return f'{self.__class__.__name__}({self.criteria.__repr__() if self.criteria else ""})'
+        criteria_str = str(self.criteria) if self.criteria else ""
+        return f"{self.__class__.__name__}({criteria_str})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.criteria == other.criteria
@@ -130,7 +131,7 @@ class All(FHIRPathFunction):
         return f"{self.__class__.__name__.lower()}({self.criteria.__str__()})"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.criteria.__repr__()})"
+        return f"{self.__class__.__name__}({self.criteria!s})"
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.criteria == other.criteria

@@ -853,7 +853,7 @@ class Invocation(FHIRPath):
         return "%s.%s" % (self.left, self.right)
 
     def __repr__(self):
-        return "%s(%r, %r)" % (self.__class__.__name__, self.left, self.right)
+        return "%s(%s, %s)" % (self.__class__.__name__, self.left, self.right)
 
     def __hash__(self):
         return hash((self.left, self.right))

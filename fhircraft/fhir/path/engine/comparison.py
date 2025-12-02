@@ -26,7 +26,7 @@ class FHIRComparisonOperator(FHIRPath, ABC):
 
     def __repr__(self):
         return (
-            f"{self.__class__.__name__}({self.left.__repr__(), self.right.__repr__()})"
+            f"{self.__class__.__name__}({self.left!s}, {self.right!s})"
         )
 
     def __eq__(self, other):

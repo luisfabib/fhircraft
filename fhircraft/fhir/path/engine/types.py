@@ -75,7 +75,7 @@ class FHIRTypesOperator(FHIRPath):
         raise NotImplementedError("Subclasses must implement __str__ method.")
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.left.__repr__(), self.type_specifier.__repr__()})"
+        return f"{self.__class__.__name__}({self.left!s}, {self.type_specifier!s})"
 
     def __eq__(self, other):
         return (
