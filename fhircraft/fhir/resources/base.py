@@ -84,7 +84,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     def _serialize_polymorphic_fields(self, serializer, info) -> Any:
         """Apply polymorphic serialization to FHIR fields during serialization."""
         # Check if polymorphic serialization is enabled
-        if not self._enable_polymorphic_serialization:
+        if not isinstance(self, FHIRBaseModel) or not self._enable_polymorphic_serialization:
             return serializer(self)
 
         # Get the base serialization with warnings suppressed
