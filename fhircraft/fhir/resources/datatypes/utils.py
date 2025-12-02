@@ -13,7 +13,7 @@ from datetime import date, datetime, time
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Type, Union
 
-from pydantic import TypeAdapter, Field, ValidationError, create_model
+from pydantic import TypeAdapter, BaseModel, ValidationError, create_model
 from typing_extensions import TypeAliasType
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
@@ -194,6 +194,8 @@ def is_fhir_complex_type(
                 raise FHIRTypeError(f"Unknown complex FHIR type: {fhir_type}")
             else:
                 return False
+    if isinstance(value, BaseModel) and issubclass(fhir_type, BaseModel):
+        return isinstance(value, fhir_type)
     try:
         if hasattr(fhir_type, "model_validate"):
             fhir_type.model_validate(value)  # type: ignore

@@ -32,7 +32,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 
 
-class DomainResource(FHIRBaseModel):
+class DomainResource(Resource):
     """
     A resource that includes narrative, extensions, and contained resources.
     """

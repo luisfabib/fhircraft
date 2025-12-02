@@ -13,6 +13,7 @@ class BackboneElement(Element):
     """
     Base for elements defined inside a resource
     """
+    _fhir_release = "R4"
 
     modifierExtension: Optional[List[Extension]] = Field(
         description="Extensions that cannot be ignored even if unrecognized",

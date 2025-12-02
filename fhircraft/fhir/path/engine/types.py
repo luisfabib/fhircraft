@@ -44,7 +44,7 @@ class FHIRTypesOperator(FHIRPath):
             )
         return left_collection[0].value
 
-    def _validate_type_specifier(self, value: Any) -> bool:
+    def _validate_type_specifier(self, value: Any, environment: dict, create: bool) -> bool:
         """
         Validates the type specifier against the known FHIR types.
         Raises an error if the type specifier is not valid.
@@ -52,7 +52,7 @@ class FHIRTypesOperator(FHIRPath):
         # Laxy import to avoid circular dependencies
         from fhircraft.fhir.resources.datatypes import utils as type_utils
 
-        type_ = self.type_specifier.evaluate([], {}, True)[0].value
+        type_ = self.type_specifier.evaluate([], environment, create)[0].value
         # Handle the FHIRPath literal types as special cases
         if isinstance(value, fhirpath_literals.Quantity):
             return type_.__name__ == "Quantity"
@@ -121,7 +121,7 @@ class Is(FHIRTypesOperator):
         value = self._get_singleton_collection_value(collection, environment, create)
         if value is None:
             return []
-        return [FHIRPathCollectionItem.wrap(self._validate_type_specifier(value))]
+        return [FHIRPathCollectionItem.wrap(self._validate_type_specifier(value, environment, create))]
 
     def __str__(self):
         return f"{self.left} is {self.type_specifier}"
@@ -185,7 +185,7 @@ class As(FHIRTypesOperator):
             return []
         return (
             [FHIRPathCollectionItem.wrap(value)]
-            if self._validate_type_specifier(value)
+            if self._validate_type_specifier(value, environment, create)
             else []
         )
 

@@ -1,6 +1,6 @@
-from typing import TYPE_CHECKING, Any, List
-
+from typing import TYPE_CHECKING, Any, List, ClassVar
 from fhircraft.fhir.path.utils import import_fhirpath_engine
+from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
 
 if TYPE_CHECKING:
     from fhircraft.fhir.path.parser import FhirPathParser
@@ -13,6 +13,13 @@ class FHIRPathMixin:
     This mixin provides convenient methods for working with FHIRPath expressions directly
     on FHIR resource instances, leveraging the enhanced FHIRPath interface.
     """
+
+
+    def _generate_fhirpath_environment(self):
+        environment = {}
+        if release := getattr(self, '_fhir_release', None):
+            environment['%fhirRelease'] = FHIRPathCollectionItem.wrap(release)
+        return environment
 
     @property
     def fhirpath(self) -> "FhirPathParser":
@@ -33,7 +40,7 @@ class FHIRPathMixin:
             List[Any]: A list of all values that match the FHIRPath expression.
                       Returns an empty list if no matches are found.
         """
-        return self.fhirpath.parse(expression).values(self)
+        return self.fhirpath.parse(expression).values(self, environment=self._generate_fhirpath_environment())
 
     def fhirpath_single(self, expression: str, default: Any = None) -> Any:
         """
@@ -49,7 +56,7 @@ class FHIRPathMixin:
         Raises:
             FHIRPathRuntimeError: If more than one value is found
         """
-        return self.fhirpath.parse(expression).single(self, default=default)
+        return self.fhirpath.parse(expression).single(self, default=default, environment=self._generate_fhirpath_environment())
 
     def fhirpath_first(self, expression: str, default: Any = None) -> Any:
         """
@@ -62,7 +69,7 @@ class FHIRPathMixin:
         Returns:
             Any: The first matching value, or the default if no matches
         """
-        return self.fhirpath.parse(expression).first(self, default=default)
+        return self.fhirpath.parse(expression).first(self, default=default, environment=self._generate_fhirpath_environment())
 
     def fhirpath_last(self, expression: str, default: Any = None) -> Any:
         """
@@ -75,7 +82,7 @@ class FHIRPathMixin:
         Returns:
             Any: The last matching value, or the default if no matches
         """
-        return self.fhirpath.parse(expression).last(self, default=default)
+        return self.fhirpath.parse(expression).last(self, default=default, environment=self._generate_fhirpath_environment())
 
     def fhirpath_exists(self, expression: str) -> bool:
         """
@@ -87,7 +94,7 @@ class FHIRPathMixin:
         Returns:
             bool: True if at least one value matches, False otherwise
         """
-        return self.fhirpath.parse(expression).exists(self)
+        return self.fhirpath.parse(expression).exists(self, environment=self._generate_fhirpath_environment())
 
     def fhirpath_is_empty(self, expression: str) -> bool:
         """
@@ -99,7 +106,7 @@ class FHIRPathMixin:
         Returns:
             bool: True if no values match, False otherwise
         """
-        return self.fhirpath.parse(expression).is_empty(self)
+        return self.fhirpath.parse(expression).is_empty(self, environment=self._generate_fhirpath_environment())
 
     def fhirpath_count(self, expression: str) -> int:
         """
@@ -111,7 +118,7 @@ class FHIRPathMixin:
         Returns:
             int: The number of matching values
         """
-        return self.fhirpath.parse(expression).count(self)
+        return self.fhirpath.parse(expression).count(self, environment=self._generate_fhirpath_environment())
 
     def fhirpath_update_values(self, expression: str, value: Any) -> None:
         """
@@ -124,7 +131,7 @@ class FHIRPathMixin:
         Raises:
             RuntimeError: If no matching locations are found or if locations cannot be set
         """
-        self.fhirpath.parse(expression).update_values(self, value)
+        self.fhirpath.parse(expression).update_values(self, value, environment=self._generate_fhirpath_environment())
 
     def fhirpath_update_single(self, expression: str, value: Any) -> None:
         """
@@ -138,4 +145,4 @@ class FHIRPathMixin:
             FHIRPathError: If zero or more than one matching locations are found
             RuntimeError: If the location cannot be set
         """
-        self.fhirpath.parse(expression).update_single(self, value)
+        self.fhirpath.parse(expression).update_single(self, value, environment=self._generate_fhirpath_environment())

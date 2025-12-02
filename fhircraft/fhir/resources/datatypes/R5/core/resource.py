@@ -23,10 +23,10 @@ from typing import Optional, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
-from fhircraft.fhir.resources.datatypes.R5.complex import Element, Meta
+from fhircraft.fhir.resources.datatypes.R5.complex import Meta, Base, Element
 
 
-class Resource(FHIRBaseModel):
+class Resource(Base):
     """
     This is the base resource type for everything.
     """

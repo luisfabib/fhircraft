@@ -28,6 +28,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     """
 
     model_config = ConfigDict(defer_build=True)
+    _fhir_release: ClassVar[str]
 
     # Configuration for polymorphic behavior
     _enable_polymorphic_serialization: ClassVar[bool] = True

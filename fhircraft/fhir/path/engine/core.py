@@ -1,6 +1,7 @@
 import inspect
 import logging
 import typing
+import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial
@@ -382,6 +383,7 @@ class FHIRPath(ABC):
         # Determine %resource and %rootResource from parent tracking if available
         resource = data
         root_resource = data
+        fhir_release = getattr(data, "_fhir_release", None)
 
         # Check if data has parent tracking attributes (from FHIRBaseModel)
         if hasattr(data, "_resource") and hasattr(data, "_root_resource"):
@@ -402,6 +404,7 @@ class FHIRPath(ABC):
             "%context": FHIRPathCollectionItem.wrap(data),
             "%resource": FHIRPathCollectionItem.wrap(resource),
             "%rootResource": FHIRPathCollectionItem.wrap(root_resource),
+            "%fhirRelease": FHIRPathCollectionItem.wrap(fhir_release),
         }
         # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
@@ -973,6 +976,8 @@ class TypeSpecifier(FHIRPath):
     ) -> FHIRPathCollection:
         """
         Evaluate the input collection to assert that the entries are valid FHIR resources of the given type.
+        The type is resolved based on the namespace and specifier using the FHIR release specified in the environment
+        variable `%fhirRelease`. If the variable is not present, it defaults to "R4" and will warn on usage.
 
         Args:
             collection (Collection): The collection of items to be evaluated.
@@ -987,7 +992,20 @@ class TypeSpecifier(FHIRPath):
         namespace = self.namespace or "FHIR"
         if namespace == "FHIR":
             self.specifier = self.specifier[0].upper() + self.specifier[1:]
-            type = get_fhir_type(self.specifier)
+            release = environment.get("%fhirRelease")
+            if release:
+                release = (
+                    release.value
+                    if isinstance(release, FHIRPathCollectionItem)
+                    else release
+                )
+            if not release:
+                warnings.warn(
+                    "No %fhirRelease found in environment. Defaulting to R4 for type resolution.",
+                    UserWarning,
+                )
+                release = "R4"
+            type = get_fhir_type(self.specifier, release=release)
         else:
             raise NameError(
                 f"Unknown namespace '{self.namespace}' for type specifier '{self.specifier}'"
@@ -1000,7 +1018,11 @@ class TypeSpecifier(FHIRPath):
         )
 
     def __repr__(self):
-        return f'TypeSpecifier("{self.namespace}.{self.specifier}")'
+        return (
+            f'TypeSpecifier("{self.namespace}.{self.specifier}")'
+            if self.namespace
+            else f'TypeSpecifier("{self.specifier}")'
+        )
 
     def __eq__(self, other):
         return (

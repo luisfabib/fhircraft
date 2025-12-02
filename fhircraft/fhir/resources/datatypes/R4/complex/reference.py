@@ -94,6 +94,8 @@ class Reference(Element):
 
     @model_validator(mode="after")
     def FHIR_ref_1_constraint_model_validator(self):
+        if getattr(self, "_resource", None) == self:
+            return self
         return fhir_validators.validate_model_constraint(
             self,
             expression="reference.startsWith('#').not() or (reference.substring(1).trace('url') in %rootResource.contained.id.trace('ids'))",

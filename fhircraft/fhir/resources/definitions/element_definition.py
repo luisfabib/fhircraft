@@ -19,7 +19,6 @@ NoneType = type(None)
 
 from typing import List, Optional
 
-from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import (
     Base64Binary,
     Boolean,

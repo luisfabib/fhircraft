@@ -7,7 +7,6 @@ from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPathCollectionItem,
     FHIRPathError,
-    Invocation,
 )
 from fhircraft.fhir.path.engine.core import This
 from fhircraft.fhir.path.engine.subsetting import *

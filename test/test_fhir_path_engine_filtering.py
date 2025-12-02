@@ -7,7 +7,7 @@ from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.filtering import *
 from fhircraft.fhir.path.engine.literals import Date, Quantity
 
-env = dict()
+env = {'%fhirRelease': "R4"}
 
 # -------------
 # Where
