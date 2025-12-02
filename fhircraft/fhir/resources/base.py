@@ -343,16 +343,28 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         cls, obj, *, strict=None, from_attributes=None, context=None
     ) -> Self:
         """Override model_validate to provide default kwargs for FHIR resources."""
-        return super().model_validate(
+        instance = super().model_validate(
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
+        
+        # Set up resource context for the root instance if it's a resource
+        if hasattr(instance, 'resourceType'):
+            instance._set_resource_context(parent=None, root=instance, resource=instance)
+        
+        return instance
 
     @classmethod
     def model_validate_json(
         cls, json_data, *, strict=None, context=None
     ) -> Self:
         """Override model_validate_json to provide default kwargs for FHIR resources."""
-        return super().model_validate_json(json_data, strict=strict, context=context)
+        instance = super().model_validate_json(json_data, strict=strict, context=context)
+        
+        # Set up resource context for the root instance if it's a resource
+        if hasattr(instance, 'resourceType'):
+            instance._set_resource_context(parent=None, root=instance, resource=instance)
+        
+        return instance
 
     @classmethod
     def _deserialize_polymorphically(cls, value: Any, base_type: Type) -> Any:

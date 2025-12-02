@@ -533,6 +533,186 @@ class TestComplexPolymorphicScenarios:
         assert serialized3["optionalList"][0]["valueString"] == "optional"
         assert serialized3["optionalList"][1]["valueInteger"] == 999
 
+    def test_nested_fhir_resource_with_extension_polymorphic_validation(self):
+        """Test loading a nested resource with extensions using polymorphic deserialization with mock models."""
+        # Create mock models for the test to avoid FHIR validation constraints
+
+        class MockExtension(FHIRBaseModel):
+            url: str
+            valueString: Optional[str] = None
+
+        class MockHumanName(FHIRBaseModel):
+            use: Optional[str] = None
+            family: Optional[str] = None
+            given: Optional[List[str]] = None
+
+        class MockPatient(FHIRBaseModel):
+            resourceType: str = "Patient"
+            id: Optional[str] = None
+            active: Optional[bool] = None
+            name: Optional[List[MockHumanName]] = None
+            extension: Optional[List[MockExtension]] = None
+
+        # Create test data - focus purely on polymorphic behavior
+        patient_data = {
+            "resourceType": "Patient",
+            "id": "main-patient",
+            "active": True,
+            "name": [{"use": "official", "family": "Doe", "given": ["John"]}],
+            # Simple extension to test extension polymorphism
+            "extension": [
+                {
+                    "url": "http://example.org/patient-note",
+                    "valueString": "Patient has regular monitoring",
+                }
+            ],
+        }
+
+        # Validate using model_validate - this tests polymorphic deserialization
+        patient = MockPatient.model_validate(patient_data)
+
+        # Verify the main patient
+        assert patient.id == "main-patient"
+        assert patient.active == True
+        assert patient.name
+        assert patient.name[0].family == "Doe"
+        assert patient.name[0].given == ["John"]
+
+        # Verify extension handling
+        assert patient.extension is not None
+        assert len(patient.extension) == 1
+        ext = patient.extension[0]
+        assert isinstance(ext, MockExtension)
+        assert ext.url == "http://example.org/patient-note"
+        assert ext.valueString == "Patient has regular monitoring"
+
+        # CORE TEST: Verify polymorphic serialization preserves specialized fields
+        serialized = patient.model_dump()
+
+        assert serialized["id"] == "main-patient"
+        assert serialized["active"] == True
+
+        # Verify extension serialization
+        assert "extension" in serialized
+        assert len(serialized["extension"]) == 1
+        ext_data = serialized["extension"][0]
+        assert ext_data["url"] == "http://example.org/patient-note"
+        assert ext_data["valueString"] == "Patient has regular monitoring"
+
+        # CORE TEST: Verify round-trip polymorphic deserialization
+        patient_roundtrip = MockPatient.model_validate(serialized)
+        assert patient_roundtrip.id == patient.id
+        assert patient_roundtrip.active == patient.active
+
+        # Verify extension round-trip worked
+        assert patient_roundtrip.extension
+        roundtrip_ext = patient_roundtrip.extension[0]
+        assert isinstance(roundtrip_ext, MockExtension)
+        assert roundtrip_ext.url == ext.url
+        assert roundtrip_ext.valueString == ext.valueString
+
+    def test_nested_fhir_resource_with_extension_and_contained_resource(self):
+        """Test polymorphic behavior with both extensions and contained resources."""
+        # Create mock models for the test to avoid FHIR validation constraints
+
+        class MockExtension(FHIRBaseModel):
+            url: str
+            valueString: Optional[str] = None
+
+        class MockCoding(FHIRBaseModel):
+            system: Optional[str] = None
+            code: Optional[str] = None
+            display: Optional[str] = None
+
+        class MockCodeableConcept(FHIRBaseModel):
+            coding: Optional[List[MockCoding]] = None
+
+        class MockObservation(FHIRBaseModel):
+            resourceType: str = "Observation"
+            id: Optional[str] = None
+            status: Optional[str] = None
+            code: Optional[MockCodeableConcept] = None
+            valueString: Optional[str] = None
+
+        class MockHumanName(FHIRBaseModel):
+            use: Optional[str] = None
+            family: Optional[str] = None
+            given: Optional[List[str]] = None
+
+        class MockPatient(FHIRBaseModel):
+            resourceType: str = "Patient"
+            id: Optional[str] = None
+            active: Optional[bool] = None
+            name: Optional[List[MockHumanName]] = None
+            contained: Optional[List[MockObservation]] = None
+            extension: Optional[List[MockExtension]] = None
+
+        # Create test data with a contained resource
+        patient_data = {
+            "resourceType": "Patient",
+            "id": "test-patient",
+            "active": True,
+            "name": [{"use": "official", "family": "Smith", "given": ["Alice"]}],
+            "contained": [
+                {
+                    "resourceType": "Observation",
+                    "id": "obs-1",
+                    "status": "final",
+                    "code": {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org",
+                                "code": "29463-7",
+                                "display": "Body weight",
+                            }
+                        ]
+                    },
+                    "valueString": "65 kg",
+                }
+            ],
+            "extension": [
+                {
+                    "url": "http://example.org/patient-metadata",
+                    "valueString": "Special monitoring patient",
+                }
+            ],
+        }
+
+        # Use model_validate to test polymorphic deserialization
+        patient = MockPatient.model_validate(patient_data)
+
+        # CORE TEST: Check polymorphic deserialization of contained resources
+        assert patient.contained is not None
+        assert len(patient.contained) == 1
+        contained_obs = patient.contained[0]
+
+        # Key test: contained resource should be correctly typed as MockObservation
+        assert isinstance(contained_obs, MockObservation)
+        assert contained_obs.id == "obs-1"
+        assert contained_obs.status == "final"
+        assert contained_obs.valueString == "65 kg"
+
+        # Test polymorphic serialization
+        serialized = patient.model_dump()
+
+        # Verify that specialized fields are preserved in serialization
+        assert "contained" in serialized
+        contained_data = serialized["contained"][0]
+        assert contained_data["resourceType"] == "Observation"
+        assert contained_data["id"] == "obs-1"
+        assert contained_data["valueString"] == "65 kg"  # Observation-specific field
+        assert contained_data["status"] == "final"
+
+        # Test round-trip deserialization
+        patient_roundtrip = MockPatient.model_validate(serialized)
+
+        # Verify polymorphic types are preserved through round-trip
+        assert patient_roundtrip.contained
+        roundtrip_contained = patient_roundtrip.contained[0]
+        assert isinstance(roundtrip_contained, MockObservation)
+        assert roundtrip_contained.id == contained_obs.id
+        assert roundtrip_contained.valueString == contained_obs.valueString
+
 
 class TestPolymorphicEdgeCases:
     """Test edge cases and error conditions for polymorphic functionality."""
