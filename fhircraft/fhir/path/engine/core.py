@@ -383,8 +383,8 @@ class FHIRPath(ABC):
         # Determine %resource and %rootResource from parent tracking if available
         resource = data
         root_resource = data
-        fhir_release = getattr(data, "_fhir_release", None) 
-        
+        fhir_release = getattr(data, "_fhir_release", None)
+
         # Check if data has parent tracking attributes (from FHIRBaseModel)
         if hasattr(data, "_resource") and hasattr(data, "_root_resource"):
             res = getattr(data, "_resource", None)
@@ -976,6 +976,8 @@ class TypeSpecifier(FHIRPath):
     ) -> FHIRPathCollection:
         """
         Evaluate the input collection to assert that the entries are valid FHIR resources of the given type.
+        The type is resolved based on the namespace and specifier using the FHIR release specified in the environment
+        variable `%fhirRelease`. If the variable is not present, it defaults to "R4" and will warn on usage.
 
         Args:
             collection (Collection): The collection of items to be evaluated.
@@ -992,7 +994,11 @@ class TypeSpecifier(FHIRPath):
             self.specifier = self.specifier[0].upper() + self.specifier[1:]
             release = environment.get("%fhirRelease")
             if release:
-                release = release.value if isinstance(release, FHIRPathCollectionItem) else release
+                release = (
+                    release.value
+                    if isinstance(release, FHIRPathCollectionItem)
+                    else release
+                )
             if not release:
                 warnings.warn(
                     "No %fhirRelease found in environment. Defaulting to R4 for type resolution.",
@@ -1012,7 +1018,11 @@ class TypeSpecifier(FHIRPath):
         )
 
     def __repr__(self):
-        return f'TypeSpecifier("{self.namespace}.{self.specifier}")' if self.namespace else f'TypeSpecifier("{self.specifier}")'
+        return (
+            f'TypeSpecifier("{self.namespace}.{self.specifier}")'
+            if self.namespace
+            else f'TypeSpecifier("{self.specifier}")'
+        )
 
     def __eq__(self, other):
         return (
