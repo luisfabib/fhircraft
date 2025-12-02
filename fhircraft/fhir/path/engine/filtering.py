@@ -59,7 +59,7 @@ class Where(FHIRPathFunction):
         return f"{self.__class__.__name__.lower()}({self.expression.__str__()})"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.expression.__repr__()})"
+        return f"{self.__class__.__name__}({self.expression!s})"
 
     def __eq__(self, other):
         return isinstance(other, Where) and other.expression == self.expression
@@ -166,7 +166,7 @@ class Repeat(FHIRPathFunction):
         return f"{self.__class__.__name__.lower()}({self.projection.__str__()})"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.projection.__repr__()})"
+        return f"{self.__class__.__name__}({self.projection!s})"
 
     def __eq__(self, other):
         return isinstance(other, Repeat) and other.projection == self.projection
@@ -213,7 +213,7 @@ class OfType(FHIRPathFunction):
         return f"ofType({self.type})"
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.type.__repr__()})"
+        return f"{self.__class__.__name__}({self.type!s})"
 
     def __eq__(self, other):
         return isinstance(other, OfType) and other.type == self.type
