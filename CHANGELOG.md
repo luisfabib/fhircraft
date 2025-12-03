@@ -8,6 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+
+
+## [0.4.1] - 2025-12-03
+
+### Added
+
+- Added internal `_fhir_release` attribute to `FHIRBaseModel` and initialized it to correct values in base resources across R4, R4B, and R5 for proper version tracking and context awareness ([#132](https://github.com/luisfabib/fhircraft/pull/132))
+- Implemented new automated FHIRPath environment variable `%fhirRelease` that tracks the resource context's FHIR release version ([#132](https://github.com/luisfabib/fhircraft/pull/132))
+
+### Changed
+
+- Updated `TypeSpecifier` to support multiple FHIR releases with enhanced error handling and version-specific type resolution ([#132](https://github.com/luisfabib/fhircraft/pull/132))
+- Enhanced FHIRPath mixin to automatically set `%fhirRelease` for better context-aware evaluation ([#132](https://github.com/luisfabib/fhircraft/pull/132))
+
+
+### Fixed
+
+- Fixed `DomainResource` invariant `dom-3` for all FHIR releases prior to R5 by replacing incorrect FHIRPath fragments `descendants().as()` with `descendants().ofType()` throughout ([#130](https://github.com/luisfabib/fhircraft/pull/130), fixes [#128](https://github.com/luisfabib/fhircraft/issues/128))
+- Fixed polymorphic serialization check in `FHIRBaseModel` by adding type check to ensure polymorphic serialization is only attempted on instances of `FHIRBaseModel` ([#131](https://github.com/luisfabib/fhircraft/pull/131), fixes [#129](https://github.com/luisfabib/fhircraft/issues/129))
+- Fixed FHIR `Reference` resource `ref-1` invariant validator to only evaluate its FHIRPath expression if the instance is assigned to a resource, allowing `Reference` objects with local references to be built outside of a root resource context ([#132](https://github.com/luisfabib/fhircraft/pull/132), [#136](https://github.com/luisfabib/fhircraft/pull/136))
+- Fixed recursion errors when checking own type in FHIRPath invariant expressions by adding circular reference protection (e.g. a `Coding` with an invariant evaluating `is(Coding)`) ([#132](https://github.com/luisfabib/fhircraft/pull/132))
+- Added missing environment variable support in `TypeSpecifier.evaluate()` ([#132](https://github.com/luisfabib/fhircraft/pull/132))
+- Fixed exponential string escaping in FHIRPath expression `__repr__` methods that caused CPU crashes with deeply nested expressions ([#134](https://github.com/luisfabib/fhircraft/pull/134), fixes [#133](https://github.com/luisfabib/fhircraft/issues/133))
+- Fixed missing resource context setup during `model_validate()` and `model_validate_json()` operations with dictionaries as input values ([#135](https://github.com/luisfabib/fhircraft/pull/135))
+- Ensured proper type preservation during dictionary-based resource loading ([#135](https://github.com/luisfabib/fhircraft/pull/135))
+- Enhanced polymorphic validation for nested FHIR resources from dictionary inputs ([#136](https://github.com/luisfabib/fhircraft/pull/136))
+- Corrected certain inheritance patterns across resource classes to ensure proper class hierarchies in all FHIR versions ([#132](https://github.com/luisfabib/fhircraft/pull/132))
+  
+----------------- 
+
 ## [0.4.0] - 2025-11-30
 
 ### Added
