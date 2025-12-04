@@ -883,3 +883,70 @@ class TestPolymorphicEdgeCases:
         list_field = ComplexContainerResource.model_fields["secondaryResources"]
         base_type = FHIRBaseModel._get_field_base_type(list_field)
         assert base_type == ComplexBaseResource
+
+
+class TestIssues:
+
+    def test_bundle_entry_nested_polymorphism(self):
+        """Test that polymorphic deserialization works for nested elements (GitHub #141)"""
+        from fhircraft.fhir.resources.datatypes.R4.core import Bundle, BundleEntry
+        from fhircraft.fhir.resources.datatypes.R4.core.patient import Patient
+
+        # Test data from the GitHub issue
+        bundle_data = {
+            "entry": [
+                {
+                    "resource": {
+                        "resourceType": "Patient",
+                        "id": "example1",
+                        "name": [{"family": "Smith", "given": ["John"]}],
+                    }
+                }
+            ]
+        }
+
+        # Test that direct BundleEntry polymorphism works (this was always working)
+        entry = BundleEntry.model_validate(bundle_data["entry"][0])
+        assert isinstance(entry.resource, Patient)
+        assert entry.resource.id == "example1"
+        assert entry.resource.name
+        assert len(entry.resource.name) == 1
+        assert entry.resource.name[0].family == "Smith"
+        assert entry.resource.name[0].given == ["John"]
+
+        # Test that nested Bundle polymorphism now works (this was broken)
+        bundle = Bundle.model_validate(bundle_data)
+        assert bundle.entry
+        assert len(bundle.entry) == 1
+        assert isinstance(bundle.entry[0].resource, Patient)
+        assert bundle.entry[0].resource.id == "example1"
+        assert bundle.entry[0].resource.name
+        assert len(bundle.entry[0].resource.name) == 1
+        assert bundle.entry[0].resource.name[0].family == "Smith"
+        assert bundle.entry[0].resource.name[0].given == ["John"]
+
+        # Test serialization preserves all fields
+        serialized = bundle.model_dump()
+        assert "entry" in serialized
+        assert len(serialized["entry"]) == 1
+        entry_data = serialized["entry"][0]
+        assert "resource" in entry_data
+        resource_data = entry_data["resource"]
+        assert resource_data["resourceType"] == "Patient"
+        assert resource_data["id"] == "example1"
+        assert "name" in resource_data
+        assert len(resource_data["name"]) == 1
+        assert resource_data["name"][0]["family"] == "Smith"
+        assert resource_data["name"][0]["given"] == ["John"]
+
+        # Test JSON serialization as well
+        json_data = bundle.model_dump_json()
+        import json
+
+        parsed = json.loads(json_data)
+        resource_data = parsed["entry"][0]["resource"]
+        assert resource_data["resourceType"] == "Patient"
+        assert resource_data["id"] == "example1"
+        assert "name" in resource_data
+        assert resource_data["name"][0]["family"] == "Smith"
+        assert resource_data["name"][0]["given"] == ["John"]
