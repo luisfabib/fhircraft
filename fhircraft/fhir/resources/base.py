@@ -1,6 +1,7 @@
 from copy import copy
 from functools import lru_cache
 import json
+import threading
 import warnings
 from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args
 from typing_extensions import Self
@@ -18,6 +19,24 @@ from pydantic_core import PydanticUndefined
 
 from fhircraft.fhir.path.mixin import FHIRPathMixin
 from fhircraft.utils import get_all_models_from_field
+
+
+# Thread-local context to track polymorphic operations to prevent recursion
+_polymorphic_context = threading.local()
+
+
+def _get_polymorphic_deserialization_stack():
+    """Get the current polymorphic deserialization stack."""
+    if not hasattr(_polymorphic_context, 'deserialization_stack'):
+        _polymorphic_context.deserialization_stack = set()
+    return _polymorphic_context.deserialization_stack
+
+
+def _get_polymorphic_serialization_stack():
+    """Get the current polymorphic serialization stack."""
+    if not hasattr(_polymorphic_context, 'serialization_stack'):
+        _polymorphic_context.serialization_stack = set()
+    return _polymorphic_context.serialization_stack
 
 
 class FHIRBaseModel(BaseModel, FHIRPathMixin):
@@ -72,11 +91,25 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             and hasattr(base_type, "__mro__")
             and issubclass(base_type, FHIRBaseModel)
         ):
+            # Create a unique key for this deserialization context
+            context_key = (cls, field_name, base_type)
+            stack = _get_polymorphic_deserialization_stack()
+            
+            # Check if we're already processing this context to prevent recursion
+            if context_key in stack:
+                return value
+                
+            # Add to stack and process
+            stack.add(context_key)
             try:
-                return cls._deserialize_polymorphically(value, base_type)
+                result = cls._deserialize_polymorphically(value, base_type)
+                return result
             except Exception:
                 # If polymorphic deserialization fails, return original value
-                pass
+                return value
+            finally:
+                # Always remove from stack when done
+                stack.discard(context_key)
 
         return value
 
@@ -84,37 +117,53 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     def _serialize_polymorphic_fields(self, serializer, info) -> Any:
         """Apply polymorphic serialization to FHIR fields during serialization."""
         # Check if polymorphic serialization is enabled
-        if not isinstance(self, FHIRBaseModel) or not self._enable_polymorphic_serialization:
+        if (
+            not isinstance(self, FHIRBaseModel)
+            or not self._enable_polymorphic_serialization
+        ):
             return serializer(self)
 
-        # Get the base serialization with warnings suppressed
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=UserWarning)
-            warnings.filterwarnings(
-                "ignore", message=".*Pydantic serializer warnings.*"
-            )
-            warnings.filterwarnings(
-                "ignore", message=".*PydanticSerializationUnexpectedValue.*"
-            )
-            data = serializer(self)
+        # Check if we're already serializing this object to prevent recursion
+        object_id = id(self)
+        stack = _get_polymorphic_serialization_stack()
+        if object_id in stack:
+            # Already serializing this object, use normal serializer to avoid recursion
+            return serializer(self)
+        
+        # Add to stack
+        stack.add(object_id)
+        try:
+            # Get the base serialization with warnings suppressed
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=UserWarning)
+                warnings.filterwarnings(
+                    "ignore", message=".*Pydantic serializer warnings.*"
+                )
+                warnings.filterwarnings(
+                    "ignore", message=".*PydanticSerializationUnexpectedValue.*"
+                )
+                data = serializer(self)
 
-        # Apply polymorphic serialization to FHIR fields
-        for field_name, field_info in self.__class__.model_fields.items():
-            if field_name in data:
-                value = getattr(self, field_name, None)
-                if value is not None:
-                    base_type = self._get_field_base_type(field_info)
-                    if (
-                        base_type != object
-                        and hasattr(base_type, "__mro__")
-                        and issubclass(base_type, FHIRBaseModel)
-                    ):
-                        # Apply polymorphic serialization to this field
-                        data[field_name] = self._serialize_fhir_field_polymorphically(
-                            value
-                        )
+            # Apply polymorphic serialization to FHIR fields
+            for field_name, field_info in self.__class__.model_fields.items():
+                if field_name in data:
+                    value = getattr(self, field_name, None)
+                    if value is not None:
+                        base_type = self._get_field_base_type(field_info)
+                        if (
+                            base_type != object
+                            and hasattr(base_type, "__mro__")
+                            and issubclass(base_type, FHIRBaseModel)
+                        ):
+                            # Apply polymorphic serialization to this field
+                            data[field_name] = self._serialize_fhir_field_polymorphically(
+                                value
+                            )
 
-        return data
+            return data
+        finally:
+            # Always remove from stack when done
+            stack.discard(object_id)
 
     @classmethod
     @lru_cache(maxsize=256)
@@ -294,16 +343,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
         # Handle FHIR models - serialize them using their runtime type
         if isinstance(value, FHIRBaseModel):
-            # Temporarily disable polymorphic serialization to avoid recursion
-            original_setting = value.__class__._enable_polymorphic_serialization
-            try:
-                value.__class__._enable_polymorphic_serialization = False
-                result = value.model_dump()
-                value.__class__._enable_polymorphic_serialization = original_setting
-                return result
-            except:
-                value.__class__._enable_polymorphic_serialization = original_setting
-                return value.model_dump()
+            # Use normal model_dump which includes polymorphic serialization
+            # The polymorphic serialization has built-in recursion protection
+            return value.model_dump()
 
         return value
 
@@ -346,24 +388,28 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         instance = super().model_validate(
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
-        
+
         # Set up resource context for the root instance if it's a resource
-        if hasattr(instance, 'resourceType'):
-            instance._set_resource_context(parent=None, root=instance, resource=instance)
-        
+        if hasattr(instance, "resourceType"):
+            instance._set_resource_context(
+                parent=None, root=instance, resource=instance
+            )
+
         return instance
 
     @classmethod
-    def model_validate_json(
-        cls, json_data, *, strict=None, context=None
-    ) -> Self:
+    def model_validate_json(cls, json_data, *, strict=None, context=None) -> Self:
         """Override model_validate_json to provide default kwargs for FHIR resources."""
-        instance = super().model_validate_json(json_data, strict=strict, context=context)
-        
+        instance = super().model_validate_json(
+            json_data, strict=strict, context=context
+        )
+
         # Set up resource context for the root instance if it's a resource
-        if hasattr(instance, 'resourceType'):
-            instance._set_resource_context(parent=None, root=instance, resource=instance)
-        
+        if hasattr(instance, "resourceType"):
+            instance._set_resource_context(
+                parent=None, root=instance, resource=instance
+            )
+
         return instance
 
     @classmethod
@@ -379,31 +425,18 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             subclasses = cls._get_all_subclasses(base_type)
             for subclass in subclasses:
                 try:
-                    # Temporarily disable polymorphic deserialization to prevent recursion
-                    original_setting = subclass._enable_polymorphic_deserialization
-                    subclass._enable_polymorphic_deserialization = False
-                    try:
-                        result = subclass.model_validate(value)
-                        subclass._enable_polymorphic_deserialization = original_setting
-                        return result
-                    except:
-                        subclass._enable_polymorphic_deserialization = original_setting
-                        raise
+                    # Try to instantiate with the subclass
+                    # Recursion is now prevented at the field validator level
+                    result = subclass.model_validate(value)
+                    return result
                 except (ValidationError, ValueError, TypeError):
                     # If specific class fails, continue trying other subclasses
                     continue
 
             # If no subclass worked, try the base type as fallback
             try:
-                original_setting = base_type._enable_polymorphic_deserialization
-                base_type._enable_polymorphic_deserialization = False
-                try:
-                    result = base_type.model_validate(value)
-                    base_type._enable_polymorphic_deserialization = original_setting
-                    return result
-                except:
-                    base_type._enable_polymorphic_deserialization = original_setting
-                    raise
+                result = base_type.model_validate(value)
+                return result
             except (ValidationError, ValueError, TypeError):
                 # If base type also fails, return original value
                 pass
