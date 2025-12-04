@@ -354,15 +354,6 @@ class BundleEntryResponse(BackboneElement):
             severity="error",
         )
 
-    @field_validator(*("outcome",), mode="plain", check_fields=None)
-    @classmethod
-    def generic_FHIR_resource_validator(cls, value):
-        return fhir_validators.validate_contained_resource(
-            cls,
-            value,
-            release="R5",
-        )
-
 
 class BundleEntry(BackboneElement):
     """
@@ -431,15 +422,6 @@ class BundleEntry(BackboneElement):
             severity="error",
         )
 
-    @field_validator(*("resource",), mode="plain", check_fields=None)
-    @classmethod
-    def generic_FHIR_resource_validator(cls, value):
-        return fhir_validators.validate_contained_resource(
-            cls,
-            value,
-            release="R5",
-        )
-
 
 class Bundle(Resource):
     """
@@ -457,7 +439,9 @@ class Bundle(Resource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/Bundle"]),
+        default_factory=lambda: Meta(
+            profile=["http://hl7.org/fhir/StructureDefinition/Bundle"]
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -578,15 +562,6 @@ class Bundle(Resource):
             human="fullUrl cannot be a version specific reference",
             key="bdl-8",
             severity="error",
-        )
-
-    @field_validator(*("issues",), mode="plain", check_fields=None)
-    @classmethod
-    def generic_FHIR_resource_validator(cls, value):
-        return fhir_validators.validate_contained_resource(
-            cls,
-            value,
-            release="R5",
         )
 
     @model_validator(mode="after")
