@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## [0.4.2] - 2025-12-05
+
+### Changed
+
+* Added thread-local stacks to track recursion during polymorphic serialization and deserialization, preventing infinite recursion in nested FHIR resource structures. This replaces the previous global flag approach for recursion protection. ([#142](https://github.com/luisfabib/fhircraft/pull/142))
+
+### Fixed 
+
+* Removed the `generic_FHIR_resource_validator` methods for the outcome, resource, and issues fields in the Bundle resource for R4, R4B, and R5. Since these were calling the previously removed `validate_contained_resource` an error was raised whenever evaluating a `Bundle` ([#140](https://github.com/luisfabib/fhircraft/pull/140))
+* Modified `FHIRBaseModel._serialize_fhir_field_polymorphically` and `FHIRBaseModel._deserialize_polymorphically` to remove temporary disabling of polymorphic flags, relying instead on stack-based recursion protection. This ensures that nested resources are handled correctly and safely. ([#142](https://github.com/luisfabib/fhircraft/pull/142), fixes [#141](https://github.com/luisfabib/fhircraft/pull/141))
 
 
 ## [0.4.1] - 2025-12-03
@@ -296,6 +306,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release 🎉
 
+[0.4.2]: https://github.com/luisfabib/fhircraft/releases/tag/0.4.2
+[0.4.1]: https://github.com/luisfabib/fhircraft/releases/tag/0.4.1
 [0.4.0]: https://github.com/luisfabib/fhircraft/releases/tag/0.4.0
 [0.3.7]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.7
 [0.3.6]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.6
