@@ -57,8 +57,8 @@ class Trace(FHIRPathFunction):
             log_collection = Select(self.projection).evaluate(
                 collection, environment, create
             )
-        logger.info(
-            f"{self.name} - {[str(item.value) if isinstance(item, FHIRPathCollectionItem) else str(item) for item in ensure_list(log_collection)]}"
+        logger.debug(
+            f"FHIRPath trace: {self.name} - {[str(item.value) if isinstance(item, FHIRPathCollectionItem) else str(item) for item in ensure_list(log_collection)]}"
         )
         return collection
 
