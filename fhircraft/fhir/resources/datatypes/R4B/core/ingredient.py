@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
@@ -109,7 +105,7 @@ class IngredientSubstanceStrengthReferenceStrength(BackboneElement):
         default=None,
         alias="_measurementPoint",
     )
-    country: Optional[List[CodeableConcept]] = Field(
+    country: Optional[ListType[CodeableConcept]] = Field(
         description="Where the strength range applies",
         default=None,
     )
@@ -205,11 +201,11 @@ class IngredientSubstanceStrength(BackboneElement):
         default=None,
         alias="_measurementPoint",
     )
-    country: Optional[List[CodeableConcept]] = Field(
+    country: Optional[ListType[CodeableConcept]] = Field(
         description="Where the strength range applies",
         default=None,
     )
-    referenceStrength: Optional[List[IngredientSubstanceStrengthReferenceStrength]] = (
+    referenceStrength: Optional[ListType[IngredientSubstanceStrengthReferenceStrength]] = (
         Field(
             description="Strength expressed in terms of a reference substance",
             default=None,
@@ -290,7 +286,7 @@ class IngredientSubstance(BackboneElement):
         description="A code or full resource that represents the ingredient substance",
         default=None,
     )
-    strength: Optional[List[IngredientSubstanceStrength]] = Field(
+    strength: Optional[ListType[IngredientSubstanceStrength]] = Field(
         description="The quantity of substance, per presentation, or per volume or mass, and type of quantity",
         default=None,
     )
@@ -361,15 +357,15 @@ class Ingredient(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -386,7 +382,7 @@ class Ingredient(DomainResource):
         default=None,
         alias="_status",
     )
-    for_: Optional[List[Reference]] = Field(
+    for_: Optional[ListType[Reference]] = Field(
         description="The product which this ingredient is a constituent part of",
         default=None,
     )
@@ -394,7 +390,7 @@ class Ingredient(DomainResource):
         description="Purpose of the ingredient within the product, e.g. active, inactive",
         default=None,
     )
-    function: Optional[List[CodeableConcept]] = Field(
+    function: Optional[ListType[CodeableConcept]] = Field(
         description="Precise action within the drug product, e.g. antioxidant, alkalizing agent",
         default=None,
     )
@@ -407,7 +403,7 @@ class Ingredient(DomainResource):
         default=None,
         alias="_allergenicIndicator",
     )
-    manufacturer: Optional[List[IngredientManufacturer]] = Field(
+    manufacturer: Optional[ListType[IngredientManufacturer]] = Field(
         description="An organization that manufactures this ingredient",
         default=None,
     )

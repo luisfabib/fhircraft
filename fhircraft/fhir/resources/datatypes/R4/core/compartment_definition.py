@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -57,7 +53,7 @@ class CompartmentDefinitionResource(BackboneElement):
         default=None,
         alias="_code",
     )
-    param: Optional[List[String]] = Field(
+    param: Optional[ListType[String]] = Field(
         description="Search Parameter Name, or chained parameters",
         default=None,
     )
@@ -145,15 +141,15 @@ class CompartmentDefinition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -220,7 +216,7 @@ class CompartmentDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -233,7 +229,7 @@ class CompartmentDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
@@ -264,7 +260,7 @@ class CompartmentDefinition(DomainResource):
         default=None,
         alias="_search",
     )
-    resource: Optional[List[CompartmentDefinitionResource]] = Field(
+    resource: Optional[ListType[CompartmentDefinitionResource]] = Field(
         description="How a resource is related to the compartment",
         default=None,
     )

@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -179,7 +175,7 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
         default=None,
         alias="_subDetailSequence",
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -188,7 +184,7 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ClaimResponseItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
         description="Subdetail level adjudication details",
         default=None,
     )
@@ -234,7 +230,7 @@ class ClaimResponseItemDetail(BackboneElement):
         default=None,
         alias="_detailSequence",
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -243,11 +239,11 @@ class ClaimResponseItemDetail(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ClaimResponseItemDetailAdjudication]] = Field(
+    adjudication: Optional[ListType[ClaimResponseItemDetailAdjudication]] = Field(
         description="Detail level adjudication details",
         default=None,
     )
-    subDetail: Optional[List[ClaimResponseItemDetailSubDetail]] = Field(
+    subDetail: Optional[ListType[ClaimResponseItemDetailSubDetail]] = Field(
         description="Adjudication for claim sub-details",
         default=None,
     )
@@ -296,7 +292,7 @@ class ClaimResponseItem(BackboneElement):
         default=None,
         alias="_itemSequence",
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -305,11 +301,11 @@ class ClaimResponseItem(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ClaimResponseItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
         description="Adjudication details",
         default=None,
     )
-    detail: Optional[List[ClaimResponseItemDetail]] = Field(
+    detail: Optional[ListType[ClaimResponseItemDetail]] = Field(
         description="Adjudication for claim details",
         default=None,
     )
@@ -353,7 +349,7 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
@@ -378,7 +374,7 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -387,7 +383,7 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ClaimResponseItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
         description="Added items detail adjudication",
         default=None,
     )
@@ -443,7 +439,7 @@ class ClaimResponseAddItemDetail(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
@@ -468,7 +464,7 @@ class ClaimResponseAddItemDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -477,11 +473,11 @@ class ClaimResponseAddItemDetail(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ClaimResponseItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
         description="Added items detail adjudication",
         default=None,
     )
-    subDetail: Optional[List[ClaimResponseAddItemDetailSubDetail]] = Field(
+    subDetail: Optional[ListType[ClaimResponseAddItemDetailSubDetail]] = Field(
         description="Insurer added line items",
         default=None,
     )
@@ -536,7 +532,7 @@ class ClaimResponseAddItem(BackboneElement):
     The first-tier service adjudications for payor added product or service lines.
     """
 
-    itemSequence: Optional[List[PositiveInt]] = Field(
+    itemSequence: Optional[ListType[PositiveInt]] = Field(
         description="Item sequence number",
         default=None,
     )
@@ -545,7 +541,7 @@ class ClaimResponseAddItem(BackboneElement):
         default=None,
         alias="_itemSequence",
     )
-    detailSequence: Optional[List[PositiveInt]] = Field(
+    detailSequence: Optional[ListType[PositiveInt]] = Field(
         description="Detail sequence number",
         default=None,
     )
@@ -554,7 +550,7 @@ class ClaimResponseAddItem(BackboneElement):
         default=None,
         alias="_detailSequence",
     )
-    subdetailSequence: Optional[List[PositiveInt]] = Field(
+    subdetailSequence: Optional[ListType[PositiveInt]] = Field(
         description="Subdetail sequence number",
         default=None,
     )
@@ -563,7 +559,7 @@ class ClaimResponseAddItem(BackboneElement):
         default=None,
         alias="_subdetailSequence",
     )
-    provider: Optional[List[Reference]] = Field(
+    provider: Optional[ListType[Reference]] = Field(
         description="Authorized providers",
         default=None,
     )
@@ -571,11 +567,11 @@ class ClaimResponseAddItem(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -629,11 +625,11 @@ class ClaimResponseAddItem(BackboneElement):
         description="Anatomical location",
         default=None,
     )
-    subSite: Optional[List[CodeableConcept]] = Field(
+    subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Anatomical sub-location",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -642,11 +638,11 @@ class ClaimResponseAddItem(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ClaimResponseItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
         description="Added items adjudication",
         default=None,
     )
-    detail: Optional[List[ClaimResponseAddItemDetail]] = Field(
+    detail: Optional[ListType[ClaimResponseAddItemDetail]] = Field(
         description="Insurer added line details",
         default=None,
     )
@@ -1108,19 +1104,19 @@ class ClaimResponse(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for a claim response",
         default=None,
     )
@@ -1210,19 +1206,19 @@ class ClaimResponse(DomainResource):
         description="Party to be paid any benefits payable",
         default=None,
     )
-    item: Optional[List[ClaimResponseItem]] = Field(
+    item: Optional[ListType[ClaimResponseItem]] = Field(
         description="Adjudication for claim line items",
         default=None,
     )
-    addItem: Optional[List[ClaimResponseAddItem]] = Field(
+    addItem: Optional[ListType[ClaimResponseAddItem]] = Field(
         description="Insurer added line items",
         default=None,
     )
-    adjudication: Optional[List[ClaimResponseItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ClaimResponseItemAdjudication]] = Field(
         description="Header-level adjudication",
         default=None,
     )
-    total: Optional[List[ClaimResponseTotal]] = Field(
+    total: Optional[ListType[ClaimResponseTotal]] = Field(
         description="Adjudication totals",
         default=None,
     )
@@ -1242,19 +1238,19 @@ class ClaimResponse(DomainResource):
         description="Printed reference or actual form",
         default=None,
     )
-    processNote: Optional[List[ClaimResponseProcessNote]] = Field(
+    processNote: Optional[ListType[ClaimResponseProcessNote]] = Field(
         description="Note concerning adjudication",
         default=None,
     )
-    communicationRequest: Optional[List[Reference]] = Field(
+    communicationRequest: Optional[ListType[Reference]] = Field(
         description="Request for additional information",
         default=None,
     )
-    insurance: Optional[List[ClaimResponseInsurance]] = Field(
+    insurance: Optional[ListType[ClaimResponseInsurance]] = Field(
         description="Patient insurance information",
         default=None,
     )
-    error: Optional[List[ClaimResponseError]] = Field(
+    error: Optional[ListType[ClaimResponseError]] = Field(
         description="Processing errors",
         default=None,
     )

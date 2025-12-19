@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -128,23 +124,23 @@ class NutritionOrderOralDiet(BackboneElement):
     Diet given orally in contrast to enteral (tube) feeding.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type of oral diet or diet restrictions that describe what can be consumed orally",
         default=None,
     )
-    schedule: Optional[List[Timing]] = Field(
+    schedule: Optional[ListType[Timing]] = Field(
         description="Scheduled frequency of diet",
         default=None,
     )
-    nutrient: Optional[List[NutritionOrderOralDietNutrient]] = Field(
+    nutrient: Optional[ListType[NutritionOrderOralDietNutrient]] = Field(
         description="Required  nutrient modifications",
         default=None,
     )
-    texture: Optional[List[NutritionOrderOralDietTexture]] = Field(
+    texture: Optional[ListType[NutritionOrderOralDietTexture]] = Field(
         description="Required  texture modifications",
         default=None,
     )
-    fluidConsistencyType: Optional[List[CodeableConcept]] = Field(
+    fluidConsistencyType: Optional[ListType[CodeableConcept]] = Field(
         description="The required consistency of fluids and liquids provided to the patient",
         default=None,
     )
@@ -212,7 +208,7 @@ class NutritionOrderSupplement(BackboneElement):
         default=None,
         alias="_productName",
     )
-    schedule: Optional[List[Timing]] = Field(
+    schedule: Optional[ListType[Timing]] = Field(
         description="Scheduled frequency of supplement",
         default=None,
     )
@@ -364,7 +360,7 @@ class NutritionOrderEnteralFormula(BackboneElement):
         description="How the formula should enter the patient\u0027s gastrointestinal tract",
         default=None,
     )
-    administration: Optional[List[NutritionOrderEnteralFormulaAdministration]] = Field(
+    administration: Optional[ListType[NutritionOrderEnteralFormulaAdministration]] = Field(
         description="Formula feeding instruction as structured data",
         default=None,
     )
@@ -469,23 +465,23 @@ class NutritionOrder(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers assigned to this order",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
@@ -494,7 +490,7 @@ class NutritionOrder(DomainResource):
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -503,7 +499,7 @@ class NutritionOrder(DomainResource):
         default=None,
         alias="_instantiatesUri",
     )
-    instantiates: Optional[List[Uri]] = Field(
+    instantiates: Optional[ListType[Uri]] = Field(
         description="Instantiates protocol or definition",
         default=None,
     )
@@ -551,15 +547,15 @@ class NutritionOrder(DomainResource):
         description="Who ordered the diet, formula or nutritional supplement",
         default=None,
     )
-    allergyIntolerance: Optional[List[Reference]] = Field(
+    allergyIntolerance: Optional[ListType[Reference]] = Field(
         description="List of the patient\u0027s food and nutrition-related allergies and intolerances",
         default=None,
     )
-    foodPreferenceModifier: Optional[List[CodeableConcept]] = Field(
+    foodPreferenceModifier: Optional[ListType[CodeableConcept]] = Field(
         description="Order-specific modifier about the type of food that should be given",
         default=None,
     )
-    excludeFoodModifier: Optional[List[CodeableConcept]] = Field(
+    excludeFoodModifier: Optional[ListType[CodeableConcept]] = Field(
         description="Order-specific modifier about the type of food that should not be given",
         default=None,
     )
@@ -567,7 +563,7 @@ class NutritionOrder(DomainResource):
         description="Oral diet components",
         default=None,
     )
-    supplement: Optional[List[NutritionOrderSupplement]] = Field(
+    supplement: Optional[ListType[NutritionOrderSupplement]] = Field(
         description="Supplement components",
         default=None,
     )
@@ -575,7 +571,7 @@ class NutritionOrder(DomainResource):
         description="Enteral formula components",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments",
         default=None,
     )

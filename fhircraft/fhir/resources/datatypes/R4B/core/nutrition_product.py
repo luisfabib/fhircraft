@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -58,7 +54,7 @@ class NutritionProductNutrient(BackboneElement):
         description="The (relevant) nutrients in the product",
         default=None,
     )
-    amount: Optional[List[Ratio]] = Field(
+    amount: Optional[ListType[Ratio]] = Field(
         description="The amount of nutrient expressed in one or more units: X per pack / per serving / per dose",
         default=None,
     )
@@ -96,7 +92,7 @@ class NutritionProductIngredient(BackboneElement):
         description="The ingredient contained in the product",
         default=None,
     )
-    amount: Optional[List[Ratio]] = Field(
+    amount: Optional[ListType[Ratio]] = Field(
         description="The amount of ingredient that is in the product",
         default=None,
     )
@@ -221,7 +217,7 @@ class NutritionProductInstance(BackboneElement):
         description="The amount of items or instances",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="The identifier for the physical instance, typically a serial number",
         default=None,
     )
@@ -328,15 +324,15 @@ class NutritionProduct(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -349,7 +345,7 @@ class NutritionProduct(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="A category or class of the nutrition product (halal, kosher, gluten free, vegan, etc)",
         default=None,
     )
@@ -357,23 +353,23 @@ class NutritionProduct(DomainResource):
         description="A code designating a specific type of nutritional product",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer, representative or officially responsible for the product",
         default=None,
     )
-    nutrient: Optional[List[NutritionProductNutrient]] = Field(
+    nutrient: Optional[ListType[NutritionProductNutrient]] = Field(
         description="The product\u0027s nutritional information expressed by the nutrients",
         default=None,
     )
-    ingredient: Optional[List[NutritionProductIngredient]] = Field(
+    ingredient: Optional[ListType[NutritionProductIngredient]] = Field(
         description="Ingredients contained in this product",
         default=None,
     )
-    knownAllergen: Optional[List[CodeableReference]] = Field(
+    knownAllergen: Optional[ListType[CodeableReference]] = Field(
         description="Known or suspected allergens that are a part of this product",
         default=None,
     )
-    productCharacteristic: Optional[List[NutritionProductProductCharacteristic]] = (
+    productCharacteristic: Optional[ListType[NutritionProductProductCharacteristic]] = (
         Field(
             description="Specifies descriptive properties of the nutrition product",
             default=None,
@@ -383,7 +379,7 @@ class NutritionProduct(DomainResource):
         description="One or several physical instances or occurrences of the nutrition product",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the product",
         default=None,
     )

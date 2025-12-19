@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -266,7 +262,7 @@ class TestReportSetup(BackboneElement):
     The results of the series of required setup operations before the tests were executed.
     """
 
-    action: Optional[List[TestReportSetupAction]] = Field(
+    action: Optional[ListType[TestReportSetupAction]] = Field(
         description="A setup operation or assert that was executed",
         default=None,
     )
@@ -479,7 +475,7 @@ class TestReportTest(BackboneElement):
         default=None,
         alias="_description",
     )
-    action: Optional[List[TestReportTestAction]] = Field(
+    action: Optional[ListType[TestReportTestAction]] = Field(
         description="A test operation or assert that was performed",
         default=None,
     )
@@ -555,7 +551,7 @@ class TestReportTeardown(BackboneElement):
     The results of the series of operations required to clean up after all the tests were executed (successfully or otherwise).
     """
 
-    action: Optional[List[TestReportTeardownAction]] = Field(
+    action: Optional[ListType[TestReportTeardownAction]] = Field(
         description="One or more teardown operations performed",
         default=None,
     )
@@ -617,15 +613,15 @@ class TestReport(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -691,7 +687,7 @@ class TestReport(DomainResource):
         default=None,
         alias="_issued",
     )
-    participant: Optional[List[TestReportParticipant]] = Field(
+    participant: Optional[ListType[TestReportParticipant]] = Field(
         description="A participant in the test execution, either the execution engine, a client, or a server",
         default=None,
     )
@@ -699,7 +695,7 @@ class TestReport(DomainResource):
         description="The results of the series of required setup operations before the tests were executed",
         default=None,
     )
-    test: Optional[List[TestReportTest]] = Field(
+    test: Optional[ListType[TestReportTest]] = Field(
         description="A test executed from the test script",
         default=None,
     )

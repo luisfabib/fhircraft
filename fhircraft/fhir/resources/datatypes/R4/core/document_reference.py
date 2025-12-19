@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Instant
 
@@ -126,11 +122,11 @@ class DocumentReferenceContext(BackboneElement):
     The clinical context in which the document was prepared.
     """
 
-    encounter: Optional[List[Reference]] = Field(
+    encounter: Optional[ListType[Reference]] = Field(
         description="Context of the document  content",
         default=None,
     )
-    event: Optional[List[CodeableConcept]] = Field(
+    event: Optional[ListType[CodeableConcept]] = Field(
         description="Main clinical acts documented",
         default=None,
     )
@@ -150,7 +146,7 @@ class DocumentReferenceContext(BackboneElement):
         description="Patient demographics from source",
         default=None,
     )
-    related: Optional[List[Reference]] = Field(
+    related: Optional[ListType[Reference]] = Field(
         description="Related identifiers or resources",
         default=None,
     )
@@ -236,15 +232,15 @@ class DocumentReference(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -252,7 +248,7 @@ class DocumentReference(DomainResource):
         description="Master Version Specific Identifier",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Other identifiers for the document",
         default=None,
     )
@@ -278,7 +274,7 @@ class DocumentReference(DomainResource):
         description="Kind of document (LOINC if possible)",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Categorization of document",
         default=None,
     )
@@ -295,7 +291,7 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_date",
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the document",
         default=None,
     )
@@ -307,7 +303,7 @@ class DocumentReference(DomainResource):
         description="Organization which maintains the document",
         default=None,
     )
-    relatesTo: Optional[List[DocumentReferenceRelatesTo]] = Field(
+    relatesTo: Optional[ListType[DocumentReferenceRelatesTo]] = Field(
         description="Relationships to other documents",
         default=None,
     )
@@ -320,11 +316,11 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_description",
     )
-    securityLabel: Optional[List[CodeableConcept]] = Field(
+    securityLabel: Optional[ListType[CodeableConcept]] = Field(
         description="Document security-tags",
         default=None,
     )
-    content: Optional[List[DocumentReferenceContent]] = Field(
+    content: Optional[ListType[DocumentReferenceContent]] = Field(
         description="Document referenced",
         default=None,
     )

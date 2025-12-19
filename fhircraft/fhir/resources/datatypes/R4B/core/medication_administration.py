@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -209,23 +205,23 @@ class MedicationAdministration(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifier",
         default=None,
     )
-    instantiates: Optional[List[Uri]] = Field(
+    instantiates: Optional[ListType[Uri]] = Field(
         description="Instantiates protocol or definition",
         default=None,
     )
@@ -234,7 +230,7 @@ class MedicationAdministration(DomainResource):
         default=None,
         alias="_instantiates",
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -247,7 +243,7 @@ class MedicationAdministration(DomainResource):
         default=None,
         alias="_status",
     )
-    statusReason: Optional[List[CodeableConcept]] = Field(
+    statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason administration not performed",
         default=None,
     )
@@ -271,7 +267,7 @@ class MedicationAdministration(DomainResource):
         description="Encounter or Episode of Care administered as part of",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Additional information to support administration",
         default=None,
     )
@@ -288,15 +284,15 @@ class MedicationAdministration(DomainResource):
         description="Start and end time of administration",
         default=None,
     )
-    performer: Optional[List[MedicationAdministrationPerformer]] = Field(
+    performer: Optional[ListType[MedicationAdministrationPerformer]] = Field(
         description="Who performed the medication administration and what they did",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Reason administration performed",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Condition or observation that supports why the medication was administered",
         default=None,
     )
@@ -304,11 +300,11 @@ class MedicationAdministration(DomainResource):
         description="Request administration performed against",
         default=None,
     )
-    device: Optional[List[Reference]] = Field(
+    device: Optional[ListType[Reference]] = Field(
         description="Device used to administer",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Information about the administration",
         default=None,
     )
@@ -316,7 +312,7 @@ class MedicationAdministration(DomainResource):
         description="Details of how medication was taken",
         default=None,
     )
-    eventHistory: Optional[List[Reference]] = Field(
+    eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of events of interest in the lifecycle",
         default=None,
     )

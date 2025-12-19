@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -196,7 +192,7 @@ class ImagingStudySeries(BackboneElement):
         default=None,
         alias="_numberOfInstances",
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Series access endpoint",
         default=None,
     )
@@ -208,7 +204,7 @@ class ImagingStudySeries(BackboneElement):
         description="Body part laterality",
         default=None,
     )
-    specimen: Optional[List[Reference]] = Field(
+    specimen: Optional[ListType[Reference]] = Field(
         description="Specimen imaged",
         default=None,
     )
@@ -221,11 +217,11 @@ class ImagingStudySeries(BackboneElement):
         default=None,
         alias="_started",
     )
-    performer: Optional[List[ImagingStudySeriesPerformer]] = Field(
+    performer: Optional[ListType[ImagingStudySeriesPerformer]] = Field(
         description="Who performed the series",
         default=None,
     )
-    instance: Optional[List[ImagingStudySeriesInstance]] = Field(
+    instance: Optional[ListType[ImagingStudySeriesInstance]] = Field(
         description="A single SOP instance from the series",
         default=None,
     )
@@ -326,19 +322,19 @@ class ImagingStudy(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers for the whole study",
         default=None,
     )
@@ -351,7 +347,7 @@ class ImagingStudy(DomainResource):
         default=None,
         alias="_status",
     )
-    modality: Optional[List[Coding]] = Field(
+    modality: Optional[ListType[Coding]] = Field(
         description="All series modality if actual acquisition modalities",
         default=None,
     )
@@ -372,7 +368,7 @@ class ImagingStudy(DomainResource):
         default=None,
         alias="_started",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled",
         default=None,
     )
@@ -380,11 +376,11 @@ class ImagingStudy(DomainResource):
         description="Referring physician",
         default=None,
     )
-    interpreter: Optional[List[Reference]] = Field(
+    interpreter: Optional[ListType[Reference]] = Field(
         description="Who interpreted images",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Study access endpoint",
         default=None,
     )
@@ -410,7 +406,7 @@ class ImagingStudy(DomainResource):
         description="The performed Procedure reference",
         default=None,
     )
-    procedureCode: Optional[List[CodeableConcept]] = Field(
+    procedureCode: Optional[ListType[CodeableConcept]] = Field(
         description="The performed procedure code",
         default=None,
     )
@@ -418,15 +414,15 @@ class ImagingStudy(DomainResource):
         description="Where ImagingStudy occurred",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why the study was requested",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Why was study performed",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="User-defined comments",
         default=None,
     )
@@ -439,7 +435,7 @@ class ImagingStudy(DomainResource):
         default=None,
         alias="_description",
     )
-    series: Optional[List[ImagingStudySeries]] = Field(
+    series: Optional[ListType[ImagingStudySeries]] = Field(
         description="Each study has one or more series of instances",
         default=None,
     )

@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -143,7 +139,7 @@ class ContractTermSecurityLabel(BackboneElement):
     Security labels that protect the handling of information about the term and its elements, which may be specifically identified..
     """
 
-    number: Optional[List[UnsignedInt]] = Field(
+    number: Optional[ListType[UnsignedInt]] = Field(
         description="Link to Security Labels",
         default=None,
     )
@@ -156,11 +152,11 @@ class ContractTermSecurityLabel(BackboneElement):
         description="Confidentiality Protection",
         default=None,
     )
-    category: Optional[List[Coding]] = Field(
+    category: Optional[ListType[Coding]] = Field(
         description="Applicable Policy",
         default=None,
     )
-    control: Optional[List[Coding]] = Field(
+    control: Optional[ListType[Coding]] = Field(
         description="Handling Instructions",
         default=None,
     )
@@ -200,7 +196,7 @@ class ContractTermOfferParty(BackboneElement):
     Offer Recipient.
     """
 
-    reference: Optional[List[Reference]] = Field(
+    reference: Optional[ListType[Reference]] = Field(
         description="Referenced entity",
         default=None,
     )
@@ -362,11 +358,11 @@ class ContractTermOffer(BackboneElement):
     The matter of concern in the context of this provision of the agrement.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Offer business ID",
         default=None,
     )
-    party: Optional[List[ContractTermOfferParty]] = Field(
+    party: Optional[ListType[ContractTermOfferParty]] = Field(
         description="Offer Recipient",
         default=None,
     )
@@ -382,11 +378,11 @@ class ContractTermOffer(BackboneElement):
         description="Accepting party choice",
         default=None,
     )
-    decisionMode: Optional[List[CodeableConcept]] = Field(
+    decisionMode: Optional[ListType[CodeableConcept]] = Field(
         description="How decision is conveyed",
         default=None,
     )
-    answer: Optional[List[ContractTermOfferAnswer]] = Field(
+    answer: Optional[ListType[ContractTermOfferAnswer]] = Field(
         description="Response to offer text",
         default=None,
     )
@@ -399,7 +395,7 @@ class ContractTermOffer(BackboneElement):
         default=None,
         alias="_text",
     )
-    linkId: Optional[List[String]] = Field(
+    linkId: Optional[ListType[String]] = Field(
         description="Pointer to text",
         default=None,
     )
@@ -408,7 +404,7 @@ class ContractTermOffer(BackboneElement):
         default=None,
         alias="_linkId",
     )
-    securityLabelNumber: Optional[List[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
         description="Offer restriction numbers",
         default=None,
     )
@@ -475,7 +471,7 @@ class ContractTermAssetContext(BackboneElement):
         description="Creator,custodian or owner",
         default=None,
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Codeable asset context",
         default=None,
     )
@@ -722,7 +718,7 @@ class ContractTermAssetValuedItem(BackboneElement):
         description="Who will receive payment",
         default=None,
     )
-    linkId: Optional[List[String]] = Field(
+    linkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -731,7 +727,7 @@ class ContractTermAssetValuedItem(BackboneElement):
         default=None,
         alias="_linkId",
     )
-    securityLabelNumber: Optional[List[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
         description="Security Labels that define affected terms",
         default=None,
     )
@@ -823,15 +819,15 @@ class ContractTermAsset(BackboneElement):
         description="Range of asset",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Asset category",
         default=None,
     )
-    typeReference: Optional[List[Reference]] = Field(
+    typeReference: Optional[ListType[Reference]] = Field(
         description="Associated entities",
         default=None,
     )
-    subtype: Optional[List[CodeableConcept]] = Field(
+    subtype: Optional[ListType[CodeableConcept]] = Field(
         description="Asset sub-category",
         default=None,
     )
@@ -839,7 +835,7 @@ class ContractTermAsset(BackboneElement):
         description="Kinship of the asset",
         default=None,
     )
-    context: Optional[List[ContractTermAssetContext]] = Field(
+    context: Optional[ListType[ContractTermAssetContext]] = Field(
         description="Circumstance of the asset",
         default=None,
     )
@@ -852,15 +848,15 @@ class ContractTermAsset(BackboneElement):
         default=None,
         alias="_condition",
     )
-    periodType: Optional[List[CodeableConcept]] = Field(
+    periodType: Optional[ListType[CodeableConcept]] = Field(
         description="Asset availability types",
         default=None,
     )
-    period: Optional[List[Period]] = Field(
+    period: Optional[ListType[Period]] = Field(
         description="Time period of the asset",
         default=None,
     )
-    usePeriod: Optional[List[Period]] = Field(
+    usePeriod: Optional[ListType[Period]] = Field(
         description="Time period",
         default=None,
     )
@@ -873,7 +869,7 @@ class ContractTermAsset(BackboneElement):
         default=None,
         alias="_text",
     )
-    linkId: Optional[List[String]] = Field(
+    linkId: Optional[ListType[String]] = Field(
         description="Pointer to asset text",
         default=None,
     )
@@ -882,11 +878,11 @@ class ContractTermAsset(BackboneElement):
         default=None,
         alias="_linkId",
     )
-    answer: Optional[List[ContractTermAssetAnswer]] = Field(
+    answer: Optional[ListType[ContractTermAssetAnswer]] = Field(
         description="Response to assets",
         default=None,
     )
-    securityLabelNumber: Optional[List[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
         description="Asset restriction numbers",
         default=None,
     )
@@ -895,7 +891,7 @@ class ContractTermAsset(BackboneElement):
         default=None,
         alias="_securityLabelNumber",
     )
-    valuedItem: Optional[List[ContractTermAssetValuedItem]] = Field(
+    valuedItem: Optional[ListType[ContractTermAssetValuedItem]] = Field(
         description="Contract Valued Item List",
         default=None,
     )
@@ -968,7 +964,7 @@ class ContractTermActionSubject(BackboneElement):
     Entity of the action.
     """
 
-    reference: Optional[List[Reference]] = Field(
+    reference: Optional[ListType[Reference]] = Field(
         description="Entity of the action",
         default=None,
     )
@@ -1019,7 +1015,7 @@ class ContractTermAction(BackboneElement):
         description="Type or form of the action",
         default=None,
     )
-    subject: Optional[List[ContractTermActionSubject]] = Field(
+    subject: Optional[ListType[ContractTermActionSubject]] = Field(
         description="Entity of the action",
         default=None,
     )
@@ -1027,7 +1023,7 @@ class ContractTermAction(BackboneElement):
         description="Purpose for the Contract Term Action",
         default=None,
     )
-    linkId: Optional[List[String]] = Field(
+    linkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -1044,7 +1040,7 @@ class ContractTermAction(BackboneElement):
         description="Episode associated with action",
         default=None,
     )
-    contextLinkId: Optional[List[String]] = Field(
+    contextLinkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -1070,11 +1066,11 @@ class ContractTermAction(BackboneElement):
         description="When action happens",
         default=None,
     )
-    requester: Optional[List[Reference]] = Field(
+    requester: Optional[ListType[Reference]] = Field(
         description="Who asked for action",
         default=None,
     )
-    requesterLinkId: Optional[List[String]] = Field(
+    requesterLinkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -1083,7 +1079,7 @@ class ContractTermAction(BackboneElement):
         default=None,
         alias="_requesterLinkId",
     )
-    performerType: Optional[List[CodeableConcept]] = Field(
+    performerType: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of service performer",
         default=None,
     )
@@ -1095,7 +1091,7 @@ class ContractTermAction(BackboneElement):
         description="Actor that wil execute (or not) the action",
         default=None,
     )
-    performerLinkId: Optional[List[String]] = Field(
+    performerLinkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -1104,15 +1100,15 @@ class ContractTermAction(BackboneElement):
         default=None,
         alias="_performerLinkId",
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why is action (not) needed?",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Why is action (not) needed?",
         default=None,
     )
-    reason: Optional[List[String]] = Field(
+    reason: Optional[ListType[String]] = Field(
         description="Why action is to be performed",
         default=None,
     )
@@ -1121,7 +1117,7 @@ class ContractTermAction(BackboneElement):
         default=None,
         alias="_reason",
     )
-    reasonLinkId: Optional[List[String]] = Field(
+    reasonLinkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -1130,11 +1126,11 @@ class ContractTermAction(BackboneElement):
         default=None,
         alias="_reasonLinkId",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments about the action",
         default=None,
     )
-    securityLabelNumber: Optional[List[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
         description="Action restriction numbers",
         default=None,
     )
@@ -1285,7 +1281,7 @@ class ContractTerm(BackboneElement):
         default=None,
         alias="_text",
     )
-    securityLabel: Optional[List[ContractTermSecurityLabel]] = Field(
+    securityLabel: Optional[ListType[ContractTermSecurityLabel]] = Field(
         description="Protection for the Term",
         default=None,
     )
@@ -1293,15 +1289,15 @@ class ContractTerm(BackboneElement):
         description="Context of the Contract term",
         default=None,
     )
-    asset: Optional[List[ContractTermAsset]] = Field(
+    asset: Optional[ListType[ContractTermAsset]] = Field(
         description="Contract Term Asset List",
         default=None,
     )
-    action: Optional[List[ContractTermAction]] = Field(
+    action: Optional[ListType[ContractTermAction]] = Field(
         description="Entity being ascribed responsibility",
         default=None,
     )
-    group: Optional[List["ContractTerm"]] = Field(
+    group: Optional[ListType["ContractTerm"]] = Field(
         description="Nested Contract Term Group",
         default=None,
     )
@@ -1386,7 +1382,7 @@ class ContractSigner(BackboneElement):
         description="Contract Signatory Party",
         default=None,
     )
-    signature: Optional[List[Signature]] = Field(
+    signature: Optional[ListType[Signature]] = Field(
         description="Contract Documentation Signature",
         default=None,
     )
@@ -1553,19 +1549,19 @@ class Contract(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Contract number",
         default=None,
     )
@@ -1634,19 +1630,19 @@ class Contract(DomainResource):
         description="Contract cessation cause",
         default=None,
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="Contract Target Entity",
         default=None,
     )
-    authority: Optional[List[Reference]] = Field(
+    authority: Optional[ListType[Reference]] = Field(
         description="Authority under which this Contract has standing",
         default=None,
     )
-    domain: Optional[List[Reference]] = Field(
+    domain: Optional[ListType[Reference]] = Field(
         description="A sphere of control governed by an authoritative jurisdiction, organization, or person",
         default=None,
     )
-    site: Optional[List[Reference]] = Field(
+    site: Optional[ListType[Reference]] = Field(
         description="Specific Location",
         default=None,
     )
@@ -1677,7 +1673,7 @@ class Contract(DomainResource):
         default=None,
         alias="_subtitle",
     )
-    alias: Optional[List[String]] = Field(
+    alias: Optional[ListType[String]] = Field(
         description="Acronym or short name",
         default=None,
     )
@@ -1706,7 +1702,7 @@ class Contract(DomainResource):
         description="Legal instrument category",
         default=None,
     )
-    subType: Optional[List[CodeableConcept]] = Field(
+    subType: Optional[ListType[CodeableConcept]] = Field(
         description="Subtype within the context of type",
         default=None,
     )
@@ -1714,31 +1710,31 @@ class Contract(DomainResource):
         description="Contract precursor content",
         default=None,
     )
-    term: Optional[List[ContractTerm]] = Field(
+    term: Optional[ListType[ContractTerm]] = Field(
         description="Contract Term List",
         default=None,
     )
-    supportingInfo: Optional[List[Reference]] = Field(
+    supportingInfo: Optional[ListType[Reference]] = Field(
         description="Extra Information",
         default=None,
     )
-    relevantHistory: Optional[List[Reference]] = Field(
+    relevantHistory: Optional[ListType[Reference]] = Field(
         description="Key event in Contract History",
         default=None,
     )
-    signer: Optional[List[ContractSigner]] = Field(
+    signer: Optional[ListType[ContractSigner]] = Field(
         description="Contract Signatory",
         default=None,
     )
-    friendly: Optional[List[ContractFriendly]] = Field(
+    friendly: Optional[ListType[ContractFriendly]] = Field(
         description="Contract Friendly Language",
         default=None,
     )
-    legal: Optional[List[ContractLegal]] = Field(
+    legal: Optional[ListType[ContractLegal]] = Field(
         description="Contract Legal Language",
         default=None,
     )
-    rule: Optional[List[ContractRule]] = Field(
+    rule: Optional[ListType[ContractRule]] = Field(
         description="Computable Contract Language",
         default=None,
     )

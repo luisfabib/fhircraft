@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -359,7 +355,7 @@ class ExplanationOfBenefitDiagnosis(BackboneElement):
         description="Nature of illness or problem",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Timing or nature of the diagnosis",
         default=None,
     )
@@ -432,7 +428,7 @@ class ExplanationOfBenefitProcedure(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Category of Procedure",
         default=None,
     )
@@ -453,7 +449,7 @@ class ExplanationOfBenefitProcedure(BackboneElement):
         description="Specific clinical procedure",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
@@ -522,7 +518,7 @@ class ExplanationOfBenefitInsurance(BackboneElement):
         description="Insurance information",
         default=None,
     )
-    preAuthRef: Optional[List[String]] = Field(
+    preAuthRef: Optional[ListType[String]] = Field(
         description="Prior authorization reference number",
         default=None,
     )
@@ -766,11 +762,11 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -795,11 +791,11 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -808,7 +804,7 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Subdetail level adjudication details",
         default=None,
     )
@@ -896,11 +892,11 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -925,11 +921,11 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -938,11 +934,11 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemDetailAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemDetailAdjudication]] = Field(
         description="Detail level adjudication details",
         default=None,
     )
-    subDetail: Optional[List[ExplanationOfBenefitItemDetailSubDetail]] = Field(
+    subDetail: Optional[ListType[ExplanationOfBenefitItemDetailSubDetail]] = Field(
         description="Additional items",
         default=None,
     )
@@ -1021,7 +1017,7 @@ class ExplanationOfBenefitItem(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    careTeamSequence: Optional[List[PositiveInt]] = Field(
+    careTeamSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable care team members",
         default=None,
     )
@@ -1030,7 +1026,7 @@ class ExplanationOfBenefitItem(BackboneElement):
         default=None,
         alias="_careTeamSequence",
     )
-    diagnosisSequence: Optional[List[PositiveInt]] = Field(
+    diagnosisSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable diagnoses",
         default=None,
     )
@@ -1039,7 +1035,7 @@ class ExplanationOfBenefitItem(BackboneElement):
         default=None,
         alias="_diagnosisSequence",
     )
-    procedureSequence: Optional[List[PositiveInt]] = Field(
+    procedureSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable procedures",
         default=None,
     )
@@ -1048,7 +1044,7 @@ class ExplanationOfBenefitItem(BackboneElement):
         default=None,
         alias="_procedureSequence",
     )
-    informationSequence: Optional[List[PositiveInt]] = Field(
+    informationSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable exception and supporting information",
         default=None,
     )
@@ -1069,11 +1065,11 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Product or service billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -1123,7 +1119,7 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
@@ -1131,15 +1127,15 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Anatomical location",
         default=None,
     )
-    subSite: Optional[List[CodeableConcept]] = Field(
+    subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Anatomical sub-location",
         default=None,
     )
-    encounter: Optional[List[Reference]] = Field(
+    encounter: Optional[ListType[Reference]] = Field(
         description="Encounters related to this billed item",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -1148,11 +1144,11 @@ class ExplanationOfBenefitItem(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Adjudication details",
         default=None,
     )
-    detail: Optional[List[ExplanationOfBenefitItemDetail]] = Field(
+    detail: Optional[ListType[ExplanationOfBenefitItemDetail]] = Field(
         description="Additional items",
         default=None,
     )
@@ -1279,7 +1275,7 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
@@ -1304,7 +1300,7 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -1313,7 +1309,7 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Added items adjudication",
         default=None,
     )
@@ -1369,7 +1365,7 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
@@ -1394,7 +1390,7 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -1403,11 +1399,11 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Added items adjudication",
         default=None,
     )
-    subDetail: Optional[List[ExplanationOfBenefitAddItemDetailSubDetail]] = Field(
+    subDetail: Optional[ListType[ExplanationOfBenefitAddItemDetailSubDetail]] = Field(
         description="Insurer added line items",
         default=None,
     )
@@ -1462,7 +1458,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
     The first-tier service adjudications for payor added product or service lines.
     """
 
-    itemSequence: Optional[List[PositiveInt]] = Field(
+    itemSequence: Optional[ListType[PositiveInt]] = Field(
         description="Item sequence number",
         default=None,
     )
@@ -1471,7 +1467,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         default=None,
         alias="_itemSequence",
     )
-    detailSequence: Optional[List[PositiveInt]] = Field(
+    detailSequence: Optional[ListType[PositiveInt]] = Field(
         description="Detail sequence number",
         default=None,
     )
@@ -1480,7 +1476,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         default=None,
         alias="_detailSequence",
     )
-    subDetailSequence: Optional[List[PositiveInt]] = Field(
+    subDetailSequence: Optional[ListType[PositiveInt]] = Field(
         description="Subdetail sequence number",
         default=None,
     )
@@ -1489,7 +1485,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         default=None,
         alias="_subDetailSequence",
     )
-    provider: Optional[List[Reference]] = Field(
+    provider: Optional[ListType[Reference]] = Field(
         description="Authorized providers",
         default=None,
     )
@@ -1497,11 +1493,11 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -1555,11 +1551,11 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Anatomical location",
         default=None,
     )
-    subSite: Optional[List[CodeableConcept]] = Field(
+    subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Anatomical sub-location",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -1568,11 +1564,11 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         default=None,
         alias="_noteNumber",
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Added items adjudication",
         default=None,
     )
-    detail: Optional[List[ExplanationOfBenefitAddItemDetail]] = Field(
+    detail: Optional[ListType[ExplanationOfBenefitAddItemDetail]] = Field(
         description="Insurer added line items",
         default=None,
     )
@@ -1991,7 +1987,7 @@ class ExplanationOfBenefitBenefitBalance(BackboneElement):
         description="Annual or lifetime",
         default=None,
     )
-    financial: Optional[List[ExplanationOfBenefitBenefitBalanceFinancial]] = Field(
+    financial: Optional[ListType[ExplanationOfBenefitBenefitBalanceFinancial]] = Field(
         description="Benefit Summary",
         default=None,
     )
@@ -2080,19 +2076,19 @@ class ExplanationOfBenefit(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for the resource",
         default=None,
     )
@@ -2163,7 +2159,7 @@ class ExplanationOfBenefit(DomainResource):
         description="Funds reserved status",
         default=None,
     )
-    related: Optional[List[ExplanationOfBenefitRelated]] = Field(
+    related: Optional[ListType[ExplanationOfBenefitRelated]] = Field(
         description="Prior or corollary claims",
         default=None,
     )
@@ -2213,7 +2209,7 @@ class ExplanationOfBenefit(DomainResource):
         default=None,
         alias="_disposition",
     )
-    preAuthRef: Optional[List[String]] = Field(
+    preAuthRef: Optional[ListType[String]] = Field(
         description="Preauthorization reference",
         default=None,
     )
@@ -2222,23 +2218,23 @@ class ExplanationOfBenefit(DomainResource):
         default=None,
         alias="_preAuthRef",
     )
-    preAuthRefPeriod: Optional[List[Period]] = Field(
+    preAuthRefPeriod: Optional[ListType[Period]] = Field(
         description="Preauthorization in-effect period",
         default=None,
     )
-    careTeam: Optional[List[ExplanationOfBenefitCareTeam]] = Field(
+    careTeam: Optional[ListType[ExplanationOfBenefitCareTeam]] = Field(
         description="Care Team members",
         default=None,
     )
-    supportingInfo: Optional[List[ExplanationOfBenefitSupportingInfo]] = Field(
+    supportingInfo: Optional[ListType[ExplanationOfBenefitSupportingInfo]] = Field(
         description="Supporting information",
         default=None,
     )
-    diagnosis: Optional[List[ExplanationOfBenefitDiagnosis]] = Field(
+    diagnosis: Optional[ListType[ExplanationOfBenefitDiagnosis]] = Field(
         description="Pertinent diagnosis information",
         default=None,
     )
-    procedure: Optional[List[ExplanationOfBenefitProcedure]] = Field(
+    procedure: Optional[ListType[ExplanationOfBenefitProcedure]] = Field(
         description="Clinical procedures performed",
         default=None,
     )
@@ -2251,7 +2247,7 @@ class ExplanationOfBenefit(DomainResource):
         default=None,
         alias="_precedence",
     )
-    insurance: Optional[List[ExplanationOfBenefitInsurance]] = Field(
+    insurance: Optional[ListType[ExplanationOfBenefitInsurance]] = Field(
         description="Patient insurance information",
         default=None,
     )
@@ -2259,19 +2255,19 @@ class ExplanationOfBenefit(DomainResource):
         description="Details of the event",
         default=None,
     )
-    item: Optional[List[ExplanationOfBenefitItem]] = Field(
+    item: Optional[ListType[ExplanationOfBenefitItem]] = Field(
         description="Product or service provided",
         default=None,
     )
-    addItem: Optional[List[ExplanationOfBenefitAddItem]] = Field(
+    addItem: Optional[ListType[ExplanationOfBenefitAddItem]] = Field(
         description="Insurer added line items",
         default=None,
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Header-level adjudication",
         default=None,
     )
-    total: Optional[List[ExplanationOfBenefitTotal]] = Field(
+    total: Optional[ListType[ExplanationOfBenefitTotal]] = Field(
         description="Adjudication totals",
         default=None,
     )
@@ -2287,7 +2283,7 @@ class ExplanationOfBenefit(DomainResource):
         description="Printed reference or actual form",
         default=None,
     )
-    processNote: Optional[List[ExplanationOfBenefitProcessNote]] = Field(
+    processNote: Optional[ListType[ExplanationOfBenefitProcessNote]] = Field(
         description="Note concerning adjudication",
         default=None,
     )
@@ -2295,7 +2291,7 @@ class ExplanationOfBenefit(DomainResource):
         description="When the benefits are applicable",
         default=None,
     )
-    benefitBalance: Optional[List[ExplanationOfBenefitBenefitBalance]] = Field(
+    benefitBalance: Optional[ListType[ExplanationOfBenefitBenefitBalance]] = Field(
         description="Balance by Benefit Category",
         default=None,
     )

@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -75,7 +71,7 @@ class RegulatedAuthorizationCase(BackboneElement):
         default=None,
         alias="_dateDateTime",
     )
-    application: Optional[List["RegulatedAuthorizationCase"]] = Field(
+    application: Optional[ListType["RegulatedAuthorizationCase"]] = Field(
         description="Applications submitted to obtain a regulated authorization. Steps within the longer running case or procedure",
         default=None,
     )
@@ -168,23 +164,23 @@ class RegulatedAuthorization(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for the authorization, typically assigned by the authorizing body",
         default=None,
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="The product type, treatment, facility or activity that is being authorized",
         default=None,
     )
@@ -201,7 +197,7 @@ class RegulatedAuthorization(DomainResource):
         default=None,
         alias="_description",
     )
-    region: Optional[List[CodeableConcept]] = Field(
+    region: Optional[ListType[CodeableConcept]] = Field(
         description="The territory in which the authorization has been granted",
         default=None,
     )
@@ -230,7 +226,7 @@ class RegulatedAuthorization(DomainResource):
         description="The intended use of the product, e.g. prevention, treatment",
         default=None,
     )
-    basis: Optional[List[CodeableConcept]] = Field(
+    basis: Optional[ListType[CodeableConcept]] = Field(
         description="The legal/regulatory framework or reasons under which this authorization is granted",
         default=None,
     )

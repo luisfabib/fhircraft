@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -53,7 +49,7 @@ class ProvenanceAgent(BackboneElement):
         description="How the agent participated",
         default=None,
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="What the agents role was",
         default=None,
     )
@@ -105,7 +101,7 @@ class ProvenanceEntityAgent(BackboneElement):
         description="How the agent participated",
         default=None,
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="What the agents role was",
         default=None,
     )
@@ -166,7 +162,7 @@ class ProvenanceEntity(BackboneElement):
         description="Identity of entity",
         default=None,
     )
-    agent: Optional[List[ProvenanceEntityAgent]] = Field(
+    agent: Optional[ListType[ProvenanceEntityAgent]] = Field(
         description="Entity is attributed to this agent",
         default=None,
     )
@@ -240,19 +236,19 @@ class Provenance(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    target: Optional[List[Reference]] = Field(
+    target: Optional[ListType[Reference]] = Field(
         description="Target Reference(s) (usually version specific)",
         default=None,
     )
@@ -278,7 +274,7 @@ class Provenance(DomainResource):
         default=None,
         alias="_recorded",
     )
-    policy: Optional[List[Uri]] = Field(
+    policy: Optional[ListType[Uri]] = Field(
         description="Policy or plan the activity was defined by",
         default=None,
     )
@@ -291,7 +287,7 @@ class Provenance(DomainResource):
         description="Where the activity occurred, if relevant",
         default=None,
     )
-    reason: Optional[List[CodeableConcept]] = Field(
+    reason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason the activity is occurring",
         default=None,
     )
@@ -299,15 +295,15 @@ class Provenance(DomainResource):
         description="Activity that occurred",
         default=None,
     )
-    agent: Optional[List[ProvenanceAgent]] = Field(
+    agent: Optional[ListType[ProvenanceAgent]] = Field(
         description="Actor involved",
         default=None,
     )
-    entity: Optional[List[ProvenanceEntity]] = Field(
+    entity: Optional[ListType[ProvenanceEntity]] = Field(
         description="An entity used in this activity",
         default=None,
     )
-    signature: Optional[List[Signature]] = Field(
+    signature: Optional[ListType[Signature]] = Field(
         description="Signature on target",
         default=None,
     )

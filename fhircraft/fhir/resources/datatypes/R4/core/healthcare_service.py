@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -95,7 +91,7 @@ class HealthcareServiceAvailableTime(BackboneElement):
     A collection of times that the Service Site is available.
     """
 
-    daysOfWeek: Optional[List[Code]] = Field(
+    daysOfWeek: Optional[ListType[Code]] = Field(
         description="mon | tue | wed | thu | fri | sat | sun",
         default=None,
     )
@@ -247,19 +243,19 @@ class HealthcareService(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifiers for this item",
         default=None,
     )
@@ -276,19 +272,19 @@ class HealthcareService(DomainResource):
         description="Organization that provides this service",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Broad category of service being performed or delivered",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type of service that may be delivered or performed",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="Specialties handled by the HealthcareService",
         default=None,
     )
-    location: Optional[List[Reference]] = Field(
+    location: Optional[ListType[Reference]] = Field(
         description="Location(s) where service may be provided",
         default=None,
     )
@@ -323,35 +319,35 @@ class HealthcareService(DomainResource):
         description="Facilitates quick identification of the service",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="Contacts related to the healthcare service",
         default=None,
     )
-    coverageArea: Optional[List[Reference]] = Field(
+    coverageArea: Optional[ListType[Reference]] = Field(
         description="Location(s) service is intended for/available to",
         default=None,
     )
-    serviceProvisionCode: Optional[List[CodeableConcept]] = Field(
+    serviceProvisionCode: Optional[ListType[CodeableConcept]] = Field(
         description="Conditions under which service is available/offered",
         default=None,
     )
-    eligibility: Optional[List[HealthcareServiceEligibility]] = Field(
+    eligibility: Optional[ListType[HealthcareServiceEligibility]] = Field(
         description="Specific eligibility requirements required to use the service",
         default=None,
     )
-    program: Optional[List[CodeableConcept]] = Field(
+    program: Optional[ListType[CodeableConcept]] = Field(
         description="Programs that this service is applicable to",
         default=None,
     )
-    characteristic: Optional[List[CodeableConcept]] = Field(
+    characteristic: Optional[ListType[CodeableConcept]] = Field(
         description="Collection of characteristics (attributes)",
         default=None,
     )
-    communication: Optional[List[CodeableConcept]] = Field(
+    communication: Optional[ListType[CodeableConcept]] = Field(
         description="The language that this service is offered in",
         default=None,
     )
-    referralMethod: Optional[List[CodeableConcept]] = Field(
+    referralMethod: Optional[ListType[CodeableConcept]] = Field(
         description="Ways that the service accepts referrals",
         default=None,
     )
@@ -364,11 +360,11 @@ class HealthcareService(DomainResource):
         default=None,
         alias="_appointmentRequired",
     )
-    availableTime: Optional[List[HealthcareServiceAvailableTime]] = Field(
+    availableTime: Optional[ListType[HealthcareServiceAvailableTime]] = Field(
         description="Times the Service Site is available",
         default=None,
     )
-    notAvailable: Optional[List[HealthcareServiceNotAvailable]] = Field(
+    notAvailable: Optional[ListType[HealthcareServiceNotAvailable]] = Field(
         description="Not available during this time due to provided reason",
         default=None,
     )
@@ -381,7 +377,7 @@ class HealthcareService(DomainResource):
         default=None,
         alias="_availabilityExceptions",
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to electronic services operated for the healthcare service",
         default=None,
     )

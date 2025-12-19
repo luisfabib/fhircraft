@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, PositiveInt
 
@@ -173,19 +169,19 @@ class EpisodeOfCare(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier(s) relevant for this EpisodeOfCare",
         default=None,
     )
@@ -198,15 +194,15 @@ class EpisodeOfCare(DomainResource):
         default=None,
         alias="_status",
     )
-    statusHistory: Optional[List[EpisodeOfCareStatusHistory]] = Field(
+    statusHistory: Optional[ListType[EpisodeOfCareStatusHistory]] = Field(
         description="Past list of status codes (the current status may be included to cover the start date of the status)",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type/class  - e.g. specialist referral, disease management",
         default=None,
     )
-    diagnosis: Optional[List[EpisodeOfCareDiagnosis]] = Field(
+    diagnosis: Optional[ListType[EpisodeOfCareDiagnosis]] = Field(
         description="The list of diagnosis relevant to this episode of care",
         default=None,
     )
@@ -222,7 +218,7 @@ class EpisodeOfCare(DomainResource):
         description="Interval during responsibility is assumed",
         default=None,
     )
-    referralRequest: Optional[List[Reference]] = Field(
+    referralRequest: Optional[ListType[Reference]] = Field(
         description="Originating Referral Request(s)",
         default=None,
     )
@@ -230,11 +226,11 @@ class EpisodeOfCare(DomainResource):
         description="Care manager/care coordinator for the patient",
         default=None,
     )
-    team: Optional[List[Reference]] = Field(
+    team: Optional[ListType[Reference]] = Field(
         description="Other practitioners facilitating this episode of care",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="The set of accounts that may be used for billing for this EpisodeOfCare",
         default=None,
     )

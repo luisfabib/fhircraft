@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -43,11 +39,11 @@ class DetectedIssueEvidence(BackboneElement):
     Supporting evidence or manifestations that provide the basis for identifying the detected issue such as a GuidanceResponse or MeasureReport.
     """
 
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Manifestation",
         default=None,
     )
-    detail: Optional[List[Reference]] = Field(
+    detail: Optional[ListType[Reference]] = Field(
         description="Supporting information",
         default=None,
     )
@@ -168,19 +164,19 @@ class DetectedIssue(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique id for the detected issue",
         default=None,
     )
@@ -227,11 +223,11 @@ class DetectedIssue(DomainResource):
         description="The provider or device that identified the issue",
         default=None,
     )
-    implicated: Optional[List[Reference]] = Field(
+    implicated: Optional[ListType[Reference]] = Field(
         description="Problem resource",
         default=None,
     )
-    evidence: Optional[List[DetectedIssueEvidence]] = Field(
+    evidence: Optional[ListType[DetectedIssueEvidence]] = Field(
         description="Supporting evidence",
         default=None,
     )
@@ -253,7 +249,7 @@ class DetectedIssue(DomainResource):
         default=None,
         alias="_reference",
     )
-    mitigation: Optional[List[DetectedIssueMitigation]] = Field(
+    mitigation: Optional[ListType[DetectedIssueMitigation]] = Field(
         description="Step taken to address",
         default=None,
     )

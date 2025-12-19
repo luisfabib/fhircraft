@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -194,7 +190,7 @@ class CoverageEligibilityRequestItem(BackboneElement):
     Service categories or billable services for which benefit details and/or an authorization prior to service delivery may be required by the payor.
     """
 
-    supportingInfoSequence: Optional[List[PositiveInt]] = Field(
+    supportingInfoSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable exception or supporting information",
         default=None,
     )
@@ -211,7 +207,7 @@ class CoverageEligibilityRequestItem(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Product or service billing modifiers",
         default=None,
     )
@@ -231,11 +227,11 @@ class CoverageEligibilityRequestItem(BackboneElement):
         description="Servicing facility",
         default=None,
     )
-    diagnosis: Optional[List[CoverageEligibilityRequestItemDiagnosis]] = Field(
+    diagnosis: Optional[ListType[CoverageEligibilityRequestItemDiagnosis]] = Field(
         description="Applicable diagnosis",
         default=None,
     )
-    detail: Optional[List[Reference]] = Field(
+    detail: Optional[ListType[Reference]] = Field(
         description="Product or service details",
         default=None,
     )
@@ -332,19 +328,19 @@ class CoverageEligibilityRequest(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for coverage eligiblity request",
         default=None,
     )
@@ -361,7 +357,7 @@ class CoverageEligibilityRequest(DomainResource):
         description="Desired processing priority",
         default=None,
     )
-    purpose: Optional[List[Code]] = Field(
+    purpose: Optional[ListType[Code]] = Field(
         description="auth-requirements | benefits | discovery | validation",
         default=None,
     )
@@ -412,15 +408,15 @@ class CoverageEligibilityRequest(DomainResource):
         description="Servicing facility",
         default=None,
     )
-    supportingInfo: Optional[List[CoverageEligibilityRequestSupportingInfo]] = Field(
+    supportingInfo: Optional[ListType[CoverageEligibilityRequestSupportingInfo]] = Field(
         description="Supporting information",
         default=None,
     )
-    insurance: Optional[List[CoverageEligibilityRequestInsurance]] = Field(
+    insurance: Optional[ListType[CoverageEligibilityRequestInsurance]] = Field(
         description="Patient insurance information",
         default=None,
     )
-    item: Optional[List[CoverageEligibilityRequestItem]] = Field(
+    item: Optional[ListType[CoverageEligibilityRequestItem]] = Field(
         description="Item to be evaluated for eligibiity",
         default=None,
     )

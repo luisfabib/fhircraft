@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -70,7 +66,7 @@ class ObservationReferenceRange(BackboneElement):
         description="Reference range qualifier",
         default=None,
     )
-    appliesTo: Optional[List[CodeableConcept]] = Field(
+    appliesTo: Optional[ListType[CodeableConcept]] = Field(
         description="Reference range population",
         default=None,
     )
@@ -141,7 +137,7 @@ class ObservationComponentReferenceRange(BackboneElement):
         description="Reference range qualifier",
         default=None,
     )
-    appliesTo: Optional[List[CodeableConcept]] = Field(
+    appliesTo: Optional[ListType[CodeableConcept]] = Field(
         description="Reference range population",
         default=None,
     )
@@ -277,11 +273,11 @@ class ObservationComponent(BackboneElement):
         description="Why the component result is missing",
         default=None,
     )
-    interpretation: Optional[List[CodeableConcept]] = Field(
+    interpretation: Optional[ListType[CodeableConcept]] = Field(
         description="High, low, normal, etc.",
         default=None,
     )
-    referenceRange: Optional[List[ObservationComponentReferenceRange]] = Field(
+    referenceRange: Optional[ListType[ObservationComponentReferenceRange]] = Field(
         description="Provides guide for interpretation of component result",
         default=None,
     )
@@ -386,27 +382,27 @@ class Observation(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for observation",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal or order",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -419,7 +415,7 @@ class Observation(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of  type of observation",
         default=None,
     )
@@ -431,7 +427,7 @@ class Observation(DomainResource):
         description="Who and/or what the observation is about",
         default=None,
     )
-    focus: Optional[List[Reference]] = Field(
+    focus: Optional[ListType[Reference]] = Field(
         description="What the observation is about, when it is not about the subject of record",
         default=None,
     )
@@ -474,7 +470,7 @@ class Observation(DomainResource):
         default=None,
         alias="_issued",
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Who is responsible for the observation",
         default=None,
     )
@@ -551,11 +547,11 @@ class Observation(DomainResource):
         description="Why the result is missing",
         default=None,
     )
-    interpretation: Optional[List[CodeableConcept]] = Field(
+    interpretation: Optional[ListType[CodeableConcept]] = Field(
         description="High, low, normal, etc.",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments about the observation",
         default=None,
     )
@@ -575,19 +571,19 @@ class Observation(DomainResource):
         description="(Measurement) Device",
         default=None,
     )
-    referenceRange: Optional[List[ObservationReferenceRange]] = Field(
+    referenceRange: Optional[ListType[ObservationReferenceRange]] = Field(
         description="Provides guide for interpretation",
         default=None,
     )
-    hasMember: Optional[List[Reference]] = Field(
+    hasMember: Optional[ListType[Reference]] = Field(
         description="Related resource that belongs to the Observation group",
         default=None,
     )
-    derivedFrom: Optional[List[Reference]] = Field(
+    derivedFrom: Optional[ListType[Reference]] = Field(
         description="Related measurements the observation is made from",
         default=None,
     )
-    component: Optional[List[ObservationComponent]] = Field(
+    component: Optional[ListType[ObservationComponent]] = Field(
         description="Component results",
         default=None,
     )

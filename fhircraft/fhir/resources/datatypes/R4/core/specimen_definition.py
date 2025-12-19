@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
@@ -114,7 +110,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         default=None,
         alias="_minimumVolumeString",
     )
-    additive: Optional[List[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
+    additive: Optional[ListType[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
         description="Additive associated with container",
         default=None,
     )
@@ -284,11 +280,11 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="Specimen retention time",
         default=None,
     )
-    rejectionCriterion: Optional[List[CodeableConcept]] = Field(
+    rejectionCriterion: Optional[ListType[CodeableConcept]] = Field(
         description="Rejection criterion",
         default=None,
     )
-    handling: Optional[List[SpecimenDefinitionTypeTestedHandling]] = Field(
+    handling: Optional[ListType[SpecimenDefinitionTypeTestedHandling]] = Field(
         description="Specimen handling before testing",
         default=None,
     )
@@ -377,15 +373,15 @@ class SpecimenDefinition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -397,7 +393,7 @@ class SpecimenDefinition(DomainResource):
         description="Kind of material to collect",
         default=None,
     )
-    patientPreparation: Optional[List[CodeableConcept]] = Field(
+    patientPreparation: Optional[ListType[CodeableConcept]] = Field(
         description="Patient preparation for collection",
         default=None,
     )
@@ -410,11 +406,11 @@ class SpecimenDefinition(DomainResource):
         default=None,
         alias="_timeAspect",
     )
-    collection: Optional[List[CodeableConcept]] = Field(
+    collection: Optional[ListType[CodeableConcept]] = Field(
         description="Specimen collection procedure",
         default=None,
     )
-    typeTested: Optional[List[SpecimenDefinitionTypeTested]] = Field(
+    typeTested: Optional[ListType[SpecimenDefinitionTypeTested]] = Field(
         description="Specimen in container intended for testing by lab",
         default=None,
     )

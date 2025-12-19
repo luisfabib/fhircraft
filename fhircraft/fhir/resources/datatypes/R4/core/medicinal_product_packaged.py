@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -84,7 +80,7 @@ class MedicinalProductPackagedPackageItem(BackboneElement):
     A packaging item, as a contained for medicine, possibly with other packaging items within.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Including possibly Data Carrier Identifier",
         default=None,
     )
@@ -96,23 +92,23 @@ class MedicinalProductPackagedPackageItem(BackboneElement):
         description="The quantity of this package in the medicinal product, at the current level of packaging. The outermost is always 1",
         default=None,
     )
-    material: Optional[List[CodeableConcept]] = Field(
+    material: Optional[ListType[CodeableConcept]] = Field(
         description="Material type of the package item",
         default=None,
     )
-    alternateMaterial: Optional[List[CodeableConcept]] = Field(
+    alternateMaterial: Optional[ListType[CodeableConcept]] = Field(
         description="A possible alternate material for the packaging",
         default=None,
     )
-    device: Optional[List[Reference]] = Field(
+    device: Optional[ListType[Reference]] = Field(
         description="A device accompanying a medicinal product",
         default=None,
     )
-    manufacturedItem: Optional[List[Reference]] = Field(
+    manufacturedItem: Optional[ListType[Reference]] = Field(
         description="The manufactured item as contained in the packaged medicinal product",
         default=None,
     )
-    packageItem: Optional[List["MedicinalProductPackagedPackageItem"]] = Field(
+    packageItem: Optional[ListType["MedicinalProductPackagedPackageItem"]] = Field(
         description="Allows containers within containers",
         default=None,
     )
@@ -120,15 +116,15 @@ class MedicinalProductPackagedPackageItem(BackboneElement):
         description="Dimensions, color etc.",
         default=None,
     )
-    otherCharacteristics: Optional[List[CodeableConcept]] = Field(
+    otherCharacteristics: Optional[ListType[CodeableConcept]] = Field(
         description="Other codeable characteristics",
         default=None,
     )
-    shelfLifeStorage: Optional[List[ProductShelfLife]] = Field(
+    shelfLifeStorage: Optional[ListType[ProductShelfLife]] = Field(
         description="Shelf Life and storage information",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this Package Item",
         default=None,
     )
@@ -229,23 +225,23 @@ class MedicinalProductPackaged(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique identifier",
         default=None,
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="The product with this is a pack for",
         default=None,
     )
@@ -262,7 +258,7 @@ class MedicinalProductPackaged(DomainResource):
         description="The legal status of supply of the medicinal product as classified by the regulator",
         default=None,
     )
-    marketingStatus: Optional[List[MarketingStatus]] = Field(
+    marketingStatus: Optional[ListType[MarketingStatus]] = Field(
         description="Marketing information",
         default=None,
     )
@@ -270,15 +266,15 @@ class MedicinalProductPackaged(DomainResource):
         description="Manufacturer of this Package Item",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this Package Item",
         default=None,
     )
-    batchIdentifier: Optional[List[MedicinalProductPackagedBatchIdentifier]] = Field(
+    batchIdentifier: Optional[ListType[MedicinalProductPackagedBatchIdentifier]] = Field(
         description="Batch numbering",
         default=None,
     )
-    packageItem: Optional[List[MedicinalProductPackagedPackageItem]] = Field(
+    packageItem: Optional[ListType[MedicinalProductPackagedPackageItem]] = Field(
         description="A packaging item, as a contained for medicine, possibly with other packaging items within",
         default=None,
     )

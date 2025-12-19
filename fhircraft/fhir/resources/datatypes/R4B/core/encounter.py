@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, PositiveInt
 
@@ -126,7 +122,7 @@ class EncounterParticipant(BackboneElement):
     The list of people responsible for providing the service.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in encounter",
         default=None,
     )
@@ -237,15 +233,15 @@ class EncounterHospitalization(BackboneElement):
         description="The type of hospital re-admission that has occurred (if any). If the value is absent, then this is not identified as a readmission",
         default=None,
     )
-    dietPreference: Optional[List[CodeableConcept]] = Field(
+    dietPreference: Optional[ListType[CodeableConcept]] = Field(
         description="Diet preferences reported by the patient",
         default=None,
     )
-    specialCourtesy: Optional[List[CodeableConcept]] = Field(
+    specialCourtesy: Optional[ListType[CodeableConcept]] = Field(
         description="Special courtesies (VIP, board member)",
         default=None,
     )
-    specialArrangement: Optional[List[CodeableConcept]] = Field(
+    specialArrangement: Optional[ListType[CodeableConcept]] = Field(
         description="Wheelchair, translator, stretcher, etc.",
         default=None,
     )
@@ -402,19 +398,19 @@ class Encounter(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
@@ -427,7 +423,7 @@ class Encounter(DomainResource):
         default=None,
         alias="_status",
     )
-    statusHistory: Optional[List[EncounterStatusHistory]] = Field(
+    statusHistory: Optional[ListType[EncounterStatusHistory]] = Field(
         description="List of past encounter statuses",
         default=None,
     )
@@ -435,11 +431,11 @@ class Encounter(DomainResource):
         description="Classification of patient encounter",
         default=None,
     )
-    classHistory: Optional[List[EncounterClassHistory]] = Field(
+    classHistory: Optional[ListType[EncounterClassHistory]] = Field(
         description="List of past encounter classes",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Specific type of encounter",
         default=None,
     )
@@ -455,19 +451,19 @@ class Encounter(DomainResource):
         description="The patient or group present at the encounter",
         default=None,
     )
-    episodeOfCare: Optional[List[Reference]] = Field(
+    episodeOfCare: Optional[ListType[Reference]] = Field(
         description="Episode(s) of care that this encounter should be recorded against",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="The ServiceRequest that initiated this encounter",
         default=None,
     )
-    participant: Optional[List[EncounterParticipant]] = Field(
+    participant: Optional[ListType[EncounterParticipant]] = Field(
         description="List of participants involved in the encounter",
         default=None,
     )
-    appointment: Optional[List[Reference]] = Field(
+    appointment: Optional[ListType[Reference]] = Field(
         description="The appointment that scheduled this encounter",
         default=None,
     )
@@ -479,19 +475,19 @@ class Encounter(DomainResource):
         description="Quantity of time the encounter lasted (less time absent)",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Coded reason the encounter takes place",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Reason the encounter takes place (reference)",
         default=None,
     )
-    diagnosis: Optional[List[EncounterDiagnosis]] = Field(
+    diagnosis: Optional[ListType[EncounterDiagnosis]] = Field(
         description="The list of diagnosis relevant to this encounter",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="The set of accounts that may be used for billing for this Encounter",
         default=None,
     )
@@ -499,7 +495,7 @@ class Encounter(DomainResource):
         description="Details about the admission to a healthcare service",
         default=None,
     )
-    location: Optional[List[EncounterLocation]] = Field(
+    location: Optional[ListType[EncounterLocation]] = Field(
         description="List of locations where the patient has been",
         default=None,
     )

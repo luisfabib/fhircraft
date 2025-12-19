@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -178,7 +174,7 @@ class CapabilityStatementRestSecurity(BackboneElement):
         default=None,
         alias="_cors",
     )
-    service: Optional[List[CodeableConcept]] = Field(
+    service: Optional[ListType[CodeableConcept]] = Field(
         description="OAuth | SMART-on-FHIR | NTLM | Basic | Kerberos | Certificates",
         default=None,
     )
@@ -422,7 +418,7 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
         alias="_profile",
     )
-    supportedProfile: Optional[List[Canonical]] = Field(
+    supportedProfile: Optional[ListType[Canonical]] = Field(
         description="Profiles for use cases supported",
         default=None,
     )
@@ -440,7 +436,7 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    interaction: Optional[List[CapabilityStatementRestResourceInteraction]] = Field(
+    interaction: Optional[ListType[CapabilityStatementRestResourceInteraction]] = Field(
         description="What operations are supported?",
         default=None,
     )
@@ -507,7 +503,7 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
         alias="_conditionalDelete",
     )
-    referencePolicy: Optional[List[Code]] = Field(
+    referencePolicy: Optional[ListType[Code]] = Field(
         description="literal | logical | resolves | enforced | local",
         default=None,
     )
@@ -516,7 +512,7 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
         alias="_referencePolicy",
     )
-    searchInclude: Optional[List[String]] = Field(
+    searchInclude: Optional[ListType[String]] = Field(
         description="_include values supported by the server",
         default=None,
     )
@@ -525,7 +521,7 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
         alias="_searchInclude",
     )
-    searchRevInclude: Optional[List[String]] = Field(
+    searchRevInclude: Optional[ListType[String]] = Field(
         description="_revinclude values supported by the server",
         default=None,
     )
@@ -534,11 +530,11 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
         alias="_searchRevInclude",
     )
-    searchParam: Optional[List[CapabilityStatementRestResourceSearchParam]] = Field(
+    searchParam: Optional[ListType[CapabilityStatementRestResourceSearchParam]] = Field(
         description="Search parameters supported by implementation",
         default=None,
     )
-    operation: Optional[List[CapabilityStatementRestResourceOperation]] = Field(
+    operation: Optional[ListType[CapabilityStatementRestResourceOperation]] = Field(
         description="Definition of a resource operation",
         default=None,
     )
@@ -819,23 +815,23 @@ class CapabilityStatementRest(BackboneElement):
         description="Information about security of implementation",
         default=None,
     )
-    resource: Optional[List[CapabilityStatementRestResource]] = Field(
+    resource: Optional[ListType[CapabilityStatementRestResource]] = Field(
         description="Resource served on the REST interface",
         default=None,
     )
-    interaction: Optional[List[CapabilityStatementRestInteraction]] = Field(
+    interaction: Optional[ListType[CapabilityStatementRestInteraction]] = Field(
         description="What operations are supported?",
         default=None,
     )
-    searchParam: Optional[List[CapabilityStatementRestSearchParam]] = Field(
+    searchParam: Optional[ListType[CapabilityStatementRestSearchParam]] = Field(
         description="Search parameters for searching all resources",
         default=None,
     )
-    operation: Optional[List[CapabilityStatementRestOperation]] = Field(
+    operation: Optional[ListType[CapabilityStatementRestOperation]] = Field(
         description="Definition of a system level operation",
         default=None,
     )
-    compartment: Optional[List[Canonical]] = Field(
+    compartment: Optional[ListType[Canonical]] = Field(
         description="Compartments served/used by system",
         default=None,
     )
@@ -995,7 +991,7 @@ class CapabilityStatementMessaging(BackboneElement):
     A description of the messaging capabilities of the solution.
     """
 
-    endpoint: Optional[List[CapabilityStatementMessagingEndpoint]] = Field(
+    endpoint: Optional[ListType[CapabilityStatementMessagingEndpoint]] = Field(
         description="Where messages should be sent",
         default=None,
     )
@@ -1017,7 +1013,7 @@ class CapabilityStatementMessaging(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    supportedMessage: Optional[List[CapabilityStatementMessagingSupportedMessage]] = (
+    supportedMessage: Optional[ListType[CapabilityStatementMessagingSupportedMessage]] = (
         Field(
             description="Messages supported by this system",
             default=None,
@@ -1156,15 +1152,15 @@ class CapabilityStatement(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -1240,7 +1236,7 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -1253,11 +1249,11 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for capability statement (if applicable)",
         default=None,
     )
@@ -1288,7 +1284,7 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_kind",
     )
-    instantiates: Optional[List[Canonical]] = Field(
+    instantiates: Optional[ListType[Canonical]] = Field(
         description="Canonical URL of another capability statement this implements",
         default=None,
     )
@@ -1297,7 +1293,7 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_instantiates",
     )
-    imports: Optional[List[Canonical]] = Field(
+    imports: Optional[ListType[Canonical]] = Field(
         description="Canonical URL of another capability statement this adds to",
         default=None,
     )
@@ -1323,7 +1319,7 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_fhirVersion",
     )
-    format: Optional[List[Code]] = Field(
+    format: Optional[ListType[Code]] = Field(
         description="formats supported (xml | json | ttl | mime type)",
         default=None,
     )
@@ -1332,7 +1328,7 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_format",
     )
-    patchFormat: Optional[List[Code]] = Field(
+    patchFormat: Optional[ListType[Code]] = Field(
         description="Patch formats supported",
         default=None,
     )
@@ -1341,7 +1337,7 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_patchFormat",
     )
-    implementationGuide: Optional[List[Canonical]] = Field(
+    implementationGuide: Optional[ListType[Canonical]] = Field(
         description="Implementation guides supported",
         default=None,
     )
@@ -1350,15 +1346,15 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_implementationGuide",
     )
-    rest: Optional[List[CapabilityStatementRest]] = Field(
+    rest: Optional[ListType[CapabilityStatementRest]] = Field(
         description="If the endpoint is a RESTful one",
         default=None,
     )
-    messaging: Optional[List[CapabilityStatementMessaging]] = Field(
+    messaging: Optional[ListType[CapabilityStatementMessaging]] = Field(
         description="If messaging is supported",
         default=None,
     )
-    document: Optional[List[CapabilityStatementDocument]] = Field(
+    document: Optional[ListType[CapabilityStatementDocument]] = Field(
         description="Document definition",
         default=None,
     )

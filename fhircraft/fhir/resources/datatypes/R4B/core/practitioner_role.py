@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -50,7 +46,7 @@ class PractitionerRoleAvailableTime(BackboneElement):
     A collection of times the practitioner is available or performing this role at the location and/or healthcareservice.
     """
 
-    daysOfWeek: Optional[List[Code]] = Field(
+    daysOfWeek: Optional[ListType[Code]] = Field(
         description="mon | tue | wed | thu | fri | sat | sun",
         default=None,
     )
@@ -202,19 +198,19 @@ class PractitionerRole(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifiers that are specific to a role/location",
         default=None,
     )
@@ -239,31 +235,31 @@ class PractitionerRole(DomainResource):
         description="Organization where the roles are available",
         default=None,
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Roles which this practitioner may perform",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="Specific specialty of the practitioner",
         default=None,
     )
-    location: Optional[List[Reference]] = Field(
+    location: Optional[ListType[Reference]] = Field(
         description="The location(s) at which this practitioner provides care",
         default=None,
     )
-    healthcareService: Optional[List[Reference]] = Field(
+    healthcareService: Optional[ListType[Reference]] = Field(
         description="The list of healthcare services that this worker provides for this role\u0027s Organization/Location(s)",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="Contact details that are specific to the role/location/service",
         default=None,
     )
-    availableTime: Optional[List[PractitionerRoleAvailableTime]] = Field(
+    availableTime: Optional[ListType[PractitionerRoleAvailableTime]] = Field(
         description="Times the Service Site is available",
         default=None,
     )
-    notAvailable: Optional[List[PractitionerRoleNotAvailable]] = Field(
+    notAvailable: Optional[ListType[PractitionerRoleNotAvailable]] = Field(
         description="Not available during this time due to provided reason",
         default=None,
     )
@@ -276,7 +272,7 @@ class PractitionerRole(DomainResource):
         default=None,
         alias="_availabilityExceptions",
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the practitioner with this role",
         default=None,
     )

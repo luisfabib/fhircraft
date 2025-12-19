@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -112,7 +108,7 @@ class LocationHoursOfOperation(BackboneElement):
     What days/times during a week is this location usually open.
     """
 
-    daysOfWeek: Optional[List[Code]] = Field(
+    daysOfWeek: Optional[ListType[Code]] = Field(
         description="mon | tue | wed | thu | fri | sat | sun",
         default=None,
     )
@@ -221,19 +217,19 @@ class Location(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique code or number identifying the location to its users",
         default=None,
     )
@@ -259,7 +255,7 @@ class Location(DomainResource):
         default=None,
         alias="_name",
     )
-    alias: Optional[List[String]] = Field(
+    alias: Optional[ListType[String]] = Field(
         description="A list of alternate names that the location is known as, or was known as, in the past",
         default=None,
     )
@@ -286,11 +282,11 @@ class Location(DomainResource):
         default=None,
         alias="_mode",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type of function performed",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="Contact details of the location",
         default=None,
     )
@@ -314,7 +310,7 @@ class Location(DomainResource):
         description="Another Location this one is physically a part of",
         default=None,
     )
-    hoursOfOperation: Optional[List[LocationHoursOfOperation]] = Field(
+    hoursOfOperation: Optional[ListType[LocationHoursOfOperation]] = Field(
         description="What days/times during a week is this location usually open",
         default=None,
     )
@@ -327,7 +323,7 @@ class Location(DomainResource):
         default=None,
         alias="_availabilityExceptions",
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the location",
         default=None,
     )

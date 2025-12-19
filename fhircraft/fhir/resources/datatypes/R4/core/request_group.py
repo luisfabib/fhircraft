@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -217,19 +213,19 @@ class RequestGroupAction(BackboneElement):
         default=None,
         alias="_priority",
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Code representing the meaning of the action or sub-actions",
         default=None,
     )
-    documentation: Optional[List[RelatedArtifact]] = Field(
+    documentation: Optional[ListType[RelatedArtifact]] = Field(
         description="Supporting documentation for the intended performer of the action",
         default=None,
     )
-    condition: Optional[List[RequestGroupActionCondition]] = Field(
+    condition: Optional[ListType[RequestGroupActionCondition]] = Field(
         description="Whether or not the action is applicable",
         default=None,
     )
-    relatedAction: Optional[List[RequestGroupActionRelatedAction]] = Field(
+    relatedAction: Optional[ListType[RequestGroupActionRelatedAction]] = Field(
         description="Relationship to another action",
         default=None,
     )
@@ -262,7 +258,7 @@ class RequestGroupAction(BackboneElement):
         description="When the action should take place",
         default=None,
     )
-    participant: Optional[List[Reference]] = Field(
+    participant: Optional[ListType[Reference]] = Field(
         description="Who should perform the action",
         default=None,
     )
@@ -319,7 +315,7 @@ class RequestGroupAction(BackboneElement):
         description="The target of the action",
         default=None,
     )
-    action: Optional[List["RequestGroupAction"]] = Field(
+    action: Optional[ListType["RequestGroupAction"]] = Field(
         description="Sub action",
         default=None,
     )
@@ -454,23 +450,23 @@ class RequestGroup(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
@@ -479,7 +475,7 @@ class RequestGroup(DomainResource):
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -488,11 +484,11 @@ class RequestGroup(DomainResource):
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal, or order",
         default=None,
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="Request(s) replaced by this request",
         default=None,
     )
@@ -552,19 +548,19 @@ class RequestGroup(DomainResource):
         description="Device or practitioner that authored the request group",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why the request group is needed",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Why the request group is needed",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional notes about the response",
         default=None,
     )
-    action: Optional[List[RequestGroupAction]] = Field(
+    action: Optional[ListType[RequestGroupAction]] = Field(
         description="Proposed actions, if any",
         default=None,
     )

@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -283,7 +279,7 @@ class SubstanceSourceMaterialOrganism(BackboneElement):
         default=None,
         alias="_intraspecificDescription",
     )
-    author: Optional[List[SubstanceSourceMaterialOrganismAuthor]] = Field(
+    author: Optional[ListType[SubstanceSourceMaterialOrganismAuthor]] = Field(
         description="4.9.13.6.1 Author type (Conditional)",
         default=None,
     )
@@ -418,15 +414,15 @@ class SubstanceSourceMaterial(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -455,11 +451,11 @@ class SubstanceSourceMaterial(DomainResource):
         default=None,
         alias="_organismName",
     )
-    parentSubstanceId: Optional[List[Identifier]] = Field(
+    parentSubstanceId: Optional[ListType[Identifier]] = Field(
         description="The parent of the herbal drug Ginkgo biloba, Leaf is the substance ID of the substance (fresh) of Ginkgo biloba L. or Ginkgo biloba L. (Whole plant)",
         default=None,
     )
-    parentSubstanceName: Optional[List[String]] = Field(
+    parentSubstanceName: Optional[ListType[String]] = Field(
         description="The parent substance of the Herbal Drug, or Herbal preparation",
         default=None,
     )
@@ -468,11 +464,11 @@ class SubstanceSourceMaterial(DomainResource):
         default=None,
         alias="_parentSubstanceName",
     )
-    countryOfOrigin: Optional[List[CodeableConcept]] = Field(
+    countryOfOrigin: Optional[ListType[CodeableConcept]] = Field(
         description="The country where the plant material is harvested or the countries where the plasma is sourced from as laid down in accordance with the Plasma Master File. For \u201cPlasma-derived substances\u201d the attribute country of origin provides information about the countries used for the manufacturing of the Cryopoor plama or Crioprecipitate",
         default=None,
     )
-    geographicalLocation: Optional[List[String]] = Field(
+    geographicalLocation: Optional[ListType[String]] = Field(
         description="The place/region where the plant is harvested or the places/regions where the animal source material has its habitat",
         default=None,
     )
@@ -485,7 +481,7 @@ class SubstanceSourceMaterial(DomainResource):
         description="Stage of life for animals, plants, insects and microorganisms. This information shall be provided only when the substance is significantly different in these stages (e.g. foetal bovine serum)",
         default=None,
     )
-    fractionDescription: Optional[List[SubstanceSourceMaterialFractionDescription]] = (
+    fractionDescription: Optional[ListType[SubstanceSourceMaterialFractionDescription]] = (
         Field(
             description="Many complex materials are fractions of parts of plants, animals, or minerals. Fraction elements are often necessary to define both Substances and Specified Group 1 Substances. For substances derived from Plants, fraction information will be captured at the Substance information level ( . Oils, Juices and Exudates). Additional information for Extracts, such as extraction solvent composition, will be captured at the Specified Substance Group 1 information level. For plasma-derived products fraction information will be captured at the Substance and the Specified Substance Group 1 levels",
             default=None,
@@ -495,7 +491,7 @@ class SubstanceSourceMaterial(DomainResource):
         description="This subclause describes the organism which the substance is derived from. For vaccines, the parent organism shall be specified based on these subclause elements. As an example, full taxonomy will be described for the Substance Name: ., Leaf",
         default=None,
     )
-    partDescription: Optional[List[SubstanceSourceMaterialPartDescription]] = Field(
+    partDescription: Optional[ListType[SubstanceSourceMaterialPartDescription]] = Field(
         description="To do",
         default=None,
     )

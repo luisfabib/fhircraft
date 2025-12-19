@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -174,7 +170,7 @@ class StructureDefinitionSnapshot(BackboneElement):
     A snapshot view is expressed in a standalone form that can be used and interpreted without considering the base StructureDefinition.
     """
 
-    element: Optional[List[ElementDefinition]] = Field(
+    element: Optional[ListType[ElementDefinition]] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
         default=None,
     )
@@ -211,7 +207,7 @@ class StructureDefinitionDifferential(BackboneElement):
     A differential view is expressed relative to the base StructureDefinition - a statement of differences that it applies.
     """
 
-    element: Optional[List[ElementDefinition]] = Field(
+    element: Optional[ListType[ElementDefinition]] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
         default=None,
     )
@@ -273,15 +269,15 @@ class StructureDefinition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -294,7 +290,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure definition",
         default=None,
     )
@@ -361,7 +357,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -374,11 +370,11 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for structure definition (if applicable)",
         default=None,
     )
@@ -400,7 +396,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_copyright",
     )
-    keyword: Optional[List[Coding]] = Field(
+    keyword: Optional[ListType[Coding]] = Field(
         description="Assist with indexing and finding",
         default=None,
     )
@@ -413,7 +409,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_fhirVersion",
     )
-    mapping: Optional[List[StructureDefinitionMapping]] = Field(
+    mapping: Optional[ListType[StructureDefinitionMapping]] = Field(
         description="External specification that the content is mapped to",
         default=None,
     )
@@ -435,11 +431,11 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_abstract",
     )
-    context: Optional[List[StructureDefinitionContext]] = Field(
+    context: Optional[ListType[StructureDefinitionContext]] = Field(
         description="If an extension, where it can be used in instances",
         default=None,
     )
-    contextInvariant: Optional[List[String]] = Field(
+    contextInvariant: Optional[ListType[String]] = Field(
         description="FHIRPath invariants - when the extension can be used",
         default=None,
     )

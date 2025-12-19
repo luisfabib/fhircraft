@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -169,7 +165,7 @@ class InvoiceLineItem(BackboneElement):
         description="Reference to ChargeItem containing details of this line item or an inline billing code",
         default=None,
     )
-    priceComponent: Optional[List[InvoiceLineItemPriceComponent]] = Field(
+    priceComponent: Optional[ListType[InvoiceLineItemPriceComponent]] = Field(
         description="Components of total line item price",
         default=None,
     )
@@ -318,19 +314,19 @@ class Invoice(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for item",
         default=None,
     )
@@ -373,7 +369,7 @@ class Invoice(DomainResource):
         default=None,
         alias="_date",
     )
-    participant: Optional[List[InvoiceParticipant]] = Field(
+    participant: Optional[ListType[InvoiceParticipant]] = Field(
         description="Participant in creation of this Invoice",
         default=None,
     )
@@ -385,11 +381,11 @@ class Invoice(DomainResource):
         description="Account that is being balanced",
         default=None,
     )
-    lineItem: Optional[List[InvoiceLineItem]] = Field(
+    lineItem: Optional[ListType[InvoiceLineItem]] = Field(
         description="Line items of this Invoice",
         default=None,
     )
-    totalPriceComponent: Optional[List[InvoiceTotalPriceComponent]] = Field(
+    totalPriceComponent: Optional[ListType[InvoiceTotalPriceComponent]] = Field(
         description="Components of Invoice total",
         default=None,
     )
@@ -410,7 +406,7 @@ class Invoice(DomainResource):
         default=None,
         alias="_paymentTerms",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the invoice",
         default=None,
     )

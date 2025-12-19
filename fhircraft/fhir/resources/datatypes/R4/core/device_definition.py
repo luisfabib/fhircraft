@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
@@ -207,7 +203,7 @@ class DeviceDefinitionCapability(BackboneElement):
         description="Type of capability",
         default=None,
     )
-    description: Optional[List[CodeableConcept]] = Field(
+    description: Optional[ListType[CodeableConcept]] = Field(
         description="Description of capability",
         default=None,
     )
@@ -245,11 +241,11 @@ class DeviceDefinitionProperty(BackboneElement):
         description="Code that specifies the property DeviceDefinitionPropetyCode (Extensible)",
         default=None,
     )
-    valueQuantity: Optional[List[Quantity]] = Field(
+    valueQuantity: Optional[ListType[Quantity]] = Field(
         description="Property value as a quantity",
         default=None,
     )
-    valueCode: Optional[List[CodeableConcept]] = Field(
+    valueCode: Optional[ListType[CodeableConcept]] = Field(
         description="Property value as a code, e.g., NTP4 (synced to NTP)",
         default=None,
     )
@@ -378,23 +374,23 @@ class DeviceDefinition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Instance identifier",
         default=None,
     )
-    udiDeviceIdentifier: Optional[List[DeviceDefinitionUdiDeviceIdentifier]] = Field(
+    udiDeviceIdentifier: Optional[ListType[DeviceDefinitionUdiDeviceIdentifier]] = Field(
         description="Unique Device Identifier (UDI) Barcode string",
         default=None,
     )
@@ -411,7 +407,7 @@ class DeviceDefinition(DomainResource):
         description="Name of device manufacturer",
         default=None,
     )
-    deviceName: Optional[List[DeviceDefinitionDeviceName]] = Field(
+    deviceName: Optional[ListType[DeviceDefinitionDeviceName]] = Field(
         description="A name given to the device to identify it",
         default=None,
     )
@@ -428,11 +424,11 @@ class DeviceDefinition(DomainResource):
         description="What kind of device or device system this is",
         default=None,
     )
-    specialization: Optional[List[DeviceDefinitionSpecialization]] = Field(
+    specialization: Optional[ListType[DeviceDefinitionSpecialization]] = Field(
         description="The capabilities supported on a  device, the standards to which the device conforms for a particular purpose, and used for the communication",
         default=None,
     )
-    version: Optional[List[String]] = Field(
+    version: Optional[ListType[String]] = Field(
         description="Available versions",
         default=None,
     )
@@ -441,11 +437,11 @@ class DeviceDefinition(DomainResource):
         default=None,
         alias="_version",
     )
-    safety: Optional[List[CodeableConcept]] = Field(
+    safety: Optional[ListType[CodeableConcept]] = Field(
         description="Safety characteristics of the device",
         default=None,
     )
-    shelfLifeStorage: Optional[List[ProductShelfLife]] = Field(
+    shelfLifeStorage: Optional[ListType[ProductShelfLife]] = Field(
         description="Shelf Life and storage information",
         default=None,
     )
@@ -453,15 +449,15 @@ class DeviceDefinition(DomainResource):
         description="Dimensions, color etc.",
         default=None,
     )
-    languageCode: Optional[List[CodeableConcept]] = Field(
+    languageCode: Optional[ListType[CodeableConcept]] = Field(
         description="Language code for the human-readable text strings produced by the device (all supported)",
         default=None,
     )
-    capability: Optional[List[DeviceDefinitionCapability]] = Field(
+    capability: Optional[ListType[DeviceDefinitionCapability]] = Field(
         description="Device capabilities",
         default=None,
     )
-    property_: Optional[List[DeviceDefinitionProperty]] = Field(
+    property_: Optional[ListType[DeviceDefinitionProperty]] = Field(
         description="The actual configuration settings of a device as it actually operates, e.g., regulation status, time properties",
         default=None,
     )
@@ -469,7 +465,7 @@ class DeviceDefinition(DomainResource):
         description="Organization responsible for device",
         default=None,
     )
-    contact: Optional[List[ContactPoint]] = Field(
+    contact: Optional[ListType[ContactPoint]] = Field(
         description="Details for human/organization for support",
         default=None,
     )
@@ -491,7 +487,7 @@ class DeviceDefinition(DomainResource):
         default=None,
         alias="_onlineInformation",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Device notes and comments",
         default=None,
     )
@@ -503,7 +499,7 @@ class DeviceDefinition(DomainResource):
         description="The parent device it can be part of",
         default=None,
     )
-    material: Optional[List[DeviceDefinitionMaterial]] = Field(
+    material: Optional[ListType[DeviceDefinitionMaterial]] = Field(
         description="A substance used to create the material(s) of which the device is made",
         default=None,
     )

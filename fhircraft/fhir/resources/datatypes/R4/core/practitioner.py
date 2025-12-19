@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -53,7 +49,7 @@ class PractitionerQualification(BackboneElement):
     The official certifications, training, and licenses that authorize or otherwise pertain to the provision of care by the practitioner.  For example, a medical license issued by a medical board authorizing the practitioner to practice medicine within a certian locality.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier for this qualification for the practitioner",
         default=None,
     )
@@ -142,19 +138,19 @@ class Practitioner(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier for the person as this agent",
         default=None,
     )
@@ -167,15 +163,15 @@ class Practitioner(DomainResource):
         default=None,
         alias="_active",
     )
-    name: Optional[List[HumanName]] = Field(
+    name: Optional[ListType[HumanName]] = Field(
         description="The name(s) associated with the practitioner",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="A contact detail for the practitioner (that apply to all roles)",
         default=None,
     )
-    address: Optional[List[Address]] = Field(
+    address: Optional[ListType[Address]] = Field(
         description="Address(es) of the practitioner that are not role specific (typically home address)",
         default=None,
     )
@@ -197,15 +193,15 @@ class Practitioner(DomainResource):
         default=None,
         alias="_birthDate",
     )
-    photo: Optional[List[Attachment]] = Field(
+    photo: Optional[ListType[Attachment]] = Field(
         description="Image of the person",
         default=None,
     )
-    qualification: Optional[List[PractitionerQualification]] = Field(
+    qualification: Optional[ListType[PractitionerQualification]] = Field(
         description="Certification, licenses, or training pertaining to the provision of care",
         default=None,
     )
-    communication: Optional[List[CodeableConcept]] = Field(
+    communication: Optional[ListType[CodeableConcept]] = Field(
         description="A language the practitioner can use in patient communication",
         default=None,
     )

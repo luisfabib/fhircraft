@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -73,7 +69,7 @@ class CodeSystemFilter(BackboneElement):
         default=None,
         alias="_description",
     )
-    operator: Optional[List[Code]] = Field(
+    operator: Optional[ListType[Code]] = Field(
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | exists",
         default=None,
     )
@@ -385,15 +381,15 @@ class CodeSystemConcept(BackboneElement):
         default=None,
         alias="_definition",
     )
-    designation: Optional[List[CodeSystemConceptDesignation]] = Field(
+    designation: Optional[ListType[CodeSystemConceptDesignation]] = Field(
         description="Additional representations for the concept",
         default=None,
     )
-    property_: Optional[List[CodeSystemConceptProperty]] = Field(
+    property_: Optional[ListType[CodeSystemConceptProperty]] = Field(
         description="Property value for the concept",
         default=None,
     )
-    concept: Optional[List["CodeSystemConcept"]] = Field(
+    concept: Optional[ListType["CodeSystemConcept"]] = Field(
         description="Child Concepts (is-a/contains/categorizes)",
         default=None,
     )
@@ -476,15 +472,15 @@ class CodeSystem(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -497,7 +493,7 @@ class CodeSystem(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the code system (business identifier)",
         default=None,
     )
@@ -564,7 +560,7 @@ class CodeSystem(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -577,11 +573,11 @@ class CodeSystem(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for code system (if applicable)",
         default=None,
     )
@@ -675,15 +671,15 @@ class CodeSystem(DomainResource):
         default=None,
         alias="_count",
     )
-    filter: Optional[List[CodeSystemFilter]] = Field(
+    filter: Optional[ListType[CodeSystemFilter]] = Field(
         description="Filter that can be used in a value set",
         default=None,
     )
-    property_: Optional[List[CodeSystemProperty]] = Field(
+    property_: Optional[ListType[CodeSystemProperty]] = Field(
         description="Additional information supplied about each concept",
         default=None,
     )
-    concept: Optional[List[CodeSystemConcept]] = Field(
+    concept: Optional[ListType[CodeSystemConcept]] = Field(
         description="Concepts in the code system",
         default=None,
     )

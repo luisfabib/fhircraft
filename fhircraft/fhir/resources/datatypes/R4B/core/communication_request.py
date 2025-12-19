@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -128,27 +124,27 @@ class CommunicationRequest(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique identifier",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan or proposal",
         default=None,
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="Request(s) replaced by this request",
         default=None,
     )
@@ -169,7 +165,7 @@ class CommunicationRequest(DomainResource):
         description="Reason for current status",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Message category",
         default=None,
     )
@@ -191,7 +187,7 @@ class CommunicationRequest(DomainResource):
         default=None,
         alias="_doNotPerform",
     )
-    medium: Optional[List[CodeableConcept]] = Field(
+    medium: Optional[ListType[CodeableConcept]] = Field(
         description="A channel of communication",
         default=None,
     )
@@ -199,7 +195,7 @@ class CommunicationRequest(DomainResource):
         description="Focus of message",
         default=None,
     )
-    about: Optional[List[Reference]] = Field(
+    about: Optional[ListType[Reference]] = Field(
         description="Resources that pertain to this communication request",
         default=None,
     )
@@ -207,7 +203,7 @@ class CommunicationRequest(DomainResource):
         description="Encounter created as part of",
         default=None,
     )
-    payload: Optional[List[CommunicationRequestPayload]] = Field(
+    payload: Optional[ListType[CommunicationRequestPayload]] = Field(
         description="Message payload",
         default=None,
     )
@@ -237,7 +233,7 @@ class CommunicationRequest(DomainResource):
         description="Who/what is requesting service",
         default=None,
     )
-    recipient: Optional[List[Reference]] = Field(
+    recipient: Optional[ListType[Reference]] = Field(
         description="Message recipient",
         default=None,
     )
@@ -245,15 +241,15 @@ class CommunicationRequest(DomainResource):
         description="Message sender",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why is communication needed?",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Why is communication needed?",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about communication request",
         default=None,
     )

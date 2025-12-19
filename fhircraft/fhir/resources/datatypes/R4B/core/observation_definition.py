@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -129,7 +125,7 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
         description="Range context qualifier",
         default=None,
     )
-    appliesTo: Optional[List[CodeableConcept]] = Field(
+    appliesTo: Optional[ListType[CodeableConcept]] = Field(
         description="Targetted population of the range",
         default=None,
     )
@@ -244,19 +240,19 @@ class ObservationDefinition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Category of observation",
         default=None,
     )
@@ -264,11 +260,11 @@ class ObservationDefinition(DomainResource):
         description="Type of observation (code / type)",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this ObservationDefinition instance",
         default=None,
     )
-    permittedDataType: Optional[List[Code]] = Field(
+    permittedDataType: Optional[ListType[Code]] = Field(
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",
         default=None,
     )
@@ -303,7 +299,7 @@ class ObservationDefinition(DomainResource):
         description="Characteristics of quantitative results",
         default=None,
     )
-    qualifiedInterval: Optional[List[ObservationDefinitionQualifiedInterval]] = Field(
+    qualifiedInterval: Optional[ListType[ObservationDefinitionQualifiedInterval]] = Field(
         description="Qualified range for continuous and ordinal observation results",
         default=None,
     )

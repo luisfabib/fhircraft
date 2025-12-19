@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -172,23 +168,23 @@ class Procedure(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Identifiers for this procedure",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
@@ -197,7 +193,7 @@ class Procedure(DomainResource):
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -206,11 +202,11 @@ class Procedure(DomainResource):
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="A request for this procedure",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -281,7 +277,7 @@ class Procedure(DomainResource):
         description="Person who asserts this procedure",
         default=None,
     )
-    performer: Optional[List[ProcedurePerformer]] = Field(
+    performer: Optional[ListType[ProcedurePerformer]] = Field(
         description="The people who performed the procedure",
         default=None,
     )
@@ -289,15 +285,15 @@ class Procedure(DomainResource):
         description="Where the procedure happened",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Coded reason procedure performed",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="The justification that the procedure was performed",
         default=None,
     )
-    bodySite: Optional[List[CodeableConcept]] = Field(
+    bodySite: Optional[ListType[CodeableConcept]] = Field(
         description="Target body sites",
         default=None,
     )
@@ -305,35 +301,35 @@ class Procedure(DomainResource):
         description="The result of procedure",
         default=None,
     )
-    report: Optional[List[Reference]] = Field(
+    report: Optional[ListType[Reference]] = Field(
         description="Any report resulting from the procedure",
         default=None,
     )
-    complication: Optional[List[CodeableConcept]] = Field(
+    complication: Optional[ListType[CodeableConcept]] = Field(
         description="Complication following the procedure",
         default=None,
     )
-    complicationDetail: Optional[List[Reference]] = Field(
+    complicationDetail: Optional[ListType[Reference]] = Field(
         description="A condition that is a result of the procedure",
         default=None,
     )
-    followUp: Optional[List[CodeableConcept]] = Field(
+    followUp: Optional[ListType[CodeableConcept]] = Field(
         description="Instructions for follow up",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional information about the procedure",
         default=None,
     )
-    focalDevice: Optional[List[ProcedureFocalDevice]] = Field(
+    focalDevice: Optional[ListType[ProcedureFocalDevice]] = Field(
         description="Manipulated, implanted, or removed device",
         default=None,
     )
-    usedReference: Optional[List[Reference]] = Field(
+    usedReference: Optional[ListType[Reference]] = Field(
         description="Items used during procedure",
         default=None,
     )
-    usedCode: Optional[List[CodeableConcept]] = Field(
+    usedCode: Optional[ListType[CodeableConcept]] = Field(
         description="Coded items used during the procedure",
         default=None,
     )

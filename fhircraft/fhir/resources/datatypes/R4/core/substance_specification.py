@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -487,7 +483,7 @@ class SubstanceSpecificationStructure(BackboneElement):
         default=None,
         alias="_molecularFormulaByMoiety",
     )
-    isotope: Optional[List[SubstanceSpecificationStructureIsotope]] = Field(
+    isotope: Optional[ListType[SubstanceSpecificationStructureIsotope]] = Field(
         description="Applicable for single substances that contain a radionuclide or a non-natural isotopic ratio",
         default=None,
     )
@@ -495,11 +491,11 @@ class SubstanceSpecificationStructure(BackboneElement):
         description="The molecular weight or weight range (for proteins, polymers or nucleic acids)",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
-    representation: Optional[List[SubstanceSpecificationStructureRepresentation]] = (
+    representation: Optional[ListType[SubstanceSpecificationStructureRepresentation]] = (
         Field(
             description="Molecular structural representation",
             default=None,
@@ -579,7 +575,7 @@ class SubstanceSpecificationCode(BackboneElement):
         default=None,
         alias="_comment",
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
@@ -698,31 +694,31 @@ class SubstanceSpecificationName(BackboneElement):
         default=None,
         alias="_preferred",
     )
-    language: Optional[List[CodeableConcept]] = Field(
+    language: Optional[ListType[CodeableConcept]] = Field(
         description="Language of the name",
         default=None,
     )
-    domain: Optional[List[CodeableConcept]] = Field(
+    domain: Optional[ListType[CodeableConcept]] = Field(
         description="The use context of this name for example if there is a different name a drug active ingredient as opposed to a food colour additive",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="The jurisdiction where this name applies",
         default=None,
     )
-    synonym: Optional[List["SubstanceSpecificationName"]] = Field(
+    synonym: Optional[ListType["SubstanceSpecificationName"]] = Field(
         description="A synonym of this name",
         default=None,
     )
-    translation: Optional[List["SubstanceSpecificationName"]] = Field(
+    translation: Optional[ListType["SubstanceSpecificationName"]] = Field(
         description="A translation for this name",
         default=None,
     )
-    official: Optional[List[SubstanceSpecificationNameOfficial]] = Field(
+    official: Optional[ListType[SubstanceSpecificationNameOfficial]] = Field(
         description="Details of the official nature of this name",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
@@ -833,7 +829,7 @@ class SubstanceSpecificationRelationship(BackboneElement):
         description='An operator for the amount, for example "average", "approximately", "less than"',
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
@@ -945,15 +941,15 @@ class SubstanceSpecification(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -982,7 +978,7 @@ class SubstanceSpecification(DomainResource):
         default=None,
         alias="_description",
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
@@ -995,11 +991,11 @@ class SubstanceSpecification(DomainResource):
         default=None,
         alias="_comment",
     )
-    moiety: Optional[List[SubstanceSpecificationMoiety]] = Field(
+    moiety: Optional[ListType[SubstanceSpecificationMoiety]] = Field(
         description="Moiety, for structural modifications",
         default=None,
     )
-    property_: Optional[List[SubstanceSpecificationProperty]] = Field(
+    property_: Optional[ListType[SubstanceSpecificationProperty]] = Field(
         description="General specifications for this substance, including how it is related to other substances",
         default=None,
     )
@@ -1011,21 +1007,21 @@ class SubstanceSpecification(DomainResource):
         description="Structural information",
         default=None,
     )
-    code: Optional[List[SubstanceSpecificationCode]] = Field(
+    code: Optional[ListType[SubstanceSpecificationCode]] = Field(
         description="Codes associated with the substance",
         default=None,
     )
-    name: Optional[List[SubstanceSpecificationName]] = Field(
+    name: Optional[ListType[SubstanceSpecificationName]] = Field(
         description="Names applicable to this substance",
         default=None,
     )
     molecularWeight: Optional[
-        List[SubstanceSpecificationStructureIsotopeMolecularWeight]
+        ListType[SubstanceSpecificationStructureIsotopeMolecularWeight]
     ] = Field(
         description="The molecular weight or weight range (for proteins, polymers or nucleic acids)",
         default=None,
     )
-    relationship: Optional[List[SubstanceSpecificationRelationship]] = Field(
+    relationship: Optional[ListType[SubstanceSpecificationRelationship]] = Field(
         description="A link between this substance and another, with details of the relationship",
         default=None,
     )

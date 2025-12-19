@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -43,7 +39,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization(BackboneElement):
     Authorization in areas within a country.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="The assigned number for the marketing authorization",
         default=None,
     )
@@ -51,7 +47,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization(BackboneElement):
         description="Country of authorization",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Jurisdiction within a country",
         default=None,
     )
@@ -123,7 +119,7 @@ class MedicinalProductAuthorizationProcedure(BackboneElement):
         default=None,
         alias="_dateDateTime",
     )
-    application: Optional[List["MedicinalProductAuthorizationProcedure"]] = Field(
+    application: Optional[ListType["MedicinalProductAuthorizationProcedure"]] = Field(
         description="Applcations submitted to obtain a marketing authorization",
         default=None,
     )
@@ -215,19 +211,19 @@ class MedicinalProductAuthorization(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for the marketing authorization, as assigned by a regulator",
         default=None,
     )
@@ -235,11 +231,11 @@ class MedicinalProductAuthorization(DomainResource):
         description="The medicinal product that is being authorized",
         default=None,
     )
-    country: Optional[List[CodeableConcept]] = Field(
+    country: Optional[ListType[CodeableConcept]] = Field(
         description="The country in which the marketing authorization has been granted",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Jurisdiction within a country",
         default=None,
     )
@@ -296,7 +292,7 @@ class MedicinalProductAuthorization(DomainResource):
         default=None,
     )
     jurisdictionalAuthorization: Optional[
-        List[MedicinalProductAuthorizationJurisdictionalAuthorization]
+        ListType[MedicinalProductAuthorizationJurisdictionalAuthorization]
     ] = Field(
         description="Authorization in areas within a country",
         default=None,

@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
@@ -53,7 +49,7 @@ class OrganizationContact(BackboneElement):
         description="A name associated with the contact",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="Contact details (telephone, email, etc.)  for a contact",
         default=None,
     )
@@ -134,19 +130,19 @@ class Organization(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifies this organization  across multiple systems",
         default=None,
     )
@@ -159,7 +155,7 @@ class Organization(DomainResource):
         default=None,
         alias="_active",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of organization",
         default=None,
     )
@@ -172,7 +168,7 @@ class Organization(DomainResource):
         default=None,
         alias="_name",
     )
-    alias: Optional[List[String]] = Field(
+    alias: Optional[ListType[String]] = Field(
         description="A list of alternate names that the organization is known as, or was known as in the past",
         default=None,
     )
@@ -181,11 +177,11 @@ class Organization(DomainResource):
         default=None,
         alias="_alias",
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="A contact detail for the organization",
         default=None,
     )
-    address: Optional[List[Address]] = Field(
+    address: Optional[ListType[Address]] = Field(
         description="An address for the organization",
         default=None,
     )
@@ -193,11 +189,11 @@ class Organization(DomainResource):
         description="The organization of which this organization forms a part",
         default=None,
     )
-    contact: Optional[List[OrganizationContact]] = Field(
+    contact: Optional[ListType[OrganizationContact]] = Field(
         description="Contact for the organization for a certain purpose",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the organization",
         default=None,
     )

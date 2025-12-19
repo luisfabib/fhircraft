@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -129,23 +125,23 @@ class ChargeItem(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for item",
         default=None,
     )
-    definitionUri: Optional[List[Uri]] = Field(
+    definitionUri: Optional[ListType[Uri]] = Field(
         description="Defining information about the code of this charge item",
         default=None,
     )
@@ -154,7 +150,7 @@ class ChargeItem(DomainResource):
         default=None,
         alias="_definitionUri",
     )
-    definitionCanonical: Optional[List[Canonical]] = Field(
+    definitionCanonical: Optional[ListType[Canonical]] = Field(
         description="Resource defining the code of this ChargeItem",
         default=None,
     )
@@ -172,7 +168,7 @@ class ChargeItem(DomainResource):
         default=None,
         alias="_status",
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced ChargeItem",
         default=None,
     )
@@ -205,7 +201,7 @@ class ChargeItem(DomainResource):
         description="When the charged service was applied",
         default=None,
     )
-    performer: Optional[List[ChargeItemPerformer]] = Field(
+    performer: Optional[ListType[ChargeItemPerformer]] = Field(
         description="Who performed charged service",
         default=None,
     )
@@ -225,7 +221,7 @@ class ChargeItem(DomainResource):
         description="Quantity of which the charge item has been serviced",
         default=None,
     )
-    bodysite: Optional[List[CodeableConcept]] = Field(
+    bodysite: Optional[ListType[CodeableConcept]] = Field(
         description="Anatomical location, if relevant",
         default=None,
     )
@@ -264,11 +260,11 @@ class ChargeItem(DomainResource):
         default=None,
         alias="_enteredDate",
     )
-    reason: Optional[List[CodeableConcept]] = Field(
+    reason: Optional[ListType[CodeableConcept]] = Field(
         description="Why was the charged  service rendered?",
         default=None,
     )
-    service: Optional[List[Reference]] = Field(
+    service: Optional[ListType[Reference]] = Field(
         description="Which rendered service is being charged?",
         default=None,
     )
@@ -280,15 +276,15 @@ class ChargeItem(DomainResource):
         description="Product charged",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="Account to place this charge",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the ChargeItem",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Further information supporting this charge",
         default=None,
     )

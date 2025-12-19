@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -102,11 +98,11 @@ class MedicationDispenseSubstitution(BackboneElement):
         description="Code signifying whether a different drug was dispensed from what was prescribed",
         default=None,
     )
-    reason: Optional[List[CodeableConcept]] = Field(
+    reason: Optional[ListType[CodeableConcept]] = Field(
         description="Why was substitution made",
         default=None,
     )
-    responsibleParty: Optional[List[Reference]] = Field(
+    responsibleParty: Optional[ListType[Reference]] = Field(
         description="Who is responsible for the substitution",
         default=None,
     )
@@ -183,23 +179,23 @@ class MedicationDispense(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifier",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Event that dispense is part of",
         default=None,
     )
@@ -240,11 +236,11 @@ class MedicationDispense(DomainResource):
         description="Encounter / Episode associated with event",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Information that supports the dispensing of the medication",
         default=None,
     )
-    performer: Optional[List[MedicationDispensePerformer]] = Field(
+    performer: Optional[ListType[MedicationDispensePerformer]] = Field(
         description="Who performed event",
         default=None,
     )
@@ -252,7 +248,7 @@ class MedicationDispense(DomainResource):
         description="Where the dispense occurred",
         default=None,
     )
-    authorizingPrescription: Optional[List[Reference]] = Field(
+    authorizingPrescription: Optional[ListType[Reference]] = Field(
         description="Medication order that authorizes the dispense",
         default=None,
     )
@@ -290,15 +286,15 @@ class MedicationDispense(DomainResource):
         description="Where the medication was sent",
         default=None,
     )
-    receiver: Optional[List[Reference]] = Field(
+    receiver: Optional[ListType[Reference]] = Field(
         description="Who collected the medication",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Information about the dispense",
         default=None,
     )
-    dosageInstruction: Optional[List[Dosage]] = Field(
+    dosageInstruction: Optional[ListType[Dosage]] = Field(
         description="How the medication is to be used by the patient or administered by the caregiver",
         default=None,
     )
@@ -306,11 +302,11 @@ class MedicationDispense(DomainResource):
         description="Whether a substitution was performed on the dispense",
         default=None,
     )
-    detectedIssue: Optional[List[Reference]] = Field(
+    detectedIssue: Optional[ListType[Reference]] = Field(
         description="Clinical issue with action",
         default=None,
     )
-    eventHistory: Optional[List[Reference]] = Field(
+    eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of relevant lifecycle events",
         default=None,
     )
