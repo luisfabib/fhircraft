@@ -35,7 +35,7 @@ def _validate_FHIR_element_constraint(
         AssertionError: If the validation fails and severity is not 'warning'.
         Warning: If the validation fails and severity is 'warning'.
     """
-    from fhircraft.fhir.path.engine.core import FHIRPathCollectionItem
+    from fhircraft.config import get_config
     from fhircraft.fhir.path.exceptions import (
         FhirPathLexerError,
         FhirPathParserError,
@@ -43,13 +43,40 @@ def _validate_FHIR_element_constraint(
     )
     from fhircraft.fhir.path.parser import fhirpath
 
+    # Check configuration for validation control
+    config = get_config()
+    validation_config = config.validation
+    
+    # Skip validation if mode is 'skip'
+    if validation_config.mode == 'skip':
+        return value
+    
+    # Skip if this specific constraint is disabled
+    if key in validation_config.disabled_constraints:
+        return value
+    
+    # Skip if all warnings are disabled and this is a warning
+    if severity == "warning" and (
+        validation_config.disable_warnings or validation_config.disable_warning_severity
+    ):
+        return value
+    
+    # Skip if all errors are disabled and this is an error
+    if severity == "error" and validation_config.disable_errors:
+        return value
+    
+    # In lenient mode, convert errors to warnings
+    effective_severity = severity
+    if validation_config.mode == 'lenient' and severity == "error":
+        effective_severity = "warning"
+
     if value is None:
         return value
     for item in ensure_list(value):
         try:
             valid = fhirpath.parse(expression).single(item, default=True)
             error_message = f'{human}. [{key}] -> "{expression}"'
-            if severity == "warning" and not valid:
+            if effective_severity == "warning" and not valid:
                 warnings.warn(error_message, FhirPathWarning)
             else:
                 assert valid, error_message
