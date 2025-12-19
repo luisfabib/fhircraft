@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -156,7 +152,7 @@ class CoverageCostToBeneficiary(BackboneElement):
         description="The amount or percentage due from the beneficiary",
         default=None,
     )
-    exception: Optional[List[CoverageCostToBeneficiaryException]] = Field(
+    exception: Optional[ListType[CoverageCostToBeneficiaryException]] = Field(
         description="Exceptions for patient payments",
         default=None,
     )
@@ -243,19 +239,19 @@ class Coverage(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for the coverage",
         default=None,
     )
@@ -310,11 +306,11 @@ class Coverage(DomainResource):
         description="Coverage start and end dates",
         default=None,
     )
-    payor: Optional[List[Reference]] = Field(
+    payor: Optional[ListType[Reference]] = Field(
         description="Issuer of the policy",
         default=None,
     )
-    class_: Optional[List[CoverageClass]] = Field(
+    class_: Optional[ListType[CoverageClass]] = Field(
         description="Additional coverage classifications",
         default=None,
     )
@@ -336,7 +332,7 @@ class Coverage(DomainResource):
         default=None,
         alias="_network",
     )
-    costToBeneficiary: Optional[List[CoverageCostToBeneficiary]] = Field(
+    costToBeneficiary: Optional[ListType[CoverageCostToBeneficiary]] = Field(
         description="Patient payments for services/products",
         default=None,
     )
@@ -349,7 +345,7 @@ class Coverage(DomainResource):
         default=None,
         alias="_subrogation",
     )
-    contract: Optional[List[Reference]] = Field(
+    contract: Optional[ListType[Reference]] = Field(
         description="Contract details",
         default=None,
     )

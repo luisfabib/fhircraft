@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Markdown
 
@@ -181,19 +177,19 @@ class ResearchStudy(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for study",
         default=None,
     )
@@ -206,11 +202,11 @@ class ResearchStudy(DomainResource):
         default=None,
         alias="_title",
     )
-    protocol: Optional[List[Reference]] = Field(
+    protocol: Optional[ListType[Reference]] = Field(
         description="Steps followed in executing study",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of larger study",
         default=None,
     )
@@ -231,31 +227,31 @@ class ResearchStudy(DomainResource):
         description="n-a | early-phase-1 | phase-1 | phase-1-phase-2 | phase-2 | phase-2-phase-3 | phase-3 | phase-4",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classifications for the study",
         default=None,
     )
-    focus: Optional[List[CodeableConcept]] = Field(
+    focus: Optional[ListType[CodeableConcept]] = Field(
         description="Drugs, devices, etc. under study",
         default=None,
     )
-    condition: Optional[List[CodeableConcept]] = Field(
+    condition: Optional[ListType[CodeableConcept]] = Field(
         description="Condition being studied",
         default=None,
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the study",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="References and dependencies",
         default=None,
     )
-    keyword: Optional[List[CodeableConcept]] = Field(
+    keyword: Optional[ListType[CodeableConcept]] = Field(
         description="Used to search for the study",
         default=None,
     )
-    location: Optional[List[CodeableConcept]] = Field(
+    location: Optional[ListType[CodeableConcept]] = Field(
         description="Geographic region(s) for study",
         default=None,
     )
@@ -268,7 +264,7 @@ class ResearchStudy(DomainResource):
         default=None,
         alias="_description",
     )
-    enrollment: Optional[List[Reference]] = Field(
+    enrollment: Optional[ListType[Reference]] = Field(
         description="Inclusion \u0026 exclusion criteria",
         default=None,
     )
@@ -284,7 +280,7 @@ class ResearchStudy(DomainResource):
         description="Researcher who oversees multiple aspects of the study",
         default=None,
     )
-    site: Optional[List[Reference]] = Field(
+    site: Optional[ListType[Reference]] = Field(
         description="Facility where study activities are conducted",
         default=None,
     )
@@ -292,15 +288,15 @@ class ResearchStudy(DomainResource):
         description="accrual-goal-met | closed-due-to-toxicity | closed-due-to-lack-of-study-progress | temporarily-closed-per-study-design",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the study",
         default=None,
     )
-    arm: Optional[List[ResearchStudyArm]] = Field(
+    arm: Optional[ListType[ResearchStudyArm]] = Field(
         description="Defined path through the study for a subject",
         default=None,
     )
-    objective: Optional[List[ResearchStudyObjective]] = Field(
+    objective: Optional[ListType[ResearchStudyObjective]] = Field(
         description="A goal for the study",
         default=None,
     )

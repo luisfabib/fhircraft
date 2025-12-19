@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -91,23 +87,23 @@ class ServiceRequest(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers assigned to this order",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
@@ -116,7 +112,7 @@ class ServiceRequest(DomainResource):
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -125,11 +121,11 @@ class ServiceRequest(DomainResource):
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="What request fulfills",
         default=None,
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="What request replaces",
         default=None,
     )
@@ -155,7 +151,7 @@ class ServiceRequest(DomainResource):
         default=None,
         alias="_intent",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of service",
         default=None,
     )
@@ -181,7 +177,7 @@ class ServiceRequest(DomainResource):
         description="What is being requested/ordered",
         default=None,
     )
-    orderDetail: Optional[List[CodeableConcept]] = Field(
+    orderDetail: Optional[ListType[CodeableConcept]] = Field(
         description="Additional order information",
         default=None,
     )
@@ -252,43 +248,43 @@ class ServiceRequest(DomainResource):
         description="Performer role",
         default=None,
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Requested performer",
         default=None,
     )
-    locationCode: Optional[List[CodeableConcept]] = Field(
+    locationCode: Optional[ListType[CodeableConcept]] = Field(
         description="Requested location",
         default=None,
     )
-    locationReference: Optional[List[Reference]] = Field(
+    locationReference: Optional[ListType[Reference]] = Field(
         description="Requested location",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Explanation/Justification for procedure or service",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Explanation/Justification for service or service",
         default=None,
     )
-    insurance: Optional[List[Reference]] = Field(
+    insurance: Optional[ListType[Reference]] = Field(
         description="Associated insurance coverage",
         default=None,
     )
-    supportingInfo: Optional[List[Reference]] = Field(
+    supportingInfo: Optional[ListType[Reference]] = Field(
         description="Additional clinical information",
         default=None,
     )
-    specimen: Optional[List[Reference]] = Field(
+    specimen: Optional[ListType[Reference]] = Field(
         description="Procedure Samples",
         default=None,
     )
-    bodySite: Optional[List[CodeableConcept]] = Field(
+    bodySite: Optional[ListType[CodeableConcept]] = Field(
         description="Location on Body",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments",
         default=None,
     )
@@ -301,7 +297,7 @@ class ServiceRequest(DomainResource):
         default=None,
         alias="_patientInstruction",
     )
-    relevantHistory: Optional[List[Reference]] = Field(
+    relevantHistory: Optional[ListType[Reference]] = Field(
         description="Request provenance",
         default=None,
     )

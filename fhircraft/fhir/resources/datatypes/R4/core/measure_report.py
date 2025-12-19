@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -193,11 +189,11 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         description="The stratum value, e.g. male",
         default=None,
     )
-    component: Optional[List[MeasureReportGroupStratifierStratumComponent]] = Field(
+    component: Optional[ListType[MeasureReportGroupStratifierStratumComponent]] = Field(
         description="Stratifier component values",
         default=None,
     )
-    population: Optional[List[MeasureReportGroupStratifierStratumPopulation]] = Field(
+    population: Optional[ListType[MeasureReportGroupStratifierStratumPopulation]] = Field(
         description="Population results in this stratum",
         default=None,
     )
@@ -241,11 +237,11 @@ class MeasureReportGroupStratifier(BackboneElement):
     When a measure includes multiple stratifiers, there will be a stratifier group for each stratifier defined by the measure.
     """
 
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="What stratifier of the group",
         default=None,
     )
-    stratum: Optional[List[MeasureReportGroupStratifierStratum]] = Field(
+    stratum: Optional[ListType[MeasureReportGroupStratifierStratum]] = Field(
         description="Stratum results, one for each unique value, or set of values, in the stratifier, or stratifier components",
         default=None,
     )
@@ -283,7 +279,7 @@ class MeasureReportGroup(BackboneElement):
         description="Meaning of the group",
         default=None,
     )
-    population: Optional[List[MeasureReportGroupPopulation]] = Field(
+    population: Optional[ListType[MeasureReportGroupPopulation]] = Field(
         description="The populations in the group",
         default=None,
     )
@@ -291,7 +287,7 @@ class MeasureReportGroup(BackboneElement):
         description="What score this group achieved",
         default=None,
     )
-    stratifier: Optional[List[MeasureReportGroupStratifier]] = Field(
+    stratifier: Optional[ListType[MeasureReportGroupStratifier]] = Field(
         description="Stratification results",
         default=None,
     )
@@ -368,19 +364,19 @@ class MeasureReport(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the MeasureReport",
         default=None,
     )
@@ -436,11 +432,11 @@ class MeasureReport(DomainResource):
         description="increase | decrease",
         default=None,
     )
-    group: Optional[List[MeasureReportGroup]] = Field(
+    group: Optional[ListType[MeasureReportGroup]] = Field(
         description="Measure results for each group",
         default=None,
     )
-    evaluatedResource: Optional[List[Reference]] = Field(
+    evaluatedResource: Optional[ListType[Reference]] = Field(
         description="What data was used to calculate the measure score",
         default=None,
     )

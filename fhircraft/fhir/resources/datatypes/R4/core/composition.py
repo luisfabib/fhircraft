@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -152,7 +148,7 @@ class CompositionEvent(BackboneElement):
     The clinical service, such as a colonoscopy or an appendectomy, being documented.
     """
 
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Code(s) that apply to the event being documented",
         default=None,
     )
@@ -160,7 +156,7 @@ class CompositionEvent(BackboneElement):
         description="The period covered by the documentation",
         default=None,
     )
-    detail: Optional[List[Reference]] = Field(
+    detail: Optional[ListType[Reference]] = Field(
         description="The event(s) being documented",
         default=None,
     )
@@ -210,7 +206,7 @@ class CompositionSection(BackboneElement):
         description="Classification of section (recommended)",
         default=None,
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the section",
         default=None,
     )
@@ -235,7 +231,7 @@ class CompositionSection(BackboneElement):
         description="Order of section entries",
         default=None,
     )
-    entry: Optional[List[Reference]] = Field(
+    entry: Optional[ListType[Reference]] = Field(
         description="A reference to data that supports this section",
         default=None,
     )
@@ -243,7 +239,7 @@ class CompositionSection(BackboneElement):
         description="Why the section is empty",
         default=None,
     )
-    section: Optional[List["CompositionSection"]] = Field(
+    section: Optional[ListType["CompositionSection"]] = Field(
         description="Nested Section",
         default=None,
     )
@@ -338,15 +334,15 @@ class Composition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -367,7 +363,7 @@ class Composition(DomainResource):
         description="Kind of composition (LOINC if possible)",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Categorization of Composition",
         default=None,
     )
@@ -388,7 +384,7 @@ class Composition(DomainResource):
         default=None,
         alias="_date",
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the composition",
         default=None,
     )
@@ -410,7 +406,7 @@ class Composition(DomainResource):
         default=None,
         alias="_confidentiality",
     )
-    attester: Optional[List[CompositionAttester]] = Field(
+    attester: Optional[ListType[CompositionAttester]] = Field(
         description="Attests to accuracy of composition",
         default=None,
     )
@@ -418,15 +414,15 @@ class Composition(DomainResource):
         description="Organization which maintains the composition",
         default=None,
     )
-    relatesTo: Optional[List[CompositionRelatesTo]] = Field(
+    relatesTo: Optional[ListType[CompositionRelatesTo]] = Field(
         description="Relationships to other compositions/documents",
         default=None,
     )
-    event: Optional[List[CompositionEvent]] = Field(
+    event: Optional[ListType[CompositionEvent]] = Field(
         description="The clinical service(s) being documented",
         default=None,
     )
-    section: Optional[List[CompositionSection]] = Field(
+    section: Optional[ListType[CompositionSection]] = Field(
         description="Composition is broken into sections",
         default=None,
     )

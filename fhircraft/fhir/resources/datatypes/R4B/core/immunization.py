@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -230,7 +226,7 @@ class ImmunizationProtocolApplied(BackboneElement):
         description="Who is responsible for publishing the recommendations",
         default=None,
     )
-    targetDisease: Optional[List[CodeableConcept]] = Field(
+    targetDisease: Optional[ListType[CodeableConcept]] = Field(
         description="Vaccine preventatable disease being targetted",
         default=None,
     )
@@ -372,19 +368,19 @@ class Immunization(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
@@ -491,19 +487,19 @@ class Immunization(DomainResource):
         description="Amount of vaccine administered",
         default=None,
     )
-    performer: Optional[List[ImmunizationPerformer]] = Field(
+    performer: Optional[ListType[ImmunizationPerformer]] = Field(
         description="Who performed event",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional immunization notes",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why immunization occurred",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Why immunization occurred",
         default=None,
     )
@@ -516,15 +512,15 @@ class Immunization(DomainResource):
         default=None,
         alias="_isSubpotent",
     )
-    subpotentReason: Optional[List[CodeableConcept]] = Field(
+    subpotentReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for being subpotent",
         default=None,
     )
-    education: Optional[List[ImmunizationEducation]] = Field(
+    education: Optional[ListType[ImmunizationEducation]] = Field(
         description="Educational material presented to patient",
         default=None,
     )
-    programEligibility: Optional[List[CodeableConcept]] = Field(
+    programEligibility: Optional[ListType[CodeableConcept]] = Field(
         description="Patient eligibility for a vaccination program",
         default=None,
     )
@@ -532,11 +528,11 @@ class Immunization(DomainResource):
         description="Funding source for the vaccine",
         default=None,
     )
-    reaction: Optional[List[ImmunizationReaction]] = Field(
+    reaction: Optional[ListType[ImmunizationReaction]] = Field(
         description="Details of a reaction that follows immunization",
         default=None,
     )
-    protocolApplied: Optional[List[ImmunizationProtocolApplied]] = Field(
+    protocolApplied: Optional[ListType[ImmunizationProtocolApplied]] = Field(
         description="Protocol followed by the provider",
         default=None,
     )

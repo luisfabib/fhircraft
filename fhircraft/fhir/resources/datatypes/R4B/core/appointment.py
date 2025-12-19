@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -51,7 +47,7 @@ class AppointmentParticipant(BackboneElement):
     List of participants involved in the appointment.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in the appointment",
         default=None,
     )
@@ -157,19 +153,19 @@ class Appointment(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this item",
         default=None,
     )
@@ -186,15 +182,15 @@ class Appointment(DomainResource):
         description="The coded reason for the appointment being cancelled",
         default=None,
     )
-    serviceCategory: Optional[List[CodeableConcept]] = Field(
+    serviceCategory: Optional[ListType[CodeableConcept]] = Field(
         description="A broad categorization of the service that is to be performed during this appointment",
         default=None,
     )
-    serviceType: Optional[List[CodeableConcept]] = Field(
+    serviceType: Optional[ListType[CodeableConcept]] = Field(
         description="The specific service that is to be performed during this appointment",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="The specialty of a practitioner that would be required to perform the service requested in this appointment",
         default=None,
     )
@@ -202,11 +198,11 @@ class Appointment(DomainResource):
         description="The style of appointment or patient that has been booked in the slot (not service type)",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Coded reason this appointment is scheduled",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Reason the appointment is to take place (resource)",
         default=None,
     )
@@ -228,7 +224,7 @@ class Appointment(DomainResource):
         default=None,
         alias="_description",
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Additional information to support the appointment",
         default=None,
     )
@@ -259,7 +255,7 @@ class Appointment(DomainResource):
         default=None,
         alias="_minutesDuration",
     )
-    slot: Optional[List[Reference]] = Field(
+    slot: Optional[ListType[Reference]] = Field(
         description="The slots that this appointment is filling",
         default=None,
     )
@@ -290,15 +286,15 @@ class Appointment(DomainResource):
         default=None,
         alias="_patientInstruction",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="The service request this appointment is allocated to assess",
         default=None,
     )
-    participant: Optional[List[AppointmentParticipant]] = Field(
+    participant: Optional[ListType[AppointmentParticipant]] = Field(
         description="Participants involved in appointment",
         default=None,
     )
-    requestedPeriod: Optional[List[Period]] = Field(
+    requestedPeriod: Optional[ListType[Period]] = Field(
         description="Potential date/time interval(s) requested to allocate the appointment within",
         default=None,
     )

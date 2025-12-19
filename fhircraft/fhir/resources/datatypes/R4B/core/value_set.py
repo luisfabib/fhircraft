@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -128,7 +124,7 @@ class ValueSetComposeIncludeConcept(BackboneElement):
         default=None,
         alias="_display",
     )
-    designation: Optional[List[ValueSetComposeIncludeConceptDesignation]] = Field(
+    designation: Optional[ListType[ValueSetComposeIncludeConceptDesignation]] = Field(
         description="Additional representations for this concept",
         default=None,
     )
@@ -243,15 +239,15 @@ class ValueSetComposeInclude(BackboneElement):
         default=None,
         alias="_version",
     )
-    concept: Optional[List[ValueSetComposeIncludeConcept]] = Field(
+    concept: Optional[ListType[ValueSetComposeIncludeConcept]] = Field(
         description="A concept defined in the system",
         default=None,
     )
-    filter: Optional[List[ValueSetComposeIncludeFilter]] = Field(
+    filter: Optional[ListType[ValueSetComposeIncludeFilter]] = Field(
         description="Select codes/concepts by their properties (including relationships)",
         default=None,
     )
-    valueSet: Optional[List[Canonical]] = Field(
+    valueSet: Optional[ListType[Canonical]] = Field(
         description="Select the contents included in this value set",
         default=None,
     )
@@ -372,7 +368,7 @@ class ValueSetComposeIncludeConcept(BackboneElement):
         default=None,
         alias="_display",
     )
-    designation: Optional[List[ValueSetComposeIncludeConceptDesignation]] = Field(
+    designation: Optional[ListType[ValueSetComposeIncludeConceptDesignation]] = Field(
         description="Additional representations for this concept",
         default=None,
     )
@@ -487,15 +483,15 @@ class ValueSetComposeExclude(BackboneElement):
         default=None,
         alias="_version",
     )
-    concept: Optional[List[ValueSetComposeIncludeConcept]] = Field(
+    concept: Optional[ListType[ValueSetComposeIncludeConcept]] = Field(
         description="A concept defined in the system",
         default=None,
     )
-    filter: Optional[List[ValueSetComposeIncludeFilter]] = Field(
+    filter: Optional[ListType[ValueSetComposeIncludeFilter]] = Field(
         description="Select codes/concepts by their properties (including relationships)",
         default=None,
     )
-    valueSet: Optional[List[Canonical]] = Field(
+    valueSet: Optional[ListType[Canonical]] = Field(
         description="Select the contents included in this value set",
         default=None,
     )
@@ -561,11 +557,11 @@ class ValueSetCompose(BackboneElement):
         default=None,
         alias="_inactive",
     )
-    include: Optional[List[ValueSetComposeInclude]] = Field(
+    include: Optional[ListType[ValueSetComposeInclude]] = Field(
         description="Include one or more codes from a code system or other value set(s)",
         default=None,
     )
-    exclude: Optional[List[ValueSetComposeExclude]] = Field(
+    exclude: Optional[ListType[ValueSetComposeExclude]] = Field(
         description="Explicitly exclude codes from a code system or other value sets",
         default=None,
     )
@@ -859,11 +855,11 @@ class ValueSetExpansionContains(BackboneElement):
         default=None,
         alias="_display",
     )
-    designation: Optional[List[ValueSetExpansionContainsDesignation]] = Field(
+    designation: Optional[ListType[ValueSetExpansionContainsDesignation]] = Field(
         description="Additional representations for this item",
         default=None,
     )
-    contains: Optional[List["ValueSetExpansionContains"]] = Field(
+    contains: Optional[ListType["ValueSetExpansionContains"]] = Field(
         description="Codes contained under this entry",
         default=None,
     )
@@ -951,11 +947,11 @@ class ValueSetExpansion(BackboneElement):
         default=None,
         alias="_offset",
     )
-    parameter: Optional[List[ValueSetExpansionParameter]] = Field(
+    parameter: Optional[ListType[ValueSetExpansionParameter]] = Field(
         description="Parameter that controlled the expansion process",
         default=None,
     )
-    contains: Optional[List[ValueSetExpansionContains]] = Field(
+    contains: Optional[ListType[ValueSetExpansionContains]] = Field(
         description="Codes in the value set",
         default=None,
     )
@@ -1074,15 +1070,15 @@ class ValueSet(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -1095,7 +1091,7 @@ class ValueSet(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the value set (business identifier)",
         default=None,
     )
@@ -1162,7 +1158,7 @@ class ValueSet(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -1175,11 +1171,11 @@ class ValueSet(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for value set (if applicable)",
         default=None,
     )

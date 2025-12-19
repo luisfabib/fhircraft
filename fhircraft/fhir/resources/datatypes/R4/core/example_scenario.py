@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -255,11 +251,11 @@ class ExampleScenarioInstance(BackboneElement):
         default=None,
         alias="_description",
     )
-    version: Optional[List[ExampleScenarioInstanceVersion]] = Field(
+    version: Optional[ListType[ExampleScenarioInstanceVersion]] = Field(
         description="A specific version of the resource",
         default=None,
     )
-    containedInstance: Optional[List[ExampleScenarioInstanceContainedInstance]] = Field(
+    containedInstance: Optional[ListType[ExampleScenarioInstanceContainedInstance]] = Field(
         description="Resources contained in the instance",
         default=None,
     )
@@ -505,7 +501,7 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
         default=None,
         alias="_description",
     )
-    step: Optional[List["ExampleScenarioProcessStep"]] = Field(
+    step: Optional[ListType["ExampleScenarioProcessStep"]] = Field(
         description="What happens in each alternative option",
         default=None,
     )
@@ -542,7 +538,7 @@ class ExampleScenarioProcessStep(BackboneElement):
     Each step of the process.
     """
 
-    process: Optional[List["ExampleScenarioProcess"]] = Field(
+    process: Optional[ListType["ExampleScenarioProcess"]] = Field(
         description="Nested process",
         default=None,
     )
@@ -559,7 +555,7 @@ class ExampleScenarioProcessStep(BackboneElement):
         description="Each interaction or action",
         default=None,
     )
-    alternative: Optional[List[ExampleScenarioProcessStepAlternative]] = Field(
+    alternative: Optional[ListType[ExampleScenarioProcessStepAlternative]] = Field(
         description="Alternate non-typical step action",
         default=None,
     )
@@ -635,7 +631,7 @@ class ExampleScenarioProcess(BackboneElement):
         default=None,
         alias="_postConditions",
     )
-    step: Optional[List[ExampleScenarioProcessStep]] = Field(
+    step: Optional[ListType[ExampleScenarioProcessStep]] = Field(
         description="Each step of the process",
         default=None,
     )
@@ -715,15 +711,15 @@ class ExampleScenario(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -736,7 +732,7 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the example scenario",
         default=None,
     )
@@ -794,15 +790,15 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for example scenario (if applicable)",
         default=None,
     )
@@ -824,19 +820,19 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_purpose",
     )
-    actor: Optional[List[ExampleScenarioActor]] = Field(
+    actor: Optional[ListType[ExampleScenarioActor]] = Field(
         description="Actor participating in the resource",
         default=None,
     )
-    instance: Optional[List[ExampleScenarioInstance]] = Field(
+    instance: Optional[ListType[ExampleScenarioInstance]] = Field(
         description="Each resource and each version that is present in the workflow",
         default=None,
     )
-    process: Optional[List[ExampleScenarioProcess]] = Field(
+    process: Optional[ListType[ExampleScenarioProcess]] = Field(
         description="Each major process - a group of operations",
         default=None,
     )
-    workflow: Optional[List[Canonical]] = Field(
+    workflow: Optional[ListType[Canonical]] = Field(
         description="Another nested workflow",
         default=None,
     )

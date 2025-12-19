@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -292,11 +288,11 @@ class DeviceProperty(BackboneElement):
         description="Code that specifies the property DeviceDefinitionPropetyCode (Extensible)",
         default=None,
     )
-    valueQuantity: Optional[List[Quantity]] = Field(
+    valueQuantity: Optional[ListType[Quantity]] = Field(
         description="Property value as a quantity",
         default=None,
     )
-    valueCode: Optional[List[CodeableConcept]] = Field(
+    valueCode: Optional[ListType[CodeableConcept]] = Field(
         description="Property value as a code, e.g., NTP4 (synced to NTP)",
         default=None,
     )
@@ -370,19 +366,19 @@ class Device(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Instance identifier",
         default=None,
     )
@@ -390,7 +386,7 @@ class Device(DomainResource):
         description="The reference to the definition for the device",
         default=None,
     )
-    udiCarrier: Optional[List[DeviceUdiCarrier]] = Field(
+    udiCarrier: Optional[ListType[DeviceUdiCarrier]] = Field(
         description="Unique Device Identifier (UDI) Barcode string",
         default=None,
     )
@@ -403,7 +399,7 @@ class Device(DomainResource):
         default=None,
         alias="_status",
     )
-    statusReason: Optional[List[CodeableConcept]] = Field(
+    statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="online | paused | standby | offline | not-ready | transduc-discon | hw-discon | off",
         default=None,
     )
@@ -461,7 +457,7 @@ class Device(DomainResource):
         default=None,
         alias="_serialNumber",
     )
-    deviceName: Optional[List[DeviceDeviceName]] = Field(
+    deviceName: Optional[ListType[DeviceDeviceName]] = Field(
         description="The name of the device as given by the manufacturer",
         default=None,
     )
@@ -487,15 +483,15 @@ class Device(DomainResource):
         description="The kind or type of device",
         default=None,
     )
-    specialization: Optional[List[DeviceSpecialization]] = Field(
+    specialization: Optional[ListType[DeviceSpecialization]] = Field(
         description="The capabilities supported on a  device, the standards to which the device conforms for a particular purpose, and used for the communication",
         default=None,
     )
-    version: Optional[List[DeviceVersion]] = Field(
+    version: Optional[ListType[DeviceVersion]] = Field(
         description="The actual design of the device or software version running on the device",
         default=None,
     )
-    property_: Optional[List[DeviceProperty]] = Field(
+    property_: Optional[ListType[DeviceProperty]] = Field(
         description="The actual configuration settings of a device as it actually operates, e.g., regulation status, time properties",
         default=None,
     )
@@ -507,7 +503,7 @@ class Device(DomainResource):
         description="Organization responsible for device",
         default=None,
     )
-    contact: Optional[List[ContactPoint]] = Field(
+    contact: Optional[ListType[ContactPoint]] = Field(
         description="Details for human/organization for support",
         default=None,
     )
@@ -524,11 +520,11 @@ class Device(DomainResource):
         default=None,
         alias="_url",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Device notes and comments",
         default=None,
     )
-    safety: Optional[List[CodeableConcept]] = Field(
+    safety: Optional[ListType[CodeableConcept]] = Field(
         description="Safety Characteristics of Device",
         default=None,
     )

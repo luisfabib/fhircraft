@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -62,7 +58,7 @@ class CarePlanActivityDetail(BackboneElement):
         default=None,
         alias="_kind",
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
@@ -71,7 +67,7 @@ class CarePlanActivityDetail(BackboneElement):
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -84,15 +80,15 @@ class CarePlanActivityDetail(BackboneElement):
         description="Detail type of activity",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why activity should be done or why activity was prohibited",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Why activity is needed",
         default=None,
     )
-    goal: Optional[List[Reference]] = Field(
+    goal: Optional[ListType[Reference]] = Field(
         description="Goals this activity relates to",
         default=None,
     )
@@ -139,7 +135,7 @@ class CarePlanActivityDetail(BackboneElement):
         description="Where it should happen",
         default=None,
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Who will be responsible?",
         default=None,
     )
@@ -269,15 +265,15 @@ class CarePlanActivity(BackboneElement):
     Identifies a planned action to occur as part of the plan.  For example, a medication to be used, lab tests to perform, self-monitoring, education, etc.
     """
 
-    outcomeCodeableConcept: Optional[List[CodeableConcept]] = Field(
+    outcomeCodeableConcept: Optional[ListType[CodeableConcept]] = Field(
         description="Results of the activity",
         default=None,
     )
-    outcomeReference: Optional[List[Reference]] = Field(
+    outcomeReference: Optional[ListType[Reference]] = Field(
         description="Appointment, Encounter, Procedure, etc.",
         default=None,
     )
-    progress: Optional[List[Annotation]] = Field(
+    progress: Optional[ListType[Annotation]] = Field(
         description="Comments about the activity status/progress",
         default=None,
     )
@@ -365,23 +361,23 @@ class CarePlan(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this plan",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
@@ -390,7 +386,7 @@ class CarePlan(DomainResource):
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
@@ -399,15 +395,15 @@ class CarePlan(DomainResource):
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills CarePlan",
         default=None,
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="CarePlan replaced by this CarePlan",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced CarePlan",
         default=None,
     )
@@ -429,7 +425,7 @@ class CarePlan(DomainResource):
         default=None,
         alias="_intent",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of plan",
         default=None,
     )
@@ -476,31 +472,31 @@ class CarePlan(DomainResource):
         description="Who is the designated responsible party",
         default=None,
     )
-    contributor: Optional[List[Reference]] = Field(
+    contributor: Optional[ListType[Reference]] = Field(
         description="Who provided the content of the care plan",
         default=None,
     )
-    careTeam: Optional[List[Reference]] = Field(
+    careTeam: Optional[ListType[Reference]] = Field(
         description="Who\u0027s involved in plan?",
         default=None,
     )
-    addresses: Optional[List[Reference]] = Field(
+    addresses: Optional[ListType[Reference]] = Field(
         description="Health issues this plan addresses",
         default=None,
     )
-    supportingInfo: Optional[List[Reference]] = Field(
+    supportingInfo: Optional[ListType[Reference]] = Field(
         description="Information considered as part of plan",
         default=None,
     )
-    goal: Optional[List[Reference]] = Field(
+    goal: Optional[ListType[Reference]] = Field(
         description="Desired outcome of plan",
         default=None,
     )
-    activity: Optional[List[CarePlanActivity]] = Field(
+    activity: Optional[ListType[CarePlanActivity]] = Field(
         description="Action to occur as part of plan",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments about the plan",
         default=None,
     )

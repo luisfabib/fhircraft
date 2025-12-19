@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -151,19 +147,19 @@ class SupplyRequest(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for SupplyRequest",
         default=None,
     )
@@ -201,7 +197,7 @@ class SupplyRequest(DomainResource):
         description="The requested amount of the item indicated",
         default=None,
     )
-    parameter: Optional[List[SupplyRequestParameter]] = Field(
+    parameter: Optional[ListType[SupplyRequestParameter]] = Field(
         description="Ordered item details",
         default=None,
     )
@@ -235,15 +231,15 @@ class SupplyRequest(DomainResource):
         description="Individual making the request",
         default=None,
     )
-    supplier: Optional[List[Reference]] = Field(
+    supplier: Optional[ListType[Reference]] = Field(
         description="Who is intended to fulfill the request",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="The reason why the supply item was requested",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="The reason why the supply item was requested",
         default=None,
     )

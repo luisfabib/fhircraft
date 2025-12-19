@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -106,7 +102,7 @@ class CitationClassification(BackboneElement):
         description="The kind of classifier (e.g. publication type, keyword)",
         default=None,
     )
-    classifier: Optional[List[CodeableConcept]] = Field(
+    classifier: Optional[ListType[CodeableConcept]] = Field(
         description="The specific classification value",
         default=None,
     )
@@ -194,7 +190,7 @@ class CitationRelatesTo(BackboneElement):
         description="How the Citation resource relates to the target artifact",
         default=None,
     )
-    targetClassifier: Optional[List[CodeableConcept]] = Field(
+    targetClassifier: Optional[ListType[CodeableConcept]] = Field(
         description="The clasification of the related artifact",
         default=None,
     )
@@ -358,7 +354,7 @@ class CitationCitedArtifactTitle(BackboneElement):
     The title details of the article or artifact.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="The kind of title",
         default=None,
     )
@@ -524,7 +520,7 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         description="How the cited artifact relates to the target artifact",
         default=None,
     )
-    targetClassifier: Optional[List[CodeableConcept]] = Field(
+    targetClassifier: Optional[ListType[CodeableConcept]] = Field(
         description="The clasification of the related artifact",
         default=None,
     )
@@ -599,7 +595,7 @@ class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
         description="Kind of container (e.g. Periodical, database, or book)",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Journal identifiers include ISSN, ISO Abbreviation and NLMuniqueID; Book identifiers include ISBN",
         default=None,
     )
@@ -854,7 +850,7 @@ class CitationCitedArtifactPublicationForm(BackboneElement):
         default=None,
         alias="_lastRevisionDate",
     )
-    language: Optional[List[CodeableConcept]] = Field(
+    language: Optional[ListType[CodeableConcept]] = Field(
         description="Language in which this form of the article is published",
         default=None,
     )
@@ -1085,7 +1081,7 @@ class CitationCitedArtifactClassification(BackboneElement):
         description="The kind of classifier (e.g. publication type, keyword)",
         default=None,
     )
-    classifier: Optional[List[CodeableConcept]] = Field(
+    classifier: Optional[ListType[CodeableConcept]] = Field(
         description="The specific classification value",
         default=None,
     )
@@ -1144,7 +1140,7 @@ class CitationCitedArtifactContributorshipEntryAffiliationInfo(BackboneElement):
         default=None,
         alias="_role",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier for the organization",
         default=None,
     )
@@ -1246,25 +1242,25 @@ class CitationCitedArtifactContributorshipEntry(BackboneElement):
         default=None,
         alias="_collectiveName",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Author identifier, eg ORCID",
         default=None,
     )
     affiliationInfo: Optional[
-        List[CitationCitedArtifactContributorshipEntryAffiliationInfo]
+        ListType[CitationCitedArtifactContributorshipEntryAffiliationInfo]
     ] = Field(
         description="Organizational affiliation",
         default=None,
     )
-    address: Optional[List[Address]] = Field(
+    address: Optional[ListType[Address]] = Field(
         description="Physical mailing address",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="Email or telephone contact methods for the author or contributor",
         default=None,
     )
-    contributionType: Optional[List[CodeableConcept]] = Field(
+    contributionType: Optional[ListType[CodeableConcept]] = Field(
         description="The specific contribution",
         default=None,
     )
@@ -1273,7 +1269,7 @@ class CitationCitedArtifactContributorshipEntry(BackboneElement):
         default=None,
     )
     contributionInstance: Optional[
-        List[CitationCitedArtifactContributorshipEntryContributionInstance]
+        ListType[CitationCitedArtifactContributorshipEntryContributionInstance]
     ] = Field(
         description="Contributions with accounting for time or number",
         default=None,
@@ -1422,11 +1418,11 @@ class CitationCitedArtifactContributorship(BackboneElement):
         default=None,
         alias="_complete",
     )
-    entry: Optional[List[CitationCitedArtifactContributorshipEntry]] = Field(
+    entry: Optional[ListType[CitationCitedArtifactContributorshipEntry]] = Field(
         description="An individual entity named in the list",
         default=None,
     )
-    summary: Optional[List[CitationCitedArtifactContributorshipSummary]] = Field(
+    summary: Optional[ListType[CitationCitedArtifactContributorshipSummary]] = Field(
         description="Used to record a display of the author/contributor list without separate coding for each list member",
         default=None,
     )
@@ -1463,11 +1459,11 @@ class CitationCitedArtifact(BackboneElement):
     The article or artifact being described.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="May include DOI, PMID, PMCID, etc.",
         default=None,
     )
-    relatedIdentifier: Optional[List[Identifier]] = Field(
+    relatedIdentifier: Optional[ListType[Identifier]] = Field(
         description="May include trial registry identifiers",
         default=None,
     )
@@ -1484,19 +1480,19 @@ class CitationCitedArtifact(BackboneElement):
         description="The defined version of the cited artifact",
         default=None,
     )
-    currentState: Optional[List[CodeableConcept]] = Field(
+    currentState: Optional[ListType[CodeableConcept]] = Field(
         description="The status of the cited artifact",
         default=None,
     )
-    statusDate: Optional[List[CitationCitedArtifactStatusDate]] = Field(
+    statusDate: Optional[ListType[CitationCitedArtifactStatusDate]] = Field(
         description="An effective date or period for a status of the cited artifact",
         default=None,
     )
-    title: Optional[List[CitationCitedArtifactTitle]] = Field(
+    title: Optional[ListType[CitationCitedArtifactTitle]] = Field(
         description="The title details of the article or artifact",
         default=None,
     )
-    abstract: Optional[List[CitationCitedArtifactAbstract]] = Field(
+    abstract: Optional[ListType[CitationCitedArtifactAbstract]] = Field(
         description="Summary of the article or artifact",
         default=None,
     )
@@ -1504,19 +1500,19 @@ class CitationCitedArtifact(BackboneElement):
         description="The component of the article or artifact",
         default=None,
     )
-    relatesTo: Optional[List[CitationCitedArtifactRelatesTo]] = Field(
+    relatesTo: Optional[ListType[CitationCitedArtifactRelatesTo]] = Field(
         description="The artifact related to the cited artifact",
         default=None,
     )
-    publicationForm: Optional[List[CitationCitedArtifactPublicationForm]] = Field(
+    publicationForm: Optional[ListType[CitationCitedArtifactPublicationForm]] = Field(
         description="If multiple, used to represent alternative forms of the article that are not separate citations",
         default=None,
     )
-    webLocation: Optional[List[CitationCitedArtifactWebLocation]] = Field(
+    webLocation: Optional[ListType[CitationCitedArtifactWebLocation]] = Field(
         description="Used for any URL for the article or artifact cited",
         default=None,
     )
-    classification: Optional[List[CitationCitedArtifactClassification]] = Field(
+    classification: Optional[ListType[CitationCitedArtifactClassification]] = Field(
         description="The assignment to an organizing scheme",
         default=None,
     )
@@ -1524,7 +1520,7 @@ class CitationCitedArtifact(BackboneElement):
         description="Attribution of authors and other contributors",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Any additional information or content for the article or artifact",
         default=None,
     )
@@ -1634,15 +1630,15 @@ class Citation(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -1655,7 +1651,7 @@ class Citation(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier for the Citation resource itself",
         default=None,
     )
@@ -1722,7 +1718,7 @@ class Citation(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher of the Citation Resource",
         default=None,
     )
@@ -1735,11 +1731,11 @@ class Citation(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the Citation Resource content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for citation (if applicable)",
         default=None,
     )
@@ -1783,43 +1779,43 @@ class Citation(DomainResource):
         description="When the citation is expected to be used",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the Citation",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the Citation",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the Citation",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the Citation",
         default=None,
     )
-    summary: Optional[List[CitationSummary]] = Field(
+    summary: Optional[ListType[CitationSummary]] = Field(
         description="A human-readable display of the citation",
         default=None,
     )
-    classification: Optional[List[CitationClassification]] = Field(
+    classification: Optional[ListType[CitationClassification]] = Field(
         description="The assignment to an organizing scheme",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for general notes and annotations not coded elsewhere",
         default=None,
     )
-    currentState: Optional[List[CodeableConcept]] = Field(
+    currentState: Optional[ListType[CodeableConcept]] = Field(
         description="The status of the citation",
         default=None,
     )
-    statusDate: Optional[List[CitationStatusDate]] = Field(
+    statusDate: Optional[ListType[CitationStatusDate]] = Field(
         description="An effective date or period for a status of the citation",
         default=None,
     )
-    relatesTo: Optional[List[CitationRelatesTo]] = Field(
+    relatesTo: Optional[ListType[CitationRelatesTo]] = Field(
         description="Artifact related to the Citation Resource",
         default=None,
     )

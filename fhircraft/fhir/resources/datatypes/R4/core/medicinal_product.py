@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -141,11 +137,11 @@ class MedicinalProductName(BackboneElement):
         default=None,
         alias="_productName",
     )
-    namePart: Optional[List[MedicinalProductNameNamePart]] = Field(
+    namePart: Optional[ListType[MedicinalProductNameNamePart]] = Field(
         description="Coding words or phrases of the name",
         default=None,
     )
-    countryLanguage: Optional[List[MedicinalProductNameCountryLanguage]] = Field(
+    countryLanguage: Optional[ListType[MedicinalProductNameCountryLanguage]] = Field(
         description="Country where the name applies",
         default=None,
     )
@@ -203,7 +199,7 @@ class MedicinalProductManufacturingBusinessOperation(BackboneElement):
         description="To indicate if this proces is commercially confidential",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="The manufacturer or establishment associated with the process",
         default=None,
     )
@@ -253,7 +249,7 @@ class MedicinalProductSpecialDesignation(BackboneElement):
     Indicates if the medicinal product has an orphan designation for the treatment of a rare disease.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier for the designation, or procedure number",
         default=None,
     )
@@ -385,19 +381,19 @@ class MedicinalProduct(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this product. Could be an MPID",
         default=None,
     )
@@ -421,7 +417,7 @@ class MedicinalProduct(DomainResource):
         description="Whether the Medicinal Product is subject to additional monitoring for regulatory reasons",
         default=None,
     )
-    specialMeasures: Optional[List[String]] = Field(
+    specialMeasures: Optional[ListType[String]] = Field(
         description="Whether the Medicinal Product is subject to special measures for regulatory reasons",
         default=None,
     )
@@ -434,53 +430,53 @@ class MedicinalProduct(DomainResource):
         description="If authorised for use in children",
         default=None,
     )
-    productClassification: Optional[List[CodeableConcept]] = Field(
+    productClassification: Optional[ListType[CodeableConcept]] = Field(
         description="Allows the product to be classified by various systems",
         default=None,
     )
-    marketingStatus: Optional[List[MarketingStatus]] = Field(
+    marketingStatus: Optional[ListType[MarketingStatus]] = Field(
         description="Marketing status of the medicinal product, in contrast to marketing authorizaton",
         default=None,
     )
-    pharmaceuticalProduct: Optional[List[Reference]] = Field(
+    pharmaceuticalProduct: Optional[ListType[Reference]] = Field(
         description="Pharmaceutical aspects of product",
         default=None,
     )
-    packagedMedicinalProduct: Optional[List[Reference]] = Field(
+    packagedMedicinalProduct: Optional[ListType[Reference]] = Field(
         description="Package representation for the product",
         default=None,
     )
-    attachedDocument: Optional[List[Reference]] = Field(
+    attachedDocument: Optional[ListType[Reference]] = Field(
         description="Supporting documentation, typically for regulatory submission",
         default=None,
     )
-    masterFile: Optional[List[Reference]] = Field(
+    masterFile: Optional[ListType[Reference]] = Field(
         description="A master file for to the medicinal product (e.g. Pharmacovigilance System Master File)",
         default=None,
     )
-    contact: Optional[List[Reference]] = Field(
+    contact: Optional[ListType[Reference]] = Field(
         description="A product specific contact, person (in a role), or an organization",
         default=None,
     )
-    clinicalTrial: Optional[List[Reference]] = Field(
+    clinicalTrial: Optional[ListType[Reference]] = Field(
         description="Clinical trials or studies that this product is involved in",
         default=None,
     )
-    name: Optional[List[MedicinalProductName]] = Field(
+    name: Optional[ListType[MedicinalProductName]] = Field(
         description="The product\u0027s name, including full name and possibly coded parts",
         default=None,
     )
-    crossReference: Optional[List[Identifier]] = Field(
+    crossReference: Optional[ListType[Identifier]] = Field(
         description="Reference to another product, e.g. for linking authorised to investigational product",
         default=None,
     )
     manufacturingBusinessOperation: Optional[
-        List[MedicinalProductManufacturingBusinessOperation]
+        ListType[MedicinalProductManufacturingBusinessOperation]
     ] = Field(
         description="An operation applied to the product, for manufacturing or adminsitrative purpose",
         default=None,
     )
-    specialDesignation: Optional[List[MedicinalProductSpecialDesignation]] = Field(
+    specialDesignation: Optional[ListType[MedicinalProductSpecialDesignation]] = Field(
         description="Indicates if the medicinal product has an orphan designation for the treatment of a rare disease",
         default=None,
     )

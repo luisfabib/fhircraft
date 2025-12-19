@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -201,7 +197,7 @@ class OperationDefinitionParameter(BackboneElement):
         default=None,
         alias="_type",
     )
-    targetProfile: Optional[List[Canonical]] = Field(
+    targetProfile: Optional[ListType[Canonical]] = Field(
         description="If type is Reference | canonical, allowed targets",
         default=None,
     )
@@ -223,11 +219,11 @@ class OperationDefinitionParameter(BackboneElement):
         description="ValueSet details if this is coded",
         default=None,
     )
-    referencedFrom: Optional[List[OperationDefinitionParameterReferencedFrom]] = Field(
+    referencedFrom: Optional[ListType[OperationDefinitionParameterReferencedFrom]] = Field(
         description="References to this parameter",
         default=None,
     )
-    part: Optional[List["OperationDefinitionParameter"]] = Field(
+    part: Optional[ListType["OperationDefinitionParameter"]] = Field(
         description="Parts of a nested Parameter",
         default=None,
     )
@@ -288,7 +284,7 @@ class OperationDefinitionOverload(BackboneElement):
     Defines an appropriate combination of parameters to use when invoking this operation, to help code generators when generating overloaded parameter sets for this operation.
     """
 
-    parameterName: Optional[List[String]] = Field(
+    parameterName: Optional[ListType[String]] = Field(
         description="Name of parameter to include in overload",
         default=None,
     )
@@ -373,15 +369,15 @@ class OperationDefinition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -466,7 +462,7 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -479,11 +475,11 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for operation definition (if applicable)",
         default=None,
     )
@@ -532,7 +528,7 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_base",
     )
-    resource: Optional[List[Code]] = Field(
+    resource: Optional[ListType[Code]] = Field(
         description="Types this operation applies to",
         default=None,
     )
@@ -586,11 +582,11 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_outputProfile",
     )
-    parameter: Optional[List[OperationDefinitionParameter]] = Field(
+    parameter: Optional[ListType[OperationDefinitionParameter]] = Field(
         description="Parameters for the operation/query",
         default=None,
     )
-    overload: Optional[List[OperationDefinitionOverload]] = Field(
+    overload: Optional[ListType[OperationDefinitionOverload]] = Field(
         description="Define overloaded variants for when  generating code",
         default=None,
     )

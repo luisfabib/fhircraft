@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -55,7 +51,7 @@ class PatientContact(BackboneElement):
     A contact party (e.g. guardian, partner, friend) for the patient.
     """
 
-    relationship: Optional[List[CodeableConcept]] = Field(
+    relationship: Optional[ListType[CodeableConcept]] = Field(
         description="The kind of relationship",
         default=None,
     )
@@ -63,7 +59,7 @@ class PatientContact(BackboneElement):
         description="A name associated with the contact person",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="A contact detail for the person",
         default=None,
     )
@@ -256,19 +252,19 @@ class Patient(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier for this patient",
         default=None,
     )
@@ -281,11 +277,11 @@ class Patient(DomainResource):
         default=None,
         alias="_active",
     )
-    name: Optional[List[HumanName]] = Field(
+    name: Optional[ListType[HumanName]] = Field(
         description="A name associated with the patient",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="A contact detail for the individual",
         default=None,
     )
@@ -325,7 +321,7 @@ class Patient(DomainResource):
         default=None,
         alias="_deceasedDateTime",
     )
-    address: Optional[List[Address]] = Field(
+    address: Optional[ListType[Address]] = Field(
         description="An address for the individual",
         default=None,
     )
@@ -351,19 +347,19 @@ class Patient(DomainResource):
         default=None,
         alias="_multipleBirthInteger",
     )
-    photo: Optional[List[Attachment]] = Field(
+    photo: Optional[ListType[Attachment]] = Field(
         description="Image of the patient",
         default=None,
     )
-    contact: Optional[List[PatientContact]] = Field(
+    contact: Optional[ListType[PatientContact]] = Field(
         description="A contact party (e.g. guardian, partner, friend) for the patient",
         default=None,
     )
-    communication: Optional[List[PatientCommunication]] = Field(
+    communication: Optional[ListType[PatientCommunication]] = Field(
         description="A language which may be used to communicate with the patient about his or her health",
         default=None,
     )
-    generalPractitioner: Optional[List[Reference]] = Field(
+    generalPractitioner: Optional[ListType[Reference]] = Field(
         description="Patient\u0027s nominated primary care provider",
         default=None,
     )
@@ -371,7 +367,7 @@ class Patient(DomainResource):
         description="Organization that is the custodian of the patient record",
         default=None,
     )
-    link: Optional[List[PatientLink]] = Field(
+    link: Optional[ListType[PatientLink]] = Field(
         description="Link to another patient resource that concerns the same actual person",
         default=None,
     )

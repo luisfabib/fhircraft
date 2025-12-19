@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -228,7 +224,7 @@ class RiskEvidenceSynthesisRiskEstimate(BackboneElement):
         alias="_numeratorCount",
     )
     precisionEstimate: Optional[
-        List[RiskEvidenceSynthesisRiskEstimatePrecisionEstimate]
+        ListType[RiskEvidenceSynthesisRiskEstimatePrecisionEstimate]
     ] = Field(
         description="How precise the estimate is",
         default=None,
@@ -282,11 +278,11 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent(BackboneElement):
         description="Type of subcomponent of certainty rating",
         default=None,
     )
-    rating: Optional[List[CodeableConcept]] = Field(
+    rating: Optional[ListType[CodeableConcept]] = Field(
         description="Subcomponent certainty rating",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
@@ -323,16 +319,16 @@ class RiskEvidenceSynthesisCertainty(BackboneElement):
     A description of the certainty of the risk estimate.
     """
 
-    rating: Optional[List[CodeableConcept]] = Field(
+    rating: Optional[ListType[CodeableConcept]] = Field(
         description="Certainty rating",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
     certaintySubcomponent: Optional[
-        List[RiskEvidenceSynthesisCertaintyCertaintySubcomponent]
+        ListType[RiskEvidenceSynthesisCertaintyCertaintySubcomponent]
     ] = Field(
         description="A component that contributes to the overall certainty",
         default=None,
@@ -407,15 +403,15 @@ class RiskEvidenceSynthesis(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -428,7 +424,7 @@ class RiskEvidenceSynthesis(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the risk evidence synthesis",
         default=None,
     )
@@ -486,7 +482,7 @@ class RiskEvidenceSynthesis(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -499,15 +495,15 @@ class RiskEvidenceSynthesis(DomainResource):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for risk evidence synthesis (if applicable)",
         default=None,
     )
@@ -542,27 +538,27 @@ class RiskEvidenceSynthesis(DomainResource):
         description="When the risk evidence synthesis is expected to be used",
         default=None,
     )
-    topic: Optional[List[CodeableConcept]] = Field(
+    topic: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the EffectEvidenceSynthesis, such as Education, Treatment, Assessment, etc.",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc.",
         default=None,
     )
@@ -594,7 +590,7 @@ class RiskEvidenceSynthesis(DomainResource):
         description="What was the estimated risk",
         default=None,
     )
-    certainty: Optional[List[RiskEvidenceSynthesisCertainty]] = Field(
+    certainty: Optional[ListType[RiskEvidenceSynthesisCertainty]] = Field(
         description="How certain is the risk",
         default=None,
     )

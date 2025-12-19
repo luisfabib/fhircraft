@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -161,7 +157,7 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Product or service billing modifiers",
         default=None,
     )
@@ -208,7 +204,7 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         description="Annual or lifetime",
         default=None,
     )
-    benefit: Optional[List[CoverageEligibilityResponseInsuranceItemBenefit]] = Field(
+    benefit: Optional[ListType[CoverageEligibilityResponseInsuranceItemBenefit]] = Field(
         description="Benefit Summary",
         default=None,
     )
@@ -221,7 +217,7 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         default=None,
         alias="_authorizationRequired",
     )
-    authorizationSupporting: Optional[List[CodeableConcept]] = Field(
+    authorizationSupporting: Optional[ListType[CodeableConcept]] = Field(
         description="Type of required supporting materials",
         default=None,
     )
@@ -317,7 +313,7 @@ class CoverageEligibilityResponseInsurance(BackboneElement):
         description="When the benefits are applicable",
         default=None,
     )
-    item: Optional[List[CoverageEligibilityResponseInsuranceItem]] = Field(
+    item: Optional[ListType[CoverageEligibilityResponseInsuranceItem]] = Field(
         description="Benefits and authorization details",
         default=None,
     )
@@ -433,19 +429,19 @@ class CoverageEligibilityResponse(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for coverage eligiblity request",
         default=None,
     )
@@ -458,7 +454,7 @@ class CoverageEligibilityResponse(DomainResource):
         default=None,
         alias="_status",
     )
-    purpose: Optional[List[Code]] = Field(
+    purpose: Optional[ListType[Code]] = Field(
         description="auth-requirements | benefits | discovery | validation",
         default=None,
     )
@@ -523,7 +519,7 @@ class CoverageEligibilityResponse(DomainResource):
         description="Coverage issuer",
         default=None,
     )
-    insurance: Optional[List[CoverageEligibilityResponseInsurance]] = Field(
+    insurance: Optional[ListType[CoverageEligibilityResponseInsurance]] = Field(
         description="Patient insurance information",
         default=None,
     )
@@ -540,7 +536,7 @@ class CoverageEligibilityResponse(DomainResource):
         description="Printed form identifier",
         default=None,
     )
-    error: Optional[List[CoverageEligibilityResponseError]] = Field(
+    error: Optional[ListType[CoverageEligibilityResponseError]] = Field(
         description="Processing errors",
         default=None,
     )

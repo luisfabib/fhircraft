@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -364,19 +360,19 @@ class BiologicallyDerivedProduct(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External ids for this item",
         default=None,
     )
@@ -402,7 +398,7 @@ class BiologicallyDerivedProduct(DomainResource):
         default=None,
         alias="_status",
     )
-    request: Optional[List[Reference]] = Field(
+    request: Optional[ListType[Reference]] = Field(
         description="Procedure request",
         default=None,
     )
@@ -415,7 +411,7 @@ class BiologicallyDerivedProduct(DomainResource):
         default=None,
         alias="_quantity",
     )
-    parent: Optional[List[Reference]] = Field(
+    parent: Optional[ListType[Reference]] = Field(
         description="BiologicallyDerivedProduct parent",
         default=None,
     )
@@ -423,7 +419,7 @@ class BiologicallyDerivedProduct(DomainResource):
         description="How this product was collected",
         default=None,
     )
-    processing: Optional[List[BiologicallyDerivedProductProcessing]] = Field(
+    processing: Optional[ListType[BiologicallyDerivedProductProcessing]] = Field(
         description="Any processing of the product during collection",
         default=None,
     )
@@ -431,7 +427,7 @@ class BiologicallyDerivedProduct(DomainResource):
         description="Any manipulation of product post-collection",
         default=None,
     )
-    storage: Optional[List[BiologicallyDerivedProductStorage]] = Field(
+    storage: Optional[ListType[BiologicallyDerivedProductStorage]] = Field(
         description="Product storage",
         default=None,
     )

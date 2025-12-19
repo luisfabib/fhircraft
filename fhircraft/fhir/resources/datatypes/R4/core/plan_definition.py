@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -146,15 +142,15 @@ class PlanDefinitionGoal(BackboneElement):
         description="When goal pursuit begins",
         default=None,
     )
-    addresses: Optional[List[CodeableConcept]] = Field(
+    addresses: Optional[ListType[CodeableConcept]] = Field(
         description="What does the goal address",
         default=None,
     )
-    documentation: Optional[List[RelatedArtifact]] = Field(
+    documentation: Optional[ListType[RelatedArtifact]] = Field(
         description="Supporting documentation for the goal",
         default=None,
     )
-    target: Optional[List[PlanDefinitionGoalTarget]] = Field(
+    target: Optional[ListType[PlanDefinitionGoalTarget]] = Field(
         description="Target outcome for the goal",
         default=None,
     )
@@ -449,19 +445,19 @@ class PlanDefinitionAction(BackboneElement):
         default=None,
         alias="_priority",
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Code representing the meaning of the action or sub-actions",
         default=None,
     )
-    reason: Optional[List[CodeableConcept]] = Field(
+    reason: Optional[ListType[CodeableConcept]] = Field(
         description="Why the action should be performed",
         default=None,
     )
-    documentation: Optional[List[RelatedArtifact]] = Field(
+    documentation: Optional[ListType[RelatedArtifact]] = Field(
         description="Supporting documentation for the intended performer of the action",
         default=None,
     )
-    goalId: Optional[List[Id]] = Field(
+    goalId: Optional[ListType[Id]] = Field(
         description="What goals this action supports",
         default=None,
     )
@@ -478,23 +474,23 @@ class PlanDefinitionAction(BackboneElement):
         description="Type of individual the action is focused on",
         default=None,
     )
-    trigger: Optional[List[TriggerDefinition]] = Field(
+    trigger: Optional[ListType[TriggerDefinition]] = Field(
         description="When the action should be triggered",
         default=None,
     )
-    condition: Optional[List[PlanDefinitionActionCondition]] = Field(
+    condition: Optional[ListType[PlanDefinitionActionCondition]] = Field(
         description="Whether or not the action is applicable",
         default=None,
     )
-    input: Optional[List[DataRequirement]] = Field(
+    input: Optional[ListType[DataRequirement]] = Field(
         description="Input data requirements",
         default=None,
     )
-    output: Optional[List[DataRequirement]] = Field(
+    output: Optional[ListType[DataRequirement]] = Field(
         description="Output data definition",
         default=None,
     )
-    relatedAction: Optional[List[PlanDefinitionActionRelatedAction]] = Field(
+    relatedAction: Optional[ListType[PlanDefinitionActionRelatedAction]] = Field(
         description="Relationship to another action",
         default=None,
     )
@@ -527,7 +523,7 @@ class PlanDefinitionAction(BackboneElement):
         description="When the action should take place",
         default=None,
     )
-    participant: Optional[List[PlanDefinitionActionParticipant]] = Field(
+    participant: Optional[ListType[PlanDefinitionActionParticipant]] = Field(
         description="Who should participate in the action",
         default=None,
     )
@@ -607,11 +603,11 @@ class PlanDefinitionAction(BackboneElement):
         default=None,
         alias="_transform",
     )
-    dynamicValue: Optional[List[PlanDefinitionActionDynamicValue]] = Field(
+    dynamicValue: Optional[ListType[PlanDefinitionActionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
         default=None,
     )
-    action: Optional[List["PlanDefinitionAction"]] = Field(
+    action: Optional[ListType["PlanDefinitionAction"]] = Field(
         description="A sub-action",
         default=None,
     )
@@ -796,15 +792,15 @@ class PlanDefinition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -817,7 +813,7 @@ class PlanDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the plan definition",
         default=None,
     )
@@ -905,7 +901,7 @@ class PlanDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -918,11 +914,11 @@ class PlanDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for plan definition (if applicable)",
         default=None,
     )
@@ -975,31 +971,31 @@ class PlanDefinition(DomainResource):
         description="When the plan definition is expected to be used",
         default=None,
     )
-    topic: Optional[List[CodeableConcept]] = Field(
+    topic: Optional[ListType[CodeableConcept]] = Field(
         description="E.g. Education, Treatment, Assessment",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations",
         default=None,
     )
-    library: Optional[List[Canonical]] = Field(
+    library: Optional[ListType[Canonical]] = Field(
         description="Logic used by the plan definition",
         default=None,
     )
@@ -1008,11 +1004,11 @@ class PlanDefinition(DomainResource):
         default=None,
         alias="_library",
     )
-    goal: Optional[List[PlanDefinitionGoal]] = Field(
+    goal: Optional[ListType[PlanDefinitionGoal]] = Field(
         description="What the plan is trying to accomplish",
         default=None,
     )
-    action: Optional[List[PlanDefinitionAction]] = Field(
+    action: Optional[ListType[PlanDefinitionAction]] = Field(
         description="Action defined by the plan",
         default=None,
     )

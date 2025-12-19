@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -52,7 +48,7 @@ class SubstanceReferenceInformationGene(BackboneElement):
         description="Todo",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Todo",
         default=None,
     )
@@ -97,7 +93,7 @@ class SubstanceReferenceInformationGeneElement(BackboneElement):
         description="Todo",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Todo",
         default=None,
     )
@@ -142,11 +138,11 @@ class SubstanceReferenceInformationClassification(BackboneElement):
         description="Todo",
         default=None,
     )
-    subtype: Optional[List[CodeableConcept]] = Field(
+    subtype: Optional[ListType[CodeableConcept]] = Field(
         description="Todo",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Todo",
         default=None,
     )
@@ -227,7 +223,7 @@ class SubstanceReferenceInformationTarget(BackboneElement):
         description="Todo",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Todo",
         default=None,
     )
@@ -331,15 +327,15 @@ class SubstanceReferenceInformation(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -352,19 +348,19 @@ class SubstanceReferenceInformation(DomainResource):
         default=None,
         alias="_comment",
     )
-    gene: Optional[List[SubstanceReferenceInformationGene]] = Field(
+    gene: Optional[ListType[SubstanceReferenceInformationGene]] = Field(
         description="Todo",
         default=None,
     )
-    geneElement: Optional[List[SubstanceReferenceInformationGeneElement]] = Field(
+    geneElement: Optional[ListType[SubstanceReferenceInformationGeneElement]] = Field(
         description="Todo",
         default=None,
     )
-    classification: Optional[List[SubstanceReferenceInformationClassification]] = Field(
+    classification: Optional[ListType[SubstanceReferenceInformationClassification]] = Field(
         description="Todo",
         default=None,
     )
-    target: Optional[List[SubstanceReferenceInformationTarget]] = Field(
+    target: Optional[ListType[SubstanceReferenceInformationTarget]] = Field(
         description="Todo",
         default=None,
     )

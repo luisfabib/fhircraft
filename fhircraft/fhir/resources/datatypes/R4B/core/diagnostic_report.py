@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -130,23 +126,23 @@ class DiagnosticReport(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for report",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="What was requested",
         default=None,
     )
@@ -159,7 +155,7 @@ class DiagnosticReport(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Service category",
         default=None,
     )
@@ -197,27 +193,27 @@ class DiagnosticReport(DomainResource):
         default=None,
         alias="_issued",
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Responsible Diagnostic Service",
         default=None,
     )
-    resultsInterpreter: Optional[List[Reference]] = Field(
+    resultsInterpreter: Optional[ListType[Reference]] = Field(
         description="Primary result interpreter",
         default=None,
     )
-    specimen: Optional[List[Reference]] = Field(
+    specimen: Optional[ListType[Reference]] = Field(
         description="Specimens this report is based on",
         default=None,
     )
-    result: Optional[List[Reference]] = Field(
+    result: Optional[ListType[Reference]] = Field(
         description="Observations",
         default=None,
     )
-    imagingStudy: Optional[List[Reference]] = Field(
+    imagingStudy: Optional[ListType[Reference]] = Field(
         description="Reference to full details of imaging associated with the diagnostic report",
         default=None,
     )
-    media: Optional[List[DiagnosticReportMedia]] = Field(
+    media: Optional[ListType[DiagnosticReportMedia]] = Field(
         description="Key images associated with this report",
         default=None,
     )
@@ -230,11 +226,11 @@ class DiagnosticReport(DomainResource):
         default=None,
         alias="_conclusion",
     )
-    conclusionCode: Optional[List[CodeableConcept]] = Field(
+    conclusionCode: Optional[ListType[CodeableConcept]] = Field(
         description="Codes for the clinical conclusion of test results",
         default=None,
     )
-    presentedForm: Optional[List[Attachment]] = Field(
+    presentedForm: Optional[ListType[Attachment]] = Field(
         description="Entire report as issued",
         default=None,
     )

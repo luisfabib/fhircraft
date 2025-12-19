@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -258,7 +254,7 @@ class MolecularSequenceQualityRoc(BackboneElement):
     Receiver Operator Characteristic (ROC) Curve  to give sensitivity/specificity tradeoff.
     """
 
-    score: Optional[List[Integer]] = Field(
+    score: Optional[ListType[Integer]] = Field(
         description="Genotype quality score",
         default=None,
     )
@@ -267,7 +263,7 @@ class MolecularSequenceQualityRoc(BackboneElement):
         default=None,
         alias="_score",
     )
-    numTP: Optional[List[Integer]] = Field(
+    numTP: Optional[ListType[Integer]] = Field(
         description="Roc score true positive numbers",
         default=None,
     )
@@ -276,7 +272,7 @@ class MolecularSequenceQualityRoc(BackboneElement):
         default=None,
         alias="_numTP",
     )
-    numFP: Optional[List[Integer]] = Field(
+    numFP: Optional[ListType[Integer]] = Field(
         description="Roc score false positive numbers",
         default=None,
     )
@@ -285,7 +281,7 @@ class MolecularSequenceQualityRoc(BackboneElement):
         default=None,
         alias="_numFP",
     )
-    numFN: Optional[List[Integer]] = Field(
+    numFN: Optional[ListType[Integer]] = Field(
         description="Roc score false negative numbers",
         default=None,
     )
@@ -294,7 +290,7 @@ class MolecularSequenceQualityRoc(BackboneElement):
         default=None,
         alias="_numFN",
     )
-    precision: Optional[List[Decimal]] = Field(
+    precision: Optional[ListType[Decimal]] = Field(
         description="Precision of the GQ score",
         default=None,
     )
@@ -303,7 +299,7 @@ class MolecularSequenceQualityRoc(BackboneElement):
         default=None,
         alias="_precision",
     )
-    sensitivity: Optional[List[Decimal]] = Field(
+    sensitivity: Optional[ListType[Decimal]] = Field(
         description="Sensitivity of the GQ score",
         default=None,
     )
@@ -312,7 +308,7 @@ class MolecularSequenceQualityRoc(BackboneElement):
         default=None,
         alias="_sensitivity",
     )
-    fMeasure: Optional[List[Decimal]] = Field(
+    fMeasure: Optional[ListType[Decimal]] = Field(
         description="FScore of the GQ score",
         default=None,
     )
@@ -848,19 +844,19 @@ class MolecularSequence(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique ID for this particular sequence. This is a FHIR-defined id",
         default=None,
     )
@@ -906,7 +902,7 @@ class MolecularSequence(DomainResource):
         description="A sequence used as reference",
         default=None,
     )
-    variant: Optional[List[MolecularSequenceVariant]] = Field(
+    variant: Optional[ListType[MolecularSequenceVariant]] = Field(
         description="Variant in sequence",
         default=None,
     )
@@ -919,7 +915,7 @@ class MolecularSequence(DomainResource):
         default=None,
         alias="_observedSeq",
     )
-    quality: Optional[List[MolecularSequenceQuality]] = Field(
+    quality: Optional[ListType[MolecularSequenceQuality]] = Field(
         description="An set of value as quality of sequence",
         default=None,
     )
@@ -932,15 +928,15 @@ class MolecularSequence(DomainResource):
         default=None,
         alias="_readCoverage",
     )
-    repository: Optional[List[MolecularSequenceRepository]] = Field(
+    repository: Optional[ListType[MolecularSequenceRepository]] = Field(
         description="External repository which contains detailed report related with observedSeq in this resource",
         default=None,
     )
-    pointer: Optional[List[Reference]] = Field(
+    pointer: Optional[ListType[Reference]] = Field(
         description="Pointer to next atomic sequence",
         default=None,
     )
-    structureVariant: Optional[List[MolecularSequenceStructureVariant]] = Field(
+    structureVariant: Optional[ListType[MolecularSequenceStructureVariant]] = Field(
         description="Structural variant",
         default=None,
     )

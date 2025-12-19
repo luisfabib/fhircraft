@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -132,19 +128,19 @@ class MedicinalProductContraindication(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="The medication for which this is an indication",
         default=None,
     )
@@ -156,19 +152,19 @@ class MedicinalProductContraindication(DomainResource):
         description="The status of the disease or symptom for the contraindication",
         default=None,
     )
-    comorbidity: Optional[List[CodeableConcept]] = Field(
+    comorbidity: Optional[ListType[CodeableConcept]] = Field(
         description="A comorbidity (concurrent condition) or coinfection",
         default=None,
     )
-    therapeuticIndication: Optional[List[Reference]] = Field(
+    therapeuticIndication: Optional[ListType[Reference]] = Field(
         description="Information about the use of the medicinal product in relation to other therapies as part of the indication",
         default=None,
     )
-    otherTherapy: Optional[List[MedicinalProductContraindicationOtherTherapy]] = Field(
+    otherTherapy: Optional[ListType[MedicinalProductContraindicationOtherTherapy]] = Field(
         description="Information about the use of the medicinal product in relation to other therapies described as part of the indication",
         default=None,
     )
-    population: Optional[List[Population]] = Field(
+    population: Optional[ListType[Population]] = Field(
         description="The population group to which this applies",
         default=None,
     )

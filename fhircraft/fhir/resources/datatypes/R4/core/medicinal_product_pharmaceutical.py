@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -140,7 +136,7 @@ class MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpecies(BackboneE
         default=None,
     )
     withdrawalPeriod: Optional[
-        List[
+        ListType[
             MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpeciesWithdrawalPeriod
         ]
     ] = Field(
@@ -202,7 +198,7 @@ class MedicinalProductPharmaceuticalRouteOfAdministration(BackboneElement):
         default=None,
     )
     targetSpecies: Optional[
-        List[MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpecies]
+        ListType[MedicinalProductPharmaceuticalRouteOfAdministrationTargetSpecies]
     ] = Field(
         description="A species for which this route applies",
         default=None,
@@ -291,19 +287,19 @@ class MedicinalProductPharmaceutical(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier for the pharmaceutical medicinal product",
         default=None,
     )
@@ -315,22 +311,22 @@ class MedicinalProductPharmaceutical(DomainResource):
         description="Todo",
         default=None,
     )
-    ingredient: Optional[List[Reference]] = Field(
+    ingredient: Optional[ListType[Reference]] = Field(
         description="Ingredient",
         default=None,
     )
-    device: Optional[List[Reference]] = Field(
+    device: Optional[ListType[Reference]] = Field(
         description="Accompanying device",
         default=None,
     )
-    characteristics: Optional[List[MedicinalProductPharmaceuticalCharacteristics]] = (
+    characteristics: Optional[ListType[MedicinalProductPharmaceuticalCharacteristics]] = (
         Field(
             description="Characteristics e.g. a products onset of action",
             default=None,
         )
     )
     routeOfAdministration: Optional[
-        List[MedicinalProductPharmaceuticalRouteOfAdministration]
+        ListType[MedicinalProductPharmaceuticalRouteOfAdministration]
     ] = Field(
         description="The path by which the pharmaceutical product is taken into or makes contact with the body",
         default=None,

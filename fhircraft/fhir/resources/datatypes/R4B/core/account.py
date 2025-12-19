@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -179,19 +175,19 @@ class Account(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Account number",
         default=None,
     )
@@ -217,7 +213,7 @@ class Account(DomainResource):
         default=None,
         alias="_name",
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="The entity that caused the expenses",
         default=None,
     )
@@ -225,7 +221,7 @@ class Account(DomainResource):
         description="Transaction window",
         default=None,
     )
-    coverage: Optional[List[AccountCoverage]] = Field(
+    coverage: Optional[ListType[AccountCoverage]] = Field(
         description="The party(s) that are responsible for covering the payment of this account, and what order should they be applied to the account",
         default=None,
     )
@@ -242,7 +238,7 @@ class Account(DomainResource):
         default=None,
         alias="_description",
     )
-    guarantor: Optional[List[AccountGuarantor]] = Field(
+    guarantor: Optional[ListType[AccountGuarantor]] = Field(
         description="The parties ultimately responsible for balancing the Account",
         default=None,
     )

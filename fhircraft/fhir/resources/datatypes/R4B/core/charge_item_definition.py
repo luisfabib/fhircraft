@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -238,13 +234,13 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
     Group of properties which are applicable under the same conditions. If no applicability rules are established for the group, then all properties always apply.
     """
 
-    applicability: Optional[List[ChargeItemDefinitionPropertyGroupApplicability]] = (
+    applicability: Optional[ListType[ChargeItemDefinitionPropertyGroupApplicability]] = (
         Field(
             description="Conditions under which the priceComponent is applicable",
             default=None,
         )
     )
-    priceComponent: Optional[List[ChargeItemDefinitionPropertyGroupPriceComponent]] = (
+    priceComponent: Optional[ListType[ChargeItemDefinitionPropertyGroupPriceComponent]] = (
         Field(
             description="Components of total line item price",
             default=None,
@@ -317,15 +313,15 @@ class ChargeItemDefinition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -338,7 +334,7 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the charge item definition",
         default=None,
     )
@@ -360,7 +356,7 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_title",
     )
-    derivedFromUri: Optional[List[Uri]] = Field(
+    derivedFromUri: Optional[ListType[Uri]] = Field(
         description="Underlying externally-defined charge item definition",
         default=None,
     )
@@ -369,7 +365,7 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_derivedFromUri",
     )
-    partOf: Optional[List[Canonical]] = Field(
+    partOf: Optional[ListType[Canonical]] = Field(
         description="A larger definition of which this particular definition is a component or step",
         default=None,
     )
@@ -378,7 +374,7 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_partOf",
     )
-    replaces: Optional[List[Canonical]] = Field(
+    replaces: Optional[ListType[Canonical]] = Field(
         description="Completed or terminated request(s) whose function is taken by this new request",
         default=None,
     )
@@ -423,7 +419,7 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -436,11 +432,11 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for charge item definition (if applicable)",
         default=None,
     )
@@ -479,15 +475,15 @@ class ChargeItemDefinition(DomainResource):
         description="Billing codes or product types this definition applies to",
         default=None,
     )
-    instance: Optional[List[Reference]] = Field(
+    instance: Optional[ListType[Reference]] = Field(
         description="Instances this definition applies to",
         default=None,
     )
-    applicability: Optional[List[ChargeItemDefinitionApplicability]] = Field(
+    applicability: Optional[ListType[ChargeItemDefinitionApplicability]] = Field(
         description="Whether or not the billing code is applicable",
         default=None,
     )
-    propertyGroup: Optional[List[ChargeItemDefinitionPropertyGroup]] = Field(
+    propertyGroup: Optional[ListType[ChargeItemDefinitionPropertyGroup]] = Field(
         description="Group of properties which are applicable under the same conditions",
         default=None,
     )

@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -444,7 +440,7 @@ class QuestionnaireItem(BackboneElement):
         default=None,
         alias="_definition",
     )
-    code: Optional[List[Coding]] = Field(
+    code: Optional[ListType[Coding]] = Field(
         description="Corresponding concept for this item in a terminology",
         default=None,
     )
@@ -475,7 +471,7 @@ class QuestionnaireItem(BackboneElement):
         default=None,
         alias="_type",
     )
-    enableWhen: Optional[List[QuestionnaireItemEnableWhen]] = Field(
+    enableWhen: Optional[ListType[QuestionnaireItemEnableWhen]] = Field(
         description="Only allow data when",
         default=None,
     )
@@ -533,15 +529,15 @@ class QuestionnaireItem(BackboneElement):
         default=None,
         alias="_answerValueSet",
     )
-    answerOption: Optional[List[QuestionnaireItemAnswerOption]] = Field(
+    answerOption: Optional[ListType[QuestionnaireItemAnswerOption]] = Field(
         description="Permitted answer",
         default=None,
     )
-    initial: Optional[List[QuestionnaireItemInitial]] = Field(
+    initial: Optional[ListType[QuestionnaireItemInitial]] = Field(
         description="Initial value(s) when item is first rendered",
         default=None,
     )
-    item: Optional[List["QuestionnaireItem"]] = Field(
+    item: Optional[ListType["QuestionnaireItem"]] = Field(
         description="Nested questionnaire items",
         default=None,
     )
@@ -666,15 +662,15 @@ class Questionnaire(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -687,7 +683,7 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the questionnaire",
         default=None,
     )
@@ -718,7 +714,7 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_title",
     )
-    derivedFrom: Optional[List[Canonical]] = Field(
+    derivedFrom: Optional[ListType[Canonical]] = Field(
         description="Instantiates protocol or definition",
         default=None,
     )
@@ -745,7 +741,7 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_experimental",
     )
-    subjectType: Optional[List[Code]] = Field(
+    subjectType: Optional[ListType[Code]] = Field(
         description="Resource that can be subject of QuestionnaireResponse",
         default=None,
     )
@@ -772,7 +768,7 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -785,11 +781,11 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for questionnaire (if applicable)",
         default=None,
     )
@@ -833,11 +829,11 @@ class Questionnaire(DomainResource):
         description="When the questionnaire is expected to be used",
         default=None,
     )
-    code: Optional[List[Coding]] = Field(
+    code: Optional[ListType[Coding]] = Field(
         description="Concept that represents the overall questionnaire",
         default=None,
     )
-    item: Optional[List[QuestionnaireItem]] = Field(
+    item: Optional[ListType[QuestionnaireItem]] = Field(
         description="Questions and sections within the Questionnaire",
         default=None,
     )

@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -213,7 +209,7 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         description="Location of the resource",
         default=None,
     )
-    fhirVersion: Optional[List[Code]] = Field(
+    fhirVersion: Optional[ListType[Code]] = Field(
         description="Versions this applies to (if different to IG)",
         default=None,
     )
@@ -353,7 +349,7 @@ class ImplementationGuideDefinitionPage(BackboneElement):
         default=None,
         alias="_generation",
     )
-    page: Optional[List["ImplementationGuideDefinitionPage"]] = Field(
+    page: Optional[ListType["ImplementationGuideDefinitionPage"]] = Field(
         description="Nested Pages / Sections",
         default=None,
     )
@@ -514,11 +510,11 @@ class ImplementationGuideDefinition(BackboneElement):
     The information needed by an IG publisher tool to publish the whole implementation guide.
     """
 
-    grouping: Optional[List[ImplementationGuideDefinitionGrouping]] = Field(
+    grouping: Optional[ListType[ImplementationGuideDefinitionGrouping]] = Field(
         description="Grouping used to present related resources in the IG",
         default=None,
     )
-    resource: Optional[List[ImplementationGuideDefinitionResource]] = Field(
+    resource: Optional[ListType[ImplementationGuideDefinitionResource]] = Field(
         description="Resource in the implementation guide",
         default=None,
     )
@@ -526,11 +522,11 @@ class ImplementationGuideDefinition(BackboneElement):
         description="Page/Section in the Guide",
         default=None,
     )
-    parameter: Optional[List[ImplementationGuideDefinitionParameter]] = Field(
+    parameter: Optional[ListType[ImplementationGuideDefinitionParameter]] = Field(
         description="Defines how IG is built by tools",
         default=None,
     )
-    template: Optional[List[ImplementationGuideDefinitionTemplate]] = Field(
+    template: Optional[ListType[ImplementationGuideDefinitionTemplate]] = Field(
         description="A template for building resources",
         default=None,
     )
@@ -668,7 +664,7 @@ class ImplementationGuideManifestPage(BackboneElement):
         default=None,
         alias="_title",
     )
-    anchor: Optional[List[String]] = Field(
+    anchor: Optional[ListType[String]] = Field(
         description="Anchor available on the page",
         default=None,
     )
@@ -719,15 +715,15 @@ class ImplementationGuideManifest(BackboneElement):
         default=None,
         alias="_rendering",
     )
-    resource: Optional[List[ImplementationGuideManifestResource]] = Field(
+    resource: Optional[ListType[ImplementationGuideManifestResource]] = Field(
         description="Resource in the implementation guide",
         default=None,
     )
-    page: Optional[List[ImplementationGuideManifestPage]] = Field(
+    page: Optional[ListType[ImplementationGuideManifestPage]] = Field(
         description="HTML page within the parent IG",
         default=None,
     )
-    image: Optional[List[String]] = Field(
+    image: Optional[ListType[String]] = Field(
         description="Image within the IG",
         default=None,
     )
@@ -736,7 +732,7 @@ class ImplementationGuideManifest(BackboneElement):
         default=None,
         alias="_image",
     )
-    other: Optional[List[String]] = Field(
+    other: Optional[ListType[String]] = Field(
         description="Additional linkable file in IG",
         default=None,
     )
@@ -821,15 +817,15 @@ class ImplementationGuide(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -905,7 +901,7 @@ class ImplementationGuide(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -918,11 +914,11 @@ class ImplementationGuide(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for implementation guide (if applicable)",
         default=None,
     )
@@ -953,7 +949,7 @@ class ImplementationGuide(DomainResource):
         default=None,
         alias="_license",
     )
-    fhirVersion: Optional[List[Code]] = Field(
+    fhirVersion: Optional[ListType[Code]] = Field(
         description="FHIR Version(s) this Implementation Guide targets",
         default=None,
     )
@@ -962,11 +958,11 @@ class ImplementationGuide(DomainResource):
         default=None,
         alias="_fhirVersion",
     )
-    dependsOn: Optional[List[ImplementationGuideDependsOn]] = Field(
+    dependsOn: Optional[ListType[ImplementationGuideDependsOn]] = Field(
         description="Another Implementation guide this depends on",
         default=None,
     )
-    global_: Optional[List[ImplementationGuideGlobal]] = Field(
+    global_: Optional[ListType[ImplementationGuideGlobal]] = Field(
         description="Profiles that apply globally",
         default=None,
     )

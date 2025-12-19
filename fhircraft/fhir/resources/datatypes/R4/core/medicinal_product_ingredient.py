@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
@@ -66,7 +62,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
         default=None,
         alias="_measurementPoint",
     )
-    country: Optional[List[CodeableConcept]] = Field(
+    country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
         default=None,
     )
@@ -134,12 +130,12 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
         default=None,
         alias="_measurementPoint",
     )
-    country: Optional[List[CodeableConcept]] = Field(
+    country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
         default=None,
     )
     referenceStrength: Optional[
-        List[MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength]
+        ListType[MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength]
     ] = Field(
         description="Strength expressed in terms of a reference substance",
         default=None,
@@ -201,7 +197,7 @@ class MedicinalProductIngredientSpecifiedSubstance(BackboneElement):
         description="Confidentiality level of the specified substance as the ingredient",
         default=None,
     )
-    strength: Optional[List[MedicinalProductIngredientSpecifiedSubstanceStrength]] = (
+    strength: Optional[ListType[MedicinalProductIngredientSpecifiedSubstanceStrength]] = (
         Field(
             description="Quantity of the substance or specified substance present in the manufactured item or pharmaceutical product",
             default=None,
@@ -266,7 +262,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
         default=None,
         alias="_measurementPoint",
     )
-    country: Optional[List[CodeableConcept]] = Field(
+    country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
         default=None,
     )
@@ -334,12 +330,12 @@ class MedicinalProductIngredientSubstanceStrength(BackboneElement):
         default=None,
         alias="_measurementPoint",
     )
-    country: Optional[List[CodeableConcept]] = Field(
+    country: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries for which the strength range applies",
         default=None,
     )
     referenceStrength: Optional[
-        List[MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength]
+        ListType[MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength]
     ] = Field(
         description="Strength expressed in terms of a reference substance",
         default=None,
@@ -393,7 +389,7 @@ class MedicinalProductIngredientSubstance(BackboneElement):
         description="The ingredient substance",
         default=None,
     )
-    strength: Optional[List[MedicinalProductIngredientSubstanceStrength]] = Field(
+    strength: Optional[ListType[MedicinalProductIngredientSubstanceStrength]] = Field(
         description="Quantity of the substance or specified substance present in the manufactured item or pharmaceutical product",
         default=None,
     )
@@ -466,15 +462,15 @@ class MedicinalProductIngredient(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -495,11 +491,11 @@ class MedicinalProductIngredient(DomainResource):
         default=None,
         alias="_allergenicIndicator",
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this Ingredient",
         default=None,
     )
-    specifiedSubstance: Optional[List[MedicinalProductIngredientSpecifiedSubstance]] = (
+    specifiedSubstance: Optional[ListType[MedicinalProductIngredientSpecifiedSubstance]] = (
         Field(
             description="A specified substance that comprises this ingredient",
             default=None,

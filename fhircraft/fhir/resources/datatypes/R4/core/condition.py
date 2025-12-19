@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -50,7 +46,7 @@ class ConditionStage(BackboneElement):
         description="Simple summary (disease specific)",
         default=None,
     )
-    assessment: Optional[List[Reference]] = Field(
+    assessment: Optional[ListType[Reference]] = Field(
         description="Formal record of assessment",
         default=None,
     )
@@ -91,11 +87,11 @@ class ConditionEvidence(BackboneElement):
     Supporting evidence / manifestations that are the basis of the Condition's verification status, such as evidence that confirmed or refuted the condition.
     """
 
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Manifestation/symptom",
         default=None,
     )
-    detail: Optional[List[Reference]] = Field(
+    detail: Optional[ListType[Reference]] = Field(
         description="Supporting information found elsewhere",
         default=None,
     )
@@ -166,19 +162,19 @@ class Condition(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this condition",
         default=None,
     )
@@ -190,7 +186,7 @@ class Condition(DomainResource):
         description="unconfirmed | provisional | differential | confirmed | refuted | entered-in-error",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="problem-list-item | encounter-diagnosis",
         default=None,
     )
@@ -202,7 +198,7 @@ class Condition(DomainResource):
         description="Identification of the condition, problem or diagnosis",
         default=None,
     )
-    bodySite: Optional[List[CodeableConcept]] = Field(
+    bodySite: Optional[ListType[CodeableConcept]] = Field(
         description="Anatomical location, if relevant",
         default=None,
     )
@@ -291,15 +287,15 @@ class Condition(DomainResource):
         description="Person who asserts this condition",
         default=None,
     )
-    stage: Optional[List[ConditionStage]] = Field(
+    stage: Optional[ListType[ConditionStage]] = Field(
         description="Stage/grade, usually assessed formally",
         default=None,
     )
-    evidence: Optional[List[ConditionEvidence]] = Field(
+    evidence: Optional[ListType[ConditionEvidence]] = Field(
         description="Supporting evidence",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional information about the Condition",
         default=None,
     )

@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -53,11 +49,11 @@ class VerificationResultPrimarySource(BackboneElement):
         description="Reference to the primary source",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type of primary source (License Board; Primary Education; Continuing Education; Postal Service; Relationship owner; Registration Authority; legal source; issuing source; authoritative source)",
         default=None,
     )
-    communicationMethod: Optional[List[CodeableConcept]] = Field(
+    communicationMethod: Optional[ListType[CodeableConcept]] = Field(
         description="Method for exchanging information with the primary source",
         default=None,
     )
@@ -78,7 +74,7 @@ class VerificationResultPrimarySource(BackboneElement):
         description="yes | no | undetermined",
         default=None,
     )
-    pushTypeAvailable: Optional[List[CodeableConcept]] = Field(
+    pushTypeAvailable: Optional[ListType[CodeableConcept]] = Field(
         description="specific | any | source",
         default=None,
     )
@@ -309,23 +305,23 @@ class VerificationResult(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    target: Optional[List[Reference]] = Field(
+    target: Optional[ListType[Reference]] = Field(
         description="A resource that was validated",
         default=None,
     )
-    targetLocation: Optional[List[String]] = Field(
+    targetLocation: Optional[ListType[String]] = Field(
         description="The fhirpath location(s) within the resource that was validated",
         default=None,
     )
@@ -360,7 +356,7 @@ class VerificationResult(DomainResource):
         description="nothing | primary | multiple",
         default=None,
     )
-    validationProcess: Optional[List[CodeableConcept]] = Field(
+    validationProcess: Optional[ListType[CodeableConcept]] = Field(
         description="The primary process by which the target is validated (edit check; value set; primary source; multiple sources; standalone; in context)",
         default=None,
     )
@@ -390,7 +386,7 @@ class VerificationResult(DomainResource):
         description="fatal | warn | rec-only | none",
         default=None,
     )
-    primarySource: Optional[List[VerificationResultPrimarySource]] = Field(
+    primarySource: Optional[ListType[VerificationResultPrimarySource]] = Field(
         description="Information about the primary source(s) involved in validation",
         default=None,
     )
@@ -398,7 +394,7 @@ class VerificationResult(DomainResource):
         description="Information about the entity attesting to information",
         default=None,
     )
-    validator: Optional[List[VerificationResultValidator]] = Field(
+    validator: Optional[ListType[VerificationResultValidator]] = Field(
         description="Information about the entity validating information",
         default=None,
     )

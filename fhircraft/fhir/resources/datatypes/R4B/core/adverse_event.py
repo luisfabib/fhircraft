@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -103,7 +99,7 @@ class AdverseEventSuspectEntity(BackboneElement):
         description="Refers to the specific entity that caused the adverse event",
         default=None,
     )
-    causality: Optional[List[AdverseEventSuspectEntityCausality]] = Field(
+    causality: Optional[ListType[AdverseEventSuspectEntityCausality]] = Field(
         description="Information on the possible cause of the event",
         default=None,
     )
@@ -174,15 +170,15 @@ class AdverseEvent(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -199,7 +195,7 @@ class AdverseEvent(DomainResource):
         default=None,
         alias="_actuality",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="product-problem | product-quality | product-use-error | wrong-dose | incorrect-prescribing-information | wrong-technique | wrong-route-of-administration | wrong-rate | wrong-duration | wrong-time | expired-drug | medical-device-use-error | problem-different-manufacturer | unsafe-physical-environment",
         default=None,
     )
@@ -242,7 +238,7 @@ class AdverseEvent(DomainResource):
         default=None,
         alias="_recordedDate",
     )
-    resultingCondition: Optional[List[Reference]] = Field(
+    resultingCondition: Optional[ListType[Reference]] = Field(
         description="Effect on the subject due to this event",
         default=None,
     )
@@ -266,23 +262,23 @@ class AdverseEvent(DomainResource):
         description="Who recorded the adverse event",
         default=None,
     )
-    contributor: Optional[List[Reference]] = Field(
+    contributor: Optional[ListType[Reference]] = Field(
         description="Who  was involved in the adverse event or the potential adverse event",
         default=None,
     )
-    suspectEntity: Optional[List[AdverseEventSuspectEntity]] = Field(
+    suspectEntity: Optional[ListType[AdverseEventSuspectEntity]] = Field(
         description="The suspected agent causing the adverse event",
         default=None,
     )
-    subjectMedicalHistory: Optional[List[Reference]] = Field(
+    subjectMedicalHistory: Optional[ListType[Reference]] = Field(
         description="AdverseEvent.subjectMedicalHistory",
         default=None,
     )
-    referenceDocument: Optional[List[Reference]] = Field(
+    referenceDocument: Optional[ListType[Reference]] = Field(
         description="AdverseEvent.referenceDocument",
         default=None,
     )
-    study: Optional[List[Reference]] = Field(
+    study: Optional[ListType[Reference]] = Field(
         description="AdverseEvent.study",
         default=None,
     )

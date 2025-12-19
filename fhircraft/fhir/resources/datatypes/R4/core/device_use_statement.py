@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -81,23 +77,23 @@ class DeviceUseStatement(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifier for this record",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal or order",
         default=None,
     )
@@ -114,7 +110,7 @@ class DeviceUseStatement(DomainResource):
         description="Patient using device",
         default=None,
     )
-    derivedFrom: Optional[List[Reference]] = Field(
+    derivedFrom: Optional[ListType[Reference]] = Field(
         description="Supporting information",
         default=None,
     )
@@ -152,11 +148,11 @@ class DeviceUseStatement(DomainResource):
         description="Reference to device used",
         default=None,
     )
-    reasonCode: Optional[List[CodeableConcept]] = Field(
+    reasonCode: Optional[ListType[CodeableConcept]] = Field(
         description="Why device was used",
         default=None,
     )
-    reasonReference: Optional[List[Reference]] = Field(
+    reasonReference: Optional[ListType[Reference]] = Field(
         description="Why was DeviceUseStatement performed?",
         default=None,
     )
@@ -164,7 +160,7 @@ class DeviceUseStatement(DomainResource):
         description="Target body site",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Addition details (comments, instructions)",
         default=None,
     )

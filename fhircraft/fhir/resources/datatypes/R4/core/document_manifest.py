@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -117,15 +113,15 @@ class DocumentManifest(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -133,7 +129,7 @@ class DocumentManifest(DomainResource):
         description="Unique Identifier for the set of documents",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Other identifiers for the manifest",
         default=None,
     )
@@ -163,11 +159,11 @@ class DocumentManifest(DomainResource):
         default=None,
         alias="_created",
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the DocumentManifest",
         default=None,
     )
-    recipient: Optional[List[Reference]] = Field(
+    recipient: Optional[ListType[Reference]] = Field(
         description="Intended to get notified about this set of documents",
         default=None,
     )
@@ -189,11 +185,11 @@ class DocumentManifest(DomainResource):
         default=None,
         alias="_description",
     )
-    content: Optional[List[Reference]] = Field(
+    content: Optional[ListType[Reference]] = Field(
         description="Items in manifest",
         default=None,
     )
-    related: Optional[List[DocumentManifestRelated]] = Field(
+    related: Optional[ListType[DocumentManifestRelated]] = Field(
         description="Related things",
         default=None,
     )

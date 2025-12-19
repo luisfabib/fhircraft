@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -102,7 +98,7 @@ class AuditEventAgent(BackboneElement):
         description="How agent participated",
         default=None,
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="Agent role in the event",
         default=None,
     )
@@ -141,7 +137,7 @@ class AuditEventAgent(BackboneElement):
         description="Where",
         default=None,
     )
-    policy: Optional[List[Uri]] = Field(
+    policy: Optional[ListType[Uri]] = Field(
         description="Policy that authorized event",
         default=None,
     )
@@ -158,7 +154,7 @@ class AuditEventAgent(BackboneElement):
         description="Logical network location for application activity",
         default=None,
     )
-    purposeOfUse: Optional[List[CodeableConcept]] = Field(
+    purposeOfUse: Optional[ListType[CodeableConcept]] = Field(
         description="Reason given for this user",
         default=None,
     )
@@ -232,7 +228,7 @@ class AuditEventSource(BackboneElement):
         description="The identity of source detecting the event",
         default=None,
     )
-    type: Optional[List[Coding]] = Field(
+    type: Optional[ListType[Coding]] = Field(
         description="The type of source where event originated",
         default=None,
     )
@@ -349,7 +345,7 @@ class AuditEventEntity(BackboneElement):
         description="Life-cycle stage for the entity",
         default=None,
     )
-    securityLabel: Optional[List[Coding]] = Field(
+    securityLabel: Optional[ListType[Coding]] = Field(
         description="Security labels on the entity",
         default=None,
     )
@@ -380,7 +376,7 @@ class AuditEventEntity(BackboneElement):
         default=None,
         alias="_query",
     )
-    detail: Optional[List[AuditEventEntityDetail]] = Field(
+    detail: Optional[ListType[AuditEventEntityDetail]] = Field(
         description="Additional Information about the entity",
         default=None,
     )
@@ -472,15 +468,15 @@ class AuditEvent(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -488,7 +484,7 @@ class AuditEvent(DomainResource):
         description="Type/identifier of event",
         default=None,
     )
-    subtype: Optional[List[Coding]] = Field(
+    subtype: Optional[ListType[Coding]] = Field(
         description="More specific type/id for the event",
         default=None,
     )
@@ -532,11 +528,11 @@ class AuditEvent(DomainResource):
         default=None,
         alias="_outcomeDesc",
     )
-    purposeOfEvent: Optional[List[CodeableConcept]] = Field(
+    purposeOfEvent: Optional[ListType[CodeableConcept]] = Field(
         description="The purposeOfUse of the event",
         default=None,
     )
-    agent: Optional[List[AuditEventAgent]] = Field(
+    agent: Optional[ListType[AuditEventAgent]] = Field(
         description="Actor involved in the event",
         default=None,
     )
@@ -544,7 +540,7 @@ class AuditEvent(DomainResource):
         description="Audit Event Reporter",
         default=None,
     )
-    entity: Optional[List[AuditEventEntity]] = Field(
+    entity: Optional[ListType[AuditEventEntity]] = Field(
         description="Data or objects used",
         default=None,
     )

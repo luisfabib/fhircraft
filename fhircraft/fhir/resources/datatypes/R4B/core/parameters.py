@@ -18,7 +18,7 @@ NoneType = type(None)
 
 # Dynamic modules
 
-from typing import List, Literal, Optional
+from typing import List as ListType, Literal, Optional
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import (
@@ -394,7 +394,7 @@ class ParametersParameter(BackboneElement):
         description="If parameter is a whole resource",
         default=None,
     )
-    part: Optional[List["ParametersParameter"]] = Field(
+    part: Optional[ListType["ParametersParameter"]] = Field(
         description="Named part of a multi-part parameter",
         default=None,
     )
@@ -526,7 +526,7 @@ class Parameters(Resource):
         default=None,
         alias="_language",
     )
-    parameter: Optional[List[ParametersParameter]] = Field(
+    parameter: Optional[ListType[ParametersParameter]] = Field(
         description="Operation Parameter",
         default=None,
     )

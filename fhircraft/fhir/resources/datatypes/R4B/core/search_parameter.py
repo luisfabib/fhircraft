@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -135,15 +131,15 @@ class SearchParameter(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
@@ -219,7 +215,7 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -232,11 +228,11 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for search parameter (if applicable)",
         default=None,
     )
@@ -258,7 +254,7 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_code",
     )
-    base: Optional[List[Code]] = Field(
+    base: Optional[ListType[Code]] = Field(
         description="The resource type(s) this search parameter applies to",
         default=None,
     )
@@ -303,7 +299,7 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_xpathUsage",
     )
-    target: Optional[List[Code]] = Field(
+    target: Optional[ListType[Code]] = Field(
         description="Types of resource (if a resource reference)",
         default=None,
     )
@@ -330,7 +326,7 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_multipleAnd",
     )
-    comparator: Optional[List[Code]] = Field(
+    comparator: Optional[ListType[Code]] = Field(
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
@@ -339,7 +335,7 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_comparator",
     )
-    modifier: Optional[List[Code]] = Field(
+    modifier: Optional[ListType[Code]] = Field(
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | ofType",
         default=None,
     )
@@ -348,7 +344,7 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_modifier",
     )
-    chain: Optional[List[String]] = Field(
+    chain: Optional[ListType[String]] = Field(
         description="Chained names supported",
         default=None,
     )
@@ -357,7 +353,7 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_chain",
     )
-    component: Optional[List[SearchParameterComponent]] = Field(
+    component: Optional[ListType[SearchParameterComponent]] = Field(
         description="For Composite resources to define the parts",
         default=None,
     )

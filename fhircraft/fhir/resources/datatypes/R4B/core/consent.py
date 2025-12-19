@@ -1,8 +1,4 @@
 # Fhircraft modules
-import fhircraft
-from fhircraft.utils import model_rebuild_all
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.fhir.resources.base import FHIRBaseModel
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
@@ -19,7 +15,7 @@ NoneType = type(None)
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from typing import Optional, List, Literal
+from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -248,27 +244,27 @@ class ConsentProvision(BackboneElement):
         description="Timeframe for this rule",
         default=None,
     )
-    actor: Optional[List[ConsentProvisionActor]] = Field(
+    actor: Optional[ListType[ConsentProvisionActor]] = Field(
         description="Who|what controlled by this rule (or group, by role)",
         default=None,
     )
-    action: Optional[List[CodeableConcept]] = Field(
+    action: Optional[ListType[CodeableConcept]] = Field(
         description="Actions controlled by this rule",
         default=None,
     )
-    securityLabel: Optional[List[Coding]] = Field(
+    securityLabel: Optional[ListType[Coding]] = Field(
         description="Security Labels that define affected resources",
         default=None,
     )
-    purpose: Optional[List[Coding]] = Field(
+    purpose: Optional[ListType[Coding]] = Field(
         description="Context of activities covered by this rule",
         default=None,
     )
-    class_: Optional[List[Coding]] = Field(
+    class_: Optional[ListType[Coding]] = Field(
         description="e.g. Resource Type, Profile, CDA, etc.",
         default=None,
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="e.g. LOINC or SNOMED CT code, etc. in the content",
         default=None,
     )
@@ -276,11 +272,11 @@ class ConsentProvision(BackboneElement):
         description="Timeframe for data controlled by this rule",
         default=None,
     )
-    data: Optional[List[ConsentProvisionData]] = Field(
+    data: Optional[ListType[ConsentProvisionData]] = Field(
         description="Data controlled by this rule",
         default=None,
     )
-    provision: Optional[List["ConsentProvision"]] = Field(
+    provision: Optional[ListType["ConsentProvision"]] = Field(
         description="Nested Exception Rules",
         default=None,
     )
@@ -378,19 +374,19 @@ class Consent(DomainResource):
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[List[Resource]] = Field(
+    contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[List[Extension]] = Field(
+    extension: Optional[ListType[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[List[Extension]] = Field(
+    modifierExtension: Optional[ListType[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier for this record (external references)",
         default=None,
     )
@@ -407,7 +403,7 @@ class Consent(DomainResource):
         description="Which of the four areas this resource covers (extensible)",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of the consent statement - for indexing/retrieval",
         default=None,
     )
@@ -424,11 +420,11 @@ class Consent(DomainResource):
         default=None,
         alias="_dateTime",
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Who is agreeing to the policy and rules",
         default=None,
     )
-    organization: Optional[List[Reference]] = Field(
+    organization: Optional[ListType[Reference]] = Field(
         description="Custodian of the consent",
         default=None,
     )
@@ -440,7 +436,7 @@ class Consent(DomainResource):
         description="Source from which this consent is taken",
         default=None,
     )
-    policy: Optional[List[ConsentPolicy]] = Field(
+    policy: Optional[ListType[ConsentPolicy]] = Field(
         description="Policies covered by this consent",
         default=None,
     )
@@ -448,7 +444,7 @@ class Consent(DomainResource):
         description="Regulation that this consents to",
         default=None,
     )
-    verification: Optional[List[ConsentVerification]] = Field(
+    verification: Optional[ListType[ConsentVerification]] = Field(
         description="Consent Verified by patient or family",
         default=None,
     )
