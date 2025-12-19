@@ -60,11 +60,6 @@ def get_config() -> FHIRCraftConfig:
     
     Returns:
         FHIRCraftConfig: The current configuration instance.
-    
-    Example:
-        config = get_config()
-        if config.validation.disable_warnings:
-            print("Warnings are disabled")
     """
     return _config_context.get()
 
@@ -78,12 +73,6 @@ def set_config(config: FHIRCraftConfig) -> None:
     Warning:
         This sets the configuration globally and persists until changed.
         Consider using `with_config()` for temporary changes.
-    
-    Example:
-        config = FHIRCraftConfig(
-            validation=ValidationConfig(disable_warnings=True)
-        )
-        set_config(config)
     """
     _config_context.set(config)
 
@@ -100,11 +89,6 @@ def configure(**kwargs) -> None:
             - validation_mode (str: 'strict', 'lenient', 'skip')
             - disable_validation_errors (bool)
             - disabled_constraints (Set[str])
-    
-    Example:
-        configure(disable_validation_warnings=True)
-        configure(validation_mode='lenient')
-        configure(disabled_constraints={'dom-6', 'sdf-0'})
     """
     current_config = get_config()
     
@@ -143,16 +127,6 @@ def with_config(**kwargs):
     
     Yields:
         FHIRCraftConfig: The temporary configuration.
-    
-    Example:
-        # Disable warnings temporarily
-        with with_config(disable_validation_warnings=True):
-            patient = Patient(name=[{"given": ["Alice"]}])
-        # Warnings re-enabled here
-        
-        # Lenient mode for a specific operation
-        with with_config(validation_mode='lenient'):
-            resource = parse_potentially_invalid_data()
     """
     old_config = get_config()
     
@@ -187,10 +161,6 @@ def disable_constraint(*constraint_keys: str) -> None:
     
     Args:
         *constraint_keys: One or more constraint keys to disable (e.g., 'dom-6').
-    
-    Example:
-        disable_constraint('dom-6')  # Disable narrative warning
-        disable_constraint('dom-6', 'sdf-0')  # Disable multiple
     """
     config = get_config()
     config.validation.disabled_constraints.update(constraint_keys)
@@ -201,10 +171,6 @@ def enable_constraint(*constraint_keys: str) -> None:
     
     Args:
         *constraint_keys: One or more constraint keys to re-enable.
-    
-    Example:
-        enable_constraint('dom-6')
-        enable_constraint('dom-6', 'sdf-0')
     """
     config = get_config()
     for key in constraint_keys:
@@ -216,9 +182,6 @@ def reset_config() -> None:
     
     This is useful for testing or when you want to clear all
     configuration changes.
-    
-    Example:
-        reset_config()  # Back to strict validation with all warnings
     """
     set_config(FHIRCraftConfig())
 
@@ -230,11 +193,6 @@ def load_config_from_env() -> None:
         - FHIRCRAFT_DISABLE_WARNINGS: 'true' to disable validation warnings
         - FHIRCRAFT_VALIDATION_MODE: 'strict', 'lenient', or 'skip'
         - FHIRCRAFT_DISABLED_CONSTRAINTS: Comma-separated constraint keys
-    
-    Example:
-        export FHIRCRAFT_DISABLE_WARNINGS=true
-        export FHIRCRAFT_VALIDATION_MODE=lenient
-        export FHIRCRAFT_DISABLED_CONSTRAINTS=dom-6,sdf-0
     """
     kwargs = {}
     
