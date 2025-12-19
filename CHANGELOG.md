@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## [0.5.0] - 2025-12-19
+
+### Added
+
+* Added a new configuration module that provides thread-safe global and context-local configuration management, and exposes functions for configuring, resetting, and modifying validation settings. This includes context manager support and environment variable loading ([#150](https://github.com/luisfabib/fhircraft/pull/150)) 
+
+* Added configuration parameters to control how validation of FHIR resource invariants is executed, including their severity, type of feedback, or completely skipping their validation. ([#150](https://github.com/luisfabib/fhircraft/pull/150)) 
+
+### Changed 
+
+* Changed the logging level from `info` to `debug` for log entries created by the FHIRPath `trace` function. ([#147](https://github.com/luisfabib/fhircraft/pull/147))  
+
+### Fixed 
+
+* Added the `packaging` module as a core dependency to avoid import errors if `pytest` is not installed in the executing environment. ([#149](https://github.com/luisfabib/fhircraft/pull/149), fixes [#148](https://github.com/luisfabib/fhircraft/pull/148)) 
+
+* Updated import statements in core FHIR resource modules to alias `typing.List` as `ListType` where necessary to avoid overshadowing the FHIR `List` model. ([#151](https://github.com/luisfabib/fhircraft/pull/151), fixes [#139](https://github.com/luisfabib/fhircraft/pull/139)) 
+
 ## [0.4.2] - 2025-12-05
 
 ### Changed
