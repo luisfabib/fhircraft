@@ -10,7 +10,7 @@ import logging
 from collections import OrderedDict
 from typing import Any, Dict, List, Type
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 import fhircraft.fhir.path.engine as fhirpath
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
@@ -30,6 +30,18 @@ from .scope import MappingScope
 from .transformer import MappingTransformer
 
 logger = logging.getLogger(__name__)
+
+
+class ArbitraryModel(BaseModel):
+    """
+    A dynamic Pydantic model that accepts arbitrary fields.
+    
+    This is used for arbitrary target structures in mappings where no 
+    specific structure definition is provided. Unlike plain dicts, this 
+    model is compatible with the FHIRPath engine's update mechanisms,
+    allowing complex nested path creation and array operations.
+    """
+    model_config = ConfigDict(extra='allow')
 
 
 class StructureMapTargetListMode(str, enum.Enum):
@@ -193,19 +205,32 @@ class FHIRMappingEngine:
         for input in target_group.input:
             if input.mode == StructureMapModelMode.SOURCE:
                 if input.type:
+                    # Explicit type specified - match by type
                     source_instance = validated_sources.get(input.type)
                     if not source_instance:
                         raise TypeError(
                             f"Invalid source provided. None of the source arguments matches the '{input.name}' parameter of type {input.type} for the entrypoint group '{target_group.name}'."
                         )
                 else:
-                    source_instance = sources[0]
+                    # No type specified - use first available source or match by parameter name
+                    source_instance = (
+                        validated_sources.get(input.name) or 
+                        validated_sources.get("source") or
+                        next(iter(validated_sources.values()), None)
+                    )
+                    if source_instance is None:
+                        raise TypeError(
+                            f"No source data available for parameter '{input.name}'."
+                        )
                 source_instance_id = f"source_{id(source_instance)}"
                 global_scope.source_instances[source_instance_id] = source_instance  # type: ignore
                 parameters.append(fhirpath.Element(source_instance_id))
 
             if input.mode == StructureMapModelMode.TARGET:
-                if input.type and (target_type := global_scope.types.get(input.type)):
+                target_type = global_scope.types.get(input.type) if input.type else None
+                
+                if target_type is not None:
+                    # Type specified and model available - create or find typed instance
                     if not targets:
                         target_instance = target_type.model_construct()
                     else:
@@ -222,12 +247,13 @@ class FHIRMappingEngine:
                                 f"Invalid target provided. None of the target arguments matches the {input.name} parameters of type {input.type} for the entrypoint group '{target_group.name}'."
                             )
                 else:
+                    # No type or type not resolved - use arbitrary target
                     if targets:
                         target_instance = targets[0]
                     else:
-                        raise RuntimeError(
-                            f"Entrypoint group '{target_group.name}' parameter {input.name} does not specify any type and no target instances have been provided."
-                        )
+                        # Create ArbitraryModel instance for arbitrary target
+                        # This allows FHIRPath engine to work properly with nested paths
+                        target_instance = ArbitraryModel()
 
                 target_instance_id = f"source_{id(target_instance)}"
                 global_scope.target_instances[target_instance_id] = target_instance  # type: ignore
@@ -239,7 +265,12 @@ class FHIRMappingEngine:
         # Return the resulting target instances
         return tuple(
             [
-                instance.model_validate(instance.model_dump())
+                # Convert ArbitraryModel to dict for user consumption
+                instance.model_dump() if isinstance(instance, ArbitraryModel)
+                # Validate other BaseModel instances
+                else instance.model_validate(instance.model_dump()) if isinstance(instance, BaseModel)
+                # Pass through non-BaseModel instances (shouldn't happen)
+                else instance
                 for instance in global_scope.target_instances.values()
             ]
         )
@@ -614,73 +645,109 @@ class FHIRMappingEngine:
 
     def _resolve_structure_definitions(
         self, structure_map: StructureMap, mode: StructureMapModelMode
-    ) -> Dict[str, type[BaseModel]]:
+    ) -> Dict[str, type[BaseModel] | None]:
         """
         Resolves and constructs resource models for the specified mode from the given StructureMap.
+        
+        If no structures are defined for the given mode, returns an empty dict, allowing
+        arbitrary data to be used without predefined models. If a structure URL cannot be
+        resolved, logs a warning and continues without that model.
 
         Args:
             structure_map (StructureMap): The structure map containing structure definitions to resolve.
             mode (StructureMapModelMode): The mode (e.g., source or target) to filter structures by.
 
         Returns:
-            Dict[str, type[BaseModel]]: A dictionary mapping structure aliases or URLs to their corresponding resource model classes.
-
-        Raises:
-            MappingError: If the structure map does not specify any structures.
+            Dict[str, type[BaseModel] | None]: A dictionary mapping structure aliases to model classes,
+                or None for structures that couldn't be resolved. Empty if no structures defined for this mode.
         """
         if not structure_map.structure:
-            raise MappingError("Structure map does not specify any structures")
+            return {}
 
-        return {
-            s.alias
-            or s.url: self.factory.construct_resource_model(
-                structure_definition=self.repository.get(s.url)
-            )
-            for s in structure_map.structure
-            if s.mode == mode
-        }
+        resolved = {}
+        for s in structure_map.structure:
+            if s.mode != mode:
+                continue
+            
+            try:
+                structure_def = self.repository.get(s.url)
+                model = self.factory.construct_resource_model(
+                    structure_definition=structure_def
+                )
+                resolved[s.alias or s.url] = model
+            except (KeyError, ValueError, AttributeError) as e:
+                # If StructureDefinition not found, log warning but continue
+                logger.warning(
+                    f"Could not resolve structure definition for {s.url}: {e}. "
+                    f"Data for this structure will be treated as arbitrary."
+                )
+                # Mark as no model validation available
+                resolved[s.alias or s.url] = None
+        
+        return resolved
 
     def _validate_source_data(
         self,
         source_data: tuple[BaseModel | dict, ...],
-        source_models: Dict[str, Type[BaseModel]],
-    ) -> dict[str, BaseModel]:
+        source_models: Dict[str, Type[BaseModel] | None],
+    ) -> dict[str, BaseModel | dict]:
         """
-        Validates and maps a tuple of source data entries to their corresponding Pydantic models.
-
-        Each entry in `source_data` is checked against the provided `source_models`. If an entry matches a model (either as an instance, a dict, or an object with a `__dict__`), it is validated and added to the result dictionary under the model's alias. If an entry does not match any model, a `MappingError` is raised.
+        Validates and maps source data entries to their corresponding models when available.
+        
+        For entries with defined models, performs Pydantic validation.
+        For entries without models (model is None or empty dict), passes through as-is.
 
         Args:
             source_data (tuple[BaseModel | dict, ...]): A tuple containing source data entries, which can be Pydantic model instances, dictionaries, or objects with a `__dict__` attribute.
-            source_models (Dict[str, Type[BaseModel]]): A dictionary mapping string aliases to Pydantic model classes.
+            source_models (Dict[str, Type[BaseModel] | None]): A dictionary mapping string aliases to Pydantic model classes, or None for arbitrary data.
 
         Returns:
-            dict[str, BaseModel]: A dictionary mapping aliases to validated Pydantic model instances.
+            dict[str, BaseModel | dict]: A dictionary mapping aliases to validated Pydantic model instances or raw data.
 
         Raises:
             MappingError: If any entry in `source_data` does not match any of the provided source models.
         """
+        if not source_models:
+            # No models defined - treat all source data as arbitrary
+            # Use generic keys for the data
+            if len(source_data) == 1:
+                return {"source": source_data[0]}
+            return {f"source{i}": data for i, data in enumerate(source_data)}
+        
         validated_entries = {}
+        matched_indices = set()
 
-        def _validate_entry(entry: BaseModel | dict) -> None:
+        def _validate_entry(entry: BaseModel | dict, entry_idx: int) -> bool:
+            """Try to validate entry against available models. Returns True if matched."""
             for alias, source_model in source_models.items():
+                if source_model is None:
+                    # No model - accept arbitrary data
+                    if alias not in validated_entries:
+                        validated_entries[alias] = entry
+                        return True
+                    continue
+                    
                 try:
                     if isinstance(entry, source_model):
                         validated_entries[alias] = entry
+                        return True
                     elif isinstance(entry, dict):
                         validated_entries[alias] = source_model(**entry)
+                        return True
                     elif hasattr(entry, "__dict__"):
                         validated_entries[alias] = source_model(**entry.__dict__)
-                    return None
-                except MappingError:
+                        return True
+                except Exception:
                     continue
-            else:
-                raise MappingError(
-                    f"Source data entry of type {type(entry)} does not match any source model"
-                )
+            return False
 
-        for entry in source_data:
-            _validate_entry(entry)
+        for idx, entry in enumerate(source_data):
+            if not _validate_entry(entry, idx):
+                raise MappingError(
+                    f"Source data entry of type {type(entry)} does not match any source model. "
+                    f"Available models: {list(source_models.keys())}"
+                )
+            matched_indices.add(idx)
 
         return validated_entries
 
