@@ -536,6 +536,140 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return instance
 
     @classmethod
+    def model_validate_xml(cls, xml_data: str, *, strict=None, context=None) -> Self:
+        """
+        Deserialize FHIR XML data into a model instance.
+        
+        Args:
+            xml_data: XML string to deserialize
+            strict: Whether to validate strictly
+            context: Additional context for validation
+            
+        Returns:
+            An instance of the model populated from the XML data
+        """
+        from xml.etree.ElementTree import fromstring
+        
+        # Parse the XML
+        root = fromstring(xml_data)
+        
+        # Convert XML to dictionary, passing model class for type checking
+        data = cls._xml_element_to_dict(root, model_class=cls)
+        
+        # Use existing model_validate with the dictionary
+        return cls.model_validate(data, strict=strict, context=context)
+
+    @classmethod
+    def _xml_element_to_dict(cls, element: ET_Element, model_class: Type = None) -> Dict[str, Any]:
+        """
+        Convert an XML element tree to a dictionary structure.
+        
+        Args:
+            element: The XML element to convert
+            model_class: The model class to use for type checking (optional)
+            
+        Returns:
+            A dictionary representation of the XML element
+        """
+        from typing import get_origin, get_args
+        
+        # Strip namespace from tag
+        tag = element.tag.split('}')[-1] if '}' in element.tag else element.tag
+        
+        # Start with an empty dict
+        result = {}
+        
+        # Add resourceType if this looks like a resource
+        if tag and tag[0].isupper():
+            result['resourceType'] = tag
+        
+        # Handle primitive value attribute
+        if 'value' in element.attrib:
+            # This is a primitive field, return just the value
+            value = element.attrib['value']
+            # Convert boolean strings
+            if value == 'true':
+                return True
+            elif value == 'false':
+                return False
+            # Return as string - let Pydantic handle type conversion
+            return value
+        
+        # Process child elements
+        child_dict = {}
+        for child in element:
+            child_tag = child.tag.split('}')[-1] if '}' in child.tag else child.tag
+            
+            # Determine the model class for the child if possible
+            child_model_class = None
+            if model_class and hasattr(model_class, 'model_fields') and child_tag in model_class.model_fields:
+                field_info = model_class.model_fields[child_tag]
+                annotation = field_info.annotation
+                # Try to extract the inner type from List[X] or Optional[List[X]]
+                origin = get_origin(annotation)
+                if origin is list:
+                    args = get_args(annotation)
+                    if args and hasattr(args[0], 'model_fields'):
+                        child_model_class = args[0]
+                elif hasattr(annotation, '__args__'):
+                    for arg in getattr(annotation, '__args__', []):
+                        if get_origin(arg) is list:
+                            args = get_args(arg)
+                            if args and hasattr(args[0], 'model_fields'):
+                                child_model_class = args[0]
+                            break
+                        elif hasattr(arg, 'model_fields'):
+                            child_model_class = arg
+            
+            child_value = cls._xml_element_to_dict(child, model_class=child_model_class)
+            
+            # Handle repeated elements (lists)
+            if child_tag in child_dict:
+                # Convert to list if not already
+                if not isinstance(child_dict[child_tag], list):
+                    child_dict[child_tag] = [child_dict[child_tag]]
+                child_dict[child_tag].append(child_value)
+            else:
+                child_dict[child_tag] = child_value
+        
+        # Merge child elements into result
+        result.update(child_dict)
+        
+        # Post-process: Convert single values to lists if the model field expects a list
+        # This handles cases like meta.profile which should always be a list
+        if model_class and hasattr(model_class, 'model_fields'):
+            for field_name, field_value in list(result.items()):
+                if field_name == 'resourceType':
+                    continue
+                
+                # Check if this field exists in the model and should be a list
+                if field_name in model_class.model_fields:
+                    field_info = model_class.model_fields[field_name]
+                    annotation = field_info.annotation
+                    
+                    # Check if the annotation is a List type
+                    origin = get_origin(annotation)
+                    # Handle Optional[List[...]] or List[...] or list[...]
+                    if origin is list:
+                        # Field expects a list, ensure value is a list
+                        if not isinstance(field_value, list):
+                            result[field_name] = [field_value]
+                    elif hasattr(annotation, '__args__'):
+                        # Handle Union types (Optional is Union[X, None])
+                        for arg in getattr(annotation, '__args__', []):
+                            if get_origin(arg) is list:
+                                # Field expects a list, ensure value is a list
+                                if not isinstance(field_value, list):
+                                    result[field_name] = [field_value]
+                                break
+        
+        # If result only contains resourceType and nothing else, just return the dict
+        if len(result) == 1 and 'resourceType' in result:
+            return result
+        
+        return result if result else None
+
+    @classmethod
     def _deserialize_polymorphically(cls, value: Any, base_type: Type) -> Any:
         """Deserialize a value using the best matching subclass."""
         # Handle lists
