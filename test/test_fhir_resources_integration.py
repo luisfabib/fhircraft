@@ -8,7 +8,7 @@ from pathlib import Path
 from pydantic import BaseModel
 import pytest
 
-from fhircraft.fhir.resources.factory import construct_resource_model, factory
+from fhircraft.fhir.resources.factory import ConstructionMode, construct_resource_model, factory
 from fhircraft.fhir.resources.generator import CodeGenerator
 
 VERSIONS = ["R4B", "R5"]
@@ -71,7 +71,8 @@ def _assert_construct_core_resource(version, resource_label, filename):
 
     # Generate source code for Pydantic FHIR model
     resource = factory.construct_resource_model(
-        canonical_url=f"http://hl7.org/fhir/StructureDefinition/{resource_label}|{fhir_version}"
+        canonical_url=f"http://hl7.org/fhir/StructureDefinition/{resource_label}|{fhir_version}",
+        mode=ConstructionMode.SNAPSHOT,
     )
     # Load example FHIR resource data
     with open(
@@ -185,7 +186,8 @@ def test_construct_profiled_resource(filename):
 
         # Generate source code for Pydantic FHIR model
         resource = construct_resource_model(
-            canonical_url=fhir_resource["meta"]["profile"][0]
+            canonical_url=fhir_resource["meta"]["profile"][0],
+            mode=ConstructionMode.SNAPSHOT,
         )
         source_code = CodeGenerator().generate_resource_model_code(resource)
         # Store source code in a file

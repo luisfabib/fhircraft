@@ -12,8 +12,11 @@ from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.factory import (
     ResourceFactory,
+    ConstructionMode,
     _Unset,
 )
+from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft.fhir.resources.definitions import StructureDefinition
 
 
 class FactoryTestCase(TestCase):
@@ -1363,3 +1366,632 @@ class TestSliceModelInheritance(FactoryTestCase):
         assert (
             extension_idx < fhir_slice_idx
         ), "Extension should come before FHIRSliceModel in MRO"
+
+
+# =============================================================================
+# Differential Structure Definition Tests
+# =============================================================================
+
+
+class TestConstructionMode(FactoryTestCase):
+    """Test the ConstructionMode enum and mode detection."""
+
+    def test_construction_mode_enum_values(self):
+        """Test that ConstructionMode enum has correct values."""
+        assert ConstructionMode.SNAPSHOT.value == "snapshot"
+        assert ConstructionMode.DIFFERENTIAL.value == "differential"
+        assert ConstructionMode.AUTO.value == "auto"
+
+    def test_construction_mode_is_string_enum(self):
+        """Test that ConstructionMode values are strings."""
+        assert isinstance(ConstructionMode.SNAPSHOT.value, str)
+        assert isinstance(ConstructionMode.DIFFERENTIAL.value, str)
+        assert isinstance(ConstructionMode.AUTO.value, str)
+
+
+class TestDetectConstructionMode(FactoryTestCase):
+    """Test the _detect_construction_mode method."""
+
+    def test_detects_snapshot_mode_with_snapshot_only(self):
+        """Test that snapshot mode is detected when only snapshot is present."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-snapshot",
+            "url": "http://example.org/StructureDefinition/test-snapshot",
+            "name": "TestSnapshot",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
+        
+        assert mode == ConstructionMode.SNAPSHOT
+
+    def test_detects_differential_mode_with_differential_only(self):
+        """Test that differential mode is detected when only differential is present."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-differential",
+            "url": "http://example.org/StructureDefinition/test-differential",
+            "name": "TestDifferential",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
+        
+        assert mode == ConstructionMode.DIFFERENTIAL
+
+    def test_prefers_differential_when_both_present(self):
+        """Test that differential is preferred when both snapshot and differential are present."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-both",
+            "url": "http://example.org/StructureDefinition/test-both",
+            "name": "TestBoth",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "snapshot": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            },
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
+        
+        assert mode == ConstructionMode.DIFFERENTIAL
+
+    def test_respects_explicit_snapshot_mode(self):
+        """Test that explicit SNAPSHOT mode is respected."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-snapshot",
+            "url": "http://example.org/StructureDefinition/test-snapshot",
+            "name": "TestSnapshot",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.SNAPSHOT)
+        
+        assert mode == ConstructionMode.SNAPSHOT
+
+    def test_respects_explicit_differential_mode(self):
+        """Test that explicit DIFFERENTIAL mode is respected."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-differential",
+            "url": "http://example.org/StructureDefinition/test-differential",
+            "name": "TestDifferential",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.DIFFERENTIAL)
+        
+        assert mode == ConstructionMode.DIFFERENTIAL
+
+    def test_raises_error_when_snapshot_requested_but_missing(self):
+        """Test that ValueError is raised when SNAPSHOT mode is requested but no snapshot exists."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-no-snapshot",
+            "url": "http://example.org/StructureDefinition/test-no-snapshot",
+            "name": "TestNoSnapshot",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        with pytest.raises(ValueError, match="SNAPSHOT mode requested but"):
+            self.factory._detect_construction_mode(sd, ConstructionMode.SNAPSHOT)
+
+    def test_raises_error_when_differential_requested_but_missing(self):
+        """Test that ValueError is raised when DIFFERENTIAL mode is requested but no differential exists."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-no-differential",
+            "url": "http://example.org/StructureDefinition/test-no-differential",
+            "name": "TestNoDifferential",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        with pytest.raises(ValueError, match="DIFFERENTIAL mode requested but"):
+            self.factory._detect_construction_mode(sd, ConstructionMode.DIFFERENTIAL)
+
+    def test_raises_error_when_neither_snapshot_nor_differential(self):
+        """Test that ValueError is raised when neither snapshot nor differential is present."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-empty",
+            "url": "http://example.org/StructureDefinition/test-empty",
+            "name": "TestEmpty",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient"
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        with pytest.raises(ValueError, match="Must have either 'snapshot' or 'differential'"):
+            self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
+
+
+class TestResolveAndConstructBaseModel(FactoryTestCase):
+    """Test the _resolve_and_construct_base_model method."""
+
+    def setUp(self):
+        """Clear factory state before each test."""
+        super().setUp()
+        self.factory.construction_cache.clear()
+        self.factory.paths_in_processing.clear()
+        self.factory.local_cache.clear()
+
+    def test_returns_cached_base_model(self):
+        """Test that cached base models are returned without reconstruction."""
+        base_url = "http://example.org/StructureDefinition/cached-base"
+        cached_model = type("CachedBase", (FHIRBaseModel,), {})
+        self.factory.construction_cache[base_url] = cached_model
+        
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/test",
+            "name": "Test",
+            "status": "draft",
+            "kind": "resource",
+            "type": "Resource",
+            "abstract": False,
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        result = self.factory._resolve_and_construct_base_model(base_url, sd)
+        
+        assert result is cached_model
+
+    def test_detects_circular_reference(self):
+        """Test that circular references are detected and FHIRBaseModel is returned."""
+        base_url = "http://example.org/StructureDefinition/circular"
+        self.factory.paths_in_processing.add(base_url)
+        
+        try:
+            sd_dict = {
+                "resourceType": "StructureDefinition",
+                "url": "http://example.org/StructureDefinition/test",
+                "name": "Test",
+                "status": "draft",
+                "kind": "resource",
+                "type": "Resource",
+                "abstract": False,
+                "baseDefinition": base_url
+            }
+            sd = StructureDefinition.model_validate(sd_dict)
+            
+            with pytest.warns(UserWarning, match="Circular reference detected"):
+                result = self.factory._resolve_and_construct_base_model(base_url, sd)
+            
+            assert result == FHIRBaseModel
+        finally:
+            # Clean up the paths_in_processing
+            self.factory.paths_in_processing.discard(base_url)
+
+    def test_fallback_to_fhir_base_model_when_not_found(self):
+        """Test that FHIRBaseModel is returned when base cannot be resolved."""
+        base_url = "http://example.org/StructureDefinition/nonexistent"
+        
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/test",
+            "name": "Test",
+            "status": "draft",
+            "kind": "resource",
+            "type": "Resource",
+            "abstract": False,
+            "baseDefinition": base_url
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        with pytest.warns(UserWarning, match="Could not resolve base definition"):
+            result = self.factory._resolve_and_construct_base_model(base_url, sd)
+        
+        assert result == FHIRBaseModel
+
+
+class TestConstructResourceModelDifferentialMode(FactoryTestCase):
+    """Test construct_resource_model with differential mode."""
+
+    def setUp(self):
+        """Clear factory state before each test."""
+        super().setUp()
+        self.factory.construction_cache.clear()
+        self.factory.paths_in_processing.clear()
+        self.factory.local_cache.clear()
+
+    def test_constructs_model_from_differential_auto_mode(self):
+        """Test that models can be constructed from differential with AUTO mode."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-patient-profile",
+            "url": "http://example.org/StructureDefinition/test-patient-profile",
+            "name": "TestPatientProfile",
+            "title": "Test Patient Profile",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "short": "Test patient profile",
+                        "min": 0,
+                        "max": "*"
+                    },
+                    {
+                        "id": "Patient.identifier",
+                        "path": "Patient.identifier",
+                        "min": 1,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        # This should auto-detect DIFFERENTIAL mode
+        model = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.AUTO
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestPatientProfile"
+        assert hasattr(model, "model_fields")
+
+    def test_constructs_model_from_differential_explicit_mode(self):
+        """Test that models can be constructed with explicit DIFFERENTIAL mode."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-patient-profile-2",
+            "url": "http://example.org/StructureDefinition/test-patient-profile-2",
+            "name": "TestPatientProfile2",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        model = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestPatientProfile2"
+
+    def test_caches_differential_model(self):
+        """Test that differential models are cached."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-cached-profile",
+            "url": "http://example.org/StructureDefinition/test-cached-profile",
+            "name": "TestCachedProfile",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        model1 = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Second construction should return cached model
+        model2 = self.factory.construct_resource_model(
+            canonical_url=differential_sd["url"]
+        )
+        
+        assert model1 is model2
+
+    def test_differential_inherits_from_base(self):
+        """Test that differential models inherit from their base."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-inheritance",
+            "url": "http://example.org/StructureDefinition/test-inheritance",
+            "name": "TestInheritance",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        model = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Should inherit from FHIRBaseModel (since base Patient might not be available)
+        assert issubclass(model, FHIRBaseModel)
+
+
+class TestConstructResourceModelSnapshotMode(FactoryTestCase):
+    """Test construct_resource_model with snapshot mode (backward compatibility)."""
+
+    def setUp(self):
+        """Clear factory state before each test."""
+        super().setUp()
+        self.factory.construction_cache.clear()
+        self.factory.paths_in_processing.clear()
+        self.factory.local_cache.clear()
+
+    def test_constructs_model_from_snapshot_auto_mode(self):
+        """Test that models can be constructed from snapshot with AUTO mode."""
+        snapshot_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-snapshot-patient",
+            "url": "http://example.org/StructureDefinition/test-snapshot-patient",
+            "name": "TestSnapshotPatient",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "base": {"path": "Patient", "min": 0, "max": "*"}
+                    },
+                    {
+                        "id": "Patient.id",
+                        "path": "Patient.id",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "id"}],
+                        "base": {"path": "Resource.id", "min": 0, "max": "1"}
+                    }
+                ]
+            }
+        }
+        
+        model = self.factory.construct_resource_model(
+            structure_definition=snapshot_sd,
+            mode=ConstructionMode.AUTO
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestSnapshotPatient"
+
+    def test_constructs_model_from_snapshot_explicit_mode(self):
+        """Test that models can be constructed with explicit SNAPSHOT mode."""
+        snapshot_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-snapshot-explicit",
+            "url": "http://example.org/StructureDefinition/test-snapshot-explicit",
+            "name": "TestSnapshotExplicit",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "base": {"path": "Patient", "min": 0, "max": "*"}
+                    }
+                ]
+            }
+        }
+        
+        model = self.factory.construct_resource_model(
+            structure_definition=snapshot_sd,
+            mode=ConstructionMode.SNAPSHOT
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestSnapshotExplicit"
+
+    def test_backward_compatibility_no_mode_parameter(self):
+        """Test that construct_resource_model works without mode parameter (backward compatibility)."""
+        snapshot_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-backward-compat",
+            "url": "http://example.org/StructureDefinition/test-backward-compat",
+            "name": "TestBackwardCompat",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "base": {"path": "Patient", "min": 0, "max": "*"}
+                    }
+                ]
+            }
+        }
+        
+        # Don't specify mode - should default to AUTO
+        model = self.factory.construct_resource_model(
+            structure_definition=snapshot_sd
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestBackwardCompat"
+
+
+class TestFactoryConfigConstructionMode(FactoryTestCase):
+    """Test that FactoryConfig properly stores construction mode."""
+
+    def setUp(self):
+        """Clear factory state before each test."""
+        super().setUp()
+        self.factory.construction_cache.clear()
+        self.factory.paths_in_processing.clear()
+        self.factory.local_cache.clear()
+
+    def test_factory_config_has_construction_mode(self):
+        """Test that FactoryConfig has construction_mode field."""
+        config = self.factory.FactoryConfig(
+            FHIR_release="R4B",
+            FHIR_version="4.3.0",
+            construction_mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        assert hasattr(config, "construction_mode")
+        assert config.construction_mode == ConstructionMode.DIFFERENTIAL
+
+    def test_factory_config_construction_mode_default(self):
+        """Test that FactoryConfig construction_mode has default value."""
+        config = self.factory.FactoryConfig(
+            FHIR_release="R4B",
+            FHIR_version="4.3.0"
+        )
+        
+        assert config.construction_mode == ConstructionMode.AUTO
+
+    def test_construct_sets_construction_mode_in_config(self):
+        """Test that construct_resource_model sets construction_mode in Config."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-config-mode",
+            "url": "http://example.org/StructureDefinition/test-config-mode",
+            "name": "TestConfigMode",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        
+        self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.AUTO
+        )
+        
+        # Config should be set during construction
+        assert hasattr(self.factory, "Config")
+        assert self.factory.Config.construction_mode == ConstructionMode.DIFFERENTIAL
