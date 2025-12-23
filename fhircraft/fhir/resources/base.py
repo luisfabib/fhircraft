@@ -7,7 +7,7 @@ from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args
 from typing_extensions import Self
 from xml.etree.ElementTree import Element as ET_Element, tostring, SubElement
 from xml.dom import minidom
-from pydantic.main import IncEx
+from pydantic.main import IncEx, ExtraValues
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -338,6 +338,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return super().model_dump(*args, **kwargs)
 
     def model_dump_xml(self, 
+            *,
             indent: int | None = None, 
             ensure_ascii: bool = True,
             include: IncEx | None = None, 
@@ -543,8 +544,16 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return instance
 
     @classmethod
-    def model_validate_json(cls, json_data, *, strict=None, context=None) -> Self:
-        """Override model_validate_json to provide default kwargs for FHIR resources."""
+    def model_validate_json(cls, json_data, *, strict: bool=None, context: Any=None, extra: ExtraValues=None) -> Self:
+        """
+        Override model_validate_json to provide default kwargs for FHIR resources.
+        
+        Args:
+            json_data: JSON string to deserialize
+            strict: Whether to validate strictly
+            context: Additional context for validation
+            extra: Extra parameters
+        """
         instance = super().model_validate_json(
             json_data, strict=strict, context=context
         )
@@ -558,7 +567,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return instance
 
     @classmethod
-    def model_validate_xml(cls, xml_data: str, *, strict=None, context=None) -> Self:
+    def model_validate_xml(cls, xml_data: str, *, strict: bool=None, context: Any=None, extra: ExtraValues=None) -> Self:
         """
         Deserialize FHIR XML data into a model instance.
         
@@ -566,6 +575,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             xml_data: XML string to deserialize
             strict: Whether to validate strictly
             context: Additional context for validation
+            extra: Extra parameters
             
         Returns:
             An instance of the model populated from the XML data
@@ -579,7 +589,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         data = cls._xml_element_to_dict(root, model_class=cls)
         
         # Use existing model_validate with the dictionary
-        return cls.model_validate(data, strict=strict, context=context)
+        return cls.model_validate(data, strict=strict, context=context, extra=extra)
 
     @classmethod
     def _xml_element_to_dict(cls, element: ET_Element, model_class: Type = None) -> Dict[str, Any]:
