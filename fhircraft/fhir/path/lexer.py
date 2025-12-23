@@ -42,7 +42,7 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
         if self.__doc__ is None:
             raise FhirPathLexerError("Docstrings have been removed by design of PLY.")
         # Create the lexer once during initialization for better performance
-        self.lexer = ply.lex.lex(module=self, optimize=True)
+        self.lexer = ply.lex.lex(module=self)
 
     def tokenize(self, string):
         """

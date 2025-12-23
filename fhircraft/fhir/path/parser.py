@@ -61,6 +61,7 @@ class FhirPathParser:
         self.lexer_class = (
             lexer_class or FhirPathLexer
         )  # Crufty but works around statefulness in PLY
+        self.lexer = self.lexer_class()
 
         # Since PLY has some crufty aspects and dumps files, we try to keep them local
         # However, we need to derive the name of the output Python file :-/
@@ -86,8 +87,7 @@ class FhirPathParser:
 
     def parse(self, string, lexer=None) -> FHIRPath | Any:
         self.string = string
-        lexer = lexer or self.lexer_class()
-        return self.parse_token_stream(lexer.tokenize(string))
+        return self.parse_token_stream(self.lexer.tokenize(string))
 
     def is_valid(self, string):
         try:
@@ -544,14 +544,22 @@ class FhirPathParser:
         """
         p[0] = p[1]
 
-    def p_fhirpath_function_arguments(self, p):
-        """arguments : expression
-        | empty"""
-        p[0] = [p[1]]
 
-    def p_fhirpath_function_arguments_list(self, p):
-        """arguments : arguments ',' arguments"""
-        p[0] = ensure_list(p[1]) + ensure_list(p[3])
+    def p_fhirpath_function_arguments(self, p):
+        """
+        arguments : arguments ',' argument
+                  | argument
+        """
+        if len(p) == 2:
+           p[0] = [p[1]]
+        else:
+           p[0] = p[1]
+           p[0].append(p[3])
+
+    def p_fhirpath_function_argument(self, p):
+        """argument : expression
+                    | empty"""
+        p[0] = p[1]
 
     def p_fhirpath_identifier(self, p):
         """identifier : IDENTIFIER"""
@@ -559,12 +567,12 @@ class FhirPathParser:
 
     def p_fhirpath_literal(self, p):
         """literal : number
-        | boolean
-        | STRING
-        | date
-        | time
-        | datetime
-        | quantity
+                   | boolean
+                   | STRING
+                   | date
+                   | time
+                   | datetime
+                   | quantity
         """
         p[0] = Literal(p[1])
 
