@@ -286,9 +286,13 @@ token_test_cases = (
 )
 
 
+@pytest.fixture(scope="module")
+def lexer():
+    return FhirMappingLanguageLexer()
+
+
 @pytest.mark.parametrize("string, expected_token_info", token_test_cases)
-def test_lexer(string, expected_token_info):
-    lexer = FhirMappingLanguageLexer(debug=True)
+def test_lexer(lexer, string, expected_token_info):
     tokens = list(lexer.tokenize(string))
     assert len(tokens) == len(expected_token_info)
     for token, (expected_value, expected_type) in zip(tokens, expected_token_info):
