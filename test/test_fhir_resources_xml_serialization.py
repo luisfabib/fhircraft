@@ -34,7 +34,7 @@ class TestBasicXMLSerialization:
             birthDate="1974-12-25"
         )
         
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         
         # Parse the XML
         root = ET.fromstring(xml_output)
@@ -68,7 +68,7 @@ class TestBasicXMLSerialization:
             # gender and birthDate are None
         )
         
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         root = ET.fromstring(xml_output)
         
         # Verify only non-None fields are present
@@ -85,7 +85,7 @@ class TestBasicXMLSerialization:
             gender="female"
         )
         
-        xml_output = patient.model_dump_xml(pretty=True)
+        xml_output = patient.model_dump_xml(indent=3)
         
         # Pretty printed XML should contain newlines and indentation
         assert '\n' in xml_output
@@ -98,7 +98,7 @@ class TestBasicXMLSerialization:
     def test_xml_namespace(self):
         """Test that FHIR namespace is correctly added."""
         patient = SimplePatient(id="example")
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         root = ET.fromstring(xml_output)
         
         # Namespace should be in the tag
@@ -147,7 +147,7 @@ class TestComplexTypeXMLSerialization:
             ]
         )
         
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         root = ET.fromstring(xml_output)
         
         # Verify name element
@@ -179,7 +179,7 @@ class TestComplexTypeXMLSerialization:
             ]
         )
         
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         root = ET.fromstring(xml_output)
         
         # Should have two name elements
@@ -208,7 +208,7 @@ class TestComplexTypeXMLSerialization:
             ]
         )
         
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         root = ET.fromstring(xml_output)
         
         address_elem = root.find(f'{FHIR_NS}address')
@@ -235,7 +235,7 @@ class TestBooleanSerialization:
     def test_boolean_true_lowercase(self):
         """Test that boolean true is serialized as 'true' (lowercase)."""
         patient = SimplePatient(id="test", active=True)
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         root = ET.fromstring(xml_output)
         
         active_elem = root.find(f'{FHIR_NS}active')
@@ -244,7 +244,7 @@ class TestBooleanSerialization:
     def test_boolean_false_lowercase(self):
         """Test that boolean false is serialized as 'false' (lowercase)."""
         patient = SimplePatient(id="test", active=False)
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         root = ET.fromstring(xml_output)
         
         active_elem = root.find(f'{FHIR_NS}active')
@@ -257,7 +257,7 @@ class TestEmptyResource:
     def test_resource_with_only_type(self):
         """Test serialization of resource with only resourceType."""
         patient = SimplePatient()
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         root = ET.fromstring(xml_output)
         
         # Should have root element with namespace
@@ -291,7 +291,7 @@ class TestXMLValidation:
             ]
         )
         
-        xml_output = patient.model_dump_xml(pretty=True)
+        xml_output = patient.model_dump_xml(indent=3)
         
         # Should parse without errors
         try:
@@ -309,7 +309,7 @@ class TestXMLValidation:
             birthDate="2000-01-01"
         )
         
-        xml_output = patient.model_dump_xml(pretty=False)
+        xml_output = patient.model_dump_xml()
         root = ET.fromstring(xml_output)
         
         # Verify all fields are present in XML
@@ -386,7 +386,7 @@ class TestXMLDeserialization:
         )
         
         # Serialize to XML
-        xml = original.model_dump_xml(pretty=False)
+        xml = original.model_dump_xml()
         
         # Deserialize back
         restored = SimplePatient.model_validate_xml(xml)
@@ -406,7 +406,7 @@ class TestXMLDeserialization:
         )
         
         # Serialize with pretty printing
-        xml = original.model_dump_xml(pretty=True)
+        xml = original.model_dump_xml(indent=3)
         
         # Pretty printed XML should still deserialize correctly
         restored = SimplePatient.model_validate_xml(xml)
@@ -549,7 +549,7 @@ class TestXMLDeserialization:
         )
         
         # Serialize
-        xml = original.model_dump_xml(pretty=True)
+        xml = original.model_dump_xml(indent=3)
         
         # Deserialize
         restored = PatientWithComplexTypes.model_validate_xml(xml)
