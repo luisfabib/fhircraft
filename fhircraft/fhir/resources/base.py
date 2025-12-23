@@ -7,7 +7,7 @@ from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args
 from typing_extensions import Self
 from xml.etree.ElementTree import Element as ET_Element, tostring, SubElement
 from xml.dom import minidom
-
+from pydantic.main import IncEx
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -337,12 +337,26 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         kwargs.update({"by_alias": True, "exclude_none": True})
         return super().model_dump(*args, **kwargs)
 
-    def model_dump_xml(self, pretty: bool = True) -> str:
+    def model_dump_xml(self, 
+            indent: int | None = None, 
+            ensure_ascii: bool = True,
+            include: IncEx | None = None, 
+            exclude: IncEx | None = None, 
+            exclude_unset: bool = False,
+            exclude_none: bool = False,
+            exclude_defaults: bool = False,
+    ) -> str:
         """
         Serialize the FHIR resource to XML format according to FHIR specification.
         
         Args:
-            pretty: Whether to format the XML with indentation (default: True)
+            indent: Indentation to use in the XML output. If None is passed, the output will be compact.
+            ensure_ascii: Whether to escape non-ASCII characters.
+            include: Fields to include in the output
+            exclude: Fields to exclude from the output
+            exclude_unset: Whether to exclude fields that were not explicitly set
+            exclude_none: Whether to exclude fields with None values
+            exclude_defaults: Whether to exclude fields with default values
             
         Returns:
             A string containing the XML representation of the FHIR resource
@@ -351,8 +365,15 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         from xml.etree.ElementTree import register_namespace
         register_namespace('', 'http://hl7.org/fhir')
         
-        # Get the data as a dictionary
-        data = self.model_dump()
+        # Get the data as a dictionary with filtering options
+        data = self.model_dump(
+            by_alias=True,
+            include=include,
+            exclude=exclude,
+            exclude_unset=exclude_unset,
+            exclude_none=exclude_none,
+            exclude_defaults=exclude_defaults,
+        )
         
         # Determine the root element name (resourceType for resources, class name for other types)
         if hasattr(self, 'resourceType') and 'resourceType' in data:
@@ -367,14 +388,15 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         # Build the XML tree
         self._build_xml_element(root, data, root_name)
         
-        # Convert to string
-        xml_str = tostring(root, encoding='unicode')
+        # Convert to string with encoding option
+        encoding = 'unicode' if ensure_ascii else 'unicode'
+        xml_str = tostring(root, encoding=encoding)
         
         # Pretty print if requested
-        if pretty:
+        if indent is not None:
             try:
                 dom = minidom.parseString(xml_str)
-                xml_str = dom.toprettyxml(indent='  ')
+                xml_str = dom.toprettyxml(indent='  '*indent)
                 # Remove extra blank lines and XML declaration if not needed
                 lines = [line for line in xml_str.split('\n') if line.strip()]
                 # Keep XML declaration
