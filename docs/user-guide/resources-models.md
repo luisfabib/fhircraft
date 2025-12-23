@@ -185,6 +185,29 @@ patient = Patient.model_validate_json(fhir_json)
 print(f"Parsed patient ID: {patient.id}")
 ```
 
+#### From XML Strings
+
+Similarly, parse FHIR XML using `model_validate_xml()`:
+
+```python
+# FHIR XML from an API or file
+fhir_xml = '''<?xml version="1.0"?>
+<Patient xmlns="http://hl7.org/fhir">
+  <id value="example-patient"/>
+  <name>
+    <given value="Bob"/>
+    <family value="Johnson"/>
+  </name>
+  <birthDate value="1975-12-01"/>
+  <gender value="male"/>
+</Patient>'''
+
+Patient = get_fhir_resource_type("Patient")
+patient = Patient.model_validate_xml(fhir_xml)
+
+print(f"Parsed patient ID: {patient.id}")
+```
+
 ## Validation and Error Handling
 
 Fhircraft automatically enforces all FHIR constraints, providing comprehensive validation for data integrity.
@@ -324,9 +347,9 @@ patient.gender = "female"
 print(f"Updated patient: {patient.name[0].family}, Active: {patient.active}")
 ```
 
-## JSON Serialization and Deserialization
+## Serialization and Deserialization
 
-### Basic Serialization
+### JSON Serialization
 
 Converting FHIR resources to and from JSON is essential for API communication and data storage. Fhircraft provides convenient methods for serialization that ensure FHIR compliance:
 
@@ -348,7 +371,28 @@ patient_dict = patient.model_dump(exclude_none=True)
 print(f"Dictionary keys: {list(patient_dict.keys())}")
 ```
 
-### Advanced Serialization Options
+### XML Serialization
+
+Fhircraft also supports FHIR XML format:
+
+```python
+# Serialize to FHIR XML
+patient_xml = patient.model_dump_xml(pretty=True)
+print("FHIR XML:")
+print(patient_xml)
+# Output:
+# <?xml version="1.0" ?>
+# <Patient xmlns="http://hl7.org/fhir">
+#   <name>
+#     <given value="John"/>
+#     <family value="Doe"/>
+#   </name>
+#   <gender value="male"/>
+#   <birthDate value="1990-01-15"/>
+# </Patient>
+```
+
+### Advanced Options
 
 For different use cases, you may need specific serialization formats or want to include/exclude certain fields. These options provide fine-grained control over the output:
 
@@ -360,6 +404,11 @@ formatted_json = patient.model_dump_json(
 )
 print("Formatted JSON:")
 print(formatted_json)
+
+# Pretty-formatted XML
+formatted_xml = patient.model_dump_xml(pretty=True)
+print("Formatted XML:")
+print(formatted_xml)
 
 # Include only specific fields
 name_only = patient.model_dump(include={'resourceType', 'name', 'gender'})
