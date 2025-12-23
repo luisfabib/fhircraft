@@ -814,9 +814,13 @@ parser_test_cases = (
 )
 
 
+@pytest.fixture(scope="module")
+def parser():
+    return FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
+
+
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
-def test_parser(string, expected_object):
-    parser = FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
+def test_parser(parser, string, expected_object):
     parsed_map = parser.parse(string).model_dump(exclude=("text", "status", "meta"))
     expected_map = expected_object.model_dump(exclude=("text", "status", "meta"))
     if parsed_map != expected_map:
@@ -854,7 +858,7 @@ directories = (
 @pytest.mark.filterwarnings("ignore:.*Pydantic serializer warnings.*")
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 @pytest.mark.parametrize("directory", directories)
-def test_parser_integration(directory):
+def test_parser_integration(directory, parser):
     with open(
         os.path.join(
             os.path.abspath(EXAMPLES_DIRECTORY), directory, directory + ".map"
@@ -869,7 +873,6 @@ def test_parser_integration(directory):
         encoding="utf8",
     ) as file:
         expected_StructureMap = json.load(file)
-    parser = FhirMappingLanguageParser(lexer_class=lambda: FhirMappingLanguageLexer())
 
     parsed_map = parser.parse(map_script).model_dump(exclude=("text", "status", "meta"))
     expected_map = StructureMap.model_validate(expected_StructureMap).model_dump(
