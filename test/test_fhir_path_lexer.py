@@ -107,9 +107,13 @@ token_test_cases = (
 )
 
 
+@pytest.fixture(scope="module")
+def lexer():
+    return FhirPathLexer()
+
+
 @pytest.mark.parametrize("string, expected_token_info", token_test_cases)
-def test_lexer(string, expected_token_info):
-    lexer = FhirPathLexer(debug=True)
+def test_lexer(lexer, string, expected_token_info):
     tokens = list(lexer.tokenize(string))
     assert len(tokens) == len(expected_token_info)
     for token, (expected_value, expected_type) in zip(tokens, expected_token_info):
@@ -133,6 +137,6 @@ invalid_token_test_cases = (
 
 
 @pytest.mark.parametrize("string", invalid_token_test_cases)
-def test_lexer_errors(string):
+def test_lexer_errors(lexer, string):
     with pytest.raises(FhirPathLexerError):
-        list(FhirPathLexer().tokenize(string))
+        list(lexer.tokenize(string))

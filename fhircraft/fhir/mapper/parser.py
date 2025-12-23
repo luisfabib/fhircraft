@@ -87,7 +87,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         self.lexer_class = (
             lexer_class or FhirMappingLanguageLexer
         )  # Crufty but works around statefulness in PLY
-
+        self.lexer = self.lexer_class()
         # Since PLY has some crufty aspects and dumps files, we try to keep them local
         # However, we need to derive the name of the output Python file :-/
         output_directory = os.path.dirname(__file__)
@@ -112,11 +112,10 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def parse(self, string, lexer=None) -> StructureMap:
         self.string = string
-        lexer = lexer or self.lexer_class()
         self.structureMap: StructureMap = StructureMap.model_construct(
             text={"div": string},
         )  # type: ignore
-        return self.parse_token_stream(lexer.tokenize(string))
+        return self.parse_token_stream(self.lexer.tokenize(string))
 
     def is_valid(self, string):
         try:

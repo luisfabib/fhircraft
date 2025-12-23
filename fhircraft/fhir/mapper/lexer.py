@@ -19,25 +19,27 @@ class FhirMappingLanguageLexer(FhirPathLexer):
             raise FhirMappingLanguageLexerError(
                 "Docstrings have been removed by design of PLY."
             )
+        # Create the lexer once during initialization for better performance
+        self.lexer = ply.lex.lex(module=self, debug=debug)
 
     def tokenize(self, string):
         """
         Maps a string to an iterator over tokens. In other words: [char] -> [token]
         """
 
-        new_lexer = ply.lex.lex(module=self)
-        new_lexer.latest_newline = 0
-        new_lexer.string_value = None
-        new_lexer.input(string)
+        # Reuse the existing lexer instead of creating a new one each time
+        self.lexer.latest_newline = 0
+        self.lexer.string_value = None
+        self.lexer.input(string)
 
         while True:
-            t = new_lexer.token()
+            t = self.lexer.token()
             if t is None:
                 break
-            t.col = t.lexpos - new_lexer.latest_newline
+            t.col = t.lexpos - self.lexer.latest_newline
             yield t
 
-        if new_lexer.string_value is not None:
+        if self.lexer.string_value is not None:
             raise FhirMappingLanguageLexerError(
                 "Unexpected EOF in string literal or identifier"
             )
