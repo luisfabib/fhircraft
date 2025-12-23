@@ -366,6 +366,12 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         from xml.etree.ElementTree import register_namespace
         register_namespace('', 'http://hl7.org/fhir')
         
+        # Determine the root element name BEFORE filtering (so exclude_defaults doesn't affect it)
+        if hasattr(self, 'resourceType'):
+            root_name = self.resourceType
+        else:
+            root_name = self.__class__.__name__
+        
         # Get the data as a dictionary with filtering options
         data = self.model_dump(
             by_alias=True,
@@ -375,12 +381,6 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             exclude_none=exclude_none,
             exclude_defaults=exclude_defaults,
         )
-        
-        # Determine the root element name (resourceType for resources, class name for other types)
-        if hasattr(self, 'resourceType') and 'resourceType' in data:
-            root_name = data['resourceType']
-        else:
-            root_name = self.__class__.__name__
         
         # Create the root element with FHIR namespace using Clark notation
         # This creates the element in the namespace but serializes with xmlns attribute
@@ -567,7 +567,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return instance
 
     @classmethod
-    def model_validate_xml(cls, xml_data: str, *, strict: bool=None, context: Any=None, extra: ExtraValues=None) -> Self:
+    def model_validate_xml(cls, xml_data: str, *, strict: bool=None, context: Any=None) -> Self:
         """
         Deserialize FHIR XML data into a model instance.
         
@@ -575,7 +575,6 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             xml_data: XML string to deserialize
             strict: Whether to validate strictly
             context: Additional context for validation
-            extra: Extra parameters
             
         Returns:
             An instance of the model populated from the XML data
@@ -589,7 +588,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         data = cls._xml_element_to_dict(root, model_class=cls)
         
         # Use existing model_validate with the dictionary
-        return cls.model_validate(data, strict=strict, context=context, extra=extra)
+        return cls.model_validate(data, strict=strict, context=context)
 
     @classmethod
     def _xml_element_to_dict(cls, element: ET_Element, model_class: Type = None) -> Dict[str, Any]:

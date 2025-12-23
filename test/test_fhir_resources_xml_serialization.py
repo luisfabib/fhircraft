@@ -675,3 +675,234 @@ class TestXMLDeserialization:
         assert len(patient.name) == 1
         assert patient.name[0].family == "External"
         assert patient.name[0].given == ["Patient"]
+
+
+class TestXMLKeywordArguments:
+    """Test keyword arguments in model_dump_xml and model_validate_xml."""
+
+    def test_indent_parameter(self):
+        """Test that indent parameter controls XML formatting."""
+        patient = SimplePatient(
+            id="example",
+            active=True,
+            gender="male"
+        )
+        
+        # Compact output (indent=None, the default)
+        compact_xml = patient.model_dump_xml(indent=None)
+        assert '\n  ' not in compact_xml  # No indentation
+        
+        # Indented output (indent=1)
+        indented_xml = patient.model_dump_xml(indent=1)
+        assert '\n' in indented_xml  # Has newlines
+        assert '  ' in indented_xml  # Has indentation
+        
+        # Both should be valid XML
+        ET.fromstring(compact_xml)
+        ET.fromstring(indented_xml)
+
+    def test_exclude_none_parameter(self):
+        """Test that exclude_none parameter controls None field serialization."""
+        patient = SimplePatient(
+            id="example",
+            active=True,
+            # gender and birthDate are None
+        )
+        
+        # With exclude_none=False, None fields might be included
+        xml_with_none = patient.model_dump_xml(exclude_none=False)
+        root_with_none = ET.fromstring(xml_with_none)
+        
+        # With exclude_none=True (default behavior), None fields are excluded
+        xml_without_none = patient.model_dump_xml(exclude_none=True)
+        root_without_none = ET.fromstring(xml_without_none)
+        
+        # Only id and active should be present (gender and birthDate are None)
+        assert root_without_none.find(f'{FHIR_NS}id') is not None
+        assert root_without_none.find(f'{FHIR_NS}active') is not None
+        assert root_without_none.find(f'{FHIR_NS}gender') is None
+        assert root_without_none.find(f'{FHIR_NS}birthDate') is None
+
+    def test_exclude_unset_parameter(self):
+        """Test that exclude_unset parameter controls unset field serialization."""
+        # Create patient with only some fields set
+        patient = SimplePatient(id="example")
+        
+        # With exclude_unset=True, only explicitly set fields should appear
+        xml_exclude_unset = patient.model_dump_xml(exclude_unset=True)
+        root_exclude_unset = ET.fromstring(xml_exclude_unset)
+        
+        # Only id should be present (others were not set)
+        assert root_exclude_unset.find(f'{FHIR_NS}id') is not None
+        # resourceType is a default field, it shouldn't count as "set"
+        
+        # With exclude_unset=False, default values might appear
+        xml_include_unset = patient.model_dump_xml(exclude_unset=False)
+        root_include_unset = ET.fromstring(xml_include_unset)
+        
+        # id should still be present
+        assert root_include_unset.find(f'{FHIR_NS}id') is not None
+
+    def test_exclude_defaults_parameter(self):
+        """Test that exclude_defaults parameter controls default value serialization."""
+        # SimplePatient has resourceType with default="Patient"
+        patient = SimplePatient(
+            id="example",
+            active=True
+        )
+        
+        # With exclude_defaults=True, resourceType is excluded from the data dict
+        # but the root element name should still be "Patient" (from instance attribute)
+        xml_exclude_defaults = patient.model_dump_xml(exclude_defaults=True)
+        xml_include_defaults = patient.model_dump_xml(exclude_defaults=False)
+        
+        # Both should be valid XML
+        root_exclude = ET.fromstring(xml_exclude_defaults)
+        root_include = ET.fromstring(xml_include_defaults)
+        
+        # Root should always be Patient (read from instance, not from data dict)
+        assert strip_ns(root_exclude.tag) == "Patient"
+        assert strip_ns(root_include.tag) == "Patient"
+
+    def test_include_parameter(self):
+        """Test that include parameter controls which fields are serialized."""
+        patient = SimplePatient(
+            id="example",
+            active=True,
+            gender="male",
+            birthDate="1974-12-25"
+        )
+        
+        # Include only specific fields
+        xml_output = patient.model_dump_xml(include={'id', 'gender'})
+        root = ET.fromstring(xml_output)
+        
+        # Only included fields should be present
+        assert root.find(f'{FHIR_NS}id') is not None
+        assert root.find(f'{FHIR_NS}gender') is not None
+        
+        # Excluded fields should not be present
+        assert root.find(f'{FHIR_NS}active') is None
+        assert root.find(f'{FHIR_NS}birthDate') is None
+
+    def test_exclude_parameter(self):
+        """Test that exclude parameter controls which fields are NOT serialized."""
+        patient = SimplePatient(
+            id="example",
+            active=True,
+            gender="male",
+            birthDate="1974-12-25"
+        )
+        
+        # Exclude specific fields
+        xml_output = patient.model_dump_xml(exclude={'active', 'birthDate'})
+        root = ET.fromstring(xml_output)
+        
+        # Non-excluded fields should be present
+        assert root.find(f'{FHIR_NS}id') is not None
+        assert root.find(f'{FHIR_NS}gender') is not None
+        
+        # Excluded fields should not be present
+        assert root.find(f'{FHIR_NS}active') is None
+        assert root.find(f'{FHIR_NS}birthDate') is None
+
+    def test_combined_keyword_arguments(self):
+        """Test using multiple keyword arguments together."""
+        patient = SimplePatient(
+            id="example",
+            active=True,
+            gender="male",
+            birthDate="1974-12-25"
+        )
+        
+        # Combine indent, exclude, and exclude_none
+        xml_output = patient.model_dump_xml(
+            indent=1,
+            exclude={'birthDate'},
+            exclude_none=True
+        )
+        root = ET.fromstring(xml_output)
+        
+        # Should be formatted
+        assert '\n' in xml_output
+        
+        # Should have id, active, gender but not birthDate
+        assert root.find(f'{FHIR_NS}id') is not None
+        assert root.find(f'{FHIR_NS}active') is not None
+        assert root.find(f'{FHIR_NS}gender') is not None
+        assert root.find(f'{FHIR_NS}birthDate') is None
+
+    def test_ensure_ascii_parameter(self):
+        """Test that ensure_ascii parameter is accepted (encoding behavior)."""
+        patient = SimplePatient(
+            id="example-unicode",
+            active=True
+        )
+        
+        # Both should work without errors
+        xml_ascii = patient.model_dump_xml(ensure_ascii=True)
+        xml_unicode = patient.model_dump_xml(ensure_ascii=False)
+        
+        # Both should be valid XML
+        root_ascii = ET.fromstring(xml_ascii)
+        root_unicode = ET.fromstring(xml_unicode)
+        
+        assert strip_ns(root_ascii.tag) == "Patient"
+        assert strip_ns(root_unicode.tag) == "Patient"
+
+    def test_model_validate_xml_with_strict(self):
+        """Test that model_validate_xml accepts strict parameter."""
+        xml = """<Patient xmlns="http://hl7.org/fhir">
+  <id value="example"/>
+  <active value="true"/>
+</Patient>"""
+        
+        # Should work with strict=None (default)
+        patient1 = SimplePatient.model_validate_xml(xml, strict=None)
+        assert patient1.id == "example"
+        
+        # Should work with strict=True
+        patient2 = SimplePatient.model_validate_xml(xml, strict=True)
+        assert patient2.id == "example"
+        
+        # Should work with strict=False
+        patient3 = SimplePatient.model_validate_xml(xml, strict=False)
+        assert patient3.id == "example"
+
+    def test_model_validate_xml_with_context(self):
+        """Test that model_validate_xml accepts context parameter."""
+        xml = """<Patient xmlns="http://hl7.org/fhir">
+  <id value="context-test"/>
+</Patient>"""
+        
+        # Should work with context parameter
+        patient = SimplePatient.model_validate_xml(xml, context={'test': 'value'})
+        assert patient.id == "context-test"
+
+    def test_multiple_indent_levels(self):
+        """Test different indent levels produce different formatting."""
+        patient = SimplePatient(
+            id="indent-test",
+            active=True,
+            gender="other"
+        )
+        
+        # Test different indent levels
+        xml_indent_1 = patient.model_dump_xml(indent=1)
+        xml_indent_2 = patient.model_dump_xml(indent=2)
+        
+        # Both should be valid
+        ET.fromstring(xml_indent_1)
+        ET.fromstring(xml_indent_2)
+        
+        # indent=2 should have more whitespace than indent=1
+        # (4 spaces vs 2 spaces per level)
+        assert '    ' in xml_indent_2  # 4 spaces
+        
+        # But both should parse to the same data
+        parsed_1 = SimplePatient.model_validate_xml(xml_indent_1)
+        parsed_2 = SimplePatient.model_validate_xml(xml_indent_2)
+        
+        assert parsed_1.id == parsed_2.id == "indent-test"
+        assert parsed_1.active == parsed_2.active == True
+        assert parsed_1.gender == parsed_2.gender == "other"
