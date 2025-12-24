@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.definitions.element_definition import (
     ElementDefinitionType,
 )
 from fhircraft.fhir.resources.factory import (
+    ConstructionMode,
     ElementDefinitionNode,
     FHIRSliceModel,
     ResourceFactory,
@@ -723,6 +724,7 @@ class TestConstructSliceModel(FactoryTestCase):
         self.factory.construct_resource_model.assert_called_once_with(  # type: ignore
             "http://example.org/fhir/StructureDefinition/DummySlice",
             base_model=FHIRSliceModel,
+            mode=ConstructionMode.AUTO,
         )
         self.assertTrue(issubclass(result, self.DummyFHIRSliceModel))
         self.assertTrue(issubclass(result, FHIRSliceModel))
