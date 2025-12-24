@@ -581,6 +581,7 @@ class ResourceFactory:
                         return self.construct_resource_model(
                             structure_definition=type_structure_definition,
                             base_model=FHIRBaseModel,
+                            mode=self.Config.construction_mode if self.Config else ConstructionMode.AUTO,
                         )
                     else:
                         raise RuntimeError(
@@ -832,7 +833,7 @@ class ResourceFactory:
         if (types := definition.type) and (canonical_urls := types[0].profile):
             # Construct the slice model from the canonical URL
             slice_model = self.construct_resource_model(
-                canonical_urls[0], base_model=FHIRSliceModel
+                canonical_urls[0], base_model=FHIRSliceModel, mode=self.Config.construction_mode if self.Config else ConstructionMode.AUTO
             )
         else:
             # Construct the slice model's name
@@ -1117,6 +1118,7 @@ class ResourceFactory:
                 return self.construct_resource_model(
                     canonical_url=base_canonical_url,
                     structure_definition=base_structure_def,
+                    mode=self.Config.construction_mode if self.Config else ConstructionMode.AUTO,
                 )
         except Exception as e:
             warnings.warn(
@@ -1467,24 +1469,8 @@ class ResourceFactory:
         )
         # Process resource-level constraints
         for constraint in structure.constraint or []:
-            validators.add_model_constraint_validator(constraint)
-        # If the resource has metadata, prefill the information
-        if "meta" in fields:
-            Meta = get_complex_FHIR_type(
-                "Meta", self.Config.FHIR_release if self.Config else "4.3.0"
-            )
-            fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
-            fields["meta"] = (
-                Optional[Meta],
-                Field(
-                    title="Meta",
-                    description="Metadata about the resource.",
-                    default=Meta(
-                        profile=[_structure_definition.url],
-                    ),
-                ),
-            )
-
+            validators.add_model_constraint_validator(constraint)\
+            
         # Determine the base model to inherit from
         if not (base := base_model):
             # For DIFFERENTIAL mode, we must resolve the base definition
@@ -1509,6 +1495,24 @@ class ResourceFactory:
                         base = FHIRBaseModel
             else:
                 base = FHIRBaseModel
+
+        # If the resource has metadata, prefill the information
+        if "meta" in fields or "meta" in getattr(base, "model_fields", {}):
+            Meta = get_complex_FHIR_type(
+                "Meta", self.Config.FHIR_release if self.Config else "4.3.0"
+            )
+            fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
+            fields["meta"] = (
+                Optional[Meta],
+                Field(
+                    title="Meta",
+                    description="Metadata about the resource.",
+                    default=Meta(
+                        profile=[_structure_definition.url],
+                    ),
+                ),
+            )
+
 
         # Construct the Pydantic model representing the FHIR resource
         model = self._construct_model_with_properties(
