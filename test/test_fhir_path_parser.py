@@ -417,9 +417,13 @@ parser_test_cases = (
 )
 
 
+
+@pytest.fixture(scope="module")
+def parser():
+    return FhirPathParser(lexer_class=lambda: FhirPathLexer())
+
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
-def test_parser(string, expected_object):
-    parser = FhirPathParser(lexer_class=lambda: FhirPathLexer())
+def test_parser(parser, string, expected_object):
     assert parser.parse(string) == expected_object
 
 
@@ -428,8 +432,7 @@ parser_error_cases = (
     ("baz,bizzle"),
 )
 
-
 @pytest.mark.parametrize("string", parser_error_cases)
-def test_parser_catches_invalid_syntax(string):
+def test_parser_catches_invalid_syntax(parser, string):
     with pytest.raises((FhirPathParserError, FhirPathLexerError)):
-        FhirPathParser(lexer_class=lambda: FhirPathLexer()).parse(string)
+        parser.parse(string)

@@ -5,7 +5,9 @@ import threading
 import warnings
 from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args
 from typing_extensions import Self
-
+from xml.etree.ElementTree import Element as ET_Element, tostring, SubElement
+from xml.dom import minidom
+from pydantic.main import IncEx, ExtraValues
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -335,6 +337,150 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         kwargs.update({"by_alias": True, "exclude_none": True})
         return super().model_dump(*args, **kwargs)
 
+    def model_dump_xml(self, 
+            *,
+            indent: int | None = None, 
+            ensure_ascii: bool = True,
+            include: IncEx | None = None, 
+            exclude: IncEx | None = None, 
+            exclude_unset: bool = False,
+            exclude_none: bool = False,
+            exclude_defaults: bool = False,
+    ) -> str:
+        """
+        Serialize the FHIR resource to XML format according to FHIR specification.
+        
+        Args:
+            indent: Indentation to use in the XML output. If None is passed, the output will be compact.
+            ensure_ascii: Whether to escape non-ASCII characters.
+            include: Fields to include in the output
+            exclude: Fields to exclude from the output
+            exclude_unset: Whether to exclude fields that were not explicitly set
+            exclude_none: Whether to exclude fields with None values
+            exclude_defaults: Whether to exclude fields with default values
+            
+        Returns:
+            A string containing the XML representation of the FHIR resource
+        """
+        # Register the FHIR namespace with empty prefix (default namespace)
+        from xml.etree.ElementTree import register_namespace
+        register_namespace('', 'http://hl7.org/fhir')
+        
+        # Determine the root element name BEFORE filtering (so exclude_defaults doesn't affect it)
+        if hasattr(self, 'resourceType'):
+            root_name = self.resourceType
+        else:
+            root_name = self.__class__.__name__
+        
+        # Get the data as a dictionary with filtering options
+        data = self.model_dump(
+            by_alias=True,
+            include=include,
+            exclude=exclude,
+            exclude_unset=exclude_unset,
+            exclude_none=exclude_none,
+            exclude_defaults=exclude_defaults,
+        )
+        
+        # Create the root element with FHIR namespace using Clark notation
+        # This creates the element in the namespace but serializes with xmlns attribute
+        root = ET_Element(f'{{http://hl7.org/fhir}}{root_name}')
+        
+        # Build the XML tree
+        self._build_xml_element(root, data, root_name)
+        
+        # Convert to string with encoding option
+        encoding = 'unicode' if ensure_ascii else 'unicode'
+        xml_str = tostring(root, encoding=encoding)
+        
+        # Pretty print if requested
+        if indent is not None:
+            try:
+                dom = minidom.parseString(xml_str)
+                xml_str = dom.toprettyxml(indent='  '*indent)
+                # Remove extra blank lines and XML declaration if not needed
+                lines = [line for line in xml_str.split('\n') if line.strip()]
+                # Keep XML declaration
+                xml_str = '\n'.join(lines)
+            except Exception:
+                # If pretty printing fails, return the raw XML
+                pass
+        
+        return xml_str
+
+    def _build_xml_element(self, parent: ET_Element, data: Dict[str, Any], parent_name: str = None):
+        """
+        Recursively build XML elements from the data dictionary.
+        
+        Args:
+            parent: The parent XML element
+            data: The data dictionary to serialize
+            parent_name: The name of the parent element (used for context)
+        """
+        for field_name, value in data.items():
+            if value is None:
+                continue
+            
+            # Skip resourceType as it's already the root element
+            if field_name == 'resourceType':
+                continue
+            
+            # Handle primitive extension fields (fields ending with _ext or starting with _)
+            if field_name.endswith('_ext') or (field_name.startswith('_') and field_name != '_value'):
+                # These are handled with their corresponding primitive fields
+                continue
+            
+            # Get the actual field name (without _ext suffix)
+            base_field_name = field_name
+            
+            # Check if this field has an extension companion
+            ext_field_name = f"{field_name}_ext"
+            ext_data = data.get(ext_field_name) if ext_field_name in data else None
+            
+            # Handle lists
+            if isinstance(value, list):
+                for item in value:
+                    self._add_field_element(parent, base_field_name, item, ext_data)
+            else:
+                self._add_field_element(parent, base_field_name, value, ext_data)
+
+    def _add_field_element(self, parent: ET_Element, field_name: str, value: Any, ext_data: Any = None):
+        """
+        Add a field element to the parent XML element.
+        
+        Args:
+            parent: The parent XML element
+            field_name: The name of the field
+            value: The value of the field
+            ext_data: Extension data for primitive fields (if any)
+        """
+        if value is None:
+            return
+        
+        # Create the field element with namespace
+        field_elem = SubElement(parent, f'{{http://hl7.org/fhir}}{field_name}')
+        
+        # Handle different value types
+        if isinstance(value, dict):
+            # For resources in arrays (like contained), wrap in proper element
+            if 'resourceType' in value and value['resourceType']:
+                # Create a child element with the resource type name
+                resource_elem = SubElement(field_elem, f'{{http://hl7.org/fhir}}{value["resourceType"]}')
+                self._build_xml_element(resource_elem, value, value['resourceType'])
+            else:
+                # Complex type - build directly into field_elem
+                self._build_xml_element(field_elem, value, field_name)
+        elif isinstance(value, (str, int, float, bool)):
+            # Primitive type - use value attribute
+            field_elem.set('value', str(value).lower() if isinstance(value, bool) else str(value))
+            
+            # Add extension elements if present
+            if ext_data and isinstance(ext_data, dict):
+                self._build_xml_element(field_elem, ext_data, field_name)
+        else:
+            # Other types - convert to string
+            field_elem.set('value', str(value))
+
     def _serialize_fhir_field_polymorphically(self, value: Any) -> Any:
         """Serialize FHIR fields polymorphically to preserve runtime type information."""
         # Handle lists/sequences
@@ -398,8 +544,16 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return instance
 
     @classmethod
-    def model_validate_json(cls, json_data, *, strict=None, context=None) -> Self:
-        """Override model_validate_json to provide default kwargs for FHIR resources."""
+    def model_validate_json(cls, json_data, *, strict: bool=None, context: Any=None, extra: ExtraValues=None) -> Self:
+        """
+        Override model_validate_json to provide default kwargs for FHIR resources.
+        
+        Args:
+            json_data: JSON string to deserialize
+            strict: Whether to validate strictly
+            context: Additional context for validation
+            extra: Extra parameters
+        """
         instance = super().model_validate_json(
             json_data, strict=strict, context=context
         )
@@ -411,6 +565,140 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             )
 
         return instance
+
+    @classmethod
+    def model_validate_xml(cls, xml_data: str, *, strict: bool=None, context: Any=None) -> Self:
+        """
+        Deserialize FHIR XML data into a model instance.
+        
+        Args:
+            xml_data: XML string to deserialize
+            strict: Whether to validate strictly
+            context: Additional context for validation
+            
+        Returns:
+            An instance of the model populated from the XML data
+        """
+        from xml.etree.ElementTree import fromstring
+        
+        # Parse the XML
+        root = fromstring(xml_data)
+        
+        # Convert XML to dictionary, passing model class for type checking
+        data = cls._xml_element_to_dict(root, model_class=cls)
+        
+        # Use existing model_validate with the dictionary
+        return cls.model_validate(data, strict=strict, context=context)
+
+    @classmethod
+    def _xml_element_to_dict(cls, element: ET_Element, model_class: Type = None) -> Dict[str, Any]:
+        """
+        Convert an XML element tree to a dictionary structure.
+        
+        Args:
+            element: The XML element to convert
+            model_class: The model class to use for type checking (optional)
+            
+        Returns:
+            A dictionary representation of the XML element
+        """
+        from typing import get_origin, get_args
+        
+        # Strip namespace from tag
+        tag = element.tag.split('}')[-1] if '}' in element.tag else element.tag
+        
+        # Start with an empty dict
+        result = {}
+        
+        # Add resourceType if this looks like a resource
+        if tag and tag[0].isupper():
+            result['resourceType'] = tag
+        
+        # Handle primitive value attribute
+        if 'value' in element.attrib:
+            # This is a primitive field, return just the value
+            value = element.attrib['value']
+            # Convert boolean strings
+            if value == 'true':
+                return True
+            elif value == 'false':
+                return False
+            # Return as string - let Pydantic handle type conversion
+            return value
+        
+        # Process child elements
+        child_dict = {}
+        for child in element:
+            child_tag = child.tag.split('}')[-1] if '}' in child.tag else child.tag
+            
+            # Determine the model class for the child if possible
+            child_model_class = None
+            if model_class and hasattr(model_class, 'model_fields') and child_tag in model_class.model_fields:
+                field_info = model_class.model_fields[child_tag]
+                annotation = field_info.annotation
+                # Try to extract the inner type from List[X] or Optional[List[X]]
+                origin = get_origin(annotation)
+                if origin is list:
+                    args = get_args(annotation)
+                    if args and hasattr(args[0], 'model_fields'):
+                        child_model_class = args[0]
+                elif hasattr(annotation, '__args__'):
+                    for arg in getattr(annotation, '__args__', []):
+                        if get_origin(arg) is list:
+                            args = get_args(arg)
+                            if args and hasattr(args[0], 'model_fields'):
+                                child_model_class = args[0]
+                            break
+                        elif hasattr(arg, 'model_fields'):
+                            child_model_class = arg
+            
+            child_value = cls._xml_element_to_dict(child, model_class=child_model_class)
+            
+            # Handle repeated elements (lists)
+            if child_tag in child_dict:
+                # Convert to list if not already
+                if not isinstance(child_dict[child_tag], list):
+                    child_dict[child_tag] = [child_dict[child_tag]]
+                child_dict[child_tag].append(child_value)
+            else:
+                child_dict[child_tag] = child_value
+        
+        # Merge child elements into result
+        result.update(child_dict)
+        
+        # Post-process: Convert single values to lists if the model field expects a list
+        # This handles cases like meta.profile which should always be a list
+        if model_class and hasattr(model_class, 'model_fields'):
+            for field_name, field_value in list(result.items()):
+                if field_name == 'resourceType':
+                    continue
+                
+                # Check if this field exists in the model and should be a list
+                if field_name in model_class.model_fields:
+                    field_info = model_class.model_fields[field_name]
+                    annotation = field_info.annotation
+                    
+                    # Check if the annotation is a List type
+                    origin = get_origin(annotation)
+                    # Handle Optional[List[...]] or List[...] or list[...]
+                    if origin is list:
+                        # Field expects a list, ensure value is a list
+                        if not isinstance(field_value, list):
+                            result[field_name] = [field_value]
+                    elif hasattr(annotation, '__args__'):
+                        # Handle Union types (Optional is Union[X, None])
+                        for arg in getattr(annotation, '__args__', []):
+                            if get_origin(arg) is list:
+                                # Field expects a list, ensure value is a list
+                                if not isinstance(field_value, list):
+                                    result[field_name] = [field_value]
+                                break
+        
+        # If result only contains resourceType and nothing else, just return the dict
+        if len(result) == 1 and 'resourceType' in result:
+            return result
+        
+        return result if result else None
 
     @classmethod
     def _deserialize_polymorphically(cls, value: Any, base_type: Type) -> Any:
