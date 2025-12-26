@@ -393,6 +393,10 @@ class CodeGenerator:
         for objects in grouped_imports.values():
             all_imported_objects.update(objects)
 
+        # Also add all serialized models (from factory) to the cleanup list
+        for model in self.data.keys():
+            all_imported_objects.add(model.__name__)
+
         for module, objects in grouped_imports.items():
             module_escaped = module.replace(".", r"\.")
             # Remove module prefixes for imported objects
@@ -420,6 +424,20 @@ class CodeGenerator:
                 rf"<class '[\w.]*\.{re.escape(obj_name)}'>", obj_name, source_code
             )
 
+        # Clean up any remaining class representations that might have been missed
+        # This catches any <class 'module.path.ClassName'> patterns
+        source_code = re.sub(
+            r"<class '[\w.]+\.(\w+)'>",
+            r"\1",
+            source_code
+        )
+        # Also catch simple <class 'ClassName'> patterns that weren't in imports
+        source_code = re.sub(
+            r"<class '(\w+)'>",
+            r"\1",
+            source_code
+        )
+
         # Clean up built-in types that aren't in imports
         builtin_types = ["str", "int", "float", "bool", "list", "dict", "tuple", "set"]
         for builtin_type in builtin_types:
@@ -427,7 +445,13 @@ class CodeGenerator:
                 rf"<class '{re.escape(builtin_type)}'>", builtin_type, source_code
             )
 
+        # Clean up any references to the factory module
         source_code = source_code.replace(f"{FACTORY_MODULE}.", "")
+        # Also clean up module paths that might appear in repr() output
+        # This handles patterns like "fhircraft.fhir.resources.factory.ClassName("
+        factory_pattern = re.escape(FACTORY_MODULE) + r"\."
+        source_code = re.sub(factory_pattern, "", source_code)
+        
         source_code = source_code.replace(LEFT_TO_RIGHT_COMPLEX, LEFT_TO_RIGHT_SIMPLE)
         return source_code
 
