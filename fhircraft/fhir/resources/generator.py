@@ -209,9 +209,14 @@ class CodeGenerator:
 
         try:
             model_base = model.__base__
-            # Add import statement for the base class the the model inherits
+            # Handle the base class: serialize if from factory, import otherwise
             if model_base and model_base != BaseModel:
-                self._add_import_statement(model.__base__)
+                if get_module_name(model_base) == FACTORY_MODULE:
+                    # If base class is from factory, serialize it
+                    self._serialize_model(model_base)
+                else:
+                    # Otherwise, import it
+                    self._add_import_statement(model.__base__)
 
             subdata = {}
             for field, info in model.model_fields.items():
