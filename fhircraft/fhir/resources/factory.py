@@ -472,6 +472,7 @@ class ResourceFactory:
             - Slice definitions (e.g., "element:sliceName") are handled by creating separate nodes under the appropriate parent.
             - Each node in the tree is an instance of ElementDefinitionNode, with children and slices populated as needed.
             - The root node is a synthetic node and is not included in the returned list.
+            - For differential mode, missing parent elements are created as placeholder nodes automatically.
         """
         root = ElementDefinitionNode(
             id="__root__",
@@ -487,6 +488,18 @@ class ResourceFactory:
                 if ":" in part:
                     # Handle slice definitions
                     part, sliceName = part.split(":")
+                    # Ensure parent element exists (create placeholder if needed for differential mode)
+                    if part not in current.children:
+                        current.children[part] = ElementDefinitionNode.model_validate(
+                            {
+                                "id": ".".join(id_parts[:index+1]).replace(":" + sliceName, ""),
+                                "path": ".".join(id_parts[:index+1]).replace(":" + sliceName, ""),
+                                "node_label": part,
+                                "root": root,
+                                "children": {},
+                                "slices": {},
+                            }
+                        )
                     current = current.children[part]
                     current.slices = current.slices or {}
                     current = current.slices.setdefault(
@@ -1121,10 +1134,16 @@ class ResourceFactory:
                     mode=self.Config.construction_mode if self.Config else ConstructionMode.AUTO,
                 )
         except Exception as e:
-            warnings.warn(
-                f"Could not resolve base definition '{base_canonical_url}' for "
-                f"'{structure_definition.name}': {e}. Using FHIRBaseModel as fallback."
-            )
+            if self.Config.construction_mode == ConstructionMode.SNAPSHOT:
+                warnings.warn(
+                    f"Could not resolve base definition '{base_canonical_url}' for "
+                    f"'{structure_definition.name}': {e}. Using FHIRBaseModel as fallback."
+                )
+            elif self.Config.construction_mode == ConstructionMode.DIFFERENTIAL:
+                raise ValueError(
+                    f"Could not resolve base definition '{base_canonical_url}' for "
+                    f"'{structure_definition.name}': {e}."
+                ) from e
         
         # Fallback to FHIRBaseModel
         return FHIRBaseModel

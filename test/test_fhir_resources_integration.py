@@ -147,29 +147,11 @@ fhir_profiles_test_cases = [
 ]
 
 
-def mock_resolve_profile_canonical_url(canonical_url: str):
-    MAP = {
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition": "mcode-primary-cancer-condition.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-medication-administration": "mcode-cancer-related-medication-administration.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-tnm-distant-metastases-category": "mcode-tnm-distant-metastases-category.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient": "mcode-cancer-patient.json",
-        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner": "us-core-practitioner.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-course-summary": "mcode-radiotherapy-course-summary.json",
-        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure": "us-core-procedure.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-human-specimen": "mcode-human-specimen.json",
-    }
-    # Use the auto-generated model to validate a FHIR resource
-    with open(
-        os.path.join(
-            os.path.abspath(f"{PROFILES_DEFINTIONS_DIRECTORY}"), MAP[canonical_url]
-        ),
-        encoding="utf8",
-    ) as file:
-        return json.load(file)
-
-
+@pytest.mark.parametrize("mode", 
+    [ConstructionMode.DIFFERENTIAL, ConstructionMode.SNAPSHOT]
+)
 @pytest.mark.parametrize("filename", fhir_profiles_test_cases)
-def test_construct_profiled_resource(filename):
+def test_construct_profiled_resource(mode, filename):
     # Use the auto-generated model to validate a FHIR resource
     with open(
         os.path.join(os.path.abspath(f"{PROFILES_EXAMPLES_DIRECTORY}"), filename),
@@ -187,7 +169,7 @@ def test_construct_profiled_resource(filename):
         # Generate source code for Pydantic FHIR model
         resource = construct_resource_model(
             canonical_url=fhir_resource["meta"]["profile"][0],
-            mode=ConstructionMode.SNAPSHOT,
+            mode=mode,
         )
         source_code = CodeGenerator().generate_resource_model_code(resource)
         # Store source code in a file
