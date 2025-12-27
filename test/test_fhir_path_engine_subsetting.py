@@ -149,7 +149,8 @@ class TestIndexResources(TestCase):
         assert self.resource.coding[10] == Coding(code="code-5", system="system-5")
 
     def test_index_creates_with_empty_list(self):
-        resource = CodeableConcept(coding=[])
+        resource = CodeableConcept.model_construct()
+        resource.coding = []
         parent = FHIRPathCollectionItem(resource, path=This())
         collection = Element("coding").evaluate([parent], env, create=True)
         Index(0).evaluate(collection, env, create=True)
