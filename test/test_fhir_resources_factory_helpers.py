@@ -46,7 +46,7 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", FHIR_version="4.3.0"
+            FHIR_release="R4B", FHIR_version="4.3.0", construction_mode=ConstructionMode.SNAPSHOT
         )
 
 
@@ -724,7 +724,7 @@ class TestConstructSliceModel(FactoryTestCase):
         self.factory.construct_resource_model.assert_called_once_with(  # type: ignore
             "http://example.org/fhir/StructureDefinition/DummySlice",
             base_model=FHIRSliceModel,
-            mode=ConstructionMode.AUTO,
+            mode=ConstructionMode.SNAPSHOT,
         )
         self.assertTrue(issubclass(result, self.DummyFHIRSliceModel))
         self.assertTrue(issubclass(result, FHIRSliceModel))

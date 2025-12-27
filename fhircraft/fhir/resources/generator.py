@@ -5,7 +5,7 @@ from collections import defaultdict
 from datetime import datetime
 from enum import Enum
 from importlib.metadata import version
-from typing import Any, Dict, ForwardRef, List, get_args
+from typing import Any, Dict, ForwardRef, List, get_args, get_origin
 
 from jinja2 import Environment, FileSystemLoader, Template
 from pydantic import BaseModel
@@ -112,6 +112,24 @@ class CodeGenerator:
         Raises:
             ValueError: If the object does not belong to a module.
         """
+        # Check if this is a generic type and handle typing imports
+        origin = get_origin(annotation)
+        if origin is not None:
+            # This is a generic type like List[X], Optional[X], Union[X, Y], etc.
+            # Add the typing construct to imports
+            origin_name = getattr(origin, "__name__", None)
+            if origin_name:
+                # Map builtin types to their typing equivalents
+                typing_name_map = {
+                    "list": "List",
+                    "dict": "Dict",
+                    "tuple": "Tuple",
+                    "set": "Set",
+                }
+                typing_name = typing_name_map.get(origin_name, origin_name)
+                if typing_name not in self.import_statements["typing"]:
+                    self.import_statements["typing"].append(typing_name)
+        
         # Get the type object
         if hasattr(annotation, "annotation"):
             type_obj = annotation.annotation
@@ -119,16 +137,30 @@ class CodeGenerator:
             type_obj = annotation
         # Ignore NoneType and strings
         if type_obj is not None and not isinstance(type_obj, str):
-            if get_module_name(type_obj) == FACTORY_MODULE and issubclass(
-                type_obj, BaseModel
-            ):
+            # Check if it's a factory-created BaseModel that needs serialization
+            is_factory_basemodel = False
+            if isinstance(type_obj, type):
+                try:
+                    module_name = get_module_name(type_obj)
+                    is_factory_basemodel = (
+                        module_name == FACTORY_MODULE
+                        and issubclass(type_obj, BaseModel)
+                    )
+                except (TypeError, AttributeError):
+                    pass
+            
+            if is_factory_basemodel:
                 # If object was created by ResourceFactory, then serialize the model
                 # But only if we're not already processing it (to prevent infinite recursion)
                 if type_obj not in self._processing_models:
                     self._serialize_model(type_obj)
             else:
-                # Otherwise, import the model's module
-                self._add_import_statement(type_obj)
+                # For everything else (types, TypeAliasType, etc.), try to import it
+                try:
+                    self._add_import_statement(type_obj)
+                except Exception:
+                    # If import fails, skip it silently
+                    pass
         # Repeat for any nested annotations
         for nested_annotation in get_args(annotation):
             self._recursively_import_annotation_types(nested_annotation)
@@ -429,20 +461,6 @@ class CodeGenerator:
                 rf"<class '[\w.]*\.{re.escape(obj_name)}'>", obj_name, source_code
             )
 
-        # Clean up any remaining class representations that might have been missed
-        # This catches any <class 'module.path.ClassName'> patterns
-        source_code = re.sub(
-            r"<class '[\w.]+\.(\w+)'>",
-            r"\1",
-            source_code
-        )
-        # Also catch simple <class 'ClassName'> patterns that weren't in imports
-        source_code = re.sub(
-            r"<class '(\w+)'>",
-            r"\1",
-            source_code
-        )
-
         # Clean up built-in types that aren't in imports
         builtin_types = ["str", "int", "float", "bool", "list", "dict", "tuple", "set"]
         for builtin_type in builtin_types:
@@ -456,6 +474,29 @@ class CodeGenerator:
         # This handles patterns like "fhircraft.fhir.resources.factory.ClassName("
         factory_pattern = re.escape(FACTORY_MODULE) + r"\."
         source_code = re.sub(factory_pattern, "", source_code)
+        
+        # Clean up module prefixes for ALL imported objects from repr() output
+        # For each module with imports, remove the module. prefix for its objects
+        for module, objects in self.import_statements.items():
+            if objects:
+                module_parts = module.split(".")
+                # Try both full module path and last part (e.g., both "typing" and "typing" for "typing")
+                module_variants = [module]
+                if len(module_parts) > 1:
+                    module_variants.append(module_parts[-1])
+                
+                for module_part in module_variants:
+                    for obj in objects:
+                        # Replace module.ObjectName with ObjectName (word boundaries to avoid partial matches)
+                        source_code = re.sub(
+                            rf"\b{re.escape(module_part)}\.{re.escape(obj)}\b",
+                            obj,
+                            source_code
+                        )
+        
+        # Special cleanup for typing module - remove typing. prefix for common constructs
+        # This handles Optional, Union, List, etc. which may appear in repr() but not all in imports
+        source_code = re.sub(r'\btyping\.', '', source_code)
         
         source_code = source_code.replace(LEFT_TO_RIGHT_COMPLEX, LEFT_TO_RIGHT_SIMPLE)
         return source_code

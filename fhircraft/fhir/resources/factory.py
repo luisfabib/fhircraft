@@ -9,6 +9,7 @@ import warnings
 
 # Standard modules
 from enum import Enum
+from annotated_types import MinLen, MaxLen
 from functools import partial
 from pathlib import Path
 from typing import (
@@ -176,6 +177,7 @@ class ResourceFactoryValidators:
         self,
         field: str,
         allowed_types: List[Union[str, type]],
+        forbidden_types: List[Union[str, type]],
         required: bool = False,
     ):
         """
@@ -194,6 +196,7 @@ class ResourceFactoryValidators:
                 field_types=allowed_types,
                 field_name_base=field,
                 required=required,
+                non_allowed_types=forbidden_types,
             )
         )
 
@@ -254,6 +257,16 @@ class ResourceFactory:
         self.paths_in_processing: set[str] = set()
         self.local_cache: Dict[str, type[BaseModel]] = {}
         self.Config: ResourceFactory.FactoryConfig
+
+    @property 
+    def in_snapshot_mode(self) -> bool:
+        """Check if the factory is in snapshot construction mode.""" 
+        return self.Config.construction_mode == ConstructionMode.SNAPSHOT
+    
+    @property
+    def in_differential_mode(self) -> bool:
+        """Check if the factory is in differential construction mode."""
+        return self.Config.construction_mode == ConstructionMode.DIFFERENTIAL
 
     # Convenience functions for easy configuration
     def configure_repository(
@@ -674,9 +687,6 @@ class ResourceFactory:
         # Determine whether typing should be a list based on max. cardinality
         is_list_type = max_card is None or max_card > 1
         actual_field_type = field_type
-        # Handle list types
-        if is_list_type:
-            actual_field_type = List[actual_field_type]
 
         # All fields are non-required and non-nullable
         if default is _Unset:
@@ -684,8 +694,12 @@ class ResourceFactory:
         elif is_list_type:
             default = ensure_list(default)
 
-        if default is None:
-            actual_field_type = Optional[actual_field_type]
+        if self.in_snapshot_mode:
+            # Handle list types
+            if is_list_type:
+                actual_field_type = List[actual_field_type]
+            if default is None:
+                actual_field_type = Optional[actual_field_type]
         # Construct the Pydantic field
         return (
             actual_field_type,
@@ -810,7 +824,7 @@ class ResourceFactory:
                 validation_alias=validation_alias,
             )
             # If the field type is a FHIR primitive, add the extension field
-            if hasattr(primitives, str(field_type)):
+            if self.in_snapshot_mode and hasattr(primitives, str(field_type)):
                 fields.update(
                     self._construct_primitive_extension_field(typed_field_name)
                 )
@@ -1207,15 +1221,20 @@ class ResourceFactory:
         properties = {}
         for name, element in structure.children.items():
 
-            # Prevent circular references
-            if base and name in base.model_fields:
-                continue
-
             # Handle Python reserved keywords for field names early
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
             )
 
+            # Prevent circular references
+            if self.in_snapshot_mode:
+                if base and name in base.model_fields:
+                    continue
+                else: 
+                    field_base_info = None
+            else: 
+                field_base_info = base.model_fields.get(name, None)
+                
             # -------------------------------------
             # Element content references
             # -------------------------------------
@@ -1232,17 +1251,33 @@ class ResourceFactory:
                 else []
             )
             # If element has no type, skip it
-            if not field_types:
+            if self.in_snapshot_mode and not field_types:
                 continue
 
             # Unify types into single annotation
-            field_type = (
-                Union[tuple(field_types)] if len(field_types) > 1 else field_types[0]
-            )
+            if field_types:
+                field_type = (
+                    Union[tuple(field_types)] if len(field_types) > 1 else field_types[0]
+                )
+            elif field_base_info:
+                field_type = field_base_info.annotation
+            else:
+                raise RuntimeError(
+                    f"Could not resolve type for element '{element.path}' in resource '{resource_name}'"
+                )
 
             # -------------------------------------
             # Cardinality
             # -------------------------------------
+            if self.in_differential_mode and field_base_info and field_base_info.metadata:
+                # Use cardinality from base model in differential mode
+                element.min = element.min or next((
+                    meta.min_length for meta in field_base_info.metadata if isinstance(meta, MinLen)
+                ))
+                element.max = element.max or next((
+                    meta.max_length for meta in field_base_info.metadata if isinstance(meta, MaxLen)
+                ))
+                print(element.min, element.max, field_base_info.metadata)
             # Get cardinality of element
             min_card, max_card = self._parse_element_cardinality(element)
 
@@ -1260,10 +1295,15 @@ class ResourceFactory:
                         element.short,
                     )
                 )
+                forbidden_types = [
+                   forbidden_type for field in base.model_fields 
+                   if field.startswith(basename) and not field.endswith('_ext') and (forbidden_type:=field.replace(basename,'')) not in [type.__name__ for type in field_types]
+                ] if self.in_differential_mode and base else []
                 # Add validator to ensure only one of these fields is set
                 validators.add_type_choice_validator(
                     field=basename,
                     allowed_types=field_types,
+                    forbidden_types=forbidden_types,
                     required=min_card > 0,
                 )
                 # Add property to access the values of the choice element without knowing the type set
@@ -1395,7 +1435,6 @@ class ResourceFactory:
                 description=element.short,
                 validation_alias=validation_alias,
             )
-
             # -------------------------------------
             # Primitive extensions
             # -------------------------------------
@@ -1480,16 +1519,7 @@ class ResourceFactory:
             FHIR_version=_structure_definition.fhirVersion or "4.3.0",
             construction_mode=resolved_mode,
         )
-        # Process the FHIR resource's elements & constraints into Pydantic fields & validators
-        fields, validators, properties = (
-            self._process_FHIR_structure_into_Pydantic_components(
-                structure, resource_name=_structure_definition.name
-            )
-        )
-        # Process resource-level constraints
-        for constraint in structure.constraint or []:
-            validators.add_model_constraint_validator(constraint)\
-            
+
         # Determine the base model to inherit from
         if not (base := base_model):
             # For DIFFERENTIAL mode, we must resolve the base definition
@@ -1515,6 +1545,19 @@ class ResourceFactory:
             else:
                 base = FHIRBaseModel
 
+        # Process the FHIR resource's elements & constraints into Pydantic fields & validators
+        fields, validators, properties = (
+            self._process_FHIR_structure_into_Pydantic_components(
+                structure, resource_name=_structure_definition.name, base=base
+            )
+        )
+        print(fields)
+        print(validators._validators)
+        # Process resource-level constraints
+        for constraint in structure.constraint or []:
+            validators.add_model_constraint_validator(constraint)
+            
+
         # If the resource has metadata, prefill the information
         if "meta" in fields or "meta" in getattr(base, "model_fields", {}):
             Meta = get_complex_FHIR_type(
@@ -1531,7 +1574,6 @@ class ResourceFactory:
                     ),
                 ),
             )
-
 
         # Construct the Pydantic model representing the FHIR resource
         model = self._construct_model_with_properties(

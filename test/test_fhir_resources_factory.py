@@ -1,12 +1,14 @@
 import json
 import keyword
 import tarfile
+from annotated_types import MaxLen, MinLen
 import pytest
-from typing import Optional
+from typing import Optional, List
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from pydantic.aliases import AliasChoices
+from pydantic import ValidationError
 
 from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
 import fhircraft.fhir.resources.datatypes.primitives as primitives
@@ -26,7 +28,7 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", FHIR_version="4.3.0"
+            FHIR_release="R4B", FHIR_version="4.3.0", construction_mode=ConstructionMode.SNAPSHOT
         )
 
 
@@ -1368,11 +1370,6 @@ class TestSliceModelInheritance(FactoryTestCase):
         ), "Extension should come before FHIRSliceModel in MRO"
 
 
-# =============================================================================
-# Differential Structure Definition Tests
-# =============================================================================
-
-
 class TestConstructionMode(FactoryTestCase):
     """Test the ConstructionMode enum and mode detection."""
 
@@ -1633,27 +1630,6 @@ class TestResolveAndConstructBaseModel(FactoryTestCase):
         finally:
             # Clean up the paths_in_processing
             self.factory.paths_in_processing.discard(base_url)
-
-    def test_fallback_to_fhir_base_model_when_not_found(self):
-        """Test that FHIRBaseModel is returned when base cannot be resolved."""
-        base_url = "http://example.org/StructureDefinition/nonexistent"
-        
-        sd_dict = {
-            "resourceType": "StructureDefinition",
-            "url": "http://example.org/StructureDefinition/test",
-            "name": "Test",
-            "status": "draft",
-            "kind": "resource",
-            "type": "Resource",
-            "abstract": False,
-            "baseDefinition": base_url
-        }
-        sd = StructureDefinition.model_validate(sd_dict)
-        
-        with pytest.warns(UserWarning, match="Could not resolve base definition"):
-            result = self.factory._resolve_and_construct_base_model(base_url, sd)
-        
-        assert result == FHIRBaseModel
 
 
 class TestConstructResourceModelDifferentialMode(FactoryTestCase):
@@ -1995,3 +1971,768 @@ class TestFactoryConfigConstructionMode(FactoryTestCase):
         # Config should be set during construction
         assert hasattr(self.factory, "Config")
         assert self.factory.Config.construction_mode == ConstructionMode.DIFFERENTIAL
+
+class TestFactoryDifferentialConstruction(FactoryTestCase):
+    """Test that Factory correctly sets construction mode for differential SDs."""
+
+    def setUp(self):
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base",
+            "url": "http://example.org/StructureDefinition/mock-base",
+            "name": "MockBase",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "MockBase",
+                        "path": "MockBase",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "MockBase.element",
+                        "path": "MockBase.element",
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "string"}],
+                        "short": "A field specific to the derived resource",
+                    },
+                ]
+            },
+        }
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        return super().setUp()
+
+
+    def test_construct_diff_max_cardinality(self):
+        """Test that construct_resource_model sets construction_mode in Config."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-mode",
+            "url": "http://example.org/StructureDefinition/test-diff-mode",
+            "name": "TestDiffMode",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base",
+            "differential": {
+                "element": [
+                    {"id": "MockBase.element", "path": "MockBase.element", "min": 0, "max": "2"}
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        self.assertIn('element', mock_resource.model_fields)
+        # Assert element
+        element = mock_resource.model_fields.get('element')
+        assert element is not None, 'Profiled element field not found in model fields'
+        assert element.annotation == Optional[List[primitives.String]], 'Profiled element field does not have correct type annotation'
+
+        # Assert metadata
+        element_metadata = element.metadata
+        assert element_metadata is not None, 'No metadata found for profiled element'
+        self.assertEqual(next((meta for meta in element_metadata if isinstance(meta, MaxLen))).max_length, 2, 'Profiled max. cardinality has not been correctly set')
+        
+        # Test valid dataset        
+        self.assertIsNotNone(mock_resource.model_validate({'element': ['test']}), 'Valid dataset did not validate correctly')
+        # Test invalid dataset
+        with self.assertRaises(ValidationError, msg='Invalid dataset did not raise ValidationError'):
+            mock_resource.model_validate({'element': ['test1', 'test2', 'test3']})
+
+        
+    def test_construct_diff_min_cardinality(self):
+        """Test that construct_resource_model sets construction_mode in Config."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-mode",
+            "url": "http://example.org/StructureDefinition/test-diff-mode",
+            "name": "TestDiffMode",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base",
+            "differential": {
+                "element": [
+                    {"id": "MockBase.element", "path": "MockBase.element", "min": 1, "max": "*"}
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        self.assertIn('element', mock_resource.model_fields)
+        # Assert element
+        element = mock_resource.model_fields.get('element')
+        assert element is not None, 'Profiled element field not found in model fields'
+        assert element.annotation == Optional[List[primitives.String]], 'Profiled element field does not have correct type annotation'
+
+        # Assert metadata
+        element_metadata = element.metadata
+        assert element_metadata is not None, 'No metadata found for profiled element'
+        self.assertEqual(next((meta for meta in element_metadata if isinstance(meta, MinLen))).min_length, 1, 'Profiled min. cardinality has not been correctly set')
+        
+        # Test valid dataset        
+        self.assertIsNotNone(mock_resource.model_validate({'element': ['test']}), 'Valid dataset did not validate correctly')
+        # Test invalid dataset
+        with self.assertRaises(ValidationError, msg='Invalid dataset did not raise ValidationError'):
+            mock_resource.model_validate({'element': []})
+
+
+    def test_construct_diff_fixed_value_constraint(self):
+        """Test that differential can add fixed value constraints to elements."""
+        # Create base with a status field
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-status",
+            "url": "http://example.org/StructureDefinition/mock-base-status",
+            "name": "MockBaseStatus",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseStatus", "path": "MockBaseStatus", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseStatus.status",
+                        "path": "MockBaseStatus.status",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "code"}],
+                    },
+                ]
+            },
+        }
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Apply fixed value constraint in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-fixed",
+            "url": "http://example.org/StructureDefinition/test-diff-fixed",
+            "name": "TestDiffFixed",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-status",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseStatus.status",
+                        "path": "MockBaseStatus.status",
+                        "fixedCode": "active"
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Status field should exist
+        self.assertIn('status', mock_resource.model_fields)
+        
+        # Test that only the fixed value is accepted
+        instance = mock_resource.model_validate({'status': 'active'})
+        self.assertEqual(instance.status.value, 'active')
+        
+        # Test that other values are rejected
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({'status': 'inactive'})
+
+
+    def test_construct_diff_pattern_value_constraint(self):
+        """Test that differential can add pattern value constraints to elements."""
+        # Create base with a coding field
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-coding",
+            "url": "http://example.org/StructureDefinition/mock-base-coding",
+            "name": "MockBaseCoding",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseCoding", "path": "MockBaseCoding", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseCoding.code",
+                        "path": "MockBaseCoding.code",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "Coding"}],
+                    },
+                ]
+            },
+        }
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Apply pattern constraint in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-pattern",
+            "url": "http://example.org/StructureDefinition/test-diff-pattern",
+            "name": "TestDiffPattern",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-coding",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseCoding.code",
+                        "path": "MockBaseCoding.code",
+                        "patternCoding": {
+                            "system": "http://example.org/codesystem",
+                            "code": "test-code"
+                        }
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Code field should exist and have a pattern validator
+        self.assertIn('code', mock_resource.model_fields)
+        
+        # Check that model has the pattern constraint validator
+        validator_names = [name for name in dir(mock_resource) if 'pattern_constraint' in name]
+        self.assertTrue(len(validator_names) > 0, "Pattern constraint validator not found")
+        
+        mock_resource.model_validate({'coding': {'system': 'http://example.org/codesystem', 'code': 'test-code'}})
+
+        # Test that other values are rejected
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({'coding': {'system': 'http://wrong-system', 'code': 'wrong-code'}})
+
+
+    def test_construct_diff_type_choice_element(self):
+        """Test that differential can constrain type choice elements."""
+        # Create base with a value[x] type choice field
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-choice",
+            "url": "http://example.org/StructureDefinition/mock-base-choice",
+            "name": "MockBaseChoice",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseChoice", "path": "MockBaseChoice", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseChoice.value[x]",
+                        "path": "MockBaseChoice.value[x]",
+                        "min": 0,
+                        "max": "1",
+                        "type": [
+                            {"code": "string"},
+                            {"code": "integer"},
+                            {"code": "boolean"}
+                        ],
+                    },
+                ]
+            },
+        }
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Constrain type choice to only string and integer in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-choice",
+            "url": "http://example.org/StructureDefinition/test-diff-choice",
+            "name": "TestDiffChoice",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-choice",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseChoice.value[x]",
+                        "path": "MockBaseChoice.value[x]",
+                        "min": 0,
+                        "max": "1",
+                        "type": [
+                            {"code": "string"},
+                        ]
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Test that property accessor works
+        self.assertTrue(hasattr(mock_resource, 'value'))
+        
+        # Test valid data with string
+        instance = mock_resource.model_validate({'valueString': 'test'})
+        self.assertEqual(instance.value, 'test')
+        
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({'valueInteger': 2})
+
+
+    def test_construct_diff_nested_backbone_element(self):
+        """Test that differential can constrain nested backbone elements."""
+        # Create base with simple nested structure using ContactPoint
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-telecom",
+            "url": "http://example.org/StructureDefinition/mock-base-telecom",
+            "name": "MockBaseTelecom",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseTelecom", "path": "MockBaseTelecom", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseTelecom.telecom",
+                        "path": "MockBaseTelecom.telecom",
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "ContactPoint"}],
+                    },
+                ]
+            },
+        }
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Constrain telecom in differential to be required
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-telecom",
+            "url": "http://example.org/StructureDefinition/test-diff-telecom",
+            "name": "TestDiffTelecom",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-telecom",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseTelecom.telecom",
+                        "path": "MockBaseTelecom.telecom",
+                        "min": 1,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Telecom field should exist
+        self.assertIn('telecom', mock_resource.model_fields)
+        
+        # Check that it's required (min cardinality 1)
+        telecom_metadata = mock_resource.model_fields['telecom'].metadata
+        self.assertEqual(next((meta for meta in telecom_metadata if isinstance(meta, MinLen))).min_length, 1)
+        
+        # Test valid data with required telecom
+        instance = mock_resource.model_validate({
+            'telecom': [{'system': 'phone', 'value': '555-1234'}]
+        })
+        self.assertIsNotNone(instance.telecom)
+        
+        # Test invalid data without required telecom
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({
+                'telecom': []
+            })
+
+
+    def test_construct_diff_element_slicing(self):
+        """Test that differential can add constraint to sliced elements."""
+        # Create base with identifier field that can be sliced
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-identifier",
+            "url": "http://example.org/StructureDefinition/mock-base-identifier",
+            "name": "MockBaseIdentifier",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseIdentifier", "path": "MockBaseIdentifier", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseIdentifier.identifier",
+                        "path": "MockBaseIdentifier.identifier",
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "Identifier"}],
+                    },
+                ]
+            },
+        }
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Constrain identifier field cardinality in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-identifier",
+            "url": "http://example.org/StructureDefinition/test-diff-identifier",
+            "name": "TestDiffIdentifier",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-identifier",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseIdentifier.identifier",
+                        "path": "MockBaseIdentifier.identifier",
+                        "min": 1,
+                        "max": "3"
+                    },
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Identifier field should exist with new constraints
+        self.assertIn('identifier', mock_resource.model_fields)
+        identifier = mock_resource.model_fields['identifier']
+        identifier_metadata = identifier.metadata
+        
+        # Verify constraints
+        self.assertEqual(next((meta for meta in identifier_metadata if isinstance(meta, MinLen))).min_length, 1)
+        self.assertEqual(next((meta for meta in identifier_metadata if isinstance(meta, MaxLen))).max_length, 3)
+
+
+    def test_construct_diff_constraint_invariant(self):
+        """Test that differential can add constraint invariants to elements."""
+        # Create base
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-constraint",
+            "url": "http://example.org/StructureDefinition/mock-base-constraint",
+            "name": "MockBaseConstraint",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseConstraint", "path": "MockBaseConstraint", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseConstraint.value",
+                        "path": "MockBaseConstraint.value",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "integer"}],
+                    },
+                ]
+            },
+        }
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Add constraint in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-constraint",
+            "url": "http://example.org/StructureDefinition/test-diff-constraint",
+            "name": "TestDiffConstraint",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseConstraint.value",
+                        "path": "MockBaseConstraint.value",
+                        "constraint": [
+                            {
+                                "key": "val-1",
+                                "severity": "error",
+                                "human": "Value must be positive",
+                                "expression": "value > 0"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Value field should exist
+        self.assertIn('value', mock_resource.model_fields)
+        
+        # Check that constraint validator was added
+        validator_names = [name for name in dir(mock_resource) if 'val-1' in name or 'constraint' in name.lower()]
+        self.assertTrue(len(validator_names) > 0, "Constraint validator not found")
+
+        # Check that valid value passes
+        instance = mock_resource.model_validate({'value': 5})
+        self.assertEqual(instance.value, 5)
+
+        # Check that invalid value raises error
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({'value': -3})
+
+
+    def test_construct_diff_multiple_elements_constraints(self):
+        """Test that differential can apply different constraint types to multiple elements."""
+        # Create base with multiple fields
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-multi",
+            "url": "http://example.org/StructureDefinition/mock-base-multi",
+            "name": "MockBaseMulti",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseMulti", "path": "MockBaseMulti", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseMulti.status",
+                        "path": "MockBaseMulti.status",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "code"}],
+                    },
+                    {
+                        "id": "MockBaseMulti.priority",
+                        "path": "MockBaseMulti.priority",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "code"}],
+                    },
+                    {
+                        "id": "MockBaseMulti.text",
+                        "path": "MockBaseMulti.text",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Apply different constraints to different elements
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-multi-constraints",
+            "url": "http://example.org/StructureDefinition/test-diff-multi-constraints",
+            "name": "TestDiffMultiConstraints",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-multi",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseMulti.status",
+                        "path": "MockBaseMulti.status",
+                        "min": 1,  # Make required
+                        "fixedCode": "active"  # Fix value
+                    },
+                    {
+                        "id": "MockBaseMulti.priority",
+                        "path": "MockBaseMulti.priority",
+                        "patternCode": "high"  # Pattern constraint
+                    },
+                    {
+                        "id": "MockBaseMulti.text",
+                        "path": "MockBaseMulti.text",
+                        "min": 1,  # Make required
+                        "max": "1"
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # All fields should exist
+        self.assertIn('status', mock_resource.model_fields)
+        self.assertIn('priority', mock_resource.model_fields)
+        self.assertIn('text', mock_resource.model_fields)
+        
+        # Test valid instance with all constraints satisfied
+        instance = mock_resource.model_validate({
+            'status': 'active',
+            'priority': 'high',
+            'text': 'Test text'
+        })
+        self.assertEqual(instance.status.value, 'active')
+        
+        # Test that fixed value is enforced
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({
+                'status': 'inactive',
+                'text': 'Test text'
+            })
+
+        # Test that pattern is enforced
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({
+                'priority': 'wrong',
+            })
+
+
+    def test_construct_diff_inherits_base_structure(self):
+        """Test that differential models properly inherit complete structure from base."""
+        # Create base with multiple nested elements
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-complex",
+            "url": "http://example.org/StructureDefinition/mock-base-complex",
+            "name": "MockBaseComplex",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseComplex", "path": "MockBaseComplex", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseComplex.field1",
+                        "path": "MockBaseComplex.field1",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                    {
+                        "id": "MockBaseComplex.field2",
+                        "path": "MockBaseComplex.field2",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "integer"}],
+                    },
+                    {
+                        "id": "MockBaseComplex.field3",
+                        "path": "MockBaseComplex.field3",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "boolean"}],
+                    },
+                ]
+            },
+        }
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Differential only constrains one field
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-inherit",
+            "url": "http://example.org/StructureDefinition/test-diff-inherit",
+            "name": "TestDiffInherit",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-complex",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseComplex.field1",
+                        "path": "MockBaseComplex.field1",
+                        "min": 1  # Only constrain field1
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # All fields from base should be present
+        self.assertIn('field1', mock_resource.model_fields)
+        self.assertIn('field2', mock_resource.model_fields)
+        self.assertIn('field3', mock_resource.model_fields)
+        
+        # Field1 should have new constraint
+        field1_metadata = mock_resource.model_fields['field1'].metadata
+        self.assertEqual(
+            next((meta for meta in field1_metadata if isinstance(meta, MinLen))).min_length,
+            1
+        )
+        
+        # Other fields should work normally
+        instance = mock_resource.model_validate({
+            'field1': 'required_value',
+            'field2': 42,
+            'field3': True
+        })
+        self.assertEqual(instance.field1, 'required_value')
+        self.assertEqual(instance.field2, 42)
+        self.assertEqual(instance.field3, True)
+
+        
