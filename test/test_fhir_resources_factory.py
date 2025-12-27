@@ -2005,6 +2005,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             },
         }
+        self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
         return super().setUp()
 
@@ -2121,6 +2122,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             },
         }
+        self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
         
         # Apply fixed value constraint in differential
@@ -2189,6 +2191,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             },
         }
+        self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
         
         # Apply pattern constraint in differential
@@ -2266,6 +2269,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             },
         }
+        self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
         
         # Constrain type choice to only string and integer in differential
@@ -2337,6 +2341,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             },
         }
+        self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
         
         # Constrain telecom in differential to be required
@@ -2414,6 +2419,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             },
         }
+        self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
         
         # Constrain identifier field cardinality in differential
@@ -2481,6 +2487,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             },
         }
+        self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
         
         # Add constraint in differential
@@ -2498,8 +2505,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseConstraint.value",
-                        "path": "MockBaseConstraint.value",
+                        "id": "MockBaseConstraint",
+                        "path": "MockBaseConstraint",
                         "constraint": [
                             {
                                 "key": "val-1",
@@ -2531,7 +2538,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
 
         # Check that invalid value raises error
         with self.assertRaises(ValidationError):
-            mock_resource.model_validate({'value': -3})
+            mock_resource.model_validate({'value': -2})
 
 
     def test_construct_diff_multiple_elements_constraints(self):
@@ -2574,6 +2581,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             },
         }
+        self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
         
         # Apply different constraints to different elements
@@ -2683,6 +2691,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             },
         }
+        self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
         
         # Differential only constrains one field

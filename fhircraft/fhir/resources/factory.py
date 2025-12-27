@@ -694,12 +694,11 @@ class ResourceFactory:
         elif is_list_type:
             default = ensure_list(default)
 
-        if self.in_snapshot_mode:
-            # Handle list types
-            if is_list_type:
-                actual_field_type = List[actual_field_type]
-            if default is None:
-                actual_field_type = Optional[actual_field_type]
+        # Handle list types
+        if is_list_type:
+            actual_field_type = List[actual_field_type]
+        if default is None:
+            actual_field_type = Optional[actual_field_type]
         # Construct the Pydantic field
         return (
             actual_field_type,
@@ -959,6 +958,125 @@ class ResourceFactory:
             max_card = 99999
         return min_card, max_card
 
+    def _resolve_base_snapshot_element(
+        self,
+        element_path: str,
+        base_structure_definition: StructureDefinition | None = None,
+    ) -> ElementDefinition | None:
+        """Resolve a snapshot element from the base StructureDefinition.
+        
+        For differential construction, this retrieves the complete element definition
+        from the base's snapshot to access inherited properties.
+        
+        Args:
+            element_path: The element path to resolve (e.g., "Patient.identifier")
+            base_structure_definition: The base StructureDefinition to resolve from
+            
+        Returns:
+            The resolved snapshot element, or None if not found
+        """
+        if not base_structure_definition:
+            return None
+            
+        if not base_structure_definition.snapshot or not base_structure_definition.snapshot.element:
+            return None
+        
+        for elem in base_structure_definition.snapshot.element:
+            if elem.path == element_path:
+                return elem
+        
+        return None
+    
+    def _merge_differential_elements_with_base_snapshot(
+        self,
+        differential_elements: List[ElementDefinition],
+        base_structure_definition: StructureDefinition,
+    ) -> List[ElementDefinition]:
+        """Merge all differential elements with their base snapshot counterparts.
+        
+        This creates a complete list of element definitions by resolving each differential
+        element against the base snapshot, inheriting all properties not explicitly changed.
+        
+        Args:
+            differential_elements: List of differential elements from the profile
+            base_structure_definition: The base StructureDefinition containing snapshot
+            
+        Returns:
+            List of merged elements with complete property information
+        """
+        if not base_structure_definition or not base_structure_definition.snapshot:
+            return differential_elements
+            
+        # Create a lookup map for base snapshot elements
+        base_snapshot_map = {
+            elem.path: elem
+            for elem in (base_structure_definition.snapshot.element or [])
+        }
+        
+        merged_elements = []
+        for diff_elem in differential_elements:
+            base_elem = base_snapshot_map.get(diff_elem.path)
+            if base_elem:
+                # Start with base snapshot element
+                merged = ElementDefinition.model_validate(base_elem.model_dump())
+                # Overlay differential changes
+                for field_name, field_info in ElementDefinition.model_fields.items():
+                    diff_value = getattr(diff_elem, field_name, None)
+                    # Only override non-None values (None means "not specified in differential")
+                    if diff_value is not None:
+                        setattr(merged, field_name, diff_value)
+                merged_elements.append(merged)
+            else:
+                # Element not in base (new element in differential)
+                merged_elements.append(diff_elem)
+        
+        return merged_elements
+    
+    def _merge_differential_with_base_snapshot(
+        self,
+        differential_element: ElementDefinition,
+        base_structure_definition: StructureDefinition | None = None,
+    ) -> ElementDefinition:
+        """Merge a differential element with its base snapshot element.
+        
+        Creates a complete element definition by overlaying differential changes
+        onto the base snapshot element. This provides authoritative FHIR properties
+        without relying on Pydantic model introspection.
+        
+        Args:
+            differential_element: The differential element from the current profile
+            base_structure_definition: The base StructureDefinition to resolve snapshot from
+            
+        Returns:
+            Merged element with base properties and differential overrides
+        """
+        # Try to resolve the base snapshot element
+        base_snapshot_element = self._resolve_base_snapshot_element(
+            differential_element.path,
+            base_structure_definition
+        )
+        
+        if not base_snapshot_element:
+            # No base snapshot available, use differential as-is
+            return differential_element
+        
+        # Start with a deep copy of the base snapshot element
+        merged = base_snapshot_element.model_copy(deep=True)
+        
+        # Overlay differential changes (any non-None values from differential)
+        # This handles fields that were explicitly set in the differential
+        for field_name in differential_element.model_fields:
+            diff_value = getattr(differential_element, field_name, None)
+            # Only override if the differential has a non-None value
+            # Special handling for ElementDefinitionNode fields
+            if field_name in ('node_label', 'children', 'slices', 'root'):
+                # Skip ElementDefinitionNode-specific fields
+                continue
+            if diff_value is not None:
+                setattr(merged, field_name, diff_value)
+        
+        return merged
+
     def _resolve_content_reference(
         self, element: ElementDefinitionNode, resource_name="Unknown"
     ) -> ElementDefinitionNode:
@@ -1209,9 +1327,9 @@ class ResourceFactory:
         Processes the FHIR structure elements into Pydantic components.
 
         Args:
-            structure (dict): The structure containing FHIR elements.
-            base (type[BaseModel], optional): The base model to check for existing validators. Defaults to None.
-            resolving_paths (set, optional): Set of paths currently being resolved to prevent circular references.
+            structure: The structure containing FHIR elements.
+            base: The base model to check for existing validators. Defaults to None.
+            resource_name: Name of the resource being processed.
 
         Returns:
             Tuple[dict, dict, dict]: A tuple containing fields, validators, and properties.
@@ -1230,10 +1348,6 @@ class ResourceFactory:
             if self.in_snapshot_mode:
                 if base and name in base.model_fields:
                     continue
-                else: 
-                    field_base_info = None
-            else: 
-                field_base_info = base.model_fields.get(name, None)
                 
             # -------------------------------------
             # Element content references
@@ -1250,35 +1364,25 @@ class ResourceFactory:
                 if element.type
                 else []
             )
-            # If element has no type, skip it
-            if self.in_snapshot_mode and not field_types:
-                continue
+            # If element has no type, skip it (only in snapshot mode)
+            if not field_types:
+                if self.in_snapshot_mode:
+                    continue
+                else:
+                    raise RuntimeError(
+                        f"Could not resolve type for element '{element.path}' in resource '{resource_name}'. "
+                        f"Differential element missing type and no base snapshot element found."
+                    )
 
             # Unify types into single annotation
-            if field_types:
-                field_type = (
-                    Union[tuple(field_types)] if len(field_types) > 1 else field_types[0]
-                )
-            elif field_base_info:
-                field_type = field_base_info.annotation
-            else:
-                raise RuntimeError(
-                    f"Could not resolve type for element '{element.path}' in resource '{resource_name}'"
-                )
+            field_type = (
+                Union[tuple(field_types)] if len(field_types) > 1 else field_types[0]
+            )
 
             # -------------------------------------
             # Cardinality
             # -------------------------------------
-            if self.in_differential_mode and field_base_info and field_base_info.metadata:
-                # Use cardinality from base model in differential mode
-                element.min = element.min or next((
-                    meta.min_length for meta in field_base_info.metadata if isinstance(meta, MinLen)
-                ))
-                element.max = element.max or next((
-                    meta.max_length for meta in field_base_info.metadata if isinstance(meta, MaxLen)
-                ))
-                print(element.min, element.max, field_base_info.metadata)
-            # Get cardinality of element
+            # Get cardinality of element (now has complete info from snapshot merge)
             min_card, max_card = self._parse_element_cardinality(element)
 
             # -------------------------------------
@@ -1383,7 +1487,7 @@ class ResourceFactory:
                 )
                 field_subfields, subfield_validators, subfield_properties = (
                     self._process_FHIR_structure_into_Pydantic_components(
-                        element, field_type, resource_name=resource_name
+                        element, field_type, resource_name=resource_name,
                     )
                 )
                 # -------------------------------------
@@ -1494,9 +1598,53 @@ class ResourceFactory:
         # Detect the appropriate construction mode
         resolved_mode = self._detect_construction_mode(_structure_definition, mode)
         
+        # Determine the base model and StructureDefinition to inherit from
+        _base_structure_definition = None
+        if not (base := base_model):
+            # For DIFFERENTIAL mode, we must resolve the base definition
+            if resolved_mode == ConstructionMode.DIFFERENTIAL:
+                if base_canonical_url := _structure_definition.baseDefinition:
+                    # Resolve and store the base StructureDefinition for snapshot merging
+                    try:
+                        _base_structure_definition = self.resolve_structure_definition(base_canonical_url)
+                    except Exception as e:
+                        # Base StructureDefinition not in repository
+                        # It may have been constructed inline - we'll construct without snapshot merging
+                        pass
+                    base = self._resolve_and_construct_base_model(
+                        base_canonical_url, _structure_definition
+                    )
+                    resolved_base_sd = self.repository.get(base_canonical_url)
+                    # Use resolved StructureDefinition if we didn't get it from repository
+                    if not _base_structure_definition and resolved_base_sd:
+                        _base_structure_definition = resolved_base_sd
+                else:
+                    warnings.warn(
+                        f"DIFFERENTIAL mode for '{_structure_definition.name}' but no baseDefinition specified. "
+                        "Using FHIRBaseModel as base."
+                    )
+                    base = FHIRBaseModel
+            # For SNAPSHOT mode, check if there's a baseDefinition to inherit from
+            elif base_canonical_url := _structure_definition.baseDefinition:
+                if not (base := self.construction_cache.get(base_canonical_url)):
+                    try:
+                        base = self._resolve_FHIR_type(base_canonical_url)
+                        assert inspect.isclass(base) and issubclass(base, FHIRBaseModel)
+                    except:
+                        base = FHIRBaseModel
+            else:
+                base = FHIRBaseModel
+        
         # Select element source based on mode
         if resolved_mode == ConstructionMode.DIFFERENTIAL:
             elements = _structure_definition.differential.element
+            # Merge differential elements with base snapshot BEFORE building tree
+            if _base_structure_definition:
+                print('BEFORE',elements)
+                elements = self._merge_differential_elements_with_base_snapshot(
+                    elements, _base_structure_definition
+                )
+                print('AFTER',elements)
         else:  # SNAPSHOT
             elements = _structure_definition.snapshot.element
         
@@ -1520,42 +1668,19 @@ class ResourceFactory:
             construction_mode=resolved_mode,
         )
 
-        # Determine the base model to inherit from
-        if not (base := base_model):
-            # For DIFFERENTIAL mode, we must resolve the base definition
-            if resolved_mode == ConstructionMode.DIFFERENTIAL:
-                if base_canonical_url := _structure_definition.baseDefinition:
-                    base = self._resolve_and_construct_base_model(
-                        base_canonical_url, _structure_definition
-                    )
-                else:
-                    warnings.warn(
-                        f"DIFFERENTIAL mode for '{_structure_definition.name}' but no baseDefinition specified. "
-                        "Using FHIRBaseModel as base."
-                    )
-                    base = FHIRBaseModel
-            # For SNAPSHOT mode, check if there's a baseDefinition to inherit from
-            elif base_canonical_url := _structure_definition.baseDefinition:
-                if not (base := self.construction_cache.get(base_canonical_url)):
-                    try:
-                        base = self._resolve_FHIR_type(base_canonical_url)
-                        assert inspect.isclass(base) and issubclass(base, FHIRBaseModel)
-                    except:
-                        base = FHIRBaseModel
-            else:
-                base = FHIRBaseModel
-
         # Process the FHIR resource's elements & constraints into Pydantic fields & validators
         fields, validators, properties = (
             self._process_FHIR_structure_into_Pydantic_components(
-                structure, resource_name=_structure_definition.name, base=base
+                structure, 
+                resource_name=_structure_definition.name, 
+                base=base,
             )
         )
-        print(fields)
-        print(validators._validators)
+        print('FIELDS:', fields)
         # Process resource-level constraints
         for constraint in structure.constraint or []:
             validators.add_model_constraint_validator(constraint)
+        print('VALIDATORS:', validators._validators)
             
 
         # If the resource has metadata, prefill the information
