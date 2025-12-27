@@ -76,14 +76,14 @@ def test_all_returns_true_for_empty_collection():
 
 def test_all_returns_true_for_criteria_applying_to_all():
     criteria = GreaterThan(This(), [FHIRPathCollectionItem.wrap(1)])
-    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    collection = [FHIRPathCollectionItem(value=3), FHIRPathCollectionItem(value=2)]
     result = All(criteria).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
 def test_all_returns_false_for_criteria_not_applying_to_all():
     criteria = GreaterThan(This(), [FHIRPathCollectionItem.wrap(0)])
-    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
+    collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=-2)]
     result = All(criteria).evaluate(collection, env)
     assert result == [FHIRPathCollectionItem.wrap(False)]
 

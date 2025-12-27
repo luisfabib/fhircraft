@@ -117,7 +117,7 @@ class All(FHIRPathFunction):
                                 [item],
                                 get_expression_context(environment, item, index),
                                 create,
-                            )
+                            )[0].value
                             if isinstance(self.criteria, FHIRPath)
                             else item.value == self.criteria
                         )
