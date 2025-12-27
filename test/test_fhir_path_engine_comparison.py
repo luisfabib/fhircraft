@@ -12,6 +12,8 @@ env = dict()
 # -------------
 
 greater_than_cases = (
+    (0, 1, False),
+    (1, 0, True),
     (10, 5, True),
     (10, 5.0, True),
     ("abc", "ABC", True),
@@ -49,6 +51,8 @@ def test_greaterthan_string_representation():
 
 
 less_than_cases = (
+    (0, 1, True),
+    (1, 0, False),
     (10, 5, False),
     (10, 5.0, False),
     ("abc", "ABC", False),
@@ -83,6 +87,8 @@ def test_lessthan_string_representation():
 # ----------------
 
 less_equal_than_cases = (
+    (0, 1, True),
+    (1, 0, False),
     (10, 5, False),
     (2.5, 5.0, True),
     ("abc", "ABC", False),
@@ -118,6 +124,8 @@ def test_lessequalthan_string_representation():
 # ----------------
 
 greater_equal_than_cases = (
+    (0, 1, False),
+    (1, 0, True),
     (10, 5, True),
     (2.5, 5.0, False),
     ("abc", "ABC", True),
