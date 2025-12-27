@@ -68,7 +68,7 @@ class GreaterThan(FHIRComparisonOperator):
         left_value, right_value = evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
-        if not left_value or not right_value:
+        if (not left_value and left_value!=0) or (not right_value and right_value!=0):
             return []
         return [FHIRPathCollectionItem.wrap(left_value > right_value)]
 
@@ -112,7 +112,7 @@ class LessThan(FHIRComparisonOperator):
         left_value, right_value = evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
-        if not left_value or not right_value:
+        if (not left_value and left_value!=0) or (not right_value and right_value!=0):
             return []
         return [FHIRPathCollectionItem.wrap(left_value < right_value)]
 
@@ -156,7 +156,7 @@ class LessEqualThan(FHIRComparisonOperator):
         left_value, right_value = evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
-        if not left_value or not right_value:
+        if (not left_value and left_value!=0) or (not right_value and right_value!=0):
             return []
         return [FHIRPathCollectionItem.wrap(left_value <= right_value)]
 
@@ -200,7 +200,7 @@ class GreaterEqualThan(FHIRComparisonOperator):
         left_value, right_value = evaluate_and_prepare_collection_values(
             self, self.left, self.right, collection, environment, create
         )
-        if not left_value or not right_value:
+        if (not left_value and left_value!=0) or (not right_value and right_value!=0):
             return []
         return [FHIRPathCollectionItem.wrap(left_value >= right_value)]
 

@@ -1102,7 +1102,7 @@ class TestSliceModelInheritance(FactoryTestCase):
         assert slice_model.max_cardinality == 3
 
         # Test instance creation
-        instance = slice_model()
+        instance = slice_model.model_construct()
         assert isinstance(
             instance, BackboneElement
         ), "Instance should be BackboneElement"
