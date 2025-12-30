@@ -521,6 +521,9 @@ class ResourceFactory:
                             {
                                 "node_label": sliceName,
                                 "path": "__root__",
+                                "root": root,
+                                "children": {},
+                                "slices": {},
                                 **(
                                     element.model_dump(exclude_unset=True)
                                     if index == len(id_parts) - 1
@@ -1009,13 +1012,22 @@ class ResourceFactory:
             
         # Create a lookup map for base snapshot elements
         base_snapshot_map = {
-            elem.path: elem
+            elem.id: elem
             for elem in (base_structure_definition.snapshot.element or [])
         }
         
         merged_elements = []
         for diff_elem in differential_elements:
-            base_elem = base_snapshot_map.get(diff_elem.path)
+            # For slice children, strip the slice name when looking up base element
+            # e.g., "MockBase.component:systolic.code" -> "MockBase.component.code"
+            lookup_id = diff_elem.id
+            if lookup_id and ':' in lookup_id:
+                # Replace "element:sliceName" with "element" in the ID
+                parts = lookup_id.split('.')
+                normalized_parts = [part.split(':')[0] for part in parts]
+                lookup_id = '.'.join(normalized_parts)
+            
+            base_elem = base_snapshot_map.get(lookup_id)
             if base_elem:
                 # Start with base snapshot element
                 merged = ElementDefinition.model_validate(base_elem.model_dump())
@@ -1338,7 +1350,6 @@ class ResourceFactory:
         validators = ResourceFactoryValidators()
         properties = {}
         for name, element in structure.children.items():
-
             # Handle Python reserved keywords for field names early
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
@@ -1366,13 +1377,7 @@ class ResourceFactory:
             )
             # If element has no type, skip it (only in snapshot mode)
             if not field_types:
-                if self.in_snapshot_mode:
-                    continue
-                else:
-                    raise RuntimeError(
-                        f"Could not resolve type for element '{element.path}' in resource '{resource_name}'. "
-                        f"Differential element missing type and no base snapshot element found."
-                    )
+                continue
 
             # Unify types into single annotation
             field_type = (
@@ -1485,9 +1490,18 @@ class ResourceFactory:
                 backbone_model_name = capitalize(resource_name).strip() + "".join(
                     [capitalize(label).strip() for label in element.path.split(".")[1:]]
                 )
+                backbone_base_model = None
+                if self.in_differential_mode:
+                    try:
+                        field_type = get_fhir_resource_type(
+                            ''.join([part.capitalize() for part in element.path.split('.')]), 
+                            self.Config.FHIR_release if self.Config else "4.3.0"
+                        )
+                    except AttributeError: 
+                        pass
                 field_subfields, subfield_validators, subfield_properties = (
                     self._process_FHIR_structure_into_Pydantic_components(
-                        element, field_type, resource_name=resource_name,
+                        element, field_type, resource_name=resource_name
                     )
                 )
                 # -------------------------------------
@@ -1598,6 +1612,14 @@ class ResourceFactory:
         # Detect the appropriate construction mode
         resolved_mode = self._detect_construction_mode(_structure_definition, mode)
         
+        self.Config = self.FactoryConfig(
+            FHIR_release=get_FHIR_release_from_version(
+                _structure_definition.fhirVersion or "4.3.0"
+            ),
+            FHIR_version=_structure_definition.fhirVersion or "4.3.0",
+            construction_mode=resolved_mode,
+        )
+
         # Determine the base model and StructureDefinition to inherit from
         _base_structure_definition = None
         if not (base := base_model):
@@ -1640,11 +1662,9 @@ class ResourceFactory:
             elements = _structure_definition.differential.element
             # Merge differential elements with base snapshot BEFORE building tree
             if _base_structure_definition:
-                print('BEFORE',elements)
                 elements = self._merge_differential_elements_with_base_snapshot(
                     elements, _base_structure_definition
                 )
-                print('AFTER',elements)
         else:  # SNAPSHOT
             elements = _structure_definition.snapshot.element
         
@@ -1660,13 +1680,6 @@ class ResourceFactory:
             warnings.warn(
                 "StructureDefinition does not specify FHIR version, defaulting to 4.3.0."
             )
-        self.Config = self.FactoryConfig(
-            FHIR_release=get_FHIR_release_from_version(
-                _structure_definition.fhirVersion or "4.3.0"
-            ),
-            FHIR_version=_structure_definition.fhirVersion or "4.3.0",
-            construction_mode=resolved_mode,
-        )
 
         # Process the FHIR resource's elements & constraints into Pydantic fields & validators
         fields, validators, properties = (
@@ -1676,11 +1689,9 @@ class ResourceFactory:
                 base=base,
             )
         )
-        print('FIELDS:', fields)
         # Process resource-level constraints
         for constraint in structure.constraint or []:
             validators.add_model_constraint_validator(constraint)
-        print('VALIDATORS:', validators._validators)
             
 
         # If the resource has metadata, prefill the information

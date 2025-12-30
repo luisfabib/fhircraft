@@ -165,12 +165,20 @@ def validate_FHIR_element_pattern(
         pattern = pattern[0]
     _element = element[0] if isinstance(element, list) else element
     if isinstance(_element, FHIRBaseModel):
+        print('CHECK',merge_dicts(_element.model_dump(), pattern.model_dump()))
+        print('VALUE',_element.model_dump())
         assert (
             merge_dicts(_element.model_dump(), pattern.model_dump())
             == _element.model_dump()
         ), f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2)}"
-    else:
-        assert _element == pattern, f"Value does not fulfill pattern: {pattern}"
+    elif isinstance(_element, dict) and isinstance(pattern, dict):
+        print('CHECK',_element)
+        print('VALUE',pattern)
+        assert merge_dicts(_element, pattern) == _element, f"Value does not fulfill pattern: {pattern}"
+    else: 
+        assert (
+            _element == pattern
+        ), f"Value does not fulfill pattern: {pattern}"
     return element
 
 

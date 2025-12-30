@@ -10,6 +10,7 @@ from typing import Any, Dict, ForwardRef, List, get_args, get_origin
 from jinja2 import Environment, FileSystemLoader, Template
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
+from typing_extensions import TypeAliasType
 
 from fhircraft.fhir.resources.factory import ResourceFactory
 from fhircraft.utils import ensure_list, get_module_name
@@ -71,6 +72,20 @@ class CodeGenerator:
         elif isinstance(arg, BaseModel):
             self._add_constant_value_imports(arg)
             return repr(arg)
+        elif isinstance(arg, list):
+            # Handle lists - convert types to their names and add imports
+            result = []
+            for item in arg:
+                if isinstance(item, (type, TypeAliasType)):
+                    try:
+                        self._add_import_statement(item)
+                        # Get the name of the type for rendering
+                        result.append(getattr(item, "__name__", repr(item)))
+                    except Exception:
+                        result.append(repr(item))
+                else:
+                    result.append(item)
+            return result
         else:
             return arg
 
@@ -276,8 +291,9 @@ class CodeGenerator:
 
                 # Handle self-referencing models
                 elif not "Literal" in annotation_string:
+                    # Only quote the model name if it's not preceded by a dot (not part of a module path)
                     annotation_string = re.sub(
-                        rf"\b{model.__name__}\b",
+                        rf"(?<!\.)(\b{model.__name__}\b)",
                         f'"{model.__name__}"',
                         annotation_string,
                         0,
