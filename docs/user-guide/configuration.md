@@ -22,7 +22,7 @@ configure(disable_validation_warnings=True)
 # Now create FHIR resources without validation warnings
 from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
 Patient = get_fhir_resource_type("Patient", "R5")
-patient = Patient(name=[{"given": ["Alice"]}])  # No warnings
+patient = Patient(name=[{"given": ["Alice"]}])
 ```
 
 ### Temporary Configuration with Context Manager
@@ -32,7 +32,7 @@ from fhircraft import with_config
 
 # Temporarily disable warnings for a specific operation
 with with_config(disable_validation_warnings=True):
-    patient = Patient(...)  # Warnings disabled here
+    patient = Patient(name=[{"given": ["Alice"]}])  # Warnings disabled here
 # Warnings re-enabled automatically after the block
 ```
 
@@ -72,7 +72,7 @@ Converts all validation errors to warnings. Useful when working with potentially
 configure(validation_mode='lenient')
 
 # This would normally raise an error, but now emits a warning
-patient = Patient(...)
+patient = Patient(name=[{"given": ["Alice"]}])
 ```
 
 ### Skip Mode
@@ -83,7 +83,7 @@ Disables all validations completely. Use with caution!
 configure(validation_mode='skip')
 
 # No validations will be performed
-patient = Patient(...)
+patient = Patient(name=[{"given": ["Alice"]}])
 ```
 
 ## Environment Variables
@@ -109,7 +109,7 @@ load_config_from_env()
 ### Working with the Config Object
 
 ```python
-from fhircraft import get_config, FHIRCraftConfig, ValidationConfig
+from fhircraft import get_config, FhircraftConfig, ValidationConfig
 
 # Get current configuration
 config = get_config()
@@ -117,7 +117,7 @@ print(f"Warnings disabled: {config.validation.disable_warnings}")
 print(f"Mode: {config.validation.mode}")
 
 # Create custom configuration
-custom_config = FHIRCraftConfig(
+custom_config = FhircraftConfig(
     validation=ValidationConfig(
         disable_warnings=True,
         disabled_constraints={'dom-6'},
@@ -153,7 +153,7 @@ configure(
 
 ## Configuration Options
 
-### `FHIRCraftConfig`
+### `FhircraftConfig`
 
 Main configuration class that can be extended for future features.
 

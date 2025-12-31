@@ -31,7 +31,7 @@ class ValidationConfig:
 
 
 @dataclass
-class FHIRCraftConfig:
+class FhircraftConfig:
     """Global configuration for FHIRcraft.
     
     This configuration class is designed to be easily extendable for future
@@ -49,22 +49,22 @@ class FHIRCraftConfig:
 
 
 # Thread-safe context variable for configuration
-_config_context: ContextVar[FHIRCraftConfig] = ContextVar(
+_config_context: ContextVar[FhircraftConfig] = ContextVar(
     'fhircraft_config',
-    default=FHIRCraftConfig()
+    default=FhircraftConfig()
 )
 
 
-def get_config() -> FHIRCraftConfig:
+def get_config() -> FhircraftConfig:
     """Get the current FHIRcraft configuration.
     
     Returns:
-        FHIRCraftConfig: The current configuration instance.
+        FhircraftConfig: The current configuration instance.
     """
     return _config_context.get()
 
 
-def set_config(config: FHIRCraftConfig) -> None:
+def set_config(config: FhircraftConfig) -> None:
     """Set the global FHIRcraft configuration.
     
     Args:
@@ -111,7 +111,7 @@ def configure(**kwargs) -> None:
     new_validation = ValidationConfig(**validation_dict)
     
     # Create new config
-    new_config = FHIRCraftConfig(validation=new_validation)
+    new_config = FhircraftConfig(validation=new_validation)
     set_config(new_config)
 
 
@@ -126,7 +126,7 @@ def with_config(**kwargs):
         **kwargs: Configuration options (same as configure()).
     
     Yields:
-        FHIRCraftConfig: The temporary configuration.
+        FhircraftConfig: The temporary configuration.
     """
     old_config = get_config()
     
@@ -146,7 +146,7 @@ def with_config(**kwargs):
     # Merge with current config
     validation_dict = {**old_config.validation.__dict__, **validation_kwargs}
     new_validation = ValidationConfig(**validation_dict)
-    new_config = FHIRCraftConfig(validation=new_validation)
+    new_config = FhircraftConfig(validation=new_validation)
     
     # Set new config and store token for reset
     token = _config_context.set(new_config)
@@ -183,7 +183,7 @@ def reset_config() -> None:
     This is useful for testing or when you want to clear all
     configuration changes.
     """
-    set_config(FHIRCraftConfig())
+    set_config(FhircraftConfig())
 
 
 def load_config_from_env() -> None:
@@ -214,7 +214,7 @@ def load_config_from_env() -> None:
 
 
 __all__ = [
-    'FHIRCraftConfig',
+    'FhircraftConfig',
     'ValidationConfig',
     'get_config',
     'set_config',

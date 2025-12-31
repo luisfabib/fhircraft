@@ -27,8 +27,8 @@ def mock_load_package(self, package_name, version=None):
 def mock_load_file(filepath):
     """Mock load_file to return test data instead of reading arbitrary files."""
     if filepath == 'my_fhir_patient.json':
-        # Return contents of the test Condition resource
-        test_file = Path(__file__).parent / "static" / "fhir-profiles-examples" / "Condition-primary-cancer-condition-jenny-m.json"
+        # Return contents of the test Patient resource
+        test_file = Path(__file__).parent / "static" / "fhir-profiles-examples" / "Patient-cancer-patient-jenny-m.json"
         with open(test_file, 'r') as f:
             return json.load(f)
     else:

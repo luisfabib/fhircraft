@@ -108,15 +108,6 @@ Fhircraft includes a FHIRPath engine for querying FHIR resources. The interface 
 ```python
 # Get the patient's last family name
 all_family_names = my_patient.fhirpath_values('Patient.name.family.last()')  
-
-assert all_family_names == ['Doe', 'Smith']
-```
-
-You can also update values through FHIRPath:
-
-```python
-# Update the patient's last family name
-my_patient.fhirpath_update('Patient.name.family.last()', 'NewFamilyName')
 ```
 
 ## Transforming Data with FHIR Mapper
@@ -125,36 +116,6 @@ The FHIR Mapper uses the official FHIR Mapping Language to transform data betwee
 
 ```python
 from fhircraft.fhir.mapper import FHIRMapper
-
-# Legacy system patient data
-legacy_patient = {
-    "firstName": "Alice",
-    "lastName": "Johnson",
-    "dob": "1985-03-15",
-    "sex": "F"
-}
-
-# Mapping script using FHIR Mapping Language
-mapping_script = """
-/// url = "http://example.org/legacy/map"
-/// name = "Legacy Patient to FHIR Patient"
-
-uses "http://example.org/legacy/LegacyPatient" as source
-uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
-
-group main(source legacy: LegacyPatient, target patient: Patient) {
-    legacy.firstName -> patient.name.given;
-    legacy.lastName -> patient.name.family;
-    legacy.dob -> patient.birthDate;
-    legacy.sex where('$this = "F"') -> patient.gender = 'female';
-    legacy.sex where('$this = "M"') -> patient.gender = 'male';
-}
-"""
-
-# Execute the transformation
-mapper = FHIRMapper()
-targets, metadata = mapper.execute_mapping(mapping_script, legacy_patient)
-patient = targets[0]
 
 # Some legacy patient data
 legacy_patient = {
@@ -169,34 +130,35 @@ mapping_script = """
 /// url = "http://example.org/legacy/map"
 /// name = "Legacy Patient to FHIR Patient"
 
-uses "http://example.org/legacy/LegacyPatient" as source
 uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
 
-group main(source legacy: LegacyPatient, target patient: Patient) {
-    legacy.firstName -> patient.name.given;
-    legacy.lastName -> patient.name.family;
+group main(source legacy, target patient: Patient) {
     legacy.dob -> patient.birthDate;
-    legacy.sex where('$this = "F"') -> patient.gender = 'female';
-    legacy.sex where('$this = "M"') -> patient.gender = 'male';
+    legacy.sex where("$this = F") -> patient.gender = "female";
+    legacy.sex where("$this = M") -> patient.gender = "male";
 }
 """
 
 # Run the transformation
 mapper = FHIRMapper()
-targets, metadata = mapper.execute_mapping(mapping_script, legacy_patient)
+targets = mapper.execute_mapping(mapping_script, legacy_patient)
 patient = targets[0]
-
-print(f"Transformed: {patient.name[0].given[0]} {patient.name[0].family}")
 ```
 
 The mapper handles the complexity of the transformation and validates the output automatically.
 
-## Where to Go Next
+## Futher Information
 
-For more details on these features, check out:
+**Documentation**
 
-- [User Guide](../user-guide/overview.md) - Full documentation on all Fhircraft features
-- [Pydantic representation of FHIR](../user-guide/pydantic-representation.md) - How Fhircraft maps FHIR to Pydantic models
-- [FHIRPath Guide](../user-guide/fhirpath.md) - Complete FHIRPath reference
+- [:material-link-variant: User Guide](../user-guide/overview.md) - Complete documentation of all Fhircraft features
 
-If you run into issues or have questions, open an issue on [GitHub](https://github.com/luisfabib/fhircraft/issues) or start a discussion in [GitHub Discussions](https://github.com/luisfabib/fhircraft/discussions).
+- [:material-book-open-variant: Pydantic Documentation](https://docs.pydantic.dev/latest/) - Learn more about Pydantic's powerful features
+
+- [:material-fire-circle: FHIRPath Documentation](https://hl7.org/fhirpath/N1/) - Official FHIRPath specification
+
+**Community & Support**
+
+- [:material-github: GitHub Issues](https://github.com/luisfabib/fhircraft/issues) - Report bugs or request features
+
+- [:material-github: GitHub Discussions](https://github.com/luisfabib/fhircraft/discussions) - Ask questions and share ideas
