@@ -40,11 +40,13 @@ mapping_script = """
 map 'http://example.org/legacy-to-fhir' = 'LegacyPatient'
 
 group main(source legacy, target patient: Patient) {
-    legacy.firstName -> patient.name.given;
-    legacy.lastName -> patient.name.family;
+    legacy -> patient.name as name then {
+        legacy.firstName -> name.given;
+        legacy.lastName -> name.family;
+    };
     legacy.dob -> patient.birthDate;
-    legacy.sex where("$this = 'F'") -> patient.gender = 'female';
-    legacy.sex where("$this = 'M'") -> patient.gender = 'male';
+    legacy.sex where("$this = F") -> patient.gender = 'female';
+    legacy.sex where("$this = M") -> patient.gender = 'male';
 }
 """
 
@@ -135,8 +137,10 @@ map 'http://example.org/patient-mapping' = 'PatientMapping'
 uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as target
 
 group main(source legacy, target patient: Patient) {
-    legacy.firstName -> patient.name.given;
-    legacy.lastName -> patient.name.family;
+    legacy -> patient.name as name then {
+        legacy.firstName -> name.given;
+        legacy.lastName -> name.family;
+    };
     legacy.dob -> patient.birthDate;
     legacy.sex where("$this = 'F'") -> patient.gender = 'female';
     legacy.sex where("$this = 'M'") -> patient.gender = 'male';
@@ -223,9 +227,11 @@ map 'http://example.org/nested' = 'NestedMapping'
 
 group main(source src, target patient: Patient) {
     // Map to nested structures
-    src.fullName -> patient.name.text;
-    src.firstName -> patient.name.given;
-    src.lastName -> patient.name.family;
+    src -> patient.name as name then {
+        src.fullName -> name.text;
+        src.firstName -> name.given;
+        src.lastName -> name.family;
+    };
     
     // Transform collections
     src.phoneNumbers -> patient.telecom as telecom then {
@@ -235,8 +241,12 @@ group main(source src, target patient: Patient) {
     
     // Conditional nested mapping
     src.emergencyContact where("exists()") -> patient.contact as contact then {
-        emergencyContact.name -> contact.name.text;
-        emergencyContact.relationship -> contact.relationship.text;
+        emergencyContact.name -> contact.name as cname then {
+            emergencyContact.name -> cname.text;
+        };
+        emergencyContact.relationship -> contact.relationship as rel then {
+            emergencyContact.relationship -> rel.text;
+        };
     };
 }
 """
@@ -271,7 +281,9 @@ group main(source src, target patient: Patient) {
 }
 
 group demographics(source src, target patient: Patient) {
-    src.name -> patient.name.text;
+    src.name -> patient.name as name then {
+        src.name -> name.text;
+    };
     src.birthDate -> patient.birthDate;
     src.gender -> patient.gender;
 }
@@ -309,14 +321,20 @@ map 'http://example.org/multi-source' = 'MultiSource'
 
 group main(source demographics, source insurance, target patient: Patient) {
     // Data from demographics source
-    demographics.name -> patient.name.text;
+    demographics.name -> patient.name as name then {
+        demographics.name -> name.text;
+    };
     demographics.birthDate -> patient.birthDate;
     demographics.gender -> patient.gender;
     
     // Data from insurance source
-    insurance.policyNumber -> patient.identifier.value;
-    insurance.carrier -> patient.identifier.system;
-    insurance.memberSince -> patient.identifier.period.start;
+    insurance -> patient.identifier as id then {
+        insurance.policyNumber -> id.value;
+        insurance.carrier -> id.system;
+        insurance.memberSince -> id.period as period then {
+            insurance.memberSince -> period.start;
+        };
+    };
 }
 """
 
@@ -404,7 +422,9 @@ uses "http://example.org/StructureDefinition/LegacyPatient" alias LegacyPatient 
 uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as target
 
 group main(source legacy: LegacyPatient, target patient: Patient) {
-    legacy.fullName -> patient.name.text;
+    legacy.fullName -> patient.name as name then {
+        legacy.fullName -> name.text;
+    };
     legacy.dateOfBirth -> patient.birthDate;
 }
 """
@@ -427,71 +447,3 @@ except MappingError as e:
 except ValidationError as e:
     print(f"FHIR validation failed: {e}")
 ```
-
-## Common Patterns
-
-### Data Cleaning During Transformation
-
-Real-world data often requires cleaning and normalization. FHIR Mapper can perform data cleaning operations as part of the transformation process, ensuring clean, consistent output:
-
-```python
-script = """
-map 'http://example.org/clean' = 'DataCleaning'
-
-group main(source src, target patient: Patient) {
-    // Clean phone numbers
-    src.phone.replace('-', '').replace(' ', '') -> patient.telecom.value;
-    
-    // Standardize gender values
-    src.gender where("$this = 'M' or $this = 'Male' or $this = 'male')") -> patient.gender = 'male';
-    src.gender where("$this = 'F' or $this = 'Female' or $this = 'female')") -> patient.gender = 'female';
-    
-    // Handle missing data with defaults
-    src.birthDate where("exists()") -> patient.birthDate;
-    src.active where("not exists()") -> patient.active = true;
-}
-"""
-```
-
-### Conditional Resource Creation
-
-Sometimes you only want to create resources when certain conditions are met. This pattern demonstrates conditional resource creation based on data availability and business rules:
-
-```python
-script = """
-map 'http://example.org/conditional' = 'ConditionalCreation'
-
-group main(source src, target bundle: Bundle) {
-    // Create patient only if required fields exist
-    src where("(name.exists() and birthDate.exists())") -> bundle.entry as entry then {
-        src -> entry.resource = create('Patient') as patient then patient_details(src, patient);
-    };
-}
-
-group patient_details(source src, target patient: Patient) {
-    src.name -> patient.name.text;
-    src.birthDate -> patient.birthDate;
-    src.gender -> patient.gender;
-}
-"""
-```
-
-## Further Help
-
-- [:material-link-variant: FHIR Mapping Tutorials](https://build.fhir.org/mapping-tutorial.html) - A set of tutorials covering the basics of the FHIR Mapping Language
-- [:material-book-open-variant: FHIR Mapping Language Specification](https://hl7.org/fhir/mapping-language.html) - Current specification of the FHIR Mapping Language
-
-## What's Next?
-
-Now that you understand FHIR transformation, explore these related topics:
-
-- **[Resource Models](resources-models.md)** - Understand the validation and structure of your mapped FHIR resources
-- **[FHIRPath](fhirpath.md)** - Query and validate your transformed data using FHIRPath expressions  
-- **[Resource Factory](resources-construction.md)** - Load custom profiles and implementation guides for specialized mappings
-- **[Pydantic FHIR](pydantic-representation.md)** - Understand the technical foundations that power automatic validation
-
-For comprehensive workflows and integration patterns, see the [User Guide overview](overview.md).
-
----
-
-**Explore more:** [Back to User Guide Overview ←](overview.md)

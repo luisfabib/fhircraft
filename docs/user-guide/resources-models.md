@@ -70,7 +70,7 @@ Work with FHIR's complex data types for rich resource modeling:
 
 ```python
 from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
-from fhircraft.fhir.resources.datatypes.R5.complex_types import (
+from fhircraft.fhir.resources.datatypes.R5.complex import (
     HumanName, ContactPoint, Address, Identifier
 )
 
@@ -274,7 +274,7 @@ else:
 FHIR defines invariant constraints that are automatically enforced:
 
 ```python
-from fhircraft.fhir.resources.datatypes.R5.complex_types import Quantity
+from fhircraft.fhir.resources.datatypes.R5.complex import Quantity
 
 try:
     # This violates FHIR invariant qty-3: code requires system
@@ -330,7 +330,7 @@ FHIR resources are mutable Python objects, so you can update their properties af
 
 ```python
 # Add contact information
-from fhircraft.fhir.resources.datatypes.R5.complex_types import ContactPoint
+from fhircraft.fhir.resources.datatypes.R5.complex import ContactPoint
 
 patient.telecom = [
     ContactPoint(
@@ -377,7 +377,7 @@ Fhircraft also supports FHIR XML format:
 
 ```python
 # Serialize to FHIR XML
-patient_xml = patient.model_dump_xml(pretty=True)
+patient_xml = patient.model_dump_xml(indent=3)
 print("FHIR XML:")
 print(patient_xml)
 # Output:
@@ -406,7 +406,7 @@ print("Formatted JSON:")
 print(formatted_json)
 
 # Pretty-formatted XML
-formatted_xml = patient.model_dump_xml(pretty=True)
+formatted_xml = patient.model_dump_xml(indent=3)
 print("Formatted XML:")
 print(formatted_xml)
 

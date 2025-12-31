@@ -72,47 +72,6 @@ Transform data between different structures using declarative mapping rules.
 | **Legacy Integration** | Convert existing data formats to FHIR resources | [FHIR Mapper](mapper.md) |
 | **Validation** | Automatic validation of transformed data | [FHIR Mapper](mapper.md) |
 
-## Common Workflows
-
-### Creating Your First FHIR Resource
-```python
-from fhircraft.fhir.resources.factory import factory
-
-# Load a FHIR package
-factory.load_package("hl7.fhir.us.core", "5.0.1")
-
-# Create a Patient model
-Patient = factory.construct_resource_model(
-    canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
-)
-
-# Create and validate a patient
-patient = Patient(
-    name=[{"family": "Doe", "given": ["John"]}],
-    gender="male",
-    birthDate="1990-01-15"
-)
-```
-**Next:** [Resource Factory](resources-construction.md) for advanced construction patterns
-
-### Querying FHIR Data
-```python
-# Query using FHIRPath
-family_names = patient.fhirpath_values("Patient.name.family")
-has_phone = patient.fhirpath_exists("Patient.telecom.where(system='phone')")
-```
-**Next:** [FHIR Path](fhirpath.md) for comprehensive querying guide
-
-### Transforming Legacy Data
-```python
-from fhircraft.fhir.mapper import FHIRMapper
-
-# Transform legacy patient data to FHIR
-mapper = FHIRMapper()
-fhir_patient = mapper.execute_mapping(mapping_script, legacy_data)
-```
-**Next:** [FHIR Mapper](mapper.md) for transformation patterns
-
 ## Getting Help
 
 ### Documentation
