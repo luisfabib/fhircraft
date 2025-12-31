@@ -60,6 +60,7 @@ docs = [
     "mkdocstrings[python]==0.26.1",
     "mkdocs-gen-files==0.5.0",
     "mkdocs-literate-nav==0.6.1",
+    "mktestdocs==0.2.5",
 ]
 
 [tool.hatch.build.targets.sdist]
