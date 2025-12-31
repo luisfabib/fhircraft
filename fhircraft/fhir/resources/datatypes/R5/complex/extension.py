@@ -314,6 +314,40 @@ class Extension(DataType):
 
     @model_validator(mode="after")
     def value_type_choice_validator(self):
+        from fhircraft.fhir.resources.datatypes.R5.complex import (
+            Address,
+            Age,
+            Annotation,
+            Attachment,
+            CodeableConcept,
+            CodeableReference,
+            Coding,
+            ContactDetail,
+            ContactPoint,
+            DataRequirement,
+            Dosage,
+            Expression,
+            Count,
+            Distance,
+            Duration,
+            HumanName,
+            Identifier,
+            Money,
+            Period,
+            Quantity,
+            Range,
+            Ratio,
+            RatioRange,
+            Reference,
+            SampledData,
+            Signature,
+            Timing,
+            ParameterDefinition,
+            RelatedArtifact,
+            TriggerDefinition,
+            UsageContext,
+            Meta,
+        )
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[

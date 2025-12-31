@@ -450,6 +450,7 @@ class StructureDefinition(FHIRBaseModel):
         default=None,
     )
     resourceType: Literal["StructureDefinition"] = Field(
+        default="StructureDefinition",
         description=None,
     )
 

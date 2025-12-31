@@ -52,7 +52,7 @@ def get_fhir_resource_type(type_str: str, release="R4B") -> type:
     # Convert CamelCase to snake_case for module lookup
     type_str_snake = re.sub(r"(?<!^)(?=[A-Z])", "_", type_str).lower()
     resource_module = importlib.import_module(
-        f"fhircraft.fhir.resources.datatypes.{release}.core.{type_str_snake}"
+        f"fhircraft.fhir.resources.datatypes.{release}.core"
     )
 
     resource = getattr(resource_module, type_str, None)
