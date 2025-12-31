@@ -1,12 +1,10 @@
 # Getting Started with Fhircraft
 
-This tutorial is for developers new to Fhircraft who want to start building FHIR-compliant applications in Python. You'll learn to create models, validate data, and work with FHIR resources using Python's type system.
+If you're new to Fhircraft, this guide will walk you through the basics of working with FHIR resources in Python.
 
-By the end of this tutorial, you'll be able to generate Pydantic models from FHIR specifications and create validated FHIR resources in your Python applications.
+## Working with Core FHIR Resources
 
-## Accessing Core Resources
-
-Fhircraft provides Pydantic models for all core FHIR resources out of the box. These models are generated from the official FHIR specifications and are ready to use for validation, serialization, and manipulation in your Python projects.
+Fhircraft includes Pydantic models for all core FHIR resources. These models are generated directly from the official FHIR specifications, so you get full validation, serialization, and type checking without any setup:
 
 ```python
 from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
@@ -14,7 +12,7 @@ from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
 # Get the built-in R5 FHIR Patient core resource model
 Patient = get_fhir_resource_type("Patient", "R5")
 
-# Now create a patient instance with validation
+# Create a patient instance with automatic validation
 patient = Patient(
     name=[{
         "given": ["Alice"],
@@ -23,27 +21,40 @@ patient = Patient(
     gender="female",
     birthDate="1985-03-15"
 )
-
-print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
 ```
 
-## Creating FHIR Models
+Fhircraft validates both the types and any structural constraints from the FHIR specification. Since these are standard Pydantic models, you get all the usual serialization and deserialization methods. See the [Pydantic documentation](https://docs.pydantic.dev/latest/concepts/models/#model-methods-and-properties) if you need a refresher on those.
 
-Let's start by creating a `Patient` profile model from the minimal Common Oncology Data Elements (mCODE) Implementation Guide:
+You can access the FHIR elements just like any Python object:
+
+```python
+assert patient.name[0].given[0] == "Alice" 
+assert patient.name[0].family == "Johnson"
+```
+
+## Working with FHIR Profiles
+
+Beyond core resources, you'll often need to work with FHIR profiles—specialized versions of resources with additional constraints. Here's how to create a model from the mCODE (minimal Common Oncology Data Elements) Implementation Guide:
 
 ```python
 from fhircraft.fhir.resources.factory import factory
 
-# Load the mCODE FHIR package
+# Load the mCODE FHIR package along with its dependencies
 factory.load_package('hl7.fhir.us.mcode')
 
-# Create a Patient model from the FHIR R5 specification
+# Build a model from the CancerPatient profile
 CancerPatient = factory.construct_resource_model(
     canonical_url='http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient'
 )
+```
 
-# Now create a patient instance with validation
-patient = CancerPatient(
+Behind the scenes, Fhircraft downloads the FHIR package, parses the structure definitions, and generates a Pydantic model with all the profile-specific constraints and validators baked in.
+
+Once you have the model, it works just like any other FHIR resource:
+
+```python
+# Create a cancer patient instance
+cancer_patient = CancerPatient(
     name=[{
         "given": ["Alice"],
         "family": "Johnson"
@@ -52,134 +63,65 @@ patient = CancerPatient(
     birthDate="1985-03-15"
 )
 
-print(f"Created cancer patient: {patient.name[0].given[0]} {patient.name[0].family}")
+assert cancer_patient.name[0].given[0] == "Alice" 
+assert cancer_patient.name[0].family == "Johnson"
 ```
 
-That's it! Fhircraft automatically downloads the FHIR specifications, generates a type-safe Pydantic model, adds the profiled constraints, and validates your data according to FHIR rules.
 
---------------
+## Generating Source Code for Models
 
-### Generating Source Code for Pydantic FHIR Models
-
-Fhircraft enables you to generate reusable Python source code for any dynamically constructed Pydantic FHIR model. This is accomplished using the `generate_resource_model_code` function, which returns the model's class definition as a string. This feature is ideal for integrating FHIR models into other projects, sharing models with collaborators, or version-controlling your model definitions.
-
-**Example: Exporting the Source Code for a FHIR `Patient` Model**
+If you need to distribute your models or avoid runtime generation, you can export any model as Python source code:
 
 ```python
 from fhircraft.fhir.resources.generator import generate_resource_model_code
 
-# Assume CancerPatient was created using construct_resource_model
+# Export the CancerPatient model we created earlier
 source_code = generate_resource_model_code(CancerPatient)
 
-# Optionally, save the code to a file for reuse
+# Save it to a file
 with open("cancerpatient.py", "w") as f:
     f.write(source_code)
 ```
 
-The generated code is ready to use in any Python project, provided that Fhircraft and its dependencies are installed. This approach streamlines collaboration and deployment by allowing you to distribute static model definitions without requiring dynamic model construction at runtime.
+The generated code is standalone Python that you can commit to version control or share with other teams. They'll need Fhircraft installed, but they won't need to load structure definitions or generate models at runtime.
 
------------
+## Validating FHIR Data
 
-### Validating FHIR Payloads
-
-Once you've constructed a Pydantic FHIR model, you can use it to validate real-world FHIR payloads. This ensures your data strictly adheres to the structure and constraints defined by the FHIR specification or your chosen profile.
-
-**Example: Validating a FHIR `Patient` Resource**
+Use your models to validate FHIR JSON payloads from external systems:
 
 ```python
 from fhircraft.utils import load_file
 
-# Load your FHIR resource data (as a dict) from a JSON file
+# Load FHIR JSON data
 data = load_file('my_fhir_patient.json')
 
-# Validate and parse the data using the generated model
-my_patient = patient_model.model_validate(data)
+# Validate it against your model
+my_patient = Patient.model_validate(data)
 ```
 
-If the input data does not match the expected FHIR structure or contains invalid values, Pydantic will raise a `ValidationError` detailing the issues. If no error is raised, your payload is valid and ready for further processing.
+If the data doesn't match the FHIR structure, Pydantic raises a `ValidationError` with details about what's wrong. Otherwise, you get a validated Python object ready to use.
 
-This validation step helps catch errors early, enforce FHIR compliance, and maintain data quality throughout your workflow.
+## Querying with FHIRPath
 
----------------
-### Manipulating Models with FHIRPath
-
-Fhircraft provides a robust FHIRPath engine with an enhanced interface, allowing you to query and modify FHIR resources using standard FHIRPath expressions directly in Python. This enables expressive, standards-compliant access to deeply nested data and supports both retrieval and update operations.
-
-**Example: Accessing Values with FHIRPath**
-
-The enhanced interface provides multiple methods for retrieving values based on your specific needs:
+Fhircraft includes a FHIRPath engine for querying FHIR resources. The interface gives you several ways to retrieve values depending on what you need. The quickly query the FHIR resource with a FHIRPath use
 
 ```python
-from fhircraft.fhir.path import fhirpath
+# Get the patient's last family name
+all_family_names = my_patient.fhirpath_values('Patient.name.family.last()')  
 
-# Parse the FHIRPath expression
-name_path = fhirpath.parse('Patient.name.family')
-
-# Get all matching values as a list (always returns a list)
-all_family_names = name_path.values(my_patient)
-# Returns: ['Doe', 'Smith'] if patient has multiple names
-
-# Get a single value (raises error if multiple values found)
-family_name = name_path.single(my_patient)
-# Returns: 'Doe' or raises FHIRPathRuntimeError if multiple names exist
-
-# Get the first value (safe for multiple values)
-first_family_name = name_path.first(my_patient)
-# Returns: 'Doe' (first family name) or None if no names
-
-# Get the last value
-last_family_name = name_path.last(my_patient)
-# Returns: 'Smith' (last family name) or None if no names
-
-# Check if values exist
-has_family_name = name_path.exists(my_patient)
-# Returns: True if patient has any family names
-
-# Count matching values
-name_count = name_path.count(my_patient)
-# Returns: 2 if patient has 2 family names
-
-# Check if path is empty
-is_empty = name_path.is_empty(my_patient)
-# Returns: True if patient has no family names
+assert all_family_names == ['Doe', 'Smith']
 ```
 
-**Example: Updating Values with FHIRPath**
+You can also update values through FHIRPath:
 
 ```python
-# Update all matching values
-name_path.update_values(my_patient, 'NewFamilyName')
-# Sets all family names to 'NewFamilyName'
-
-# Update a single value (safer for single-value fields)
-gender_path = fhirpath.parse('Patient.gender')
-gender_path.update_single(my_patient, 'female')
-# Sets gender to 'female', raises error if multiple gender values exist
+# Update the patient's last family name
+my_patient.fhirpath_update('Patient.name.family.last()', 'NewFamilyName')
 ```
 
-**Example: Using Default Values**
+## Transforming Data with FHIR Mapper
 
-```python
-# Get values with fallback defaults
-birth_date = fhirpath.parse('Patient.birthDate').first(my_patient, default='1900-01-01')
-# Returns actual birth date or '1900-01-01' if not set
-
-phone = fhirpath.parse('Patient.telecom.where(system="phone").value').single(
-    my_patient, 
-    default='No phone number'
-)
-# Returns phone number or default message if not found
-```
-
-With these methods, you can efficiently navigate and manipulate FHIR resources, making complex data operations straightforward and Pythonic.
-
-------------------
-
-### Transforming Data with FHIR Mapper
-
-Fhircraft provides a powerful mapping engine that transforms data between different structures using the official FHIR Mapping Language (FML). This is perfect for converting legacy system data to FHIR or transforming between different FHIR profiles.
-
-**Example: Converting Legacy Data to FHIR Patient**
+The FHIR Mapper uses the official FHIR Mapping Language to transform data between different structures. This is useful when you need to convert legacy data to FHIR or transform between different profiles:
 
 ```python
 from fhircraft.fhir.mapper import FHIRMapper
@@ -214,38 +156,47 @@ mapper = FHIRMapper()
 targets, metadata = mapper.execute_mapping(mapping_script, legacy_patient)
 patient = targets[0]
 
-print(f"Transformed patient: {patient.name[0].given[0]} {patient.name[0].family}")
-print(f"Birth date: {patient.birthDate}")
-print(f"Gender: {patient.gender}")
+# Some legacy patient data
+legacy_patient = {
+    "firstName": "Alice",
+    "lastName": "Johnson",
+    "dob": "1985-03-15",
+    "sex": "F"
+}
+
+# Write a mapping using FHIR Mapping Language
+mapping_script = """
+/// url = "http://example.org/legacy/map"
+/// name = "Legacy Patient to FHIR Patient"
+
+uses "http://example.org/legacy/LegacyPatient" as source
+uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
+
+group main(source legacy: LegacyPatient, target patient: Patient) {
+    legacy.firstName -> patient.name.given;
+    legacy.lastName -> patient.name.family;
+    legacy.dob -> patient.birthDate;
+    legacy.sex where('$this = "F"') -> patient.gender = 'female';
+    legacy.sex where('$this = "M"') -> patient.gender = 'male';
+}
+"""
+
+# Run the transformation
+mapper = FHIRMapper()
+targets, metadata = mapper.execute_mapping(mapping_script, legacy_patient)
+patient = targets[0]
+
+print(f"Transformed: {patient.name[0].given[0]} {patient.name[0].family}")
 ```
 
-The FHIR Mapper handles complex transformations, validation, and error handling automatically, making it easy to integrate diverse data sources into your FHIR-compliant applications.
+The mapper handles the complexity of the transformation and validates the output automatically.
 
---------------------
+## Where to Go Next
 
-## Getting Help
+For more details on these features, check out:
 
-**📚 Documentation**
+- [User Guide](../user-guide/overview.md) - Full documentation on all Fhircraft features
+- [Pydantic representation of FHIR](../user-guide/pydantic-representation.md) - How Fhircraft maps FHIR to Pydantic models
+- [FHIRPath Guide](../user-guide/fhirpath.md) - Complete FHIRPath reference
 
-- [:material-link-variant: User Guide](../user-guide/overview.md) - Complete documentation of all Fhircraft features
-
-- [:material-book-open-variant: Pydantic Documentation](https://docs.pydantic.dev/latest/) - Learn more about Pydantic's powerful features
-
-- [:material-fire-circle: FHIRPath Documentation](https://hl7.org/fhirpath/N1/) - Official FHIRPath specification
-
-**💬 Community & Support**
-
-- [:material-github: GitHub Issues](https://github.com/luisfabib/fhircraft/issues) - Report bugs or request features
-
-- [:material-github: GitHub Discussions](https://github.com/luisfabib/fhircraft/discussions) - Ask questions and share ideas
-
-**🚀 Next Steps**
-
-Ready to dive deeper? Explore these advanced topics:
-
-1. [Pydantic representation of FHIR](../user-guide/pydantic-representation.md) - Detailed description of how Fhircraft represents FHIR within Pydantic
-
-2. [Working with Fhircraft Models](../user-guide/fhir-models.md) - Advanced model construction and validation
-
-3. [FHIRPath Guide](../user-guide/fhirpath.md) - Master the FHIRPath expression language
-
+If you run into issues or have questions, open an issue on [GitHub](https://github.com/luisfabib/fhircraft/issues) or start a discussion in [GitHub Discussions](https://github.com/luisfabib/fhircraft/discussions).
