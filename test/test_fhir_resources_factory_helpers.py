@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.definitions.element_definition import (
     ElementDefinitionType,
 )
 from fhircraft.fhir.resources.factory import (
+    ConstructionMode,
     ElementDefinitionNode,
     FHIRSliceModel,
     ResourceFactory,
@@ -45,7 +46,7 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", FHIR_version="4.3.0"
+            FHIR_release="R4B", FHIR_version="4.3.0", construction_mode=ConstructionMode.SNAPSHOT
         )
 
 
@@ -723,6 +724,7 @@ class TestConstructSliceModel(FactoryTestCase):
         self.factory.construct_resource_model.assert_called_once_with(  # type: ignore
             "http://example.org/fhir/StructureDefinition/DummySlice",
             base_model=FHIRSliceModel,
+            mode=ConstructionMode.SNAPSHOT,
         )
         self.assertTrue(issubclass(result, self.DummyFHIRSliceModel))
         self.assertTrue(issubclass(result, FHIRSliceModel))
@@ -958,3 +960,491 @@ class TestResolveContentReference(FactoryTestCase):
             result.binding.valueSet
             == "http://hl7.org/fhir/ValueSet/observation-category"
         )
+
+# ----------------------------------------------------------------
+# _merge_differential_elements_with_base_snapshot()
+# ----------------------------------------------------------------
+
+
+class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
+    """
+    Unit tests for the _merge_differential_elements_with_base_snapshot method.
+    
+    This method merges differential elements with their base snapshot counterparts,
+    inheriting properties not explicitly changed in the differential.
+    """
+
+    def test_merges_simple_element(self):
+        """Test merging a simple element with base snapshot."""
+        # Base snapshot has complete element definition
+        base_sd = StructureDefinition(
+            url="http://example.org/base",
+            name="Base",
+            status="draft",
+            kind="resource",
+            abstract=False,
+            type="Resource",
+            fhirVersion="5.0.0",
+            snapshot={
+                "element": [
+                    ElementDefinition(
+                        id="Resource.status",
+                        path="Resource.status",
+                        min=0,
+                        max="1",
+                        type=[ElementDefinitionType(code="code")],
+                        short="Base status field",
+                        definition="Status from base",
+                    )
+                ]
+            }
+        )
+        
+        # Differential only changes cardinality
+        differential_elements = [
+            ElementDefinition(
+                id="Resource.status",
+                path="Resource.status",
+                min=1,  # Make required
+            )
+        ]
+        
+        merged = self.factory._merge_differential_elements_with_base_snapshot(
+            differential_elements, base_sd
+        )
+        
+        assert len(merged) == 1
+        assert merged[0].id == "Resource.status"
+        assert merged[0].min == 1  # From differential
+        assert merged[0].max == "1"  # Inherited from base
+        assert merged[0].type == [ElementDefinitionType(code="code")]  # Inherited
+        assert merged[0].short == "Base status field"  # Inherited
+        assert merged[0].definition == "Status from base"  # Inherited
+
+    def test_merges_nested_backbone_element_children(self):
+        """Test merging children of backbone elements."""
+        base_sd = StructureDefinition(
+            url="http://example.org/base",
+            name="Base",
+            status="draft",
+            kind="resource",
+            abstract=False,
+            type="Resource",
+            fhirVersion="5.0.0",
+            snapshot={
+                "element": [
+                    ElementDefinition(
+                        id="Resource.component",
+                        path="Resource.component",
+                        min=0,
+                        max="*",
+                        type=[ElementDefinitionType(code="BackboneElement")],
+                    ),
+                    ElementDefinition(
+                        id="Resource.component.code",
+                        path="Resource.component.code",
+                        min=1,
+                        max="1",
+                        type=[ElementDefinitionType(code="CodeableConcept")],
+                        short="Component code",
+                    ),
+                    ElementDefinition(
+                        id="Resource.component.value",
+                        path="Resource.component.value",
+                        min=0,
+                        max="1",
+                        type=[ElementDefinitionType(code="string")],
+                        short="Component value",
+                    ),
+                ]
+            }
+        )
+        
+        # Differential constrains parent and one child
+        differential_elements = [
+            ElementDefinition(
+                id="Resource.component",
+                path="Resource.component",
+                min=2,  # Require at least 2
+            ),
+            ElementDefinition(
+                id="Resource.component.value",
+                path="Resource.component.value",
+                min=1,  # Make required
+                short="Required component value",  # Override description
+            ),
+        ]
+        
+        merged = self.factory._merge_differential_elements_with_base_snapshot(
+            differential_elements, base_sd
+        )
+        
+        assert len(merged) == 2
+        
+        # Check parent element
+        component = next(e for e in merged if e.id == "Resource.component")
+        assert component.min == 2  # From differential
+        assert component.max == "*"  # Inherited
+        assert component.type == [ElementDefinitionType(code="BackboneElement")]  # Inherited
+        
+        # Check child element
+        value = next(e for e in merged if e.id == "Resource.component.value")
+        assert value.min == 1  # From differential
+        assert value.max == "1"  # Inherited
+        assert value.type == [ElementDefinitionType(code="string")]  # Inherited
+        assert value.short == "Required component value"  # From differential
+
+    def test_merges_sliced_element(self):
+        """Test merging a sliced element definition."""
+        base_sd = StructureDefinition(
+            url="http://example.org/base",
+            name="Base",
+            status="draft",
+            kind="resource",
+            abstract=False,
+            type="Resource",
+            fhirVersion="5.0.0",
+            snapshot={
+                "element": [
+                    ElementDefinition(
+                        id="Resource.extension",
+                        path="Resource.extension",
+                        min=0,
+                        max="*",
+                        type=[ElementDefinitionType(code="Extension")],
+                        short="Base extensions",
+                    )
+                ]
+            }
+        )
+        
+        # Differential adds slicing definition
+        differential_elements = [
+            ElementDefinition(
+                id="Resource.extension",
+                path="Resource.extension",
+                slicing={
+                    "discriminator": [{"type": "value", "path": "url"}],
+                    "rules": "open"
+                },
+            )
+        ]
+        
+        merged = self.factory._merge_differential_elements_with_base_snapshot(
+            differential_elements, base_sd
+        )
+        
+        assert len(merged) == 1
+        assert merged[0].id == "Resource.extension"
+        assert merged[0].slicing is not None
+        assert merged[0].slicing.rules == "open"  # From differential
+        assert merged[0].type == [ElementDefinitionType(code="Extension")]  # Inherited
+        assert merged[0].short == "Base extensions"  # Inherited
+
+    def test_merges_sliced_element_children(self):
+        """Test merging children of sliced elements (strips slice name for lookup)."""
+        base_sd = StructureDefinition(
+            url="http://example.org/base",
+            name="Base",
+            status="draft",
+            kind="resource",
+            abstract=False,
+            type="Resource",
+            fhirVersion="5.0.0",
+            snapshot={
+                "element": [
+                    ElementDefinition(
+                        id="Resource.extension",
+                        path="Resource.extension",
+                        min=0,
+                        max="*",
+                        type=[ElementDefinitionType(code="Extension")],
+                    ),
+                    ElementDefinition(
+                        id="Resource.extension.url",
+                        path="Resource.extension.url",
+                        min=1,
+                        max="1",
+                        type=[ElementDefinitionType(code="uri")],
+                        short="Extension URL",
+                    ),
+                    ElementDefinition(
+                        id="Resource.extension.value[x]",
+                        path="Resource.extension.value[x]",
+                        min=0,
+                        max="1",
+                        type=[
+                            ElementDefinitionType(code="string"),
+                            ElementDefinitionType(code="boolean"),
+                        ],
+                        short="Extension value",
+                    ),
+                ]
+            }
+        )
+        
+        # Differential defines a named slice with constrained children
+        differential_elements = [
+            ElementDefinition(
+                id="Resource.extension:mySlice",
+                path="Resource.extension",
+                sliceName="mySlice",
+                min=0,
+                max="1",
+            ),
+            ElementDefinition(
+                id="Resource.extension:mySlice.url",
+                path="Resource.extension.url",
+                fixedUri="http://example.org/my-extension",
+            ),
+            ElementDefinition(
+                id="Resource.extension:mySlice.valueString",
+                path="Resource.extension.valueString",
+                min=1,
+                max="1",
+                type=[ElementDefinitionType(code="string")],
+            ),
+        ]
+        
+        merged = self.factory._merge_differential_elements_with_base_snapshot(
+            differential_elements, base_sd
+        )
+        
+        assert len(merged) == 3
+        
+        # Check slice definition
+        slice_elem = next(e for e in merged if e.id == "Resource.extension:mySlice")
+        assert slice_elem.sliceName == "mySlice"
+        assert slice_elem.type == [ElementDefinitionType(code="Extension")]  # Inherited
+        
+        # Check slice child - URL (should inherit type from base)
+        url_elem = next(e for e in merged if e.id == "Resource.extension:mySlice.url")
+        assert url_elem.fixedUri == "http://example.org/my-extension"  # From differential
+        assert url_elem.type == [ElementDefinitionType(code="uri")]  # Inherited from base
+        assert url_elem.short == "Extension URL"  # Inherited
+        
+        # Check slice child - valueString (specialized from value[x])
+        value_elem = next(e for e in merged if e.id == "Resource.extension:mySlice.valueString")
+        assert value_elem.min == 1  # From differential
+        assert value_elem.type == [ElementDefinitionType(code="string")]  # From differential
+
+    def test_merges_deeply_nested_sliced_backbone_children(self):
+        """Test merging children of sliced backbone elements."""
+        base_sd = StructureDefinition(
+            url="http://example.org/base",
+            name="Base",
+            status="draft",
+            kind="resource",
+            abstract=False,
+            type="Resource",
+            fhirVersion="5.0.0",
+            snapshot={
+                "element": [
+                    ElementDefinition(
+                        id="Resource.component",
+                        path="Resource.component",
+                        min=0,
+                        max="*",
+                        type=[ElementDefinitionType(code="BackboneElement")],
+                    ),
+                    ElementDefinition(
+                        id="Resource.component.code",
+                        path="Resource.component.code",
+                        min=1,
+                        max="1",
+                        type=[ElementDefinitionType(code="CodeableConcept")],
+                        short="Component code from base",
+                    ),
+                    ElementDefinition(
+                        id="Resource.component.value[x]",
+                        path="Resource.component.value[x]",
+                        min=0,
+                        max="1",
+                        type=[
+                            ElementDefinitionType(code="Quantity"),
+                            ElementDefinitionType(code="string"),
+                        ],
+                        short="Component value from base",
+                    ),
+                ]
+            }
+        )
+        
+        # Differential slices component and constrains children
+        differential_elements = [
+            ElementDefinition(
+                id="Resource.component:systolic",
+                path="Resource.component",
+                sliceName="systolic",
+                min=1,
+                max="1",
+            ),
+            ElementDefinition(
+                id="Resource.component:systolic.code",
+                path="Resource.component.code",
+                patternCodeableConcept={
+                    "coding": [{"system": "http://loinc.org", "code": "8480-6"}]
+                },
+            ),
+            ElementDefinition(
+                id="Resource.component:systolic.valueQuantity",
+                path="Resource.component.valueQuantity",
+                min=1,
+                type=[ElementDefinitionType(code="Quantity")],
+            ),
+        ]
+        
+        merged = self.factory._merge_differential_elements_with_base_snapshot(
+            differential_elements, base_sd
+        )
+        
+        assert len(merged) == 3
+        
+        # Check slice
+        slice_elem = next(e for e in merged if e.id == "Resource.component:systolic")
+        assert slice_elem.min == 1  # From differential
+        assert slice_elem.type == [ElementDefinitionType(code="BackboneElement")]  # Inherited
+        
+        # Check code child (should inherit type and description)
+        code_elem = next(e for e in merged if e.id == "Resource.component:systolic.code")
+        assert code_elem.patternCodeableConcept is not None  # From differential
+        assert code_elem.type == [ElementDefinitionType(code="CodeableConcept")]  # Inherited
+        assert code_elem.short == "Component code from base"  # Inherited
+        
+        # Check valueQuantity child (specialized from value[x])
+        value_elem = next(e for e in merged if e.id == "Resource.component:systolic.valueQuantity")
+        assert value_elem.min == 1  # From differential
+        assert value_elem.type == [ElementDefinitionType(code="Quantity")]  # From differential
+
+    def test_handles_differential_only_elements(self):
+        """Test that elements only in differential (not in base) are returned as-is."""
+        base_sd = StructureDefinition(
+            url="http://example.org/base",
+            name="Base",
+            status="draft",
+            kind="resource",
+            abstract=False,
+            type="Resource",
+            fhirVersion="5.0.0",
+            snapshot={
+                "element": [
+                    ElementDefinition(
+                        id="Resource.field1",
+                        path="Resource.field1",
+                        type=[ElementDefinitionType(code="string")],
+                    )
+                ]
+            }
+        )
+        
+        # Differential has a new element not in base
+        differential_elements = [
+            ElementDefinition(
+                id="Resource.field2",
+                path="Resource.field2",
+                min=0,
+                max="1",
+                type=[ElementDefinitionType(code="integer")],
+                short="New field in differential",
+            )
+        ]
+        
+        merged = self.factory._merge_differential_elements_with_base_snapshot(
+            differential_elements, base_sd
+        )
+        
+        assert len(merged) == 1
+        assert merged[0].id == "Resource.field2"
+        assert merged[0].type == [ElementDefinitionType(code="integer")]
+        assert merged[0].short == "New field in differential"
+
+    def test_handles_no_base_snapshot(self):
+        """Test that differential elements are returned unchanged when base has no snapshot."""
+        base_sd = StructureDefinition(
+            url="http://example.org/base",
+            name="Base",
+            status="draft",
+            kind="resource",
+            abstract=False,
+            type="Resource",
+            fhirVersion="5.0.0",
+            # No snapshot
+        )
+        
+        differential_elements = [
+            ElementDefinition(
+                id="Resource.field",
+                path="Resource.field",
+                min=1,
+                type=[ElementDefinitionType(code="string")],
+            )
+        ]
+        
+        merged = self.factory._merge_differential_elements_with_base_snapshot(
+            differential_elements, base_sd
+        )
+        
+        # Should return differential as-is
+        assert merged == differential_elements
+
+    def test_handles_none_base_structure_definition(self):
+        """Test that differential elements are returned unchanged when base is None."""
+        differential_elements = [
+            ElementDefinition(
+                id="Resource.field",
+                path="Resource.field",
+                min=1,
+                type=[ElementDefinitionType(code="string")],
+            )
+        ]
+        
+        merged = self.factory._merge_differential_elements_with_base_snapshot(
+            differential_elements, None
+        )
+        
+        # Should return differential as-is
+        assert merged == differential_elements
+
+    def test_preserves_differential_none_values(self):
+        """Test that None values in differential don't override base values."""
+        base_sd = StructureDefinition(
+            url="http://example.org/base",
+            name="Base",
+            status="draft",
+            kind="resource",
+            abstract=False,
+            type="Resource",
+            fhirVersion="5.0.0",
+            snapshot={
+                "element": [
+                    ElementDefinition(
+                        id="Resource.field",
+                        path="Resource.field",
+                        min=0,
+                        max="1",
+                        type=[ElementDefinitionType(code="string")],
+                        short="Field description",
+                        definition="Detailed field definition",
+                    )
+                ]
+            }
+        )
+        
+        # Differential only changes min, leaves other fields as None
+        differential_elements = [
+            ElementDefinition(
+                id="Resource.field",
+                path="Resource.field",
+                min=1,
+                # short and definition are None (not specified)
+            )
+        ]
+        
+        merged = self.factory._merge_differential_elements_with_base_snapshot(
+            differential_elements, base_sd
+        )
+        
+        assert len(merged) == 1
+        assert merged[0].min == 1  # From differential
+        assert merged[0].short == "Field description"  # Preserved from base
+        assert merged[0].definition == "Detailed field definition"  # Preserved from base

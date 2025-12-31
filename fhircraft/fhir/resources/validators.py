@@ -165,17 +165,26 @@ def validate_FHIR_element_pattern(
         pattern = pattern[0]
     _element = element[0] if isinstance(element, list) else element
     if isinstance(_element, FHIRBaseModel):
+        print('CHECK',merge_dicts(_element.model_dump(), pattern.model_dump()))
+        print('VALUE',_element.model_dump())
         assert (
             merge_dicts(_element.model_dump(), pattern.model_dump())
             == _element.model_dump()
         ), f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2)}"
-    else:
-        assert _element == pattern, f"Value does not fulfill pattern: {pattern}"
+    elif isinstance(_element, dict) and isinstance(pattern, dict):
+        print('CHECK',_element)
+        print('VALUE',pattern)
+        assert merge_dicts(_element, pattern) == _element, f"Value does not fulfill pattern: {pattern}"
+    else: 
+        assert (
+            _element == pattern
+        ), f"Value does not fulfill pattern: {pattern}"
     return element
 
 
 def validate_type_choice_element(
-    instance: T, field_types: List[Any], field_name_base: str, required: bool = False
+    instance: T, field_types: List[Any], field_name_base: str, required: bool = False,
+    non_allowed_types: List[Any] | None = None
 ) -> T:
     """
     Validate the type choice element for a given instance.
@@ -184,12 +193,14 @@ def validate_type_choice_element(
         instance (T): The instance to validate.
         field_types (List[Any]): List of field types to check.
         field_name_base (str): Base name of the field.
+        required (bool): Whether the type choice element is required.
+        non_allowed_types (List[Any] | None): List of types that are not allowed for this element (for negative checks).
 
     Returns:
         T: The validated instance.
 
     Raises:
-        AssertionError: If more than one value is set for the type choice element.
+        AssertionError: If more than one value is set for the type choice element or if a non-allowed type is set.
     """
     types_set_count = sum(
         (
@@ -215,6 +226,20 @@ def validate_type_choice_element(
     assert not required or (
         required and types_set_count > 0
     ), f"Type choice element {field_name_base}[x] must have one value set. Got {types_set_count}."
+    
+    # Check that non-allowed types are not set
+    if non_allowed_types:
+        for non_allowed_type in non_allowed_types:
+            field_name = field_name_base + (
+                non_allowed_type
+                if isinstance(non_allowed_type, str)
+                else non_allowed_type.__name__
+            )
+            value = getattr(instance, field_name, None)
+            assert value is None, (
+                f"Type choice element {field_name_base}[x] cannot use non-allowed type '{non_allowed_type}'. "
+            )
+    
     return instance
 
 
