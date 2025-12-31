@@ -8,7 +8,7 @@ from pathlib import Path
 from pydantic import BaseModel
 import pytest
 
-from fhircraft.fhir.resources.factory import construct_resource_model, factory
+from fhircraft.fhir.resources.factory import ConstructionMode, construct_resource_model, factory
 from fhircraft.fhir.resources.generator import CodeGenerator
 
 VERSIONS = ["R4B", "R5"]
@@ -71,7 +71,8 @@ def _assert_construct_core_resource(version, resource_label, filename):
 
     # Generate source code for Pydantic FHIR model
     resource = factory.construct_resource_model(
-        canonical_url=f"http://hl7.org/fhir/StructureDefinition/{resource_label}|{fhir_version}"
+        canonical_url=f"http://hl7.org/fhir/StructureDefinition/{resource_label}|{fhir_version}",
+        mode=ConstructionMode.SNAPSHOT,
     )
     # Load example FHIR resource data
     with open(
@@ -146,29 +147,11 @@ fhir_profiles_test_cases = [
 ]
 
 
-def mock_resolve_profile_canonical_url(canonical_url: str):
-    MAP = {
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-primary-cancer-condition": "mcode-primary-cancer-condition.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-medication-administration": "mcode-cancer-related-medication-administration.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-tnm-distant-metastases-category": "mcode-tnm-distant-metastases-category.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient": "mcode-cancer-patient.json",
-        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner": "us-core-practitioner.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-radiotherapy-course-summary": "mcode-radiotherapy-course-summary.json",
-        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure": "us-core-procedure.json",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-human-specimen": "mcode-human-specimen.json",
-    }
-    # Use the auto-generated model to validate a FHIR resource
-    with open(
-        os.path.join(
-            os.path.abspath(f"{PROFILES_DEFINTIONS_DIRECTORY}"), MAP[canonical_url]
-        ),
-        encoding="utf8",
-    ) as file:
-        return json.load(file)
-
-
+@pytest.mark.parametrize("mode", 
+    [ConstructionMode.DIFFERENTIAL, ConstructionMode.SNAPSHOT]
+)
 @pytest.mark.parametrize("filename", fhir_profiles_test_cases)
-def test_construct_profiled_resource(filename):
+def test_construct_profiled_resource(mode, filename):
     # Use the auto-generated model to validate a FHIR resource
     with open(
         os.path.join(os.path.abspath(f"{PROFILES_EXAMPLES_DIRECTORY}"), filename),
@@ -182,11 +165,15 @@ def test_construct_profiled_resource(filename):
         factory.disable_internet_access()
         # Load the FHIR resource definition from local files
         factory.load_definitions_from_directory(Path(PROFILES_DEFINTIONS_DIRECTORY))
-
+        factory.clear_cache()
         # Generate source code for Pydantic FHIR model
         resource = construct_resource_model(
-            canonical_url=fhir_resource["meta"]["profile"][0]
+            canonical_url=fhir_resource["meta"]["profile"][0],
+            mode=mode,
         )
+        
+        print(CodeGenerator().generate_resource_model_code(resource))
+        assert json.loads(resource.model_validate(fhir_resource).model_dump_json()) == fhir_resource
         source_code = CodeGenerator().generate_resource_model_code(resource)
         # Store source code in a file
         temp_file_name = os.path.join(d, f"temp_test_{resource.__name__}.py")

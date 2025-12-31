@@ -423,7 +423,7 @@ def test_simple_mapping_scenarios(test_name, source_data, expected_target, rules
     engine = FHIRMappingEngine(repository=repository)
 
     result = engine.execute(structure_map, source_data)
-    result = result[0].model_dump(mode="json", exclude_unset=False)
+    result = result[0].model_dump(mode="json", exclude_unset=False, exclude={"resourceType", "meta"})
     if expected_target != result:
         print("Result:")
         pprint.pprint(result)

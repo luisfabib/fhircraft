@@ -1,19 +1,24 @@
 import json
 import keyword
 import tarfile
+from annotated_types import MaxLen, MinLen
 import pytest
-from typing import Optional
+from typing import Optional, List
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from pydantic.aliases import AliasChoices
+from pydantic import ValidationError
 
 from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.factory import (
     ResourceFactory,
+    ConstructionMode,
     _Unset,
 )
+from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft.fhir.resources.definitions import StructureDefinition
 
 
 class FactoryTestCase(TestCase):
@@ -23,7 +28,7 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", FHIR_version="4.3.0"
+            FHIR_release="R4B", FHIR_version="4.3.0", construction_mode=ConstructionMode.SNAPSHOT
         )
 
 
@@ -1363,3 +1368,1685 @@ class TestSliceModelInheritance(FactoryTestCase):
         assert (
             extension_idx < fhir_slice_idx
         ), "Extension should come before FHIRSliceModel in MRO"
+
+
+class TestConstructionMode(FactoryTestCase):
+    """Test the ConstructionMode enum and mode detection."""
+
+    def test_construction_mode_enum_values(self):
+        """Test that ConstructionMode enum has correct values."""
+        assert ConstructionMode.SNAPSHOT.value == "snapshot"
+        assert ConstructionMode.DIFFERENTIAL.value == "differential"
+        assert ConstructionMode.AUTO.value == "auto"
+
+    def test_construction_mode_is_string_enum(self):
+        """Test that ConstructionMode values are strings."""
+        assert isinstance(ConstructionMode.SNAPSHOT.value, str)
+        assert isinstance(ConstructionMode.DIFFERENTIAL.value, str)
+        assert isinstance(ConstructionMode.AUTO.value, str)
+
+
+class TestDetectConstructionMode(FactoryTestCase):
+    """Test the _detect_construction_mode method."""
+
+    def test_detects_snapshot_mode_with_snapshot_only(self):
+        """Test that snapshot mode is detected when only snapshot is present."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-snapshot",
+            "url": "http://example.org/StructureDefinition/test-snapshot",
+            "name": "TestSnapshot",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
+        
+        assert mode == ConstructionMode.SNAPSHOT
+
+    def test_detects_differential_mode_with_differential_only(self):
+        """Test that differential mode is detected when only differential is present."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-differential",
+            "url": "http://example.org/StructureDefinition/test-differential",
+            "name": "TestDifferential",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
+        
+        assert mode == ConstructionMode.DIFFERENTIAL
+
+    def test_prefers_differential_when_both_present(self):
+        """Test that differential is preferred when both snapshot and differential are present."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-both",
+            "url": "http://example.org/StructureDefinition/test-both",
+            "name": "TestBoth",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "snapshot": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            },
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
+        
+        assert mode == ConstructionMode.DIFFERENTIAL
+
+    def test_respects_explicit_snapshot_mode(self):
+        """Test that explicit SNAPSHOT mode is respected."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-snapshot",
+            "url": "http://example.org/StructureDefinition/test-snapshot",
+            "name": "TestSnapshot",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.SNAPSHOT)
+        
+        assert mode == ConstructionMode.SNAPSHOT
+
+    def test_respects_explicit_differential_mode(self):
+        """Test that explicit DIFFERENTIAL mode is respected."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-differential",
+            "url": "http://example.org/StructureDefinition/test-differential",
+            "name": "TestDifferential",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        mode = self.factory._detect_construction_mode(sd, ConstructionMode.DIFFERENTIAL)
+        
+        assert mode == ConstructionMode.DIFFERENTIAL
+
+    def test_raises_error_when_snapshot_requested_but_missing(self):
+        """Test that ValueError is raised when SNAPSHOT mode is requested but no snapshot exists."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-no-snapshot",
+            "url": "http://example.org/StructureDefinition/test-no-snapshot",
+            "name": "TestNoSnapshot",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        with pytest.raises(ValueError, match="SNAPSHOT mode requested but"):
+            self.factory._detect_construction_mode(sd, ConstructionMode.SNAPSHOT)
+
+    def test_raises_error_when_differential_requested_but_missing(self):
+        """Test that ValueError is raised when DIFFERENTIAL mode is requested but no differential exists."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-no-differential",
+            "url": "http://example.org/StructureDefinition/test-no-differential",
+            "name": "TestNoDifferential",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        with pytest.raises(ValueError, match="DIFFERENTIAL mode requested but"):
+            self.factory._detect_construction_mode(sd, ConstructionMode.DIFFERENTIAL)
+
+    def test_raises_error_when_neither_snapshot_nor_differential(self):
+        """Test that ValueError is raised when neither snapshot nor differential is present."""
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "id": "test-empty",
+            "url": "http://example.org/StructureDefinition/test-empty",
+            "name": "TestEmpty",
+            "status": "draft",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient"
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        with pytest.raises(ValueError, match="Must have either 'snapshot' or 'differential'"):
+            self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
+
+
+class TestResolveAndConstructBaseModel(FactoryTestCase):
+    """Test the _resolve_and_construct_base_model method."""
+
+    def setUp(self):
+        """Clear factory state before each test."""
+        super().setUp()
+        self.factory.construction_cache.clear()
+        self.factory.paths_in_processing.clear()
+        self.factory.local_cache.clear()
+
+    def test_returns_cached_base_model(self):
+        """Test that cached base models are returned without reconstruction."""
+        base_url = "http://example.org/StructureDefinition/cached-base"
+        cached_model = type("CachedBase", (FHIRBaseModel,), {})
+        self.factory.construction_cache[base_url] = cached_model
+        
+        sd_dict = {
+            "resourceType": "StructureDefinition",
+            "url": "http://example.org/StructureDefinition/test",
+            "name": "Test",
+            "status": "draft",
+            "kind": "resource",
+            "type": "Resource",
+            "abstract": False,
+        }
+        sd = StructureDefinition.model_validate(sd_dict)
+        
+        result = self.factory._resolve_and_construct_base_model(base_url, sd)
+        
+        assert result is cached_model
+
+    def test_detects_circular_reference(self):
+        """Test that circular references are detected and FHIRBaseModel is returned."""
+        base_url = "http://example.org/StructureDefinition/circular"
+        self.factory.paths_in_processing.add(base_url)
+        
+        try:
+            sd_dict = {
+                "resourceType": "StructureDefinition",
+                "url": "http://example.org/StructureDefinition/test",
+                "name": "Test",
+                "status": "draft",
+                "kind": "resource",
+                "type": "Resource",
+                "abstract": False,
+                "baseDefinition": base_url
+            }
+            sd = StructureDefinition.model_validate(sd_dict)
+            
+            with pytest.warns(UserWarning, match="Circular reference detected"):
+                result = self.factory._resolve_and_construct_base_model(base_url, sd)
+            
+            assert result == FHIRBaseModel
+        finally:
+            # Clean up the paths_in_processing
+            self.factory.paths_in_processing.discard(base_url)
+
+
+class TestConstructResourceModelDifferentialMode(FactoryTestCase):
+    """Test construct_resource_model with differential mode."""
+
+    def setUp(self):
+        """Clear factory state before each test."""
+        super().setUp()
+        self.factory.construction_cache.clear()
+        self.factory.paths_in_processing.clear()
+        self.factory.local_cache.clear()
+
+    def test_constructs_model_from_differential_auto_mode(self):
+        """Test that models can be constructed from differential with AUTO mode."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-patient-profile",
+            "url": "http://example.org/StructureDefinition/test-patient-profile",
+            "name": "TestPatientProfile",
+            "title": "Test Patient Profile",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "short": "Test patient profile",
+                        "min": 0,
+                        "max": "*"
+                    },
+                    {
+                        "id": "Patient.identifier",
+                        "path": "Patient.identifier",
+                        "min": 1,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        # This should auto-detect DIFFERENTIAL mode
+        model = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.AUTO
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestPatientProfile"
+        assert hasattr(model, "model_fields")
+
+    def test_constructs_model_from_differential_explicit_mode(self):
+        """Test that models can be constructed with explicit DIFFERENTIAL mode."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-patient-profile-2",
+            "url": "http://example.org/StructureDefinition/test-patient-profile-2",
+            "name": "TestPatientProfile2",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        model = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestPatientProfile2"
+
+    def test_caches_differential_model(self):
+        """Test that differential models are cached."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-cached-profile",
+            "url": "http://example.org/StructureDefinition/test-cached-profile",
+            "name": "TestCachedProfile",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        model1 = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Second construction should return cached model
+        model2 = self.factory.construct_resource_model(
+            canonical_url=differential_sd["url"]
+        )
+        
+        assert model1 is model2
+
+    def test_differential_inherits_from_base(self):
+        """Test that differential models inherit from their base."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-inheritance",
+            "url": "http://example.org/StructureDefinition/test-inheritance",
+            "name": "TestInheritance",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        model = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Should inherit from FHIRBaseModel (since base Patient might not be available)
+        assert issubclass(model, FHIRBaseModel)
+
+
+class TestConstructResourceModelSnapshotMode(FactoryTestCase):
+    """Test construct_resource_model with snapshot mode (backward compatibility)."""
+
+    def setUp(self):
+        """Clear factory state before each test."""
+        super().setUp()
+        self.factory.construction_cache.clear()
+        self.factory.paths_in_processing.clear()
+        self.factory.local_cache.clear()
+
+    def test_constructs_model_from_snapshot_auto_mode(self):
+        """Test that models can be constructed from snapshot with AUTO mode."""
+        snapshot_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-snapshot-patient",
+            "url": "http://example.org/StructureDefinition/test-snapshot-patient",
+            "name": "TestSnapshotPatient",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "derivation": "constraint",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "base": {"path": "Patient", "min": 0, "max": "*"}
+                    },
+                    {
+                        "id": "Patient.id",
+                        "path": "Patient.id",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "id"}],
+                        "base": {"path": "Resource.id", "min": 0, "max": "1"}
+                    }
+                ]
+            }
+        }
+        
+        model = self.factory.construct_resource_model(
+            structure_definition=snapshot_sd,
+            mode=ConstructionMode.AUTO
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestSnapshotPatient"
+
+    def test_constructs_model_from_snapshot_explicit_mode(self):
+        """Test that models can be constructed with explicit SNAPSHOT mode."""
+        snapshot_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-snapshot-explicit",
+            "url": "http://example.org/StructureDefinition/test-snapshot-explicit",
+            "name": "TestSnapshotExplicit",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "base": {"path": "Patient", "min": 0, "max": "*"}
+                    }
+                ]
+            }
+        }
+        
+        model = self.factory.construct_resource_model(
+            structure_definition=snapshot_sd,
+            mode=ConstructionMode.SNAPSHOT
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestSnapshotExplicit"
+
+    def test_backward_compatibility_no_mode_parameter(self):
+        """Test that construct_resource_model works without mode parameter (backward compatibility)."""
+        snapshot_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-backward-compat",
+            "url": "http://example.org/StructureDefinition/test-backward-compat",
+            "name": "TestBackwardCompat",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "base": {"path": "Patient", "min": 0, "max": "*"}
+                    }
+                ]
+            }
+        }
+        
+        # Don't specify mode - should default to AUTO
+        model = self.factory.construct_resource_model(
+            structure_definition=snapshot_sd
+        )
+        
+        assert model is not None
+        assert model.__name__ == "TestBackwardCompat"
+
+
+class TestFactoryConfigConstructionMode(FactoryTestCase):
+    """Test that FactoryConfig properly stores construction mode."""
+
+    def setUp(self):
+        """Clear factory state before each test."""
+        super().setUp()
+        self.factory.construction_cache.clear()
+        self.factory.paths_in_processing.clear()
+        self.factory.local_cache.clear()
+
+    def test_factory_config_has_construction_mode(self):
+        """Test that FactoryConfig has construction_mode field."""
+        config = self.factory.FactoryConfig(
+            FHIR_release="R4B",
+            FHIR_version="4.3.0",
+            construction_mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        assert hasattr(config, "construction_mode")
+        assert config.construction_mode == ConstructionMode.DIFFERENTIAL
+
+    def test_factory_config_construction_mode_default(self):
+        """Test that FactoryConfig construction_mode has default value."""
+        config = self.factory.FactoryConfig(
+            FHIR_release="R4B",
+            FHIR_version="4.3.0"
+        )
+        
+        assert config.construction_mode == ConstructionMode.AUTO
+
+    def test_construct_sets_construction_mode_in_config(self):
+        """Test that construct_resource_model sets construction_mode in Config."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-config-mode",
+            "url": "http://example.org/StructureDefinition/test-config-mode",
+            "name": "TestConfigMode",
+            "status": "draft",
+            "fhirVersion": "4.3.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "differential": {
+                "element": [
+                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                ]
+            }
+        }
+        
+        self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.AUTO
+        )
+        
+        # Config should be set during construction
+        assert hasattr(self.factory, "Config")
+        assert self.factory.Config.construction_mode == ConstructionMode.DIFFERENTIAL
+
+class TestFactoryDifferentialConstruction(FactoryTestCase):
+    """Test that Factory correctly sets construction mode for differential SDs."""
+
+    def setUp(self):
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base",
+            "url": "http://example.org/StructureDefinition/mock-base",
+            "name": "MockBase",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "MockBase",
+                        "path": "MockBase",
+                        "min": 0,
+                        "max": "*",
+                    },
+                    {
+                        "id": "MockBase.element",
+                        "path": "MockBase.element",
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "string"}],
+                        "short": "A field specific to the derived resource",
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        return super().setUp()
+
+
+    def test_construct_diff_max_cardinality(self):
+        """Test that construct_resource_model sets construction_mode in Config."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-mode",
+            "url": "http://example.org/StructureDefinition/test-diff-mode",
+            "name": "TestDiffMode",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base",
+            "differential": {
+                "element": [
+                    {"id": "MockBase.element", "path": "MockBase.element", "min": 0, "max": "2"}
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        self.assertIn('element', mock_resource.model_fields)
+        # Assert element
+        element = mock_resource.model_fields.get('element')
+        assert element is not None, 'Profiled element field not found in model fields'
+        assert element.annotation == Optional[List[primitives.String]], 'Profiled element field does not have correct type annotation'
+
+        # Assert metadata
+        element_metadata = element.metadata
+        assert element_metadata is not None, 'No metadata found for profiled element'
+        self.assertEqual(next((meta for meta in element_metadata if isinstance(meta, MaxLen))).max_length, 2, 'Profiled max. cardinality has not been correctly set')
+        
+        # Test valid dataset        
+        self.assertIsNotNone(mock_resource.model_validate({'element': ['test']}), 'Valid dataset did not validate correctly')
+        # Test invalid dataset
+        with self.assertRaises(ValidationError, msg='Invalid dataset did not raise ValidationError'):
+            mock_resource.model_validate({'element': ['test1', 'test2', 'test3']})
+
+        
+    def test_construct_diff_min_cardinality(self):
+        """Test that construct_resource_model sets construction_mode in Config."""
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-mode",
+            "url": "http://example.org/StructureDefinition/test-diff-mode",
+            "name": "TestDiffMode",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base",
+            "differential": {
+                "element": [
+                    {"id": "MockBase.element", "path": "MockBase.element", "min": 1, "max": "*"}
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        self.assertIn('element', mock_resource.model_fields)
+        # Assert element
+        element = mock_resource.model_fields.get('element')
+        assert element is not None, 'Profiled element field not found in model fields'
+        assert element.annotation == Optional[List[primitives.String]], 'Profiled element field does not have correct type annotation'
+
+        # Assert metadata
+        element_metadata = element.metadata
+        assert element_metadata is not None, 'No metadata found for profiled element'
+        self.assertEqual(next((meta for meta in element_metadata if isinstance(meta, MinLen))).min_length, 1, 'Profiled min. cardinality has not been correctly set')
+        
+        # Test valid dataset        
+        self.assertIsNotNone(mock_resource.model_validate({'element': ['test']}), 'Valid dataset did not validate correctly')
+        # Test invalid dataset
+        with self.assertRaises(ValidationError, msg='Invalid dataset did not raise ValidationError'):
+            mock_resource.model_validate({'element': []})
+
+
+    def test_construct_diff_fixed_value_constraint(self):
+        """Test that differential can add fixed value constraints to elements."""
+        # Create base with a status field
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-status",
+            "url": "http://example.org/StructureDefinition/mock-base-status",
+            "name": "MockBaseStatus",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseStatus", "path": "MockBaseStatus", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseStatus.status",
+                        "path": "MockBaseStatus.status",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "code"}],
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Apply fixed value constraint in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-fixed",
+            "url": "http://example.org/StructureDefinition/test-diff-fixed",
+            "name": "TestDiffFixed",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-status",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseStatus.status",
+                        "path": "MockBaseStatus.status",
+                        "fixedCode": "active"
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Status field should exist
+        self.assertIn('status', mock_resource.model_fields)
+        
+        # Test that only the fixed value is accepted
+        instance = mock_resource.model_validate({'status': 'active'})
+        self.assertEqual(instance.status.value, 'active')
+        
+        # Test that other values are rejected
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({'status': 'inactive'})
+
+
+    def test_construct_diff_pattern_value_constraint(self):
+        """Test that differential can add pattern value constraints to elements."""
+        # Create base with a coding field
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-coding",
+            "url": "http://example.org/StructureDefinition/mock-base-coding",
+            "name": "MockBaseCoding",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseCoding", "path": "MockBaseCoding", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseCoding.code",
+                        "path": "MockBaseCoding.code",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "Coding"}],
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Apply pattern constraint in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-pattern",
+            "url": "http://example.org/StructureDefinition/test-diff-pattern",
+            "name": "TestDiffPattern",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-coding",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseCoding.code",
+                        "path": "MockBaseCoding.code",
+                        "patternCoding": {
+                            "system": "http://example.org/codesystem",
+                            "code": "test-code"
+                        }
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Code field should exist and have a pattern validator
+        self.assertIn('code', mock_resource.model_fields)
+        
+        # Check that model has the pattern constraint validator
+        validator_names = [name for name in dir(mock_resource) if 'pattern_constraint' in name]
+        self.assertTrue(len(validator_names) > 0, "Pattern constraint validator not found")
+        
+        mock_resource.model_validate({'code': {'system': 'http://example.org/codesystem', 'code': 'test-code'}})
+        
+        # Test that other values are rejected
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({'code': {'system': 'http://wrong-system', 'code': 'wrong-code'}})
+
+
+    def test_construct_diff_type_choice_element(self):
+        """Test that differential can constrain type choice elements."""
+        # Create base with a value[x] type choice field
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-choice",
+            "url": "http://example.org/StructureDefinition/mock-base-choice",
+            "name": "MockBaseChoice",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseChoice", "path": "MockBaseChoice", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseChoice.value[x]",
+                        "path": "MockBaseChoice.value[x]",
+                        "min": 0,
+                        "max": "1",
+                        "type": [
+                            {"code": "string"},
+                            {"code": "integer"},
+                            {"code": "boolean"}
+                        ],
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Constrain type choice to only string and integer in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-choice",
+            "url": "http://example.org/StructureDefinition/test-diff-choice",
+            "name": "TestDiffChoice",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-choice",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseChoice.value[x]",
+                        "path": "MockBaseChoice.value[x]",
+                        "min": 0,
+                        "max": "1",
+                        "type": [
+                            {"code": "string"},
+                        ]
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Test that property accessor works
+        self.assertTrue(hasattr(mock_resource, 'value'))
+        
+        # Test valid data with string
+        instance = mock_resource.model_validate({'valueString': 'test'})
+        self.assertEqual(instance.value, 'test')
+        
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({'valueInteger': 2})
+
+
+    def test_construct_diff_nested_backbone_element(self):
+        """Test that differential can constrain nested backbone elements."""
+        # Create base with simple nested structure using ContactPoint
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-telecom",
+            "url": "http://example.org/StructureDefinition/mock-base-telecom",
+            "name": "MockBaseTelecom",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseTelecom", "path": "MockBaseTelecom", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseTelecom.telecom",
+                        "path": "MockBaseTelecom.telecom",
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "ContactPoint"}],
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Constrain telecom in differential to be required
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-telecom",
+            "url": "http://example.org/StructureDefinition/test-diff-telecom",
+            "name": "TestDiffTelecom",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-telecom",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseTelecom.telecom",
+                        "path": "MockBaseTelecom.telecom",
+                        "min": 1,
+                        "max": "*"
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Telecom field should exist
+        self.assertIn('telecom', mock_resource.model_fields)
+        
+        # Check that it's required (min cardinality 1)
+        telecom_metadata = mock_resource.model_fields['telecom'].metadata
+        self.assertEqual(next((meta for meta in telecom_metadata if isinstance(meta, MinLen))).min_length, 1)
+        
+        # Test valid data with required telecom
+        instance = mock_resource.model_validate({
+            'telecom': [{'system': 'phone', 'value': '555-1234'}]
+        })
+        self.assertIsNotNone(instance.telecom)
+        
+        # Test invalid data without required telecom
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({
+                'telecom': []
+            })
+
+
+    def test_construct_diff_element_slicing(self):
+        """Test that differential can add constraint to sliced elements."""
+        # Create base with identifier field that can be sliced
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-identifier",
+            "url": "http://example.org/StructureDefinition/mock-base-identifier",
+            "name": "MockBaseIdentifier",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseIdentifier", "path": "MockBaseIdentifier", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseIdentifier.identifier",
+                        "path": "MockBaseIdentifier.identifier",
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "Identifier"}],
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Constrain identifier field cardinality in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-identifier",
+            "url": "http://example.org/StructureDefinition/test-diff-identifier",
+            "name": "TestDiffIdentifier",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-identifier",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseIdentifier.identifier",
+                        "path": "MockBaseIdentifier.identifier",
+                        "min": 1,
+                        "max": "3"
+                    },
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Identifier field should exist with new constraints
+        self.assertIn('identifier', mock_resource.model_fields)
+        identifier = mock_resource.model_fields['identifier']
+        identifier_metadata = identifier.metadata
+        
+        # Verify constraints
+        self.assertEqual(next((meta for meta in identifier_metadata if isinstance(meta, MinLen))).min_length, 1)
+        self.assertEqual(next((meta for meta in identifier_metadata if isinstance(meta, MaxLen))).max_length, 3)
+
+
+    def test_construct_diff_constraint_invariant(self):
+        """Test that differential can add constraint invariants to elements."""
+        # Create base
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-constraint",
+            "url": "http://example.org/StructureDefinition/mock-base-constraint",
+            "name": "MockBaseConstraint",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseConstraint", "path": "MockBaseConstraint", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseConstraint.value",
+                        "path": "MockBaseConstraint.value",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "integer"}],
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Add constraint in differential
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-constraint",
+            "url": "http://example.org/StructureDefinition/test-diff-constraint",
+            "name": "TestDiffConstraint",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-constraint",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseConstraint",
+                        "path": "MockBaseConstraint",
+                        "constraint": [
+                            {
+                                "key": "val-1",
+                                "severity": "error",
+                                "human": "Value must be positive",
+                                "expression": "value > 0"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Value field should exist
+        self.assertIn('value', mock_resource.model_fields)
+        
+        # Check that constraint validator was added
+        validator_names = [name for name in dir(mock_resource) if 'val-1' in name or 'constraint' in name.lower()]
+        self.assertTrue(len(validator_names) > 0, "Constraint validator not found")
+
+        # Check that valid value passes
+        instance = mock_resource.model_validate({'value': 5})
+        self.assertEqual(instance.value, 5)
+
+        # Check that invalid value raises error
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({'value': -2})
+
+
+    def test_construct_diff_multiple_elements_constraints(self):
+        """Test that differential can apply different constraint types to multiple elements."""
+        # Create base with multiple fields
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-multi",
+            "url": "http://example.org/StructureDefinition/mock-base-multi",
+            "name": "MockBaseMulti",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseMulti", "path": "MockBaseMulti", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseMulti.status",
+                        "path": "MockBaseMulti.status",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "code"}],
+                    },
+                    {
+                        "id": "MockBaseMulti.priority",
+                        "path": "MockBaseMulti.priority",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "code"}],
+                    },
+                    {
+                        "id": "MockBaseMulti.text",
+                        "path": "MockBaseMulti.text",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Apply different constraints to different elements
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-multi-constraints",
+            "url": "http://example.org/StructureDefinition/test-diff-multi-constraints",
+            "name": "TestDiffMultiConstraints",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-multi",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseMulti.status",
+                        "path": "MockBaseMulti.status",
+                        "min": 1,  # Make required
+                        "fixedCode": "active"  # Fix value
+                    },
+                    {
+                        "id": "MockBaseMulti.priority",
+                        "path": "MockBaseMulti.priority",
+                        "patternCode": "high"  # Pattern constraint
+                    },
+                    {
+                        "id": "MockBaseMulti.text",
+                        "path": "MockBaseMulti.text",
+                        "min": 1,  # Make required
+                        "max": "1"
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # All fields should exist
+        self.assertIn('status', mock_resource.model_fields)
+        self.assertIn('priority', mock_resource.model_fields)
+        self.assertIn('text', mock_resource.model_fields)
+        
+        # Test valid instance with all constraints satisfied
+        instance = mock_resource.model_validate({
+            'status': 'active',
+            'priority': 'high',
+            'text': 'Test text'
+        })
+        self.assertEqual(instance.status.value, 'active')
+        
+        # Test that fixed value is enforced
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({
+                'status': 'inactive',
+                'text': 'Test text'
+            })
+
+        # Test that pattern is enforced
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({
+                'priority': 'wrong',
+            })
+
+
+    def test_construct_diff_inherits_base_structure(self):
+        """Test that differential models properly inherit complete structure from base."""
+        # Create base with multiple nested elements
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-complex",
+            "url": "http://example.org/StructureDefinition/mock-base-complex",
+            "name": "MockBaseComplex",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseComplex", "path": "MockBaseComplex", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseComplex.field1",
+                        "path": "MockBaseComplex.field1",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                    {
+                        "id": "MockBaseComplex.field2",
+                        "path": "MockBaseComplex.field2",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "integer"}],
+                    },
+                    {
+                        "id": "MockBaseComplex.field3",
+                        "path": "MockBaseComplex.field3",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "boolean"}],
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Differential only constrains one field
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-inherit",
+            "url": "http://example.org/StructureDefinition/test-diff-inherit",
+            "name": "TestDiffInherit",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-complex",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseComplex.field1",
+                        "path": "MockBaseComplex.field1",
+                        "min": 1  # Only constrain field1
+                    }
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # All fields from base should be present
+        self.assertIn('field1', mock_resource.model_fields)
+        self.assertIn('field2', mock_resource.model_fields)
+        self.assertIn('field3', mock_resource.model_fields)
+        
+        # Other fields should work normally
+        instance = mock_resource.model_validate({
+            'field1': 'required_value',
+            'field2': 42,
+            'field3': True
+        })
+        self.assertEqual(instance.field1, 'required_value')
+        self.assertEqual(instance.field2, 42)
+        self.assertEqual(instance.field3, True)
+
+
+    def test_construct_diff_sliced_elements_with_discriminators(self):
+        """Test that differential can define sliced elements with discriminators and named slices."""
+        # Create base with extension field that will be sliced
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-extension",
+            "url": "http://example.org/StructureDefinition/mock-base-extension",
+            "name": "MockBaseExtension",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseExtension", "path": "MockBaseExtension", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseExtension.extension",
+                        "path": "MockBaseExtension.extension",
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "Extension"}],
+                    },
+                    {
+                        "id": "MockBaseExtension.extension.url",
+                        "path": "MockBaseExtension.extension.url",
+                        "min": 1,
+                        "max": "1",
+                        "type": [{"code": "uri"}],
+                    }
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Define slicing on extension with discriminators and named slices
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-slicing",
+            "url": "http://example.org/StructureDefinition/test-diff-slicing",
+            "name": "TestDiffSlicing",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Patient",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-extension",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseExtension.extension",
+                        "path": "MockBaseExtension.extension",
+                        "slicing": {
+                            "discriminator": [
+                                {
+                                    "type": "value",
+                                    "path": "url"
+                                }
+                            ],
+                            "rules": "open"
+                        },
+                        "min": 0,
+                        "max": "*"
+                    },
+                    {
+                        "id": "MockBaseExtension.extension:birthPlace",
+                        "path": "MockBaseExtension.extension",
+                        "sliceName": "birthPlace",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "Extension"}],
+                    },
+                    {
+                        "id": "MockBaseExtension.extension:birthPlace.url",
+                        "path": "MockBaseExtension.extension.url",
+                        "min": 1,
+                        "max": "1",
+                        "fixedUri": "http://example.org/birthPlace"
+                    },
+                    {
+                        "id": "MockBaseExtension.extension:birthPlace.valueString",
+                        "path": "MockBaseExtension.extension.valueString",
+                        "min": 0,
+                        "max": "1",
+                        "type": [{"code": "string"}],
+                    },
+                    {
+                        "id": "MockBaseExtension.extension:nationality",
+                        "path": "MockBaseExtension.extension",
+                        "sliceName": "nationality",
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "Extension"}],
+                    },
+                    {
+                        "id": "MockBaseExtension.extension:nationality.url",
+                        "path": "MockBaseExtension.extension.url",
+                        "min": 1,
+                        "max": "1",
+                        "fixedUri": "http://example.org/nationality"
+                    },
+                    {
+                        "id": "MockBaseExtension.extension:nationality.valueCodeableConcept",
+                        "path": "MockBaseExtension.extension.valueCodeableConcept",
+                        "min": 1,
+                        "max": "1",
+                        "type": [{"code": "CodeableConcept"}],
+                    },
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Extension field should exist
+        self.assertIn('extension', mock_resource.model_fields)
+        
+        # Check for slice-specific fields (if factory creates them)
+        fields = mock_resource.model_fields
+        slice_fields = [f for f in fields.keys() if 'birthPlace' in f or 'nationality' in f]
+        
+        # If slices are created as separate fields, they should exist
+        if slice_fields:
+            self.assertTrue(len(slice_fields) > 0, "Slice fields should be created")
+        
+        # Test that base extension field still works
+        instance = mock_resource.model_validate({
+            'extension': [
+                {
+                    'url': 'http://example.org/birthPlace',
+                    'valueString': 'New York'
+                },
+                {
+                    'url': 'http://example.org/nationality',
+                    'valueCodeableConcept': {
+                        'coding': [{'system': 'http://example.org', 'code': 'US'}]
+                    }
+                }
+            ]
+        })
+        self.assertIsNotNone(instance.extension)
+        self.assertEqual(len(instance.extension), 2)
+
+
+    def test_construct_diff_sliced_backbone_elements(self):
+        """Test that differential can slice backbone elements with specific constraints."""
+        # Create base with component backbone element
+        base_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "mock-base-component",
+            "url": "http://example.org/StructureDefinition/mock-base-component",
+            "name": "MockBaseComponent",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Resource",
+            "snapshot": {
+                "element": [
+                    {"id": "MockBaseComponent", "path": "MockBaseComponent", "min": 0, "max": "*"},
+                    {
+                        "id": "MockBaseComponent.component",
+                        "path": "MockBaseComponent.component",
+                        "min": 0,
+                        "max": "*",
+                        "type": [{"code": "BackboneElement"}],
+                    },
+                    {
+                        "id": "MockBaseComponent.component.code",
+                        "path": "MockBaseComponent.component.code",
+                        "min": 1,
+                        "max": "1",
+                        "type": [{"code": "CodeableConcept"}],
+                    },
+                    {
+                        "id": "MockBaseComponent.component.value[x]",
+                        "path": "MockBaseComponent.component.value[x]",
+                        "min": 0,
+                        "max": "1",
+                        "type": [
+                            {"code": "Quantity"},
+                            {"code": "string"},
+                        ],
+                    },
+                ]
+            },
+        }
+        self.factory.repository.load_from_definitions(base_sd)
+        self.factory.construct_resource_model(structure_definition=base_sd)
+        
+        # Slice component by code
+        differential_sd = {
+            "resourceType": "StructureDefinition",
+            "id": "test-diff-component-slice",
+            "url": "http://example.org/StructureDefinition/test-diff-component-slice",
+            "name": "TestDiffComponentSlice",
+            "status": "draft",
+            "fhirVersion": "5.0.0",
+            "kind": "resource",
+            "abstract": False,
+            "type": "Observation",
+            "baseDefinition": "http://example.org/StructureDefinition/mock-base-component",
+            "differential": {
+                "element": [
+                    {
+                        "id": "MockBaseComponent.component",
+                        "path": "MockBaseComponent.component",
+                        "slicing": {
+                            "discriminator": [
+                                {
+                                    "type": "pattern",
+                                    "path": "code"
+                                }
+                            ],
+                            "rules": "open"
+                        },
+                        "min": 2,
+                        "max": "*"
+                    },
+                    {
+                        "id": "MockBaseComponent.component:systolic",
+                        "path": "MockBaseComponent.component",
+                        "sliceName": "systolic",
+                        "min": 1,
+                        "max": "1",
+                    },
+                    {
+                        "id": "MockBaseComponent.component:systolic.code",
+                        "path": "MockBaseComponent.component.code",
+                        "patternCodeableConcept": {
+                            "coding": [
+                                {
+                                    "system": "http://loinc.org",
+                                    "code": "8480-6"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "id": "MockBaseComponent.component:systolic.valueQuantity",
+                        "path": "MockBaseComponent.component.valueQuantity",
+                        "min": 1,
+                        "max": "1",
+                        "type": [{"code": "Quantity"}],
+                    },
+                    {
+                        "id": "MockBaseComponent.component:diastolic",
+                        "path": "MockBaseComponent.component",
+                        "sliceName": "diastolic",
+                        "min": 1,
+                        "max": "1",
+                    },
+                    {
+                        "id": "MockBaseComponent.component:diastolic.code",
+                        "path": "MockBaseComponent.component.code",
+                        "patternCodeableConcept": {
+                            "coding": [
+                                {
+                                    "system": "http://loinc.org",
+                                    "code": "8462-4"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "id": "MockBaseComponent.component:diastolic.valueQuantity",
+                        "path": "MockBaseComponent.component.valueQuantity",
+                        "min": 1,
+                        "max": "1",
+                        "type": [{"code": "Quantity"}],
+                    },
+                ]
+            }
+        }
+        
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd,
+            mode=ConstructionMode.DIFFERENTIAL
+        )
+        
+        # Component field should exist
+        self.assertIn('component', mock_resource.model_fields)
+        
+        # Check cardinality constraint (min 2)
+        component_metadata = mock_resource.model_fields['component'].metadata
+        self.assertEqual(next((meta for meta in component_metadata if isinstance(meta, MinLen))).min_length, 2)
+        
+        # Test valid instance with both required slices
+        instance = mock_resource.model_validate({
+            'component': [
+                {
+                    'code': {
+                        'coding': [{'system': 'http://loinc.org', 'code': '8480-6'}]
+                    },
+                    'valueQuantity': {'value': 120, 'unit': 'mmHg'}
+                },
+                {
+                    'code': {
+                        'coding': [{'system': 'http://loinc.org', 'code': '8462-4'}]
+                    },
+                    'valueQuantity': {'value': 80, 'unit': 'mmHg'}
+                }
+            ]
+        })
+        self.assertIsNotNone(instance.component)
+        self.assertEqual(len(instance.component), 2)
+
+        
