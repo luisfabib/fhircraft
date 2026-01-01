@@ -90,3 +90,7 @@ plugins:
           import:
             - https://docs.python.org/3/objects.inv
             - https://docs.pydantic.dev/latest/objects.inv
+          options:
+            extensions:
+              - griffe_fieldz:
+                  include_inherited: true

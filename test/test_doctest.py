@@ -13,12 +13,12 @@ def mock_load_package(self, package_name, version=None):
         # Load the local mcode cancer patient profile
         test_files_dir = Path(__file__).parent / "static" / "fhir-profiles-definitions"
         mcode_file = test_files_dir / "mcode-cancer-patient.json"
-        
-        if mcode_file.exists():
-            # Load directly into the repository
-            self.repository.load_from_files(mcode_file)
-        else:
-            raise FileNotFoundError(f"Test file not found: {mcode_file}")
+        self.repository.load_from_files(mcode_file)
+    elif package_name == 'hl7.fhir.us.core':
+        # Load the local mcode cancer patient profile
+        test_files_dir = Path(__file__).parent / "static" / "fhir-profiles-definitions"
+        mcode_file = test_files_dir / "us-core-patient.json"
+        self.repository.load_from_files(mcode_file)
     else:
         # For other packages, raise an error since we don't have mocks for them
         raise NotImplementedError(f"Mock not implemented for package: {package_name}")
@@ -26,7 +26,7 @@ def mock_load_package(self, package_name, version=None):
 
 def mock_load_file(filepath):
     """Mock load_file to return test data instead of reading arbitrary files."""
-    if filepath == 'my_fhir_patient.json':
+    if filepath == 'patient.json' or filepath == 'patient_profile.json' or filepath == 'my_fhir_patient.json':
         # Return contents of the test Patient resource
         test_file = Path(__file__).parent / "static" / "fhir-profiles-examples" / "Patient-cancer-patient-jenny-m.json"
         with open(test_file, 'r') as f:

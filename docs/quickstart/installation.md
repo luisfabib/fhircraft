@@ -43,17 +43,6 @@ Patient = construct_resource_model(
 print("Fhircraft installed successfully!")
 ```
 
-## Dependencies
-
-Fhircraft automatically installs these dependencies:
-
-- **Pydantic** (≥2.7) - Data validation and serialization
-- **requests** - HTTP client for FHIR specifications
-- **ply** (≥3.11) - FHIRPath expression parsing
-- **jsonschema** (>4) - JSON schema validation
-- **PyYAML** - YAML file support
-- **jsonpath-ng** - JSON path operations
-- **Jinja2** (≥3.1) - Code generation
 
 ## Development installation
 

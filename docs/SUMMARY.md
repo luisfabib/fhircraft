@@ -1,13 +1,8 @@
   - [Home](index.md)
-  - Getting Started
-    - Introduction
-        - [Installation](quickstart/installation.md)
-        - [Basics](quickstart/basics.md)
-    - Community
-        - [Contributing](community/contributing.md)
-        - [Code of Conduct](community/code_of_conduct.md)
-        - [Credits](community/credits.md)
-        - [License](community/license.md)
+  - Get Started
+    - [Installation](quickstart/installation.md)
+    - [Quick Start](quickstart/quickstart.md)
+    - [Tutorial](quickstart/tutorial.md)
   - [User Guide](user-guide/overview.md)
       - Fhircraft
           - [FHIR Resources](user-guide/resources-overview.md)
@@ -17,5 +12,12 @@
           - [FHIR Path](user-guide/fhirpath.md)
           - [FHIR Mapper](user-guide/mapper.md)
   - [Release Notes](changelog.md)
+  - Community
+    - [FAQ](community/faq.md)
+    - [Contributing](community/contributing.md)
+    - [Development Guide](community/development.md)
+    - [Code of Conduct](community/code_of_conduct.md)
+    - [Credits](community/credits.md)
+    - [License](community/license.md)
   - Reference
     -  ./reference/*
