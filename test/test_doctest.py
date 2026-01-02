@@ -3,9 +3,7 @@ import pytest
 import json
 from unittest.mock import patch, MagicMock, mock_open
 from pathlib import Path
-
-from mktestdocs import check_md_file
-
+from .mktestdocs import check_md_file
 
 def mock_load_package(self, package_name, version=None):
     """Mock load_package to load local test files instead of downloading from internet."""
@@ -26,9 +24,15 @@ def mock_load_package(self, package_name, version=None):
 
 def mock_load_file(filepath):
     """Mock load_file to return test data instead of reading arbitrary files."""
-    if filepath == 'patient.json' or filepath == 'patient_profile.json' or filepath == 'my_fhir_patient.json':
+    if filepath == 'patient.json' or filepath == 'my_fhir_patient.json':
         # Return contents of the test Patient resource
         test_file = Path(__file__).parent / "static" / "fhir-profiles-examples" / "Patient-cancer-patient-jenny-m.json"
+        with open(test_file, 'r') as f:
+            return json.load(f)
+        
+    elif filepath == 'patient_profile.json':
+        # Return contents of the test Patient structure definition
+        test_file = Path(__file__).parent / "static" / "fhir-profiles-definitions" / "us-core-patient.json"
         with open(test_file, 'r') as f:
             return json.load(f)
     else:
@@ -54,8 +58,10 @@ def mock_open_func(file, mode='r', *args, **kwargs):
 @patch('builtins.open', side_effect=mock_open_func)
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_documentation_examples(mock_file, fpath):
+    # Do not test documentation pages that include many abstract python examples
     if fpath in [
         pathlib.Path("docs") / "user-guide" / "pydantic-representation.md",
+        pathlib.Path("docs") / "user-guide" / "resources-construction.md",
     ]:
         pytest.skip("Skipping documentation with invalid python examples.")
     check_md_file(fpath=fpath, memory=True)
