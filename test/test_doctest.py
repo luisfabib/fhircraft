@@ -52,9 +52,18 @@ def mock_open_func(file, mode='r', *args, **kwargs):
 @patch('fhircraft.fhir.resources.factory.ResourceFactory.load_package', mock_load_package)
 @patch('fhircraft.utils.load_file', mock_load_file)
 @patch('builtins.open', side_effect=mock_open_func)
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_documentation_examples(mock_file, fpath):
     if fpath in [
         pathlib.Path("docs") / "user-guide" / "pydantic-representation.md",
     ]:
         pytest.skip("Skipping documentation with invalid python examples.")
     check_md_file(fpath=fpath, memory=True)
+
+
+@patch('fhircraft.fhir.resources.factory.ResourceFactory.load_package', mock_load_package)
+@patch('fhircraft.utils.load_file', mock_load_file)
+@patch('builtins.open', side_effect=mock_open_func)
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_readme_examples(mock_file):
+    check_md_file(fpath=pathlib.Path("README.md"), memory=True)

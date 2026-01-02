@@ -131,7 +131,7 @@ has_phone = patient.fhirpath_exists("Patient.telecom.where(system='phone')")
 
 # Update data using FHIRPath expressions
 patient.fhirpath_update_single("Patient.gender", "female")
-patient.fhirpath_update("Patient.name.given", ["Jane", "Marie"])
+patient.fhirpath_update_values("Patient.name.given", ["Jane", "Marie"])
 
 print(f"Updated patient: {family_names[0]}, Phone: {has_phone}")
 ```
@@ -152,23 +152,23 @@ legacy_patient = {
 
 # FHIR Mapping script
 mapping_script = """
-map 'http://example.org/legacy-to-fhir' = 'LegacyPatient'
+/// url = "http://example.org/legacy-to-fhir"
+/// name = "LegacyPatientToFHIR"
+
+uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
 
 group main(source legacy, target patient: Patient) {
-    legacy.firstName -> patient.name.given;
-    legacy.lastName -> patient.name.family;
-    legacy.dob -> patient.birthDate;
-    legacy.sex where("$this = 'M'") -> patient.gender = 'male';
-    legacy.sex where("$this = 'F'") -> patient.gender = 'female';
+    legacy -> patient.name as name then {
+        legacy.firstName -> name.given;
+        legacy.lastName -> name.family;
+    };
 }
 """
 
 # Execute transformation
 mapper = FHIRMapper()
-targets, metadata = mapper.execute_mapping(mapping_script, legacy_patient)
+targets = mapper.execute_mapping(mapping_script, legacy_patient)
 fhir_patient = targets[0]
-
-print(f"Transformed: {fhir_patient.name[0].given[0]} {fhir_patient.name[0].family}")
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
