@@ -210,6 +210,20 @@ token_test_cases = (
         ),
     ),
     (
+        "where(a = 10) -> create patient",
+        (
+            ("where", "WHERE"),
+            ("(", "("),
+            ("a", "IDENTIFIER"),
+            ("=", "EQUAL"),
+            (10, "INTEGER"),
+            (")", ")"),
+            ("->", "RIGHT_ARROW"),
+            ("create", "IDENTIFIER"),
+            ("patient", "IDENTIFIER"),
+        ),
+    ),
+    (
         "check src.exists()",
         (
             ("check", "CHECK"),
