@@ -707,6 +707,29 @@ parser_test_cases = (
         ),
     ),
     (
+        """group map_example(source src, target tgt){src.field as f where(f = 10) -> tgt.field;}""",
+        add_rules_to_basic_map(
+            rules=[
+                StructureMapGroupRule(
+                    source=[
+                        StructureMapGroupRuleSource(
+                            context="src",
+                            element="field",
+                            condition="f = 10",
+                            variable="f",
+                        )
+                    ],
+                    target=[
+                        StructureMapGroupRuleTarget(
+                            context="tgt",
+                            element="field",
+                        )
+                    ],
+                )
+            ]
+        ),
+    ),
+    (
         """group map_example(source src, target tgt){src.field as f where(f > 10) -> tgt.field;}""",
         add_rules_to_basic_map(
             rules=[

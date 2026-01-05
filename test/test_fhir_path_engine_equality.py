@@ -51,7 +51,7 @@ def test_equals_returns_correct_boolean(left, right, expected):
 
 def test_equals_string_representation():
     expression = Equals(Element("left"), Element("right"))
-    assert str(expression) == "left == right"
+    assert str(expression) == "left = right"
 
 
 @pytest.mark.parametrize("left, right, expected", equals_boolean_logic_cases)
