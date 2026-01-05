@@ -337,6 +337,7 @@ parser_test_cases = (
     ("A is canonical", Is(Element("A"), TypeSpecifier("canonical"))),
     ("A is Observation", Is(Element("A"), TypeSpecifier("Observation"))),
     ("A is System.String", Is(Element("A"), TypeSpecifier("System.String"))),
+    ("A is System.Patient", Is(Element("A"), TypeSpecifier("System.Patient"))),
     ("A as string", As(Element("A"), TypeSpecifier("string"))),
     ("A as System.String", As(Element("A"), TypeSpecifier("System.String"))),
     (
@@ -417,10 +418,10 @@ parser_test_cases = (
 )
 
 
-
 @pytest.fixture(scope="module")
 def parser():
     return FhirPathParser(lexer_class=lambda: FhirPathLexer())
+
 
 @pytest.mark.parametrize("string, expected_object", parser_test_cases)
 def test_parser(parser, string, expected_object):
@@ -431,6 +432,7 @@ parser_error_cases = (
     ("*"),
     ("baz,bizzle"),
 )
+
 
 @pytest.mark.parametrize("string", parser_error_cases)
 def test_parser_catches_invalid_syntax(parser, string):

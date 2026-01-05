@@ -578,7 +578,8 @@ class FhirMappingLanguageParser(FhirPathParser):
                             source_var + "target_"
                             if f"_{element}_" == source_var
                             or f"_{context}_" == source_var
-                            or f"_{(subelement := target_path.get('subelements', [None])[-1])}_" == source_var
+                            or f"_{(subelement := target_path.get('subelements', [None])[-1])}_"
+                            == source_var
                             else f"_{subelement or element or context}_"
                         )
                     ),
@@ -636,7 +637,7 @@ class FhirMappingLanguageParser(FhirPathParser):
             target.listMode = data.get("listMode")
             target.transform = data.get("transform")
             target.parameter = data.get("parameter")
-            
+
         _rule.dependent = dependent.get("dependent") if dependent else None
         if dependent_rule := dependent.get("rule"):
             _rule.rule = _rule.rule or []
@@ -1035,7 +1036,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         m_fhirpath : expression
         """
         expr = str(p[1])
-        p[0] = expr.strip('\'') if expr.startswith('\'') and expr.endswith('\'') else expr
+        p[0] = expr.strip("'") if expr.startswith("'") and expr.endswith("'") else expr
 
     def p_mapper_url(self, p):
         """
