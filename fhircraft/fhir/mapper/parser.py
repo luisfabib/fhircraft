@@ -719,7 +719,11 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_mapper_ruleSource(self, p):
         """m_ruleSource : m_ruleContext m_source_modifiers"""
         if "." in p[1]:
-            context, element = p[1].split(".")
+            if len(parts := p[1].split(".")) > 2:
+                raise FhirMappingLanguageParserError(
+                    f"Source context '{p[1]}' has too many segments; only one '.' is allowed."
+                )               
+            context, element = parts
         else:
             context = p[1]
             element = None
