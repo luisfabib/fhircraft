@@ -909,7 +909,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as f where(f = 10) -> tgt.field = f;}""",
+        """group map_example(source src, target tgt){src.field as f where(f = 10) -> tgt.field;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -925,10 +925,6 @@ parser_test_cases = (
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="field",
-                            transform="copy",
-                            parameter=[
-                                StructureMapGroupRuleTargetParameter(valueId="f")
-                            ],
                         )
                     ],
                 )
@@ -936,7 +932,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as f where(f > 10) -> tgt.field = f;}""",
+        """group map_example(source src, target tgt){src.field as f where(f > 10) -> tgt.field;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
