@@ -578,7 +578,7 @@ class FhirMappingLanguageParser(FhirPathParser):
                             source_var + "target_"
                             if f"_{element}_" == source_var
                             or f"_{context}_" == source_var
-                            else f"_{element or context}_"
+                            else f"_{(subelement := target_path.get("subelements", [None])[-1]) or element or context}_"
                         )
                     ),
                 }
@@ -601,7 +601,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         if len(sources) == 1 and sources[0].variable:
             source_variable = sources[0].variable
 
-        rule = StructureMapGroupRule(source=sources, **dependent)
+        rule = StructureMapGroupRule(source=sources)
 
         targets = []
         for data in _targets:
@@ -635,6 +635,10 @@ class FhirMappingLanguageParser(FhirPathParser):
             target.listMode = data.get("listMode")
             target.transform = data.get("transform")
             target.parameter = data.get("parameter")
+            _rule.dependent = dependent.get("dependent") if dependent else None
+            if dependent_rule := dependent.get("rule"):
+                _rule.rule = _rule.rule or []
+                _rule.rule.extend(dependent_rule)
 
         rule.target = targets
         return rule

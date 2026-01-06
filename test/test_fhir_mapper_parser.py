@@ -685,6 +685,58 @@ parser_test_cases = (
             ]
         ),
     ),
+    (
+        """group map_example(source src, target tgt){src.fieldA -> tgt.fieldB.subfieldB;}""",
+        add_rules_to_basic_map(
+            rules=[
+                StructureMapGroupRule(
+                    source=[
+                        StructureMapGroupRuleSource(
+                            context="src",
+                            element="fieldA",
+                            variable="_fieldA_",
+                        )
+                    ],
+                    target=[
+                        StructureMapGroupRuleTarget(
+                            context="tgt",
+                            element="fieldB",
+                            variable="_fieldB_",
+                        )
+                    ],
+                    rule=[
+                        StructureMapGroupRule(
+                            source=[
+                                StructureMapGroupRuleSource(
+                                    context="_fieldA_",
+                                )
+                            ],
+                            target=[
+                                StructureMapGroupRuleTarget(
+                                    context="_fieldB_",
+                                    element="subfieldB",
+                                    variable="_subfieldB_",
+                                )
+                            ],
+                            dependent=[
+                                StructureMapGroupRuleDependent(
+                                    name="_DefaultMappingGroup_",
+                                    parameter=[
+                                        StructureMapGroupRuleDependentParameter(
+                                            valueId="_fieldA_"
+                                        ),
+                                        StructureMapGroupRuleDependentParameter(
+                                            valueId="_subfieldB_"
+                                        ),
+                                    ],
+                                )
+                            ],
+                        )
+                    ],
+                ),
+            ]
+        ),
+    ),
     # ----------------- EDGE CASES & ADDITIONAL SYNTAX -----------------
     (
         """/// description = 'A test map'""",
