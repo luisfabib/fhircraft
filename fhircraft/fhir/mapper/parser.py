@@ -132,10 +132,19 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def _parse_list_tokens(self, tokens: list, comma_separated=False) -> list | None:
         if len(tokens) == 2:
-            tokens[0] = [tokens[1]] if tokens[1] else None
+            if not tokens[1]:
+                tokens[0] = None
+            elif isinstance(tokens[1], list):
+                tokens[0] = tokens[1]
+            else:
+                tokens[0] = [tokens[1]]
         else:
             tokens[0] = tokens[1] or []
-            tokens[0].append(tokens[2] if not comma_separated else tokens[3])
+            appended = tokens[2] if not comma_separated else tokens[3]
+            if isinstance(appended, list):
+                tokens[0].extend(appended)
+            else:
+                tokens[0].append(appended)
 
     # ===================== PLY Parser specification =====================
 
@@ -532,24 +541,62 @@ class FhirMappingLanguageParser(FhirPathParser):
         p[0] = p[1]
         p[0].name = p[2]
 
+    def p_mapping_rule(self, p):
+        """
+        m_rule : m_rule_only_sources
+               | m_rule
+        """
+        p[0] = p[1]
+
     def p_mapper_rule_only_sources(self, p):
         """
-        m_rule : m_rule_source_list m_dependent
-               | m_rule_source_list
+        m_rule_only_sources : m_rule_source_list m_dependent
+                            | m_rule_source_list
         """
         sources = p[1]
         dependent = p[2] if len(p) == 3 else {}
         p[0] = StructureMapGroupRule(source=sources, **dependent)
 
-    def p_mapper_rule_complex_transform(self, p):
-        """
-        m_rule : m_rule_source_list RIGHT_ARROW m_rule_target_list m_dependent
-               | m_rule_source_list RIGHT_ARROW m_rule_target_list
-        """
-        sources = p[1]
-        _targets = p[3]
-        dependent = p[4] if len(p) == 5 else {}
+    def _process_identity_transform(self, source_path, target_path):
+        return self._process_rule(
+            sources=[
+                StructureMapGroupRuleSource(
+                    context=(context := source_path.get("context")),
+                    element=(element := source_path.get("element")),
+                    variable=(source_var := f"_{element or context}_"),
+                )
+            ],
+            _targets=[
+                {
+                    "path": dict(
+                        context=(context := target_path.get("context")),
+                        element=(element := target_path.get("element")),
+                        subelements=target_path.get("subelements"),
+                    ),
+                    "variable": (
+                        target_var := (
+                            source_var + "target_"
+                            if f"_{element}_" == source_var
+                            or f"_{context}_" == source_var
+                            else f"_{element or context}_"
+                        )
+                    ),
+                }
+            ],
+            dependent={
+                "dependent": [
+                    StructureMapGroupRuleDependent(
+                        name="_DefaultMappingGroup_",
+                        parameter=[
+                            StructureMapGroupRuleDependentParameter(valueId=source_var),
+                            StructureMapGroupRuleDependentParameter(valueId=target_var),
+                        ],
+                    )
+                ]
+            },
+        )
 
+    def _process_rule(self, sources, _targets, dependent):
         source_variable = None
         if len(sources) == 1 and sources[0].variable:
             source_variable = sources[0].variable
@@ -589,28 +636,64 @@ class FhirMappingLanguageParser(FhirPathParser):
             target.transform = data.get("transform")
             target.parameter = data.get("parameter")
 
-            if not target.transform and not rule.dependent and not rule.rule:
-                rule.dependent = [
-                    StructureMapGroupRuleDependent(
-                        name="_DefaultMappingGroup_",
-                        parameter=[
-                            StructureMapGroupRuleDependentParameter(
-                                valueId=source_variable or "_source_"
-                            ),
-                            StructureMapGroupRuleDependentParameter(
-                                valueId=target.variable or "_target_"
-                            ),
-                        ],
-                    )
-                ]
-
         rule.target = targets
-        p[0] = rule
+        return rule
+
+    def p_identifier_list(self, p):
+        """
+        m_identifier_list : m_identifier_list ',' m_identifier
+                          | m_identifier
+        """
+        self._parse_list_tokens(p, comma_separated=True)
+
+    def p_mapper_rule_full(self, p):
+        """
+        m_rule : m_rule_source_list RIGHT_ARROW m_rule_target_list m_dependent
+                       | m_rule_source_list RIGHT_ARROW m_rule_target_list ':' m_identifier_list
+                       | m_rule_source_list RIGHT_ARROW m_rule_target_list
+        """
+        sources = p[1]
+        _targets = p[3]
+        dependent = p[4] if len(p) == 5 else {}
+
+        if (
+            len(sources) == 1
+            and len(_targets) == 1
+            and not dependent
+            and not sources[0].variable
+            and not _targets[0].get("variable")
+            and not _targets[0].get("listMode")
+            and not _targets[0].get("transform")
+            and not _targets[0].get("parameter")
+        ):
+            if len(p) == 6:
+                # Special case: multiple identity transforms
+                p[0] = [
+                    self._process_identity_transform(
+                        {"context": sources[0].context, "element": element},
+                        {
+                            "context": _targets[0].get("path")["context"],
+                            "element": element,
+                        },
+                    )
+                    for element in p[5]
+                ]
+            else:
+                # Special case: identity transform
+                p[0] = self._process_identity_transform(
+                    source_path={
+                        "context": sources[0].context,
+                        "element": sources[0].element,
+                    },
+                    target_path=_targets[0].get("path"),
+                )
+        else:
+            p[0] = self._process_rule(sources, _targets, dependent)
 
     def p_mapper_rule_name(self, p):
         """
         m_rule_name : m_identifier
-                   | STRING"""
+                    | STRING"""
         p[0] = p[1]
 
     # ===================== Rule sources parsing =====================

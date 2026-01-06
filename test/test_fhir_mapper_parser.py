@@ -219,12 +219,14 @@ parser_test_cases = (
                         StructureMapGroupRuleSource(
                             context="src",
                             element="fieldA",
+                            variable="_fieldA_",
                         )
                     ],
                     target=[
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="fieldB",
+                            variable="_fieldB_",
                         )
                     ],
                     dependent=[
@@ -232,16 +234,83 @@ parser_test_cases = (
                             name="_DefaultMappingGroup_",
                             parameter=[
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_source_"
+                                    valueId="_fieldA_"
                                 ),
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_target_"
+                                    valueId="_fieldB_"
                                 ),
                             ],
                         )
                     ],
                     name=None,
                 )
+            ]
+        ),
+    ),
+    (
+        """group map_example(source src, target tgt){src -> tgt: fieldA, fieldB;}""",
+        add_rules_to_basic_map(
+            rules=[
+                StructureMapGroupRule(
+                    source=[
+                        StructureMapGroupRuleSource(
+                            context="src",
+                            element="fieldA",
+                            variable="_fieldA_",
+                        )
+                    ],
+                    target=[
+                        StructureMapGroupRuleTarget(
+                            context="tgt",
+                            element="fieldA",
+                            variable="_fieldA_target_",
+                        )
+                    ],
+                    dependent=[
+                        StructureMapGroupRuleDependent(
+                            name="_DefaultMappingGroup_",
+                            parameter=[
+                                StructureMapGroupRuleDependentParameter(
+                                    valueId="_fieldA_"
+                                ),
+                                StructureMapGroupRuleDependentParameter(
+                                    valueId="_fieldA_target_"
+                                ),
+                            ],
+                        )
+                    ],
+                    name=None,
+                ),
+                StructureMapGroupRule(
+                    source=[
+                        StructureMapGroupRuleSource(
+                            context="src",
+                            element="fieldB",
+                            variable="_fieldB_",
+                        )
+                    ],
+                    target=[
+                        StructureMapGroupRuleTarget(
+                            context="tgt",
+                            element="fieldB",
+                            variable="_fieldB_target_",
+                        )
+                    ],
+                    dependent=[
+                        StructureMapGroupRuleDependent(
+                            name="_DefaultMappingGroup_",
+                            parameter=[
+                                StructureMapGroupRuleDependentParameter(
+                                    valueId="_fieldB_"
+                                ),
+                                StructureMapGroupRuleDependentParameter(
+                                    valueId="_fieldB_target_"
+                                ),
+                            ],
+                        )
+                    ],
+                    name=None,
+                ),
             ]
         ),
     ),
@@ -253,14 +322,12 @@ parser_test_cases = (
                     name="example_rule",
                     source=[
                         StructureMapGroupRuleSource(
-                            context="src",
-                            element="fieldA",
+                            context="src", element="fieldA", variable="_fieldA_"
                         )
                     ],
                     target=[
                         StructureMapGroupRuleTarget(
-                            context="tgt",
-                            element="fieldB",
+                            context="tgt", element="fieldB", variable="_fieldB_"
                         )
                     ],
                     dependent=[
@@ -268,10 +335,10 @@ parser_test_cases = (
                             name="_DefaultMappingGroup_",
                             parameter=[
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_source_"
+                                    valueId="_fieldA_"
                                 ),
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_target_"
+                                    valueId="_fieldB_"
                                 ),
                             ],
                         )
@@ -297,15 +364,6 @@ parser_test_cases = (
                             context="tgt",
                             element="fieldB",
                             variable="b",
-                        )
-                    ],
-                    dependent=[
-                        StructureMapGroupRuleDependent(
-                            name="_DefaultMappingGroup_",
-                            parameter=[
-                                StructureMapGroupRuleDependentParameter(valueId="a"),
-                                StructureMapGroupRuleDependentParameter(valueId="b"),
-                            ],
                         )
                     ],
                     name=None,
