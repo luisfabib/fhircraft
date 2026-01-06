@@ -507,7 +507,7 @@ parser_test_cases = (
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="fieldB",
-                            variable="_fieldB",
+                            variable="_fieldB_",
                         )
                     ],
                     rule=[
@@ -519,12 +519,72 @@ parser_test_cases = (
                             ],
                             target=[
                                 StructureMapGroupRuleTarget(
-                                    context="_fieldB",
+                                    context="_fieldB_",
                                     element="subfieldB",
                                     transform="copy",
                                     parameter=[
                                         StructureMapGroupRuleTargetParameter(
                                             valueId="a"
+                                        )
+                                    ],
+                                )
+                            ],
+                        )
+                    ],
+                ),
+            ]
+        ),
+    ),
+    (
+        """group map_example(source src, target tgt){src.fieldA as a -> tgt.fieldB.subfieldB.descendantB = a;}""",
+        add_rules_to_basic_map(
+            rules=[
+                StructureMapGroupRule(
+                    source=[
+                        StructureMapGroupRuleSource(
+                            context="src",
+                            element="fieldA",
+                            variable="a",
+                        )
+                    ],
+                    target=[
+                        StructureMapGroupRuleTarget(
+                            context="tgt",
+                            element="fieldB",
+                            variable="_fieldB_",
+                        )
+                    ],
+                    rule=[
+                        StructureMapGroupRule(
+                            source=[
+                                StructureMapGroupRuleSource(
+                                    context="a",
+                                )
+                            ],
+                            target=[
+                                StructureMapGroupRuleTarget(
+                                    context="_fieldB_",
+                                    element="subfieldB",
+                                    variable="_subfieldB_",
+                                )
+                            ],
+                            rule=[
+                                StructureMapGroupRule(
+                                    source=[
+                                        StructureMapGroupRuleSource(
+                                            context="a",
+                                        )
+                                    ],
+                                    target=[
+                                        StructureMapGroupRuleTarget(
+                                            context="_subfieldB_",
+                                            element="descendantB",
+                                            transform="copy",
+                                            parameter=[
+                                                StructureMapGroupRuleTargetParameter(
+                                                    valueId="a"
+                                                )
+                                            ],
                                         )
                                     ],
                                 )

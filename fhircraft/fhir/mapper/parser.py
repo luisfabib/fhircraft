@@ -37,181 +37,6 @@ def parse(string: str) -> StructureMap:
     return FhirMappingLanguageParser().parse(string)
 
 
-def _create_nested_target_structure(
-    context_path: str, transform, modifiers: dict
-) -> dict:
-    """
-    Create metadata for a nested target that will be expanded later.
-
-    Stores information about nested paths to be processed when we have
-    access to source variables in the rule parsing functions.
-
-    Args:
-        context_path: The full path like "tgt.element.subelement"
-        transform: The transform to apply to the innermost target
-        modifiers: Modifiers for the innermost target
-
-    Returns:
-        Dict with nested target information
-    """
-    parts = context_path.split(".")
-
-    return {
-        "is_nested": True,
-        "parts": parts,
-        "transform": transform,
-        "modifiers": modifiers,
-    }
-
-
-def _expand_nested_target_with_source(
-    nested_info: dict, source_variable: str
-) -> tuple[StructureMapGroupRuleTarget, list[StructureMapGroupRule]]:
-    """
-    Expand nested target metadata into actual target and nested rules.
-
-    Args:
-        nested_info: Dict from _create_nested_target_structure
-        source_variable: The source variable to use in inner rules
-
-    Returns:
-        Tuple of (outer_target, [inner_rules])
-    """
-    parts = nested_info["parts"]
-    transform = nested_info["transform"]
-    modifiers = nested_info["modifiers"]
-
-    context = parts[0]
-    element = parts[1]
-    remaining_parts = parts[2:]
-
-    # Create intermediate variable name
-    var_name = f"_{element}"
-
-    # Create outer target (context.element as _variable_)
-    outer_target = StructureMapGroupRuleTarget(
-        context=context,
-        element=element,
-        variable=var_name,
-    )
-
-    # Build nested rules recursively
-    def build_nested_rules(current_context: str, path_parts: list[str], depth: int = 0):
-        """Recursively build nested rules for remaining path."""
-        if len(path_parts) == 1:
-            # Innermost level - create final target
-            inner_target = StructureMapGroupRuleTarget(
-                context=current_context,
-                element=path_parts[0],
-            )
-
-            # Apply transform and modifiers
-            if transform:
-                if isinstance(transform, dict):
-                    inner_target.transform = transform.get("name", "copy")
-                    inner_target.parameter = transform.get("parameters")
-                else:
-                    inner_target.transform = "copy"
-                    inner_target.parameter = (
-                        [transform] if not isinstance(transform, list) else transform
-                    )
-
-            if modifiers:
-                if modifiers.get("variable"):
-                    inner_target.variable = modifiers["variable"]
-                if modifiers.get("listMode"):
-                    inner_target.listMode = [modifiers["listMode"]]
-
-            # Create innermost rule
-            return [
-                StructureMapGroupRule(
-                    source=[StructureMapGroupRuleSource(context=source_variable)],
-                    target=[inner_target],
-                )
-            ]
-        else:
-            # Intermediate level - create variable and recurse
-            next_element = path_parts[0]
-            next_var = f"_{next_element}"
-
-            intermediate_target = StructureMapGroupRuleTarget(
-                context=current_context,
-                element=next_element,
-                variable=next_var,
-            )
-
-            # Recurse for remaining path
-            nested_rules = build_nested_rules(next_var, path_parts[1:], depth + 1)
-
-            return [
-                StructureMapGroupRule(
-                    source=[StructureMapGroupRuleSource(context=source_variable)],
-                    target=[intermediate_target],
-                    rule=nested_rules,
-                )
-            ]
-
-    inner_rules = build_nested_rules(var_name, remaining_parts)
-
-    return outer_target, inner_rules
-
-
-def _process_rule_with_nested_targets(
-    sources: list, targets: list, dependent: dict = None, name: str = None
-) -> StructureMapGroupRule:
-    """
-    Process a rule that may contain nested targets and expand them.
-
-    Args:
-        sources: List of rule sources
-        targets: List of rule targets (may contain nested targets)
-        dependent: Dependent clause dict (may contain rules)
-        name: Rule name
-
-    Returns:
-        StructureMapGroupRule with nested targets expanded
-    """
-    # Extract source variable (use the last source's variable if available)
-    source_variable = None
-    for source in sources:
-        if hasattr(source, "variable") and source.variable:
-            source_variable = source.variable
-
-    # If no variable in sources, use the context of the first source
-    if not source_variable and sources:
-        source_variable = sources[0].context
-
-    # Process targets
-    final_targets = []
-    nested_rules = []
-
-    for target in targets:
-        if hasattr(target, "_nested_info"):
-            # Expand nested target
-            nested_info = target._nested_info
-            outer_target, inner_rules = _expand_nested_target_with_source(
-                nested_info, source_variable
-            )
-            final_targets.append(outer_target)
-            nested_rules.extend(inner_rules)
-        else:
-            final_targets.append(target)
-
-    # Merge nested rules with dependent rules
-    dependent = dependent or {}
-    if nested_rules:
-        existing_rules = dependent.get("rule", [])
-        dependent["rule"] = (existing_rules or []) + nested_rules
-
-    # Build the rule
-    rule_dict = {"source": sources, "target": final_targets}
-    if name:
-        rule_dict["name"] = name
-    rule_dict.update(dependent)
-
-    return StructureMapGroupRule(**rule_dict)
-
-
 def _parse_StructureMapGroupRuleTargetParameter(
     value: (
         str
@@ -675,9 +500,9 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_rule_list(self, p):
         """
-        m_rule_list : m_rule
+        m_rule_list : m_rule_delimited
                     | m_documented_rule
-                    | m_rule_list m_rule
+                    | m_rule_list m_rule_delimited
                     | m_rule_list m_documented_rule
                     | m_empty
         """
@@ -685,8 +510,8 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_rule_documentation(self, p):
         """
-        m_documented_rule : DOCUMENTATION m_rule
-                          | m_rule DOCUMENTATION
+        m_documented_rule : DOCUMENTATION m_rule_delimited
+                          | m_rule_delimited DOCUMENTATION
         """
         rule, doc = (
             (p[1], p[2]) if isinstance(p[1], StructureMapGroupRule) else (p[2], p[1])
@@ -694,64 +519,76 @@ class FhirMappingLanguageParser(FhirPathParser):
         rule.documentation = doc
         p[0] = rule
 
-    def p_mapper_rule(self, p):
+    def p_mapper_rule_delimited(self, p):
         """
-        m_rule : m_rule_source_list RIGHT_ARROW m_rule_target_list m_dependent m_rule_name ';'
+        m_rule_delimited : m_rule ';'
+        """
+        p[0] = p[1]
+
+    def p_mapper_rule_named(self, p):
+        """
+        m_rule : m_rule m_rule_name
+        """
+        p[0] = p[1]
+        p[0].name = p[2]
+
+    def p_mapper_rule_only_sources(self, p):
+        """
+        m_rule : m_rule_source_list m_dependent
+               | m_rule_source_list
         """
         sources = p[1]
-        targets = p[3]
-        dependent = p[4]
-        rule_name = p[5]
-        p[0] = _process_rule_with_nested_targets(sources, targets, dependent, rule_name)
-
-    def p_mapper_rule_arrow_targets_dependent(self, p):
-        """m_rule : m_rule_source_list RIGHT_ARROW m_rule_target_list m_dependent ';'"""
-        sources = p[1]
-        targets = p[3]
-        dependent = p[4]
-        p[0] = _process_rule_with_nested_targets(sources, targets, dependent)
-
-    def p_mapper_rule_arrow_targets_name(self, p):
-        """m_rule : m_rule_source_list RIGHT_ARROW m_rule_target_list m_rule_name ';'"""
-        sources = p[1]
-        targets = p[3]
-        rule_name = p[4]
-        p[0] = _process_rule_with_nested_targets(sources, targets, name=rule_name)
-
-    def p_mapper_rule_arrow_targets(self, p):
-        """m_rule : m_rule_source_list RIGHT_ARROW m_rule_target_list ';'"""
-        sources = p[1]
-        targets = p[3]
-        p[0] = _process_rule_with_nested_targets(sources, targets)
-
-    def p_mapper_rule_dependent_name(self, p):
-        """m_rule : m_rule_source_list m_dependent m_rule_name ';'"""
-        sources = p[1]
-        dependent = p[2]
-        rule_name = p[3]
-        p[0] = StructureMapGroupRule(source=sources, name=rule_name, **dependent)
-
-    def p_mapper_rule_dependent(self, p):
-        """m_rule : m_rule_source_list m_dependent ';'"""
-        sources = p[1]
-        dependent = p[2]
+        dependent = p[2] if len(p) == 3 else {}
         p[0] = StructureMapGroupRule(source=sources, **dependent)
 
-    def p_mapper_named_rule(self, p):
-        """m_rule : m_rule_source_list m_rule_name ';'"""
+    def p_mapper_rule_arrow_targets(self, p):
+        """
+        m_rule : m_rule_source_list RIGHT_ARROW m_rule_target_list m_dependent
+               | m_rule_source_list RIGHT_ARROW m_rule_target_list
+        """
         sources = p[1]
-        rule_name = p[2]
-        p[0] = StructureMapGroupRule(
-            source=sources,
-            name=rule_name,
-        )
+        _targets = p[3]
+        dependent = p[4] if len(p) == 5 else {}
 
-    def p_mapper_rule_sources(self, p):
-        """m_rule : m_rule_source_list ';'"""
-        sources = p[1]
-        p[0] = StructureMapGroupRule(
-            source=sources,
-        )
+        source_variable = None
+        if len(sources) == 1 and sources[0].variable:
+            source_variable = sources[0].variable
+
+        rule = StructureMapGroupRule(source=sources, **dependent)
+
+        targets = []
+        for _target in _targets:
+            target = StructureMapGroupRuleTarget.model_construct()
+            if path := _target.get("path"):
+                target.context = path.get("context")
+                target.element = path.get("element")
+            targets.append(target)
+            _rule = rule
+            if path and (subelements := path.get("subelements")):
+                for subelement in subelements:
+                    target_temp_variable = f"_{target.element}_"
+                    target.variable = target_temp_variable
+                    target = StructureMapGroupRuleTarget(
+                        context=target_temp_variable,
+                        element=subelement,
+                    )
+                    _rule.rule = _rule.rule or []
+                    _rule.rule.append(
+                        StructureMapGroupRule(
+                            source=[
+                                StructureMapGroupRuleSource(context=source_variable)
+                            ],
+                            target=[target],
+                        )
+                    )
+                    _rule = _rule.rule[-1]
+
+            target.variable = _target.get("variable")
+            target.listMode = _target.get("listMode")
+            target.transform = _target.get("transform")
+            target.parameter = _target.get("parameter")
+        rule.target = targets
+        p[0] = rule
 
     def p_mapper_rule_name(self, p):
         """
@@ -770,7 +607,7 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_rule_source(self, p):
         """
-        m_rule_source : m_rule_context m_source_modifiers
+        m_rule_source : m_rule_path m_source_modifiers
         """
         p[0] = StructureMapGroupRuleSource(
             context=p[1].get("context"),
@@ -817,15 +654,22 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_rule_context(self, p):
         """
-        m_rule_context : m_identifier
+        m_rule_path : m_identifier
         """
         p[0] = {"context": p[1], "element": None}
 
     def p_mapper_rule_context_with_element(self, p):
         """
-        m_rule_context : m_identifier '.' m_identifier
+        m_rule_path : m_identifier '.' m_identifier
         """
         p[0] = {"context": p[1], "element": p[3]}
+
+    def p_mapper_rule_context_with_subelements(self, p):
+        """
+        m_rule_path : m_rule_path '.' m_identifier
+        """
+        p[0] = p[1]
+        p[0]["subelements"] = p[0].get("subelements", []) + [p[3]]
 
     def p_mapper_sourceType(self, p):
         """
@@ -893,7 +737,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         """
         m_rule_target : m_invocation m_target_modifier_list
         """
-        p[0] = StructureMapGroupRuleTarget(
+        p[0] = dict(
             transform=p[1].get("name"),
             parameter=p[1].get("parameters"),
             variable=p[2].get("variable"),
@@ -902,15 +746,14 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def p_mapper_rule_target(self, p):
         """
-        m_rule_target : m_rule_context EQUAL m_transform m_target_modifier_list
-                      | m_rule_context m_target_modifier_list
+        m_rule_target : m_rule_path EQUAL m_transform m_target_modifier_list
+                      | m_rule_path m_target_modifier_list
         """
         if len(p) == 5:
             transform = p[3]
             modifiers = p[4] or {}
-            p[0] = StructureMapGroupRuleTarget(
-                context=p[1].get("context"),
-                element=p[1].get("element"),
+            p[0] = dict(
+                path=p[1],
                 variable=modifiers.get("variable"),
                 listMode=modifiers.get("listMode"),
                 transform=(
@@ -924,9 +767,8 @@ class FhirMappingLanguageParser(FhirPathParser):
             )
         else:
             list_mode = p[2].get("listMode")
-            p[0] = StructureMapGroupRuleTarget(
-                context=p[1].get("context"),
-                element=p[1].get("element"),
+            p[0] = dict(
+                path=p[1],
                 variable=p[2].get("variable"),
                 listMode=[list_mode] if list_mode else None,
             )
@@ -961,14 +803,14 @@ class FhirMappingLanguageParser(FhirPathParser):
         """
         m_transform : m_transform_fhirpath
                     | m_transform_invocation
-                    | m_transform_rule_context
+                    | m_transform_rule_path
                     | m_transform_literal
         """
         p[0] = p[1]
 
-    def p_mapper_transform_rule_context(self, p):
+    def p_mapper_transform_rule_path(self, p):
         """
-        m_transform_rule_context : m_rule_context
+        m_transform_rule_path : m_rule_path
         """
         p[0] = StructureMapGroupRuleTargetParameter(valueId=p[1].get("context"))
 
