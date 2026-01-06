@@ -227,7 +227,19 @@ parser_test_cases = (
                             element="fieldB",
                         )
                     ],
-                    dependent=None,
+                    dependent=[
+                        StructureMapGroupRuleDependent(
+                            name="_DefaultMappingGroup_",
+                            parameter=[
+                                StructureMapGroupRuleDependentParameter(
+                                    valueId="_source_"
+                                ),
+                                StructureMapGroupRuleDependentParameter(
+                                    valueId="_target_"
+                                ),
+                            ],
+                        )
+                    ],
                     name=None,
                 )
             ]
@@ -251,7 +263,19 @@ parser_test_cases = (
                             element="fieldB",
                         )
                     ],
-                    dependent=None,
+                    dependent=[
+                        StructureMapGroupRuleDependent(
+                            name="_DefaultMappingGroup_",
+                            parameter=[
+                                StructureMapGroupRuleDependentParameter(
+                                    valueId="_source_"
+                                ),
+                                StructureMapGroupRuleDependentParameter(
+                                    valueId="_target_"
+                                ),
+                            ],
+                        )
+                    ],
                 )
             ]
         ),
@@ -275,7 +299,15 @@ parser_test_cases = (
                             variable="b",
                         )
                     ],
-                    dependent=None,
+                    dependent=[
+                        StructureMapGroupRuleDependent(
+                            name="_DefaultMappingGroup_",
+                            parameter=[
+                                StructureMapGroupRuleDependentParameter(valueId="a"),
+                                StructureMapGroupRuleDependentParameter(valueId="b"),
+                            ],
+                        )
+                    ],
                     name=None,
                 )
             ]
@@ -767,7 +799,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as f where(f = 10) -> tgt.field;}""",
+        """group map_example(source src, target tgt){src.field as f where(f = 10) -> tgt.field = f;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -783,6 +815,10 @@ parser_test_cases = (
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="field",
+                            transform="copy",
+                            parameter=[
+                                StructureMapGroupRuleTargetParameter(valueId="f")
+                            ],
                         )
                     ],
                 )
@@ -790,7 +826,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as f where(f > 10) -> tgt.field;}""",
+        """group map_example(source src, target tgt){src.field as f where(f > 10) -> tgt.field = f;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -806,6 +842,10 @@ parser_test_cases = (
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="field",
+                            transform="copy",
+                            parameter=[
+                                StructureMapGroupRuleTargetParameter(valueId="f")
+                            ],
                         )
                     ],
                 )

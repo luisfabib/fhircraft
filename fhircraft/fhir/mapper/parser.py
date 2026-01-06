@@ -541,7 +541,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         dependent = p[2] if len(p) == 3 else {}
         p[0] = StructureMapGroupRule(source=sources, **dependent)
 
-    def p_mapper_rule_arrow_targets(self, p):
+    def p_mapper_rule_complex_transform(self, p):
         """
         m_rule : m_rule_source_list RIGHT_ARROW m_rule_target_list m_dependent
                | m_rule_source_list RIGHT_ARROW m_rule_target_list
@@ -557,12 +557,13 @@ class FhirMappingLanguageParser(FhirPathParser):
         rule = StructureMapGroupRule(source=sources, **dependent)
 
         targets = []
-        for _target in _targets:
+        for data in _targets:
             target = StructureMapGroupRuleTarget.model_construct()
-            if path := _target.get("path"):
+            targets.append(target)
+
+            if path := data.get("path"):
                 target.context = path.get("context")
                 target.element = path.get("element")
-            targets.append(target)
             _rule = rule
             if path and (subelements := path.get("subelements")):
                 for subelement in subelements:
@@ -583,10 +584,26 @@ class FhirMappingLanguageParser(FhirPathParser):
                     )
                     _rule = _rule.rule[-1]
 
-            target.variable = _target.get("variable")
-            target.listMode = _target.get("listMode")
-            target.transform = _target.get("transform")
-            target.parameter = _target.get("parameter")
+            target.variable = data.get("variable")
+            target.listMode = data.get("listMode")
+            target.transform = data.get("transform")
+            target.parameter = data.get("parameter")
+
+            if not target.transform and not rule.dependent and not rule.rule:
+                rule.dependent = [
+                    StructureMapGroupRuleDependent(
+                        name="_DefaultMappingGroup_",
+                        parameter=[
+                            StructureMapGroupRuleDependentParameter(
+                                valueId=source_variable or "_source_"
+                            ),
+                            StructureMapGroupRuleDependentParameter(
+                                valueId=target.variable or "_target_"
+                            ),
+                        ],
+                    )
+                ]
+
         rule.target = targets
         p[0] = rule
 
