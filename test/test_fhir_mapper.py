@@ -126,8 +126,8 @@ def test_basic_execute_mapping():
     uses "http://example.org/StructureDefinition/SimpleTarget" alias SimpleTarget as target
 
     group main(source src: SimpleSource, target tgt: SimpleTarget) {
-        src.name -> tgt.full_name;
-        src.age -> tgt.years_old;
+        src.name -> tgt.fullName;
+        src.age -> tgt.yearsOld;
     }
     """
 
@@ -150,11 +150,11 @@ def test_execute_mapping_with_options():
     uses "http://example.org/StructureDefinition/SimpleTarget" alias SimpleTarget as target
 
     group first_map(source src: SimpleSource, target tgt: SimpleTarget) {
-        src.name -> tgt.full_name;
+        src.name -> tgt.fullName;
     }
 
     group second_map(source src: SimpleSource, target tgt: SimpleTarget) {
-        src.age -> tgt.years_old;
+        src.age -> tgt.yearsOld;
     }
     """
 
