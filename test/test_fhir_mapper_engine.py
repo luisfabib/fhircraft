@@ -12,6 +12,8 @@ from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMapGroup,
     StructureMapGroupInput,
     StructureMapGroupRule,
+    StructureMapGroupRuleDependent,
+    StructureMapGroupRuleDependentParameter,
     StructureMapGroupRuleSource,
     StructureMapGroupRuleTarget,
     StructureMapGroupRuleTargetParameter,
@@ -194,6 +196,22 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     id="SimpleTarget.fullName",
                     path="SimpleTarget.fullName",
                     definition="Full name field",
+                    min=0,
+                    max="1",
+                    type=[ElementDefinitionType(code="string")],
+                ),
+                ElementDefinition(
+                    id="SimpleTarget.name",
+                    path="SimpleTarget.name",
+                    definition="Name field",
+                    min=0,
+                    max="1",
+                    type=[ElementDefinitionType(code="BackboneElement")],
+                ),
+                ElementDefinition(
+                    id="SimpleTarget.name.text",
+                    path="SimpleTarget.name.text",
+                    definition="Name as text field",
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="string")],
@@ -401,6 +419,127 @@ simple_mapping_test_cases = [
             )
         ],
     ),
+    (
+        "Multi-field shorthand mapping (src -> tgt: fieldA, fieldB)",
+        {"name": "Alice Cooper", "age": 35},
+        {"fullName": "Alice Cooper", "yearsOld": 35},
+        [
+            StructureMapGroupRule(
+                source=[
+                    StructureMapGroupRuleSource(
+                        context="src", element="name", variable="_name_"
+                    )
+                ],
+                target=[
+                    StructureMapGroupRuleTarget(
+                        context="tgt", element="fullName", variable="_fullName_target_"
+                    )
+                ],
+                dependent=[
+                    StructureMapGroupRuleDependent(
+                        name="_DefaultMappingGroup_",
+                        parameter=[
+                            StructureMapGroupRuleDependentParameter(valueId="_name_"),
+                            StructureMapGroupRuleDependentParameter(
+                                valueId="_fullName_target_"
+                            ),
+                        ],
+                    )
+                ],
+                name=None,
+            ),
+            StructureMapGroupRule(
+                source=[
+                    StructureMapGroupRuleSource(
+                        context="src", element="age", variable="_age_"
+                    )
+                ],
+                target=[
+                    StructureMapGroupRuleTarget(
+                        context="tgt", element="yearsOld", variable="_yearsOld_target_"
+                    )
+                ],
+                dependent=[
+                    StructureMapGroupRuleDependent(
+                        name="_DefaultMappingGroup_",
+                        parameter=[
+                            StructureMapGroupRuleDependentParameter(valueId="_age_"),
+                            StructureMapGroupRuleDependentParameter(
+                                valueId="_yearsOld_target_"
+                            ),
+                        ],
+                    )
+                ],
+                name=None,
+            ),
+        ],
+    ),
+    (
+        "Direct field mapping shorthand (src.fieldA -> tgt.fieldB)",
+        {"name": "Bob Wilson", "age": 42},
+        {"fullName": "Bob Wilson"},
+        [
+            StructureMapGroupRule(
+                source=[
+                    StructureMapGroupRuleSource(
+                        context="src", element="name", variable="_name_"
+                    )
+                ],
+                target=[
+                    StructureMapGroupRuleTarget(
+                        context="tgt", element="fullName", variable="_fullName_"
+                    )
+                ],
+                dependent=[
+                    StructureMapGroupRuleDependent(
+                        name="_DefaultMappingGroup_",
+                        parameter=[
+                            StructureMapGroupRuleDependentParameter(valueId="_name_"),
+                            StructureMapGroupRuleDependentParameter(
+                                valueId="_fullName_"
+                            ),
+                        ],
+                    )
+                ],
+                name=None,
+            ),
+        ],
+    ),
+    (
+        "Nested path mapping with then block",
+        {"name": "Charlie Brown", "age": 28},
+        {"name": {"text": "Charlie Brown"}},
+        [
+            StructureMapGroupRule(
+                source=[
+                    StructureMapGroupRuleSource(
+                        context="src", element="name", variable="a"
+                    )
+                ],
+                target=[
+                    StructureMapGroupRuleTarget(
+                        context="tgt", element="name", variable="b"
+                    )
+                ],
+                rule=[
+                    StructureMapGroupRule(
+                        source=[StructureMapGroupRuleSource(context="a")],
+                        target=[
+                            StructureMapGroupRuleTarget(
+                                context="b",
+                                element="text",
+                                transform="copy",
+                                parameter=[
+                                    StructureMapGroupRuleTargetParameter(valueId="a")
+                                ],
+                            )
+                        ],
+                    )
+                ],
+                name=None,
+            ),
+        ],
+    ),
 ]
 
 
@@ -423,7 +562,9 @@ def test_simple_mapping_scenarios(test_name, source_data, expected_target, rules
     engine = FHIRMappingEngine(repository=repository)
 
     result = engine.execute(structure_map, source_data)
-    result = result[0].model_dump(mode="json", exclude_unset=False, exclude={"resourceType", "meta"})
+    result = result[0].model_dump(
+        mode="json", exclude_unset=False, exclude={"resourceType", "meta"}
+    )
     if expected_target != result:
         print("Result:")
         pprint.pprint(result)

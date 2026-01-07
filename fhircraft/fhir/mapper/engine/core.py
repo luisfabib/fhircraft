@@ -156,6 +156,9 @@ class FHIRMappingEngine:
             },
         )
 
+        # Build default mapping group registry
+        self._build_default_group_registry(structure_map, global_scope)
+
         # Parse and validate constants
         for const in structure_map.const or []:
             if not const.name:
@@ -274,6 +277,24 @@ class FHIRMappingEngine:
                 for instance in global_scope.target_instances.values()
             ]
         )
+
+    def _build_default_group_registry(self, structure_map: StructureMap, global_scope: MappingScope):
+        """
+        Builds a registry of default mapping groups based on typeMode.
+        Groups with typeMode 'types' or 'type-and-types' are considered default mapping groups.
+        """
+        default_groups = {}
+        for group in structure_map.group or []:
+            if group.typeMode in ['types', 'type-and-types']:
+                # Build a key based on input/output types
+                if group.input and len(group.input) >= 2:
+                    source_type = group.input[0].type or 'Any'
+                    target_type = group.input[1].type or 'Any'
+                    key = f"{source_type}->{target_type}"
+                    default_groups[key] = group
+        
+        # Store the default groups registry in global scope
+        global_scope.default_groups = default_groups
 
     def process_group(
         self,

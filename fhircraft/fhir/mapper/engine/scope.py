@@ -43,6 +43,9 @@ class MappingScope:
     variables: Dict[str, FHIRPath] = field(default_factory=dict)
     """Registry of variables mapped to resolved FHIRPath expressions"""
 
+    default_groups: Dict[str, StructureMapGroup] = field(default_factory=dict)
+    """Registry of default mapping groups by type signature"""
+
     processing_rules: Set[str] = field(default_factory=set)
     """Set of currently processing rules"""
 
@@ -188,6 +191,10 @@ class MappingScope:
         Raises:
             MappingError: If the symbol cannot be found in the current or any parent scopes.
         """
+        # Handle special _DefaultMappingGroup_ symbol
+        if identifier == "_DefaultMappingGroup_":
+            return self._resolve_default_mapping_group()
+        
         # Check local scope first
         if identifier in self.variables:
             return self.variables[identifier]
@@ -237,6 +244,56 @@ class MappingScope:
             identifier in self.variables
             or identifier in self.types
             or identifier in self.groups
+        )
+
+    def _resolve_default_mapping_group(self) -> StructureMapGroup:
+        """
+        Resolves the _DefaultMappingGroup_ symbol by looking for appropriate default groups
+        based on current context types.
+        
+        Returns:
+            StructureMapGroup: A default mapping group or a generated copy group
+        """
+        # Try to find default groups in current or parent scopes
+        scope = self
+        while scope:
+            if hasattr(scope, 'default_groups') and scope.default_groups:
+                # For now, return any available default group
+                # In the future, we could enhance this to select based on current types
+                return next(iter(scope.default_groups.values()))
+            scope = scope.parent
+        
+        # If no default group found, create a simple copy group
+        from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
+            StructureMapGroup,
+            StructureMapGroupInput,
+            StructureMapGroupRule,
+            StructureMapGroupRuleSource,
+            StructureMapGroupRuleTarget,
+            StructureMapGroupRuleTargetParameter,
+        )
+        
+        return StructureMapGroup(
+            name="_GeneratedCopyGroup_",
+            typeMode="none",
+            input=[
+                StructureMapGroupInput(name="source", mode="source"),
+                StructureMapGroupInput(name="target", mode="target"),
+            ],
+            rule=[
+                StructureMapGroupRule(
+                    source=[StructureMapGroupRuleSource(context="source")],
+                    target=[
+                        StructureMapGroupRuleTarget(
+                            context="target",
+                            transform="copy",
+                            parameter=[
+                                StructureMapGroupRuleTargetParameter(valueId="source")
+                            ],
+                        )
+                    ],
+                )
+            ],
         )
 
     def resolve_fhirpath(self, identifier: str) -> FHIRPath:
