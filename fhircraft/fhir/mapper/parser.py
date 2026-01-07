@@ -578,7 +578,8 @@ class FhirMappingLanguageParser(FhirPathParser):
                             source_var + "target_"
                             if f"_{element}_" == source_var
                             or f"_{context}_" == source_var
-                            else f"_{target_path.get('subelements', [None])[-1] or element or context}_"
+                            or f"_{(subelement := target_path.get('subelements', [None])[-1])}_" == source_var
+                            else f"_{subelement or element or context}_"
                         )
                     ),
                 }
@@ -635,10 +636,11 @@ class FhirMappingLanguageParser(FhirPathParser):
             target.listMode = data.get("listMode")
             target.transform = data.get("transform")
             target.parameter = data.get("parameter")
-            _rule.dependent = dependent.get("dependent") if dependent else None
-            if dependent_rule := dependent.get("rule"):
-                _rule.rule = _rule.rule or []
-                _rule.rule.extend(dependent_rule)
+            
+        _rule.dependent = dependent.get("dependent") if dependent else None
+        if dependent_rule := dependent.get("rule"):
+            _rule.rule = _rule.rule or []
+            _rule.rule.extend(dependent_rule)
 
         rule.target = targets
         return rule
