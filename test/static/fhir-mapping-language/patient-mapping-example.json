@@ -1,0 +1,18 @@
+{
+    "resourceType": "StructureMap",
+    "status": "draft",
+    "name": "PatientMapping",
+    "url": "http://example.org/PatientMapping",
+    "group": [{
+        "name": "main",
+        "input": [
+            {"name": "src", "mode": "source"},
+            {"name": "tgt", "mode": "target", "type": "Patient"}
+        ],
+        "rule": [{
+            "name": "name",
+            "source": [{"context": "src", "element": "name"}],
+            "target": [{"context": "tgt", "element": "name.text"}]
+        }]
+    }]
+}

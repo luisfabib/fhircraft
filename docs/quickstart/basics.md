@@ -133,8 +133,10 @@ mapping_script = """
 uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
 
 group main(source legacy, target patient: Patient) {
-    legacy.firstName -> patient.name.given;
-    legacy.lastName -> patient.name.family;
+    legacy -> patient.name as name then {
+        legacy.firstName -> name.given;
+        legacy.lastName -> name.family;
+    };
     legacy.dob -> patient.birthDate;
     legacy.sex where($this = 'F') -> patient.gender = "female";
     legacy.sex where($this = 'M') -> patient.gender = "male";

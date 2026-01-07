@@ -45,17 +45,17 @@ group main(source legacy, target patient: Patient) {
         legacy.lastName -> name.family;
     };
     legacy.dob -> patient.birthDate;
-    legacy.sex where("$this = F") -> patient.gender = 'female';
-    legacy.sex where("$this = M") -> patient.gender = 'male';
+    legacy.sex where($this = 'F') -> patient.gender = 'female';
+    legacy.sex where($this = 'M') -> patient.gender = 'male';
 }
 """
 
 # Execute transformation
 mapper = FHIRMapper()
-targets, metadata = mapper.execute_mapping(mapping_script, legacy_patient)
+targets = mapper.execute_mapping(mapping_script, legacy_patient)
 patient = targets[0]
 
-print(f"Transformed: {patient.name[0].given[0]} {patient.name[0].family}")
+print(f"Transformed: {patient}")
 ```
 
 ## Understanding FHIR Mapping
@@ -122,7 +122,7 @@ group main(source src, target tgt) {
 
 source_data = {"name": "John Doe", "age": 30, "email": "john@example.com"}
 mapper = FHIRMapper()
-targets, metadata = mapper.execute_mapping(script, source_data)
+targets = mapper.execute_mapping(script, source_data)
 ```
 
 ### Working with FHIR Resources
@@ -142,8 +142,8 @@ group main(source legacy, target patient: Patient) {
         legacy.lastName -> name.family;
     };
     legacy.dob -> patient.birthDate;
-    legacy.sex where("$this = 'F'") -> patient.gender = 'female';
-    legacy.sex where("$this = 'M'") -> patient.gender = 'male';
+    legacy.sex where($this = 'F') -> patient.gender = 'female';
+    legacy.sex where($this = 'M') -> patient.gender = 'male';
 }
 """
 
@@ -154,65 +154,8 @@ legacy_data = {
     "sex": "F"
 }
 
-targets, _ = mapper.execute_mapping(script, legacy_data)
+targets = mapper.execute_mapping(script, legacy_data)
 patient = targets[0]  # Validated FHIR Patient resource
-```
-
-## Value Transformations
-
-### Concatenation and String Operations
-
-FHIR Mapper supports various string operations and value combinations. This example demonstrates how to combine multiple source fields and apply conditional logic during transformation:
-
-```python
-script = """
-map 'http://example.org/transform' = 'ValueTransform'
-
-group main(source src, target tgt) {
-    // Combine fields
-    src.firstName + ' ' + src.lastName -> tgt.displayName;
-    
-    // Conditional transformations
-    src.status where("$this = 'A'") -> tgt.active = true;
-    src.status where("$this = 'I'") -> tgt.active = false;
-    
-    // Default values
-    src.priority -> tgt.priority "routine";
-}
-"""
-
-source = {
-    "firstName": "John",
-    "lastName": "Doe",
-    "status": "A",
-    "priority": None
-}
-
-targets, _ = mapper.execute_mapping(script, source)
-# Result: {"displayName": "John Doe", "active": True, "priority": "routine"}
-```
-
-### Type Conversions and Formatting
-
-Often you'll need to convert data types or reformat values during mapping. This example shows how to construct dates from separate components and convert between different data formats:
-
-```python
-script = """
-map 'http://example.org/convert' = 'TypeConvert'
-
-group main(source src, target patient: Patient) {
-    // Date formatting
-    src.birthYear + '-' + src.birthMonth + '-' + src.birthDay -> patient.birthDate;
-    
-    // Boolean conversions
-    src.isActive where("$this = 1") -> patient.active = true;
-    src.isActive where("$this = 0") -> patient.active = false;
-    
-    // Code mappings
-    src.genderCode where("$this = 'M'") -> patient.gender = 'male';
-    src.genderCode where("$this = 'F'") -> patient.gender = 'female';
-}
-"""
 ```
 
 ## Complex Mappings
@@ -240,7 +183,7 @@ group main(source src, target patient: Patient) {
     };
     
     // Conditional nested mapping
-    src.emergencyContact where("exists()") -> patient.contact as contact then {
+    src.emergencyContact where(exists()) -> patient.contact as contact then {
         emergencyContact.name -> contact.name as cname then {
             emergencyContact.name -> cname.text;
         };
@@ -289,26 +232,23 @@ group demographics(source src, target patient: Patient) {
 }
 
 group contacts(source src, target patient: Patient) {
-    src.phone -> patient.telecom as tel then {
-        phone -> tel.value;
-        'phone' -> tel.system;
+    src.phone as phone -> patient.telecom as tel then {
+        phone -> tel.value, tel.system='phone';
     };
-    src.email -> patient.telecom as email then {
-        email -> email.value;
-        'email' -> email.system;
+    src.email as email -> patient.telecom as email then {
+        email -> email.value, email.system='email';
     };
 }
 
 group identifiers(source src, target patient: Patient) {
     src.ssn -> patient.identifier as id then {
-        ssn -> id.value;
-        'http://hl7.org/fhir/sid/us-ssn' -> id.system;
+        ssn -> id.value, id.system='http://hl7.org/fhir/sid/us-ssn';
     };
 }
 """
 
 # Execute specific group
-targets, _ = mapper.execute_mapping(script, source_data, group="demographics")
+targets = mapper.execute_mapping(script, source_data, group="demographics")
 ```
 
 ## Multi-Source Transformations
@@ -351,7 +291,7 @@ insurance_data = {
 }
 
 # Pass sources as tuple
-targets, _ = mapper.execute_mapping(
+targets = mapper.execute_mapping(
     script,
     (demo_data, insurance_data)
 )
@@ -366,34 +306,12 @@ For complex mappings or reusable transformations, you can store mapping definiti
 ```python
 # Load from JSON file
 structure_map = mapper.load_structure_map("patient-mapping.json")
-targets, _ = mapper.execute_mapping(structure_map, source_data)
+targets = mapper.execute_mapping(structure_map, source_data)
 
 # Load from URL
 structure_map = mapper.load_structure_map(
     "https://example.org/fhir/StructureMap/PatientMapping"
 )
-
-# Load from dictionary
-map_definition = {
-    "resourceType": "StructureMap",
-    "status": "draft",
-    "name": "PatientMapping",
-    "url": "http://example.org/PatientMapping",
-    "group": [{
-        "name": "main",
-        "input": [
-            {"name": "src", "mode": "source"},
-            {"name": "tgt", "mode": "target", "type": "Patient"}
-        ],
-        "rule": [{
-            "name": "name",
-            "source": [{"context": "src", "element": "name"}],
-            "target": [{"context": "tgt", "element": "name.text"}]
-        }]
-    }]
-}
-
-structure_map = mapper.load_structure_map(map_definition)
 ```
 
 ### Working with Structure Definitions
@@ -407,8 +325,12 @@ from fhircraft.fhir.resources.factory import construct_resource_model
 source_structure_def = {
     "resourceType": "StructureDefinition",
     "url": "http://example.org/StructureDefinition/LegacyPatient",
+    "version": "0.1.0",
     "name": "LegacyPatient",
-    # ... structure definition details
+    "status": "draft",
+    "kind" : "resource",
+    "abstract" : False,
+    "type" : "LegacyPatient",
 }
 
 # Register with mapper
@@ -438,7 +360,7 @@ Handle mapping failures gracefully:
 from fhircraft.fhir.mapper.engine.exceptions import MappingError
 
 try:
-    targets, metadata = mapper.execute_mapping(script, source_data)
+    targets = mapper.execute_mapping(script, source_data)
     patient = targets[0]
 except MappingError as e:
     print(f"Mapping failed: {e}")
