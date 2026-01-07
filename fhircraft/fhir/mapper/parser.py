@@ -578,7 +578,7 @@ class FhirMappingLanguageParser(FhirPathParser):
                             source_var + "target_"
                             if f"_{element}_" == source_var
                             or f"_{context}_" == source_var
-                            else f"_{(subelement := target_path.get("subelements", [None])[-1]) or element or context}_"
+                            else f"_{target_path.get('subelements', [None])[-1] or element or context}_"
                         )
                     ),
                 }
