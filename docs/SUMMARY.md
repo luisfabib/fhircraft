@@ -15,9 +15,18 @@
   - Community
     - [FAQ](community/faq.md)
     - [Contributing](community/contributing.md)
-    - [Development Guide](community/development.md)
     - [Code of Conduct](community/code_of_conduct.md)
     - [Credits](community/credits.md)
     - [License](community/license.md)
   - Reference
-    -  ./reference/*
+      - FHIR Resources
+          - [Bases](reference/fhir-resources-base.md)
+          - [Primitive Types](reference/fhir-resources-primitives.md)
+          - R4
+              - [Complex Types](reference/fhir-resources-r4-complex.md)
+              - [Core Resources](reference/fhir-resources-r4-core.md)
+      - FHIRPath
+          - [Engine](reference/fhir-path.md)
+      - [FHIR Mapping](reference/fhir-mapping.md)
+      - [Core Utilities](reference/core-utilities.md)
+
