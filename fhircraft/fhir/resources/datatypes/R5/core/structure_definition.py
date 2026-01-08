@@ -119,7 +119,7 @@ class StructureDefinitionMapping(BackboneElement):
 
 class StructureDefinitionContext(BackboneElement):
     """
-    Identifies the types of resource or data type elements to which the extension can be applied. For more guidance on using the 'context' element, see the [defining extensions page](defining-extensions.html#context).
+    Identifies the types of resource or data type elements to which the extension can be applied. For more guidance on using the 'context' element, see the [defining extensions page](https://hl7.org/fhir/R5/defining-extensions.html#context).
     """
 
     type: Optional[Code] = Field(

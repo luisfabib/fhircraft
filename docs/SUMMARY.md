@@ -13,20 +13,40 @@
           - [FHIR Mapper](user-guide/mapper.md)
   - [Release Notes](changelog.md)
   - Community
-    - [FAQ](community/faq.md)
     - [Contributing](community/contributing.md)
     - [Code of Conduct](community/code_of_conduct.md)
+    - [FAQ](community/faq.md)
     - [Credits](community/credits.md)
     - [License](community/license.md)
   - Reference
       - FHIR Resources
           - [Bases](reference/fhir-resources-base.md)
-          - [Primitive Types](reference/fhir-resources-primitives.md)
-          - R4
-              - [Complex Types](reference/fhir-resources-r4-complex.md)
-              - [Core Resources](reference/fhir-resources-r4-core.md)
+          - [Factory](reference/fhir-resources-factory.md)
+          - [Repositories](reference/fhir-resources-repository.md)
+          - [Code Generator](reference/fhir-resources-code-generator.md)
+          - Built-in Types
+              - [Primitive Types](reference/fhir-resources-primitives.md)
+              - R4
+                  - [Complex Types](reference/fhir-resources-r4-complex.md)
+                  - [Core Resources](reference/fhir-resources-r4-core.md)
+              - R4B
+                  - [Complex Types](reference/fhir-resources-r4b-complex.md)
+                  - [Core Resources](reference/fhir-resources-r4b-core.md)
+              - R5
+                  - [Complex Types](reference/fhir-resources-r5-complex.md)
+                  - [Core Resources](reference/fhir-resources-r5-core.md)
+              - [Type Utilities](reference/fhir-resources-type-utils.md)
       - FHIRPath
-          - [Engine](reference/fhir-path.md)
-      - [FHIR Mapping](reference/fhir-mapping.md)
-      - [Core Utilities](reference/core-utilities.md)
+          - [Engine](reference/fhir-path-engine.md)
+          - [Mixin](reference/fhir-path-mixin.md)
+          - [Parser](reference/fhir-path-parser.md)
+          - [Exceptions](reference/fhir-path-exceptions.md)
+      - FHIR Mapping
+          - [Engine](reference/fhir-mapping-engine.md)
+          - [Parser](reference/fhir-mapping-parser.md)
+      - FHIR Package Registry
+          - [Client](reference/fhir-packages-client.md)
+          - [Models](reference/fhir-packages-models.md)
+      - Other
+          - [Core Utilities](reference/core-utilities.md)
 

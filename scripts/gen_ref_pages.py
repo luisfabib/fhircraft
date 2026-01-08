@@ -6,8 +6,11 @@ import re
 import sys
 from pathlib import Path
 from typing import List, Union
+import logging
 
 import mkdocs_gen_files
+
+logger = logging.getLogger(__name__)
 
 root = Path(__file__).parent.parent
 src = root / "fhircraft"
@@ -25,10 +28,38 @@ CONFIGS = [
         "files": ["fhir/resources/base.py"],
     },
     {
+        "output": "reference/fhir-resources-factory.md",
+        "title": "FHIR Model Factory",
+        "description": "Main class and utilities for dynamically constructing FHIR resource models.",
+        "patterns": [],
+        "files": ["fhir/resources/factory.py", "fhir/resources/validators.py"],
+    },
+    {
+        "output": "reference/fhir-resources-repository.md",
+        "title": "Repository",
+        "description": "Main class and utilities for managing FHIR structure definitions.",
+        "patterns": [],
+        "files": ["fhir/resources/repository.py"],
+    },
+    {
+        "output": "reference/fhir-resources-code-generator.md",
+        "title": "Code Generator",
+        "description": "FHIR resource code generation utilities.",
+        "patterns": [],
+        "files": ["fhir/resources/generator.py"],
+    },
+    {
         "output": "reference/fhir-resources-primitives.md",
         "title": "FHIR Primitive Types",
         "description": "Primitive data types.",
         "patterns": [r"^fhir/resources/datatypes/primitives.py"],
+        "files": [],
+    },
+    {
+        "output": "reference/fhir-resources-type-utils.md",
+        "title": "FHIR Types Utilities",
+        "description": "Utility classes and functions for getting and validating FHIR types.",
+        "patterns": [r"^fhir/resources/datatypes/utils.py"],
         "files": [],
     },
     {
@@ -45,51 +76,89 @@ CONFIGS = [
         "patterns": [r"^fhir/resources/datatypes/R4/core/.*"],
         "files": [],
     },
-    # {
-    #     "output": "reference/fhir-resources-r4b-complex.md",
-    #     "title": "FHIR R4B Complex Types",
-    #     "description": "Classes representing FHIR R4B complex data types.",
-    #     "patterns": [r"^fhir/resources/datatypes/R4B/complex/.*"],
-    #     "files": [],
-    # },
-    # {
-    #     "output": "reference/fhir-resources-r4b-core.md",
-    #     "title": "FHIR R4B Core Resources",
-    #     "description": "Classes representing FHIR R4B core resources.",
-    #     "patterns": [r"^fhir/resources/datatypes/R4B/core/.*"],
-    #     "files": [],
-    # },
-    # {
-    #     "output": "reference/fhir-resources-r5-complex.md",
-    #     "title": "FHIR R5 Complex Types",
-    #     "description": "Classes representing FHIR R5 complex data types.",
-    #     "patterns": [r"^fhir/resources/datatypes/R5/complex/.*"],
-    #     "files": [],
-    # },
-    # {
-    #     "output": "reference/fhir-resources-r5-core.md",
-    #     "title": "FHIR R5 Core Resources",
-    #     "description": "Classes representing FHIR R5 core resources.",
-    #     "patterns": [r"^fhir/resources/datatypes/R5/core/.*"],
-    #     "files": [],
-    # },
     {
-        "output": "reference/fhir-path.md",
-        "title": "FHIR Path",
-        "description": "FHIRPath expression evaluation and utilities.",
+        "output": "reference/fhir-resources-r4b-complex.md",
+        "title": "FHIR R4B Complex Types",
+        "description": "Classes representing FHIR R4B complex data types.",
+        "patterns": [r"^fhir/resources/datatypes/R4B/complex/.*"],
+        "files": [],
+    },
+    {
+        "output": "reference/fhir-resources-r4b-core.md",
+        "title": "FHIR R4B Core Resources",
+        "description": "Classes representing FHIR R4B core resources.",
+        "patterns": [r"^fhir/resources/datatypes/R4B/core/.*"],
+        "files": [],
+    },
+    {
+        "output": "reference/fhir-resources-r5-complex.md",
+        "title": "FHIR R5 Complex Types",
+        "description": "Classes representing FHIR R5 complex data types.",
+        "patterns": [r"^fhir/resources/datatypes/R5/complex/.*"],
+        "files": [],
+    },
+    {
+        "output": "reference/fhir-resources-r5-core.md",
+        "title": "FHIR R5 Core Resources",
+        "description": "Classes representing FHIR R5 core resources.",
+        "patterns": [r"^fhir/resources/datatypes/R5/core/.*"],
+        "files": [],
+    },
+    {
+        "output": "reference/fhir-path-engine.md",
+        "title": "FHIRPath Engine",
+        "description": "FHIRPath evaluation engine components",
         "patterns": [
-            r"^fhir/path/.*",
+            r"^fhir/path/engine/.*",
         ],
         "files": [],
     },
     {
-        "output": "reference/fhir-mapping.md",
+        "output": "reference/fhir-path-parser.md",
+        "title": "FHIRPath Parser & Lexer",
+        "description": "FHIRPath lexer and parser components",
+        "patterns": [],
+        "files": [
+            "fhir/path/lexer.py",
+            "fhir/path/parser.py",
+        ],
+    },
+    {
+        "output": "reference/fhir-path-mixin.md",
+        "title": "FHIRPath Mixin",
+        "description": "FHIRPath mixin components",
+        "patterns": [],
+        "files": [
+            "fhir/path/mixin.py",
+        ],
+    },
+    {
+        "output": "reference/fhir-path-exceptions.md",
+        "title": "FHIRPath Exceptions",
+        "description": "FHIRPath exceptions components",
+        "patterns": [],
+        "files": [
+            "fhir/path/exceptions.py",
+        ],
+    },
+    {
+        "output": "reference/fhir-mapping-engine.md",
         "title": "FHIR Mapping Language",
         "description": "FHIR Mapping Language parser and transformation utilities.",
         "patterns": [
-            r"^fhir/mapping/.*",
+            r"^fhir/mapper/engine/.*",
         ],
         "files": [],
+    },
+    {
+        "output": "reference/fhir-mapping-parser.md",
+        "title": "FHIR Mapping Language Parser",
+        "description": "FHIR Mapping Language parser and lexer utilities.",
+        "patterns": [],
+        "files": [
+            "fhir/mapper/lexer.py",
+            "fhir/mapper/parser.py",
+        ],
     },
     {
         "output": "reference/core-utilities.md",
@@ -103,10 +172,28 @@ CONFIGS = [
             "utils.py",
         ],
     },
+    {
+        "output": "reference/fhir-packages-models.md",
+        "title": "FHIR Packages Models",
+        "description": "FHIR Package Registry data models.",
+        "patterns": [],
+        "files": [
+            "fhir/packages/models.py",
+        ],
+    },
+    {
+        "output": "reference/fhir-packages-client.md",
+        "title": "FHIR Packages Client",
+        "description": "FHIR Package Registry client utilities.",
+        "patterns": [],
+        "files": [
+            "fhir/packages/client.py",
+        ],
+    },
 ]
 
 # Excluded files/modules (basename matching)
-EXCLUDE = ["__init__", "__main__", "parser", "lexer", "__pycache__"]
+EXCLUDE = ["__init__", "__main__", "__pycache__"]
 
 
 def matches_pattern(module_path: str, patterns: List[str]) -> bool:
@@ -222,7 +309,6 @@ for config in CONFIGS:
             for obj_name in objects:
                 print(f"::: {obj_name}", file=fd)
                 print("", file=fd)  # Add empty line between objects
-
         # Set edit path to the first module (or could be omitted)
         if modules:
             mkdocs_gen_files.set_edit_path(output_path, modules[0][0].relative_to(root))

@@ -354,5 +354,5 @@ python patient_system.py
 - **[User Guide](../user-guide/overview.md)** - Explore all Fhircraft features in depth
 - **[FHIRPath Guide](../user-guide/fhirpath.md)** - Master advanced querying techniques
 - **[Mapper Guide](../user-guide/mapper.md)** - Learn complex data transformations
-- **[API Reference](../reference/)** - Detailed API documentation
+- **[API Reference](../reference/fhir-resources-base.md)** - Detailed API documentation
 

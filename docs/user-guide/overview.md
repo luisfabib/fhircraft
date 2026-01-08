@@ -76,7 +76,7 @@ Transform data between different structures using declarative mapping rules.
 
 ### Documentation
 - **This User Guide** - Comprehensive feature documentation
-- **[API Reference](../reference/)** - Detailed method and class documentation
+- **[API Reference](../reference/fhir-resources-base.md)** - Detailed method and class documentation
 - **[Pydantic Docs](https://docs.pydantic.dev/latest/)** - Learn about the underlying validation framework
 
 ### Troubleshooting

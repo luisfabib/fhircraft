@@ -396,7 +396,7 @@ class TerminologyCapabilitiesExpansionParameter(BackboneElement):
 
 class TerminologyCapabilitiesExpansion(BackboneElement):
     """
-    Information about the [ValueSet/$expand](valueset-operation-expand.html) operation.
+    Information about the [ValueSet/$expand](https://www.hl7.org/fhir/R5/valueset-operation-expand.html) operation.
     """
 
     hierarchical: Optional[Boolean] = Field(
@@ -475,7 +475,7 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
 
 class TerminologyCapabilitiesValidateCode(BackboneElement):
     """
-    Information about the [ValueSet/$validate-code](valueset-operation-validate-code.html) operation.
+    Information about the [ValueSet/$validate-code](https://hl7.org/fhir/R5/valueset-operation-validate-code.html) operation.
     """
 
     translations: Optional[Boolean] = Field(
@@ -507,7 +507,7 @@ class TerminologyCapabilitiesValidateCode(BackboneElement):
 
 class TerminologyCapabilitiesTranslation(BackboneElement):
     """
-    Information about the [ConceptMap/$translate](conceptmap-operation-translate.html) operation.
+    Information about the [ConceptMap/$translate](https://hl7.org/fhir/R5/conceptmap-operation-translate.html) operation.
     """
 
     needsMap: Optional[Boolean] = Field(
@@ -789,7 +789,7 @@ class TerminologyCapabilities(DomainResource):
         default=None,
     )
     expansion: Optional[TerminologyCapabilitiesExpansion] = Field(
-        description="Information about the [ValueSet/$expand](valueset-operation-expand.html) operation",
+        description="Information about the [ValueSet/$expand](https://www.hl7.org/fhir/R5/valueset-operation-expand.html) operation",
         default=None,
     )
     codeSearch: Optional[Code] = Field(
@@ -802,15 +802,15 @@ class TerminologyCapabilities(DomainResource):
         alias="_codeSearch",
     )
     validateCode: Optional[TerminologyCapabilitiesValidateCode] = Field(
-        description="Information about the [ValueSet/$validate-code](valueset-operation-validate-code.html) operation",
+        description="Information about the [ValueSet/$validate-code](https://hl7.org/fhir/R5/valueset-operation-validate-code.html) operation",
         default=None,
     )
     translation: Optional[TerminologyCapabilitiesTranslation] = Field(
-        description="Information about the [ConceptMap/$translate](conceptmap-operation-translate.html) operation",
+        description="Information about the [ConceptMap/$translate](https://hl7.org/fhir/R5/conceptmap-operation-translate.html) operation",
         default=None,
     )
     closure: Optional[TerminologyCapabilitiesClosure] = Field(
-        description="Information about the [ConceptMap/$closure](conceptmap-operation-closure.html) operation",
+        description="Information about the [ConceptMap/$closure](https://hl7.org/fhir/R5/conceptmap-operation-closure.html) operation",
         default=None,
     )
     resourceType: Literal["TerminologyCapabilities"] = Field(

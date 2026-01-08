@@ -492,7 +492,7 @@ class ParametersParameter(BackboneElement):
 
 class Parameters(Resource):
     """
-    This resource is a non-persisted resource used to pass information into and back from an [operation](operations.html). It has no other use, and there is no RESTful endpoint associated with it.
+    This resource is a non-persisted resource used to pass information into and back from an [operation](https://hl7.org/fhir/R4B/operations.html). It has no other use, and there is no RESTful endpoint associated with it.
     """
 
     id: Optional[String] = Field(
@@ -506,7 +506,9 @@ class Parameters(Resource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/Parameters"]),
+        default_factory=lambda: Meta(
+            profile=["http://hl7.org/fhir/StructureDefinition/Parameters"]
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
