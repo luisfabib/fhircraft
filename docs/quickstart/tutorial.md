@@ -340,15 +340,6 @@ Run it:
 python patient_system.py
 ```
 
-## What You've Learned
-
-✅ Creating and validating FHIR resources  
-✅ Working with relationships between resources  
-✅ Querying data with FHIRPath  
-✅ Transforming legacy data to FHIR  
-✅ Creating bundles and exporting data  
-✅ Handling validation errors  
-
 ## Next Steps
 
 - **[User Guide](../user-guide/overview.md)** - Explore all Fhircraft features in depth

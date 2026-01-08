@@ -10,7 +10,7 @@ Fhircraft requires a recent version of [Python](https://www.python.org/) (3.10 o
 
 !!! tip "Pydantic Knowledge"
 
-    Fhircraft is built on [Pydantic](https://docs.pydantic.dev/latest/), meaning all FHIR resource models are Pydantic models with full access to their API. This documentation assumes basic Pydantic familiarity, so we recommend reviewing the Pydantic documentation if you're new to it.  
+    Fhircraft is built on [:simple-pydantic: Pydantic](https://docs.pydantic.dev/latest/), meaning all FHIR resource models are Pydantic models with full access to their API. This documentation assumes basic Pydantic familiarity, so we recommend reviewing the Pydantic documentation if you're new to it.  
 
 
 ## Installation
