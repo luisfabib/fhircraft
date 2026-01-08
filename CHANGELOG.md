@@ -1,4 +1,3 @@
-
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -8,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## [0.5.0] - 2025-12-19
+## v0.5.0 - 2025-12-19
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.5.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.5.0...0.4.2)
 
 ### Added
 
@@ -26,7 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Updated import statements in core FHIR resource modules to alias `typing.List` as `ListType` where necessary to avoid overshadowing the FHIR `List` model. ([#151](https://github.com/luisfabib/fhircraft/pull/151), fixes [#139](https://github.com/luisfabib/fhircraft/pull/139)) 
 
-## [0.4.2] - 2025-12-05
+## v0.4.2 - 2025-12-05
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.4.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.4.2...0.4.1)
 
 ### Changed
 
@@ -38,7 +41,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Modified `FHIRBaseModel._serialize_fhir_field_polymorphically` and `FHIRBaseModel._deserialize_polymorphically` to remove temporary disabling of polymorphic flags, relying instead on stack-based recursion protection. This ensures that nested resources are handled correctly and safely. ([#142](https://github.com/luisfabib/fhircraft/pull/142), fixes [#141](https://github.com/luisfabib/fhircraft/pull/141))
 
 
-## [0.4.1] - 2025-12-03
+## v0.4.1 - 2025-12-03
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.4.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.4.1...0.4.0)
 
 ### Added
 
@@ -66,7 +71,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   
 ----------------- 
 
-## [0.4.0] - 2025-11-30
+## v0.4.0 - 2025-11-30
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.4.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.4.0...0.3.7)
 
 ### Added
 
@@ -91,7 +98,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## [0.3.7] - 2025-11-26
+## v0.3.7 - 2025-11-26
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.7) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.7...0.3.6)
 
 ### Added
 
@@ -112,7 +121,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## [0.3.6] - 2025-11-19
+## v0.3.6 - 2025-11-19
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.6) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.6...0.3.5)
 
 ### Changed
 
@@ -126,7 +137,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## [0.3.5] - 2025-11-19
+## v0.3.5 - 2025-11-19
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.5) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.5...0.3.4)
 
 ### Changed
 
@@ -144,7 +157,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## [0.3.4] - 2025-11-11
+## v0.3.4 - 2025-11-11
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.4) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.4...0.3.3)
 
 ### Fixed
 - Fixed processing of pattern and fixed values for both primitive and complex FHIR types ([#82](https://github.com/luisfabib/fhircraft/pull/82))
@@ -160,7 +175,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## [0.3.3] - 2025-10-13
+## v0.3.3 - 2025-10-13
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.3...0.3.2)
 
 ### Changed
 
@@ -182,7 +199,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## [0.3.2] - 2025-10-09
+## v0.3.2 - 2025-10-09
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.2...0.3.1)
 
 ### Changed
 
@@ -195,7 +214,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## [0.3.1] - 2025-10-09
+## v0.3.1 - 2025-10-09
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.1...0.3.0)
 
 ### Fixed
 
@@ -203,7 +224,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## [0.3.0] - 2025-10-07
+## v0.3.0 - 2025-10-07
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.3.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.3.0...0.2.0)
 
 ### Added
 - Implement complete FHIR Mapping Language support with lexer, parser, and execution engine ([#30](https://github.com/luisfabib/fhircraft/pull/30))
@@ -281,11 +304,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix validation of constrained values by ensuring proper handling of `BaseModel` instances when structure definition is of a different version than the resource's ([#66](https://github.com/luisfabib/fhircraft/pull/66)) 
 
-**Full Changelog**: https://github.com/luisfabib/fhircraft/compare/0.2.0...0.3.0
+
 
 ----------------- 
 
-## [0.2.0] - 2025-08-12
+## v0.2.0 - 2025-08-12
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.2.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.2.0...0.1.1)
 
 ### Added
 - FHIR StructureDefinition repository system for managing FHIR Structure Definitions from local, package, or online sources ([#19](https://github.com/luisfabib/fhircraft/pull/19))
@@ -298,11 +323,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Several bug fixes ([#17](https://github.com/luisfabib/fhircraft/pull/17))
 
-**Full Changelog**: https://github.com/luisfabib/fhircraft/compare/0.1.1...0.2.0
+
 
 ----------------- 
 
-## [0.1.1] - 2025-08-07
+## v0.1.1 - 2025-08-07
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.1.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.1.1...0.1.0)
 
 ### Added
 - Logic to load a JSON `StructureDefinition` from a file if a string path is provided to the factory method.
@@ -315,26 +342,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Quality of life improvements ([#12](https://github.com/luisfabib/fhircraft/pull/12))
 - Prepare patch 0.1.1 ([#13](https://github.com/luisfabib/fhircraft/pull/13))
 
-**Full Changelog**: https://github.com/luisfabib/fhircraft/compare/0.1.0...0.1.1
+
 
 ----------------- 
 
-## [0.1.0] - 2024-08-20
+## v0.1.0 - 2024-08-20
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.1.0)
 
 ### Added
 - Initial release 🎉
-
-[0.4.2]: https://github.com/luisfabib/fhircraft/releases/tag/0.4.2
-[0.4.1]: https://github.com/luisfabib/fhircraft/releases/tag/0.4.1
-[0.4.0]: https://github.com/luisfabib/fhircraft/releases/tag/0.4.0
-[0.3.7]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.7
-[0.3.6]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.6
-[0.3.5]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.5
-[0.3.4]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.4
-[0.3.3]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.3
-[0.3.2]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.2
-[0.3.1]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.1
-[0.3.0]: https://github.com/luisfabib/fhircraft/releases/tag/0.3.0
-[0.2.0]: https://github.com/luisfabib/fhircraft/releases/tag/0.2.0
-[0.1.1]: https://github.com/luisfabib/fhircraft/releases/tag/0.1.1
-[0.1.0]: https://github.com/luisfabib/fhircraft/releases/tag/0.1.0
