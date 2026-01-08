@@ -1,6 +1,9 @@
 """Generate the code reference pages organized by logical sections."""
 
+import importlib
+import inspect
 import re
+import sys
 from pathlib import Path
 from typing import List, Union
 
@@ -114,68 +117,112 @@ def matches_pattern(module_path: str, patterns: List[str]) -> bool:
     return False
 
 
+def get_module_objects(identifier: str) -> List[str]:
+    """Get all public objects defined in a module (not imported).
+
+    Returns:
+        List of fully qualified object names
+    """
+    objects = []
+    try:
+        # Add the root directory to Python path if not already there
+        if str(root) not in sys.path:
+            sys.path.insert(0, str(root))
+
+        module = importlib.import_module(identifier)
+
+        # Get all members and filter for those defined in this module
+        for name, obj in inspect.getmembers(module):
+            if not name.startswith("_"):  # Only public objects
+                # Check if the object is defined in this module
+                obj_module = getattr(obj, "__module__", None)
+                if obj_module == identifier:
+                    # Include classes, functions, and other objects defined in this module
+                    if (
+                        inspect.isclass(obj)
+                        or inspect.isfunction(obj)
+                        or inspect.ismethod(obj)
+                        or not inspect.ismodule(obj)
+                    ):
+                        objects.append(f"{identifier}.{name}")
+    except Exception as e:
+        print(f"Warning: Could not import {identifier}: {e}")
+        # Fallback to module-level import if individual object inspection fails
+        objects = [identifier]
+
+    return objects if objects else [identifier]
+
+
 def collect_modules_for_section(section_config: dict) -> List[tuple[Path, str]]:
     """Collect all modules that belong to a section.
-    
+
     Returns:
         List of (file_path, module_identifier) tuples
     """
     modules = []
     patterns = section_config.get("patterns", [])
     files = section_config.get("files", [])
-    
+
     # Collect all Python files in the source directory
     for path in sorted(src.rglob("*.py")):
         try:
             # Skip excluded files
-            if any(excluded in path.parts or path.stem == excluded for excluded in EXCLUDE):
+            if any(
+                excluded in path.parts or path.stem == excluded for excluded in EXCLUDE
+            ):
                 continue
-            
+
             module_path = path.relative_to(root).with_suffix("")
             parts = tuple(module_path.parts)
-            
+
             # Skip if not in fhircraft package
             if parts[0] != "fhircraft":
                 continue
-            
+
             # Convert to relative path from src for pattern matching
             relative_path = str(path.relative_to(src))
-            
+
             # Check if matches explicit files
             if relative_path in files:
                 identifier = ".".join(parts)
                 modules.append((path, identifier))
                 continue
-            
+
             # Check if matches any pattern
             if patterns and matches_pattern(relative_path, patterns):
                 identifier = ".".join(parts)
                 modules.append((path, identifier))
-                
+
         except Exception:
             continue
-    
+
     return modules
 
 
 # Generate documentation pages for each section
 for config in CONFIGS:
     modules = collect_modules_for_section(config)
-    
+
     if not modules:
         continue
-    
+
     output_path = Path(config["output"])
-    
+
     with mkdocs_gen_files.open(output_path, "w") as fd:
         # Write section header
         print(f"# {config['title']}\n", file=fd)
         print(f"{config['description']}\n", file=fd)
-        
+
         # Write each module's documentation
         for path, identifier in modules:
-            print(f"::: {identifier}", file=fd)
-        
+            # Get all objects from the module
+            objects = get_module_objects(identifier)
+
+            # Write documentation for each object
+            for obj_name in objects:
+                print(f"::: {obj_name}", file=fd)
+                print("", file=fd)  # Add empty line between objects
+
         # Set edit path to the first module (or could be omitted)
         if modules:
             mkdocs_gen_files.set_edit_path(output_path, modules[0][0].relative_to(root))

@@ -44,6 +44,7 @@ theme:
 
 extra_css:
   - stylesheets/extra.css
+  - stylesheets/mkdocstrings.css
 
 extra:
   social:
@@ -79,17 +80,21 @@ plugins:
         - scripts/gen_credits_page.py
         - scripts/gen_repo_pages.py
   - mkdocstrings:
+      custom_templates: docs/templates
       handlers:
         python:
-          docstring_section_style: google
           options:
+            docstring_style: google
             members_order: source
             separate_signature: true
             filters: ["!^_"]
             docstring_options:
               ignore_init_summary: true
             merge_init_into_class: true
+            show_root_heading: true
+            show_root_full_path: false
             show_signature_annotations: true
+            summary: true
             signature_crossrefs: true
             extensions:
               - griffe_fieldz:
