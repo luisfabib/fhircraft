@@ -19,7 +19,7 @@ hide:
 Fhircraft transforms FHIR (Fast Healthcare Interoperability Resources) specifications into type-safe Python models using Pydantic. Build healthcare applications with automatic validation, intelligent code completion, and seamless integration with Python's ecosystem.
 
 [Get Started :fontawesome-solid-rocket:](quickstart/installation.md){ .md-button .md-button--primary }
-[Learn the Basics :fontawesome-solid-book-open:](quickstart/basics.md){ .md-button }
+[Learn the Basics :fontawesome-solid-book-open:](quickstart/quickstart.md){ .md-button }
 
 !!! warning "Active development"
   

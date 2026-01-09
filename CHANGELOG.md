@@ -129,7 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update return type of `model_construct` to `Self` to fix type hinting of return value for all `FHIRBaseModel` classes ([#99](https://github.com/luisfabib/fhircraft/pull/99))
 
- ### Fixed
+### Fixed
 
 - Improved handling of empty collections in FHIRPath `Is` and `As` operators to avoid errors on runtime ([#98](https://github.com/luisfabib/fhircraft/pull/98))
 - Fixed the FHIRPath `replace()` fucntion to allowing empty strings `''` to be used for the substitution instead of returning an empty collection ([#100](https://github.com/luisfabib/fhircraft/pull/100))
@@ -188,7 +188,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add an internal `FHIR_version` attribute to the `FactoryConfig` class for more precise version tracking during model construction ([#79](https://github.com/luisfabib/fhircraft/pull/79))
 - Improve test cases for content reference resolution to include valid URL references ([#79](https://github.com/luisfabib/fhircraft/pull/79))
 
-## Fixed
+### Fixed
 
 - Enhance the `_resolve_content_reference` method to support cross-resource references by splitting the `contentReference` into resource URL and path ([#79](https://github.com/luisfabib/fhircraft/pull/79), fixes [#65](https://github.com/luisfabib/fhircraft/pull/65))
 - Resolve an obscure bug in the `ResourceFactory._build_element_tree_structure` method that lead to repeated calls to return erroneous results ([#79](https://github.com/luisfabib/fhircraft/pull/79))

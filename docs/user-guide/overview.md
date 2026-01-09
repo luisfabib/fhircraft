@@ -18,7 +18,7 @@ Fhircraft enables you to:
 **Start here if you're beginning your Fhircraft journey:**
 
 1. **[Installation](../quickstart/installation.md)** - Get Fhircraft running in your environment
-2. **[Basics Tutorial](../quickstart/basics.md)** - Your first FHIR models and resources
+2. **[Basics Tutorial](../quickstart/quickstart.md)** - Your first FHIR models and resources
 3. **[FHIR Resources Overview](resources-overview.md)** - Understanding Fhircraft's approach to FHIR
 
 ### Building FHIR Applications?
@@ -78,11 +78,6 @@ Transform data between different structures using declarative mapping rules.
 - **This User Guide** - Comprehensive feature documentation
 - **[API Reference](../reference/fhir-resources-base.md)** - Detailed method and class documentation
 - **[Pydantic Docs](https://docs.pydantic.dev/latest/)** - Learn about the underlying validation framework
-
-### Troubleshooting
-- **[Resource Models](resources-models.md#error-handling)** - Common validation errors and solutions
-- **[FHIR Path](fhirpath.md#debugging-and-troubleshooting)** - FHIRPath debugging techniques
-- **[Resource Factory](resources-construction.md#troubleshooting)** - Package loading and construction issues
 
 ### Community
 - **[GitHub Issues](https://github.com/luisfabib/fhircraft/issues)** - Report bugs and request features

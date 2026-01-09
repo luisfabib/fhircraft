@@ -30,10 +30,12 @@ print(patient.name[0].family)
 
 1. This creates a Patient object that validates the input data against the FHIR specification and allows you to access patient information through object attributes.
 
-**Further reading:**
+!!! info "Further reading"
 
-- [:material-fire: FHIR Patient Resource](https://hl7.org/fhir/patient.html)
-- [:simple-pydantic: Pydantic Models](https://docs.pydantic.dev/latest/concepts/models/)
+    Checkout these resources for additional information:
+        
+    - [:material-fire: FHIR Patient Resource](https://hl7.org/fhir/patient.html)
+    - [:simple-pydantic: Pydantic Models](https://docs.pydantic.dev/latest/concepts/models/)
 
 ## Working with FHIR resources
 
@@ -56,11 +58,13 @@ json_str = patient.model_dump_json(indent=2) # (1)!
 
 1. This loads a JSON file containing FHIR data, creates a validated Patient object from it, then exports that object back to formatted JSON.
 
-**Further reading:**
+!!! info "Further reading"
 
-- [:simple-pydantic: Pydantic Serialization](https://docs.pydantic.dev/latest/concepts/serialization/)
-- [:material-fire: FHIR JSON Format](https://hl7.org/fhir/json.html)
-    
+    Checkout these resources for additional information:
+
+    - [:simple-pydantic: Pydantic Serialization](https://docs.pydantic.dev/latest/concepts/serialization/)
+    - [:material-fire: FHIR JSON Format](https://hl7.org/fhir/json.html)
+
 ## Querying with FHIRPath
 
 FHIR resources can contain complex nested data structures. Instead of writing loops and conditionals to extract information, FHIRPath provides a standardized query language. This becomes particularly useful when you need to extract specific data points, perform calculations, or filter resources based on criteria.
@@ -68,21 +72,29 @@ FHIR resources can contain complex nested data structures. Instead of writing lo
 Use [FHIRPath expressions](https://hl7.org/fhirpath/) to extract data from FHIR resources:
 
 ```python
+patient = Patient(
+    name=[{"given": ["Alice", "Samantha", "Erika"], "family": "Johnson"}],
+    gender="female",
+    birthDate="1985-03-15"
+)
+
 # Get all family names
-family_names = patient.fhirpath_values('Patient.name.family')
-assert family_names == ["Johnson"] # (1)!
+first_name = patient.fhirpath_values('Patient.name.given.first()')
+assert first_name == ["Alice"] # (1)!
 
 # Check if patient is female
 is_female = patient.fhirpath_values("Patient.gender = 'female'")
 assert is_female == [True] # (2)!
 ```
-1. This uses a FHIRPath expression to extract all family names from the patient's name elements and returns them as a list.
+1. This uses a FHIRPath expression to extract all middle names from the patient's name elements and returns them as a list.
 
 2. This evaluates a boolean expression that checks whether the patient's gender equals "female" and returns the result as a list.
 
-**Further reading:**
+!!! info "Further reading"
 
-- [:material-fire: FHIRPath Specification](https://hl7.org/fhirpath/)
+    Checkout these resources for additional information:
+
+   - [:material-fire: FHIRPath Specification](https://hl7.org/fhirpath/)
 
 ## Working with Profiles
 
@@ -113,10 +125,12 @@ us_patient = USCorePatient(
 
 2. This creates a specialized Patient model based on the US Core profile, then uses it to create a patient object that validates against the US Core constraints.
 
-**Further reading:**
+!!! info "Further reading"
 
-- [:material-fire: FHIR Profiles](https://hl7.org/fhir/profiling.html)
-- [:material-fire: US Core Implementation Guide](http://hl7.org/fhir/us/core/)
+    Checkout these resources for additional information:
+
+   - [:material-fire: FHIR Profiles](https://hl7.org/fhir/profiling.html)
+   - [:material-fire: US Core Implementation Guide](http://hl7.org/fhir/us/core/)
 
 
 ## Transforming Data with FHIR Mapper
@@ -166,13 +180,15 @@ patient = targets[0]
 
 3. This executes the mapping script on the legacy data and returns a list containing the transformed FHIR Patient object.
 
-**Further reading:**
+!!! info "Further reading"
+   
+    Checkout these resources for additional information:
+    
+    - [:material-fire: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html)
+    - [:material-fire: StructureMap Resource](https://hl7.org/fhir/structuremap.html)
 
-- [:material-fire: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html)
-- [:material-fire: StructureMap Resource](https://hl7.org/fhir/structuremap.html)
 
-
-## Further Reading
+## Next Steps
 
 For more detailed information on specific topics:
 

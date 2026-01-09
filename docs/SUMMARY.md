@@ -9,7 +9,7 @@
               - [Pydantic FHIR](user-guide/pydantic-representation.md)
               - [Resource Models](user-guide/resources-models.md)
               - [Resource Factory](user-guide/resources-construction.md)
-          - [FHIR Path](user-guide/fhirpath.md)
+          - [FHIRPath Querying](user-guide/fhirpath.md)
           - [FHIR Mapper](user-guide/mapper.md)
   - [Release Notes](changelog.md)
   - Community
