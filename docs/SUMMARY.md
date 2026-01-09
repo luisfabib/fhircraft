@@ -5,10 +5,9 @@
     - [Tutorial](quickstart/tutorial.md)
   - [User Guide](user-guide/overview.md)
       - Fhircraft
-          - [FHIR Resources](user-guide/resources-overview.md)
-              - [Pydantic FHIR](user-guide/pydantic-representation.md)
-              - [Resource Models](user-guide/resources-models.md)
-              - [Resource Factory](user-guide/resources-construction.md)
+          - [Pydantic FHIR](user-guide/pydantic-representation.md)
+          - [Resource Models](user-guide/resources-models.md)
+          - [Resource Factory](user-guide/resources-construction.md)
           - [FHIRPath Querying](user-guide/fhirpath.md)
           - [FHIR Mapper](user-guide/mapper.md)
   - [Release Notes](changelog.md)

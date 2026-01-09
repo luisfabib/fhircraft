@@ -253,14 +253,14 @@ patient = Patient(
 )
 name = patient.name[0]
 
-print(name.fhirpath_single("%context")) # (1)!
-#> PatientName
+print(type(name.fhirpath_single("%context"))) # (1)!
+#> <class 'fhircraft.fhir.resources.datatypes.R5.complex.human_name.HumanName'>
 
-print(patient.fhirpath_single("%resource")) # (2)!  
-#> Patient
+print(type(patient.fhirpath_single("%resource"))) # (2)!  
+#> <class 'fhircraft.fhir.resources.datatypes.R5.core.patient.Patient'>
 
-print(patient.fhirpath_single("%rootResource")) # (3)!
-#> Patient
+print(type(patient.fhirpath_single("%rootResource"))) # (3)!
+#> <class 'fhircraft.fhir.resources.datatypes.R5.core.patient.Patient'>
 
 print(patient.fhirpath_single("%ucum")) # (4)!
 #> http://unitsofmeasure.org
