@@ -50,23 +50,29 @@ def exec_python(source):
 
     Does not return anything, but exceptions raised by the source
     will propagate out unmodified
+
+    Preprocessing: Converts print() statements followed by #> lines
+    into assert statements for testing.
     """
+    # Preprocess the source to convert print/expected output patterns to assertions
+    source = preprocess_print_assertions(source)
+
     try:
         # Compile first so we get proper line numbers in tracebacks
-        code = compile(source, filename='<doctest>', mode='exec')
+        code = compile(source, filename="<doctest>", mode="exec")
         exec(code, {"__name__": "__main__"})
-    except Exception as e:        
+    except Exception as e:
         # Extract line number from traceback
         tb = traceback.extract_tb(e.__traceback__)
         error_line = None
         for frame in tb:
-            if frame.filename == '<doctest>':
+            if frame.filename == "<doctest>":
                 error_line = frame.lineno
                 break
-        
+
         # Print only lines around the error
         if error_line:
-            lines = source.split('\n')
+            lines = source.split("\n")
             context = 3  # lines before and after
             start = max(1, error_line - context)
             end = min(len(lines), error_line + context)
@@ -76,10 +82,80 @@ def exec_python(source):
                 print(f"{marker} {i:4d}: {lines[i-1]}")
         else:
             print("\nFull source:")
-            for i, line in enumerate(source.split('\n'), 1):
+            for i, line in enumerate(source.split("\n"), 1):
                 print(f"{i:4d}: {line}")
         print("=" * 60)
         raise
+
+
+def preprocess_print_assertions(source):
+    """Convert print() statements followed by #> lines into assert statements"""
+    import re
+
+    lines = source.split("\n")
+    new_lines = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+
+        # Look for print() statements with proper parentheses matching
+        print_start = line.find("print(")
+        if print_start != -1 and i + 1 < len(lines):
+            # Find the matching closing parenthesis
+            paren_count = 0
+            start_pos = print_start + 6  # Start after 'print('
+            end_pos = None
+
+            for j in range(start_pos, len(line)):
+                if line[j] == "(":
+                    paren_count += 1
+                elif line[j] == ")":
+                    if paren_count == 0:
+                        end_pos = j
+                        break
+                    paren_count -= 1
+
+            if end_pos is not None:
+                next_line = lines[i + 1].strip()
+
+                # Check if the next line starts with #>
+                if next_line.startswith("#>"):
+                    # Extract the print argument and expected value
+                    print_arg = line[start_pos:end_pos].strip()
+                    expected_value = next_line[2:].strip()  # Remove #> prefix
+
+                    # Create the assertion
+                    # Handle string values by adding quotes if not already present
+                    if not (
+                        expected_value.startswith('"')
+                        or expected_value.startswith("'")
+                        or expected_value.isdigit()
+                        or expected_value in ["True", "False", "None"]
+                        or expected_value.startswith("[")
+                        or expected_value.startswith("{")
+                    ):
+                        expected_value = f'"{expected_value}"'
+
+                    # Preserve indentation from the original print line
+                    indent = len(line) - len(line.lstrip())
+                    # Escape quotes in expected_value for the error message
+                    escaped_expected = expected_value.replace('"', '\\"')
+
+                    # Create assertion that handles quote differences gracefully
+                    assertion = f'assert str({print_arg}) == str({expected_value}), f"Expected {escaped_expected}, got {{str({print_arg})}}"'
+                    new_line = " " * indent + assertion
+                    new_lines.append(new_line)
+
+                    # Skip both the print line and the #> line
+                    i += 2
+                    continue
+
+        # If not a print/expected pattern, keep the original line
+        new_lines.append(line)
+        i += 1
+
+    return "\n".join(new_lines)
 
 
 register_executor("", exec_python)
