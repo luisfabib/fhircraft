@@ -289,7 +289,10 @@ class FhirPathParser:
         p[0] = TypeSpecifier(p[1])
 
     def p_fhirpath_type_specifier_context(self, p):
-        """type_specifier : identifier '.' identifier"""
+        """
+        type_specifier : identifier '.' identifier
+                       | identifier '.' ROOT_NODE
+        """
         p[0] = TypeSpecifier(f"{p[1]}.{p[3]}")
 
     def p_fhirpath_function(self, p):
@@ -544,21 +547,20 @@ class FhirPathParser:
         """
         p[0] = p[1]
 
-
     def p_fhirpath_function_arguments(self, p):
         """
         arguments : arguments ',' argument
                   | argument
         """
         if len(p) == 2:
-           p[0] = [p[1]]
+            p[0] = [p[1]]
         else:
-           p[0] = p[1]
-           p[0].append(p[3])
+            p[0] = p[1]
+            p[0].append(p[3])
 
     def p_fhirpath_function_argument(self, p):
         """argument : expression
-                    | empty"""
+        | empty"""
         p[0] = p[1]
 
     def p_fhirpath_identifier(self, p):
@@ -567,12 +569,12 @@ class FhirPathParser:
 
     def p_fhirpath_literal(self, p):
         """literal : number
-                   | boolean
-                   | STRING
-                   | date
-                   | time
-                   | datetime
-                   | quantity
+        | boolean
+        | STRING
+        | date
+        | time
+        | datetime
+        | quantity
         """
         p[0] = Literal(p[1])
 
