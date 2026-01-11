@@ -9,6 +9,7 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathError,
 )
 from fhircraft.fhir.path.engine.core import This
+from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.subsetting import *
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
@@ -54,9 +55,11 @@ def test_indexing_returns_last_with_negative_index():
     result = Index(-1).evaluate(collection, env, create=False)
     assert result == [collection[2]]
 
+
 def test_index_string_representation():
     expression = Index(2)
     assert str(expression) == "[2]"
+
 
 class TestIndexPrimitive(TestCase):
 
@@ -183,9 +186,11 @@ def test_single_raises_error_for_multiple_item_collection():
     with pytest.raises(FHIRPathError):
         Single().evaluate(collection, env, create=False)
 
+
 def test_single_string_representation():
     expression = Single()
     assert str(expression) == "single()"
+
 
 # -------------
 # First
@@ -207,9 +212,11 @@ def test_first_returns_first_item_in_collection():
     result = First().evaluate(collection, env, create=False)
     assert result == [collection[0]]
 
+
 def test_first_string_representation():
     expression = First()
     assert str(expression) == "first()"
+
 
 # -------------
 # Last
@@ -231,9 +238,11 @@ def test_last_returns_last_item_in_collection():
     result = Last().evaluate(collection, env, create=False)
     assert result == [collection[-1]]
 
+
 def test_last_string_representation():
     expression = Last()
     assert str(expression) == "last()"
+
 
 # -------------
 # Tail
@@ -255,9 +264,11 @@ def test_tail_returns_expected_collection():
     result = Tail().evaluate(collection, env, create=False)
     assert result == collection[1:]
 
+
 def test_tail_string_representation():
     expression = Tail()
     assert str(expression) == "tail()"
+
 
 # -------------
 # Skip
@@ -301,9 +312,21 @@ def test_skip_returns_expected_collection():
     result = Skip(2).evaluate(collection, env, create=False)
     assert result == [collection[-1]]
 
+
 def test_skip_string_representation():
     expression = Skip(2)
     assert str(expression) == "skip(2)"
+
+
+def test_skip_returns_expected_collection_with_fhirpath():
+    collection = [
+        FHIRPathCollectionItem(value="item1"),
+        FHIRPathCollectionItem(value="item2"),
+        FHIRPathCollectionItem(value="item3"),
+    ]
+    result = Skip(EnvironmentVariable("%count")).evaluate(collection, {"%count": 2})
+    assert result == [collection[-1]]
+
 
 # -------------
 # Take
@@ -347,9 +370,21 @@ def test_take_returns_expected_collection():
     result = Take(2).evaluate(collection, env, create=False)
     assert result == collection[:2]
 
+
 def test_take_string_representation():
     expression = Take(2)
     assert str(expression) == "take(2)"
+
+
+def test_take_returns_expected_collection_with_fhirpath():
+    collection = [
+        FHIRPathCollectionItem(value="item1"),
+        FHIRPathCollectionItem(value="item2"),
+        FHIRPathCollectionItem(value="item3"),
+    ]
+    result = Take(EnvironmentVariable("%count")).evaluate(collection, {"%count": 2})
+    assert result == collection[:2]
+
 
 # ---------------
 # Intersection
@@ -373,9 +408,11 @@ def test_intersection_returns_common_items_without_duplicates():
         FHIRPathCollectionItem(value="item3"),
     ]
 
+
 def test_intersection_string_representation():
     expression = Intersect(Element("other"))
     assert str(expression) == "intersect(other)"
+
 
 # ---------------
 # Exclude

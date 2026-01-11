@@ -428,13 +428,37 @@ class Log(FHIRPathMathFunction):
         base (int | Literal): The base of the logarithm. Must be an integer greater than 1.
     """
 
-    def __init__(self, base: int | Literal):
-        self.base = base if not isinstance(base, Literal) else base.value
-        if not isinstance(self.base, int) or self.base <= 1:
+    def __init__(self, base: int | FHIRPath):
+        self.base = Literal(base) if not isinstance(base, FHIRPath) else base
+
+    def evaluate(
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+    ) -> FHIRPathCollection:
+        """
+        Computes the logarithm of the input value to the specified base.
+
+        Args:
+            collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
+
+        Returns:
+            FHIRPathCollection: The output collection.
+
+        Raises:
+            FHIRPathRuntimeError: For non-singleton collections or invalid base.
+        """
+        if (
+            not isinstance(
+                base := self.base.single(collection, environment=environment), int
+            )
+            or base <= 1
+        ):
             raise FHIRPathRuntimeError(
                 "The base argument of the log function must be an integer greater than 1."
             )
-        self.math_operation = lambda x: log(x, self.base)
+        self.math_operation = lambda x: log(x, base)
+        return super().evaluate(collection, environment, create)
 
 
 class Power(FHIRPathMathFunction):
@@ -442,34 +466,83 @@ class Power(FHIRPathMathFunction):
     A representation of the FHIRPath [`power`](https://hl7.org/fhirpath/N1/#powerexponent-integer-decimal-integer-decimal) function.
 
     Attributes:
-        exponent (int | float | Literal): The exponent to which the input value is raised..
+        exponent (int | float | Literal): The exponent to which the input value is raised.
     """
 
-    def __init__(self, exponent: int | float | Literal):
+    def __init__(self, exponent: int | float | FHIRPath):
         self.exponent = (
-            exponent if not isinstance(exponent, Literal) else exponent.value
+            Literal(exponent) if not isinstance(exponent, FHIRPath) else exponent
         )
-        if not isinstance(self.exponent, (int, float)):
+
+    def evaluate(
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+    ) -> FHIRPathCollection:
+        """
+        Computes the input value raised to the specified exponent.
+        Args:
+            collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
+        Returns:
+            FHIRPathCollection: The output collection.
+
+        Raises:
+            FHIRPathRuntimeError: For non-singleton collections or invalid exponent.
+        """
+
+        if not isinstance(
+            exponent := self.exponent.single(collection, environment=environment),
+            (int, float),
+        ):
             raise FHIRPathRuntimeError(
                 "The exponent argument of the power function must be a number."
             )
-        self.math_operation = lambda x: pow(x, self.exponent)
+        self.math_operation = lambda x: pow(x, exponent)
+        return super().evaluate(collection, environment, create)
 
 
 class Round(FHIRPathMathFunction):
     """
     A representation of the FHIRPath [`round`](https://hl7.org/fhirpath/N1/#roundprecision-integer-decimal) function.
+
+    Attributes:
+        precision (int): The number of decimal places to round to.
     """
 
-    def __init__(self, precision: int | Literal):
+    def __init__(self, precision: int | FHIRPath):
         self.precision = (
-            precision if not isinstance(precision, Literal) else precision.value
+            Literal(precision) if not isinstance(precision, FHIRPath) else precision
         )
-        if not isinstance(self.precision, int) or self.precision < 0:
+
+    def evaluate(
+        self, collection: FHIRPathCollection, environment: dict, create: bool = False
+    ) -> FHIRPathCollection:
+        """
+        Rounds the input value to the specified precision.
+
+        Args:
+            collection (FHIRPathCollection): The input collection.
+            environment (dict): The environment context for the evaluation.
+            create (bool): Whether to create new elements during evaluation if necessary.
+
+        Returns:
+            FHIRPathCollection: The output collection.
+
+        Raises:
+            FHIRPathRuntimeError: For non-singleton collections or invalid precision.
+        """
+        if (
+            not isinstance(
+                precision := self.precision.single(collection, environment=environment),
+                int,
+            )
+            or precision < 0
+        ):
             raise FHIRPathRuntimeError(
                 "The precision argument of the round function must be a non-negative integer."
             )
-        self.math_operation = lambda x: round(x, self.precision)
+        self.math_operation = lambda x: round(x, precision)
+        return super().evaluate(collection, environment, create)
 
 
 class Sqrt(FHIRPathMathFunction):
