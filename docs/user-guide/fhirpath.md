@@ -413,12 +413,12 @@ Some of these literal types support FHIRPath-specific aritmethical and compariso
     from fhircraft.fhir.path.engine.literals import Quantity, Date, DateTime
 
     # FHIRPath Quantity with unit conversion
-    bp_systolic = Quantity(120, "mmHg")
-    bp_kpa = Quantity(16.0, "kPa") 
+    bp_systolic = Quantity(120000, "Pa")
+    bp_kpa = Quantity(120, "kPa") 
 
     # FHIRPath handles unit conversion automatically
     print(bp_systolic == bp_kpa)  # (1)!
-    #> True (converts between units)
+    #> True
 
     # FHIRPath Date with partial precision
     partial_date = Date("@2023-03")  # (2)!
@@ -441,8 +441,9 @@ is_patient_explicit = patient.fhirpath_single("Patient is FHIR.Patient") # (1)!
 is_patient_implicit = patient.fhirpath_single("Patient is Patient") # (2)!
 
 print(f"Explicit namespace: {is_patient_explicit}")
+#> Explicit namespace: True
 print(f"Implicit namespace: {is_patient_implicit}")
-#> Both return True
+#> Implicit namespace: True
 
 # Check for complex types with explicit namespace
 has_name = patient.fhirpath_single("Patient.name.first() is FHIR.HumanName") # (3)!
@@ -470,18 +471,15 @@ FHIRPath provides `is` and `as` operators for type checking and casting. These o
 ```python
 from fhircraft.fhir.resources.datatypes.R5.core import Patient
 
-patient = Patient(id="1234") # (1)!
+patient = Patient(id="ID1234") # (1)!
 
 print(patient.fhirpath_single("Patient.id is id"))
 #> True
 
 print(patient.fhirpath_single("Patient.id is FHIR.id"))
-#> false
-
-print(patient.fhirpath_single("Patient.id is FHIR.uuid"))
-#> false
-
-print(patient.fhirpath_single("Patient.id is System.string"))
 #> True
+
+print(patient.fhirpath_single("Patient.id is FHIR.integer"))
+#> False
 ```
 
