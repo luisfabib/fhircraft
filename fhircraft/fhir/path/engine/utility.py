@@ -26,11 +26,11 @@ class Trace(FHIRPathFunction):
     A representation of the FHIRPath [`trace()`](http://hl7.org/fhirpath/N1/#tracename-string-projection-expression-collection) function.
 
     Attributes:
-        name  (str): Subtring query.
+        name  (str | FHIRPath): Subtring query or FHIRPath to evaluate for the trace name.
     """
 
-    def __init__(self, name: Literal | str, projection: Optional[FHIRPath] = None):
-        self.name = name if isinstance(name, str) else name.value
+    def __init__(self, name: FHIRPath | str, projection: Optional[FHIRPath] = None):
+        self.name = Literal(name) if isinstance(name, str) else name
         self.projection = projection
 
     def evaluate(
@@ -57,8 +57,12 @@ class Trace(FHIRPathFunction):
             log_collection = Select(self.projection).evaluate(
                 collection, environment, create
             )
+        if not isinstance(
+            name := self.name.single(collection, environment=environment), str
+        ):
+            raise TypeError("Trace name must evaluate to a string.")
         logger.debug(
-            f"FHIRPath trace: {self.name} - {[str(item.value) if isinstance(item, FHIRPathCollectionItem) else str(item) for item in ensure_list(log_collection)]}"
+            f"FHIRPath trace: {name} - {[str(item.value) if isinstance(item, FHIRPathCollectionItem) else str(item) for item in ensure_list(log_collection)]}"
         )
         return collection
 

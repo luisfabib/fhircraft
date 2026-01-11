@@ -30,7 +30,7 @@ class Quantity(FHIRPathLiteralType):
         elif isinstance(other, (int, float)) and self.unit in (None, "1"):
             return op(self.value, other)
         else:
-            raise TypeError(f"Comparisons with {type(other)} not supported")
+            return False
 
     def __math__(self, other, op) -> PintQuantity:
         if isinstance(other, Quantity):

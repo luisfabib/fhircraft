@@ -4,6 +4,7 @@ import pytest
 
 from fhircraft.fhir.path.engine.additional import *
 from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
@@ -395,3 +396,11 @@ def test_comparable_returns_empty_for_empty_collection():
     )
     result = Comparable(quantity).evaluate(collection, env)
     assert result == []
+
+
+def test_comparable_same_units_with_fhirpath():
+    collection = [FHIRPathCollectionItem(value=Quantity(value=10, unit="mg"))]
+    result = Comparable(EnvironmentVariable("%quantity")).evaluate(
+        collection, {"%quantity": Quantity(value=12, unit="mg")}
+    )
+    assert result[0].value == True

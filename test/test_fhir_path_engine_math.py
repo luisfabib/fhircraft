@@ -4,6 +4,7 @@ import pytest
 
 from fhircraft.fhir.path.engine.additional import GetValue
 from fhircraft.fhir.path.engine.core import *
+from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Quantity
 from fhircraft.fhir.path.engine.math import *
 
@@ -359,6 +360,15 @@ def test_log_string_representation():
     assert str(expression) == "value.log(10)"
 
 
+def test_log_returns_correct_value_with_fhirpath():
+    resource = namedtuple("Resource", ["value"])(value=5)
+    collection = [FHIRPathCollectionItem(value=resource)]
+    result = Invocation(Element("value"), Log(EnvironmentVariable("%base"))).evaluate(
+        collection, {"%base": 10}
+    )
+    assert result[0].value == pytest.approx(0.698970004, rel=1e-5)
+
+
 # -------------
 # Power
 # -------------
@@ -390,6 +400,15 @@ def test_power_returns_correct_value(value, expected):
 def test_power_string_representation():
     expression = Invocation(Element("value"), Power(2))
     assert str(expression) == "value.power(2)"
+
+
+def test_power_returns_correct_value_with_fhirpath():
+    resource = namedtuple("Resource", ["value"])(value=5)
+    collection = [FHIRPathCollectionItem(value=resource)]
+    result = Invocation(
+        Element("value"), Power(EnvironmentVariable("%exponent"))
+    ).evaluate(collection, {"%exponent": 2})
+    assert result[0].value == pytest.approx(25, rel=1e-5)
 
 
 # -------------
@@ -427,6 +446,15 @@ def test_round_returns_correct_value(value, expected):
 def test_round_string_representation():
     expression = Invocation(Element("value"), Round(1))
     assert str(expression) == "value.round(1)"
+
+
+def test_round_returns_correct_value_with_fhirpath():
+    resource = namedtuple("Resource", ["value"])(value=5.559)
+    collection = [FHIRPathCollectionItem(value=resource)]
+    result = Invocation(
+        Element("value"), Round(EnvironmentVariable("%precision"))
+    ).evaluate(collection, {"%precision": 2})
+    assert result[0].value == pytest.approx(5.56, rel=1e-5)
 
 
 # -------------
