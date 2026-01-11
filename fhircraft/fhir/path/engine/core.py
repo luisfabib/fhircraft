@@ -408,6 +408,7 @@ class FHIRPath(ABC):
         }
         # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
+        print(environment)
         return self.evaluate(collection, environment or dict(), create)
 
     def _invoke(self, invocation: "FHIRPath") -> "FHIRPath":
@@ -697,18 +698,22 @@ class Element(FHIRPath):
         if not hasattr(parent.__class__, "model_fields"):
             return None
         field_info = parent.__class__.model_fields.get(self.label)
-        
+
         # Check if parent model allows extra fields
         if field_info is None:
             model_config = getattr(parent.__class__, "model_config", {})
-            extra_setting = model_config.get("extra") if isinstance(model_config, dict) else getattr(model_config, "extra", None)
+            extra_setting = (
+                model_config.get("extra")
+                if isinstance(model_config, dict)
+                else getattr(model_config, "extra", None)
+            )
             if extra_setting == "allow":
                 # For models with extra='allow', create new instance of same type
                 # This supports dynamic models
                 new_element = parent.__class__()
                 return new_element
             return None
-        
+
         model = get_fhir_model_from_field(field_info)
         if not model:
             new_element = None
