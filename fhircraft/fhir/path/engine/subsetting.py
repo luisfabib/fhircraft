@@ -235,15 +235,11 @@ class Skip(FHIRPathFunction):
     A representation of the FHIRPath [`skip()`](https://hl7.org/fhirpath/N1/#skipnum-integer-collection) function.
 
     Attributes:
-        num (int): The number of items to skip.
+        num (int | FHIRPath): The number of items to skip or FHIRPath evaluating to an integer.
     """
 
-    def __init__(self, num: int | Literal):
-        if isinstance(num, Literal):
-            num = num.value
-        if not isinstance(num, int):
-            raise FHIRPathError("Skip() argument must be an integer number.")
-        self.num = num
+    def __init__(self, num: int | FHIRPath):
+        self.num = Literal(num) if not isinstance(num, FHIRPath) else num
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -262,9 +258,13 @@ class Skip(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        if self.num <= 0:
+        if not isinstance(
+            num := self.num.single(collection, environment=environment), int
+        ):
+            raise FHIRPathError("Skip() argument must evaluate to an integer number.")
+        if num <= 0:
             return []
-        return ensure_list(collection[self.num :])
+        return ensure_list(collection[num:])
 
 
 class Take(FHIRPathFunction):
@@ -275,12 +275,8 @@ class Take(FHIRPathFunction):
         num (int): The number of items to take.
     """
 
-    def __init__(self, num: int | Literal):
-        if isinstance(num, Literal):
-            num = num.value
-        if not isinstance(num, int):
-            raise FHIRPathError("Take() argument must be an integer number.")
-        self.num = num
+    def __init__(self, num: int | FHIRPath):
+        self.num = Literal(num) if not isinstance(num, FHIRPath) else num
 
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
@@ -298,9 +294,13 @@ class Take(FHIRPathFunction):
         Returns:
             FHIRPathCollection): The output collection.
         """
-        if self.num <= 0:
+        if not isinstance(
+            num := self.num.single(collection, environment=environment), int
+        ):
+            raise FHIRPathError("Skip() argument must evaluate to an integer number.")
+        if num <= 0:
             return []
-        return ensure_list(collection[: self.num])
+        return ensure_list(collection[:num])
 
 
 class Intersect(FHIRPathFunction):

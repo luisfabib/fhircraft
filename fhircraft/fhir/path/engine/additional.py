@@ -942,14 +942,16 @@ class Comparable(FHIRPathFunction):
     A representation of the FHIRPath [`comparable()`](https://www.hl7.org/fhir/fhirpath.html) function.
 
     Attributes:
-        quantity (Quantity): The quantity to check for comparability.
+        quantity (Quantity | FHIRPath): The quantity to check for comparability or a FHIRPath that resolves to a Quantity.
     """
 
-    def __init__(self, quantity: Quantity | Literal):
-        if isinstance(quantity, Literal):
-            quantity = quantity.value
-        if not isinstance(quantity, Quantity):
-            raise FHIRPathError("comparable() argument must be a Quantity.")
+    def __init__(self, quantity: Quantity | FHIRPath):
+        if isinstance(quantity, Quantity):
+            quantity = Literal(quantity)
+        if not isinstance(quantity, FHIRPath):
+            raise FHIRPathError(
+                "comparable() argument must be a Quantity or valid FHIRPath."
+            )
         self.quantity = quantity
 
     def evaluate(
@@ -974,5 +976,10 @@ class Comparable(FHIRPathFunction):
         if not isinstance(item.value, Quantity):
             raise FHIRPathError("comparable() requires a Quantity input.")
         input_quantity: Quantity = item.value
+        if not isinstance(
+            quantity := self.quantity.single(collection, environment=environment),
+            Quantity,
+        ):
+            raise FHIRPathError("Comparable() input did not evaluate to a Quantity.")
         # TODO: Implement proper unit comparison logic once unit systems are supported
-        return [FHIRPathCollectionItem.wrap(input_quantity.unit == self.quantity.unit)]
+        return [FHIRPathCollectionItem.wrap(input_quantity.unit == quantity.unit)]
