@@ -1,22 +1,24 @@
-  - [Home](index.md)
-  - Get Started
-    - [Installation](quickstart/installation.md)
-    - [Quick Start](quickstart/quickstart.md)
-    - [Tutorial](quickstart/tutorial.md)
+  - [Fhircraft](index.md)
   - [User Guide](user-guide/overview.md)
+      - First Steps 
+          - [Installation](quickstart/installation.md)
+          - [Quick Start](quickstart/quickstart.md)
+          - [Tutorial](quickstart/tutorial.md)
       - Fhircraft
           - [Pydantic FHIR](user-guide/pydantic-representation.md)
           - [Resource Models](user-guide/resources-models.md)
+          - [Managing FHIR Artifacts](user-guide/managing-fhir-artifacts.md)
           - [Resource Factory](user-guide/resources-construction.md)
+          - [Global Configuration](user-guide/configuration.md)
           - [FHIRPath Querying](user-guide/fhirpath.md)
           - [FHIR Mapper](user-guide/mapper.md)
-  - [Release Notes](changelog.md)
   - Community
     - [Contributing](community/contributing.md)
     - [Code of Conduct](community/code_of_conduct.md)
     - [FAQ](community/faq.md)
     - [Credits](community/credits.md)
     - [License](community/license.md)
+  - [Release Notes](changelog.md)
   - Reference
       - FHIR Resources
           - [Bases](reference/fhir-resources-base.md)

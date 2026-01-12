@@ -3,7 +3,14 @@ import pytest
 import json
 from unittest.mock import patch, MagicMock, mock_open
 from pathlib import Path
+
+from fhircraft.fhir.resources.factory import factory, ResourceFactory
+from fhircraft.fhir.resources.datatypes.R5.core import Patient, Observation
 from .mktestdocs import check_md_file
+
+# Store original methods before patching
+_original_configure_repository = ResourceFactory.configure_repository
+_original_construct_resource_model = ResourceFactory.construct_resource_model
 
 
 def mock_load_package(self, package_name, version=None):
@@ -21,6 +28,29 @@ def mock_load_package(self, package_name, version=None):
     else:
         # For other packages, raise an error since we don't have mocks for them
         raise NotImplementedError(f"Mock not implemented for package: {package_name}")
+
+
+def mock_configure_repository(self, directory=None, files=None, definitions=None, packages=None, internet_enabled=False):
+    """Mock configure_repository to use local test files instead of downloading from internet."""
+    if directory or files:
+        return _original_configure_repository(self, directory='test/static/fhir-profiles-definitions', internet_enabled=internet_enabled)
+    elif definitions:
+        return _original_configure_repository(self, definitions=definitions, internet_enabled=internet_enabled)
+    elif packages:
+        return _original_configure_repository(self, packages=packages, internet_enabled=internet_enabled)
+    else: 
+        raise ValueError("Either directory/files or definitions must be provided.")
+    
+def mock_construct_resource_model(self, canonical_url=None, structure_definition=None):
+    """Mock construct_resource_model"""
+    if canonical_url:
+        if canonical_url == "http://example.org/StructureDefinition/MyPatient":
+            return Patient
+        elif canonical_url == "http://example.org/StructureDefinition/MyObservation":
+            return Observation
+        elif canonical_url == "http://hl7.org/fhir/us/core/StructureDefinition/mcode-cancer-patient":
+            return Patient
+    return _original_construct_resource_model(self, canonical_url=canonical_url, structure_definition=structure_definition)
 
 
 def mock_load_structure_map(self, source):
@@ -88,6 +118,8 @@ def mock_open_func(file, mode="r", *args, **kwargs):
     "fhircraft.fhir.resources.factory.ResourceFactory.load_package", mock_load_package
 )
 @patch("fhircraft.fhir.mapper.FHIRMapper.load_structure_map", mock_load_structure_map)
+@patch("fhircraft.fhir.resources.factory.ResourceFactory.construct_resource_model", mock_construct_resource_model)
+@patch("fhircraft.fhir.resources.factory.ResourceFactory.configure_repository", mock_configure_repository)
 @patch("fhircraft.utils.load_file", mock_load_file)
 @patch("builtins.open", side_effect=mock_open_func)
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
