@@ -114,7 +114,18 @@ Fhircraft connects to the FHIR package registry at [packages.fhir.org](https://p
 
 ### Loading a FHIR Package
 
-When you know which package and version you need, you can load it directly. The [FHIR Package Registry](https://registry.fhir.org/) hosts hundreds of packages covering different healthcare domains, countries, and use cases. Each package has a unique name following the NPM naming convention and a [semantic version number](https://semver.org/). Popular packages include the [International Patient Summary](https://hl7.org/fhir/uv/ips/) for global interoperability, and [mCODE](https://hl7.org/fhir/us/mcode/) for oncology data.
+When you know which package and version you need, you can load it directly. The [FHIR Package Registry](https://registry.fhir.org/) hosts hundreds of packages covering different healthcare domains, countries, and use cases. Each package has a unique name following the NPM naming convention and a [semantic version number](https://semver.org/). Popular packages include the [International Patient Summary](https://hl7.org/fhir/uv/ips/) for global interoperability, and [mCODE](https://hl7.org/fhir/us/mcode/) for oncology data. Here is a collection of commonly used FHIR packages:
+
+| Package | Description | Use Case |
+|---------|-------------|----------|
+| `hl7.fhir.r4.core` | FHIR R4 core specification | Base FHIR R4 resources |
+| `hl7.fhir.r5.core` | FHIR R5 core specification | Base FHIR R5 resources |
+| `hl7.fhir.us.core` | US Core Implementation Guide | US healthcare interoperability |
+| `hl7.fhir.uv.ips` | International Patient Summary | Global patient summaries |
+| `hl7.fhir.us.mcode` | Minimal Common Oncology Data Elements | Cancer care data |
+| `hl7.fhir.uv.smart-app-launch` | SMART Ascpp Launch | OAuth2-based app authorization |
+
+
 
 Fhircraft downloads the package contents, extracts all structure definitions, and makes them available through their canonical URLs. The first time you load a package, Fhircraft downloads it from the internet and caches it on your computer. This download might take a few seconds depending on the package size. Subsequent loads use the cached version and complete almost instantly
 
@@ -170,13 +181,13 @@ USCorePatient = factory.construct_resource_model(
     "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
 )
 
-IPSPatient = factory.construct_resource_model(
-    "http://hl7.org/fhir/us/core/StructureDefinition/mcode-cancer-patient"
+CancerPatient = factory.construct_resource_model(
+    "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient"
 )
 
 # Use both models
 us_patient = USCorePatient(name=[{"family": "Smith"}], gender="male")
-mcode_patient = IPSPatient(name=[{"family": "Jones"}], gender="female")
+mcode_patient = CancerPatient(name=[{"family": "Jones"}], gender="female")
 
 print(f"Loaded {len([USCorePatient, mcode_patient])} different patient types")
 ```

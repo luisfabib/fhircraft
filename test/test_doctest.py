@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock, mock_open
 from pathlib import Path
 
 from fhircraft.fhir.resources.factory import factory, ResourceFactory
-from fhircraft.fhir.resources.datatypes.R5.core import Patient, Observation
+from fhircraft.fhir.resources.datatypes.R5.core import Patient, Observation, Procedure, Condition
 from .mktestdocs import check_md_file
 
 # Store original methods before patching
@@ -46,10 +46,18 @@ def mock_construct_resource_model(self, canonical_url=None, structure_definition
     if canonical_url:
         if canonical_url == "http://example.org/StructureDefinition/MyPatient":
             return Patient
+        elif canonical_url == "http://example.org/StructureDefinition/CustomPatient":
+            return Patient
         elif canonical_url == "http://example.org/StructureDefinition/MyObservation":
             return Observation
-        elif canonical_url == "http://hl7.org/fhir/us/core/StructureDefinition/mcode-cancer-patient":
+        elif canonical_url == "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient":
             return Patient
+        elif canonical_url.startswith("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"):
+            return Patient
+        elif canonical_url.startswith("http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"):
+            return Condition
+        elif canonical_url.startswith("http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure"):
+            return Procedure
     return _original_construct_resource_model(self, canonical_url=canonical_url, structure_definition=structure_definition)
 
 
@@ -124,11 +132,6 @@ def mock_open_func(file, mode="r", *args, **kwargs):
 @patch("builtins.open", side_effect=mock_open_func)
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_documentation_examples(mock_file, fpath):
-    # Do not test documentation pages that include many abstract python examples
-    if fpath in [
-        pathlib.Path("docs") / "user-guide" / "resources-construction.md",
-    ]:
-        pytest.skip("Skipping documentation with invalid python examples.")
     check_md_file(fpath=fpath, memory=True)
 
 
