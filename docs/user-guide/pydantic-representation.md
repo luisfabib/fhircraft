@@ -391,7 +391,7 @@ patient.extension = [
     )
 ] # (2)!
 
-print(patient.extension[0].valueCodeableConcept.coding.code)  # (3)!
+print(patient.extension[0].valueCodeableConcept.coding[0].code)  # (3)!
 #> VIP
 ```
 
@@ -437,8 +437,8 @@ This approach ensures type safety while maintaining the flexibility that slicing
 !!! example "Working with sliced elements"
 
     ```python
-    from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel, BackboneElement
-    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept
+    from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept, BackboneElement
     from pydantic import Field
     from typing import Optional, List, Union, Annotated
 
@@ -486,10 +486,10 @@ This approach ensures type safety while maintaining the flexibility that slicing
 
     # Verify slice assignments
     print(type(observation.component[0]))  # (7)!
-    #> <class 'StringComponent'>
+    #> <class '__main__.StringComponent'>
     
     print(type(observation.component[1]))  # (8)!
-    #> <class 'IntegerComponent'>
+    #> <class '__main__.IntegerComponent'>
     
     print(observation.component[0].valueString)  # (9)!
     #> Normal
