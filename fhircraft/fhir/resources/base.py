@@ -48,7 +48,11 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     Expands the Pydantic [BaseModel](https://docs.pydantic.dev/latest/api/base_model/) class with FHIR-specific methods.
     """
 
-    model_config = ConfigDict(defer_build=True)
+    model_config = ConfigDict(
+        defer_build=True,
+        validate_by_alias=True,
+        validate_by_name=True,
+    )
     _fhir_release: ClassVar[str]
 
     # Configuration for polymorphic behavior

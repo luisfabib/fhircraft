@@ -408,7 +408,6 @@ class FHIRPath(ABC):
         }
         # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
-        print(environment)
         return self.evaluate(collection, environment or dict(), create)
 
     def _invoke(self, invocation: "FHIRPath") -> "FHIRPath":
