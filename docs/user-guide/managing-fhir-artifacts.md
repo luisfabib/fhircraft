@@ -44,7 +44,7 @@ patient = Patient(
 )
 
 print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
-#> Created patient: Alice Johnson
+#> Created patient: Maria Garcia
 ```
 
 ### Loading from Individual Files
