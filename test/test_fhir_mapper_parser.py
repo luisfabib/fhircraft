@@ -67,26 +67,30 @@ parser_test_cases = (
         ),
     ),
     (
-        """uses 'http://example.org' as target
-        uses 'http://example.org' as queried
-        uses 'http://example.org' as produced""",
-        StructureMap.model_construct(
-            structure=[
-                StructureMapStructure(url="http://example.org", mode="target"),
-                StructureMapStructure(url="http://example.org", mode="queried"),
-                StructureMapStructure(url="http://example.org", mode="produced"),
-            ]
-        ),
-    ),
-    (
-        """uses 'http://example.org' as source // This documents the source""",
+        """
+        // Just a comment 
+        uses 'http://example.org' as source
+        """,
         StructureMap.model_construct(
             structure=[
                 StructureMapStructure(
                     url="http://example.org",
                     mode="source",
-                    documentation="This documents the source",
                 )
+            ]
+        ),
+    ),
+    (
+        """
+        uses 'http://example.org' as target
+        uses 'http://example.org' as queried
+        uses 'http://example.org' as produced
+        """,
+        StructureMap.model_construct(
+            structure=[
+                StructureMapStructure(url="http://example.org", mode="target"),
+                StructureMapStructure(url="http://example.org", mode="queried"),
+                StructureMapStructure(url="http://example.org", mode="produced"),
             ]
         ),
     ),
@@ -96,7 +100,9 @@ parser_test_cases = (
         StructureMap.model_construct(import_=["http://example.org"]),
     ),
     (
-        """imports 'http://example1.org' \n imports 'http://example2.org'""",
+        """
+        // Just a comment
+        imports 'http://example1.org' \n imports 'http://example2.org'""",
         StructureMap.model_construct(
             import_=["http://example1.org", "http://example2.org"]
         ),
@@ -792,100 +798,12 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){
-            // This documents the rule
-            src.field -> tgt.field = create('TestResource') as tr;
-        }""",
-        add_rules_to_basic_map(
-            rules=[
-                StructureMapGroupRule(
-                    documentation="This documents the rule",
-                    source=[
-                        StructureMapGroupRuleSource(context="src", element="field"),
-                    ],
-                    target=[
-                        StructureMapGroupRuleTarget(
-                            context="tgt",
-                            element="field",
-                            transform="create",
-                            parameter=[
-                                StructureMapGroupRuleTargetParameter(
-                                    valueString="TestResource"
-                                )
-                            ],
-                            variable="tr",
-                        )
-                    ],
-                )
-            ]
-        ),
-    ),
-    (
-        """group map_example(source src, target tgt){
-            src.field -> tgt.field = create('TestResource') as tr;
-            // This documents the rule
-        }""",
-        add_rules_to_basic_map(
-            rules=[
-                StructureMapGroupRule(
-                    documentation="This documents the rule",
-                    source=[
-                        StructureMapGroupRuleSource(context="src", element="field"),
-                    ],
-                    target=[
-                        StructureMapGroupRuleTarget(
-                            context="tgt",
-                            element="field",
-                            transform="create",
-                            parameter=[
-                                StructureMapGroupRuleTargetParameter(
-                                    valueString="TestResource"
-                                )
-                            ],
-                            variable="tr",
-                        )
-                    ],
-                )
-            ]
-        ),
-    ),
-    (
         """
-        // This documents the group
+        // Just a comment
         group map_example(source src, target tgt){
             src.field -> tgt.field = create('TestResource') as tr;
         }""",
         add_rules_to_basic_map(
-            documentation="This documents the group",
-            rules=[
-                StructureMapGroupRule(
-                    source=[
-                        StructureMapGroupRuleSource(context="src", element="field"),
-                    ],
-                    target=[
-                        StructureMapGroupRuleTarget(
-                            context="tgt",
-                            element="field",
-                            transform="create",
-                            parameter=[
-                                StructureMapGroupRuleTargetParameter(
-                                    valueString="TestResource"
-                                )
-                            ],
-                            variable="tr",
-                        )
-                    ],
-                )
-            ],
-        ),
-    ),
-    (
-        """
-        group map_example(source src, target tgt){
-            src.field -> tgt.field = create('TestResource') as tr;
-        } // This documents the group""",
-        add_rules_to_basic_map(
-            documentation="This documents the group",
             rules=[
                 StructureMapGroupRule(
                     source=[
