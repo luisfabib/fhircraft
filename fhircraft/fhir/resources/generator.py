@@ -1,4 +1,5 @@
 import functools
+import inspect
 import os
 import re
 from collections import defaultdict
@@ -46,6 +47,44 @@ class CodeGenerator:
         self._processing_models = (
             set()
         )  # Track models being processed to prevent infinite recursion
+
+    def _extract_default_factory_code(self, default_factory: Any) -> str:
+        """
+        Extract the code representation for a default_factory.
+
+        Args:
+            default_factory: The default_factory function or class
+
+        Returns:
+            str: The code representation of the default_factory
+        """
+        # Handle built-in types
+        if default_factory in (list, dict, set, tuple, frozenset):
+            return default_factory.__name__
+
+        try:
+            # Try to get source code and extract lambda
+            source = inspect.getsource(default_factory)
+            # Use regex to extract lambda expression more simply
+            import ast
+
+            # Find the lambda pattern and extract it
+            match = re.search(r"lambda:\s*.*?(?=\s*[,)])", source, re.DOTALL)
+            if match:
+                lambda_code = match.group(0).strip()
+                # Validate it's valid Python by trying to parse it
+                try:
+                    ast.parse(lambda_code, mode="eval")
+                    return lambda_code
+                except SyntaxError:
+                    pass
+
+            # If regex fails or lambda is malformed, fall back to repr()
+            return f"lambda: {repr(default_factory())}"
+
+        except (OSError, TypeError, AttributeError):
+            # For built-ins or when source is unavailable
+            return f"lambda: {repr(default_factory())}"
 
     def _cleanup_function_argument(self, arg: Any) -> Any:
         """
@@ -142,9 +181,9 @@ class CodeGenerator:
                     "set": "Set",
                 }
                 typing_name = typing_name_map.get(origin_name, origin_name)
-                if typing_name not in self.import_statements["typing"]:
+                if typing_name and typing_name not in self.import_statements["typing"]:
                     self.import_statements["typing"].append(typing_name)
-        
+
         # Get the type object
         if hasattr(annotation, "annotation"):
             type_obj = annotation.annotation
@@ -157,13 +196,12 @@ class CodeGenerator:
             if isinstance(type_obj, type):
                 try:
                     module_name = get_module_name(type_obj)
-                    is_factory_basemodel = (
-                        module_name == FACTORY_MODULE
-                        and issubclass(type_obj, BaseModel)
+                    is_factory_basemodel = module_name == FACTORY_MODULE and issubclass(
+                        type_obj, BaseModel
                     )
                 except (TypeError, AttributeError):
                     pass
-            
+
             if is_factory_basemodel:
                 # If object was created by ResourceFactory, then serialize the model
                 # But only if we're not already processing it (to prevent infinite recursion)
@@ -316,7 +354,9 @@ class CodeGenerator:
                 elif info.default is not PydanticUndefined:
                     default = repr(info.default)
                 elif info.default_factory is not None:
-                    default_factory = info.default_factory
+                    default_factory = self._extract_default_factory_code(
+                        info.default_factory
+                    )
 
                 subdata[field] = {
                     "annotation": annotation_string,
@@ -334,22 +374,24 @@ class CodeGenerator:
                         raise ValueError(
                             f"Property {key} does not have a getter function."
                         )
-                    if not isinstance(value.fget, functools.partial):  # type: ignore
-                        raise ValueError(
-                            f"Only partial functions are supported for properties in the code generator. Property {key} uses {type(value.fget)}."
+                    if isinstance(value.fget, functools.partial):  # type: ignore
+                        self._add_import_statement(value.fget.func)
+                        model_properties[key] = dict(
+                            func=value.fget.func,
+                            args=[
+                                self._cleanup_function_argument(arg)
+                                for arg in value.fget.args
+                            ],
+                            keywords={
+                                k: self._cleanup_function_argument(v)
+                                for k, v in value.fget.keywords.items()
+                            },
                         )
-                    self._add_import_statement(value.fget.func)
-                    model_properties[key] = dict(
-                        func=value.fget.func,
-                        args=[
-                            self._cleanup_function_argument(arg)
-                            for arg in value.fget.args
-                        ],
-                        keywords={
-                            k: self._cleanup_function_argument(v)
-                            for k, v in value.fget.keywords.items()
-                        },
-                    )
+                    else:
+                        # Handle regular functions (not partial)
+                        # Skip properties that are not partial functions as they likely come from inheritance
+                        # or are defined differently and don't need to be regenerated
+                        continue
 
             inherited_validator_functions = [
                 getattr(v.func, "__func__", v.func)
@@ -379,20 +421,19 @@ class CodeGenerator:
                             key: self._cleanup_function_argument(arg)
                             for key, arg in validation_function.keywords.items()
                         }
+                        validators[name] = dict(
+                            mode=mode,
+                            info=validator.info,
+                            func=validation_function.func,
+                            args=func_args,
+                            keywords=func_kwargs,
+                        )
                     else:
                         if validation_function in inherited_validator_functions:
                             continue  # Skip inherited validators
-                        raise ValueError(
-                            "Only partial functions are supported for validators in the code generator."
-                        )
-
-                    validators[name] = dict(
-                        mode=mode,
-                        info=validator.info,
-                        func=validation_function.func,
-                        args=func_args,
-                        keywords=func_kwargs,
-                    )
+                        # Skip validators that are not partial functions as they likely come from inheritance
+                        # or are defined differently and don't need to be regenerated
+                        continue
 
             self.data.update(
                 {
@@ -490,7 +531,7 @@ class CodeGenerator:
         # This handles patterns like "fhircraft.fhir.resources.factory.ClassName("
         factory_pattern = re.escape(FACTORY_MODULE) + r"\."
         source_code = re.sub(factory_pattern, "", source_code)
-        
+
         # Clean up module prefixes for ALL imported objects from repr() output
         # For each module with imports, remove the module. prefix for its objects
         for module, objects in self.import_statements.items():
@@ -500,20 +541,20 @@ class CodeGenerator:
                 module_variants = [module]
                 if len(module_parts) > 1:
                     module_variants.append(module_parts[-1])
-                
+
                 for module_part in module_variants:
                     for obj in objects:
                         # Replace module.ObjectName with ObjectName (word boundaries to avoid partial matches)
                         source_code = re.sub(
                             rf"\b{re.escape(module_part)}\.{re.escape(obj)}\b",
                             obj,
-                            source_code
+                            source_code,
                         )
-        
+
         # Special cleanup for typing module - remove typing. prefix for common constructs
         # This handles Optional, Union, List, etc. which may appear in repr() but not all in imports
-        source_code = re.sub(r'\btyping\.', '', source_code)
-        
+        source_code = re.sub(r"\btyping\.", "", source_code)
+
         source_code = source_code.replace(LEFT_TO_RIGHT_COMPLEX, LEFT_TO_RIGHT_SIMPLE)
         return source_code
 
