@@ -136,12 +136,11 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         r"\/\/\/"
         return t
 
-    def t_DOCUMENTATION(self, t):
+    def t_ignore_DOCUMENTATION(self, t):
         r"\/{2}(.*)"
         for substring in ["//", "/*", "*/"]:
             t.value = t.value.replace(substring, "")
         t.value = t.value.strip()
-        return t
 
     def t_RIGHT_ARROW(self, t):
         r"->"
