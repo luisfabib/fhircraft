@@ -11,7 +11,10 @@ token_test_cases = (
     # -------- Environmental Operators -----------
     ("%resource", (("%resource", "ENVIRONMENTAL_VARIABLE"),)),
     ("%context", (("%context", "ENVIRONMENTAL_VARIABLE"),)),
-    ("%`custom-named-variable`", (("%`custom-named-variable`", "ENVIRONMENTAL_VARIABLE"),)),
+    (
+        "%`custom-named-variable`",
+        (("%`custom-named-variable`", "ENVIRONMENTAL_VARIABLE"),),
+    ),
     # ----------------- Symbols -----------------
     (".", ((".", "."),)),
     (",", ((",", ","),)),
@@ -25,6 +28,12 @@ token_test_cases = (
     (")", ((")", ")"),)),
     ("}", (("}", "}"),)),
     ("{", (("{", "{"),)),
+    # ----------------- Escaped Unicode Strings ------------------
+    ("'\"'", (('"', "STRING"),)),
+    ("'\r'", (("\r", "STRING"),)),
+    ("'\n'", (("\n", "STRING"),)),
+    ("'\t'", (("\t", "STRING"),)),
+    ("'\f'", (("\f", "STRING"),)),
     # ----------------- Literals -----------------
     ("// comment line", ()),
     ("/* multiline \n comment */", ()),
