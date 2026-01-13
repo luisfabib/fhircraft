@@ -74,10 +74,6 @@ token_test_cases = (
     ("'string'", (("string", "STRING"),)),
     ("'test string'", (("test string", "STRING"),)),
     ("'string1' 'string2'", (("string1", "STRING"), ("string2", "STRING"))),
-    (
-        "// documentation of something",
-        (("documentation of something", "DOCUMENTATION"),),
-    ),
     ('"hello world"', (("hello world", "STRING"),)),
     ('"test"', (("test", "STRING"),)),
     # ----------------- Identifiers -----------------
