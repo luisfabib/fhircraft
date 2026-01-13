@@ -1,6 +1,7 @@
 import unittest
 from functools import partial
 from typing import List, Optional
+import pytest
 
 from pydantic import BaseModel, Field
 from pydantic import create_model as _create_model
@@ -626,4 +627,45 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         self.assertNotIn(
             "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
             code,
+        )
+
+
+@pytest.mark.parametrize(
+    "model",
+    [
+        "Patient",
+        "Observation",
+        "Condition",
+        "MedicationRequest",
+        "Encounter",
+        "Practitioner",
+        "AllergyIntolerance",
+        "Procedure",
+        "Immunization",
+        "DiagnosticReport",
+        "CarePlan",
+        "ServiceRequest",
+        "FamilyMemberHistory",
+        "Device",
+        "Goal",
+        "Specimen",
+        "StructureDefinition",
+    ],
+)
+def test_code_generates_for_builtin_models(model):
+    """Test that code generation works for built-in FHIR resource models."""
+    from fhircraft.fhir.resources.datatypes.R5 import core
+
+    # Generate code for Patient model
+    code = generate_resource_model_code(getattr(core, model))
+
+    # Check for some expected elements in the generated code
+    assert f"class {model}(DomainResource):" in code
+
+    # Fake compile to ensure no syntax errors
+    try:
+        compile(code, "<generated>", "exec")
+    except SyntaxError as e:
+        pytest.fail(
+            f"Generated code for {model} has syntax error: {e}\n\nGenerated code:\n{code}"
         )
