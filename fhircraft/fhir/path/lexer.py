@@ -412,7 +412,7 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
         # The String type represents string values up to 231-1 characters in length. String
         # literals are surrounded by single-quotes and may use \-escapes to escape quotes
         # and represent Unicode characters
-        r"\'([^\']*)?\'"
+        r"\'((?:[^\'\\]|\\.)*)\'"
         t.value = t.value.strip("'")
         return t
 
