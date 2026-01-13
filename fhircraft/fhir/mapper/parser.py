@@ -348,13 +348,6 @@ class FhirMappingLanguageParser(FhirPathParser):
         """
         self._parse_list_tokens(p)
 
-    def p_mapper_documented_structure(self, p):
-        """
-        m_structure : m_structure DOCUMENTATION
-        """
-        p[1].documentation = p[2]
-        p[0] = p[1]
-
     def p_mapper_structure(self, p):
         """
         m_structure : USES m_url m_structureAlias AS m_model_mode
@@ -392,19 +385,6 @@ class FhirMappingLanguageParser(FhirPathParser):
         m_const : LET m_identifier EQUAL m_fhirpath ';'
         """
         p[0] = StructureMapConst(name=p[2], value=str(p[4]))
-
-    def p_mapper_group_documentation(self, p):
-        """
-        m_group : DOCUMENTATION m_group
-                | m_group DOCUMENTATION
-        """
-        if isinstance(p[1], StructureMapGroup):
-            group = p[1]
-            group.documentation = p[2]
-        else:
-            group = p[2]
-            group.documentation = p[1]
-        p[0] = group
 
     def p_mapper_extending_group(self, p):
         """
@@ -510,23 +490,10 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_mapper_rule_list(self, p):
         """
         m_rule_list : m_rule_delimited
-                    | m_documented_rule
                     | m_rule_list m_rule_delimited
-                    | m_rule_list m_documented_rule
                     | m_empty
         """
         self._parse_list_tokens(p)
-
-    def p_mapper_rule_documentation(self, p):
-        """
-        m_documented_rule : DOCUMENTATION m_rule_delimited
-                          | m_rule_delimited DOCUMENTATION
-        """
-        rule, doc = (
-            (p[1], p[2]) if isinstance(p[1], StructureMapGroupRule) else (p[2], p[1])
-        )
-        rule.documentation = doc
-        p[0] = rule
 
     def p_mapper_rule_delimited(self, p):
         """
@@ -578,7 +545,8 @@ class FhirMappingLanguageParser(FhirPathParser):
                             source_var + "target_"
                             if f"_{element}_" == source_var
                             or f"_{context}_" == source_var
-                            or f"_{(subelement := target_path.get('subelements', [None])[-1])}_" == source_var
+                            or f"_{(subelement := target_path.get('subelements', [None])[-1])}_"
+                            == source_var
                             else f"_{subelement or element or context}_"
                         )
                     ),
@@ -636,7 +604,7 @@ class FhirMappingLanguageParser(FhirPathParser):
             target.listMode = data.get("listMode")
             target.transform = data.get("transform")
             target.parameter = data.get("parameter")
-            
+
         _rule.dependent = dependent.get("dependent") if dependent else None
         if dependent_rule := dependent.get("rule"):
             _rule.rule = _rule.rule or []
@@ -1035,7 +1003,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         m_fhirpath : expression
         """
         expr = str(p[1])
-        p[0] = expr.strip('\'') if expr.startswith('\'') and expr.endswith('\'') else expr
+        p[0] = expr.strip("'") if expr.startswith("'") and expr.endswith("'") else expr
 
     def p_mapper_url(self, p):
         """
