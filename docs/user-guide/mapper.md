@@ -4,17 +4,21 @@ This guide shows you how to convert data between different structures using FHIR
 
 ## What Is FHIR Mapping
 
-Healthcare data exists in countless formats across different systems, databases, and file structures. Converting this data into standardized FHIR resources manually would require writing custom transformation code for each source format, leading to maintenance challenges and inconsistent implementations. FHIR Mapping Language provides a standardized, declarative way to describe these transformations.
+Healthcare data exists in countless formats across different systems, databases, and file structures. Converting this data into standardized FHIR resources manually would require writing custom transformation code for each source format, leading to maintenance challenges and inconsistent implementations. 
 
 Fhircraft implements the [:material-fire: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html) specification, which lets you write transformation rules that describe what the end result should look like rather than step-by-step instructions on how to build it. The mapper executes these rules, handles data type conversions, manages nested structures, and automatically validates output against FHIR specifications. This approach separates transformation logic from application code, making it easier to maintain, audit, and share mapping rules.
 
-The mapping language is particularly valuable in healthcare integration scenarios where you need repeatable, auditable transformations. Every mapped resource is automatically validated using the resource models discussed in earlier sections, ensuring that transformed data complies with FHIR constraints before it reaches your application. However, note that the FHIR Mapping Language is specified as [:material-fire: Maturity Level 0 (Draft)](https://hl7.org/fhir/versions.html#maturity), meaning both the specification and implementations may change as the standard evolves.
+The mapping language is particularly valuable in healthcare integration scenarios where you need repeatable, auditable transformations. Every mapped resource is automatically validated using the resource models discussed in earlier sections, ensuring that transformed data complies with FHIR constraints before it reaches your application. 
+
+!!! warning "Maturity Level 0 (Draft)"
+
+    The FHIR Mapping Language is specified as [:material-fire: Maturity Level 0 (Draft)](https://hl7.org/fhir/versions.html#maturity), meaning both the specification and implementations may change as the standard evolves.
 
 ## Basic Data Transformation
 
-The simplest way to understand FHIR mapping is through a complete example that transforms legacy patient data into a standard FHIR Patient resource. This example demonstrates the core concepts: defining the mapping, writing transformation rules, and executing the transformation.
+The simplest way to understand FHIR mapping is through a complete example that transforms legacy patient data into a standard [:material-fire: FHIR Patient](https://www.hl7.org/fhir/patient.html) resource. This example demonstrates the core concepts: defining the mapping, writing transformation rules, and executing the transformation.
 
-Legacy systems often use different field names and value formats than FHIR expects. The mapping script below shows how to convert a simple patient record with fields like firstName and sex into a FHIR-compliant Patient resource with the proper structure:
+Legacy systems often use different field names and value formats than FHIR expects. The mapping script below shows how to convert a simple patient record with fields like `firstName` and `sex` into a FHIR-compliant [:material-fire: Patient](https://www.hl7.org/fhir/patient.html) resource with the proper structure:
 
 ```python
 # Import the FHIR mapper
@@ -52,15 +56,20 @@ targets = mapper.execute_mapping(mapping_script, legacy_patient)
 patient = targets[0]  # Get the transformed Patient resource
 
 print(f"Transformed: {patient}")
+#> Transformed: {'name': {'given': 'Alice', 'family': 'Johnson'}, 'birthDate': '1985-03-15'}
 ```
 
 ## Understanding Mapping Benefits and Use Cases
 
-FHIR Mapping Language provides advantages over writing custom transformation code in several important ways. The declarative approach means you describe what data should look like in the target format rather than writing step-by-step instructions. This makes mapping rules more readable and easier for non-programmers to understand and review. Healthcare domain experts can often read and verify mapping logic without deep programming knowledge.
+The [:material-fire: FHIR Mapping Language](https://hl7.org/fhir/mapping-language.html) provides advantages over writing custom transformation code in several important ways. The declarative approach means you describe what data should look like in the target format rather than writing step-by-step instructions. This makes mapping rules more readable and easier for non-programmers to understand and review. Healthcare domain experts can often read and verify mapping logic without deep programming knowledge.
 
-Automatic validation is built into every transformation. The mapper validates output against [:material-fire: FHIR Constraints and Invariants](https://www.hl7.org/fhir/conformance-rules.html#constraints) as resources are constructed, catching structural errors and data quality issues before they propagate through your system. This validation uses the same resource models covered in earlier sections, ensuring consistency across your application.
+!!! tip "Mapping Beyond FHIR Resources"
 
-Mapping rules are also portable and reusable. Because they follow the standard FHIR specification, you can share mapping definitions between systems and organizations. A mapping you create can work in other FHIR implementations, and mappings created by others can work in Fhircraft. This interoperability reduces duplication and promotes consistent transformation logic across the healthcare ecosystem.
+    The mapping engine is not limited to FHIR-defined structures. You can use the same mapping language to transform between any arbitrary data formats, making it a versatile tool for general data integration tasks. The automatic validation and declarative syntax benefits apply whether your targets are FHIR resources or custom data structures.
+
+Automatic validation is built into every transformation. If the transformation product is a FHIR resource, the mapper validates output against [:material-fire: FHIR Constraints and Invariants](https://www.hl7.org/fhir/conformance-rules.html#constraints) as resources are constructed, catching structural errors and data quality issues before they propagate through your system. This validation uses the same resource models covered in earlier sections, ensuring consistency across your application.
+
+Mapping rules are also portable, reusable, and can be easily version-controlled. Because they follow the standard FHIR specification, you can share mapping definitions between systems and organizations. A mapping you create can work in other FHIR implementations, and mappings created by others can work in Fhircraft and any other services supporting FHIR mapping. This interoperability reduces duplication and promotes consistent transformation logic across the healthcare ecosystem.
 
 ### Choosing When to Use Mapping
 
@@ -76,7 +85,7 @@ The map declaration identifies the mapping with a unique URL and human-readable 
 
 ### Direct Field Mapping
 
-The simplest transformation type copies values directly from source fields to target fields without modification. This approach works when source and target use compatible data types and the values need no transformation. The mapping syntax uses arrows to indicate data flow from left to right:
+The simplest transformation type copies values directly from source fields to target fields without modification. This [:material-fire:  Identitty Transform](https://build.fhir.org/mapping-language.html#simple) approach works when source and target use compatible data types and the values need no transformation.
 
 ```python
 from fhircraft.fhir.mapper import FHIRMapper
@@ -100,7 +109,8 @@ source_data = {"name": "John Doe", "age": 30, "email": "john@example.com"}
 mapper = FHIRMapper()
 targets = mapper.execute_mapping(script, source_data)
 
-print(f"Result: {targets[0]}")
+print(f"Transformed: {targets[0]}")
+#> Transformed: {'fullName': 'John Doe', 'yearsOld': 30, 'contactEmail': 'john@example.com'}
 ```
 
 ### Mapping to FHIR Resources
@@ -142,7 +152,8 @@ legacy_data = {
 targets = mapper.execute_mapping(script, legacy_data)
 patient = targets[0]  # This is a validated FHIR Patient resource
 
-print(f"Patient ID: {patient.id}")
+print(f"Transformed: {patient}")
+#> Transformed: {'name': {'given': 'Alice', 'family': 'Johnson'}, 'birthDate': '1985-03-15'}
 ```
 
 ## Handling Complex Transformations
@@ -151,7 +162,7 @@ Real-world data transformations often involve nested structures, collections, an
 
 ### Working with Nested Structures
 
-FHIR resources organize data hierarchically. A Patient has name objects, which contain given and family elements. Addresses have line arrays, city, state, and postal code fields. The mapping language uses the then keyword to navigate into these nested structures, creating intermediate objects as needed.
+FHIR resources organize data hierarchically. The mapping language uses the `then` keyword to create [:material-fire: Dependent Rules](https://build.fhir.org/mapping-language.html#dep-rules) that allow navigation into these nested structures, creating intermediate objects as needed.
 
 When you map into a nested structure, the mapper creates the parent objects automatically. You do not need to explicitly construct each level of the hierarchy. The transformation rules describe the desired final structure, and the mapper builds it appropriately:
 
@@ -198,6 +209,10 @@ source_data = {
 }
 
 targets = mapper.execute_mapping(script, source_data)
+patient = targets[0] 
+
+print(f"Transformed: {patient}")
+#> Transformed: {'name': {'text': 'Alice Johnson', 'given': 'Alice', 'family': 'Johnson'}, 'telecom': {'value': '555-0123', 'system': 'phone'}}
 ```
 
 ### Organizing with Multiple Groups
@@ -331,38 +346,6 @@ structure_map = mapper.load_structure_map(
 # Execute mapping loaded from URL
 targets = mapper.execute_mapping(structure_map, source_data)
 ```
-
-## Handling Mapping Errors
-
-Mapping failures can occur for several reasons: invalid mapping syntax, missing source fields, data type mismatches, or FHIR validation failures. Understanding these error types helps you diagnose and fix transformation problems quickly. The mapper provides detailed error information including which rule failed and what data was being processed.
-
-Mapping errors occur when transformation rules cannot execute, such as when source data lacks required fields or when conditional expressions evaluate incorrectly. Validation errors occur when the transformed output violates FHIR constraints. Both error types provide context to help you identify and resolve the problem:
-
-```python
-from fhircraft.fhir.mapper import FHIRMapper
-from fhircraft.fhir.mapper.engine.exceptions import MappingError
-from pydantic import ValidationError
-
-mapper = FHIRMapper()
-
-try:
-    # Attempt the mapping transformation
-    targets = mapper.execute_mapping(structure_map, source_data)
-    patient = targets[0]
-    
-except MappingError as e:
-    # Mapping execution failed
-    print(f"Mapping failed: {e}")
-    print(f"Failed rule: {e.rule_path}")  # Which rule caused the error
-    print(f"Data context: {e.context}")   # What data was being processed
-    
-except ValidationError as e:
-    # Output failed FHIR validation
-    print(f"FHIR validation failed: {e}")
-    print(f"Invalid fields: {e.errors()}")  # Which fields are invalid
-```
-
-When debugging mapping failures, examine the error message and context carefully. The rule path shows which transformation rule failed, while the context shows the actual data being processed. This information helps you identify whether the problem is incorrect mapping logic or unexpected source data.
 
 ## Common Problems and Solutions
 

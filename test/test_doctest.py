@@ -41,7 +41,7 @@ def mock_configure_repository(self, directory=None, files=None, definitions=None
     else: 
         raise ValueError("Either directory/files or definitions must be provided.")
     
-def mock_construct_resource_model(self, canonical_url=None, structure_definition=None):
+def mock_construct_resource_model(self, canonical_url=None, structure_definition=None, mode=None):
     """Mock construct_resource_model"""
     if canonical_url:
         if canonical_url == "http://example.org/StructureDefinition/MyPatient":
@@ -58,7 +58,7 @@ def mock_construct_resource_model(self, canonical_url=None, structure_definition
             return Condition
         elif canonical_url.startswith("http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure"):
             return Procedure
-    return _original_construct_resource_model(self, canonical_url=canonical_url, structure_definition=structure_definition)
+    return _original_construct_resource_model(self, canonical_url=canonical_url, structure_definition=structure_definition, mode=mode)
 
 
 def mock_load_structure_map(self, source):

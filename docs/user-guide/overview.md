@@ -1,88 +1,123 @@
 # Overview
 
-Welcome to the comprehensive Fhircraft User Guide. This guide is designed for developers who want to leverage FHIR (Fast Healthcare Interoperability Resources) in Python applications using type-safe, validated Pydantic models.
-
-## What You'll Learn
-
-Fhircraft enables you to:
-
-- **Build Type-Safe FHIR Models** from specifications and implementation guides
-- **Query and Navigate** FHIR resources using the standard FHIRPath language
-- **Transform Data** between different structures using FHIR Mapping Language
-- **Validate Healthcare Data** with automatic FHIR compliance checking
-- **Integrate FHIR** seamlessly into modern Python applications
-
-## Choose Your Learning Path
-
-### New to Fhircraft?
-**Start here if you're beginning your Fhircraft journey:**
-
-1. **[Installation](../quickstart/installation.md)** - Get Fhircraft running in your environment
-2. **[Basics Tutorial](../quickstart/quickstart.md)** - Your first FHIR models and resources
-3. **[FHIR Resources Overview](resources-overview.md)** - Understanding Fhircraft's approach to FHIR
-
-### Building FHIR Applications?
-**Follow this path for application development:**
-
-1. **[FHIR Resources Overview](resources-overview.md)** - Core concepts and architecture
-2. **[Pydantic FHIR](pydantic-representation.md)** - How FHIR maps to Python types
-3. **[Resource Models](resources-models.md)** - Working with FHIR resource instances
-4. **[Resource Factory](resources-construction.md)** - Advanced model construction patterns
-
-### Working with FHIR Data?
-**Focus on querying and data manipulation:**
-
-1. **[Resource Models](resources-models.md)** - Creating and validating FHIR resources
-2. **[FHIR Path](fhirpath.md)** - Querying resources with FHIRPath expressions
-3. **[FHIR Mapper](mapper.md)** - Transforming data between structures
-
-### Integrating Legacy Systems?
-**Emphasize data transformation and validation:**
-
-1. **[FHIR Mapper](mapper.md)** - Convert legacy data to FHIR resources
-2. **[Resource Factory](resources-construction.md)** - Loading custom profiles and packages
-3. **[Resource Models](resources-models.md)** - Validation and error handling patterns
-
-## Feature Overview
-
-### FHIR Resources
-Transform FHIR specifications into working Python code with full type safety and validation.
-
-| Feature | Description | Learn More |
-|---------|-------------|------------|
-| **Pydantic Models** | FHIR resources as validated Python classes | [Pydantic FHIR](pydantic-representation.md) |
-| **Resource Construction** | Build models from specifications and packages | [Resource Factory](resources-construction.md) |
-| **Data Validation** | Automatic FHIR compliance and constraint checking | [Resource Models](resources-models.md) |
-
-### FHIR Path
-Query and navigate FHIR resources using the standard FHIRPath expression language.
-
-| Feature | Description | Learn More |
-|---------|-------------|------------|
-| **Path Expressions** | Extract data using familiar path-based syntax | [FHIR Path](fhirpath.md) |
-| **Resource Integration** | Built-in FHIRPath methods on all Fhircraft models | [FHIR Path](fhirpath.md) |
-| **Complex Queries** | Support for filtering, aggregation, and transformation | [FHIR Path](fhirpath.md) |
-
-### FHIR Mapper
-Transform data between different structures using declarative mapping rules.
-
-| Feature | Description | Learn More |
-|---------|-------------|------------|
-| **Mapping Language** | Official FHIR Mapping Language implementation | [FHIR Mapper](mapper.md) |
-| **Legacy Integration** | Convert existing data formats to FHIR resources | [FHIR Mapper](mapper.md) |
-| **Validation** | Automatic validation of transformed data | [FHIR Mapper](mapper.md) |
-
-## Getting Help
-
-### Documentation
-- **This User Guide** - Comprehensive feature documentation
-- **[API Reference](../reference/fhir-resources-base.md)** - Detailed method and class documentation
-- **[Pydantic Docs](https://docs.pydantic.dev/latest/)** - Learn about the underlying validation framework
-
-### Community
-- **[GitHub Issues](https://github.com/luisfabib/fhircraft/issues)** - Report bugs and request features
-- **[GitHub Discussions](https://github.com/luisfabib/fhircraft/discussions)** - Ask questions and share ideas
+Welcome to the Fhircraft user guide. This comprehensive documentation shows you how to work with [:material-fire: FHIR](https://hl7.org/fhir/) healthcare data in Python using type-safe [:simple-pydantic: Pydantic](https://docs.pydantic.dev/) models.
 
 ---
 
-**Ready to start?** Choose your learning path above or jump directly to [FHIR Resources Overview](resources-overview.md) to begin building with Fhircraft.
+## :material-map-outline: Quick Navigation
+
+<div class="grid cards" markdown>
+
+-   :material-lightning-bolt:{ .lg .middle } __Getting Started__
+
+    ---
+
+    New to Fhircraft? Start here to learn the basics.
+
+    [:octicons-arrow-right-24: Quick Start](../quickstart/quickstart.md)
+
+-   :simple-pydantic:{ .lg .middle } __FHIR & Pydantic__
+
+    ---
+
+    Understand how FHIR structures map to Python types.
+
+    [:octicons-arrow-right-24: Pydantic Representation](pydantic-representation.md)
+
+-   :material-database:{ .lg .middle } __Working with Resources__
+
+    ---
+
+    Create, validate, and serialize FHIR resources.
+
+    [:octicons-arrow-right-24: Resource Models](resources-models.md)
+
+-   :material-factory:{ .lg .middle } __Building Custom Models__
+
+    ---
+
+    Construct models from profiles and implementation guides.
+
+    [:octicons-arrow-right-24: Model Construction](resources-construction.md)
+
+</div>
+
+---
+
+## :material-tools: Core Features
+
+<div class="grid cards" markdown>
+
+-   :material-code-json:{ .lg .middle } __FHIRPath Querying__
+
+    ---
+
+    Query and extract data from FHIR resources using standard FHIRPath expressions.
+
+    [:octicons-arrow-right-24: Learn FHIRPath](fhirpath.md)
+
+-   :material-swap-horizontal:{ .lg .middle } __Data Transformation__
+
+    ---
+
+    Transform legacy data into FHIR resources using the FHIR Mapping Language.
+
+    [:octicons-arrow-right-24: FHIR Mapper](mapper.md)
+
+-   :material-package-variant:{ .lg .middle } __Managing Artifacts__
+
+    ---
+
+    Load and organize structure definitions, packages, and implementation guides.
+
+    [:octicons-arrow-right-24: FHIR Artifacts](managing-fhir-artifacts.md)
+
+-   :material-cog:{ .lg .middle } __Configuration__
+
+    ---
+
+    Control validation behavior and customize Fhircraft settings.
+
+    [:octicons-arrow-right-24: Configuration](configuration.md)
+
+</div>
+
+---
+
+## :material-help-circle: Additional Resources
+
+<div class="grid cards" markdown>
+
+-   :material-fire:{ .lg .middle } __FHIR Specification__
+
+    ---
+
+    Official FHIR documentation and standards.
+
+    [:octicons-arrow-right-24: hl7.org/fhir](https://hl7.org/fhir/)
+
+-   :simple-pydantic:{ .lg .middle } __Pydantic Documentation__
+
+    ---
+
+    Learn about the validation framework behind Fhircraft.
+
+    [:octicons-arrow-right-24: docs.pydantic.dev](https://docs.pydantic.dev/)
+
+-   :material-api:{ .lg .middle } __API Reference__
+
+    ---
+
+    Detailed technical documentation for all classes and methods.
+
+    [:octicons-arrow-right-24: API Docs](/reference/fhir-resources-base/)
+
+-   :material-github:{ .lg .middle } __GitHub Repository__
+
+    ---
+
+    Source code, issues, discussions, and contributions.
+
+    [:octicons-arrow-right-24: luisfabib/fhircraft](https://github.com/luisfabib/fhircraft)
+
+</div>

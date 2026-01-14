@@ -192,7 +192,6 @@ patient = targets[0]
 
 For more detailed information on specific topics:
 
-- **[Complete Tutorial](tutorial.md)** - Build a healthcare application step-by-step
 - **[User Guide](../user-guide/overview.md)** - Comprehensive documentation of all features
 - **[FHIRPath Guide](../user-guide/fhirpath.md)** - Query FHIR data with expressions
 - **[Mapper Guide](../user-guide/mapper.md)** - Transform data between formats
@@ -204,6 +203,5 @@ For external documentation:
 
 For community support:
 
-- **[FAQ](../community/faq.md)** - Common questions and answers
 - **[GitHub Discussions](https://github.com/luisfabib/fhircraft/discussions)** - Ask questions and share ideas
 - **[GitHub Issues](https://github.com/luisfabib/fhircraft/issues)** - Report bugs or request features
