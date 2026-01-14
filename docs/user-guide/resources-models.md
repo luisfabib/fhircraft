@@ -351,7 +351,7 @@ Pydantic models use [Python descriptors](https://docs.pydantic.dev/latest/concep
 
 !!! tip "Accessing Nested Data with FHIRPath"
 
-    Due to the complex and nested structure of FHIR resources, accessing deeply-nested attributes can be cumbersome and can be simplified by using [FHIRPath queries](../fhirpath.md). 
+    Due to the complex and nested structure of FHIR resources, accessing deeply-nested attributes can be cumbersome and can be simplified by using [FHIRPath queries](./fhirpath.md). 
 
 ### Updating Resource Data Recipe
 
@@ -400,7 +400,7 @@ Pydantic's [validators run on assignment](https://docs.pydantic.dev/latest/conce
 
 !!! tip "Simplifying Deep Updates with FHIRPath"
 
-    When modifying deeply-nested values in complex resources, standard Python attribute access can become verbose. Fhircraft offers a more concise alternative through [FHIRPath-based updates](../fhirpath.md), allowing you to target and modify specific elements using path expressions.
+    When modifying deeply-nested values in complex resources, standard Python attribute access can become verbose. Fhircraft offers a more concise alternative through [FHIRPath-based updates](./fhirpath.md), allowing you to target and modify specific elements using path expressions.
 
 
 ## Data Export

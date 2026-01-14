@@ -178,7 +178,7 @@ For further information see the [Installation Guide](quickstart/installation.md)
 
 
 [Read the Guide](user-guide/overview.md){ .md-button .md-button--primary }
-[Technical Reference](quickstart/reference/fhir-resources-base/.md){ .md-button }
+[Technical Reference](reference/fhir-resources-base.md){ .md-button }
 [material-github: GitHub](https://github.com/luisfabib/fhircraft){ .md-button }
 
 
