@@ -1,110 +1,463 @@
-# Contributing
+# Contributing to Fhircraft
 
-Thank you for your interest in contributing to this project! Your help is greatly appreciated. This guide will help you get started with contributing code, documentation, or reporting issues.
+Thank you for your interest in contributing to Fhircraft! This guide provides detailed instructions for setting up your development environment and contributing to both the codebase and documentation. Whether you're fixing bugs, adding features, or improving docs, your help makes Fhircraft better for everyone.
 
-## How to Contribute
+## Ways to Contribute
 
-We welcome all types of contributions! Here’s how you can get involved:
+We welcome all types of contributions:
 
-- **Report Bugs:**  
-    If you encounter a bug, please [open an issue](https://github.com/fhircraft/issues) with clear steps to reproduce, expected vs. actual behavior, and any relevant logs or screenshots.
+<div class="grid cards" markdown>
 
-- **Suggest Features or Improvements:**  
-    Have an idea to make the project better? Open an issue or start a discussion to share your suggestions. Please describe the motivation and potential benefits.
+-   :material-bug:{ .lg .middle } __Report Bugs__
 
-- **Submit Pull Requests:**  
-    If you’ve fixed a bug, added a feature, or improved documentation, feel free to submit a pull request. Make sure to follow the [Pull Request Process](#pull-request-process) outlined below.
+    ---
 
-- **Improve Documentation:**  
-    Help us keep our documentation accurate and up to date by suggesting edits or clarifications.
+    Found an issue? [Open a bug report](https://github.com/luisfabib/fhircraft/issues/new?labels=bug) with reproduction steps, expected vs actual behavior, and relevant logs
 
-- **Review and Discuss:**  
-    Participate in code reviews, discussions, or help answer questions from other contributors.
+-   :material-lightbulb:{ .lg .middle } __Suggest Features__
 
-No contribution is too small—thank you for helping us improve!
+    ---
 
-## Development Setup
+    Have ideas for improvements? [Open a feature request](https://github.com/luisfabib/fhircraft/issues/new?labels=enhancement) or start a discussion
 
-1. **Clone the repository:**
-    ```sh
-    git clone https://github.com/fhircraft.git
-    cd fhircraft
-    ```
+-   :material-code-braces:{ .lg .middle } __Submit Code__
 
-2. **Install dependencies:**
-    ```sh
-    pip install -e .
-    ```
+    ---
 
-3. **Run tests:**
-    ```sh
-    pytest
-    ```
-## Coding Guidelines
+    Fix bugs, add features, or improve performance by submitting pull requests
 
-- **Code Style:** Adhere to [PEP 8](https://pep8.org/) for Python code. Formatting is handled automatically by [Black](https://black.readthedocs.io/en/stable/), so you do not need to worry about manual formatting.
-- **Testing:**  
-    - For new features, add or update tests as needed.
-    - When refactoring or fixing bugs, ensure existing tests are updated or expanded—do not remove failing tests.
-- **Documentation:**  
-    - Document all public functions and classes with [Google-style Python docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
-- **Commits:**  
-    - Write clear, descriptive commit messages that explain the purpose of your changes.
+-   :material-file-document-edit:{ .lg .middle } __Improve Documentation__
 
-## Pull Request Process
+    ---
 
-1. **Fork the repository.**
-2. **Create a feature branch from `main`:**
-    ```sh
-    git checkout -b fix/some-bugfix
-    ```
-3. **Make your changes:**  
-   Ensure all tests pass locally before committing.
-4. **Commit your changes with a clear message:**
-    ```sh
-    git commit -m "fix: resolve issue with [brief description]"
-    ```
-5. **Push your branch to your fork and open a pull request:**  
-   - Provide a concise, descriptive summary of your changes.
-   - Reference related issues if applicable (e.g., "Closes #123").
-   - Wait for automated checks to complete.
-6. **Respond to feedback:**  
-   Address any requested changes from reviewers.
-7. **Squash and merge:**  
-   Once approved and all checks pass, squash and merge your changes into `main`.
+    Help keep docs accurate, clear, and up-to-date
 
-Thank you for your contribution!
+-   :material-comment-text:{ .lg .middle } __Review & Discuss__
 
-## Releases
+    ---
 
-To publish a new release, follow these steps:
+    Participate in code reviews or help answer community questions
 
-1. **Create a release branch:**
-    ```sh
-    git checkout -b release/vX.Y.Z
-    ```
-2. **Update the version:**  
-   Bump the version number in `pyproject.toml` according to [semantic versioning](https://semver.org/).
-3. **Update the changelog:**  
-   Add a summary of changes for this release in your changelog file (if available).
-4. **Open a pull request:**  
-   Submit a PR from your release branch to `main`. Ensure all tests pass and the PR includes the version and changelog updates.
-5. **Merge the pull request:**  
-   Once approved, squash and merge the PR into `main`.
-6. **Create a GitHub Release:**  
-   Go to the [GitHub Releases page](https://github.com/fhircraft/releases), click "Draft a new release", and:
-   - Set the tag to the new version (e.g., `vX.Y.Z`)
-   - Add release notes (copy from the changelog)
-   - Publish the release
-7. **Verify the package on PyPI:**  
-   Wait for the CI/CD workflow to complete. Confirm the new version is available on [PyPI](https://pypi.org/project/fhircraft/).
+</div>
 
-If you encounter any issues during the release process, please open an issue for assistance.
-
-## Questions?
-
-If you have any questions, feel free to open an issue or join the discussion!
+No contribution is too small—every improvement counts!
 
 ---
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
+## Quick Start for Contributors
+
+### Prerequisites
+
+Before you begin, ensure you have:
+
+- **Python 3.10 or higher** (3.10, 3.11, 3.12, or 3.13)
+- **Git** for version control
+- **pip** for package management
+
+### Initial Setup
+
+1. **Fork and clone the repository:**
+    ```bash
+    git clone https://github.com/YOUR-USERNAME/fhircraft.git
+    cd fhircraft
+    ```
+
+2. **Add the upstream remote:**
+    ```bash
+    git remote add upstream https://github.com/luisfabib/fhircraft.git
+    ```
+
+3. **Verify your Python version:**
+    ```bash
+    python --version  # Should be 3.10+
+    ```
+
+Now proceed to the appropriate setup section based on your contribution type.
+
+---
+
+## Contributing Code Changes
+
+Follow these steps when contributing bug fixes, new features, or code improvements.
+
+### 1. Environment Setup for Code Development
+
+**Install the package in editable mode with development dependencies:**
+
+```bash
+# Install core package + development tools
+pip install -e ".[dev]"
+```
+
+This installs:
+
+- **Core dependencies** - Required for Fhircraft to run (Pydantic, requests, etc.)
+- **Testing tools** - pytest, pytest-mock, parameterized, coverage
+- **The package in editable mode** - Changes to code are immediately reflected
+
+**Verify your installation:**
+
+```bash
+# Check that pytest is available
+pytest --version
+
+# Run a quick test to ensure everything works
+pytest test/test_config.py -v
+```
+
+### 2. Create a Feature Branch
+
+Always work on a dedicated branch:
+
+```bash
+# Update your main branch
+git checkout main
+git pull upstream main
+
+# Create a feature branch with a descriptive name
+git checkout -b fix/issue-123-patient-validation
+# or
+git checkout -b feature/add-fhirpath-function
+```
+
+Branch naming conventions:
+
+- `fix/` - Bug fixes
+- `feature/` - New features
+- `refactor/` - Code improvements without changing behavior
+- `docs/` - Documentation-only changes
+
+### 3. Make Your Changes
+
+**Write clean, maintainable code:**
+
+- Follow [PEP 8](https://pep8.org/) style guidelines
+- Ideally, use the Black formatter
+- Use type hints for function signatures
+- Keep functions focused and single-purpose
+- Add docstrings for public APIs
+
+**Example of well-documented code:**
+
+```python
+def validate_fhir_resource(resource: dict, resource_type: str) -> bool:
+    """Validate a FHIR resource against its structure definition.
+    
+    Args:
+        resource: The FHIR resource as a dictionary
+        resource_type: The FHIR resource type (e.g., "Patient", "Observation")
+        
+    Returns:
+        True if validation succeeds, False otherwise
+        
+    Raises:
+        ValueError: If resource_type is not a valid FHIR resource
+    """
+    # Implementation here
+```
+
+### 4. Write Tests
+
+**All code changes must include tests.** Fhircraft uses pytest for testing.
+
+**Test file structure:**
+
+```
+test/
+├── test_fhir_path_engine.py          # FHIRPath functionality
+├── test_fhir_mapper.py                # Mapping language
+├── test_fhir_resources_factory.py     # Resource construction
+└── test_*.py                          # Other test modules
+```
+
+**Writing tests:**
+
+```python
+# test/test_my_feature.py
+import pytest
+from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+
+def test_patient_creation_validates_gender():
+    """Test that invalid gender codes raise validation errors."""
+    Patient = get_fhir_resource_type("Patient", "R5")
+    
+    # Valid gender should work
+    patient = Patient(gender="female")
+    assert patient.gender == "female"
+    
+    # Invalid gender should raise error
+    with pytest.raises(ValueError):
+        Patient(gender="invalid-gender")
+```
+
+**Run tests:**
+
+```bash
+# Run all tests
+pytest
+
+# Run specific test file
+pytest test/test_fhir_resources_factory.py
+
+# Run with verbose output
+pytest -v
+
+# Run with coverage report
+pytest --cov=fhircraft --cov-report=html
+```
+
+**Test guidelines:**
+
+- Test both success and failure cases
+- Use descriptive test names that explain what is being tested
+- Keep tests isolated - each test should run independently
+- Mock external dependencies (network calls, file I/O)
+- Aim for high code coverage (>80%)
+
+### 5. Run the Test Suite
+
+Before submitting, ensure all tests pass:
+
+```bash
+# Run full test suite
+pytest
+
+# Check for any warnings
+pytest -v --tb=short
+
+# Run tests for specific Python version (if using pyenv/tox)
+python3.10 -m pytest
+```
+
+### 6. Commit Your Changes
+
+Write clear, descriptive commit messages:
+
+```bash
+# Stage your changes
+git add .
+
+# Commit with a descriptive message
+git commit -m "fix: resolve patient validation for edge cases
+
+- Add validation for missing name fields
+- Handle null gender values gracefully  
+- Add tests for edge cases in test_fhir_resources_factory.py
+
+Fixes #123"
+```
+
+**Commit message format:**
+
+```
+<type>: <short summary>
+
+<optional detailed description>
+
+<optional footer with issue references>
+```
+
+Types: `fix`, `feature`, `refactor`, `test`, `docs`, `chore`
+
+### 7. Push and Create Pull Request
+
+```bash
+# Push to your fork
+git push origin fix/issue-123-patient-validation
+
+# Create pull request via GitHub UI
+```
+
+**Pull request checklist:**
+
+- All tests pass locally
+- New tests added for new functionality
+- Code follows project style guidelines
+- Docstrings added for any new functions or classes
+- Related issues referenced in PR description
+- PR description clearly explains the changes
+
+---
+
+## Contributing Documentation Changes
+
+Follow these steps when improving user guides, API documentation, or examples.
+
+### 1. Environment Setup for Documentation
+
+**Install the package with documentation dependencies:**
+
+```bash
+# Install core package + documentation tools
+pip install -e ".[dev, docs]"
+```
+
+This installs:
+
+- **MkDocs Material** - Modern documentation theme
+- **mkdocstrings** - Automatic API documentation generation
+- **Supporting plugins** - For navigation, code generation, etc.
+
+**Verify your installation:**
+
+```bash
+# Check that mkdocs is available
+mkdocs --version
+```
+
+
+### 2. Preview Documentation Locally
+
+**Start the development server:**
+
+```bash
+# From project root
+mkdocs serve
+```
+
+This starts a local server at `http://127.0.0.1:8000` with live reloading. Changes to markdown files automatically refresh the browser.
+
+### 3. Writing Documentation
+
+**Follow the established style:**
+
+- Use clear, concise language
+- Start with a brief introduction explaining what/why
+- Include practical code examples
+- Add admonitions for important notes, warnings, tips
+- Link to related pages and external resources
+
+### 4. Testing Documentation
+
+**Check for broken links and issues:**
+
+```bash
+# Build in strict mode to catch warnings
+mkdocs build --strict
+
+# Manually review your changes
+mkdocs serve
+```
+
+**Documentation checklist:**
+
+- All code examples are tested and work
+- Links to other pages are valid
+- External links use the correct format
+- Images load correctly
+- Tables render properly
+- Admonitions display correctly
+
+### 5. Testing Code Examples in Documentation
+
+Some documentation includes doctest examples. Test them with:
+
+```bash
+# Run doctest tests
+pytest test/test_doctest.py -v
+```
+
+### 6. Submit Documentation Changes
+
+```bash
+# Create a branch
+git checkout -b docs/improve-fhirpath-guide
+
+# Make your changes, then commit
+git add docs/
+git commit -m "docs: improve FHIRPath querying examples
+
+- Add more complex query examples
+- Clarify when to use different query methods
+- Fix typos in code examples"
+
+# Push and create PR
+git push origin docs/improve-fhirpath-guide
+```
+
+---
+
+## Pull Request Process
+
+1. **Fork the repository** via GitHub UI
+
+2. **Create a feature branch:**
+    ```bash
+    git checkout -b fix/descriptive-name
+    ```
+
+3. **Make your changes** following the guidelines above
+
+4. **Test your changes:**
+    - For code: Run `pytest` to ensure all tests pass
+    - For docs: Run `mkdocs serve` to preview locally
+
+5. **Commit with clear messages:**
+    ```bash
+    git commit -m "fix: descriptive message
+
+    Detailed explanation if needed.
+    
+    Fixes #123"
+    ```
+
+6. **Push to your fork:**
+    ```bash
+    git push origin fix/descriptive-name
+    ```
+
+7. **Open a pull request** on GitHub with:
+    - Clear description of changes
+    - Reference to related issues
+    - Screenshots (for UI/docs changes)
+    - Test results confirmation
+
+8. **Respond to feedback** from reviewers promptly
+
+9. **Wait for CI checks** - All tests must pass:
+    - Pytest suite runs on Python 3.10, 3.11, 3.12
+    - Code quality checks
+
+10. **Merge** - Once approved, maintainers will squash and merge
+
+---
+
+## Getting Help
+
+- **Questions?** Open a [discussion](https://github.com/luisfabib/fhircraft/discussions)
+- **Stuck?** Comment on your PR or issue
+- **Need clarification?** Ask in the issue before starting work
+
+---
+
+## Release Process
+
+*This section is for maintainers.*
+
+To publish a new release:
+
+1. **Create release branch:**
+    ```bash
+    git checkout -b release/vX.Y.Z
+    ```
+
+2. **Update version** in `pyproject.toml` following [semantic versioning](https://semver.org/)
+
+3. **Update CHANGELOG.md** with release notes
+
+4. **Open PR** to `main` with version bump
+
+5. **Merge PR** after approval
+
+6. **Create GitHub Release:**
+    - Tag: `vX.Y.Z`
+    - Copy changelog entries
+    - Publish release
+
+7. **CI/CD** automatically publishes to PyPI
+
+8. **Verify** package on [PyPI](https://pypi.org/project/fhircraft/)
+
+---
+
+Thank you for contributing to Fhircraft! Your efforts help make healthcare interoperability more accessible to Python developers worldwide.
