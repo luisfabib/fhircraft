@@ -10,7 +10,9 @@ theme:
   favicon: assets/images/favicon.png
   logo: assets/logo_white.svg
   name: material
+  custom_dir: docs/templates
   features:
+    - announce.dismiss
     - content.code.copy
     - content.code.annotate
     - navigation.expand

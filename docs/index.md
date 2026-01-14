@@ -86,10 +86,6 @@ h1:first-of-type {
 </div>
 
 
-!!! warning "Active development"
-  
-    This package is under active development. Breaking changes can occur in future pre-releases.
-
 ---
 
 <div class="section" markdown>
@@ -175,38 +171,15 @@ For further information see the [Installation Guide](quickstart/installation.md)
 
 ---
 
-<div class="section" markdown>
-
-## :material-lightning-bolt:{ .lg } Key Capabilities
-
-<div class="grid" markdown>
-
-!!! success "Pydantic Models"
-    Auto-generated, type-safe models for all FHIR resources.  Full IDE autocomplete and validation support.
-
-!!! info "FHIRPath Queries"
-    Execute FHIRPath expressions directly on your resources. Standard-compliant querying made simple.
-
-!!! tip "Version Flexibility"
-    Work across FHIR versions without rewriting code. Future-proof your healthcare applications.
-
-!!! abstract "Resource Mapping"
-    Transform between different FHIR resource types using the official Mapping Language specification. 
-
-</div>
-
-</div>
-
----
 
 <div class="section" style="text-align: center; padding-bottom: 4rem;" markdown>
 
 ## Ready to Build with FHIR?
 
-<div class="buttons">
-    <a href="user-guide/" class="button-primary">Read the Guide</a>
-    <a href="api-reference/" class="button-secondary">API Reference</a>
-    <a href="https://github.com/luisfabib/fhircraft" class="button-secondary">: material-github: GitHub</a>
-</div>
+
+[Read the Guide](user-guide/overview.md){ .md-button .md-button--primary }
+[Technical Reference](quickstart/reference/fhir-resources-base/.md){ .md-button }
+[material-github: GitHub](https://github.com/luisfabib/fhircraft){ .md-button }
+
 
 </div>
