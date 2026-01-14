@@ -12,7 +12,7 @@ import mkdocs_gen_files
 
 logger = logging.getLogger(__name__)
 
-root = Path(__file__).parent.parent
+root = Path(__file__).parent.parent.parent
 src = root / "fhircraft"
 
 # Define documentation sections with their patterns

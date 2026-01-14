@@ -22,9 +22,6 @@ from pathlib import Path
 
 import mkdocs_gen_files
 
-root = Path(__file__).parent.parent
-src = root / ""  
-
 
 # YORE: EOL 3.10: Replace block with line 2.
 if sys.version_info >= (3, 11):

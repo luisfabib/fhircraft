@@ -10,7 +10,7 @@ theme:
   favicon: assets/images/favicon.png
   logo: assets/logo_white.svg
   name: material
-  custom_dir: docs/templates
+  custom_dir: docs/.overrides
   features:
     - announce.dismiss
     - content.code.copy
@@ -79,11 +79,11 @@ plugins:
       nav_file: SUMMARY.md
   - gen-files:
       scripts:
-        - scripts/gen_ref_pages.py
-        - scripts/gen_credits_page.py
-        - scripts/gen_repo_pages.py
+        - docs/.scripts/gen_ref_pages.py
+        - docs/.scripts/gen_credits_page.py
+        - docs/.scripts/gen_repo_pages.py
   - mkdocstrings:
-      custom_templates: docs/templates
+      custom_templates: docs/.overrides
       handlers:
         python:
           options:

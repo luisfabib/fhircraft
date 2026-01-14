@@ -2,9 +2,6 @@ import os
 from pathlib import Path
 import mkdocs_gen_files
 
-root = Path(__file__).parent.parent
-src = root / ""
-
 
 def print_file_contents(filename, file=None, changes=None):
     if os.path.isfile(filename):
@@ -33,7 +30,7 @@ hide:
     return (
         content.replace("# Changelog", "")
         .replace("[GitHub Release]", "[:material-github: GitHub Release]")
-        .replace("[Full Changelog]", "[:material-code-json: Full Changelog]")
+        .replace("[Full Changelog]", "[:material-source-pull: Full Changelog]")
     )
 
 
