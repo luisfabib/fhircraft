@@ -14,6 +14,7 @@
   - Community
     - [Contributing](community/contributing.md)
     - [Code of Conduct](community/code_of_conduct.md)
+    - [Alternatives](community/alternatives.md)
     - [Credits](community/credits.md)
     - [License](community/license.md)
   - [Release Notes](changelog.md)
