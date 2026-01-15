@@ -147,11 +147,21 @@ def _render_credits() -> str:
         """
         # Credits
 
+        This is an automatically generated credits page.
+
+        ## Contributors
+
+        This is a list of everyone who has contributed to *fhicraft*.
+
+        <img src="https://contrib.rocks/image?repo=luisfabib/fhircraft">
+
+        ## Acknowledgements
+
         These projects were used to build *{{ project_name }}*. **Thank you!**
 
         [Python](https://www.python.org/) |
         [HL7 FHIR](https://hl7.org/fhir/) |
-        [Pydantic](https://www.pydantic.dev/) |
+        [Pydantic](https://www.pydantic.dev/)
 
         {% macro dep_line(dep) -%}
         [{{ dep.name }}](https://pypi.org/project/{{ dep.name }}/) | {{ dep.summary }} | {{ ("`" ~ dep.spec|sort(reverse=True)|join(", ") ~ "`") if dep.spec else "" }} | `{{ dep.version }}` | {{ dep.license }}
