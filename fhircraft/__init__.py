@@ -60,6 +60,10 @@ def __getattr__(name):
         from fhircraft.config import FHIRValidationConfig
 
         return FHIRValidationConfig
+    elif name == "FhircraftConfig":
+        from fhircraft.config import FhircraftConfig
+
+        return FhircraftConfig
     elif name == "get_config":
         from fhircraft.config import get_config
 

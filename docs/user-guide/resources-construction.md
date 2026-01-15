@@ -1,47 +1,217 @@
-# Resource Factory
+# Constructing Dynamic FHIR Models
 
-This guide is for developers who want to construct Pydantic models from FHIR structure definitions, implementation guides, and packages. You'll learn to use Fhircraft's factory system to build type-safe FHIR models from various sources, manage repositories, and handle complex scenarios like custom profiles and multiple FHIR versions.
+This guide shows you how to build custom Pydantic FHIR models from FHIR [:material-fire: Structure Definitions](https://hl7.org/fhir/structuredefinition.html). This is different from using pre-built resource models. You need the factory system when you work with implementation guides like [:material-fire: US Core](https://www.hl7.org/fhir/us/core/), [:material-fire: International Patient Summary](https://hl7.org/fhir/uv/ips/), or your own custom profiles. The factory constructs models that enforce profile-specific requirements beyond base FHIR validation.
 
-## Prerequisites
+The factory system takes a [:material-fire: Structure Definitions](https://hl7.org/fhir/structuredefinition.html) and generates a [:simple-pydantic: Pydantic model](https://docs.pydantic.dev/latest/concepts/models/) class. The generated model includes all constraints, extensions, and validation rules from the profile. This means you get type safety and automatic validation for your custom FHIR profiles. 
 
-Before diving into this guide, make sure you understand:
+!!! note
 
-- **Basic Fhircraft concepts** from the [FHIR Resources Overview](resources-overview.md)
-- **FHIR structure definitions** and how they define resource shapes
-- **Python imports and package management**
+    For information about loading structure definitions and packages, see [managing FHIR artifacts](managing-fhir-artifacts.md). This guide focuses on constructing models from those definitions.
 
-## Overview
+## Building Models
 
-Fhircraft transforms FHIR structure definitions into usable Python Pydantic models that provide type safety, validation, and easy integration with your applications. The factory system supports multiple construction methods:
+### Construction Mode
 
-- **Direct Construction** - Build models from loaded structure definitions
-- **Canonical URL Resolution** - Resolve definitions from URLs with fallback strategies
-- **FHIR Package Loading** - Load complete implementation guides and profiles
-- **Repository Management** - Organize multiple definitions with version control
+The factory supports two construction approaches:
 
-## Basic Model Construction
+- **Snapshot mode**: Builds models from complete, flattened snapshot elements. The snapshot contains the complete view of all elements with all inherited properties resolved.
+- **Differential mode**: Builds models from differential elements that only specify changes from the base definition. The factory automatically resolves and merges these with the base profile.
 
-### Direct Model Construction from Structure Definitions
+The factory automatically detects which mode to use based on what elements are present in the structure definition. When both snapshot and differential elements exist, the factory prefers differential mode. You can also explicitly specify the construction mode.
 
-Use `construct_resource_model` to create Pydantic models from FHIR structure definitions. This method provides complete control and security by working with local files.
+See the [:material-fire: FHIR structure definition documentation](https://hl7.org/fhir/structuredefinition.html) for details about snapshot and differential elements.
 
-**Requirements:**
+### Snapshot Mode Construction
 
-- Structure definitions must include a `snapshot` section (not just differential)
-- Fhircraft automatically detects and handles FHIR version differences (R4, R4B, R5)
+Snapshot mode works with structure definitions that contain complete element definitions. This mode is useful for base resource definitions and profiles that include full snapshots.
+
+```python
+from fhircraft.fhir.resources.factory import construct_resource_model, ConstructionMode
+from fhircraft.fhir.resources.datatypes.R4.core import Patient
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+# Structure definition with snapshot elements
+snapshot_structure_def = {
+    "resourceType": "StructureDefinition",
+    "name": "LegacyPatient",
+    "type": "Resource",
+    "url": "http://example.org/fhir/StructureDefinition/LegacyPatient",
+    "fhirVersion": "4.0.1",
+    "kind": "resource",
+    "status": "draft",
+    "abstract": False,
+    "snapshot": {
+        "element": [
+            {
+                "id": "LegacyPatient",
+                "path": "LegacyPatient",
+                "min": 0,
+                "max": "*"
+            },
+            {
+                "id": "LegacyPatient.fullName",
+                "path": "LegacyPatient.fullName",
+                "min": 1,
+                "max": "1",
+                "type": [{"code": "string"}]
+            }
+        ]
+    }
+}
+
+# Construct the resource
+LegacyPatient = construct_resource_model(
+    structure_definition=snapshot_structure_def,
+    mode=ConstructionMode.SNAPSHOT
+)
+
+assert issubclass(LegacyPatient, FHIRBaseModel)
+assert not issubclass(LegacyPatient, Patient) # (2)!
+
+instance = LegacyPatient(fullName="Maria Johnson")
+
+print(f"Legacy patient name: {instance.fullName}")
+#> Legacy patient name: Maria Johnson
+```
+
+1. This option could be left out and the factory would automatically switch to snapshot mode.
+2. Check that `LegacyPatient` actually inherits from the `FHIRBaseModel` model but is unrelated to the `Patient` resource.
+
+
+!!! tip "Snapshot Use Cases"
+
+    Use *snapshot mode* when:
+
+    - Working with base FHIR resource definitions
+    - The structure definition only contains snapshot elements
+    - You need complete element definitions without relying on base resolution
+    - Debugging model construction issues by examining the full flattened structure
+
+### Differential Mode Construction
+
+Differential mode works with structure definitions that only specify changes from a base definition. The factory automatically resolves the base definition and merges the differential constraints with it. This is the standard approach for FHIR profiles and implementation guides.
+
+```python
+from fhircraft.fhir.resources.factory import factory, ConstructionMode
+from pydantic import ValidationError 
+
+# Structure definition with only differential elements
+differential_structure_def = {
+    "resourceType": "StructureDefinition",
+    "name": "MyPatient",
+    "type": "Patient",
+    "url": "http://example.org/fhir/StructureDefinition/MyPatient",
+    "fhirVersion": "4.0.1",
+    "kind": "resource",
+    "status": "draft",
+    "abstract": False,
+    "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+    "differential": {
+        "element": [
+            {
+                "id": "Patient.identifier",
+                "path": "Patient.identifier",
+                "max": "2"
+            }
+        ]
+    }
+}
+
+# Explicitly use differential mode
+MyPatient = factory.construct_resource_model(
+    structure_definition=differential_structure_def,
+    mode=ConstructionMode.DIFFERENTIAL # (1)!
+)
+
+assert issubclass(MyPatient, FHIRBaseModel)
+assert issubclass(MyPatient, Patient) # (2)!
+
+# Valid patient
+patient = MyPatient(
+    identifier=[{"system": "http://example.org", "value": "12345"}], 
+) 
+
+
+print(f"My patient ID: {patient.identifier[0].value}")
+#> My patient ID: 12345
+
+try:
+    # Invalid patient
+    patient = MyPatient(
+        identifier=[
+            {"system": "http://example.org", "value": "12345"},
+            {"system": "http://example.org", "value": "67890"},
+            {"system": "http://example.org", "value": "54321"},
+        ], 
+    ) # (3)!
+except ValidationError:
+    print("Invalid MyPatient was caught successfuly")
+
+```
+
+1. This option could be left out and the factory would automatically switch to differential mode.
+2. Check that `MyPatient` actually inherits from the `Patient` resource model
+3. While it is a valid `Patient` instance, it violates one of the `MyPatient` additional constraints, resulting in a validation error.
+
+!!! tip "Differential Use Cases"
+
+    Use *differential mode* when:
+
+    - Working with implementation guide profiles
+    - The structure definition only contains differential elements
+    - You want to leverage profile inheritance and constraint layering
+    - Building models that extend or constrain base profiles
+
+### Choosing Between Modes
+
+The factory automatically selects the appropriate mode using these rules:
+
+1. If you specify a mode explicitly, the factory uses that mode and validates the structure definition contains the required elements
+2. In AUTO mode (the default), the factory prefers differential if both snapshot and differential exist
+3. If only one element type exists, the factory uses that mode
+4. If neither exists, the factory raises an error
+
+Most published implementation guide profiles include both snapshot and differential elements. The factory defaults to differential mode in these cases because it correctly handles profile inheritance and constraint layering.
+
+```python
+from fhircraft.fhir.resources.factory import factory, ConstructionMode
+
+# AUTO mode (default) - factory decides based on available elements
+model_auto = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+)
+
+# Explicit SNAPSHOT mode - use the complete flattened view
+model_snapshot = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient",
+    mode=ConstructionMode.SNAPSHOT
+)
+
+# Explicit DIFFERENTIAL mode - use constraints from profile only
+model_differential = factory.construct_resource_model(
+    canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient",
+    mode=ConstructionMode.DIFFERENTIAL
+)
+```
+
+### Constructing from Structure Definitions
+
+You can build models from structure definitions already loaded into memory. The structure definition is a JSON or XML document that describes the profile, loaded into memory in the form of a `StructureDefinition` or dictionary object. The [`construct_resource_model`](/reference/fhir-resources-factory/#fhircraft.fhir.resources.factory.ResourceFactory.construct_resource_model) method of the factory takes that definition and returns the constructed model.
 
 ```python
 from fhircraft.fhir.resources.factory import construct_resource_model
 from fhircraft.utils import load_file
 
-# Load structure definition from local file
+# Load the structure definition from a local JSON file
 structure_def = load_file('patient_profile.json')
 
-# Create the Pydantic model
-PatientModel = construct_resource_model(structure_definition=structure_def)
+# Construct a Pydantic model class from the definition
+# The factory automatically detects whether to use snapshot or differential mode
+ProfiledPatient = construct_resource_model(structure_definition=structure_def)
 
-# Use the model with automatic validation
-patient = PatientModel(
+# Create an instance using the generated model
+# Validation happens automatically using profile rules
+patient = ProfiledPatient(
     name=[{"given": ["John"], "family": "Doe"}],
     birthDate="1990-05-15",
     gender="male"
@@ -50,638 +220,307 @@ patient = PatientModel(
 print(f"Created model for: {structure_def['name']}")
 ```
 
-### Repository-Based Management
 
-For applications with multiple structure definitions, use the repository system for organized management:
+#### Constructing from Canonical URLs
+
+If the structure definitions have been loaded into the repository, you construct models referencing their structure definition's canonical URLs. This is the most common approach for working with implementation guides. The factory looks up the definition by its canonical URL and constructs the model.
+
+!!! important 
+
+    See [managing FHIR artifacts](managing-fhir-artifacts.md) for information about loading structure definitions into the repository. This section assumes you have already configured the repository.
 
 ```python
 from fhircraft.fhir.resources.factory import factory
 
-# Configure repository with multiple sources
+# Load structure definitions into the repository first
+# See managing-fhir-artifacts.md for loading options
 factory.configure_repository(
-    directory="./fhir-profiles",            # Load all JSON/YAML files from directory
-    files=["./custom-profile.json"],        # Include specific files
-    internet_enabled=True                   # Enable internet fallback for canonical URLs
+    directory="./fhir-profiles",
+    internet_enabled=True
 )
 
-# Reference models by their canonical URLs
+# Construct a model using the canonical URL
+# The factory retrieves the definition from the repository
 CustomPatient = factory.construct_resource_model(
     canonical_url="http://example.org/StructureDefinition/CustomPatient"
 )
 
-# Use the constructed model
+# Use the model like any other Pydantic model
 patient = CustomPatient(
     name=[{"given": ["Alice"], "family": "Johnson"}],
     gender="female"
 )
 ```
 
-## Canonical URL Resolution
 
-Canonical URLs are globally unique identifiers for FHIR conformance resources. Fhircraft's repository system uses a smart resolution strategy that checks local definitions first, then falls back to internet downloads when needed.
+!!! example "Implementation Guide Recipe"
 
-### Basic URL Resolution
+    This recipe shows the complete workflow for working with an implementation guide. You load the package, construct models for the profiles, and use those models with profile-specific validation.
 
-Canonical URLs provide a standardized way to reference FHIR structure definitions. Fhircraft will attempt to resolve these URLs automatically, checking local sources first and falling back to internet downloads when needed:
+    ```python
+    from fhircraft.fhir.resources.factory import ResourceFactory
+
+    # Create a factory with package support enabled
+    factory = ResourceFactory(enable_packages=True)
+
+    # Load the US Core implementation guide
+    # See managing-fhir-artifacts.md for package loading details
+    factory.load_package("hl7.fhir.us.core", "5.0.1")
+
+    # Construct a model for the US Core Patient profile
+    # The canonical URL comes from the implementation guide
+    USCorePatient = factory.construct_resource_model(
+        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+    )
+
+    # Create a patient using the profile model
+    # US Core Patient requires an identifier
+    patient = USCorePatient(
+        name=[{"given": ["John"], "family": "Doe"}],
+        gender="male",
+        identifier=[{  # Required by US Core
+            "system": "http://example.org/mrn",
+            "value": "12345"
+        }]
+    )
+
+    print(f"Created US Core patient: {patient.name[0].given[0]} {patient.name[0].family}")
+    ```
+
+!!! example "Multiple Profiles Recipe"
+
+    When working with multiple implementation guides, you load all required packages and then construct models for each profile. Each model enforces its own profile constraints.
+
+    ```python
+    from fhircraft.fhir.resources.factory import ResourceFactory
+
+    # Create factory and load multiple implementation guides
+    factory = ResourceFactory(enable_packages=True)
+
+    # Load both US Core and International Patient Summary
+    factory.load_package("hl7.fhir.us.core", "5.0.1")
+    factory.load_package("hl7.fhir.us.mcode", "1.1.0")
+
+    # Construct models for different profiles
+    USCorePatient = factory.construct_resource_model(
+        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+    )
+
+    CancerPatient = factory.construct_resource_model(
+        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient"
+    )
+
+    # Each model validates using its profile rules
+    us_patient = USCorePatient(
+        name=[{"family": "Doe", "given": ["John"]}],
+        gender="male"
+    )
+
+    cancer_patient = CancerPatient(
+        name=[{"family": "Smith", "given": ["Alice"]}],
+        gender="female"
+    )
+
+    print(f"Created US Core patient with name: {us_patient.name[0].given[0]} {us_patient.name[0].family}")
+    #> Created US Core patient with name: John Doe
+
+    print(f"Created mCODE cancer patient with name: {cancer_patient.name[0].given[0]} {cancer_patient.name[0].family}")
+    #> Created mCODE cancer patient with name: Alice Smith
+    ```
+
+### Versioned Structure Definitions
+
+You specify versions in canonical URLs using the pipe separator. The factory retrieves the specific version from the repository. Without a version, the factory uses the latest version available in the repository.
 
 ```python
 from fhircraft.fhir.resources.factory import construct_resource_model
 
-# Construct from official FHIR Patient resource
+# Construct using a specific version
+# The version appears after the pipe character
 patient_model = construct_resource_model(
+    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient|4.0.1"
+)
+
+# Construct without specifying a version
+# The factory uses the latest version in the repository
+latest_patient = construct_resource_model(
     canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
 )
 
-# Construct from a custom profile (will try local first, then download)
-custom_profile_model = construct_resource_model(
-    canonical_url="http://example.org/fhir/StructureDefinition/MyPatientProfile"
-)
-
-# Construct from HL7 implementation guides
+# Construct from implementation guide profiles
+# Include the full canonical URL from the implementation guide
 us_core_patient = construct_resource_model(
     canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
 )
-
-# Specify exact versions using the canonical URL format
-versioned_patient = construct_resource_model(
-    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient|4.3.0"
-)
 ```
 
-### Multi-Source Resolution Strategy
+See the [:material-fire: FHIR versioning specification](https://hl7.org/fhir/versions.html) for information about version identifiers and the [managing FHIR artifacts](managing-fhir-artifacts.md) guide for details about how the repository resolves canonical URLs.
 
-Fhircraft follows a prioritized lookup strategy for robust definition resolution:
 
-!!! tip "Resolution Priority"
+## Model Caching
 
-    1. **Local Definitions** - Structure definitions loaded from local files (highest priority)
-    2. **Package Registry** - Definitions from loaded FHIR packages (medium priority)  
-    3. **Internet Fallback** - Downloads from canonical URLs if not found locally (lowest priority)
-    4. **Version Support** - Handles semantic versioning with latest version tracking
-    5. **Caching** - Automatically caches downloaded definitions for better performance
+The factory caches constructed models by their canonical URL. When you request the same canonical URL again, the factory returns the cached model instead of reconstructing it. This improves performance significantly, especially when constructing models that might depend on previously constructed models which would otherwise be re-constructed or lead to circular loops.
 
-!!! warning "Network Dependencies"
-
-    When using canonical URLs for definitions not available locally, ensure you have internet connectivity. For production environments, consider pre-loading all required structure definitions locally.
-
-## FHIR Package Integration
-
-FHIR packages contain published specifications like [US Core](https://build.fhir.org/ig/HL7/US-Core/), [International Patient Summary](https://build.fhir.org/ig/HL7/fhir-ips/), and other Implementation Guides. Fhircraft automatically downloads, caches, and integrates these packages into your development workflow.
-
-### Quick Start with Packages
-
-The fastest way to get started with FHIR packages is to load a popular implementation guide like [US Core](https://build.fhir.org/ig/HL7/US-Core/). This example shows the complete workflow from package loading to model usage:
-
-```python
-from fhircraft.fhir.resources.factory import ResourceFactory
-
-# Enable package loading
-factory = ResourceFactory(enable_packages=True)
-
-# Load US Core Implementation Guide version 5.0.1
-factory.load_package("hl7.fhir.us.core", "5.0.1")
-
-# Create a US Core Patient model with enhanced validation
-USCorePatient = factory.construct_resource_model(
-    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
-)
-
-# Use the model with US Core constraints
-patient = USCorePatient(
-    name=[{"given": ["John"], "family": "Doe"}],
-    gender="male",
-    # US Core requires identifier
-    identifier=[{
-        "system": "http://example.org/mrn",
-        "value": "12345"
-    }]
-)
-
-print(f"Created US Core patient: {patient.name[0].given[0]} {patient.name[0].family}")
-```
-
-### Batch Package Loading
-
-Load multiple packages efficiently for comprehensive profile support:
-
-```python
-# Configure factory with multiple packages at once
-factory.configure_repository(
-    directory="local_profiles/",  # Load local files first
-    packages=[
-        "hl7.fhir.r4.core",                    # Latest version of FHIR R4 core
-        ("hl7.fhir.us.core", "5.0.1"),        # Specific version of US Core
-        ("hl7.fhir.uv.ips", "1.1.0"),         # International Patient Summary
-        ("hl7.fhir.us.mcode", "3.0.0"),       # Minimal Common Oncology Data Elements
-    ],
-    internet_enabled=True
-)
-
-# All structure definitions from loaded packages are now available
-USCorePatient = factory.construct_resource_model(
-    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
-)
-
-IPSPatient = factory.construct_resource_model(
-    "http://hl7.org/fhir/uv/ips/StructureDefinition/Patient-uv-ips"
-)
-```
-
-### Common FHIR Packages
-
-Fhircraft can download and extract any FHIR packages from the [FHIR Package Registry](https://registry.fhir.org/). Here is a collection of commonly used FHIR packages. 
-
-| Package | Description | Use Case |
-|---------|-------------|----------|
-| `hl7.fhir.r4.core` | FHIR R4 core specification | Base FHIR R4 resources |
-| `hl7.fhir.r5.core` | FHIR R5 core specification | Base FHIR R5 resources |
-| `hl7.fhir.us.core` | US Core Implementation Guide | US healthcare interoperability |
-| `hl7.fhir.uv.ips` | International Patient Summary | Global patient summaries |
-| `hl7.fhir.us.mcode` | Minimal Common Oncology Data Elements | Cancer care data |
-| `hl7.fhir.uv.smart-app-launch` | SMART App Launch | OAuth2-based app authorization |
-
-### Package Management Operations
-
-Once you've loaded packages, you'll often need to inspect what's available, manage versions, or clean up when packages are no longer needed. These operations help you maintain control over your loaded packages:
-
-```python
-# Check what packages are loaded
-packages = factory.get_loaded_packages()
-print("Loaded packages:", packages)
-
-# Check if specific package is loaded
-if factory.has_package("hl7.fhir.us.core"):
-    print("US Core is available")
-
-# Remove packages when no longer needed
-factory.remove_package("hl7.fhir.us.core", "5.0.1")
-
-# Clear entire package cache
-factory.clear_package_cache()
-
-print(f"Cache cleared, {len(factory.get_loaded_packages())} packages remaining")
-```
-
-### Error Handling for Package Operations
-
-Package loading can fail for various reasons - network issues, missing packages, or incorrect versions. Robust applications should handle these errors gracefully and provide helpful feedback:
-
-```python
-from fhircraft.fhir.packages import PackageNotFoundError, FHIRPackageRegistryError
-
-def load_package_safely(package_name: str, version: str = None) -> bool:
-    """Safely load a FHIR package with error handling."""
-    try:
-        factory.load_package(package_name, version)
-        print(f"Successfully loaded {package_name} {version or 'latest'}")
-        return True
-    except PackageNotFoundError as e:
-        print(f"Package not found: {e}")
-        return False
-    except FHIRPackageRegistryError as e:
-        print(f"Registry error: {e}")
-        return False
-    except Exception as e:
-        print(f"Unexpected error loading package: {e}")
-        return False
-
-# Usage
-success = load_package_safely("hl7.fhir.us.core", "5.0.1")
-if success:
-    # Proceed with model construction
-    pass
-```
-
-## Advanced Package Management
-
-### Configuration Options
-
-For production applications or specialized environments, you may need to customize the factory behavior. These configuration options provide control over package sources, timeouts, and access permissions:
-
-```python
-# Configure factory with custom settings
-factory = ResourceFactory(
-    enable_packages=True,
-    registry_base_url="https://packages.fhir.org",  # Default FHIR package registry
-    timeout=30.0,                                   # Request timeout in seconds
-    internet_enabled=True                           # Allow internet access
-)
-
-# Configure repository with comprehensive options
-factory.configure_repository(
-    directory="./local_profiles",                   # Local structure definitions
-    packages=[
-        "hl7.fhir.r4.core",                       # Load latest version
-        ("hl7.fhir.us.core", "5.0.1"),           # Load specific version
-    ],
-    registry_base_url="https://packages.fhir.org",
-    internet_enabled=True,
-    timeout=30.0
-)
-```
-
-### Direct Package Registry Access
-
-For advanced scenarios, interact directly with the FHIR package registry:
-
-```python
-from fhircraft.fhir.packages import FHIRPackageRegistryClient
-
-# Create client for direct registry interaction
-client = FHIRPackageRegistryClient()
-
-# List available versions of a package
-package_info = client.list_package_versions("hl7.fhir.us.core")
-print(f"Latest version: {package_info.dist_tags.latest}")
-print(f"All versions: {list(package_info.versions.keys())}")
-
-# Download package manually (for custom processing)
-package_data = client.download_package("hl7.fhir.us.core", "5.0.1")
-print(f"Downloaded package size: {len(package_data)} bytes")
-```
-
-### Working with Multiple Package Sources
-
-For complex applications, you might need to combine multiple sources of structure definitions - local files, different packages, and internet resources. The composite repository provides a unified interface:
-
-```python
-from pathlib import Path
-from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
-
-# Create repository with all sources enabled
-repo = CompositeStructureDefinitionRepository(
-    enable_packages=True,
-    internet_enabled=True
-)
-
-# Load from multiple sources
-repo.load_from_directory("local_profiles/")
-repo.load_package("hl7.fhir.us.core", "5.0.1")
-
-# Getting a structure definition checks sources in priority order
-patient_def = repo.get("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
-if patient_def:
-    print(f"Found definition for: {patient_def['name']}")
-```
-
-### Integrated Construction Workflow
-
-Combine package loading with model construction for complete workflows:
-
-```python
-# Complete workflow: Load packages and construct models
-factory = ResourceFactory(enable_packages=True)
-
-# Load required packages for comprehensive coverage
-packages_to_load = [
-    ("hl7.fhir.us.core", "5.0.1"),
-    ("hl7.fhir.uv.ips", "1.1.0")
-]
-
-for package_name, version in packages_to_load:
-    factory.load_package(package_name, version)
-
-# Construct models from package definitions
-USCorePatient = factory.construct_resource_model(
-    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
-)
-
-USCoreCondition = factory.construct_resource_model(
-    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
-)
-
-IPSPatient = factory.construct_resource_model(
-    "http://hl7.org/fhir/uv/ips/StructureDefinition/Patient-uv-ips"
-)
-
-# Use the models with proper validation
-us_patient = USCorePatient(
-    identifier=[{"system": "http://example.com", "value": "123"}],
-    name=[{"family": "Doe", "given": ["John"]}],
-    gender="male"
-)
-
-print(f"Created US Core patient: {us_patient.id}")
-```
-
-## Model Caching and Performance
-
-### Automatic Model Caching
-
-Fhircraft automatically caches constructed models based on their canonical URLs to improve performance:
+You clear the cache when structure definitions change or during testing when you need fresh model construction. The cache stores references to model classes, not instances, so memory usage remains reasonable even with many cached models.
 
 ```python
 from fhircraft.fhir.resources.factory import construct_resource_model, factory
+from time import time 
 
-# First call - downloads and constructs the model
+# First call constructs the model and caches it
+start_time = time()
 patient_model_1 = construct_resource_model(
     canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
 )
+original_construction_time = (end_time := time()) - start_time
 
-# Second call - returns cached model (much faster)
+
+# Second call returns the cached model
+start_time = time()
 patient_model_2 = construct_resource_model(
     canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
 )
+cached_construction_time = (end_time := time()) - start_time
+ 
+assert patient_model_1 is patient_model_2 # (1)!
+assert cached_construction_time < original_construction_time # (2)!
 
-# Verify they're the same cached instance
-assert patient_model_1 is patient_model_2
-print("Models are identical (cached)")
-
-# Clear the cache when needed
+# Clear the cache when definitions change
 factory.clear_cache()
 
-# This will now reconstruct the model
+# This reconstructs the model
+
+start_time = time()
 patient_model_3 = construct_resource_model(
     canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
 )
 
-print("Model reconstructed after cache clear")
+assert patient_model_1 is not patient_model_3 # (4)!
+
 ```
 
-### Cache Management Best Practices
+1. Both variables reference the same model class
+2. The cached results is obtained much faster than the original
+3. This reconstructs the model from scratch
+4. New variable no longer references the old class
 
-!!! tip "When to Clear Cache"
-    
-    Clear the cache when:
-    
-    - **Structure definitions have been updated** - Ensure you're using the latest versions
-    - **During development/testing** - Ensure fresh model construction between test runs
-    - **Memory optimization** - Free memory when working with many different profiles
-    - **Version switching** - When changing between different versions of the same profile
+See the [:simple-pydantic: Pydantic performance documentation](https://docs.pydantic.dev/latest/concepts/performance/) for information about model validation performance.
 
-!!! note "Performance Considerations"
-    
-    - **Cache hits are ~1000x faster** than model reconstruction
-    - **Memory usage grows** with the number of unique canonical URLs
-    - **Thread safety** - Cache is safe for concurrent read access
-    - **Production deployment** - Consider warming the cache with frequently used models
+## Code Generation
 
-## Multi-Version FHIR Support
+The code generator converts constructed Pydantic models into Python source code. This is useful when you want to save generated models to files instead of constructing them at runtime. The generated code includes all field definitions, validators, and properties from the original model.
 
-### Working with Different FHIR Releases
+You can use code generation to avoid runtime overhead of model construction. Instead of loading structure definitions and constructing models each time your application starts, you generate the code once and import the models directly. This is especially valuable in production environments where startup time matters or to generate a re-usable a codebase for Python-based FHIR service or application.
 
-Fhircraft automatically detects the FHIR version from structure definitions and uses the appropriate data types:
-
-```python
-from fhircraft.fhir.resources.factory import construct_resource_model
-
-# R4 Patient model
-r4_patient_model = construct_resource_model(
-    canonical_url="http://hl7.org/fhir/R4/StructureDefinition/Patient"
-)
-
-# R4B Patient model  
-r4b_patient_model = construct_resource_model(
-    canonical_url="http://hl7.org/fhir/R4B/StructureDefinition/Patient"
-)
-
-# R5 Patient model
-r5_patient_model = construct_resource_model(
-    canonical_url="http://hl7.org/fhir/R5/StructureDefinition/Patient"
-)
-
-# Each model uses version-specific data types and constraints
-r4_patient = r4_patient_model(name=[{"family": "Smith"}])
-r5_patient = r5_patient_model(name=[{"family": "Smith"}])
-
-print(f"R4 Patient type: {type(r4_patient)}")
-print(f"R5 Patient type: {type(r5_patient)}")
-```
-
-### Direct Version-Specific Imports
-
-For explicit version control, import pre-built models for specific FHIR releases:
-
-```python
-# Direct imports for specific releases
-from fhircraft.fhir.resources.datatypes.R4.complex_types import Patient as PatientR4
-from fhircraft.fhir.resources.datatypes.R4B.complex_types import Patient as PatientR4B  
-from fhircraft.fhir.resources.datatypes.R5.complex_types import Patient as PatientR5
-
-# Use the appropriate model for your data version
-patient_r4 = PatientR4(name=[{"family": "Smith"}])
-patient_r5 = PatientR5(name=[{"family": "Smith"}])
-
-# Each model enforces version-specific constraints
-print(f"R4 Patient resourceType: {patient_r4.resourceType}")
-print(f"R5 Patient resourceType: {patient_r5.resourceType}")
-```
-
-## Repository System Management
-
-### Basic Repository Configuration
-
-The repository system provides efficient storage, versioning, and retrieval of structure definitions:
+The generated code is readable Python that you can inspect, modify, and share with others. All imports are included automatically, so the generated file is self-contained.
 
 ```python
 from fhircraft.fhir.resources.factory import factory
+from fhircraft.fhir.resources.generator import generate_resource_model_code
 
-# Configure repository with multiple sources
-factory.configure_repository(
-    directory="/path/to/structure/definitions",    # Load all JSON files from directory
-    files=[                                        # Load specific files
-        "/path/to/custom/profile1.json",
-        "/path/to/custom/profile2.json"
-    ],
-    definitions=[structure_def_dict],              # Load from pre-loaded dictionaries
-    internet_enabled=True                          # Allow internet fallback
+# Load a package and construct a model
+factory.load_package("hl7.fhir.us.core", "5.0.1")
+USCorePatient = factory.construct_resource_model(
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
 )
 
-# Use canonical URLs - will check local first, then internet
-Patient = factory.construct_resource_model(
-    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
-)
+# Generate Python source code for the model
+# The code includes all fields, validators, and imports
+source_code = generate_resource_model_code(USCorePatient)
+
+# Save to a file for later import
+with open("us_core_patient.py", "w") as f:
+    f.write(source_code)
+
+print("Generated model saved to us_core_patient.py")
 ```
 
-### Advanced Repository Operations
+See the [Pydantic JSON schema documentation](https://docs.pydantic.dev/latest/concepts/json_schema/) for information about model introspection.
 
-The repository system provides fine-grained control over how definitions are loaded and managed. These operations are useful for dynamic loading, offline operation, and repository introspection:
+!!! example "Multiple Models Generation"
+
+    When working with multiple profiles from an implementation guide, you generate all models together in a single file. This keeps related models organized and ensures they can reference each other correctly.
+
+    ```python
+    from fhircraft.fhir.resources.factory import factory
+    from fhircraft.fhir.resources.generator import generate_resource_model_code
+
+    # Load the implementation guide
+    factory.load_package("hl7.fhir.us.core", "5.0.1")
+
+    # Construct multiple related models
+    models_to_generate = []
+
+    us_core_profiles = [
+        "us-core-patient",
+        "us-core-condition",
+        "us-core-procedure",
+    ]
+
+    # Construct each model and add to the list
+    for profile_name in us_core_profiles:
+        model = factory.construct_resource_model(
+            f"http://hl7.org/fhir/us/core/StructureDefinition/{profile_name}"
+        )
+        models_to_generate.append(model)
+
+    # Generate source code for all models together
+    # This ensures proper cross-references between models
+    source_code = generate_resource_model_code(models_to_generate)
+
+    # Save to a single module file
+    with open("us_core_models.py", "w") as f:
+        f.write(source_code)
+
+    print(f"Generated {len(models_to_generate)} models in us_core_models.py")
+    ```
+
+### Generated Code Structure
+
+The generated code follows a consistent structure. It starts with imports, then defines models in dependency order so that base classes appear before derived classes. Each model includes field definitions with type annotations, default values, and metadata.
+
+Here is what the generated code looks like:
 
 ```python
-from fhircraft.fhir.resources.factory import factory
+# Generated automatically - includes timestamp and version
 
-# Load definitions incrementally
-factory.load_definitions_from_directory("/path/to/core/definitions")
-factory.load_definitions_from_files("/path/to/custom/profile.json")
+from typing import List, Optional
+from pydantic import BaseModel, Field
+from fhircraft.fhir.resources.datatypes.R4.complex import Identifier, HumanName
 
-# Control internet access dynamically
-factory.disable_internet_access()  # Offline mode for production
-print("Internet access disabled")
-
-# Perform offline operations...
-
-factory.enable_internet_access()   # Re-enable for development
-print("Internet access restored")
-
-# Check repository status
-repository = factory.repository
-has_definition = repository.has("http://hl7.org/fhir/StructureDefinition/Patient")
-available_versions = repository.get_versions("http://hl7.org/fhir/StructureDefinition/Patient")
-latest_version = repository.get_latest_version("http://hl7.org/fhir/StructureDefinition/Patient")
-
-print(f"Patient definition available: {has_definition}")
-print(f"Available versions: {available_versions}")
-print(f"Latest version: {latest_version}")
-```
-
-### Versioned Structure Definitions
-
-The repository system supports FHIR versioning using the canonical URL format `url|version`:
-
-```python
-from fhircraft.fhir.resources.factory import factory
-
-# Load specific version
-patient_v401 = factory.construct_resource_model(
-    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient|4.0.1"
-)
-
-# Load latest version (default behavior)
-patient_latest = factory.construct_resource_model(
-    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
-)
-
-# Check available versions
-versions = factory.repository.get_versions("http://hl7.org/fhir/StructureDefinition/Patient")
-print(f"Available versions: {versions}")
-
-# Get version metadata
-version_info = factory.repository.get_version_info("http://hl7.org/fhir/StructureDefinition/Patient|4.0.1")
-print(f"Version info: {version_info}")
-```
-
-## Best Practices
-
-### Production Deployment
-
-!!! tip "Production Configuration"
+class Patient(BaseModel):
+    """US Core Patient Profile"""
     
-    For production environments:
-    
-    1. **Pre-load all definitions** - Load all required structure definitions at application startup
-    2. **Disable internet access** - Use `factory.disable_internet_access()` to prevent unexpected network calls
-    3. **Version pinning** - Use specific versions in canonical URLs for reproducible builds
-    4. **Local storage** - Store structure definitions in your application's resources directory
-    5. **Cache warming** - Pre-construct frequently used models to improve runtime performance
-
-```python
-def setup_production_factory() -> ResourceFactory:
-    """Configure factory for production use."""
-    factory = ResourceFactory(
-        enable_packages=True,
-        internet_enabled=False  # Disable internet for production
+    identifier: List[Identifier] = Field(
+        ...,
+        description="An identifier for this patient"
     )
     
-    # Load all required packages with specific versions
-    required_packages = [
-        ("hl7.fhir.us.core", "5.0.1"),
-        ("hl7.fhir.uv.ips", "1.1.0"),
-    ]
+    name: List[HumanName] = Field(
+        ...,
+        description="A name associated with the patient"
+    )
     
-    for package_name, version in required_packages:
-        factory.load_package(package_name, version)
-    
-    # Pre-construct frequently used models
-    common_models = [
-        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient",
-        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition",
-    ]
-    
-    for canonical_url in common_models:
-        factory.construct_resource_model(canonical_url)
-        
-    return factory
+    gender: Optional[str] = Field(
+        None,
+        description="male | female | other | unknown"
+    )
 ```
 
-### Error Handling and Validation
+The generator handles inheritance, forward references, and circular dependencies automatically.
 
-Model construction can fail for various reasons - missing definitions, network issues, or invalid structure definitions. Implementing comprehensive error handling ensures your application remains stable:
+## Common Problems
 
-```python
-def safe_model_construction(canonical_url: str) -> tuple[bool, any]:
-    """Safely construct a model with comprehensive error handling."""
-    try:
-        model = factory.construct_resource_model(canonical_url)
-        return True, model
-    except PackageNotFoundError as e:
-        print(f"Package not found for {canonical_url}: {e}")
-        return False, f"Package not found: {e}"
-    except ValueError as e:
-        print(f"Invalid structure definition for {canonical_url}: {e}")
-        return False, f"Invalid definition: {e}"
-    except Exception as e:
-        print(f"Unexpected error constructing {canonical_url}: {e}")
-        return False, f"Construction failed: {e}"
-
-# Usage
-success, result = safe_model_construction("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
-if success:
-    PatientModel = result
-    print(f"Successfully constructed model")
-else:
-    error_message = result
-    print(f"Failed to construct model: {error_message}")
-```
-
-### Memory and Performance Optimization
-
-!!! warning "Memory Considerations"
-    
-    - **Repository keeps definitions in memory** for fast access
-    - **Monitor memory usage** with many definitions
-    - **Consider on-demand loading** for large applications
-    - **Clear caches periodically** if memory becomes a concern
-
-!!! note "Thread Safety"
-    
-    - **Repository is thread-safe** for read operations
-    - **Avoid concurrent modifications** from multiple threads
-    - **Cache access is atomic** for model retrieval
-    - **Package loading should be done in main thread**
-
-## Troubleshooting
-
-### Common Issues and Solutions
-
-#### Package Not Found
-```python
-# Issue: PackageNotFoundError when loading package
-try:
-    factory.load_package("hl7.fhir.us.core", "999.0.0")  # Non-existent version
-except PackageNotFoundError:
-    print("Check package name and version at https://packages.fhir.org")
-```
-
-#### Internet Access Issues
-```python
-# Issue: Cannot download canonical URLs
-factory.disable_internet_access()
-# Ensure all required definitions are loaded locally
-```
-
-#### Version Conflicts
-```python
-# Issue: Multiple versions of same package
-factory.remove_package("hl7.fhir.us.core", "4.0.0")  # Remove old version
-factory.load_package("hl7.fhir.us.core", "5.0.1")    # Load new version
-```
-
-#### Cache Issues
-```python
-# Issue: Stale cached models
-factory.clear_cache()  # Clear all cached models
-# Reconstruct models with updated definitions
-```
-
-## What's Next?
-
-Now that you understand model construction, explore these related topics:
-
-- **[Resource Models](resources-models.md)** - Learn to create and work with resource instances
-- **[Pydantic FHIR](pydantic-representation.md)** - Understand the technical foundations of FHIR representation
-- **[FHIR Path](fhirpath.md)** - Query and manipulate resources with FHIRPath expressions
-- **[FHIR Mapper](mapper.md)** - Transform external data into FHIR resources
-
----
-
-**Continue learning:** [Resource Models →](resources-models.md)
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| ValueError: Structure definition not found | The canonical URL is not in the repository | Load the package or file containing the definition. See [managing FHIR artifacts](managing-fhir-artifacts.md) |
+| ValueError: SNAPSHOT mode requested but no snapshot element | Explicitly requested snapshot mode for a differential-only structure definition | Use `ConstructionMode.DIFFERENTIAL` or `ConstructionMode.AUTO` instead |
+| ValueError: DIFFERENTIAL mode requested but no differential element | Explicitly requested differential mode for a snapshot-only structure definition | Use `ConstructionMode.SNAPSHOT` or `ConstructionMode.AUTO` instead |
+| ValueError: Must have either snapshot or differential | Structure definition contains neither snapshot nor differential elements | Ensure the structure definition is valid and contains element definitions |
+| Model construction is slow | Constructing models without caching | The factory caches models automatically. Reuse the same factory instance across your application |
+| Profile constraints not enforced | Using base resource model instead of profile model | Construct a model from the profile canonical URL, not the base resource |
+| Base definition not found in differential mode | The baseDefinition URL cannot be resolved | Ensure the base profile is loaded into the repository before constructing the differential profile |
+| Cannot find profile from implementation guide | Package not loaded or incorrect canonical URL | Verify the package is loaded and check the canonical URL in the implementation guide documentation |
+| Models conflict between FHIR versions | Multiple FHIR versions loaded | Use version-specific canonical URLs or load only one FHIR version per repository |
+| Memory usage increases over time | Many models cached | Clear the cache periodically with `factory.clear_cache()` if needed |
+| Thread safety issues | Concurrent modifications to repository | Load all definitions during application startup before concurrent access |

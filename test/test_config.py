@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import pytest
 
 from fhircraft.config import (
-    FHIRCraftConfig,
+    FhircraftConfig,
     ValidationConfig,
     configure,
     disable_constraint,
@@ -49,23 +49,23 @@ class TestValidationConfig:
 
 
 class TestFHIRCraftConfig:
-    """Tests for FHIRCraftConfig dataclass."""
+    """Tests for FhircraftConfig dataclass."""
 
     def test_default_fhircraft_config(self):
-        """Test default FHIRCraftConfig values."""
-        config = FHIRCraftConfig()
+        """Test default FhircraftConfig values."""
+        config = FhircraftConfig()
         assert isinstance(config.validation, ValidationConfig)
         assert config.validation.mode == 'strict'
 
     def test_fhircraft_config_with_validation(self):
-        """Test FHIRCraftConfig with custom ValidationConfig."""
+        """Test FhircraftConfig with custom ValidationConfig."""
         validation = ValidationConfig(disable_warnings=True)
-        config = FHIRCraftConfig(validation=validation)
+        config = FhircraftConfig(validation=validation)
         assert config.validation.disable_warnings is True
 
     def test_fhircraft_config_with_dict(self):
-        """Test FHIRCraftConfig converts dict to ValidationConfig."""
-        config = FHIRCraftConfig(
+        """Test FhircraftConfig converts dict to ValidationConfig."""
+        config = FhircraftConfig(
             validation={'disable_warnings': True, 'mode': 'lenient'}
         )
         assert isinstance(config.validation, ValidationConfig)
@@ -79,12 +79,12 @@ class TestConfigAccess:
     def test_get_default_config(self):
         """Test getting default configuration."""
         config = get_config()
-        assert isinstance(config, FHIRCraftConfig)
+        assert isinstance(config, FhircraftConfig)
         assert config.validation.mode == 'strict'
 
     def test_set_config(self):
         """Test setting global configuration."""
-        new_config = FHIRCraftConfig(
+        new_config = FhircraftConfig(
             validation=ValidationConfig(disable_warnings=True)
         )
         set_config(new_config)
@@ -196,7 +196,7 @@ class TestWithConfigContextManager:
     def test_with_config_returns_config(self):
         """Test that with_config yields the new configuration."""
         with with_config(disable_validation_warnings=True) as config:
-            assert isinstance(config, FHIRCraftConfig)
+            assert isinstance(config, FhircraftConfig)
             assert config.validation.disable_warnings is True
 
 

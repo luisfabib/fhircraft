@@ -1,8 +1,8 @@
-site_name: Fhircraft
+site_name: Fhircraft - Pythonic FHIR 
 site_url: https://github.com/luisfabib/fhircraft
 repo_url: https://github.com/luisfabib/fhircraft
 repo_name: luisfabib/fhircraft
-copyright: Copyright &copy; 2024 - 2025 Luis Fábregas-Ibáñez and contributors
+copyright: Copyright &copy; 2024 - 2026 Luis Fábregas-Ibáñez and contributors
 
 theme:
   icon:
@@ -10,7 +10,9 @@ theme:
   favicon: assets/images/favicon.png
   logo: assets/logo_white.svg
   name: material
+  custom_dir: docs/.overrides
   features:
+    - announce.dismiss
     - content.code.copy
     - content.code.annotate
     - navigation.expand
@@ -44,6 +46,7 @@ theme:
 
 extra_css:
   - stylesheets/extra.css
+  - stylesheets/mkdocstrings.css
 
 extra:
   social:
@@ -56,6 +59,7 @@ markdown_extensions:
   - attr_list
   - md_in_html
   - admonition
+  - pymdownx.details
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.emoji:
@@ -75,18 +79,30 @@ plugins:
       nav_file: SUMMARY.md
   - gen-files:
       scripts:
-        - scripts/gen_ref_pages.py
-        - scripts/gen_credits_page.py
-        - scripts/gen_repo_pages.py
+        - docs/.scripts/gen_ref_pages.py
+        - docs/.scripts/gen_credits_page.py
+        - docs/.scripts/gen_repo_pages.py
   - mkdocstrings:
+      custom_templates: docs/.overrides
       handlers:
         python:
-          docstring_section_style: google
-          docstring_options:
-            ignore_init_summary: true
-          merge_init_into_class: true
-          separate_signature: true
-          signature_crossrefs: true
+          options:
+            docstring_style: google
+            members_order: source
+            separate_signature: true
+            filters: ["!^_"]
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            summary: true
+            signature_crossrefs: true
+            extensions:
+              - griffe_fieldz:
+                  include_inherited: true
           import:
             - https://docs.python.org/3/objects.inv
             - https://docs.pydantic.dev/latest/objects.inv
+            - https://typing-extensions.readthedocs.io/en/latest/objects.inv

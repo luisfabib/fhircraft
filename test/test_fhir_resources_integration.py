@@ -31,7 +31,7 @@ fhir_resources_test_cases = {
             [
                 (resource_label, filename)
                 for filename in _get_core_example_filenames(
-                    f"{resource_label.lower()}-*", version
+                    f"{resource_label.lower()}-*.json", version
                 )
             ]
             for resource_label in [

@@ -1,76 +1,86 @@
 
-# Installation
+## Requirements
 
-This installation guide is for developers who want to add Fhircraft to their Python projects. You'll get Fhircraft running in your environment and be ready to build FHIR-compliant applications.
+Fhircraft requires a recent version of [Python](https://www.python.org/) (3.10 or higher) and a Python package manager (e.g., [pip](https://packaging.python.org/en/latest/tutorials/installing-packages/)) to be installed on your system.
 
-## Quick Install
+!!! note "Internet Connection (optional)"
 
-Install Fhircraft using pip if you have Python 3.10+ installed:
+    Fhircraft works completely offline. An internet connection is only needed if you want to dynamically download external FHIR resources and definitions at runtime.
 
-```bash
-pip install fhircraft
-```
 
-Or install the latest development version:
+!!! tip "Pydantic Knowledge"
 
-```bash
-pip install git+https://github.com/luisfabib/fhircraft.git
-```
+    Fhircraft is built on [:simple-pydantic: Pydantic](https://docs.pydantic.dev/latest/), meaning all FHIR resource models are Pydantic models with full access to their API. This documentation assumes basic Pydantic familiarity, so we recommend reviewing the Pydantic documentation if you're new to it.  
 
-## System Requirements
 
-**Required:**
+## Installation
 
-- Python 3.10 or higher
-- pip package manager
+### Latest Release
 
-**Optional but recommended:**
+Fhircraft is provided as a [Python package](https://pypi.org/project/fhircraft/) and can be installed with your preferred package manager of choice, ideally by using a [virtual environment](https://realpython.com/what-is-pip/#using-pip-in-a-python-virtual-environment). Open up a terminal and install the latest Fhircraft version with:
 
-- Internet connection (for downloading FHIR specifications)
-- Basic familiarity with [Pydantic](https://docs.pydantic.dev/latest/) (Fhircraft's foundation)
+=== ":simple-pypi: pip"
 
-## Verify Installation
+    ```bash
+    pip install fhircraft
+    ```
 
-Test your installation by creating a simple FHIR model:
+=== ":simple-poetry: Poetry"
 
-```python
-from fhircraft.fhir.resources.factory import construct_resource_model
+    ```bash
+    poetry add fhircraft
+    ```
 
-# This should work without errors
-Patient = construct_resource_model(
-    canonical_url='http://hl7.org/fhir/StructureDefinition/Patient'
-)
-print("Fhircraft installed successfully!")
-```
+=== ":material-lightning-bolt: uv"
 
-## Dependencies
+    ```bash
+    uv add fhircraft
+    ```
 
-Fhircraft automatically installs these dependencies:
+=== ":octicons-package-16: pipenv"
 
-- **Pydantic** (≥2.7) - Data validation and serialization
-- **requests** - HTTP client for FHIR specifications
-- **ply** (≥3.11) - FHIRPath expression parsing
-- **jsonschema** (>4) - JSON schema validation
-- **PyYAML** - YAML file support
-- **jsonpath-ng** - JSON path operations
-- **Jinja2** (≥3.1) - Code generation
+    ```bash
+    pipenv install fhircraft
+    ```
+
+### Development Version
+
+Install the latest development version directly from the [GitHub repository](https://github.com/luisfabib/fhircraft):
+
+=== ":simple-pypi: pip"
+
+    ```bash
+    pip install git+https://github.com/luisfabib/fhircraft.git
+    ```
+
+=== ":simple-poetry: Poetry"
+
+    ```bash
+    poetry add git+https://github.com/luisfabib/fhircraft.git
+    ```
+
+=== ":material-lightning-bolt: uv"
+
+    ```bash
+    uv add git+https://github.com/luisfabib/fhircraft.git
+    ```
 
 ## Development installation
 
 
-If you want to contribute to Fhircraft or work with the latest development version:
+If you want to contribute to Fhircraft or work with a customized version:
 
+1. Clone the Fhircraft repository
 ```bash
-# Clone the repository
 git clone https://github.com/luisfabib/fhircraft.git
 cd fhircraft
-
-# Install in development mode
-pip install -e .
-
-# Install development dependencies
-pip install -e ".[dev]"
 ```
+
+2. Install in editable mode along with the development dependencies
+```bash
+pip install -e .[dev]
+```
+
 For detailed instructions on developing and contributing to Fhircraft, see the [:octicons-devices-16: Contributing Guide](../community/contributing.md).
 
 

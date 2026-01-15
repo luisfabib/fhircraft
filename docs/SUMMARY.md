@@ -1,21 +1,52 @@
-  - [Home](index.md)
-  - Getting Started
-    - Introduction
-        - [Installation](quickstart/installation.md)
-        - [Basics](quickstart/basics.md)
-    - Community
-        - [Contributing](community/contributing.md)
-        - [Code of Conduct](community/code_of_conduct.md)
-        - [Credits](community/credits.md)
-        - [License](community/license.md)
+  - [Fhircraft](index.md)
   - [User Guide](user-guide/overview.md)
+      - First Steps 
+          - [Installation](quickstart/installation.md)
+          - [Quick Start](quickstart/quickstart.md)
       - Fhircraft
-          - [FHIR Resources](user-guide/resources-overview.md)
-              - [Pydantic FHIR](user-guide/pydantic-representation.md)
-              - [Resource Models](user-guide/resources-models.md)
-              - [Resource Factory](user-guide/resources-construction.md)
-          - [FHIR Path](user-guide/fhirpath.md)
-          - [FHIR Mapper](user-guide/mapper.md)
+          - [Pydantic Representation of FHIR](user-guide/pydantic-representation.md)
+          - [Working with FHIR Resource Models](user-guide/resources-models.md)
+          - [Managing FHIR Artifacts](user-guide/managing-fhir-artifacts.md)
+          - [Constructing Dynamic FHIR Models](user-guide/resources-construction.md)
+          - [Configuring Validation Behavior](user-guide/configuration.md)
+          - [Querying Data with FHIRPath](user-guide/fhirpath.md)
+          - [Transforming Data with FHIR Mapper](user-guide/mapper.md)
+  - Community
+    - [Contributing](community/contributing.md)
+    - [Code of Conduct](community/code_of_conduct.md)
+    - [Alternatives](community/alternatives.md)
+    - [Credits](community/credits.md)
+    - [License](community/license.md)
   - [Release Notes](changelog.md)
   - Reference
-    -  ./reference/*
+      - FHIR Resources
+          - [Bases](reference/fhir-resources-base.md)
+          - [Factory](reference/fhir-resources-factory.md)
+          - [Repositories](reference/fhir-resources-repository.md)
+          - [Code Generator](reference/fhir-resources-code-generator.md)
+          - Built-in Types
+              - [Primitive Types](reference/fhir-resources-primitives.md)
+              - R4
+                  - [Complex Types](reference/fhir-resources-r4-complex.md)
+                  - [Core Resources](reference/fhir-resources-r4-core.md)
+              - R4B
+                  - [Complex Types](reference/fhir-resources-r4b-complex.md)
+                  - [Core Resources](reference/fhir-resources-r4b-core.md)
+              - R5
+                  - [Complex Types](reference/fhir-resources-r5-complex.md)
+                  - [Core Resources](reference/fhir-resources-r5-core.md)
+              - [Type Utilities](reference/fhir-resources-type-utils.md)
+      - FHIRPath
+          - [Engine](reference/fhir-path-engine.md)
+          - [Mixin](reference/fhir-path-mixin.md)
+          - [Parser](reference/fhir-path-parser.md)
+          - [Exceptions](reference/fhir-path-exceptions.md)
+      - FHIR Mapping
+          - [Engine](reference/fhir-mapping-engine.md)
+          - [Parser](reference/fhir-mapping-parser.md)
+      - FHIR Package Registry
+          - [Client](reference/fhir-packages-client.md)
+          - [Models](reference/fhir-packages-models.md)
+      - Other
+          - [Core Utilities](reference/core-utilities.md)
+
