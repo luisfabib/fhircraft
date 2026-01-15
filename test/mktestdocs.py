@@ -143,7 +143,7 @@ def preprocess_print_assertions(source):
                     escaped_expected = expected_value.replace('"', '\\"')
 
                     # Create assertion that handles quote differences gracefully
-                    assertion = f'assert str({print_arg}) == str({expected_value}), f"Expected {escaped_expected}, got {{str({print_arg})}}"'
+                    assertion = f'assert (test_value := str({print_arg})) == (expected_value := str({expected_value})), f"Expected {{expected_value}}, got {{test_value}}"'
                     new_line = " " * indent + assertion
                     new_lines.append(new_line)
 
