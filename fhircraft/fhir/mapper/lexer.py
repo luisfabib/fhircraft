@@ -113,7 +113,6 @@ class FhirMappingLanguageLexer(FhirPathLexer):
         "IDENTIFIER",
         "DELIMITEDIDENTIFIER",
         "METADATA_DECLARATION",
-        "DOCUMENTATION",
         "GROUPTYPE",
         "INTEGER",
         "DECIMAL",
