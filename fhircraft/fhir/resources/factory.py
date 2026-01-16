@@ -40,12 +40,33 @@ from fhircraft.fhir.resources.datatypes.utils import get_fhir_resource_type
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
-from fhircraft.fhir.resources.definitions import (
-    ElementDefinition,
-    ElementDefinitionConstraint,
-    ElementDefinitionSlicing,
-    ElementDefinitionType,
-    StructureDefinition,
+
+from fhircraft.fhir.resources.datatypes.R4.core import (
+    StructureDefinition as R4_StructureDefinition,
+)
+from fhircraft.fhir.resources.datatypes.R4B.core import (
+    StructureDefinition as R4B_StructureDefinition,
+)
+from fhircraft.fhir.resources.datatypes.R5.core import (
+    StructureDefinition as R5_StructureDefinition,
+)
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    ElementDefinition as R4_ElementDefinition,
+    ElementDefinitionConstraint as R4_ElementDefinitionConstraint,
+    ElementDefinitionSlicing as R4_ElementDefinitionSlicing,
+    ElementDefinitionType as R4_ElementDefinitionType,
+)
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
+    ElementDefinition as R4B_ElementDefinition,
+    ElementDefinitionConstraint as R4B_ElementDefinitionConstraint,
+    ElementDefinitionSlicing as R4B_ElementDefinitionSlicing,
+    ElementDefinitionType as R4B_ElementDefinitionType,
+)
+from fhircraft.fhir.resources.datatypes.R5.complex import (
+    ElementDefinition as R5_ElementDefinition,
+    ElementDefinitionConstraint as R5_ElementDefinitionConstraint,
+    ElementDefinitionSlicing as R5_ElementDefinitionSlicing,
+    ElementDefinitionType as R5_ElementDefinitionType,
 )
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 from fhircraft.utils import capitalize, ensure_list, get_FHIR_release_from_version
@@ -73,13 +94,18 @@ class ConstructionMode(str, Enum):
     AUTO = "auto"
 
 
-class ElementDefinitionNode(ElementDefinition):
+class StructureNode(BaseModel):
     """A node in the ElementDefinition tree structure."""
 
+    id: str = Field(...)
+    path: str = Field(...)
     node_label: str = Field(...)
-    children: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
-    slices: Dict[str, "ElementDefinitionNode"] = Field(default_factory=dict)
-    root: Optional["ElementDefinitionNode"] = None
+    children: Dict[str, "StructureNode"] = Field(default_factory=dict)
+    slices: Dict[str, "StructureNode"] = Field(default_factory=dict)
+    root: Optional["StructureNode"] = None
+    definition: (
+        R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition | None
+    ) = Field(default=None)
 
 
 @dataclass
@@ -94,13 +120,30 @@ class ResourceFactoryValidators:
     def add(self, validator_name: str, validator: Any) -> None:
         self._validators[validator_name] = validator
 
-    def add_model_constraint_validator(self, constraint: ElementDefinitionConstraint):
+    def add_model_constraint_validator(
+        self,
+        constraint: (
+            R4_ElementDefinitionConstraint
+            | R4B_ElementDefinitionConstraint
+            | R5_ElementDefinitionConstraint
+        ),
+    ):
         """
         Adds a model constraint validator based on the provided constraint.
 
         Args:
             constraint (dict): The constraint details including expression, human-readable description, key, and severity.
         """
+        if (
+            not constraint.key
+            or not constraint.expression
+            or not constraint.human
+            or not constraint.key
+            or not constraint.severity
+        ):
+            raise ValueError(
+                "Constraint must have key, expression, human, and severity."
+            )
         # Construct function name for validator
         constraint_name = constraint.key.replace("-", "_")
         validator_name = f"FHIR_{constraint_name}_constraint_model_validator"
@@ -119,7 +162,11 @@ class ResourceFactoryValidators:
     def add_element_constraint_validator(
         self,
         field: str,
-        constraint: ElementDefinitionConstraint,
+        constraint: (
+            R4_ElementDefinitionConstraint
+            | R4B_ElementDefinitionConstraint
+            | R5_ElementDefinitionConstraint
+        ),
         base: Any,
     ):
         """
@@ -130,6 +177,16 @@ class ResourceFactoryValidators:
             constraint (dict): The details of the constraint including expression, human-readable description, key, and severity.
             base (Any): The base model to check for existing validators.
         """
+        if (
+            not constraint.key
+            or not constraint.expression
+            or not constraint.human
+            or not constraint.key
+            or not constraint.severity
+        ):
+            raise ValueError(
+                "Constraint must have key, expression, human, and severity."
+            )
         # Construct function name for validator
         constraint_name = constraint.key.replace("-", "_")
         validator_name = f"FHIR_{constraint_name}_constraint_validator"
@@ -459,17 +516,22 @@ class ResourceFactory:
 
     def resolve_structure_definition(
         self, canonical_url: str, version: str | None = None
-    ) -> StructureDefinition:
+    ) -> R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition:
         """Resolve structure definition using the repository."""
         if structure_def := self.repository.get(canonical_url, version):
             return structure_def
         raise ValueError(f"Could not resolve structure definition: {canonical_url}")
 
     def _build_element_tree_structure(
-        self, elements: List[ElementDefinition]
-    ) -> List[ElementDefinitionNode]:
+        self,
+        elements: (
+            List[R4_ElementDefinition]
+            | List[R4B_ElementDefinition]
+            | List[R5_ElementDefinition]
+        ),
+    ) -> List[StructureNode]:
         """
-        Builds a hierarchical tree structure of ElementDefinitionNode objects from a flat list of ElementDefinition elements.
+        Builds a hierarchical tree structure of StructureNode objects from a flat list of ElementDefinition elements.
 
         This method organizes the provided FHIR ElementDefinition elements into a nested tree based on their dot-separated IDs,
         handling both regular child elements and slice definitions (denoted by a colon in the ID part).
@@ -479,21 +541,22 @@ class ResourceFactory:
                 A list of ElementDefinition objects representing the structure to be organized.
 
         Returns:
-            List[ElementDefinitionNode]:
-                A list of top-level ElementDefinitionNode objects representing the root children of the constructed tree.
+            List[StructureNode]:
+                A list of top-level StructureNode objects representing the root children of the constructed tree.
 
         Notes:
             - Slice definitions (e.g., "element:sliceName") are handled by creating separate nodes under the appropriate parent.
-            - Each node in the tree is an instance of ElementDefinitionNode, with children and slices populated as needed.
+            - Each node in the tree is an instance of StructureNode, with children and slices populated as needed.
             - The root node is a synthetic node and is not included in the returned list.
             - For differential mode, missing parent elements are created as placeholder nodes automatically.
         """
-        root = ElementDefinitionNode(
+        root = StructureNode(
             id="__root__",
             path="__root__",
             node_label="__root__",
             children={},
             slices={},
+            definition=R4_ElementDefinition.model_construct(),
         )
         for element in elements:
             current = root
@@ -504,7 +567,7 @@ class ResourceFactory:
                     part, sliceName = part.split(":")
                     # Ensure parent element exists (create placeholder if needed for differential mode)
                     if part not in current.children:
-                        current.children[part] = ElementDefinitionNode.model_validate(
+                        current.children[part] = StructureNode.model_validate(
                             {
                                 "id": ".".join(id_parts[: index + 1]).replace(
                                     ":" + sliceName, ""
@@ -522,17 +585,15 @@ class ResourceFactory:
                     current.slices = current.slices or {}
                     current = current.slices.setdefault(
                         sliceName,
-                        ElementDefinitionNode.model_validate(
+                        StructureNode.model_validate(
                             {
                                 "node_label": sliceName,
                                 "path": "__root__",
                                 "root": root,
                                 "children": {},
                                 "slices": {},
-                                **(
-                                    element.model_dump(exclude_unset=True)
-                                    if index == len(id_parts) - 1
-                                    else {}
+                                "definition": (
+                                    element if index == len(id_parts) - 1 else None
                                 ),
                             }
                         ),
@@ -542,15 +603,13 @@ class ResourceFactory:
                     current.children = current.children or {}
                     current = current.children.setdefault(
                         part,
-                        ElementDefinitionNode.model_validate(
+                        StructureNode.model_validate(
                             {
                                 "node_label": part,
                                 "root": root,
                                 "path": "__root__",
-                                **(
-                                    element.model_dump(exclude_unset=True)
-                                    if index == len(id_parts) - 1
-                                    else {}
+                                "definition": (
+                                    element if index == len(id_parts) - 1 else None
                                 ),
                             }
                         ),
@@ -559,7 +618,13 @@ class ResourceFactory:
         return result
 
     def _resolve_FHIR_type(
-        self, element_type: ElementDefinitionType | str
+        self,
+        element_type: (
+            R4_ElementDefinitionType
+            | R4B_ElementDefinitionType
+            | R5_ElementDefinitionType
+            | str
+        ),
     ) -> type | str:
         """
         Resolves and returns the Python type corresponding to a FHIR complex or primitive type
@@ -583,8 +648,15 @@ class ResourceFactory:
         FHIR_COMPLEX_TYPE_PREFIX = "http://hl7.org/fhir/StructureDefinition/"
         FHIRPATH_TYPE_PREFIX = "http://hl7.org/fhirpath/System."
         element_type_code = (
-            element_type.code
-            if isinstance(element_type, ElementDefinitionType)
+            str(element_type.code)
+            if isinstance(
+                element_type,
+                (
+                    R4_ElementDefinitionType,
+                    R4B_ElementDefinitionType,
+                    R5_ElementDefinitionType,
+                ),
+            )
             else element_type
         )
         # Pre-process the type string
@@ -605,7 +677,14 @@ class ResourceFactory:
                 )
             except (ModuleNotFoundError, AttributeError):
                 if (
-                    isinstance(element_type, ElementDefinitionType)
+                    isinstance(
+                        element_type,
+                        (
+                            R4_ElementDefinitionType,
+                            R4B_ElementDefinitionType,
+                            R5_ElementDefinitionType,
+                        ),
+                    )
                     and element_type.profile
                 ):
                     # Try to resolve custom type from profile URL
@@ -626,7 +705,14 @@ class ResourceFactory:
                             f"Could not resolve the canonical URL '{element_type.profile[0]}' for the FHIR type '{element_type_code}'. Please add the resource to the factory repository."
                         )
                 elif (
-                    isinstance(element_type, ElementDefinitionType)
+                    isinstance(
+                        element_type,
+                        (
+                            R4_ElementDefinitionType,
+                            R4B_ElementDefinitionType,
+                            R5_ElementDefinitionType,
+                        ),
+                    )
                     and element_type.code
                 ):
                     return self.local_cache.get(element_type.code, element_type.code)
@@ -752,7 +838,9 @@ class ResourceFactory:
         return field_name, None
 
     def _process_pattern_or_fixed_values(
-        self, element: ElementDefinition, constraint_prefix: str
+        self,
+        element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+        constraint_prefix: str,
     ) -> Any:
         """
         Process the pattern or fixed values of a StructureDefinition element.
@@ -844,7 +932,7 @@ class ResourceFactory:
     def _construct_slice_model(
         self,
         name: str,
-        definition: ElementDefinitionNode,
+        node: StructureNode,
         base: type[ModelT],
         base_name: str,
     ) -> Any:
@@ -859,7 +947,7 @@ class ResourceFactory:
 
         Args:
             name (str): The name of the slice.
-            definition (ElementDefinitionNode): The FHIR element definition node describing the slice.
+            definition (StructureNode): The FHIR element definition node describing the slice.
             base (type[BaseModel]): The base Pydantic model to inherit from.
 
         Returns:
@@ -868,6 +956,10 @@ class ResourceFactory:
         Raises:
             AssertionError: If the constructed model is not a subclass of `FHIRSliceModel`.
         """
+        definition = node.definition
+        if not definition:
+            raise ValueError(f"Slice definition for '{name}' is missing.")
+        # Check if the slice references a canonical profile
         if (types := definition.type) and (canonical_urls := types[0].profile):
             # Construct the slice model from the canonical URL
             slice_model = self.construct_resource_model(
@@ -887,7 +979,7 @@ class ResourceFactory:
             # Process and compile all subfields of the slice
             slice_subfields, slice_validators, slice_properties = (
                 self._process_FHIR_structure_into_Pydantic_components(
-                    definition,
+                    node,
                     FHIRSliceModel,
                     resource_name=slice_model_name,
                 )
@@ -917,7 +1009,7 @@ class ResourceFactory:
 
     def _construct_annotated_sliced_field(
         self,
-        slices: Dict[str, ElementDefinitionNode],
+        slices: Dict[str, StructureNode],
         field_type: type[BaseModel],
         base_name: str,
     ) -> Annotated:
@@ -925,7 +1017,7 @@ class ResourceFactory:
         Constructs an annotated field representing a union of sliced models and the base field type.
 
         Args:
-            slices (Dict[str, ElementDefinitionNode]): A dictionary mapping slice names to their corresponding ElementDefinitionNode objects.
+            slices (Dict[str, StructureNode]): A dictionary mapping slice names to their corresponding StructureNode objects.
             field_type (type[BaseModel]): The base model type for the field.
 
         Returns:
@@ -948,7 +1040,10 @@ class ResourceFactory:
             Field(union_mode="left_to_right"),
         ]
 
-    def _parse_element_cardinality(self, element: ElementDefinition) -> Tuple[int, int]:
+    def _parse_element_cardinality(
+        self,
+        element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+    ) -> Tuple[int, int]:
         """
         Parses the cardinality constraints from a FHIR element definition.
 
@@ -979,8 +1074,13 @@ class ResourceFactory:
     def _resolve_base_snapshot_element(
         self,
         element_path: str,
-        base_structure_definition: StructureDefinition | None = None,
-    ) -> ElementDefinition | None:
+        base_structure_definition: (
+            R4_StructureDefinition
+            | R4B_StructureDefinition
+            | R5_StructureDefinition
+            | None
+        ) = None,
+    ) -> R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition | None:
         """Resolve a snapshot element from the base StructureDefinition.
 
         For differential construction, this retrieves the complete element definition
@@ -1010,9 +1110,22 @@ class ResourceFactory:
 
     def _merge_differential_elements_with_base_snapshot(
         self,
-        differential_elements: List[ElementDefinition],
-        base_structure_definition: StructureDefinition,
-    ) -> List[ElementDefinition]:
+        differential_elements: (
+            List[R4_ElementDefinition]
+            | List[R4B_ElementDefinition]
+            | List[R5_ElementDefinition]
+        ),
+        base_structure_definition: (
+            R4_StructureDefinition
+            | R4B_StructureDefinition
+            | R5_StructureDefinition
+            | None
+        ) = None,
+    ) -> (
+        List[R4_ElementDefinition]
+        | List[R4B_ElementDefinition]
+        | List[R5_ElementDefinition]
+    ):
         """Merge all differential elements with their base snapshot counterparts.
 
         This creates a complete list of element definitions by resolving each differential
@@ -1046,6 +1159,9 @@ class ResourceFactory:
 
             base_elem = base_snapshot_map.get(lookup_id)
             if base_elem:
+                ElementDefinition = get_complex_FHIR_type(
+                    "ElementDefinition", self.Config.FHIR_release
+                )
                 # Start with base snapshot element
                 merged = ElementDefinition.model_validate(base_elem.model_dump())
                 # Overlay differential changes
@@ -1063,9 +1179,16 @@ class ResourceFactory:
 
     def _merge_differential_with_base_snapshot(
         self,
-        differential_element: ElementDefinition,
-        base_structure_definition: StructureDefinition | None = None,
-    ) -> ElementDefinition:
+        differential_element: (
+            R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition
+        ),
+        base_structure_definition: (
+            R4_StructureDefinition
+            | R4B_StructureDefinition
+            | R5_StructureDefinition
+            | None
+        ) = None,
+    ) -> R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition:
         """Merge a differential element with its base snapshot element.
 
         Creates a complete element definition by overlaying differential changes
@@ -1079,6 +1202,8 @@ class ResourceFactory:
         Returns:
             Merged element with base properties and differential overrides
         """
+        if not differential_element.path:
+            raise ValueError("Differential element must have a valid path")
         # Try to resolve the base snapshot element
         base_snapshot_element = self._resolve_base_snapshot_element(
             differential_element.path, base_structure_definition
@@ -1096,9 +1221,9 @@ class ResourceFactory:
         for field_name in differential_element.model_fields:
             diff_value = getattr(differential_element, field_name, None)
             # Only override if the differential has a non-None value
-            # Special handling for ElementDefinitionNode fields
+            # Special handling for StructureNode fields
             if field_name in ("node_label", "children", "slices", "root"):
-                # Skip ElementDefinitionNode-specific fields
+                # Skip StructureNode-specific fields
                 continue
             if diff_value is not None:
                 setattr(merged, field_name, diff_value)
@@ -1106,16 +1231,16 @@ class ResourceFactory:
         return merged
 
     def _resolve_content_reference(
-        self, element: ElementDefinitionNode, resource_name="Unknown"
-    ) -> ElementDefinitionNode:
+        self, node: StructureNode, resource_name="Unknown"
+    ) -> StructureNode:
         """
-        Resolves the content reference for a given ElementDefinitionNode by copying relevant fields
+        Resolves the content reference for a given StructureNode by copying relevant fields
         from the referenced element to the current element. Adds cycle detection to prevent infinite recursion.
         Args:
-            element (ElementDefinitionNode): The element node containing a content reference.
+            element (StructureNode): The element node containing a content reference.
 
         Returns:
-            ElementDefinitionNode: The updated element node with fields populated from the referenced element.
+            StructureNode: The updated element node with fields populated from the referenced element.
 
         Raises:
             ValueError: If the provided element does not have a content reference.
@@ -1123,12 +1248,15 @@ class ResourceFactory:
         Warns:
             UserWarning: If the content reference cannot be resolved or a cycle is detected.
         """
-        if not element.contentReference:
+        if not node.definition:
+            raise ValueError("StructureNode does not have a definition")
+
+        if not node.definition.contentReference:
             raise ValueError("Element does not have a content reference")
 
-        resource_url, reference_path = element.contentReference.split("#")
+        resource_url, reference_path = node.definition.contentReference.split("#")
         if not resource_url:
-            search = element.root
+            search = node.root
         else:
             # Resolve the resource URL to a StructureDefinition
             structure_definition = self.resolve_structure_definition(
@@ -1138,6 +1266,10 @@ class ResourceFactory:
                 raise ValueError(f"Could not resolve resource URL: {resource_url}")
             if not structure_definition.snapshot:
                 raise ValueError(f"StructureDefinition {resource_url} has no snapshot")
+            if not structure_definition.snapshot.element:
+                raise ValueError(
+                    f"StructureDefinition {resource_url} snapshot has no elements"
+                )
             search_tree = self._build_element_tree_structure(
                 structure_definition.snapshot.element
             )
@@ -1147,15 +1279,19 @@ class ResourceFactory:
         parts = reference_path.split(".")
 
         # Detect cycles
-        if reference_path in self.paths_in_processing or element.path.startswith(
+        if reference_path in self.paths_in_processing or node.path.startswith(
             reference_path + "."
         ):
             backbone_model_name = capitalize(resource_name).strip() + "".join(
                 [capitalize(label).strip() for label in reference_path.split(".")[1:]]
             )
-            element.type = [ElementDefinitionType(code=backbone_model_name)]
-            element.children = {}
-            return element
+            ElementDefinitionType = get_complex_FHIR_type(
+                "ElementDefinition", self.Config.FHIR_release
+            )
+
+            node.definition.type = [ElementDefinitionType(code=backbone_model_name)]  # type: ignore
+            node.children = {}
+            return node
         self.paths_in_processing.add(reference_path)
 
         for part in parts:
@@ -1168,13 +1304,18 @@ class ResourceFactory:
 
         if not referenced_element:
             warnings.warn(
-                f"Could not resolve content reference: {element.contentReference}."
+                f"Could not resolve content reference: {node.definition.contentReference}."
             )
             self.paths_in_processing.remove(reference_path)
-            return element
+            return node
 
-        for field in ("children", "type", "maxLength", "binding"):
-            setattr(element, field, getattr(referenced_element, field, None))
+        setattr(node, "children", getattr(referenced_element, "children", None))
+        for field in ("type", "maxLength", "binding"):
+            setattr(
+                node.definition,
+                field,
+                getattr(referenced_element.definition, field, None),
+            )
         for field in (
             "defaultValue",
             "fixed",
@@ -1183,17 +1324,25 @@ class ResourceFactory:
             "minValue",
             "maxValue",
         ):
-            for attr in element.__class__.model_fields:
+            for attr in node.definition.__class__.model_fields:
                 if (
                     attr.startswith(field)
-                    and getattr(referenced_element, attr, None) is not None
+                    and getattr(referenced_element.definition, attr, None) is not None
                 ):
-                    setattr(element, attr, getattr(referenced_element, attr, None))
+                    setattr(
+                        node.definition,
+                        attr,
+                        getattr(referenced_element.definition, attr, None),
+                    )
 
-        return element
+        return node
 
     def _detect_construction_mode(
-        self, structure_definition: StructureDefinition, mode: ConstructionMode
+        self,
+        structure_definition: (
+            R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition
+        ),
+        mode: ConstructionMode | str,
     ) -> ConstructionMode:
         """Detect the appropriate construction mode for a structure definition.
 
@@ -1207,27 +1356,27 @@ class ResourceFactory:
         Raises:
             ValueError: If neither snapshot nor differential is available
         """
-        if mode != ConstructionMode.AUTO:
-            # Validate that requested mode is available
-            if mode == ConstructionMode.SNAPSHOT:
-                if (
-                    not structure_definition.snapshot
-                    or not structure_definition.snapshot.element
-                ):
-                    raise ValueError(
-                        f"SNAPSHOT mode requested but StructureDefinition '{structure_definition.name}' "
-                        "does not have a snapshot element."
-                    )
-            elif mode == ConstructionMode.DIFFERENTIAL:
-                if (
-                    not structure_definition.differential
-                    or not structure_definition.differential.element
-                ):
-                    raise ValueError(
-                        f"DIFFERENTIAL mode requested but StructureDefinition '{structure_definition.name}' "
-                        "does not have a differential element."
-                    )
-            return mode
+        # Validate that requested mode is available
+        if mode == ConstructionMode.SNAPSHOT:
+            if (
+                not structure_definition.snapshot
+                or not structure_definition.snapshot.element
+            ):
+                raise ValueError(
+                    f"SNAPSHOT mode requested but StructureDefinition '{structure_definition.name}' "
+                    "does not have a snapshot element."
+                )
+        elif mode == ConstructionMode.DIFFERENTIAL:
+            if (
+                not structure_definition.differential
+                or not structure_definition.differential.element
+            ):
+                raise ValueError(
+                    f"DIFFERENTIAL mode requested but StructureDefinition '{structure_definition.name}' "
+                    "does not have a differential element."
+                )
+        else:
+            return ConstructionMode.AUTO
 
         # AUTO mode: detect based on available elements
         has_differential = (
@@ -1255,7 +1404,11 @@ class ResourceFactory:
             return ConstructionMode.SNAPSHOT
 
     def _resolve_and_construct_base_model(
-        self, base_canonical_url: str, structure_definition: StructureDefinition
+        self,
+        base_canonical_url: str,
+        structure_definition: (
+            R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition
+        ),
     ) -> type[BaseModel]:
         """Resolve and construct the base model for a differential structure definition.
 
@@ -1355,7 +1508,7 @@ class ResourceFactory:
 
     def _process_FHIR_structure_into_Pydantic_components(
         self,
-        structure: ElementDefinitionNode,
+        structure: StructureNode,
         base: Any | None = None,
         resource_name: str = "Unknown",
     ) -> Tuple[
@@ -1377,7 +1530,9 @@ class ResourceFactory:
         fields = {}
         validators = ResourceFactoryValidators()
         properties = {}
-        for name, element in structure.children.items():
+        for name, node in structure.children.items():
+            if not node.definition:
+                raise ValueError(f"Element definition for '{name}' is missing.")
             # Handle Python reserved keywords for field names early
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
@@ -1391,16 +1546,19 @@ class ResourceFactory:
             # -------------------------------------
             # Element content references
             # -------------------------------------
-            if element.contentReference:
-                element = self._resolve_content_reference(element, resource_name)
+            if node.definition.contentReference:
+                node = self._resolve_content_reference(node, resource_name)
 
             # -------------------------------------
             # Type resolution
             # -------------------------------------
             # Parse the FHIR types of the element
             field_types = (
-                [self._resolve_FHIR_type(field_type) for field_type in element.type]
-                if element.type
+                [
+                    self._resolve_FHIR_type(field_type)
+                    for field_type in node.definition.type
+                ]
+                if node.definition.type
                 else []
             )
             # If element has no type, skip it (only in snapshot mode)
@@ -1416,7 +1574,7 @@ class ResourceFactory:
             # Cardinality
             # -------------------------------------
             # Get cardinality of element (now has complete info from snapshot merge)
-            min_card, max_card = self._parse_element_cardinality(element)
+            min_card, max_card = self._parse_element_cardinality(node.definition)
 
             # -------------------------------------
             # Type choice elements
@@ -1429,7 +1587,7 @@ class ResourceFactory:
                         basename,
                         field_types,
                         max_card,
-                        element.short,
+                        node.definition.short,
                     )
                 )
                 forbidden_types = (
@@ -1439,7 +1597,10 @@ class ResourceFactory:
                         if field.startswith(basename)
                         and not field.endswith("_ext")
                         and (forbidden_type := field.replace(basename, ""))
-                        not in [type.__name__ for type in field_types]
+                        not in [
+                            _type.__name__ if isinstance(_type, type) else str(_type)
+                            for _type in field_types
+                        ]
                     ]
                     if self.in_differential_mode and base
                     else []
@@ -1464,7 +1625,7 @@ class ResourceFactory:
             # Pattern value constraints
             # -------------------------------------
             if pattern_value := self._process_pattern_or_fixed_values(
-                element, "pattern"
+                node.definition, "pattern"
             ):
                 field_default = pattern_value
                 # Add the current field to the list of validated fields
@@ -1481,7 +1642,9 @@ class ResourceFactory:
             # -------------------------------------
             # Fixed value constraints
             # -------------------------------------
-            if fixed_value := self._process_pattern_or_fixed_values(element, "fixed"):
+            if fixed_value := self._process_pattern_or_fixed_values(
+                node.definition, "fixed"
+            ):
                 # Use enum with single choice since Literal definition does not work at runtime
                 singleChoice = Enum(
                     f"{name}FixedValue",
@@ -1494,7 +1657,7 @@ class ResourceFactory:
             # -------------------------------------
             # Fixed value constraints
             # -------------------------------------
-            if constraints := element.constraint:
+            if constraints := node.definition.constraint:
                 # Process FHIR constraint invariants on the element
                 for constraint in constraints:
                     validators.add_element_constraint_validator(
@@ -1504,13 +1667,13 @@ class ResourceFactory:
             # -------------------------------------
             # Slicing
             # -------------------------------------
-            if element.slices:
+            if node.slices:
                 # Process FHIR slicing on the element
                 assert isinstance(field_type, type) and issubclass(
                     field_type, BaseModel
-                ), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {element.path}"
+                ), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {node.path}"
                 field_type = self._construct_annotated_sliced_field(
-                    element.slices, field_type, base_name=resource_name
+                    node.slices, field_type, base_name=resource_name
                 )
                 # Add slicing cardinality validator for field
                 validators.add_slicing_validator(field=safe_field_name)
@@ -1518,20 +1681,20 @@ class ResourceFactory:
             # -------------------------------------
             # Children elements
             # -------------------------------------
-            elif element.children:
+            elif node.children:
                 # Process element children
                 assert isinstance(field_type, type) and issubclass(
                     field_type, BaseModel
-                ), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {element.path}"
+                ), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {node.path}"
                 backbone_model_name = capitalize(resource_name).strip() + "".join(
-                    [capitalize(label).strip() for label in element.path.split(".")[1:]]
+                    [capitalize(label).strip() for label in node.path.split(".")[1:]]
                 )
                 backbone_base_model = None
                 if self.in_differential_mode:
                     try:
                         field_type = get_fhir_resource_type(
                             "".join(
-                                [part.capitalize() for part in element.path.split(".")]
+                                [part.capitalize() for part in node.path.split(".")]
                             ),
                             self.Config.FHIR_release if self.Config else "4.3.0",
                         )
@@ -1539,29 +1702,28 @@ class ResourceFactory:
                         pass
                 field_subfields, subfield_validators, subfield_properties = (
                     self._process_FHIR_structure_into_Pydantic_components(
-                        element, field_type, resource_name=resource_name
+                        node, field_type, resource_name=resource_name
                     )
                 )
                 # -------------------------------------
                 # Complex extensions
                 # -------------------------------------
-                if (
-                    "extension" in element.children
-                    and element.children["extension"].slices
-                ):
+                if "extension" in node.children and node.children["extension"].slices:
                     extension_slice_base_type = get_complex_FHIR_type(
                         "Extension",
                         self.Config.FHIR_release if self.Config else "4.3.0",
                     )
                     extension_type = self._construct_annotated_sliced_field(
-                        element.children["extension"].slices,
+                        node.children["extension"].slices,
                         extension_slice_base_type,
                         base_name=resource_name,
                     )
 
                     # Get cardinality of extension element
                     extension_min_card, extension_max_card = (
-                        self._parse_element_cardinality(element.children["extension"])
+                        self._parse_element_cardinality(
+                            node.children["extension"].definition
+                        )
                     )
                     # Add slicing cardinality validator for field
                     subfield_validators.add_slicing_validator(field="extension")
@@ -1574,7 +1736,7 @@ class ResourceFactory:
                     base=(field_type,),
                     validators=subfield_validators.get_all(),
                     properties=subfield_properties,
-                    docstring=element.definition,
+                    docstring=node.definition.definition,
                 )
                 self.local_cache[backbone_model_name] = field_type
 
@@ -1588,7 +1750,7 @@ class ResourceFactory:
                 min_card,
                 max_card,
                 default=field_default,
-                description=element.short,
+                description=node.definition.short,
                 validation_alias=validation_alias,
             )
             # -------------------------------------
@@ -1602,7 +1764,14 @@ class ResourceFactory:
     def construct_resource_model(
         self,
         canonical_url: str | None = None,
-        structure_definition: Union[str, dict, StructureDefinition] | None = None,
+        structure_definition: (
+            str
+            | dict
+            | R4_StructureDefinition
+            | R4B_StructureDefinition
+            | R5_StructureDefinition
+            | None
+        ) = None,
         base_model: type[ModelT] | None = None,
         mode: ConstructionMode | str = ConstructionMode.AUTO,
     ) -> type[ModelT | BaseModel]:
@@ -1626,15 +1795,20 @@ class ResourceFactory:
 
         # Resolve the FHIR structure definition
         _structure_definition = None
-        if isinstance(structure_definition, StructureDefinition):
+        if isinstance(
+            structure_definition,
+            (R4_StructureDefinition, R4B_StructureDefinition, R5_StructureDefinition),
+        ):
+            self.repository.add(structure_definition)
             _structure_definition = structure_definition
         elif isinstance(structure_definition, str):
             _structure_definition = self.repository.load_from_files(
                 Path(structure_definition)
             )
         elif isinstance(structure_definition, dict):
-            _structure_definition = StructureDefinition.model_validate(
-                structure_definition
+            self.repository.load_from_definitions(structure_definition)
+            _structure_definition = self.repository.get(
+                structure_definition.get("url", "")
             )
         elif canonical_url:
             _structure_definition = self.resolve_structure_definition(canonical_url)
@@ -1642,10 +1816,8 @@ class ResourceFactory:
             raise ValueError(
                 "No StructureDefinition provided or downloaded. Please provide a valid StructureDefinition."
             )
-        # Parse and validate the StructureDefinition
-        _structure_definition = StructureDefinition.model_validate(
-            _structure_definition
-        )
+        if not _structure_definition.name:
+            raise ValueError("StructureDefinition must have a valid name.")
 
         # Detect the appropriate construction mode
         resolved_mode = self._detect_construction_mode(_structure_definition, mode)
@@ -1699,15 +1871,26 @@ class ResourceFactory:
 
         # Select element source based on mode
         if resolved_mode == ConstructionMode.DIFFERENTIAL:
+            if not _structure_definition.differential:
+                raise ValueError(
+                    f"StructureDefinition '{_structure_definition.name}' has no differential element."
+                )
             elements = _structure_definition.differential.element
             # Merge differential elements with base snapshot BEFORE building tree
-            if _base_structure_definition:
+            if _base_structure_definition and elements:
                 elements = self._merge_differential_elements_with_base_snapshot(
                     elements, _base_structure_definition
                 )
         else:  # SNAPSHOT
+            if not _structure_definition.snapshot:
+                raise ValueError(
+                    f"StructureDefinition '{_structure_definition.name}' has no snapshot element."
+                )
             elements = _structure_definition.snapshot.element
-
+        if not elements:
+            raise ValueError(
+                f"StructureDefinition '{_structure_definition.name}' has no elements to process."
+            )
         # Pre-process the elements into a tree structure to simplify model construction later
         nodes = self._build_element_tree_structure(elements)
         assert (
@@ -1730,7 +1913,7 @@ class ResourceFactory:
             )
         )
         # Process resource-level constraints
-        for constraint in structure.constraint or []:
+        for constraint in structure.definition.constraint or []:
             validators.add_model_constraint_validator(constraint)
 
         # If the resource has metadata, prefill the information
@@ -1760,7 +1943,7 @@ class ResourceFactory:
             docstring=_structure_definition.description,
         )
         # Add the current model to the cache
-        self.construction_cache[_structure_definition.url] = model
+        self.construction_cache[str(_structure_definition.url)] = model
         return model
 
     def clear_cache(self):
