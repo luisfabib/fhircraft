@@ -5,7 +5,7 @@ import pprint
 import pytest
 from pydantic import BaseModel
 
-from fhircraft.fhir.mapper.engine.core import FHIRMappingEngine
+from fhircraft.fhir.mapper.engine.core import FHIRMappingEngine, StructureMapModelMode
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
     StructureMapConst,
@@ -623,3 +623,107 @@ def test_simple_mapping_scenarios(test_name, source_data, expected_target, rules
         pprint.pprint(expected_target)
 
     assert expected_target == result
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_resolve_aliased_source_structure_definitions():
+    """Test resolving structure definitions in the mapping engine."""
+    structure_map = StructureMap(
+        structure=[
+            StructureMapStructure(
+                url="http://example.org/StructureDefinition/SimpleSource",
+                mode="source",
+                alias="SimpleSourceAlias",
+            )
+        ]
+    )
+
+    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository.add(create_simple_source_structure_definition())
+
+    engine = FHIRMappingEngine(repository=repository)
+
+    resolved = engine._resolve_structure_definitions(
+        structure_map, StructureMapModelMode.SOURCE
+    )
+
+    assert "SimpleSourceAlias" in resolved
+    assert resolved["SimpleSourceAlias"] is not None
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_resolve_unaliased_source_structure_definitions():
+    """Test resolving structure definitions in the mapping engine."""
+    structure_map = StructureMap(
+        structure=[
+            StructureMapStructure(
+                url="http://example.org/StructureDefinition/SimpleSource",
+                mode="source",
+            )
+        ]
+    )
+
+    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository.add(create_simple_source_structure_definition())
+
+    engine = FHIRMappingEngine(repository=repository)
+
+    resolved = engine._resolve_structure_definitions(
+        structure_map, StructureMapModelMode.SOURCE
+    )
+
+    assert "SimpleSource" in resolved
+    assert resolved["SimpleSource"] is not None
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_resolve_aliased_target_structure_definitions():
+    """Test resolving structure definitions in the mapping engine."""
+    structure_map = StructureMap(
+        structure=[
+            StructureMapStructure(
+                url="http://example.org/StructureDefinition/SimpleTarget",
+                mode="target",
+                alias="SimpleTargetAlias",
+            )
+        ]
+    )
+
+    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository.add(create_simple_target_structure_definition())
+    repository.add(create_simple_source_structure_definition())
+
+    engine = FHIRMappingEngine(repository=repository)
+
+    resolved = engine._resolve_structure_definitions(
+        structure_map, StructureMapModelMode.TARGET
+    )
+
+    assert "SimpleTargetAlias" in resolved
+    assert resolved["SimpleTargetAlias"] is not None
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_resolve_unaliased_target_structure_definitions():
+    """Test resolving structure definitions in the mapping engine."""
+    structure_map = StructureMap(
+        structure=[
+            StructureMapStructure(
+                url="http://example.org/StructureDefinition/SimpleTarget",
+                mode="target",
+            )
+        ]
+    )
+
+    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository.add(create_simple_target_structure_definition())
+    repository.add(create_simple_source_structure_definition())
+
+    engine = FHIRMappingEngine(repository=repository)
+
+    resolved = engine._resolve_structure_definitions(
+        structure_map, StructureMapModelMode.TARGET
+    )
+
+    assert "SimpleTarget" in resolved
+    assert resolved["SimpleTarget"] is not None

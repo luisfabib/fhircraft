@@ -756,7 +756,7 @@ class FHIRMappingEngine:
                 model = self.factory.construct_resource_model(
                     structure_definition=structure_def
                 )
-                resolved[s.alias or s.url] = model
+                resolved[s.alias or structure_def.name or s.url] = model
             except (KeyError, ValueError, AttributeError) as e:
                 # If StructureDefinition not found, log warning but continue
                 logger.warning(
