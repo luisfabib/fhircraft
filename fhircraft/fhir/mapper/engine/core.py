@@ -705,7 +705,13 @@ class FHIRMappingEngine:
         for s in structure_map.structure:
             if s.mode != mode:
                 continue
-            
+            if not s.url:
+                logger.warning(
+                    f"Structure definition for mode {mode} is missing URL. "
+                    f"Data for this structure will be treated as arbitrary."
+                )
+                resolved[s.alias or "arbitrary"] = None
+                continue
             try:
                 structure_def = self.repository.get(s.url)
                 model = self.factory.construct_resource_model(
@@ -720,7 +726,7 @@ class FHIRMappingEngine:
                 )
                 # Mark as no model validation available
                 resolved[s.alias or s.url] = None
-        
+
         return resolved
 
     def _validate_source_data(
