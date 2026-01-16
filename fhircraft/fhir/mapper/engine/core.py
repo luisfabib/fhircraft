@@ -134,10 +134,7 @@ class FHIRMappingEngine:
         produced_models = self._resolve_structure_definitions(
             structure_map, StructureMapModelMode.PRODUCED
         )
-        print("Source models:", source_models)
-        print("Target models:", target_models)
-        print("Queried models:", queried_models)
-        print("Produced models:", produced_models)
+
         # Validate source data
         validated_sources = self._validate_source_data(sources, source_models)
 
@@ -162,7 +159,6 @@ class FHIRMappingEngine:
 
         # Build default mapping group registry
         self._build_default_group_registry(structure_map, global_scope)
-        print("Global scope: ", global_scope.get_all_visible_symbols())
 
         # Parse and validate constants
         for const in structure_map.const or []:
@@ -270,25 +266,6 @@ class FHIRMappingEngine:
         # Process the entrypoint group
         self.process_group(target_group, parameters, global_scope)
 
-        print("Final target instances:", global_scope.target_instances)
-        print(
-            "Is ArbitraryModel:",
-            isinstance(
-                global_scope.target_instances[
-                    list(global_scope.target_instances.keys())[0]
-                ],
-                ArbitraryModel,
-            ),
-        )
-        print(
-            "Is BaseModel:",
-            isinstance(
-                global_scope.target_instances[
-                    list(global_scope.target_instances.keys())[0]
-                ],
-                BaseModel,
-            ),
-        )
         # Return the resulting target instances
         return tuple(
             [
@@ -721,7 +698,7 @@ class FHIRMappingEngine:
 
     def _resolve_structure_definitions(
         self, structure_map: StructureMap, mode: StructureMapModelMode
-    ) -> Dict[str, type[BaseModel] | None]:
+    ) -> Dict[str, type[BaseModel] | type[ArbitraryModel]]:
         """
         Resolves and constructs resource models for the specified mode from the given StructureMap.
 
@@ -749,14 +726,14 @@ class FHIRMappingEngine:
                     f"Structure definition for mode {mode} is missing URL. "
                     f"Data for this structure will be treated as arbitrary."
                 )
-                resolved[s.alias or "arbitrary"] = None
+                resolved[s.alias or "arbitrary"] = ArbitraryModel
                 continue
             try:
                 structure_def = self.repository.get(s.url)
                 model = self.factory.construct_resource_model(
                     structure_definition=structure_def
                 )
-                resolved[s.alias or structure_def.name or s.url] = model
+                resolved[s.alias or structure_def.name] = model
             except (KeyError, ValueError, AttributeError) as e:
                 # If StructureDefinition not found, log warning but continue
                 logger.warning(
@@ -764,7 +741,7 @@ class FHIRMappingEngine:
                     f"Data for this structure will be treated as arbitrary."
                 )
                 # Mark as no model validation available
-                resolved[s.alias or s.url] = None
+                resolved[s.alias or s.url] = ArbitraryModel
 
         return resolved
 
