@@ -324,13 +324,29 @@ class FHIRMappingEngine:
             name=group_name,
             parent=scope,
         )
-
+        if not group.input:
+            raise MappingError(f"Group '{group_name}' has no input definitions.")
         # Validate input parameters
         if len(group.input) != len(parameters):
             raise MappingError(
                 f"Invalid number of parameters provided for group '{group_name}'. Expected {len(group.input)}, got {len(parameters)}."
             )
         for input, parameter in zip(group.input, parameters):
+            if input.mode == "target":
+                if not input.type:
+                    raise MappingError(
+                        f"Target input '{input.name}' in group '{group_name}' must have a type specified."
+                    )
+
+                elif not scope.types.get(input.type):
+                    raise MappingError(
+                        f"Input '{input.name}' in group '{group_name}' has unknown type '{input.type}'."
+                    )
+            if not input.name:
+                raise MappingError(
+                    f"A {input.mode} input in group '{group_name}' is missing a name."
+                )
+
             group_scope.define_variable(input.name, parameter)
 
         # Process rules in order, handling 'first' and 'last' list modes
