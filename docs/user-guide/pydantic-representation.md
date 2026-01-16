@@ -294,7 +294,7 @@ Fhircraft automatically handles inheritance and polymorphism during serializatio
 During serialization, each resource automatically includes a `resourceType` field, which identifies the specific FHIR resource class. This discriminator field allows deserializers to reconstruct the exact Python class when reading the data back.
 
 
-!!! example "Serializing a Bundle
+!!! example "Serializing a Bundle"
     
     For example, when a `Bundle` contains both `Patient` and `Observation` resources in its entries, serialization preserves each resource's specific type information.
 
