@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Type
 from pydantic import BaseModel, ConfigDict
 
 import fhircraft.fhir.path.engine as fhirpath
+from fhircraft.fhir.resources.datatypes.R5.core.concept_map import ConceptMap
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
     StructureMapGroup,
@@ -90,7 +91,7 @@ class FHIRMappingEngine:
         sources: tuple[BaseModel | dict],
         targets: tuple[BaseModel | dict] | None = None,
         group: str | None = None,
-    ) -> tuple[BaseModel, ...]:
+    ) -> tuple[BaseModel | dict, ...]:
         """
         Executes a FHIR StructureMap transformation using the provided sources and optional targets.
 
@@ -99,13 +100,13 @@ class FHIRMappingEngine:
         to produce the mapped target instances.
 
         Args:
-            structure_map (StructureMap): The StructureMap resource defining the transformation rules.
-            sources (tuple[BaseModel | dict]): Source data to be mapped, as a tuple of Pydantic models or dictionaries.
-            targets (tuple[BaseModel | dict] | None, optional): Optional target instances to populate. If not provided, new instances are created as needed.
-            group (str | None, optional): The name of the entrypoint group to execute. If not specified, the first group is used.
+            structure_map: The StructureMap resource defining the transformation rules.
+            sources: Source data to be mapped, as a tuple of Pydantic models or dictionaries.
+            targets: Optional target instances to populate. If not provided, new instances are created as needed.
+            group: The name of the entrypoint group to execute. If not specified, the first group is used.
 
         Returns:
-            tuple[BaseModel, ...]: A tuple of resulting target instances after the transformation.
+            tuple: A tuple of resulting target instances after the transformation, which can be a mixture of BaseModel instances and/or dictionaries.
 
         Raises:
             NotImplementedError: If StructureMap imports are present (not supported).
@@ -148,12 +149,12 @@ class FHIRMappingEngine:
                 **produced_models,
             },
             groups=OrderedDict(
-                [(group.name, group) for group in structure_map.group or []]
+                [(str(group.name), group) for group in structure_map.group or []]
             ),
             concept_maps={
-                map.name: map
+                str(map.name): map
                 for map in (structure_map.contained or [])
-                if map.resourceType == "ConceptMap" and map.name
+                if isinstance(map, ConceptMap) and map.name
             },
         )
 
@@ -206,8 +207,13 @@ class FHIRMappingEngine:
 
         # Bind source and target instances to group parameters
         parameters = []
-        for input in target_group.input:
+        for input in target_group.input or []:
+            if not input.name:
+                raise ValueError(
+                    f"Input in group '{target_group.name}' is missing a name."
+                )
             if input.mode == StructureMapModelMode.SOURCE:
+
                 if input.type:
                     # Explicit type specified - match by type
                     source_instance = validated_sources.get(input.type)
@@ -525,6 +531,10 @@ class FHIRMappingEngine:
 
                     # Process dependent rules for this iteration
                     for dependent in rule.dependent or []:
+                        if not dependent.name:
+                            raise RuleProcessingError(
+                                "Dependent rule or group must have a name"
+                            )
                         dependent_group = iteration_scope.resolve_symbol(dependent.name)
                         if not dependent_group:
                             raise RuleProcessingError(
@@ -536,7 +546,7 @@ class FHIRMappingEngine:
                             )
                         parameters = [
                             iteration_scope.resolve_fhirpath(param.value)
-                            for param in dependent.parameter
+                            for param in dependent.parameter or []
                         ]
                         print("Dependent:", dependent_group)
                         self.process_group(
@@ -576,6 +586,8 @@ class FHIRMappingEngine:
         Returns:
             str: The variable name under which the resolved FHIRPath expression is stored in the scope.
         """
+        if not source.context:
+            raise RuleProcessingError("Source context is required")
         path = scope.resolve_fhirpath(source.context)
         # Apply element path if specified
         if source.element:

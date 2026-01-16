@@ -106,6 +106,7 @@ def test_integration_tutorial_examples(directory):
     engine = FHIRMappingEngine(repository=repository)
 
     result = engine.execute(structure_map, input)
+    assert isinstance(result[0], BaseModel)
     result = result[0].model_dump(mode="json", exclude_unset=False)
     expected_result.pop("resourceType", None)
     if expected_result != result:
@@ -617,6 +618,7 @@ def test_simple_mapping_scenarios(test_name, source_data, expected_target, rules
     engine = FHIRMappingEngine(repository=repository)
 
     result = engine.execute(structure_map, source_data)
+    assert isinstance(result[0], BaseModel)
     result = result[0].model_dump(
         mode="json", exclude_unset=False, exclude={"resourceType", "meta"}
     )
