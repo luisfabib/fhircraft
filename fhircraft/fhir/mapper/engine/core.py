@@ -354,10 +354,13 @@ class FHIRMappingEngine:
                         f"Target input '{input.name}' in group '{group_name}' must have a type specified."
                     )
 
-            if input.type and not scope.types.get(input.type):
-                raise MappingError(
-                    f"Input '{input.name}' in group '{group_name}' has unknown type '{input.type}'."
-                )
+            if input.type:
+                try:
+                    scope.get_type(input.type)
+                except MappingError:
+                    raise MappingError(
+                        f"Input '{input.name}' in group '{group_name}' has unknown type '{input.type}'."
+                    )
             if not input.name:
                 raise MappingError(
                     f"A {input.mode} input in group '{group_name}' is missing a name."
