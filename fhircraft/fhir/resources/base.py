@@ -52,6 +52,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         defer_build=True,
         validate_by_alias=True,
         validate_by_name=True,
+        extra="forbid",
     )
     _fhir_release: ClassVar[str]
 
