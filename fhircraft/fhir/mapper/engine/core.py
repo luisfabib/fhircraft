@@ -354,7 +354,7 @@ class FHIRMappingEngine:
                         f"Target input '{input.name}' in group '{group_name}' must have a type specified."
                     )
 
-            elif input.type and not scope.types.get(input.type):
+            if input.type and not scope.types.get(input.type):
                 raise MappingError(
                     f"Input '{input.name}' in group '{group_name}' has unknown type '{input.type}'."
                 )
@@ -548,7 +548,6 @@ class FHIRMappingEngine:
                             iteration_scope.resolve_fhirpath(param.value)
                             for param in dependent.parameter or []
                         ]
-                        print("Dependent:", dependent_group)
                         self.process_group(
                             dependent_group,
                             parameters,
