@@ -172,6 +172,9 @@ group main(source legacy, target patient: Patient) {
 mapper = FHIRMapper()
 targets = mapper.execute_mapping(mapping_script, legacy_patient)  # (3)!
 patient = targets[0]
+
+print(patient.model_dump(exclude={'meta','resourceType'}))
+#> {'name': [{'family': 'Johnson', 'given': ['Alice']}], 'birthDate': '1985-03-15'}
 ```
 
 1. This defines a dictionary with legacy patient data that doesn't match the FHIR Patient structure.
