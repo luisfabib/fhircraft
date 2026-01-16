@@ -35,13 +35,14 @@ logger = logging.getLogger(__name__)
 class ArbitraryModel(BaseModel):
     """
     A dynamic Pydantic model that accepts arbitrary fields.
-    
-    This is used for arbitrary target structures in mappings where no 
-    specific structure definition is provided. Unlike plain dicts, this 
+
+    This is used for arbitrary target structures in mappings where no
+    specific structure definition is provided. Unlike plain dicts, this
     model is compatible with the FHIRPath engine's update mechanisms,
     allowing complex nested path creation and array operations.
     """
-    model_config = ConfigDict(extra='allow')
+
+    model_config = ConfigDict(extra="allow")
 
 
 class StructureMapTargetListMode(str, enum.Enum):
@@ -133,7 +134,10 @@ class FHIRMappingEngine:
         produced_models = self._resolve_structure_definitions(
             structure_map, StructureMapModelMode.PRODUCED
         )
-
+        print("Source models:", source_models)
+        print("Target models:", target_models)
+        print("Queried models:", queried_models)
+        print("Produced models:", produced_models)
         # Validate source data
         validated_sources = self._validate_source_data(sources, source_models)
 
@@ -158,6 +162,7 @@ class FHIRMappingEngine:
 
         # Build default mapping group registry
         self._build_default_group_registry(structure_map, global_scope)
+        print("Global scope: ", global_scope.get_all_visible_symbols())
 
         # Parse and validate constants
         for const in structure_map.const or []:
@@ -217,9 +222,9 @@ class FHIRMappingEngine:
                 else:
                     # No type specified - use first available source or match by parameter name
                     source_instance = (
-                        validated_sources.get(input.name) or 
-                        validated_sources.get("source") or
-                        next(iter(validated_sources.values()), None)
+                        validated_sources.get(input.name)
+                        or validated_sources.get("source")
+                        or next(iter(validated_sources.values()), None)
                     )
                     if source_instance is None:
                         raise TypeError(
@@ -231,7 +236,7 @@ class FHIRMappingEngine:
 
             if input.mode == StructureMapModelMode.TARGET:
                 target_type = global_scope.types.get(input.type) if input.type else None
-                
+
                 if target_type is not None:
                     # Type specified and model available - create or find typed instance
                     if not targets:
@@ -265,34 +270,61 @@ class FHIRMappingEngine:
         # Process the entrypoint group
         self.process_group(target_group, parameters, global_scope)
 
+        print("Final target instances:", global_scope.target_instances)
+        print(
+            "Is ArbitraryModel:",
+            isinstance(
+                global_scope.target_instances[
+                    list(global_scope.target_instances.keys())[0]
+                ],
+                ArbitraryModel,
+            ),
+        )
+        print(
+            "Is BaseModel:",
+            isinstance(
+                global_scope.target_instances[
+                    list(global_scope.target_instances.keys())[0]
+                ],
+                BaseModel,
+            ),
+        )
         # Return the resulting target instances
         return tuple(
             [
                 # Convert ArbitraryModel to dict for user consumption
-                instance.model_dump() if isinstance(instance, ArbitraryModel)
-                # Validate other BaseModel instances
-                else instance.model_validate(instance.model_dump()) if isinstance(instance, BaseModel)
-                # Pass through non-BaseModel instances (shouldn't happen)
-                else instance
+                (
+                    instance.model_dump()
+                    if isinstance(instance, ArbitraryModel)
+                    # Validate other BaseModel instances
+                    else (
+                        instance.model_validate(instance.model_dump())
+                        if isinstance(instance, BaseModel)
+                        # Pass through non-BaseModel instances (shouldn't happen)
+                        else instance
+                    )
+                )
                 for instance in global_scope.target_instances.values()
             ]
         )
 
-    def _build_default_group_registry(self, structure_map: StructureMap, global_scope: MappingScope):
+    def _build_default_group_registry(
+        self, structure_map: StructureMap, global_scope: MappingScope
+    ):
         """
         Builds a registry of default mapping groups based on typeMode.
         Groups with typeMode 'types' or 'type-and-types' are considered default mapping groups.
         """
         default_groups = {}
         for group in structure_map.group or []:
-            if group.typeMode in ['types', 'type-and-types']:
+            if group.typeMode in ["types", "type-and-types"]:
                 # Build a key based on input/output types
                 if group.input and len(group.input) >= 2:
-                    source_type = group.input[0].type or 'Any'
-                    target_type = group.input[1].type or 'Any'
+                    source_type = group.input[0].type or "Any"
+                    target_type = group.input[1].type or "Any"
                     key = f"{source_type}->{target_type}"
                     default_groups[key] = group
-        
+
         # Store the default groups registry in global scope
         global_scope.default_groups = default_groups
 
@@ -301,6 +333,7 @@ class FHIRMappingEngine:
         group: StructureMapGroup,
         parameters: list[FHIRPath] | tuple[FHIRPath],
         scope: MappingScope,
+        is_dependent: bool = False,
     ):
         """
         Processes a StructureMap group by validating input parameters, constructing a local mapping scope,
@@ -332,16 +365,16 @@ class FHIRMappingEngine:
                 f"Invalid number of parameters provided for group '{group_name}'. Expected {len(group.input)}, got {len(parameters)}."
             )
         for input, parameter in zip(group.input, parameters):
-            if input.mode == "target":
+            if input.mode == "target" and not is_dependent:
                 if not input.type:
                     raise MappingError(
                         f"Target input '{input.name}' in group '{group_name}' must have a type specified."
                     )
 
-                elif not scope.types.get(input.type):
-                    raise MappingError(
-                        f"Input '{input.name}' in group '{group_name}' has unknown type '{input.type}'."
-                    )
+            elif input.type and not scope.types.get(input.type):
+                raise MappingError(
+                    f"Input '{input.name}' in group '{group_name}' has unknown type '{input.type}'."
+                )
             if not input.name:
                 raise MappingError(
                     f"A {input.mode} input in group '{group_name}' is missing a name."
@@ -528,7 +561,13 @@ class FHIRMappingEngine:
                             iteration_scope.resolve_fhirpath(param.value)
                             for param in dependent.parameter
                         ]
-                        self.process_group(dependent_group, parameters, iteration_scope)
+                        print("Dependent:", dependent_group)
+                        self.process_group(
+                            dependent_group,
+                            parameters,
+                            iteration_scope,
+                            is_dependent=True,
+                        )
 
                     # Process nested rules for this iteration
                     for nested_rule in rule.rule or []:
@@ -685,7 +724,7 @@ class FHIRMappingEngine:
     ) -> Dict[str, type[BaseModel] | None]:
         """
         Resolves and constructs resource models for the specified mode from the given StructureMap.
-        
+
         If no structures are defined for the given mode, returns an empty dict, allowing
         arbitrary data to be used without predefined models. If a structure URL cannot be
         resolved, logs a warning and continues without that model.
@@ -736,7 +775,7 @@ class FHIRMappingEngine:
     ) -> dict[str, BaseModel | dict]:
         """
         Validates and maps source data entries to their corresponding models when available.
-        
+
         For entries with defined models, performs Pydantic validation.
         For entries without models (model is None or empty dict), passes through as-is.
 
@@ -756,7 +795,7 @@ class FHIRMappingEngine:
             if len(source_data) == 1:
                 return {"source": source_data[0]}
             return {f"source{i}": data for i, data in enumerate(source_data)}
-        
+
         validated_entries = {}
         matched_indices = set()
 
@@ -769,7 +808,7 @@ class FHIRMappingEngine:
                         validated_entries[alias] = entry
                         return True
                     continue
-                    
+
                 try:
                     if isinstance(entry, source_model):
                         validated_entries[alias] = entry

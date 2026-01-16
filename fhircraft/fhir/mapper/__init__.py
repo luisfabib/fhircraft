@@ -161,7 +161,7 @@ class FHIRMapper:
             Union[BaseModel, Dict[str, Any], Tuple[Union[BaseModel, dict], ...]]
         ] = None,
         group: Optional[str] = None,
-    ) -> tuple[list[BaseModel], dict[str, Any]]:
+    ) -> tuple[BaseModel, dict[str, Any]]:
         """
         Execute a mapping transformation.
 

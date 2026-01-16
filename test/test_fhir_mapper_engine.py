@@ -232,6 +232,22 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     max="1",
                     type=[ElementDefinitionType(code="string")],
                 ),
+                ElementDefinition(
+                    id="SimpleTarget.arrayField",
+                    path="SimpleTarget.arrayField",
+                    definition="Array field",
+                    min=0,
+                    max="*",
+                    type=[ElementDefinitionType(code="BackboneElement")],
+                ),
+                ElementDefinition(
+                    id="SimpleTarget.arrayField.valueString",
+                    path="SimpleTarget.arrayField.valueString",
+                    definition="Array field string value",
+                    min=0,
+                    max="1",
+                    type=[ElementDefinitionType(code="string")],
+                ),
             ]
         ),
     )
@@ -506,7 +522,7 @@ simple_mapping_test_cases = [
         ],
     ),
     (
-        "Nested path mapping with then block",
+        "Nested path mapping with then block: src.name as a -> tgt.name as b then {a -> b.text = copy(a)}",
         {"name": "Charlie Brown", "age": 28},
         {"name": {"text": "Charlie Brown"}},
         [
@@ -528,6 +544,41 @@ simple_mapping_test_cases = [
                             StructureMapGroupRuleTarget(
                                 context="b",
                                 element="text",
+                                transform="copy",
+                                parameter=[
+                                    StructureMapGroupRuleTargetParameter(valueId="a")
+                                ],
+                            )
+                        ],
+                    )
+                ],
+                name=None,
+            ),
+        ],
+    ),
+    (
+        "Nested path mapping with arrays: src -> tgt.arrayField as array then {array -> array.valueString = a}",
+        {"name": "Charlie Brown", "age": 28},
+        {"arrayField": [{"valueString": "Charlie Brown"}]},
+        [
+            StructureMapGroupRule(
+                source=[StructureMapGroupRuleSource(context="src")],
+                target=[
+                    StructureMapGroupRuleTarget(
+                        context="tgt", element="arrayField", variable="array"
+                    )
+                ],
+                rule=[
+                    StructureMapGroupRule(
+                        source=[
+                            StructureMapGroupRuleSource(
+                                context="src", element="name", variable="a"
+                            )
+                        ],
+                        target=[
+                            StructureMapGroupRuleTarget(
+                                context="array",
+                                element="valueString",
                                 transform="copy",
                                 parameter=[
                                     StructureMapGroupRuleTargetParameter(valueId="a")
