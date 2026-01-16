@@ -1,18 +1,183 @@
 {
-    "resourceType": "StructureMap",
-    "status": "draft",
-    "name": "PatientMapping",
-    "url": "http://example.org/PatientMapping",
-    "group": [{
-        "name": "main",
-        "input": [
-            {"name": "src", "mode": "source"},
-            {"name": "tgt", "mode": "target", "type": "Patient"}
-        ],
-        "rule": [{
-            "name": "name",
-            "source": [{"context": "src", "element": "name"}],
-            "target": [{"context": "tgt", "element": "name.text"}]
-        }]
-    }]
+   "meta": {
+      "profile": [
+         "http://hl7.org/fhir/StructureDefinition/StructureMap"
+      ]
+   },
+   "text": {
+      "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n/// url = \"http://example.org/legacy/map\"\n/// name = \"Legacy Patient to FHIR Patient\"\n\nuses \"http://hl7.org/fhir/StructureDefinition/Patient\" as target\n\ngroup main(source legacy, target patient: Patient) {\n    legacy -> patient.name as name then {\n        legacy.firstName -> name.given;\n        legacy.lastName -> name.family;\n    };\n    legacy.dob -> patient.birthDate;\n    legacy.sex where($this = 'F') -> patient.gender = \"female\";\n    legacy.sex where($this = 'M') -> patient.gender = \"male\";\n}\n</div>"
+   },
+   "url": "http://example.org/legacy/map",
+   "name": "Legacy Patient to FHIR Patient",
+   "status": "draft",
+   "structure": [
+      {
+         "url": "http://hl7.org/fhir/StructureDefinition/Patient",
+         "mode": "target"
+      }
+   ],
+   "group": [
+      {
+         "name": "main",
+         "input": [
+            {
+               "name": "legacy",
+               "mode": "source"
+            },
+            {
+               "name": "patient",
+               "type": "Patient",
+               "mode": "target"
+            }
+         ],
+         "rule": [
+            {
+               "source": [
+                  {
+                     "context": "legacy"
+                  }
+               ],
+               "target": [
+                  {
+                     "context": "patient",
+                     "element": "name",
+                     "variable": "name"
+                  }
+               ],
+               "rule": [
+                  {
+                     "source": [
+                        {
+                           "context": "legacy",
+                           "element": "firstName",
+                           "variable": "_firstName_"
+                        }
+                     ],
+                     "target": [
+                        {
+                           "context": "name",
+                           "element": "given",
+                           "variable": "_given_"
+                        }
+                     ],
+                     "dependent": [
+                        {
+                           "name": "_DefaultMappingGroup_",
+                           "parameter": [
+                              {
+                                 "valueId": "_firstName_"
+                              },
+                              {
+                                 "valueId": "_given_"
+                              }
+                           ]
+                        }
+                     ]
+                  },
+                  {
+                     "source": [
+                        {
+                           "context": "legacy",
+                           "element": "lastName",
+                           "variable": "_lastName_"
+                        }
+                     ],
+                     "target": [
+                        {
+                           "context": "name",
+                           "element": "family",
+                           "variable": "_family_"
+                        }
+                     ],
+                     "dependent": [
+                        {
+                           "name": "_DefaultMappingGroup_",
+                           "parameter": [
+                              {
+                                 "valueId": "_lastName_"
+                              },
+                              {
+                                 "valueId": "_family_"
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               ]
+            },
+            {
+               "source": [
+                  {
+                     "context": "legacy",
+                     "element": "dob",
+                     "variable": "_dob_"
+                  }
+               ],
+               "target": [
+                  {
+                     "context": "patient",
+                     "element": "birthDate",
+                     "variable": "_birthDate_"
+                  }
+               ],
+               "dependent": [
+                  {
+                     "name": "_DefaultMappingGroup_",
+                     "parameter": [
+                        {
+                           "valueId": "_dob_"
+                        },
+                        {
+                           "valueId": "_birthDate_"
+                        }
+                     ]
+                  }
+               ]
+            },
+            {
+               "source": [
+                  {
+                     "context": "legacy",
+                     "element": "sex",
+                     "condition": "$this = 'F'"
+                  }
+               ],
+               "target": [
+                  {
+                     "context": "patient",
+                     "element": "gender",
+                     "transform": "copy",
+                     "parameter": [
+                        {
+                           "valueString": "female"
+                        }
+                     ]
+                  }
+               ]
+            },
+            {
+               "source": [
+                  {
+                     "context": "legacy",
+                     "element": "sex",
+                     "condition": "$this = 'M'"
+                  }
+               ],
+               "target": [
+                  {
+                     "context": "patient",
+                     "element": "gender",
+                     "transform": "copy",
+                     "parameter": [
+                        {
+                           "valueString": "male"
+                        }
+                     ]
+                  }
+               ]
+            }
+         ]
+      }
+   ],
+   "resourceType": "StructureMap"
 }

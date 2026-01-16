@@ -1,3 +1,4 @@
+import html
 import logging
 import os.path
 
@@ -8,6 +9,7 @@ import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
 from fhircraft.fhir.path.parser import FhirPathParser
 from fhircraft.fhir.path.utils import _underline_error_in_fhir_path
+from fhircraft.fhir.resources.datatypes.R5.complex import Narrative
 from fhircraft.fhir.resources.datatypes.R5.core.concept_map import (
     ConceptMap,
     ConceptMapGroup,
@@ -112,8 +114,12 @@ class FhirMappingLanguageParser(FhirPathParser):
 
     def parse(self, string, lexer=None) -> StructureMap:
         self.string = string
+        # HTML escape the mapping content to avoid FHIR narrative validation issues
+        escaped_content = html.escape(string)
         self.structureMap: StructureMap = StructureMap.model_construct(
-            text={"div": string},
+            text=Narrative(
+                div=f'<div xmlns="http://www.w3.org/1999/xhtml"><pre>{escaped_content}</pre></div>'
+            )
         )  # type: ignore
         return self.parse_token_stream(self.lexer.tokenize(string))
 

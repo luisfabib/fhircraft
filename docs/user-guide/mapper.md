@@ -23,6 +23,7 @@ Legacy systems often use different field names and value formats than FHIR expec
 ```python
 # Import the FHIR mapper
 from fhircraft.fhir.mapper import FHIRMapper
+from fhircraft.fhir.resources.datatypes.R5.core.patient import Patient
 
 # Legacy system data with non-FHIR field names
 legacy_patient = {
@@ -35,6 +36,8 @@ legacy_patient = {
 # Mapping script defines transformation rules
 mapping_script = """
 map 'http://example.org/legacy-to-fhir' = 'LegacyPatient'
+
+uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
 
 group main(source legacy, target patient: Patient) {
     // Map name fields to FHIR name structure
@@ -55,8 +58,8 @@ mapper = FHIRMapper()
 targets = mapper.execute_mapping(mapping_script, legacy_patient)
 patient = targets[0]  # Get the transformed Patient resource
 
-print(f"Transformed: {patient}")
-#> Transformed: {'name': {'given': 'Alice', 'family': 'Johnson'}, 'birthDate': '1985-03-15'}
+print(f"Transformed: {patient.model_dump(exclude={'meta','resourceType'})}")
+#> Transformed: {'name': [{'family': 'Johnson', 'given': ['Alice']}], 'birthDate': '1985-03-15'}
 ```
 
 ## Understanding Mapping Benefits and Use Cases
@@ -94,23 +97,25 @@ from fhircraft.fhir.mapper import FHIRMapper
 script = """
 map 'http://example.org/simple-mapping' = 'SimpleMapping'
 
-group main(source src, target tgt) {
+uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
+
+group main(source src, target tgt: Patient) {
     // Copy fields directly without transformation
-    src.name -> tgt.fullName;     
-    src.age -> tgt.yearsOld;       
-    src.email -> tgt.contactEmail;
+    src.surname -> tgt.name.family;     
+    src.sex -> tgt.gender;       
+    src.civilStatus -> tgt.maritalStatus.text;
 }
 """
 
 # Source data to transform
-source_data = {"name": "John Doe", "age": 30, "email": "john@example.com"}
+source_data = {"surname": "Smith", "sex": "female", "civilStatus": "divorced"}
 
 # Execute the mapping
 mapper = FHIRMapper()
 targets = mapper.execute_mapping(script, source_data)
 
-print(f"Transformed: {targets[0]}")
-#> Transformed: {'fullName': 'John Doe', 'yearsOld': 30, 'contactEmail': 'john@example.com'}
+print(f"Transformed: {targets[0].model_dump(exclude={'meta','resourceType'})}")
+#> Transformed: {'name': [{'family': 'Smith'}], 'gender': 'female', 'maritalStatus': {'text': 'divorced'}}
 ```
 
 ### Mapping to FHIR Resources
@@ -152,8 +157,8 @@ legacy_data = {
 targets = mapper.execute_mapping(script, legacy_data)
 patient = targets[0]  # This is a validated FHIR Patient resource
 
-print(f"Transformed: {patient}")
-#> Transformed: {'name': {'given': 'Alice', 'family': 'Johnson'}, 'birthDate': '1985-03-15'}
+print(f"Transformed: {patient.model_dump(exclude={'meta','resourceType'})}")
+#> Transformed: {'name': [{'family': 'Johnson', 'given': ['Alice']}], 'birthDate': '1985-03-15'}
 ```
 
 ## Handling Complex Transformations
@@ -169,6 +174,8 @@ When you map into a nested structure, the mapper creates the parent objects auto
 ```python
 script = """
 map 'http://example.org/nested' = 'NestedMapping'
+
+uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
 
 group main(source src, target patient: Patient) {
     // Navigate into nested name structure
@@ -211,8 +218,8 @@ source_data = {
 targets = mapper.execute_mapping(script, source_data)
 patient = targets[0] 
 
-print(f"Transformed: {patient}")
-#> Transformed: {'name': {'text': 'Alice Johnson', 'given': 'Alice', 'family': 'Johnson'}, 'telecom': {'value': '555-0123', 'system': 'phone'}}
+print(f"Transformed: {patient.model_dump(exclude={'meta','resourceType'})}")
+#> Transformed: {'name': [{'text': 'Alice Johnson', 'family': 'Johnson', 'given': ['Alice']}], 'telecom': [{'system': 'phone', 'value': '555-0123'}]}
 ```
 
 ### Organizing with Multiple Groups
@@ -224,6 +231,8 @@ Groups can call other groups, creating a hierarchy of transformation logic. The 
 ```python
 script = """
 map 'http://example.org/multi-group' = 'MultiGroup'
+
+uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
 
 // Main group orchestrates the transformation
 group main(source src, target patient: Patient) {
@@ -276,6 +285,8 @@ When you define multiple source parameters in a group, you pass the source data 
 script = """
 map 'http://example.org/multi-source' = 'MultiSource'
 
+uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
+
 // Define two separate source parameters
 group main(source demographics, source insurance, target patient: Patient) {
     // Pull demographic fields from first source
@@ -316,7 +327,7 @@ targets = mapper.execute_mapping(
     (demo_data, insurance_data)
 )
 
-patient = targets[0]  # Single Patient resource combining both sources
+patient = targets[0].model_dump(exclude={'meta','resourceType'})  # Single Patient resource combining both sources
 ```
 
 ## Managing Mapping Definitions

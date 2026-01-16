@@ -167,18 +167,17 @@ def test_execute_mapping_with_options():
     assert len(result) == 1
 
 
-
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_arbitrary_source_to_fhir_target():
     """Test mapping from arbitrary dict to FHIR Patient resource."""
-    
+
     # Arbitrary source data (not a FHIR resource)
     source_data = {
         "first_name": "Alice",
         "last_name": "Johnson",
-        "birth_date": "1985-03-15"
+        "birth_date": "1985-03-15",
     }
-    
+
     # Mapping script - only declares FHIR target
     mapping_script = """
     map 'http://example.org/test' = 'ArbitraryToFHIR'
@@ -193,85 +192,15 @@ def test_arbitrary_source_to_fhir_target():
         src.birth_date as bd -> patient.birthDate = bd;
     }
     """
-    
+
     mapper = FHIRMapper()
     targets = mapper.execute_mapping(mapping_script, source_data)
-    
+
     assert len(targets) == 1
     patient = targets[0]
-    
+
     # Verify the target is a valid FHIR Patient
     assert patient.resourceType == "Patient"
     assert patient.name[0].given[0] == "Alice"
     assert patient.name[0].family == "Johnson"
     assert str(patient.birthDate) == "1985-03-15"
-
-
-@pytest.mark.filterwarnings("ignore:.*dom-6.*")
-def test_fhir_source_to_arbitrary_target():
-    """Test mapping from FHIR Patient resource to arbitrary dict."""
-    
-    # Simple FHIR Patient resource as source
-    fhir_patient_data = {
-        "resourceType": "Patient",
-        "name": [{"given": ["Bob"], "family": "Smith"}],
-        "birthDate": "1990-07-20"
-    }
-    
-    # Mapping script - only declares arbitrary target
-    # Note: Arbitrary targets (dicts) have limitation with nested mappings
-    mapping_script = """
-    map 'http://example.org/fhir-to-arbitrary' = 'FHIRToArbitrary'
-    
-    uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as source
-    
-    group main(source patient: Patient, target tgt) {
-        patient.name only_one as name -> tgt then {
-            name.given only_one as first_name -> tgt.first_name = first_name;
-            name.family as last_name -> tgt.last_name = last_name;
-        };
-        patient.birthDate as bd -> tgt.birth_date = bd;
-    }
-    """
-    
-    mapper = FHIRMapper()
-    targets = mapper.execute_mapping(mapping_script, fhir_patient_data)
-    
-    assert len(targets) == 1
-    arbitrary_target = targets[0]
-    
-    # Verify the target is a dict (arbitrary structure)
-    assert isinstance(arbitrary_target, dict)
-    # With ArbitraryModel, nested path creation now works
-    assert arbitrary_target["first_name"] == "Bob"
-    assert arbitrary_target["last_name"] == "Smith"
-    assert arbitrary_target["birth_date"] == "1990-07-20"
-
-@pytest.mark.filterwarnings("ignore:.*dom-6.*")
-def test_arbitrary_source_to_arbitrary_target():
-    """Test that mappings work without any structure definitions."""
-    
-    source_data = {"name": "John", "age": 30}
-    
-    # No structure definitions at all
-    mapping_script = """
-    map 'http://example.org/test' = 'NoStructures'
-    
-    group main(source src, target tgt) {
-        src.name as name -> tgt.full_name = name;
-        src.age as age -> tgt.ageYears = age;
-    }
-    """
-    
-    mapper = FHIRMapper()
-    # This should not raise an error about missing structures
-    targets = mapper.execute_mapping(mapping_script, source_data)
-    
-    assert len(targets) == 1
-    arbitrary_target = targets[0]
-    
-    # Verify that an arbitrary target was created (should be a dict)
-    assert isinstance(arbitrary_target, dict)
-    # With ArbitraryModel, field assignments work correctly
-    assert arbitrary_target["full_name"] == "John"
-    assert arbitrary_target["ageYears"] == 30

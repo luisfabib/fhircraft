@@ -162,6 +162,9 @@ group main(source legacy, target patient: Patient) {
         legacy.firstName -> name.given;
         legacy.lastName -> name.family;
     };
+    legacy.dob -> patient.birthDate;
+    legacy.sex where($this = 'F') -> patient.gender = "female";
+    legacy.sex where($this = 'M') -> patient.gender = "male";
 }
 """
 
@@ -169,6 +172,9 @@ group main(source legacy, target patient: Patient) {
 mapper = FHIRMapper()
 targets = mapper.execute_mapping(mapping_script, legacy_patient)
 fhir_patient = targets[0]
+
+print(fhir_patient.model_dump(exclude={'meta','resourceType'}))
+#> {'name': [{'family': 'Smith', 'given': ['Bob']}], 'birthDate': '1975-06-20'}
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
