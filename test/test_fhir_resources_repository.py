@@ -14,14 +14,18 @@ import tarfile
 import json
 from unittest import mock
 import pytest
-import io 
+import io
 from fhircraft.fhir.resources.repository import PackageStructureDefinitionRepository
-from fhircraft.fhir.resources.definitions import StructureDefinition
 
 import pytest
 
 from fhircraft.fhir.packages import FHIRPackageRegistryError, PackageNotFoundError
-from fhircraft.fhir.resources.definitions import StructureDefinition
+from fhircraft.fhir.resources.datatypes.R4.core import (
+    StructureDefinition as StructureDefinitionR4,
+)
+from fhircraft.fhir.resources.datatypes.R4B.core import (
+    StructureDefinition as StructureDefinitionR4B,
+)
 from fhircraft.fhir.resources.repository import (
     CompositeStructureDefinitionRepository,
     HttpStructureDefinitionRepository,
@@ -34,6 +38,7 @@ SAMPLE_PATIENT_R4 = {
     "resourceType": "StructureDefinition",
     "url": "http://hl7.org/fhir/StructureDefinition/Patient",
     "version": "4.0.0",
+    "fhirVersion": "4.0.1",
     "name": "Patient",
     "status": "active",
     "kind": "resource",
@@ -68,6 +73,7 @@ SAMPLE_PATIENT_R4B = {
     "resourceType": "StructureDefinition",
     "url": "http://hl7.org/fhir/StructureDefinition/Patient",
     "version": "4.3.0",
+    "fhirVersion": "4.3.1",
     "name": "Patient",
     "status": "active",
     "kind": "resource",
@@ -102,6 +108,7 @@ SAMPLE_OBSERVATION = {
     "resourceType": "StructureDefinition",
     "url": "http://hl7.org/fhir/StructureDefinition/Observation",
     "version": "4.0.0",
+    "fhirVersion": "4.0.1",
     "name": "Observation",
     "status": "active",
     "kind": "resource",
@@ -147,9 +154,9 @@ class TestStructureDefinitionRepository:
         repo = CompositeStructureDefinitionRepository(internet_enabled=False)
 
         # Add different versions of Patient
-        patient_r4 = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
-        patient_r4b = StructureDefinition.model_validate(SAMPLE_PATIENT_R4B)
-        observation = StructureDefinition.model_validate(SAMPLE_OBSERVATION)
+        patient_r4 = StructureDefinitionR4.model_validate(SAMPLE_PATIENT_R4)
+        patient_r4b = StructureDefinitionR4B.model_validate(SAMPLE_PATIENT_R4B)
+        observation = StructureDefinitionR4.model_validate(SAMPLE_OBSERVATION)
 
         repo.add(patient_r4)
         repo.add(patient_r4b)
@@ -197,7 +204,7 @@ class TestStructureDefinitionRepository:
     def test_add_structure_definition(self, empty_repository):
         """Test adding structure definitions."""
         repo = empty_repository
-        patient = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
+        patient = StructureDefinitionR4.model_validate(SAMPLE_PATIENT_R4)
 
         # Test successful addition
         repo.add(patient)
@@ -207,7 +214,7 @@ class TestStructureDefinitionRepository:
     def test_add_duplicate_version(self, empty_repository):
         """Test adding duplicate versions raises error."""
         repo = empty_repository
-        patient = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
+        patient = StructureDefinitionR4.model_validate(SAMPLE_PATIENT_R4)
 
         repo.add(patient)
 
@@ -221,7 +228,7 @@ class TestStructureDefinitionRepository:
         invalid_data = SAMPLE_PATIENT_R4.copy()
         del invalid_data["version"]
 
-        patient = StructureDefinition.model_validate(invalid_data)
+        patient = StructureDefinitionR4.model_validate(invalid_data)
 
         with pytest.raises(ValueError, match="must have a version"):
             repo.add(patient)
@@ -234,7 +241,7 @@ class TestStructureDefinitionRepository:
 
         # This should fail at StructureDefinition validation level
         with pytest.raises(Exception):
-            StructureDefinition.model_validate(invalid_data)
+            StructureDefinitionR4.model_validate(invalid_data)
 
     def test_get_structure_definition(self, populated_repository):
         """Test retrieving structure definitions."""
@@ -571,7 +578,7 @@ class TestPackageStructureDefinitionRepository:
     def test_package_repository_add_and_get(self, package_repository):
         """Test adding and retrieving structure definitions in package repository."""
         repo = package_repository
-        patient = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
+        patient = StructureDefinitionR4.model_validate(SAMPLE_PATIENT_R4)
 
         # Add structure definition
         repo.add(patient)
@@ -588,7 +595,7 @@ class TestPackageStructureDefinitionRepository:
     def test_package_repository_has(self, package_repository):
         """Test checking existence of structure definitions in package repository."""
         repo = package_repository
-        patient = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
+        patient = StructureDefinitionR4.model_validate(SAMPLE_PATIENT_R4)
 
         # Initially should not exist
         assert not repo.has("http://hl7.org/fhir/StructureDefinition/Patient")
@@ -689,7 +696,7 @@ class TestPackageStructureDefinitionRepository:
     def test_package_repository_clear_cache(self, package_repository):
         """Test clearing the package repository cache."""
         repo = package_repository
-        patient = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
+        patient = StructureDefinitionR4.model_validate(SAMPLE_PATIENT_R4)
 
         # Add data
         repo.add(patient)
@@ -843,7 +850,7 @@ class TestCompositeRepositoryPackageIntegration:
     ):
         """Test that get() method falls back to package repository."""
         repo = composite_repo_with_packages
-        patient = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
+        patient = StructureDefinitionR4.model_validate(SAMPLE_PATIENT_R4)
 
         # Add structure definition to package repository only
         repo._package_repository.add(patient)
@@ -866,7 +873,7 @@ class TestCompositeRepositoryPackageIntegration:
     ):
         """Test that has() method checks package repository."""
         repo = composite_repo_with_packages
-        patient = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
+        patient = StructureDefinitionR4.model_validate(SAMPLE_PATIENT_R4)
 
         # Initially not available
         assert not repo.has("http://hl7.org/fhir/StructureDefinition/Patient", "4.0.0")
@@ -887,8 +894,8 @@ class TestCompositeRepositoryPackageIntegration:
         repo = composite_repo_with_packages
 
         # Create two different versions of the same structure definition
-        patient_r4 = StructureDefinition.model_validate(SAMPLE_PATIENT_R4)
-        patient_r4b = StructureDefinition.model_validate(SAMPLE_PATIENT_R4B)
+        patient_r4 = StructureDefinitionR4.model_validate(SAMPLE_PATIENT_R4)
+        patient_r4b = StructureDefinitionR4B.model_validate(SAMPLE_PATIENT_R4B)
 
         # Add one version to package repository
         repo._package_repository.add(patient_r4)
@@ -911,8 +918,6 @@ class TestCompositeRepositoryPackageIntegration:
         assert latest.version == "4.3.0"
 
 
-
-
 def make_tarfile_with_structuredefs(struct_defs, package_json=None):
     """Helper to create an in-memory tarfile with StructureDefinition JSON files and optional package.json."""
     tar_bytes = io.BytesIO()
@@ -933,7 +938,10 @@ def make_tarfile_with_structuredefs(struct_defs, package_json=None):
     # Return the BytesIO object so the caller can open the tarfile as needed
     return tar_bytes
 
-def valid_structure_definition(url="http://example.org/StructureDefinition/test", version="1.0.0"):
+
+def valid_structure_definition(
+    url="http://example.org/StructureDefinition/test", version="1.0.0"
+):
     return {
         "resourceType": "StructureDefinition",
         "url": url,
@@ -944,8 +952,9 @@ def valid_structure_definition(url="http://example.org/StructureDefinition/test"
         "abstract": False,
         "type": "Observation",
         "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
-        "derivation": "constraint"
+        "derivation": "constraint",
     }
+
 
 class TestProcessPackageTar:
     def setup_method(self):
@@ -959,8 +968,12 @@ class TestProcessPackageTar:
 
     def test_extracts_and_adds_structure_definitions(self):
         struct_defs = [
-            valid_structure_definition(url="http://example.org/StructureDefinition/one", version="1.0.0"),
-            valid_structure_definition(url="http://example.org/StructureDefinition/two", version="2.0.0"),
+            valid_structure_definition(
+                url="http://example.org/StructureDefinition/one", version="1.0.0"
+            ),
+            valid_structure_definition(
+                url="http://example.org/StructureDefinition/two", version="2.0.0"
+            ),
         ]
         tar_bytes = make_tarfile_with_structuredefs(struct_defs)
         with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
@@ -974,7 +987,9 @@ class TestProcessPackageTar:
     def test_raises_if_no_structure_definitions_found(self):
         tar_bytes = make_tarfile_with_structuredefs([])
         with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
-            with pytest.raises(RuntimeError, match="No StructureDefinition resources found"):
+            with pytest.raises(
+                RuntimeError, match="No StructureDefinition resources found"
+            ):
                 self.repo._process_package_tar(tar, "testpkg", "1.0.0")
 
     def test_ignores_non_structuredefinition_json_files(self):
@@ -987,18 +1002,24 @@ class TestProcessPackageTar:
             tar.addfile(tarinfo, io.BytesIO(content))
         tar_bytes.seek(0)
         with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
-            with pytest.raises(RuntimeError, match="No StructureDefinition resources found"):
+            with pytest.raises(
+                RuntimeError, match="No StructureDefinition resources found"
+            ):
                 self.repo._process_package_tar(tar, "testpkg", "1.0.0")
 
     def test_processes_package_json_and_loads_dependencies(self):
         struct_defs = [valid_structure_definition()]
         package_json = {"dependencies": {"dep.pkg": "1.2.3"}}
-        tar_bytes = make_tarfile_with_structuredefs(struct_defs, package_json=package_json)
+        tar_bytes = make_tarfile_with_structuredefs(
+            struct_defs, package_json=package_json
+        )
         # Patch load_package to track dependency loading
         with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
             with mock.patch.object(self.repo, "load_package") as mock_load_package:
                 self.repo._process_package_tar(tar, "testpkg", "1.0.0")
-                mock_load_package.assert_any_call("dep.pkg", "1.2.3", fail_if_exists=False)
+                mock_load_package.assert_any_call(
+                    "dep.pkg", "1.2.3", fail_if_exists=False
+                )
         # Should still add the StructureDefinition
         assert self.mock_add.call_count == 1
 
@@ -1006,7 +1027,7 @@ class TestProcessPackageTar:
         # One valid, one invalid StructureDefinition
         struct_defs = [
             valid_structure_definition(),
-            {"resourceType": "StructureDefinition", "invalid": "data"}
+            {"resourceType": "StructureDefinition", "invalid": "data"},
         ]
         tar_bytes = make_tarfile_with_structuredefs(struct_defs)
         # Should not raise, but print a warning

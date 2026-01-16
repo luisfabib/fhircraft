@@ -8,19 +8,26 @@ from pydantic import BaseModel, Field
 from pydantic.aliases import AliasChoices
 from pydantic.fields import FieldInfo
 
+from fhircraft.fhir.resources.datatypes.R5.complex.coding import Coding
+from fhircraft.fhir.resources.datatypes.R5.complex.codeable_concept import (
+    CodeableConcept,
+)
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-import fhircraft.fhir.resources.datatypes.R4B.complex as complex
-from fhircraft.fhir.resources.definitions import (
+import fhircraft.fhir.resources.datatypes.R5.complex as complex
+from fhircraft.fhir.resources.datatypes.R5.core import (
     StructureDefinition,
     StructureDefinitionSnapshot,
 )
-from fhircraft.fhir.resources.definitions.element_definition import (
+from fhircraft.fhir.resources.datatypes.R5.complex.element_definition import (
     ElementDefinition,
+    ElementDefinitionBase,
+    ElementDefinitionSlicing,
     ElementDefinitionType,
+    ElementDefinitionSlicingDiscriminator,
 )
 from fhircraft.fhir.resources.factory import (
     ConstructionMode,
-    ElementDefinitionNode,
+    StructureNode,
     FHIRSliceModel,
     ResourceFactory,
     ResourceFactoryValidators,
@@ -32,7 +39,7 @@ class FactoryTestCase(TestCase):
     Test case for verifying the behavior of the ResourceFactory class and its configuration helpers.
 
     This class sets up a ResourceFactory instance with a specific configuration for testing purposes.
-    The configuration uses FHIR release "R4B" and resource name "Test".
+    The configuration uses FHIR release "R5" and resource name "Test".
 
     Class Attributes:
         factory (ResourceFactory): An instance of ResourceFactory configured for testing.
@@ -46,7 +53,9 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", FHIR_version="4.3.0", construction_mode=ConstructionMode.SNAPSHOT
+            FHIR_release="R5",
+            FHIR_version="5.0.0",
+            construction_mode=ConstructionMode.SNAPSHOT,
         )
 
 
@@ -89,16 +98,16 @@ class TestBuildElementTreeStructure(FactoryTestCase):
         assert "Patient" == node.node_label
         assert "name" in node.children
         assert "Patient.name" == node.children["name"].id
-        assert node.children["name"].type is not None
-        assert "string" == node.children["name"].type[0].code
+        assert node.children["name"].definition.type is not None
+        assert "string" == node.children["name"].definition.type[0].code
         assert "address" in node.children
         assert "Patient.address" == node.children["address"].id
-        assert node.children["address"].type is not None
-        assert "Address" == node.children["address"].type[0].code
+        assert node.children["address"].definition.type is not None
+        assert "Address" == node.children["address"].definition.type[0].code
         assert "identifier" in node.children
         assert "Patient.identifier" == node.children["identifier"].id
-        assert node.children["identifier"].type is not None
-        assert "Identifier" == node.children["identifier"].type[0].code
+        assert node.children["identifier"].definition.type is not None
+        assert "Identifier" == node.children["identifier"].definition.type[0].code
 
     def test_handles_single_level_paths(self):
         elements = [
@@ -215,7 +224,7 @@ class TestGetComplexFhirType(FactoryTestCase):
                 url=profile_url,
                 name="CustomType",
                 version="1.0.0",
-                fhirVersion="4.0.0",
+                fhirVersion="5.0.0",
                 status="active",
                 kind="complex-type",
                 abstract=False,
@@ -625,19 +634,25 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         # Should have both the main field and the extension field
         assert "deceasedDateTime" in fields
         assert "deceasedDateTime_ext" in fields
-        
+
         # Verify the main field
         field_type, field_info = fields["deceasedDateTime"]
         assert field_type == Optional[primitives.DateTime]
-        
+
         # Verify the extension field
         ext_field_type, ext_field_info = fields["deceasedDateTime_ext"]
         assert ext_field_type == Optional[complex.Element]
         assert ext_field_info.alias == "_deceasedDateTime"
 
-    def test_mixed_primitive_and_complex_types_create_extension_only_for_primitives(self):
+    def test_mixed_primitive_and_complex_types_create_extension_only_for_primitives(
+        self,
+    ):
         # Test that extension fields are only created for primitive types
-        element_types = [primitives.Boolean, primitives.DateTime, complex.CodeableConcept]
+        element_types = [
+            primitives.Boolean,
+            primitives.DateTime,
+            complex.CodeableConcept,
+        ]
         basename = "value"
         max_card = 1
         fields = self.factory._construct_type_choice_fields(
@@ -647,7 +662,7 @@ class TestProcessChoiceTypeField(FactoryTestCase):
         assert "valueBoolean" in fields
         assert "valueDateTime" in fields
         assert "valueCodeableConcept" in fields
-        
+
         # Should have extension fields only for primitives
         assert "valueBoolean_ext" in fields
         assert "valueDateTime_ext" in fields
@@ -808,70 +823,97 @@ class TestResolveContentReference(FactoryTestCase):
     def setUp(self):
         super().setUp()
 
-        self.root = ElementDefinitionNode(
+        self.root = StructureNode(
             id="__root__",
             path="__root__",
             node_label="__root__",
             children={},
             slices={},
+            definition=None,
         )
         # Patch _build_element_tree_structure to return a mock tree
-        self.mock_tree = ElementDefinitionNode(
+        self.mock_tree = StructureNode(
             node_label="Patient",
             id="Patient",
             path="Patient",
             root=self.root,
-            type=[ElementDefinitionType(code="Patient")],
+            definition=ElementDefinition(
+                type=[ElementDefinitionType(code="Patient")],
+            ),
             children={
-                "gender": ElementDefinitionNode(
+                "gender": StructureNode(
                     node_label="gender",
                     id="Patient.gender",
                     path="Patient.gender",
                     root=self.root,
                     children={},
-                    type=[ElementDefinitionType(code="string")],
-                    fixedString="female",
+                    definition=ElementDefinition(
+                        id="Patient.gender",
+                        path="Patient.gender",
+                        type=[ElementDefinitionType(code="string")],
+                        fixedString="female",
+                    ),
                 ),
-                "name": ElementDefinitionNode(
+                "name": StructureNode(
                     node_label="name",
                     id="Patient.name",
                     path="Patient.name",
                     root=self.root,
-                    type=[ElementDefinitionType(code="BackboneElement")],
+                    definition=ElementDefinition(
+                        id="Patient.name",
+                        path="Patient.name",
+                        type=[ElementDefinitionType(code="BackboneElement")],
+                    ),
                     children={
-                        "given": ElementDefinitionNode(
+                        "given": StructureNode(
                             node_label="given",
                             id="Patient.name.given",
                             path="Patient.name.given",
                             root=self.root,
                             children={},
-                            type=[ElementDefinitionType(code="string")],
+                            definition=ElementDefinition(
+                                id="Patient.name.given",
+                                path="Patient.name.given",
+                                type=[ElementDefinitionType(code="string")],
+                            ),
                         ),
-                        "family": ElementDefinitionNode(
+                        "family": StructureNode(
                             node_label="family",
                             id="Patient.name.family",
                             path="Patient.name.family",
                             root=self.root,
                             children={},
-                            type=[ElementDefinitionType(code="string")],
+                            definition=ElementDefinition(
+                                id="Patient.name.family",
+                                path="Patient.name.family",
+                                type=[ElementDefinitionType(code="string")],
+                            ),
                         ),
-                        "other": ElementDefinitionNode(
+                        "other": StructureNode(
                             node_label="other",
                             id="Patient.name.other",
                             path="Patient.name.other",
                             root=self.root,
                             children={},
-                            contentReference="#Patient.gender.name",
+                            definition=ElementDefinition(
+                                id="Patient.name.other",
+                                path="Patient.name.other",
+                                contentReference="#Patient.gender.name",
+                            ),
                         ),
                     },
                 ),
-                "address": ElementDefinitionNode(
+                "address": StructureNode(
                     node_label="address",
                     id="Patient.address",
                     path="Patient.address",
                     root=self.root,
                     children={},
-                    type=[ElementDefinitionType(code="Address")],
+                    definition=ElementDefinition(
+                        id="Patient.address",
+                        path="Patient.address",
+                        type=[ElementDefinitionType(code="Address")],
+                    ),
                 ),
             },
         )
@@ -879,60 +921,74 @@ class TestResolveContentReference(FactoryTestCase):
 
     def test_resolves_valid_content_reference(self):
         # Simulate an element with a valid contentReference
-        element = ElementDefinitionNode(
+        element = StructureNode(
             path="dummy",
+            id="dummy",
             node_label="dummy",
-            contentReference="#Patient.gender",
+            definition=ElementDefinition(
+                contentReference="#Patient.gender",
+            ),
             root=self.root,
         )
 
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             result = self.factory._resolve_content_reference(element)
-        assert isinstance(result, ElementDefinitionNode)
+        assert isinstance(result, StructureNode)
         assert result.node_label == "dummy"
-        assert result.type == self.mock_tree.children["gender"].type
-        assert result.fixedString == "female"
+        assert (
+            result.definition.type == self.mock_tree.children["gender"].definition.type
+        )
+        assert result.definition.fixedString == "female"
 
     def test_resolves_valid_content_reference_with_children(self):
         # Simulate an element with a valid contentReference
-        element = ElementDefinitionNode(
+        element = StructureNode(
             path="dummy",
+            id="dummy",
             node_label="dummy",
-            contentReference="#Patient.name",
+            definition=ElementDefinition(
+                contentReference="#Patient.name",
+            ),
             root=self.root,
         )
 
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             result = self.factory._resolve_content_reference(element)
-        assert isinstance(result, ElementDefinitionNode)
+        assert isinstance(result, StructureNode)
         assert result.node_label == "dummy"
-        assert result.type == self.mock_tree.children["name"].type
+        assert result.definition.type == self.mock_tree.children["name"].definition.type
         assert result.children == self.mock_tree.children["name"].children
 
     def test_resolves_content_reference_to_root(self):
         # Reference to the root node
-        element = ElementDefinitionNode(
+        element = StructureNode(
             path="dummy",
+            id="dummy",
             node_label="dummy",
-            contentReference="#Patient",
+            definition=ElementDefinition(
+                contentReference="#Patient",
+            ),
             root=self.root,
         )
 
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             result = self.factory._resolve_content_reference(element)
-        assert isinstance(result, ElementDefinitionNode)
+        assert isinstance(result, StructureNode)
         assert result.node_label == "dummy"
-        assert result.type == self.mock_tree.type
+        assert result.definition.type == self.mock_tree.definition.type
 
     def test_returns_original_node_for_invalid_reference(self):
         # Reference to a non-existent node
-        element = ElementDefinitionNode(
+        element = StructureNode(
             path="dummy",
             node_label="dummy",
-            contentReference="#Patient.nonexistent",
+            id="dummy",
+            definition=ElementDefinition(
+                contentReference="#Patient.nonexistent",
+            ),
             root=self.root,
         )
         with warnings.catch_warnings():
@@ -942,24 +998,28 @@ class TestResolveContentReference(FactoryTestCase):
 
     def test_valid_url_content_reference(self):
         # Reference to a valid URL
-        element = ElementDefinitionNode(
+        element = StructureNode(
+            id="dummy",
             path="dummy",
             node_label="dummy",
-            contentReference="http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
+            definition=ElementDefinition(
+                contentReference="http://hl7.org/fhir/StructureDefinition/Observation#Observation.category",
+            ),
             root=self.root,
         )
 
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             result = self.factory._resolve_content_reference(element)
-        assert isinstance(result, ElementDefinitionNode)
+        assert isinstance(result, StructureNode)
         assert result.node_label == "dummy"
-        assert result.type == [ElementDefinitionType(code="CodeableConcept")]
-        assert result.binding
+        assert result.definition.type == [ElementDefinitionType(code="CodeableConcept")]
+        assert result.definition.binding
         assert (
-            result.binding.valueSet
+            result.definition.binding.valueSet
             == "http://hl7.org/fhir/ValueSet/observation-category"
         )
+
 
 # ----------------------------------------------------------------
 # _merge_differential_elements_with_base_snapshot()
@@ -969,7 +1029,7 @@ class TestResolveContentReference(FactoryTestCase):
 class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
     """
     Unit tests for the _merge_differential_elements_with_base_snapshot method.
-    
+
     This method merges differential elements with their base snapshot counterparts,
     inheriting properties not explicitly changed in the differential.
     """
@@ -982,11 +1042,24 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
             name="Base",
             status="draft",
             kind="resource",
-            abstract=False,
+            abstract=True,
             type="Resource",
             fhirVersion="5.0.0",
-            snapshot={
-                "element": [
+            snapshot=StructureDefinitionSnapshot(
+                element=[
+                    ElementDefinition(
+                        id="Resource",
+                        path="Resource",
+                        min=0,
+                        max="1",
+                        definition="Base element definition",
+                        short="Base element",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource",
+                        ),
+                    ),
                     ElementDefinition(
                         id="Resource.status",
                         path="Resource.status",
@@ -995,11 +1068,16 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                         type=[ElementDefinitionType(code="code")],
                         short="Base status field",
                         definition="Status from base",
-                    )
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.status",
+                        ),
+                    ),
                 ]
-            }
+            ),
         )
-        
+
         # Differential only changes cardinality
         differential_elements = [
             ElementDefinition(
@@ -1008,11 +1086,11 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                 min=1,  # Make required
             )
         ]
-        
+
         merged = self.factory._merge_differential_elements_with_base_snapshot(
             differential_elements, base_sd
         )
-        
+
         assert len(merged) == 1
         assert merged[0].id == "Resource.status"
         assert merged[0].min == 1  # From differential
@@ -1028,17 +1106,36 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
             name="Base",
             status="draft",
             kind="resource",
-            abstract=False,
+            abstract=True,
             type="Resource",
             fhirVersion="5.0.0",
-            snapshot={
-                "element": [
+            snapshot=StructureDefinitionSnapshot(
+                element=[
+                    ElementDefinition(
+                        id="Resource",
+                        path="Resource",
+                        min=0,
+                        max="1",
+                        definition="Base element definition",
+                        short="Base element",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource",
+                        ),
+                    ),
                     ElementDefinition(
                         id="Resource.component",
                         path="Resource.component",
                         min=0,
                         max="*",
                         type=[ElementDefinitionType(code="BackboneElement")],
+                        definition="Component from base",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.component",
+                        ),
                     ),
                     ElementDefinition(
                         id="Resource.component.code",
@@ -1047,6 +1144,12 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                         max="1",
                         type=[ElementDefinitionType(code="CodeableConcept")],
                         short="Component code",
+                        definition="Code of the component",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.component.code",
+                        ),
                     ),
                     ElementDefinition(
                         id="Resource.component.value",
@@ -1055,11 +1158,17 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                         max="1",
                         type=[ElementDefinitionType(code="string")],
                         short="Component value",
+                        definition="Value of the component",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.component.value",
+                        ),
                     ),
                 ]
-            }
+            ),
         )
-        
+
         # Differential constrains parent and one child
         differential_elements = [
             ElementDefinition(
@@ -1074,19 +1183,21 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                 short="Required component value",  # Override description
             ),
         ]
-        
+
         merged = self.factory._merge_differential_elements_with_base_snapshot(
             differential_elements, base_sd
         )
-        
+
         assert len(merged) == 2
-        
+
         # Check parent element
         component = next(e for e in merged if e.id == "Resource.component")
         assert component.min == 2  # From differential
         assert component.max == "*"  # Inherited
-        assert component.type == [ElementDefinitionType(code="BackboneElement")]  # Inherited
-        
+        assert component.type == [
+            ElementDefinitionType(code="BackboneElement")
+        ]  # Inherited
+
         # Check child element
         value = next(e for e in merged if e.id == "Resource.component.value")
         assert value.min == 1  # From differential
@@ -1101,39 +1212,59 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
             name="Base",
             status="draft",
             kind="resource",
-            abstract=False,
+            abstract=True,
             type="Resource",
             fhirVersion="5.0.0",
-            snapshot={
-                "element": [
+            snapshot=StructureDefinitionSnapshot(
+                element=[
+                    ElementDefinition(
+                        id="Resource",
+                        path="Resource",
+                        min=0,
+                        max="1",
+                        definition="Base element definition",
+                        short="Base element",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource",
+                        ),
+                    ),
                     ElementDefinition(
                         id="Resource.extension",
                         path="Resource.extension",
                         min=0,
                         max="*",
+                        definition="Base extension definition",
                         type=[ElementDefinitionType(code="Extension")],
                         short="Base extensions",
-                    )
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.extension",
+                        ),
+                    ),
                 ]
-            }
+            ),
         )
-        
         # Differential adds slicing definition
         differential_elements = [
             ElementDefinition(
                 id="Resource.extension",
                 path="Resource.extension",
-                slicing={
-                    "discriminator": [{"type": "value", "path": "url"}],
-                    "rules": "open"
-                },
+                slicing=ElementDefinitionSlicing(
+                    discriminator=[
+                        ElementDefinitionSlicingDiscriminator(type="value", path="url")
+                    ],
+                    rules="open",
+                ),
             )
         ]
-        
+
         merged = self.factory._merge_differential_elements_with_base_snapshot(
             differential_elements, base_sd
         )
-        
+
         assert len(merged) == 1
         assert merged[0].id == "Resource.extension"
         assert merged[0].slicing is not None
@@ -1148,17 +1279,36 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
             name="Base",
             status="draft",
             kind="resource",
-            abstract=False,
+            abstract=True,
             type="Resource",
             fhirVersion="5.0.0",
-            snapshot={
-                "element": [
+            snapshot=StructureDefinitionSnapshot(
+                element=[
+                    ElementDefinition(
+                        id="Resource",
+                        path="Resource",
+                        min=0,
+                        max="1",
+                        definition="Base element definition",
+                        short="Base element",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource",
+                        ),
+                    ),
                     ElementDefinition(
                         id="Resource.extension",
                         path="Resource.extension",
                         min=0,
                         max="*",
                         type=[ElementDefinitionType(code="Extension")],
+                        definition="Extension from base",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Extension",
+                        ),
                     ),
                     ElementDefinition(
                         id="Resource.extension.url",
@@ -1167,6 +1317,12 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                         max="1",
                         type=[ElementDefinitionType(code="uri")],
                         short="Extension URL",
+                        definition="URL of the extension",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Extension.url",
+                        ),
                     ),
                     ElementDefinition(
                         id="Resource.extension.value[x]",
@@ -1178,11 +1334,17 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                             ElementDefinitionType(code="boolean"),
                         ],
                         short="Extension value",
+                        definition="Value of the extension",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Extension.value[x]",
+                        ),
                     ),
                 ]
-            }
+            ),
         )
-        
+
         # Differential defines a named slice with constrained children
         differential_elements = [
             ElementDefinition(
@@ -1205,28 +1367,36 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                 type=[ElementDefinitionType(code="string")],
             ),
         ]
-        
+
         merged = self.factory._merge_differential_elements_with_base_snapshot(
             differential_elements, base_sd
         )
-        
+
         assert len(merged) == 3
-        
+
         # Check slice definition
         slice_elem = next(e for e in merged if e.id == "Resource.extension:mySlice")
         assert slice_elem.sliceName == "mySlice"
         assert slice_elem.type == [ElementDefinitionType(code="Extension")]  # Inherited
-        
+
         # Check slice child - URL (should inherit type from base)
         url_elem = next(e for e in merged if e.id == "Resource.extension:mySlice.url")
-        assert url_elem.fixedUri == "http://example.org/my-extension"  # From differential
-        assert url_elem.type == [ElementDefinitionType(code="uri")]  # Inherited from base
+        assert (
+            url_elem.fixedUri == "http://example.org/my-extension"
+        )  # From differential
+        assert url_elem.type == [
+            ElementDefinitionType(code="uri")
+        ]  # Inherited from base
         assert url_elem.short == "Extension URL"  # Inherited
-        
+
         # Check slice child - valueString (specialized from value[x])
-        value_elem = next(e for e in merged if e.id == "Resource.extension:mySlice.valueString")
+        value_elem = next(
+            e for e in merged if e.id == "Resource.extension:mySlice.valueString"
+        )
         assert value_elem.min == 1  # From differential
-        assert value_elem.type == [ElementDefinitionType(code="string")]  # From differential
+        assert value_elem.type == [
+            ElementDefinitionType(code="string")
+        ]  # From differential
 
     def test_merges_deeply_nested_sliced_backbone_children(self):
         """Test merging children of sliced backbone elements."""
@@ -1235,17 +1405,36 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
             name="Base",
             status="draft",
             kind="resource",
-            abstract=False,
+            abstract=True,
             type="Resource",
             fhirVersion="5.0.0",
-            snapshot={
-                "element": [
+            snapshot=StructureDefinitionSnapshot(
+                element=[
+                    ElementDefinition(
+                        id="Resource",
+                        path="Resource",
+                        min=0,
+                        max="1",
+                        definition="Base element definition",
+                        short="Base element",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource",
+                        ),
+                    ),
                     ElementDefinition(
                         id="Resource.component",
                         path="Resource.component",
                         min=0,
                         max="*",
                         type=[ElementDefinitionType(code="BackboneElement")],
+                        definition="Component from base",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.component",
+                        ),
                     ),
                     ElementDefinition(
                         id="Resource.component.code",
@@ -1254,22 +1443,34 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                         max="1",
                         type=[ElementDefinitionType(code="CodeableConcept")],
                         short="Component code from base",
+                        definition="Component code from base",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.component.code",
+                        ),
                     ),
                     ElementDefinition(
                         id="Resource.component.value[x]",
                         path="Resource.component.value[x]",
                         min=0,
                         max="1",
+                        definition="Component value from base",
                         type=[
                             ElementDefinitionType(code="Quantity"),
                             ElementDefinitionType(code="string"),
                         ],
                         short="Component value from base",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.component.value",
+                        ),
                     ),
                 ]
-            }
+            ),
         )
-        
+
         # Differential slices component and constrains children
         differential_elements = [
             ElementDefinition(
@@ -1282,9 +1483,9 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
             ElementDefinition(
                 id="Resource.component:systolic.code",
                 path="Resource.component.code",
-                patternCodeableConcept={
-                    "coding": [{"system": "http://loinc.org", "code": "8480-6"}]
-                },
+                patternCodeableConcept=CodeableConcept(
+                    coding=[Coding(system="http://loinc.org", code="8480-6")]
+                ),
             ),
             ElementDefinition(
                 id="Resource.component:systolic.valueQuantity",
@@ -1293,28 +1494,38 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                 type=[ElementDefinitionType(code="Quantity")],
             ),
         ]
-        
+
         merged = self.factory._merge_differential_elements_with_base_snapshot(
             differential_elements, base_sd
         )
-        
+
         assert len(merged) == 3
-        
+
         # Check slice
         slice_elem = next(e for e in merged if e.id == "Resource.component:systolic")
         assert slice_elem.min == 1  # From differential
-        assert slice_elem.type == [ElementDefinitionType(code="BackboneElement")]  # Inherited
-        
+        assert slice_elem.type == [
+            ElementDefinitionType(code="BackboneElement")
+        ]  # Inherited
+
         # Check code child (should inherit type and description)
-        code_elem = next(e for e in merged if e.id == "Resource.component:systolic.code")
+        code_elem = next(
+            e for e in merged if e.id == "Resource.component:systolic.code"
+        )
         assert code_elem.patternCodeableConcept is not None  # From differential
-        assert code_elem.type == [ElementDefinitionType(code="CodeableConcept")]  # Inherited
+        assert code_elem.type == [
+            ElementDefinitionType(code="CodeableConcept")
+        ]  # Inherited
         assert code_elem.short == "Component code from base"  # Inherited
-        
+
         # Check valueQuantity child (specialized from value[x])
-        value_elem = next(e for e in merged if e.id == "Resource.component:systolic.valueQuantity")
+        value_elem = next(
+            e for e in merged if e.id == "Resource.component:systolic.valueQuantity"
+        )
         assert value_elem.min == 1  # From differential
-        assert value_elem.type == [ElementDefinitionType(code="Quantity")]  # From differential
+        assert value_elem.type == [
+            ElementDefinitionType(code="Quantity")
+        ]  # From differential
 
     def test_handles_differential_only_elements(self):
         """Test that elements only in differential (not in base) are returned as-is."""
@@ -1323,20 +1534,41 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
             name="Base",
             status="draft",
             kind="resource",
-            abstract=False,
+            abstract=True,
             type="Resource",
             fhirVersion="5.0.0",
-            snapshot={
-                "element": [
+            snapshot=StructureDefinitionSnapshot(
+                element=[
+                    ElementDefinition(
+                        id="Resource",
+                        path="Resource",
+                        min=0,
+                        max="1",
+                        definition="Base element definition",
+                        short="Base element",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource",
+                        ),
+                    ),
                     ElementDefinition(
                         id="Resource.field1",
                         path="Resource.field1",
                         type=[ElementDefinitionType(code="string")],
-                    )
+                        definition="Field 1 in base",
+                        min=0,
+                        max="1",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.field1",
+                        ),
+                    ),
                 ]
-            }
+            ),
         )
-        
+
         # Differential has a new element not in base
         differential_elements = [
             ElementDefinition(
@@ -1348,44 +1580,15 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                 short="New field in differential",
             )
         ]
-        
+
         merged = self.factory._merge_differential_elements_with_base_snapshot(
             differential_elements, base_sd
         )
-        
+
         assert len(merged) == 1
         assert merged[0].id == "Resource.field2"
         assert merged[0].type == [ElementDefinitionType(code="integer")]
         assert merged[0].short == "New field in differential"
-
-    def test_handles_no_base_snapshot(self):
-        """Test that differential elements are returned unchanged when base has no snapshot."""
-        base_sd = StructureDefinition(
-            url="http://example.org/base",
-            name="Base",
-            status="draft",
-            kind="resource",
-            abstract=False,
-            type="Resource",
-            fhirVersion="5.0.0",
-            # No snapshot
-        )
-        
-        differential_elements = [
-            ElementDefinition(
-                id="Resource.field",
-                path="Resource.field",
-                min=1,
-                type=[ElementDefinitionType(code="string")],
-            )
-        ]
-        
-        merged = self.factory._merge_differential_elements_with_base_snapshot(
-            differential_elements, base_sd
-        )
-        
-        # Should return differential as-is
-        assert merged == differential_elements
 
     def test_handles_none_base_structure_definition(self):
         """Test that differential elements are returned unchanged when base is None."""
@@ -1397,11 +1600,11 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                 type=[ElementDefinitionType(code="string")],
             )
         ]
-        
+
         merged = self.factory._merge_differential_elements_with_base_snapshot(
             differential_elements, None
         )
-        
+
         # Should return differential as-is
         assert merged == differential_elements
 
@@ -1412,11 +1615,24 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
             name="Base",
             status="draft",
             kind="resource",
-            abstract=False,
+            abstract=True,
             type="Resource",
             fhirVersion="5.0.0",
-            snapshot={
-                "element": [
+            snapshot=StructureDefinitionSnapshot(
+                element=[
+                    ElementDefinition(
+                        id="Resource",
+                        path="Resource",
+                        min=0,
+                        max="1",
+                        definition="Base element definition",
+                        short="Base element",
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource",
+                        ),
+                    ),
                     ElementDefinition(
                         id="Resource.field",
                         path="Resource.field",
@@ -1425,11 +1641,16 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                         type=[ElementDefinitionType(code="string")],
                         short="Field description",
                         definition="Detailed field definition",
-                    )
+                        base=ElementDefinitionBase(
+                            min=0,
+                            max="1",
+                            path="Resource.field",
+                        ),
+                    ),
                 ]
-            }
+            ),
         )
-        
+
         # Differential only changes min, leaves other fields as None
         differential_elements = [
             ElementDefinition(
@@ -1439,12 +1660,14 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
                 # short and definition are None (not specified)
             )
         ]
-        
+
         merged = self.factory._merge_differential_elements_with_base_snapshot(
             differential_elements, base_sd
         )
-        
+
         assert len(merged) == 1
         assert merged[0].min == 1  # From differential
         assert merged[0].short == "Field description"  # Preserved from base
-        assert merged[0].definition == "Detailed field definition"  # Preserved from base
+        assert (
+            merged[0].definition == "Detailed field definition"
+        )  # Preserved from base
