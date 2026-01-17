@@ -37,7 +37,9 @@ class EnvironmentVariable(FHIRPathVariable):
 
     def __init__(self, variable: str):
         if not variable.startswith("%"):
-            raise ValueError("FHIRPath environment variable names must start with '%'")
+            raise ValueError(
+                f"FHIRPath environment variable names must start with '%', got '{variable}'"
+            )
         self.variable = variable
 
     def evaluate(
