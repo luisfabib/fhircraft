@@ -2846,7 +2846,7 @@ class ElementDefinition(BackboneType):
     def FHIR_eld_11_constraint_model_validator(self):
         return validate_model_constraint(
             self,
-            expression="binding.empty() or type.code.empty() or type.code.contains(\":\") or type.select((code = 'code') or (code = 'Coding') or (code='CodeableConcept') or (code = 'Quantity') or (code = 'string') or (code = 'uri') or (code = 'Duration')).exists()",
+            expression="binding.empty() or type.code.empty() or type.select(code.contains(':')).exists() or type.select((code = 'code') or (code = 'Coding') or (code='CodeableConcept') or (code = 'Quantity') or (code = 'string') or (code = 'uri') or (code = 'Duration')).exists()",
             human="Binding can only be present for coded elements, string, and uri if using FHIR-defined types",
             key="eld-11",
             severity="error",
