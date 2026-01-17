@@ -567,6 +567,16 @@ class FhirPathParser:
         """identifier : IDENTIFIER"""
         p[0] = p[1]
 
+    def p_fhirpath_polar_literal(self, p):
+        """
+        literal : '+' number
+                | '-' number
+        """
+        if p[1] == "+":
+            p[0] = Literal(p[2])
+        elif p[1] == "-":
+            p[0] = Literal(-p[2])
+
     def p_fhirpath_literal(self, p):
         """literal : number
         | boolean
