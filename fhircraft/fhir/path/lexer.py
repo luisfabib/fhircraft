@@ -393,7 +393,7 @@ class FhirPathLexer(metaclass=MergeLexerMetaclass):
         return t
 
     def t_NUMBER(self, t):
-        r"-?\d+(\.\d+)?"
+        r"\d+(\.\d+)?"
         if "." in t.value:
             # Decimal (http://hl7.org/fhirpath/N1/#decimal)
             # -------------------------------------------------------------------------------

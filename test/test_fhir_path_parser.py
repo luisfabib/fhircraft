@@ -49,6 +49,7 @@ parser_test_cases = (
     ("false", Literal(False)),
     ("0.5", Literal(0.5)),
     ("12", Literal(12)),
+    ("-12", Literal(-12)),
     ("12 'mg'", Literal(Quantity(12, "mg"))),
     ("12.5 'kg'", Literal(Quantity(12.5, "kg"))),
     ("5 days", Literal(Quantity(5, "days"))),
@@ -377,7 +378,11 @@ parser_test_cases = (
     # ----------------------------------
     # Math Operators
     # ----------------------------------
+    ("2 + 3", Addition(Literal(2), Literal(3))),
+    ("2+3", Addition(Literal(2), Literal(3))),
     ("A + B", Addition(Element("A"), Element("B"))),
+    ("2 - 3", Subtraction(Literal(2), Literal(3))),
+    ("2-3", Subtraction(Literal(2), Literal(3))),
     ("A - B", Subtraction(Element("A"), Element("B"))),
     ("A * B", Multiplication(Element("A"), Element("B"))),
     ("A / B", Division(Element("A"), Element("B"))),
