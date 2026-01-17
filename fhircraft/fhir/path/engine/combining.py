@@ -40,10 +40,7 @@ class Union(FHIRPathFunction):
             )
         return [
             FHIRPathCollectionItem.wrap(item)
-            for item in sorted(
-                list(set(collection) | set(self.other_collection)),
-                key=lambda item: item.value,
-            )
+            for item in list(set(self.other_collection) | set(collection))
         ]
 
 
