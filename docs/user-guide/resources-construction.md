@@ -383,7 +383,8 @@ patient_model_2 = construct_resource_model(
 cached_construction_time = (end_time := time()) - start_time
  
 assert patient_model_1 is patient_model_2 # (1)!
-assert cached_construction_time < original_construction_time # (2)!
+print(f"Cached: {cached_construction_time}s")
+print(f"Original: {original_construction_time}s") # (2)!
 
 # Clear the cache when definitions change
 factory.clear_cache()

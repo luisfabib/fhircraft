@@ -399,13 +399,13 @@ class FHIRPath(ABC):
             if root is not None:
                 root_resource = root
 
-        environment = (environment or dict()) | {
+        environment = {
             "%ucum": FHIRPathCollectionItem.wrap("http://unitsofmeasure.org"),
             "%context": FHIRPathCollectionItem.wrap(data),
             "%resource": FHIRPathCollectionItem.wrap(resource),
             "%rootResource": FHIRPathCollectionItem.wrap(root_resource),
             "%fhirRelease": FHIRPathCollectionItem.wrap(fhir_release),
-        }
+        } | (environment or dict())
         # Ensure that entrypoint is a list of FHIRPathCollectionItem instances
         collection = [FHIRPathCollectionItem.wrap(item) for item in ensure_list(data)]
         return self.evaluate(collection, environment or dict(), create)

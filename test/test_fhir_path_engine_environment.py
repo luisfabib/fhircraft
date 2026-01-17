@@ -1,6 +1,8 @@
 import pytest
 
 from fhircraft.fhir.path.engine.environment import *
+from fhircraft.fhir.path.engine.core import Invocation, Element
+from fhircraft.fhir.path.engine.filtering import Select
 from fhircraft.fhir.path.exceptions import FHIRPathError
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
@@ -59,6 +61,18 @@ def test_default_resource_variable_is_set():
     assert EnvironmentVariable("%resource").single(patient) == patient
     assert EnvironmentVariable("%resource").single(observation) == observation
     assert EnvironmentVariable("%resource").single(reference) == observation
+
+
+def test_nested_environment_calls():
+    reference = MockReference(reference="patient-1")
+    observation = MockObservation(subject=reference)
+    assert (
+        Invocation(
+            Element("subject"),
+            Select(EnvironmentVariable("%resource")),
+        ).single(observation)
+        == observation
+    )
 
 
 def test_default_root_resource_variable_is_set():
