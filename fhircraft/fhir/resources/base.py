@@ -78,66 +78,77 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         strict: bool = None,
         from_attributes: bool = None,
         context: dict = None,
-        **kwargs
+        **kwargs,
     ) -> "FHIRBaseModel":
         """
         Override model_validate to inject relationship context for validation.
-        
+
         This ensures that field validators have access to parent, resource, and root_resource
         context through the validation context, enabling FHIRPath expressions to use
         environment variables like %resource, %context, etc.
-        
+
         Args:
             obj: The object to validate
             strict: Whether to use strict validation
             from_attributes: Whether to validate from attributes
             context: Validation context dictionary
             **kwargs: Additional validation arguments
-            
+
         Returns:
             The validated FHIRBaseModel instance
         """
         print(f"🔍 FHIRBaseModel.model_validate called for {cls.__name__}")
-        
+
         # Import here to avoid circular imports
-        from fhircraft.fhir.resources.validators import set_validation_context, clear_validation_context
-        
+        from fhircraft.fhir.resources.validators import (
+            set_validation_context,
+            clear_validation_context,
+        )
+
         # Enhance context with relationship info if available on the input object
         enhanced_context = context or {}
-        
+
         # If the object being validated already has relationship attributes, add them to context
-        if hasattr(obj, '_resource') and obj._resource is not None:
-            enhanced_context['_resource'] = obj._resource
-        if hasattr(obj, '_root_resource') and obj._root_resource is not None:
-            enhanced_context['_root_resource'] = obj._root_resource
-        if hasattr(obj, '_parent') and obj._parent is not None:
-            enhanced_context['_parent'] = obj._parent
-        
+        if hasattr(obj, "_resource") and obj._resource is not None:
+            enhanced_context["_resource"] = obj._resource
+        if hasattr(obj, "_root_resource") and obj._root_resource is not None:
+            enhanced_context["_root_resource"] = obj._root_resource
+        if hasattr(obj, "_parent") and obj._parent is not None:
+            enhanced_context["_parent"] = obj._parent
+
         # If we're validating a resource (has resourceType), create a temporary instance for context
         # This handles the common case where we validate from a dictionary
-        if isinstance(obj, dict) and obj.get('resourceType') and hasattr(cls, '__name__'):
+        if (
+            isinstance(obj, dict)
+            and obj.get("resourceType")
+            and hasattr(cls, "__name__")
+        ):
             # Create a minimal mock instance for resource context
             # We'll use this as the %resource context during validation
-            temp_instance = type('TempResource', (), {
-                'resourceType': obj.get('resourceType'),
-                'id': obj.get('id'),
-                '__class__': cls
-            })()
-            enhanced_context['_resource'] = temp_instance
-            enhanced_context['_root_resource'] = temp_instance
+            temp_instance = type(
+                "TempResource",
+                (),
+                {
+                    "resourceType": obj.get("resourceType"),
+                    "id": obj.get("id"),
+                    "__class__": cls,
+                },
+            )()
+            enhanced_context["_resource"] = temp_instance
+            enhanced_context["_root_resource"] = temp_instance
             print(f"🔍 Created temp resource context: {temp_instance.resourceType}")
-        
+
         # Set thread-local context for validators to access
         print(f"🔍 Setting enhanced context: {enhanced_context}")
         set_validation_context(enhanced_context)
-        
+
         try:
             return super().model_validate(
                 obj,
                 strict=strict,
                 from_attributes=from_attributes,
                 context=enhanced_context,
-                **kwargs
+                **kwargs,
             )
         finally:
             # Always clear context when done to prevent leaking between validations

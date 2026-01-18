@@ -27,7 +27,7 @@ def set_validation_context(context: dict | None):
 
 def get_validation_context() -> dict | None:
     """Get the validation context for the current thread."""
-    return getattr(_validation_context, 'context', None)
+    return getattr(_validation_context, "context", None)
 
 
 def clear_validation_context():
@@ -35,31 +35,42 @@ def clear_validation_context():
     _validation_context.context = None
 
 
-def create_context_aware_element_validator(expression: str, human: str, key: str, severity: str):
+def create_context_aware_element_validator(
+    expression: str, human: str, key: str, severity: str
+):
     """
     Creates a context-aware field validator that can access validation context.
-    
+
     Args:
         expression (str): The FHIRPath expression to evaluate.
         human (str): A human-readable description of the constraint.
         key (str): The key associated with the constraint.
         severity (str): The severity level of the constraint.
-    
+
     Returns:
         Callable: A field validator function that extracts context from ValidationInfo.
     """
+
     def validator(cls, value: Any, info: "ValidationInfo") -> Any:
         # Try to get context from ValidationInfo first, then fall back to thread-local
-        context = getattr(info, 'context', None) if info else None
+        context = getattr(info, "context", None) if info else None
         if context is None:
             context = get_validation_context()
-        
-        return validate_element_constraint(cls, value, expression, human, key, severity, context)
+
+        return validate_element_constraint(
+            cls, value, expression, human, key, severity, context
+        )
+
     return validator
 
 
 def _validate_FHIR_element_constraint(
-    value: Any, expression: str, human: str, key: str, severity: str, context: dict | None = None
+    value: Any,
+    expression: str,
+    human: str,
+    key: str,
+    severity: str,
+    context: dict | None = None,
 ):
     """
     Validate FHIR element constraint against a FHIRPath expression.
@@ -89,38 +100,38 @@ def _validate_FHIR_element_constraint(
     # Extract environment variables from context for FHIRPath
     env_vars = {}
     if context:
-        if '_resource' in context and context['_resource']:
-            env_vars['%resource'] = context['_resource']
-        if '_root_resource' in context and context['_root_resource']:
-            env_vars['%rootResource'] = context['_root_resource']
-        if '_parent' in context and context['_parent']:
-            env_vars['%context'] = context['_parent']
+        if "_resource" in context and context["_resource"]:
+            env_vars["%resource"] = context["_resource"]
+        if "_root_resource" in context and context["_root_resource"]:
+            env_vars["%rootResource"] = context["_root_resource"]
+        if "_parent" in context and context["_parent"]:
+            env_vars["%context"] = context["_parent"]
 
     # Check configuration for validation control
     config = get_config()
     validation_config = config.validation
-    
+
     # Skip validation if mode is 'skip'
-    if validation_config.mode == 'skip':
+    if validation_config.mode == "skip":
         return value
-    
+
     # Skip if this specific constraint is disabled
     if key in validation_config.disabled_constraints:
         return value
-    
+
     # Skip if all warnings are disabled and this is a warning
     if severity == "warning" and (
         validation_config.disable_warnings or validation_config.disable_warning_severity
     ):
         return value
-    
+
     # Skip if all errors are disabled and this is an error
     if severity == "error" and validation_config.disable_errors:
         return value
-    
+
     # In lenient mode, convert errors to warnings
     effective_severity = severity
-    if validation_config.mode == 'lenient' and severity == "error":
+    if validation_config.mode == "lenient" and severity == "error":
         effective_severity = "warning"
 
     if value is None:
@@ -149,7 +160,13 @@ def _validate_FHIR_element_constraint(
 
 
 def validate_element_constraint(
-    cls, value: Any, expression: str, human: str, key: str, severity: str, context: dict | None = None
+    cls,
+    value: Any,
+    expression: str,
+    human: str,
+    key: str,
+    severity: str,
+    context: dict | None = None,
 ) -> Any:
     """
     Validates a FHIR element constraint based on a FHIRPath expression.
@@ -170,7 +187,9 @@ def validate_element_constraint(
         AssertionError: If the validation fails and severity is not `warning`.
         Warning: If the validation fails and severity is `warning`.
     """
-    return _validate_FHIR_element_constraint(value, expression, human, key, severity, context)
+    return _validate_FHIR_element_constraint(
+        value, expression, human, key, severity, context
+    )
 
 
 def validate_model_constraint(
@@ -221,26 +240,29 @@ def validate_FHIR_element_pattern(
         pattern = pattern[0]
     _element = element[0] if isinstance(element, list) else element
     if isinstance(_element, FHIRBaseModel):
-        print('CHECK',merge_dicts(_element.model_dump(), pattern.model_dump()))
-        print('VALUE',_element.model_dump())
+        print("CHECK", merge_dicts(_element.model_dump(), pattern.model_dump()))
+        print("VALUE", _element.model_dump())
         assert (
             merge_dicts(_element.model_dump(), pattern.model_dump())
             == _element.model_dump()
         ), f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2)}"
     elif isinstance(_element, dict) and isinstance(pattern, dict):
-        print('CHECK',_element)
-        print('VALUE',pattern)
-        assert merge_dicts(_element, pattern) == _element, f"Value does not fulfill pattern: {pattern}"
-    else: 
+        print("CHECK", _element)
+        print("VALUE", pattern)
         assert (
-            _element == pattern
+            merge_dicts(_element, pattern) == _element
         ), f"Value does not fulfill pattern: {pattern}"
+    else:
+        assert _element == pattern, f"Value does not fulfill pattern: {pattern}"
     return element
 
 
 def validate_type_choice_element(
-    instance: T, field_types: List[Any], field_name_base: str, required: bool = False,
-    non_allowed_types: List[Any] | None = None
+    instance: T,
+    field_types: List[Any],
+    field_name_base: str,
+    required: bool = False,
+    non_allowed_types: List[Any] | None = None,
 ) -> T:
     """
     Validate the type choice element for a given instance.
@@ -282,7 +304,7 @@ def validate_type_choice_element(
     assert not required or (
         required and types_set_count > 0
     ), f"Type choice element {field_name_base}[x] must have one value set. Got {types_set_count}."
-    
+
     # Check that non-allowed types are not set
     if non_allowed_types:
         for non_allowed_type in non_allowed_types:
@@ -292,10 +314,10 @@ def validate_type_choice_element(
                 else non_allowed_type.__name__
             )
             value = getattr(instance, field_name, None)
-            assert value is None, (
-                f"Type choice element {field_name_base}[x] cannot use non-allowed type '{non_allowed_type}'. "
-            )
-    
+            assert (
+                value is None
+            ), f"Type choice element {field_name_base}[x] cannot use non-allowed type '{non_allowed_type}'. "
+
     return instance
 
 
