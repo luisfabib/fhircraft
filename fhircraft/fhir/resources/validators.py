@@ -1,6 +1,7 @@
 # Fhircraft modules
 import traceback
 import warnings
+import threading
 
 # Standard modules
 from typing import TYPE_CHECKING, Any, List, TypeVar, Union
@@ -9,14 +10,56 @@ from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+    from pydantic import ValidationInfo
 
 from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
 
 T = TypeVar("T", bound=BaseModel)
 
+# Thread-local storage for validation context
+_validation_context = threading.local()
+
+
+def set_validation_context(context: dict | None):
+    """Set the validation context for the current thread."""
+    _validation_context.context = context
+
+
+def get_validation_context() -> dict | None:
+    """Get the validation context for the current thread."""
+    return getattr(_validation_context, 'context', None)
+
+
+def clear_validation_context():
+    """Clear the validation context for the current thread."""
+    _validation_context.context = None
+
+
+def create_context_aware_element_validator(expression: str, human: str, key: str, severity: str):
+    """
+    Creates a context-aware field validator that can access validation context.
+    
+    Args:
+        expression (str): The FHIRPath expression to evaluate.
+        human (str): A human-readable description of the constraint.
+        key (str): The key associated with the constraint.
+        severity (str): The severity level of the constraint.
+    
+    Returns:
+        Callable: A field validator function that extracts context from ValidationInfo.
+    """
+    def validator(cls, value: Any, info: "ValidationInfo") -> Any:
+        # Try to get context from ValidationInfo first, then fall back to thread-local
+        context = getattr(info, 'context', None) if info else None
+        if context is None:
+            context = get_validation_context()
+        
+        return validate_element_constraint(cls, value, expression, human, key, severity, context)
+    return validator
+
 
 def _validate_FHIR_element_constraint(
-    value: Any, expression: str, human: str, key: str, severity: str
+    value: Any, expression: str, human: str, key: str, severity: str, context: dict | None = None
 ):
     """
     Validate FHIR element constraint against a FHIRPath expression.
@@ -42,6 +85,16 @@ def _validate_FHIR_element_constraint(
         FhirPathWarning,
     )
     from fhircraft.fhir.path.parser import fhirpath
+
+    # Extract environment variables from context for FHIRPath
+    env_vars = {}
+    if context:
+        if '_resource' in context and context['_resource']:
+            env_vars['%resource'] = context['_resource']
+        if '_root_resource' in context and context['_root_resource']:
+            env_vars['%rootResource'] = context['_root_resource']
+        if '_parent' in context and context['_parent']:
+            env_vars['%context'] = context['_parent']
 
     # Check configuration for validation control
     config = get_config()
@@ -74,7 +127,9 @@ def _validate_FHIR_element_constraint(
         return value
     for item in ensure_list(value):
         try:
-            valid = fhirpath.parse(expression).single(item, default=True)
+            # Parse FHIRPath expression and evaluate with environment variables
+            parsed_expression = fhirpath.parse(expression)
+            valid = parsed_expression.single(item, default=True, environment=env_vars)
             error_message = f'{human}. [{key}] -> "{expression}"'
             if effective_severity == "warning" and not valid:
                 warnings.warn(error_message, FhirPathWarning)
@@ -94,7 +149,7 @@ def _validate_FHIR_element_constraint(
 
 
 def validate_element_constraint(
-    cls, value: Any, expression: str, human: str, key: str, severity: str
+    cls, value: Any, expression: str, human: str, key: str, severity: str, context: dict | None = None
 ) -> Any:
     """
     Validates a FHIR element constraint based on a FHIRPath expression.
@@ -106,6 +161,7 @@ def validate_element_constraint(
         human (str): A human-readable description of the constraint.
         key (str): The key associated with the constraint.
         severity (str): The severity level of the constraint ('warning' or 'error').
+        context (dict | None): Optional validation context containing relationship information.
 
     Returns:
         Any: The validated value.
@@ -114,7 +170,7 @@ def validate_element_constraint(
         AssertionError: If the validation fails and severity is not `warning`.
         Warning: If the validation fails and severity is `warning`.
     """
-    return _validate_FHIR_element_constraint(value, expression, human, key, severity)
+    return _validate_FHIR_element_constraint(value, expression, human, key, severity, context)
 
 
 def validate_model_constraint(

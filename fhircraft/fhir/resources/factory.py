@@ -152,8 +152,7 @@ class ResourceFactoryValidators:
             self._validators[validator_name] = field_validator(
                 *validate_fields, mode="after"
             )(
-                partial(
-                    fhir_validators.validate_element_constraint,
+                fhir_validators.create_context_aware_element_validator(
                     expression=constraint.expression,
                     human=constraint.human,
                     key=constraint.key,
