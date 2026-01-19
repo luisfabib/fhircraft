@@ -195,19 +195,19 @@ class StructureDefinitionDifferential(BackboneElement):
         description="Definition of elements in the resource (if no StructureDefinition)",
     )
 
-    @field_validator(
-        *("element", "modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
-        return fhir_validators.validate_element_constraint(
-            cls,
-            value,
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
+    # @field_validator(
+    #     *("element", "modifierExtension", "extension"), mode="after", check_fields=None
+    # )
+    # @classmethod
+    # def FHIR_ele_1_constraint_validator(cls, value):
+    #     return fhir_validators.validate_element_constraint(
+    #         cls,
+    #         value,
+    #         expression="hasValue() or (children().count() > id.count())",
+    #         human="All FHIR elements must have a @value or children",
+    #         key="ele-1",
+    #         severity="error",
+    #     )
 
 
 class StructureDefinition(FHIRBaseModel):

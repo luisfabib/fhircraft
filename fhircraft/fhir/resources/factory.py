@@ -133,20 +133,16 @@ class ResourceFactoryValidators:
         # Construct function name for validator
         constraint_name = constraint.key.replace("-", "_")
         validator_name = f"FHIR_{constraint_name}_constraint_validator"
+        # If base model has a validator with the same name, modify the validator name to avoid conflicts
+        if base and validator_name in base.__pydantic_decorators__.field_validators:
+            validator_name = f"{base.__name__}_diff_{validator_name}"
         # Check if validator has already been constructed for another field
         validate_fields = [field]
         # Get the list of fields already being validated by this constraint
         if validator_name in self._validators:
             validator = self._validators.get(validator_name)
             if validator:
-                validate_fields.extend(validator.decorator_info.fields)
-        # Get the list of fields already being validated by this constraint in base model
-        if base and validator_name in base.__pydantic_decorators__.field_validators:
-            validate_fields.extend(
-                base.__pydantic_decorators__.field_validators[
-                    validator_name
-                ].info.fields
-            )
+                validate_fields.extend(validator.keywords.get("elements", []))
         # Add the current field to the list of validated fields
         if constraint.expression:
             self._validators[validator_name] = model_validator(
