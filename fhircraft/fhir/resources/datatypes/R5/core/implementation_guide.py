@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -88,29 +88,24 @@ class ImplementationGuideDependsOn(BackboneElement):
         alias="_reason",
     )
 
-    @field_validator(
-        *(
-            "reason",
-            "version",
-            "packageId",
-            "uri",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "reason",
+                "version",
+                "packageId",
+                "uri",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -142,23 +137,18 @@ class ImplementationGuideGlobal(BackboneElement):
         alias="_profile",
     )
 
-    @field_validator(
-        *(
-            "profile",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "profile",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -190,23 +180,18 @@ class ImplementationGuideDefinitionGrouping(BackboneElement):
         alias="_description",
     )
 
-    @field_validator(
-        *(
-            "description",
-            "name",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "description",
+                "name",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -278,38 +263,33 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         alias="_groupingId",
     )
 
-    @field_validator(
-        *(
-            "groupingId",
-            "profile",
-            "isExample",
-            "description",
-            "name",
-            "fhirVersion",
-            "reference",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "groupingId",
+                "profile",
+                "isExample",
+                "description",
+                "name",
+                "fhirVersion",
+                "reference",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -388,29 +368,24 @@ class ImplementationGuideDefinitionPage(BackboneElement):
             base="source",
         )
 
-    @field_validator(
-        *(
-            "page",
-            "generation",
-            "title",
-            "name",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "page",
+                "generation",
+                "title",
+                "name",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -446,23 +421,18 @@ class ImplementationGuideDefinitionParameter(BackboneElement):
         alias="_value",
     )
 
-    @field_validator(
-        *(
-            "value",
-            "code",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "value",
+                "code",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -503,26 +473,21 @@ class ImplementationGuideDefinitionTemplate(BackboneElement):
         alias="_scope",
     )
 
-    @field_validator(
-        *(
-            "scope",
-            "source",
-            "code",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "scope",
+                "source",
+                "code",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -556,44 +521,38 @@ class ImplementationGuideDefinition(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "template",
-            "parameter",
-            "page",
-            "resource",
-            "grouping",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "template",
+                "parameter",
+                "page",
+                "resource",
+                "grouping",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("page",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ig_3_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ig_3_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("page",),
             expression="generation='generated' implies source.empty()",
             human="Source must be absent if 'generated' is generated",
             key="ig-3",
@@ -638,29 +597,24 @@ class ImplementationGuideManifestResource(BackboneElement):
         alias="_relativePath",
     )
 
-    @field_validator(
-        *(
-            "relativePath",
-            "profile",
-            "isExample",
-            "reference",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "relativePath",
+                "profile",
+                "isExample",
+                "reference",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -701,26 +655,21 @@ class ImplementationGuideManifestPage(BackboneElement):
         alias="_anchor",
     )
 
-    @field_validator(
-        *(
-            "anchor",
-            "title",
-            "name",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "anchor",
+                "title",
+                "name",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -769,32 +718,27 @@ class ImplementationGuideManifest(BackboneElement):
         alias="_other",
     )
 
-    @field_validator(
-        *(
-            "other",
-            "image",
-            "page",
-            "resource",
-            "rendering",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "other",
+                "image",
+                "page",
+                "resource",
+                "rendering",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -1048,84 +992,77 @@ class ImplementationGuide(DomainResource):
             base="versionAlgorithm",
         )
 
-    @field_validator(
-        *(
-            "manifest",
-            "definition",
-            "global_",
-            "dependsOn",
-            "fhirVersion",
-            "license",
-            "packageId",
-            "copyrightLabel",
-            "copyright",
-            "purpose",
-            "jurisdiction",
-            "useContext",
-            "description",
-            "contact",
-            "publisher",
-            "date",
-            "experimental",
-            "status",
-            "title",
-            "name",
-            "version",
-            "identifier",
-            "url",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "manifest",
+                "definition",
+                "global_",
+                "dependsOn",
+                "fhirVersion",
+                "license",
+                "packageId",
+                "copyrightLabel",
+                "copyright",
+                "purpose",
+                "jurisdiction",
+                "useContext",
+                "description",
+                "contact",
+                "publisher",
+                "date",
+                "experimental",
+                "status",
+                "title",
+                "name",
+                "version",
+                "identifier",
+                "url",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("url",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_cnl_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("url",),
             expression="exists() implies matches('^[^|# ]+$')",
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",
             severity="warning",
         )
 
-    @field_validator(*("definition",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ig_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ig_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("definition",),
             expression="resource.groupingId.all(%context.grouping.id contains $this)",
             human="If a resource has a groupingId, it must refer to a grouping defined in the Implementation Guide",
             key="ig-1",

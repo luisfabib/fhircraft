@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -146,73 +146,66 @@ class OrganizationAffiliation(DomainResource):
         default="OrganizationAffiliation",
     )
 
-    @field_validator(
-        *(
-            "endpoint",
-            "contact",
-            "healthcareService",
-            "location",
-            "specialty",
-            "code",
-            "network",
-            "participatingOrganization",
-            "organization",
-            "period",
-            "active",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "endpoint",
+                "contact",
+                "healthcareService",
+                "location",
+                "specialty",
+                "code",
+                "network",
+                "participatingOrganization",
+                "organization",
+                "period",
+                "active",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("contact",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_org_3_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_org_3_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("contact",),
             expression="telecom.where(use = 'home').empty()",
             human="The telecom of an organization can never be of use 'home'",
             key="org-3",
             severity="error",
         )
 
-    @field_validator(*("contact",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_org_4_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_org_4_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("contact",),
             expression="address.where(use = 'home').empty()",
             human="The address of an organization can never be of use 'home'",
             key="org-4",

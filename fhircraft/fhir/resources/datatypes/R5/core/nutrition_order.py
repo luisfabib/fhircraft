@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -69,26 +69,21 @@ class NutritionOrderOralDietSchedule(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "asNeededFor",
-            "asNeeded",
-            "timing",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "asNeededFor",
+                "asNeeded",
+                "timing",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -110,23 +105,18 @@ class NutritionOrderOralDietNutrient(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "amount",
-            "modifier",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "amount",
+                "modifier",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -148,23 +138,18 @@ class NutritionOrderOralDietTexture(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "foodType",
-            "modifier",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "foodType",
+                "modifier",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -207,35 +192,30 @@ class NutritionOrderOralDiet(BackboneElement):
         alias="_instruction",
     )
 
-    @field_validator(
-        *(
-            "instruction",
-            "fluidConsistencyType",
-            "texture",
-            "nutrient",
-            "schedule",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "instruction",
+                "fluidConsistencyType",
+                "texture",
+                "nutrient",
+                "schedule",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -266,26 +246,21 @@ class NutritionOrderSupplementSchedule(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "asNeededFor",
-            "asNeeded",
-            "timing",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "asNeededFor",
+                "asNeeded",
+                "timing",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -329,32 +304,27 @@ class NutritionOrderSupplement(BackboneElement):
         alias="_instruction",
     )
 
-    @field_validator(
-        *(
-            "instruction",
-            "quantity",
-            "schedule",
-            "productName",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "instruction",
+                "quantity",
+                "schedule",
+                "productName",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -385,26 +355,21 @@ class NutritionOrderEnteralFormulaAdditive(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "quantity",
-            "productName",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "quantity",
+                "productName",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -435,26 +400,21 @@ class NutritionOrderEnteralFormulaAdministrationSchedule(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "asNeededFor",
-            "asNeeded",
-            "timing",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "asNeededFor",
+                "asNeeded",
+                "timing",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -491,23 +451,18 @@ class NutritionOrderEnteralFormulaAdministration(BackboneElement):
             base="rate",
         )
 
-    @field_validator(
-        *(
-            "quantity",
-            "schedule",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "quantity",
+                "schedule",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -576,44 +531,39 @@ class NutritionOrderEnteralFormula(BackboneElement):
         alias="_administrationInstruction",
     )
 
-    @field_validator(
-        *(
-            "administrationInstruction",
-            "maxVolumeToDeliver",
-            "administration",
-            "routeOfAdministration",
-            "caloricDensity",
-            "additive",
-            "deliveryDevice",
-            "baseFormulaProductName",
-            "baseFormulaType",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "administrationInstruction",
+                "maxVolumeToDeliver",
+                "administration",
+                "routeOfAdministration",
+                "caloricDensity",
+                "additive",
+                "deliveryDevice",
+                "baseFormulaProductName",
+                "baseFormulaType",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -812,60 +762,55 @@ class NutritionOrder(DomainResource):
         default="NutritionOrder",
     )
 
-    @field_validator(
-        *(
-            "note",
-            "enteralFormula",
-            "supplement",
-            "oralDiet",
-            "outsideFoodAllowed",
-            "excludeFoodModifier",
-            "foodPreferenceModifier",
-            "allergyIntolerance",
-            "performer",
-            "orderer",
-            "dateTime",
-            "supportingInformation",
-            "encounter",
-            "subject",
-            "priority",
-            "intent",
-            "status",
-            "groupIdentifier",
-            "basedOn",
-            "instantiates",
-            "instantiatesUri",
-            "instantiatesCanonical",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "note",
+                "enteralFormula",
+                "supplement",
+                "oralDiet",
+                "outsideFoodAllowed",
+                "excludeFoodModifier",
+                "foodPreferenceModifier",
+                "allergyIntolerance",
+                "performer",
+                "orderer",
+                "dateTime",
+                "supportingInformation",
+                "encounter",
+                "subject",
+                "priority",
+                "intent",
+                "status",
+                "groupIdentifier",
+                "basedOn",
+                "instantiates",
+                "instantiatesUri",
+                "instantiatesCanonical",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",

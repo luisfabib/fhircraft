@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -63,29 +63,24 @@ class ProvenanceAgent(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "onBehalfOf",
-            "who",
-            "role",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "onBehalfOf",
+                "who",
+                "role",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -115,29 +110,24 @@ class ProvenanceEntityAgent(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "onBehalfOf",
-            "who",
-            "role",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "onBehalfOf",
+                "who",
+                "role",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -168,26 +158,21 @@ class ProvenanceEntity(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "agent",
-            "what",
-            "role",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "agent",
+                "what",
+                "role",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -332,85 +317,77 @@ class Provenance(DomainResource):
             base="occurred",
         )
 
-    @field_validator(
-        *(
-            "signature",
-            "entity",
-            "agent",
-            "encounter",
-            "patient",
-            "basedOn",
-            "activity",
-            "authorization",
-            "location",
-            "policy",
-            "recorded",
-            "target",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "signature",
+                "entity",
+                "agent",
+                "encounter",
+                "patient",
+                "basedOn",
+                "activity",
+                "authorization",
+                "location",
+                "policy",
+                "recorded",
+                "target",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("agent",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_prov_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_prov_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("agent",),
             expression="who.resolve().exists() and onBehalfOf.resolve().exists() implies who.resolve() != onBehalfOf.resolve()",
             human="Who and onBehalfOf cannot be the same",
             key="prov-1",
             severity="error",
         )
 
-    @field_validator(*("agent",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_prov_2_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_prov_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("agent",),
             expression="who.resolve().ofType(PractitionerRole).practitioner.resolve().exists() and onBehalfOf.resolve().ofType(Practitioner).exists() implies who.resolve().practitioner.resolve() != onBehalfOf.resolve()",
             human="If who is a PractitionerRole, onBehalfOf can't reference the same Practitioner",
             key="prov-2",
             severity="error",
         )
 
-    @field_validator(*("agent",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_prov_3_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_prov_3_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("agent",),
             expression="who.resolve().ofType(Organization).exists() and onBehalfOf.resolve().ofType(PractitionerRole).organization.resolve().exists() implies who.resolve() != onBehalfOf.resolve().organization.resolve()",
             human="If who is an organization, onBehalfOf can't be a PractitionerRole within that organization",
             key="prov-3",

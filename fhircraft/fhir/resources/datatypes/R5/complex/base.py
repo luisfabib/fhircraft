@@ -9,6 +9,7 @@ class Base(FHIRBaseModel):
     """
     Base for all types and resources
     """
+
     _fhir_release = "R5"
 
     @model_validator(mode="after")

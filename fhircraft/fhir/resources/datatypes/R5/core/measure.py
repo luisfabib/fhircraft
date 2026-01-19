@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -67,23 +67,18 @@ class MeasureTerm(BackboneElement):
         alias="_definition",
     )
 
-    @field_validator(
-        *(
-            "definition",
-            "code",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "definition",
+                "code",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -140,50 +135,44 @@ class MeasureGroupPopulation(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "aggregateMethod",
-            "inputPopulationId",
-            "groupDefinition",
-            "criteria",
-            "description",
-            "code",
-            "linkId",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "aggregateMethod",
+                "inputPopulationId",
+                "groupDefinition",
+                "criteria",
+                "description",
+                "code",
+                "linkId",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("linkId",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_mea_3_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_mea_3_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("linkId",),
             expression="$this.length() <= 255",
             human="Link ids should be 255 characters or less",
             key="mea-3",
@@ -227,44 +216,38 @@ class MeasureGroupStratifierComponent(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "groupDefinition",
-            "criteria",
-            "description",
-            "code",
-            "linkId",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "groupDefinition",
+                "criteria",
+                "description",
+                "code",
+                "linkId",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("linkId",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_mea_5_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_mea_5_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("linkId",),
             expression="$this.length() <= 255",
             human="Link ids should be 255 characters or less",
             key="mea-5",
@@ -312,47 +295,41 @@ class MeasureGroupStratifier(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "component",
-            "groupDefinition",
-            "criteria",
-            "description",
-            "code",
-            "linkId",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "component",
+                "groupDefinition",
+                "criteria",
+                "description",
+                "code",
+                "linkId",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("linkId",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_mea_4_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_mea_4_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("linkId",),
             expression="$this.length() <= 255",
             human="Link ids should be 255 characters or less",
             key="mea-4",
@@ -454,65 +431,59 @@ class MeasureGroup(BackboneElement):
             base="subject",
         )
 
-    @field_validator(
-        *(
-            "stratifier",
-            "population",
-            "library",
-            "improvementNotation",
-            "rateAggregation",
-            "scoringUnit",
-            "scoring",
-            "basis",
-            "type",
-            "description",
-            "code",
-            "linkId",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "stratifier",
+                "population",
+                "library",
+                "improvementNotation",
+                "rateAggregation",
+                "scoringUnit",
+                "scoring",
+                "basis",
+                "type",
+                "description",
+                "code",
+                "linkId",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("linkId",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_mea_2_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_mea_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("linkId",),
             expression="$this.length() <= 255",
             human="Link ids should be 255 characters or less",
             key="mea-2",
@@ -565,44 +536,38 @@ class MeasureSupplementalData(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "criteria",
-            "description",
-            "usage",
-            "code",
-            "linkId",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "criteria",
+                "description",
+                "usage",
+                "code",
+                "linkId",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("linkId",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_mea_6_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_mea_6_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("linkId",),
             expression="$this.length() <= 255",
             human="Link ids should be 255 characters or less",
             key="mea-6",
@@ -996,92 +961,86 @@ class Measure(DomainResource):
             base="subject",
         )
 
-    @field_validator(
-        *(
-            "supplementalData",
-            "group",
-            "guidance",
-            "term",
-            "improvementNotation",
-            "clinicalRecommendationStatement",
-            "rationale",
-            "rateAggregation",
-            "riskAdjustment",
-            "type",
-            "compositeScoring",
-            "scoringUnit",
-            "scoring",
-            "disclaimer",
-            "library",
-            "relatedArtifact",
-            "endorser",
-            "reviewer",
-            "editor",
-            "author",
-            "topic",
-            "effectivePeriod",
-            "lastReviewDate",
-            "approvalDate",
-            "copyrightLabel",
-            "copyright",
-            "usage",
-            "purpose",
-            "jurisdiction",
-            "useContext",
-            "description",
-            "contact",
-            "publisher",
-            "date",
-            "basis",
-            "experimental",
-            "status",
-            "subtitle",
-            "title",
-            "name",
-            "version",
-            "identifier",
-            "url",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "supplementalData",
+                "group",
+                "guidance",
+                "term",
+                "improvementNotation",
+                "clinicalRecommendationStatement",
+                "rationale",
+                "rateAggregation",
+                "riskAdjustment",
+                "type",
+                "compositeScoring",
+                "scoringUnit",
+                "scoring",
+                "disclaimer",
+                "library",
+                "relatedArtifact",
+                "endorser",
+                "reviewer",
+                "editor",
+                "author",
+                "topic",
+                "effectivePeriod",
+                "lastReviewDate",
+                "approvalDate",
+                "copyrightLabel",
+                "copyright",
+                "usage",
+                "purpose",
+                "jurisdiction",
+                "useContext",
+                "description",
+                "contact",
+                "publisher",
+                "date",
+                "basis",
+                "experimental",
+                "status",
+                "subtitle",
+                "title",
+                "name",
+                "version",
+                "identifier",
+                "url",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("url",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_cnl_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("url",),
             expression="exists() implies matches('^[^|# ]+$')",
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",

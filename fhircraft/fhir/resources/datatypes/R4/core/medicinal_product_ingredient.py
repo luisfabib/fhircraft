@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -67,32 +67,27 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
         default=None,
     )
 
-    @field_validator(
-        *(
-            "country",
-            "measurementPoint",
-            "strengthLowLimit",
-            "strength",
-            "substance",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "country",
+                "measurementPoint",
+                "strengthLowLimit",
+                "strength",
+                "substance",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -141,38 +136,33 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "referenceStrength",
-            "country",
-            "measurementPoint",
-            "concentrationLowLimit",
-            "concentration",
-            "presentationLowLimit",
-            "presentation",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "referenceStrength",
+                "country",
+                "measurementPoint",
+                "concentrationLowLimit",
+                "concentration",
+                "presentationLowLimit",
+                "presentation",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -197,36 +187,31 @@ class MedicinalProductIngredientSpecifiedSubstance(BackboneElement):
         description="Confidentiality level of the specified substance as the ingredient",
         default=None,
     )
-    strength: Optional[ListType[MedicinalProductIngredientSpecifiedSubstanceStrength]] = (
-        Field(
-            description="Quantity of the substance or specified substance present in the manufactured item or pharmaceutical product",
-            default=None,
-        )
+    strength: Optional[
+        ListType[MedicinalProductIngredientSpecifiedSubstanceStrength]
+    ] = Field(
+        description="Quantity of the substance or specified substance present in the manufactured item or pharmaceutical product",
+        default=None,
     )
 
-    @field_validator(
-        *(
-            "strength",
-            "confidentiality",
-            "group",
-            "code",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "strength",
+                "confidentiality",
+                "group",
+                "code",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -267,32 +252,27 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
         default=None,
     )
 
-    @field_validator(
-        *(
-            "country",
-            "measurementPoint",
-            "strengthLowLimit",
-            "strength",
-            "substance",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "country",
+                "measurementPoint",
+                "strengthLowLimit",
+                "strength",
+                "substance",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -341,38 +321,33 @@ class MedicinalProductIngredientSubstanceStrength(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "referenceStrength",
-            "country",
-            "measurementPoint",
-            "concentrationLowLimit",
-            "concentration",
-            "presentationLowLimit",
-            "presentation",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "referenceStrength",
+                "country",
+                "measurementPoint",
+                "concentrationLowLimit",
+                "concentration",
+                "presentationLowLimit",
+                "presentation",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -394,23 +369,18 @@ class MedicinalProductIngredientSubstance(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "strength",
-            "code",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "strength",
+                "code",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -495,11 +465,11 @@ class MedicinalProductIngredient(DomainResource):
         description="Manufacturer of this Ingredient",
         default=None,
     )
-    specifiedSubstance: Optional[ListType[MedicinalProductIngredientSpecifiedSubstance]] = (
-        Field(
-            description="A specified substance that comprises this ingredient",
-            default=None,
-        )
+    specifiedSubstance: Optional[
+        ListType[MedicinalProductIngredientSpecifiedSubstance]
+    ] = Field(
+        description="A specified substance that comprises this ingredient",
+        default=None,
     )
     substance: Optional[MedicinalProductIngredientSubstance] = Field(
         description="The ingredient substance",
@@ -510,43 +480,38 @@ class MedicinalProductIngredient(DomainResource):
         default="MedicinalProductIngredient",
     )
 
-    @field_validator(
-        *(
-            "substance",
-            "specifiedSubstance",
-            "manufacturer",
-            "allergenicIndicator",
-            "role",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "substance",
+                "specifiedSubstance",
+                "manufacturer",
+                "allergenicIndicator",
+                "role",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",

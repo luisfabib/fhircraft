@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -85,14 +85,15 @@ class DeviceRequestParameter(BackboneElement):
             base="value",
         )
 
-    @field_validator(
-        *("code", "modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "code",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -337,62 +338,57 @@ class DeviceRequest(DomainResource):
             base="occurrence",
         )
 
-    @field_validator(
-        *(
-            "relevantHistory",
-            "note",
-            "supportingInfo",
-            "insurance",
-            "asNeededFor",
-            "asNeeded",
-            "reason",
-            "performer",
-            "requester",
-            "authoredOn",
-            "encounter",
-            "subject",
-            "parameter",
-            "quantity",
-            "code",
-            "doNotPerform",
-            "priority",
-            "intent",
-            "status",
-            "groupIdentifier",
-            "replaces",
-            "basedOn",
-            "instantiatesUri",
-            "instantiatesCanonical",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "relevantHistory",
+                "note",
+                "supportingInfo",
+                "insurance",
+                "asNeededFor",
+                "asNeeded",
+                "reason",
+                "performer",
+                "requester",
+                "authoredOn",
+                "encounter",
+                "subject",
+                "parameter",
+                "quantity",
+                "code",
+                "doNotPerform",
+                "priority",
+                "intent",
+                "status",
+                "groupIdentifier",
+                "replaces",
+                "basedOn",
+                "instantiatesUri",
+                "instantiatesCanonical",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",

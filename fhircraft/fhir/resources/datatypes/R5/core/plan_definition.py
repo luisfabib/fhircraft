@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -123,23 +123,18 @@ class PlanDefinitionGoalTarget(BackboneElement):
             base="detail",
         )
 
-    @field_validator(
-        *(
-            "due",
-            "measure",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "due",
+                "measure",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -198,38 +193,33 @@ class PlanDefinitionGoal(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "target",
-            "documentation",
-            "addresses",
-            "start",
-            "priority",
-            "description",
-            "category",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "target",
+                "documentation",
+                "addresses",
+                "start",
+                "priority",
+                "description",
+                "category",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -269,29 +259,24 @@ class PlanDefinitionActorOption(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "role",
-            "typeReference",
-            "typeCanonical",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "role",
+                "typeReference",
+                "typeCanonical",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -327,26 +312,21 @@ class PlanDefinitionActor(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "option",
-            "description",
-            "title",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "option",
+                "description",
+                "title",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -373,23 +353,18 @@ class PlanDefinitionActionCondition(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "expression",
-            "kind",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "expression",
+                "kind",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -425,26 +400,21 @@ class PlanDefinitionActionInput(BackboneElement):
         alias="_relatedData",
     )
 
-    @field_validator(
-        *(
-            "relatedData",
-            "requirement",
-            "title",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "relatedData",
+                "requirement",
+                "title",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -480,26 +450,21 @@ class PlanDefinitionActionOutput(BackboneElement):
         alias="_relatedData",
     )
 
-    @field_validator(
-        *(
-            "relatedData",
-            "requirement",
-            "title",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "relatedData",
+                "requirement",
+                "title",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -555,26 +520,21 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
             base="offset",
         )
 
-    @field_validator(
-        *(
-            "endRelationship",
-            "relationship",
-            "targetId",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "endRelationship",
+                "relationship",
+                "targetId",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -636,35 +596,30 @@ class PlanDefinitionActionParticipant(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "function",
-            "role",
-            "typeReference",
-            "typeCanonical",
-            "type",
-            "actorId",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "function",
+                "role",
+                "typeReference",
+                "typeCanonical",
+                "type",
+                "actorId",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -691,23 +646,18 @@ class PlanDefinitionActionDynamicValue(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "expression",
-            "path",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "expression",
+                "path",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -962,119 +912,112 @@ class PlanDefinitionAction(BackboneElement):
             base="definition",
         )
 
-    @field_validator(
-        *(
-            "action",
-            "dynamicValue",
-            "transform",
-            "cardinalityBehavior",
-            "precheckBehavior",
-            "requiredBehavior",
-            "selectionBehavior",
-            "groupingBehavior",
-            "type",
-            "participant",
-            "location",
-            "relatedAction",
-            "output",
-            "input",
-            "condition",
-            "trigger",
-            "goalId",
-            "documentation",
-            "reason",
-            "code",
-            "priority",
-            "textEquivalent",
-            "description",
-            "title",
-            "prefix",
-            "linkId",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "action",
+                "dynamicValue",
+                "transform",
+                "cardinalityBehavior",
+                "precheckBehavior",
+                "requiredBehavior",
+                "selectionBehavior",
+                "groupingBehavior",
+                "type",
+                "participant",
+                "location",
+                "relatedAction",
+                "output",
+                "input",
+                "condition",
+                "trigger",
+                "goalId",
+                "documentation",
+                "reason",
+                "code",
+                "priority",
+                "textEquivalent",
+                "description",
+                "title",
+                "prefix",
+                "linkId",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("input",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_pld_0_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_pld_0_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("input",),
             expression="requirement.exists() xor relatedData.exists()",
             human="Input data elements must have a requirement or a relatedData, but not both",
             key="pld-0",
             severity="error",
         )
 
-    @field_validator(*("output",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_pld_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_pld_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("output",),
             expression="requirement.exists() xor relatedData.exists()",
             human="Output data element must have a requirement or a relatedData, but not both",
             key="pld-1",
@@ -1445,81 +1388,75 @@ class PlanDefinition(DomainResource):
             base="asNeeded",
         )
 
-    @field_validator(
-        *(
-            "action",
-            "actor",
-            "goal",
-            "library",
-            "relatedArtifact",
-            "endorser",
-            "reviewer",
-            "editor",
-            "author",
-            "topic",
-            "effectivePeriod",
-            "lastReviewDate",
-            "approvalDate",
-            "copyrightLabel",
-            "copyright",
-            "usage",
-            "purpose",
-            "jurisdiction",
-            "useContext",
-            "description",
-            "contact",
-            "publisher",
-            "date",
-            "experimental",
-            "status",
-            "type",
-            "subtitle",
-            "title",
-            "name",
-            "version",
-            "identifier",
-            "url",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "action",
+                "actor",
+                "goal",
+                "library",
+                "relatedArtifact",
+                "endorser",
+                "reviewer",
+                "editor",
+                "author",
+                "topic",
+                "effectivePeriod",
+                "lastReviewDate",
+                "approvalDate",
+                "copyrightLabel",
+                "copyright",
+                "usage",
+                "purpose",
+                "jurisdiction",
+                "useContext",
+                "description",
+                "contact",
+                "publisher",
+                "date",
+                "experimental",
+                "status",
+                "type",
+                "subtitle",
+                "title",
+                "name",
+                "version",
+                "identifier",
+                "url",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("url",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_cnl_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("url",),
             expression="exists() implies matches('^[^|# ]+$')",
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",

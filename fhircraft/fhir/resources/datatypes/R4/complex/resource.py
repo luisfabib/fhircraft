@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import Field, field_validator
+from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRBaseModel
@@ -14,6 +14,7 @@ class Resource(FHIRBaseModel):
     """
     Base Resource
     """
+
     _fhir_release = "R4"
 
     id: Optional[String] = Field(
@@ -48,14 +49,15 @@ class Resource(FHIRBaseModel):
         alias="_language",
     )
 
-    @field_validator(
-        *("language", "implicitRules", "meta"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
