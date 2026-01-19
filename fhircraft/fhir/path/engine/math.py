@@ -12,7 +12,7 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.literals import Quantity
 from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
-from fhircraft.fhir.path.utils import evaluate_and_prepare_collection_values
+from fhircraft.fhir.path.utils import evaluate_and_prepare_collection_values, get_expression_context
 
 
 class FHIRMathOperator(FHIRPath):
@@ -347,6 +347,13 @@ class FHIRPathMathFunction(FHIRPathFunction):
 
     math_operation: Callable
 
+    def _validate_collection(self, collection: FHIRPathCollection):
+        if len(collection) == 0:
+            return []
+        elif len(collection) > 1:
+            raise FHIRPathRuntimeError("Input collection must be a singleton.")
+        return collection
+
     def evaluate(
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
@@ -364,10 +371,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
         Raises:
             FHIRPathRuntimeError: For non-singleton collections.
         """
-        if len(collection) == 0:
-            return []
-        elif len(collection) > 1:
-            raise FHIRPathRuntimeError("Input collection must be a singleton.")
+        collection = self._validate_collection(collection)
         value = collection[0].value
         if isinstance(value, (int, float)):
             value = self.math_operation(value)
@@ -448,6 +452,9 @@ class Log(FHIRPathMathFunction):
         Raises:
             FHIRPathRuntimeError: For non-singleton collections or invalid base.
         """
+        collection = self._validate_collection(collection)
+        value = collection[0].value
+        environment = get_expression_context(environment, value, index=0)
         if (
             not isinstance(
                 base := self.base.single(collection, environment=environment), int
@@ -490,6 +497,10 @@ class Power(FHIRPathMathFunction):
             FHIRPathRuntimeError: For non-singleton collections or invalid exponent.
         """
 
+        collection = self._validate_collection(collection)
+        value = collection[0].value
+        environment = get_expression_context(environment, value, index=0)
+
         if not isinstance(
             exponent := self.exponent.single(collection, environment=environment),
             (int, float),
@@ -531,6 +542,9 @@ class Round(FHIRPathMathFunction):
         Raises:
             FHIRPathRuntimeError: For non-singleton collections or invalid precision.
         """
+        collection = self._validate_collection(collection)
+        value = collection[0].value
+        environment = get_expression_context(environment, value, index=0)
         if (
             not isinstance(
                 precision := self.precision.single(collection, environment=environment),

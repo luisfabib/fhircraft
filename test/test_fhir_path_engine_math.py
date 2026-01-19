@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from unittest.mock import patch
 import pytest
 
 from fhircraft.fhir.path.engine.additional import GetValue
@@ -359,6 +360,14 @@ def test_log_string_representation():
     expression = Invocation(Element("value"), Log(10))
     assert str(expression) == "value.log(10)"
 
+def test_log_uses_evaluation_context():
+    value = 2.1654
+    resource = namedtuple("Resource", ["value"])(value=value)
+    collection = [FHIRPathCollectionItem(value=resource)]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal(10).evaluate) as mock_evaluate:
+        Invocation(Element("value"), Log(10)).evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == value
 
 def test_log_returns_correct_value_with_fhirpath():
     resource = namedtuple("Resource", ["value"])(value=5)
@@ -400,6 +409,16 @@ def test_power_returns_correct_value(value, expected):
 def test_power_string_representation():
     expression = Invocation(Element("value"), Power(2))
     assert str(expression) == "value.power(2)"
+
+
+def test_power_uses_evaluation_context():
+    value = 2.3152
+    resource = namedtuple("Resource", ["value"])(value=value)
+    collection = [FHIRPathCollectionItem(value=resource)]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal(10).evaluate) as mock_evaluate:
+        Invocation(Element("value"), Power(10)).evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == value
 
 
 def test_power_returns_correct_value_with_fhirpath():
@@ -447,6 +466,14 @@ def test_round_string_representation():
     expression = Invocation(Element("value"), Round(1))
     assert str(expression) == "value.round(1)"
 
+def test_round_uses_evaluation_context():
+    value = 2.2565
+    resource = namedtuple("Resource", ["value"])(value=value)
+    collection = [FHIRPathCollectionItem(value=resource)]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal(10).evaluate) as mock_evaluate:
+        Invocation(Element("value"), Round(10)).evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == value
 
 def test_round_returns_correct_value_with_fhirpath():
     resource = namedtuple("Resource", ["value"])(value=5.559)
