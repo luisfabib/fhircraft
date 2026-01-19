@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -66,23 +66,18 @@ class OperationDefinitionParameterBinding(BackboneElement):
         alias="_valueSet",
     )
 
-    @field_validator(
-        *(
-            "valueSet",
-            "strength",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "valueSet",
+                "strength",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -114,23 +109,18 @@ class OperationDefinitionParameterReferencedFrom(BackboneElement):
         alias="_sourceId",
     )
 
-    @field_validator(
-        *(
-            "sourceId",
-            "source",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "sourceId",
+                "source",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -219,59 +209,56 @@ class OperationDefinitionParameter(BackboneElement):
         description="ValueSet details if this is coded",
         default=None,
     )
-    referencedFrom: Optional[ListType[OperationDefinitionParameterReferencedFrom]] = Field(
-        description="References to this parameter",
-        default=None,
+    referencedFrom: Optional[ListType[OperationDefinitionParameterReferencedFrom]] = (
+        Field(
+            description="References to this parameter",
+            default=None,
+        )
     )
     part: Optional[ListType["OperationDefinitionParameter"]] = Field(
         description="Parts of a nested Parameter",
         default=None,
     )
 
-    @field_validator(
-        *(
-            "part",
-            "referencedFrom",
-            "binding",
-            "searchType",
-            "targetProfile",
-            "type",
-            "documentation",
-            "max",
-            "min",
-            "use",
-            "name",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "part",
+                "referencedFrom",
+                "binding",
+                "searchType",
+                "targetProfile",
+                "type",
+                "documentation",
+                "max",
+                "min",
+                "use",
+                "name",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -303,23 +290,18 @@ class OperationDefinitionOverload(BackboneElement):
         alias="_comment",
     )
 
-    @field_validator(
-        *(
-            "comment",
-            "parameterName",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "comment",
+                "parameterName",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -595,99 +577,91 @@ class OperationDefinition(DomainResource):
         default="OperationDefinition",
     )
 
-    @field_validator(
-        *(
-            "overload",
-            "parameter",
-            "outputProfile",
-            "inputProfile",
-            "instance",
-            "type",
-            "system",
-            "resource",
-            "base",
-            "comment",
-            "code",
-            "affectsState",
-            "purpose",
-            "jurisdiction",
-            "useContext",
-            "description",
-            "contact",
-            "publisher",
-            "date",
-            "experimental",
-            "kind",
-            "status",
-            "title",
-            "name",
-            "version",
-            "url",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "overload",
+                "parameter",
+                "outputProfile",
+                "inputProfile",
+                "instance",
+                "type",
+                "system",
+                "resource",
+                "base",
+                "comment",
+                "code",
+                "affectsState",
+                "purpose",
+                "jurisdiction",
+                "useContext",
+                "description",
+                "contact",
+                "publisher",
+                "date",
+                "experimental",
+                "kind",
+                "status",
+                "title",
+                "name",
+                "version",
+                "url",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("parameter",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_opd_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_opd_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("parameter",),
             expression="type.exists() or part.exists()",
             human="Either a type must be provided, or parts",
             key="opd-1",
             severity="error",
         )
 
-    @field_validator(*("parameter",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_opd_2_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_opd_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("parameter",),
             expression="searchType.exists() implies type = 'string'",
             human="A search type can only be specified for parameters of type string",
             key="opd-2",
             severity="error",
         )
 
-    @field_validator(*("parameter",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_opd_3_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_opd_3_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("parameter",),
             expression="targetProfile.exists() implies (type = 'Reference' or type = 'canonical')",
             human="A targetProfile can only be specified for parameters of type Reference or Canonical",
             key="opd-3",

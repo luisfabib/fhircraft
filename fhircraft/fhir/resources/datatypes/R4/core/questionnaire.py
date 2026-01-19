@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -157,23 +157,18 @@ class QuestionnaireItemEnableWhen(BackboneElement):
             base="answer",
         )
 
-    @field_validator(
-        *(
-            "operator",
-            "question",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "operator",
+                "question",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -267,16 +262,15 @@ class QuestionnaireItemAnswerOption(BackboneElement):
             base="value",
         )
 
-    @field_validator(
-        *("initialSelected", "modifierExtension", "extension"),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "initialSelected",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -542,77 +536,71 @@ class QuestionnaireItem(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "item",
-            "initial",
-            "answerOption",
-            "answerValueSet",
-            "maxLength",
-            "readOnly",
-            "repeats",
-            "required",
-            "enableBehavior",
-            "enableWhen",
-            "type",
-            "text",
-            "prefix",
-            "code",
-            "definition",
-            "linkId",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "item",
+                "initial",
+                "answerOption",
+                "answerValueSet",
+                "maxLength",
+                "readOnly",
+                "repeats",
+                "required",
+                "enableBehavior",
+                "enableWhen",
+                "type",
+                "text",
+                "prefix",
+                "code",
+                "definition",
+                "linkId",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("enableWhen",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_7_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_7_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("enableWhen",),
             expression="operator = 'exists' implies (answer is Boolean)",
             human="If the operator is 'exists', the value must be a boolean",
             key="que-7",
@@ -842,191 +830,175 @@ class Questionnaire(DomainResource):
         default="Questionnaire",
     )
 
-    @field_validator(
-        *(
-            "item",
-            "code",
-            "effectivePeriod",
-            "lastReviewDate",
-            "approvalDate",
-            "copyright",
-            "purpose",
-            "jurisdiction",
-            "useContext",
-            "description",
-            "contact",
-            "publisher",
-            "date",
-            "subjectType",
-            "experimental",
-            "status",
-            "derivedFrom",
-            "title",
-            "name",
-            "version",
-            "identifier",
-            "url",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "item",
+                "code",
+                "effectivePeriod",
+                "lastReviewDate",
+                "approvalDate",
+                "copyright",
+                "purpose",
+                "jurisdiction",
+                "useContext",
+                "description",
+                "contact",
+                "publisher",
+                "date",
+                "subjectType",
+                "experimental",
+                "status",
+                "derivedFrom",
+                "title",
+                "name",
+                "version",
+                "identifier",
+                "url",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="(type='group' implies item.empty().not()) and (type.trace('type')='display' implies item.trace('item').empty())",
             human="Group items must have nested items, display items cannot have nested items",
             key="que-1",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_3_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_3_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="type!='display' or code.empty()",
             human='Display items cannot have a "code" asserted',
             key="que-3",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_4_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_4_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="answerOption.empty() or answerValueSet.empty()",
             human="A question cannot have both answerOption and answerValueSet",
             key="que-4",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_5_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_5_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="(type ='choice' or type = 'open-choice' or type = 'decimal' or type = 'integer' or type = 'date' or type = 'dateTime' or type = 'time' or type = 'string' or type = 'quantity') or (answerValueSet.empty() and answerOption.empty())",
             human="Only 'choice' and 'open-choice' items can have answerValueSet",
             key="que-5",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_6_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_6_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="type!='display' or (required.empty() and repeats.empty())",
             human="Required and repeat aren't permitted for display items",
             key="que-6",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_8_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_8_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="(type!='group' and type!='display') or initial.empty()",
             human="Initial values can't be specified for groups or display items",
             key="que-8",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_9_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_9_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="type!='display' or readOnly.empty()",
             human='Read-only can\'t be specified for "display" items',
             key="que-9",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_10_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_10_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="(type in ('boolean' | 'decimal' | 'integer' | 'string' | 'text' | 'url' | 'open-choice')) or maxLength.empty()",
             human="Maximum length can only be declared for simple question types",
             key="que-10",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_11_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_11_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="answerOption.empty() or initial.empty()",
             human="If one or more answerOption is present, initial[x] must be missing",
             key="que-11",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_12_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_12_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="enableWhen.count() > 2 implies enableBehavior.exists()",
             human="If there are more than one enableWhen, enableBehavior must be specified",
             key="que-12",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_que_13_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_que_13_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="repeats=true or initial.count() <= 1",
             human="Can only have multiple initial values for repeating items",
             key="que-13",

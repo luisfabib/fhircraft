@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, model_validator
 
 from fhircraft.fhir.resources.validators import (
     get_type_choice_value_by_base,
@@ -72,14 +72,16 @@ class ElementDefinitionSlicingDiscriminator(Element):
         alias="_path",
     )
 
-    @field_validator(
-        *("path", "type", "extension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "path",
+                "type",
+                "extension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -124,25 +126,20 @@ class ElementDefinitionSlicing(Element):
         alias="_rules",
     )
 
-    @field_validator(
-        *(
-            "rules",
-            "ordered",
-            "description",
-            "discriminator",
-            "extension",
-            "extension",
-            "extension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "rules",
+                "ordered",
+                "description",
+                "discriminator",
+                "extension",
+                "extension",
+                "extension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -183,16 +180,18 @@ class ElementDefinitionBase(Element):
         alias="_max",
     )
 
-    @field_validator(
-        *("max", "min", "path", "extension", "extension", "extension"),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "max",
+                "min",
+                "path",
+                "extension",
+                "extension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -251,27 +250,22 @@ class ElementDefinitionType(Element):
         alias="_versioning",
     )
 
-    @field_validator(
-        *(
-            "versioning",
-            "aggregation",
-            "targetProfile",
-            "profile",
-            "code",
-            "extension",
-            "extension",
-            "extension",
-            "extension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "versioning",
+                "aggregation",
+                "targetProfile",
+                "profile",
+                "code",
+                "extension",
+                "extension",
+                "extension",
+                "extension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -600,12 +594,14 @@ class ElementDefinitionExample(Element):
             base="value",
         )
 
-    @field_validator(*("label", "extension"), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "label",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -744,31 +740,26 @@ class ElementDefinitionConstraint(Element):
         alias="_source",
     )
 
-    @field_validator(
-        *(
-            "source",
-            "xpath",
-            "expression",
-            "human",
-            "severity",
-            "requirements",
-            "key",
-            "extension",
-            "extension",
-            "extension",
-            "extension",
-            "extension",
-            "extension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "source",
+                "xpath",
+                "expression",
+                "human",
+                "severity",
+                "requirements",
+                "key",
+                "extension",
+                "extension",
+                "extension",
+                "extension",
+                "extension",
+                "extension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -809,16 +800,18 @@ class ElementDefinitionBinding(Element):
         alias="_valueSet",
     )
 
-    @field_validator(
-        *("valueSet", "description", "strength", "extension", "extension", "extension"),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "valueSet",
+                "description",
+                "strength",
+                "extension",
+                "extension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -868,25 +861,20 @@ class ElementDefinitionMapping(Element):
         alias="_comment",
     )
 
-    @field_validator(
-        *(
-            "comment",
-            "map",
-            "language",
-            "identity",
-            "extension",
-            "extension",
-            "extension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "comment",
+                "map",
+                "language",
+                "identity",
+                "extension",
+                "extension",
+                "extension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -2205,176 +2193,165 @@ class ElementDefinition(BackboneElement):
             base="maxValue",
         )
 
-    @field_validator(
-        *(
-            "mapping",
-            "binding",
-            "isSummary",
-            "isModifierReason",
-            "isModifier",
-            "mustSupport",
-            "constraint",
-            "condition",
-            "maxLength",
-            "example",
-            "orderMeaning",
-            "meaningWhenMissing",
-            "type",
-            "contentReference",
-            "base",
-            "max",
-            "min",
-            "alias",
-            "requirements",
-            "comment",
-            "definition",
-            "short",
-            "slicing",
-            "code",
-            "label",
-            "sliceIsConstraining",
-            "sliceName",
-            "representation",
-            "path",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "mapping",
+                "binding",
+                "isSummary",
+                "isModifierReason",
+                "isModifier",
+                "mustSupport",
+                "constraint",
+                "condition",
+                "maxLength",
+                "example",
+                "orderMeaning",
+                "meaningWhenMissing",
+                "type",
+                "contentReference",
+                "base",
+                "max",
+                "min",
+                "alias",
+                "requirements",
+                "comment",
+                "definition",
+                "short",
+                "slicing",
+                "code",
+                "label",
+                "sliceIsConstraining",
+                "sliceName",
+                "representation",
+                "path",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("slicing",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_eld_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_eld_1_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("slicing",),
             expression="discriminator.exists() or description.exists()",
             human="If there are no discriminators, there must be a definition",
             key="eld-1",
             severity="error",
         )
 
-    @field_validator(*("max",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_eld_3_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_eld_3_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("max",),
             expression="empty() or ($this = '*') or (toInteger() >= 0)",
             human='Max SHALL be a number or "*"',
             key="eld-3",
             severity="error",
         )
 
-    @field_validator(*("type",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_eld_4_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_eld_4_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("type",),
             expression="aggregation.empty() or (code = 'Reference') or (code = 'canonical')",
             human="Aggregation may only be specified if one of the allowed types for the element is a reference",
             key="eld-4",
             severity="error",
         )
 
-    @field_validator(*("type",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_eld_17_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_eld_17_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("type",),
             expression="(code='Reference' or code = 'canonical' or code = 'CodeableReference') or targetProfile.empty()",
             human="targetProfile is only allowed if the type is Reference or canonical",
             key="eld-17",
             severity="error",
         )
 
-    @field_validator(*("constraint",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_eld_21_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_eld_21_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("constraint",),
             expression="expression.exists()",
             human="Constraints should have an expression or else validators will not be able to enforce them",
             key="eld-21",
             severity="warning",
         )
 
-    @field_validator(*("binding",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_eld_12_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_eld_12_constraint_validator(self):
         return validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("binding",),
             expression="valueSet.exists() implies (valueSet.startsWith('http:') or valueSet.startsWith('https') or valueSet.startsWith('urn:') or valueSet.startsWith('#'))",
             human="ValueSet SHALL start with http:// or https:// or urn:",
             key="eld-12",
@@ -2711,7 +2688,7 @@ class ElementDefinition(BackboneElement):
     def FHIR_eld_16_constraint_model_validator(self):
         return validate_model_constraint(
             self,
-            expression="sliceName.empty() or sliceName.matches('^[a-zA-Z0-9\\\\/\\\\-_\\\\[\\\\]\\\\@]+$')",
+            expression="sliceName.empty() or sliceName.matches('^[a-zA-Z0-9\\/\\-_\\[\\]\\@]+$')",
             human='sliceName must be composed of proper tokens separated by"/"',
             key="eld-16",
             severity="error",
@@ -2731,7 +2708,7 @@ class ElementDefinition(BackboneElement):
     def FHIR_eld_19_constraint_model_validator(self):
         return validate_model_constraint(
             self,
-            expression="path.matches('^[^\\\\s\\\\.,:;\\\\\\'\"\\\\/|?!@#$%&*()\\\\[\\\\]{}]{1,64}(\\\\.[^\\\\s\\\\.,:;\\\\\\'\"\\\\/|?!@#$%&*()\\\\[\\\\]{}]{1,64}(\\\\[x\\\\])?(\\\\:[^\\\\s\\\\.]+)?)*$')",
+            expression="path.matches('^[^\\s\\.,:;\\\\'\"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\.[^\\s\\.,:;\\\\'\"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\[x\\])?(\\:[^\\s\\.]+)?)*$')",
             human="Element names cannot include some special characters",
             key="eld-19",
             severity="error",
@@ -2741,7 +2718,7 @@ class ElementDefinition(BackboneElement):
     def FHIR_eld_20_constraint_model_validator(self):
         return validate_model_constraint(
             self,
-            expression="path.matches('^[A-Za-z][A-Za-z0-9]*(\\\\.[a-z][A-Za-z0-9]*(\\\\[x])?)*$')",
+            expression="path.matches('^[A-Za-z][A-Za-z0-9]*(\\.[a-z][A-Za-z0-9]*(\\[x])?)*$')",
             human="Element names should be simple alphanumerics with a max of 64 characters, or code generation tools may be broken",
             key="eld-20",
             severity="warning",

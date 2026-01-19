@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -109,29 +109,24 @@ class RiskAssessmentPrediction(BackboneElement):
             base="when",
         )
 
-    @field_validator(
-        *(
-            "rationale",
-            "relativeRisk",
-            "qualitativeRisk",
-            "outcome",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "rationale",
+                "relativeRisk",
+                "qualitativeRisk",
+                "outcome",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -310,77 +305,70 @@ class RiskAssessment(DomainResource):
             base="occurrence",
         )
 
-    @field_validator(
-        *(
-            "note",
-            "mitigation",
-            "prediction",
-            "basis",
-            "reasonReference",
-            "reasonCode",
-            "performer",
-            "condition",
-            "encounter",
-            "subject",
-            "code",
-            "method",
-            "status",
-            "parent",
-            "basedOn",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "note",
+                "mitigation",
+                "prediction",
+                "basis",
+                "reasonReference",
+                "reasonCode",
+                "performer",
+                "condition",
+                "encounter",
+                "subject",
+                "code",
+                "method",
+                "status",
+                "parent",
+                "basedOn",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("contained",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_dom_r4b_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_dom_r4b_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("contained",),
             expression="($this is Citation or $this is Evidence or $this is EvidenceReport or $this is EvidenceVariable or $this is MedicinalProductDefinition or $this is PackagedProductDefinition or $this is AdministrableProductDefinition or $this is Ingredient or $this is ClinicalUseDefinition or $this is RegulatedAuthorization or $this is SubstanceDefinition or $this is SubscriptionStatus or $this is SubscriptionTopic) implies (%resource is Citation or %resource is Evidence or %resource is EvidenceReport or %resource is EvidenceVariable or %resource is MedicinalProductDefinition or %resource is PackagedProductDefinition or %resource is AdministrableProductDefinition or %resource is Ingredient or %resource is ClinicalUseDefinition or %resource is RegulatedAuthorization or %resource is SubstanceDefinition or %resource is SubscriptionStatus or %resource is SubscriptionTopic)",
             human="Containing new R4B resources within R4 resources may cause interoperability issues if instances are shared with R4 systems",
             key="dom-r4b",
             severity="warning",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("prediction",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ras_2_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ras_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("prediction",),
             expression="probability.exists($this is decimal) implies (probability as decimal) <= 100",
             human="Must be <= 100",
             key="ras-2",

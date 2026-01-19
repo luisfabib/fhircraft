@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import *
@@ -73,61 +73,53 @@ class DataRequirement(Element):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "sort",
-            "limit",
-            "dateFilter",
-            "codeFilter",
-            "mustSupport",
-            "profile",
-            "type",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "sort",
+                "limit",
+                "dateFilter",
+                "codeFilter",
+                "mustSupport",
+                "profile",
+                "type",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("extension",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("extension",),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("codeFilter",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_drq_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_drq_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("codeFilter",),
             expression="path.exists() xor searchParam.exists()",
             human="Either a path or a searchParam must be provided, but not both",
             key="drq-1",
             severity="error",
         )
 
-    @field_validator(*("dateFilter",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_drq_2_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_drq_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("dateFilter",),
             expression="path.exists() xor searchParam.exists()",
             human="Either a path or a searchParam must be provided, but not both",
             key="drq-2",

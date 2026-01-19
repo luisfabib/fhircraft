@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Literal, Optional, Union
 
 # Pydantic modules
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, model_validator
 from pydantic.fields import FieldInfo
 
 import fhircraft
@@ -406,23 +406,18 @@ class ParametersParameter(BackboneElement):
             base="value",
         )
 
-    @field_validator(
-        *(
-            "part",
-            "name",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "part",
+                "name",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -537,28 +532,27 @@ class Parameters(Resource):
         default="Parameters",
     )
 
-    @field_validator(
-        *("parameter", "language", "implicitRules", "meta"),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "parameter",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("parameter",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_inv_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_inv_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("parameter",),
             expression="(part.exists() and value.empty() and resource.empty()) or (part.empty() and (value.exists() xor resource.exists()))",
             human="A parameter must have one and only one of (value, resource, part)",
             key="inv-1",

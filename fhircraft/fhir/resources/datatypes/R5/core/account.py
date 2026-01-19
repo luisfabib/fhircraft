@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -64,23 +64,18 @@ class AccountCoverage(BackboneElement):
         alias="_priority",
     )
 
-    @field_validator(
-        *(
-            "priority",
-            "coverage",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "priority",
+                "coverage",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -111,26 +106,21 @@ class AccountGuarantor(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "period",
-            "onHold",
-            "party",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "period",
+                "onHold",
+                "party",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -183,35 +173,30 @@ class AccountDiagnosis(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "packageCode",
-            "onAdmission",
-            "type",
-            "dateOfDiagnosis",
-            "condition",
-            "sequence",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "packageCode",
+                "onAdmission",
+                "type",
+                "dateOfDiagnosis",
+                "condition",
+                "sequence",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -259,35 +244,30 @@ class AccountProcedure(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "device",
-            "packageCode",
-            "type",
-            "dateOfService",
-            "code",
-            "sequence",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "device",
+                "packageCode",
+                "type",
+                "dateOfService",
+                "code",
+                "sequence",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -309,23 +289,18 @@ class AccountRelatedAccount(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "account",
-            "relationship",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "account",
+                "relationship",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -362,29 +337,24 @@ class AccountBalance(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "amount",
-            "estimate",
-            "term",
-            "aggregate",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "amount",
+                "estimate",
+                "term",
+                "aggregate",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -539,78 +509,71 @@ class Account(DomainResource):
         default="Account",
     )
 
-    @field_validator(
-        *(
-            "calculatedAt",
-            "balance",
-            "currency",
-            "relatedAccount",
-            "procedure",
-            "diagnosis",
-            "guarantor",
-            "description",
-            "owner",
-            "coverage",
-            "servicePeriod",
-            "subject",
-            "name",
-            "type",
-            "billingStatus",
-            "status",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "calculatedAt",
+                "balance",
+                "currency",
+                "relatedAccount",
+                "procedure",
+                "diagnosis",
+                "guarantor",
+                "description",
+                "owner",
+                "coverage",
+                "servicePeriod",
+                "subject",
+                "name",
+                "type",
+                "billingStatus",
+                "status",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("diagnosis",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_act_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_act_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("diagnosis",),
             expression="condition.reference.empty().not() implies dateOfDiagnosis.empty()",
             human="The dateOfDiagnosis is not valid when using a reference to a diagnosis",
             key="act-1",
             severity="error",
         )
 
-    @field_validator(*("procedure",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_act_2_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_act_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("procedure",),
             expression="code.reference.empty().not() implies dateOfService.empty()",
             human="The dateOfService is not valid when using a reference to a procedure",
             key="act-2",

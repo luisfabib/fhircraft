@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -80,26 +80,21 @@ class ObservationTriggeredBy(BackboneElement):
         alias="_reason",
     )
 
-    @field_validator(
-        *(
-            "reason",
-            "type",
-            "observation",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "reason",
+                "type",
+                "observation",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -146,38 +141,33 @@ class ObservationReferenceRange(BackboneElement):
         alias="_text",
     )
 
-    @field_validator(
-        *(
-            "text",
-            "age",
-            "appliesTo",
-            "type",
-            "normalValue",
-            "high",
-            "low",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "text",
+                "age",
+                "appliesTo",
+                "type",
+                "normalValue",
+                "high",
+                "low",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -224,38 +214,33 @@ class ObservationComponentReferenceRange(BackboneElement):
         alias="_text",
     )
 
-    @field_validator(
-        *(
-            "text",
-            "age",
-            "appliesTo",
-            "type",
-            "normalValue",
-            "high",
-            "low",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "text",
+                "age",
+                "appliesTo",
+                "type",
+                "normalValue",
+                "high",
+                "low",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -369,29 +354,24 @@ class ObservationComponent(BackboneElement):
             base="value",
         )
 
-    @field_validator(
-        *(
-            "referenceRange",
-            "interpretation",
-            "dataAbsentReason",
-            "code",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "referenceRange",
+                "interpretation",
+                "dataAbsentReason",
+                "code",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -724,85 +704,78 @@ class Observation(DomainResource):
             base="value",
         )
 
-    @field_validator(
-        *(
-            "component",
-            "derivedFrom",
-            "hasMember",
-            "referenceRange",
-            "device",
-            "specimen",
-            "method",
-            "bodyStructure",
-            "bodySite",
-            "note",
-            "interpretation",
-            "dataAbsentReason",
-            "performer",
-            "issued",
-            "encounter",
-            "focus",
-            "subject",
-            "code",
-            "category",
-            "status",
-            "partOf",
-            "triggeredBy",
-            "basedOn",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "component",
+                "derivedFrom",
+                "hasMember",
+                "referenceRange",
+                "device",
+                "specimen",
+                "method",
+                "bodyStructure",
+                "bodySite",
+                "note",
+                "interpretation",
+                "dataAbsentReason",
+                "performer",
+                "issued",
+                "encounter",
+                "focus",
+                "subject",
+                "code",
+                "category",
+                "status",
+                "partOf",
+                "triggeredBy",
+                "basedOn",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("specimen",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_obs_9_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_obs_9_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("specimen",),
             expression="(reference.resolve().exists() and reference.resolve() is Group) implies reference.resolve().member.entity.resolve().all($this is Specimen)",
             human="If Observation.specimen is a reference to Group, the group can only have specimens",
             key="obs-9",
             severity="error",
         )
 
-    @field_validator(*("referenceRange",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_obs_3_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_obs_3_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("referenceRange",),
             expression="low.exists() or high.exists() or text.exists()",
             human="Must have at least a low or a high or text",
             key="obs-3",

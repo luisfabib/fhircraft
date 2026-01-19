@@ -3,7 +3,7 @@ import traceback
 import warnings
 
 # Standard modules
-from typing import TYPE_CHECKING, Any, List, TypeVar, Union
+from typing import TYPE_CHECKING, Any, List, TypeVar, Union, Sequence
 
 from pydantic import BaseModel
 
@@ -16,7 +16,7 @@ T = TypeVar("T", bound=BaseModel)
 
 
 def _validate_FHIR_element_constraint(
-    value: Any, expression: str, human: str, key: str, severity: str
+    value: Any, expression: str, human: str, key: str, severity: str, element: str | None = None
 ):
     """
     Validate FHIR element constraint against a FHIRPath expression.
@@ -75,7 +75,9 @@ def _validate_FHIR_element_constraint(
     for item in ensure_list(value):
         try:
             valid = fhirpath.parse(expression).single(item, default=True)
-            error_message = f'{human}. [{key}] -> "{expression}"'
+            error_message = f'[{key}] {human}. -> {expression}'
+            if element:
+                error_message = f'{element}\n\t{error_message}'
             if effective_severity == "warning" and not valid:
                 warnings.warn(error_message, FhirPathWarning)
             else:
@@ -94,14 +96,14 @@ def _validate_FHIR_element_constraint(
 
 
 def validate_element_constraint(
-    cls, value: Any, expression: str, human: str, key: str, severity: str
-) -> Any:
+    instance: T, elements: Sequence[str], expression: str, human: str, key: str, severity: str
+) -> T:
     """
     Validates a FHIR element constraint based on a FHIRPath expression.
 
     Args:
-        cls (Any): Placeholder for an argument that is not used in the function.
-        value (Any): The value to be validated.
+        instance (T): The instance to be validated.
+        elements (Sequence[str]): The elements to be validated.
         expression (str): The FHIRPath expression to evaluate.
         human (str): A human-readable description of the constraint.
         key (str): The key associated with the constraint.
@@ -114,7 +116,12 @@ def validate_element_constraint(
         AssertionError: If the validation fails and severity is not `warning`.
         Warning: If the validation fails and severity is `warning`.
     """
-    return _validate_FHIR_element_constraint(value, expression, human, key, severity)
+    for element in elements:
+        value = getattr(instance, element)
+        if not value:
+            continue
+        _validate_FHIR_element_constraint(value, expression, human, key, severity)
+    return instance
 
 
 def validate_model_constraint(

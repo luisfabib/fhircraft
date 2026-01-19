@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -109,35 +109,30 @@ class MolecularSequenceRelativeStartingSequence(BackboneElement):
             base="sequence",
         )
 
-    @field_validator(
-        *(
-            "strand",
-            "orientation",
-            "windowEnd",
-            "windowStart",
-            "chromosome",
-            "genomeAssembly",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "strand",
+                "orientation",
+                "windowEnd",
+                "windowStart",
+                "chromosome",
+                "genomeAssembly",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -196,29 +191,24 @@ class MolecularSequenceRelativeEdit(BackboneElement):
         alias="_replacedSequence",
     )
 
-    @field_validator(
-        *(
-            "replacedSequence",
-            "replacementSequence",
-            "end",
-            "start",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "replacedSequence",
+                "replacementSequence",
+                "end",
+                "start",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -257,56 +247,49 @@ class MolecularSequenceRelative(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "edit",
-            "startingSequence",
-            "sequenceRange",
-            "ordinalPosition",
-            "coordinateSystem",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "edit",
+                "startingSequence",
+                "sequenceRange",
+                "ordinalPosition",
+                "coordinateSystem",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("startingSequence",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_msq_5_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_msq_5_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("startingSequence",),
             expression="chromosome.exists() = genomeAssembly.exists()",
             human="Both genomeAssembly and chromosome must be both contained if either one of them is contained",
             key="msq-5",
             severity="error",
         )
 
-    @field_validator(*("startingSequence",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_msq_6_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_msq_6_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("startingSequence",),
             expression="genomeAssembly.exists() xor sequence.exists()",
             human="Have and only have one of the following elements in startingSequence: 1. genomeAssembly; 2 sequence",
             key="msq-6",
@@ -423,47 +406,42 @@ class MolecularSequence(DomainResource):
         default="MolecularSequence",
     )
 
-    @field_validator(
-        *(
-            "relative",
-            "formatted",
-            "literal",
-            "performer",
-            "device",
-            "specimen",
-            "focus",
-            "subject",
-            "type",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "relative",
+                "formatted",
+                "literal",
+                "performer",
+                "device",
+                "specimen",
+                "focus",
+                "subject",
+                "type",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",

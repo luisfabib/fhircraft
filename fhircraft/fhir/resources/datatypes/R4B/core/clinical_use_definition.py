@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -49,23 +49,18 @@ class ClinicalUseDefinitionContraindicationOtherTherapy(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "therapy",
-            "relationshipType",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "therapy",
+                "relationshipType",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -94,39 +89,34 @@ class ClinicalUseDefinitionContraindication(BackboneElement):
         description="The indication which this is a contraidication for",
         default=None,
     )
-    otherTherapy: Optional[ListType[ClinicalUseDefinitionContraindicationOtherTherapy]] = (
-        Field(
-            description="Information about use of the product in relation to other therapies described as part of the contraindication",
-            default=None,
-        )
+    otherTherapy: Optional[
+        ListType[ClinicalUseDefinitionContraindicationOtherTherapy]
+    ] = Field(
+        description="Information about use of the product in relation to other therapies described as part of the contraindication",
+        default=None,
     )
 
-    @field_validator(
-        *(
-            "otherTherapy",
-            "indication",
-            "comorbidity",
-            "diseaseStatus",
-            "diseaseSymptomProcedure",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "otherTherapy",
+                "indication",
+                "comorbidity",
+                "diseaseStatus",
+                "diseaseSymptomProcedure",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
             key="ele-1",
@@ -148,23 +138,18 @@ class ClinicalUseDefinitionIndicationOtherTherapy(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "therapy",
-            "relationshipType",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "therapy",
+                "relationshipType",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -210,9 +195,11 @@ class ClinicalUseDefinitionIndication(BackboneElement):
         description="An unwanted side effect or negative outcome of the subject of this resource when being used for this indication",
         default=None,
     )
-    otherTherapy: Optional[ListType[ClinicalUseDefinitionIndicationOtherTherapy]] = Field(
-        description="The use of the medicinal product in relation to other therapies described as part of the indication",
-        default=None,
+    otherTherapy: Optional[ListType[ClinicalUseDefinitionIndicationOtherTherapy]] = (
+        Field(
+            description="The use of the medicinal product in relation to other therapies described as part of the indication",
+            default=None,
+        )
     )
 
     @property
@@ -222,35 +209,30 @@ class ClinicalUseDefinitionIndication(BackboneElement):
             base="duration",
         )
 
-    @field_validator(
-        *(
-            "otherTherapy",
-            "undesirableEffect",
-            "intendedEffect",
-            "comorbidity",
-            "diseaseStatus",
-            "diseaseSymptomProcedure",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "otherTherapy",
+                "undesirableEffect",
+                "intendedEffect",
+                "comorbidity",
+                "diseaseStatus",
+                "diseaseSymptomProcedure",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -303,9 +285,11 @@ class ClinicalUseDefinitionInteraction(BackboneElement):
     Specifics for when this is an interaction.
     """
 
-    interactant: Optional[ListType[ClinicalUseDefinitionInteractionInteractant]] = Field(
-        description="The specific medication, food, substance or laboratory test that interacts",
-        default=None,
+    interactant: Optional[ListType[ClinicalUseDefinitionInteractionInteractant]] = (
+        Field(
+            description="The specific medication, food, substance or laboratory test that interacts",
+            default=None,
+        )
     )
     type: Optional[CodeableConcept] = Field(
         description="The type of the interaction e.g. drug-drug interaction, drug-lab test interaction",
@@ -324,32 +308,27 @@ class ClinicalUseDefinitionInteraction(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "management",
-            "incidence",
-            "effect",
-            "type",
-            "interactant",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "management",
+                "incidence",
+                "effect",
+                "type",
+                "interactant",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -375,26 +354,21 @@ class ClinicalUseDefinitionUndesirableEffect(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "frequencyOfOccurrence",
-            "classification",
-            "symptomConditionEffect",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "frequencyOfOccurrence",
+                "classification",
+                "symptomConditionEffect",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -421,23 +395,18 @@ class ClinicalUseDefinitionWarning(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "code",
-            "description",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "code",
+                "description",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -553,60 +522,54 @@ class ClinicalUseDefinition(DomainResource):
         default="ClinicalUseDefinition",
     )
 
-    @field_validator(
-        *(
-            "warning",
-            "undesirableEffect",
-            "population",
-            "interaction",
-            "indication",
-            "contraindication",
-            "status",
-            "subject",
-            "category",
-            "type",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "warning",
+                "undesirableEffect",
+                "population",
+                "interaction",
+                "indication",
+                "contraindication",
+                "status",
+                "subject",
+                "category",
+                "type",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("contained",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_dom_r4b_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_dom_r4b_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("contained",),
             expression="($this is Citation or $this is Evidence or $this is EvidenceReport or $this is EvidenceVariable or $this is MedicinalProductDefinition or $this is PackagedProductDefinition or $this is AdministrableProductDefinition or $this is Ingredient or $this is ClinicalUseDefinition or $this is RegulatedAuthorization or $this is SubstanceDefinition or $this is SubscriptionStatus or $this is SubscriptionTopic) implies (%resource is Citation or %resource is Evidence or %resource is EvidenceReport or %resource is EvidenceVariable or %resource is MedicinalProductDefinition or %resource is PackagedProductDefinition or %resource is AdministrableProductDefinition or %resource is Ingredient or %resource is ClinicalUseDefinition or %resource is RegulatedAuthorization or %resource is SubstanceDefinition or %resource is SubscriptionStatus or %resource is SubscriptionTopic)",
             human="Containing new R4B resources within R4 resources may cause interoperability issues if instances are shared with R4 systems",
             key="dom-r4b",
             severity="warning",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",

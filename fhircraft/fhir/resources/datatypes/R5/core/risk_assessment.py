@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -110,29 +110,24 @@ class RiskAssessmentPrediction(BackboneElement):
             base="when",
         )
 
-    @field_validator(
-        *(
-            "rationale",
-            "relativeRisk",
-            "qualitativeRisk",
-            "outcome",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "rationale",
+                "relativeRisk",
+                "qualitativeRisk",
+                "outcome",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -307,64 +302,58 @@ class RiskAssessment(DomainResource):
             base="occurrence",
         )
 
-    @field_validator(
-        *(
-            "note",
-            "mitigation",
-            "prediction",
-            "basis",
-            "reason",
-            "performer",
-            "condition",
-            "encounter",
-            "subject",
-            "code",
-            "method",
-            "status",
-            "parent",
-            "basedOn",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "note",
+                "mitigation",
+                "prediction",
+                "basis",
+                "reason",
+                "performer",
+                "condition",
+                "encounter",
+                "subject",
+                "code",
+                "method",
+                "status",
+                "parent",
+                "basedOn",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("prediction",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ras_2_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ras_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("prediction",),
             expression="probability.empty() or ((probability is decimal) implies ((probability as decimal) <= 100))",
             human="Probability as a deciml must be <= 100",
             key="ras-2",
