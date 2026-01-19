@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -56,23 +56,18 @@ class AdverseEventParticipant(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "actor",
-            "function",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "actor",
+                "function",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -98,26 +93,21 @@ class AdverseEventSuspectEntityCausality(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "author",
-            "entityRelatedness",
-            "assessmentMethod",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "author",
+                "entityRelatedness",
+                "assessmentMethod",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -150,16 +140,15 @@ class AdverseEventSuspectEntity(BackboneElement):
             base="instance",
         )
 
-    @field_validator(
-        *("causality", "modifierExtension", "extension"),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "causality",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -500,60 +489,55 @@ class AdverseEvent(DomainResource):
             base="occurrence",
         )
 
-    @field_validator(
-        *(
-            "note",
-            "supportingInfo",
-            "mitigatingAction",
-            "preventiveAction",
-            "contributingFactor",
-            "suspectEntity",
-            "expectedInResearchStudy",
-            "study",
-            "participant",
-            "recorder",
-            "outcome",
-            "seriousness",
-            "location",
-            "resultingEffect",
-            "recordedDate",
-            "detected",
-            "encounter",
-            "subject",
-            "code",
-            "category",
-            "actuality",
-            "status",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "note",
+                "supportingInfo",
+                "mitigatingAction",
+                "preventiveAction",
+                "contributingFactor",
+                "suspectEntity",
+                "expectedInResearchStudy",
+                "study",
+                "participant",
+                "recorder",
+                "outcome",
+                "seriousness",
+                "location",
+                "resultingEffect",
+                "recordedDate",
+                "detected",
+                "encounter",
+                "subject",
+                "code",
+                "category",
+                "actuality",
+                "status",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",

@@ -1,4 +1,4 @@
-from pydantic import field_validator, model_validator
+from pydantic import model_validator
 
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import *

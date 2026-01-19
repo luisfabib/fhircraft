@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -87,29 +87,24 @@ class StructureDefinitionMapping(BackboneElement):
         alias="_comment",
     )
 
-    @field_validator(
-        *(
-            "comment",
-            "name",
-            "uri",
-            "identity",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "comment",
+                "name",
+                "uri",
+                "identity",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -141,23 +136,18 @@ class StructureDefinitionContext(BackboneElement):
         alias="_expression",
     )
 
-    @field_validator(
-        *(
-            "expression",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "expression",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -175,26 +165,26 @@ class StructureDefinitionSnapshot(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *("element", "modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "element",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("element",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_sdf_10_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_sdf_10_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("element",),
             expression="binding.empty() or binding.valueSet.exists() or binding.description.exists()",
             human="provide either a binding reference or a description (or both)",
             key="sdf-10",
@@ -212,14 +202,15 @@ class StructureDefinitionDifferential(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *("element", "modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "element",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -484,172 +475,158 @@ class StructureDefinition(DomainResource):
         default="StructureDefinition",
     )
 
-    @field_validator(
-        *(
-            "differential",
-            "snapshot",
-            "derivation",
-            "baseDefinition",
-            "type",
-            "contextInvariant",
-            "context",
-            "abstract",
-            "kind",
-            "mapping",
-            "fhirVersion",
-            "keyword",
-            "copyright",
-            "purpose",
-            "jurisdiction",
-            "useContext",
-            "description",
-            "contact",
-            "publisher",
-            "date",
-            "experimental",
-            "status",
-            "title",
-            "name",
-            "version",
-            "identifier",
-            "url",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "differential",
+                "snapshot",
+                "derivation",
+                "baseDefinition",
+                "type",
+                "contextInvariant",
+                "context",
+                "abstract",
+                "kind",
+                "mapping",
+                "fhirVersion",
+                "keyword",
+                "copyright",
+                "purpose",
+                "jurisdiction",
+                "useContext",
+                "description",
+                "contact",
+                "publisher",
+                "date",
+                "experimental",
+                "status",
+                "title",
+                "name",
+                "version",
+                "identifier",
+                "url",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("contained",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_dom_r4b_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_dom_r4b_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("contained",),
             expression="($this is Citation or $this is Evidence or $this is EvidenceReport or $this is EvidenceVariable or $this is MedicinalProductDefinition or $this is PackagedProductDefinition or $this is AdministrableProductDefinition or $this is Ingredient or $this is ClinicalUseDefinition or $this is RegulatedAuthorization or $this is SubstanceDefinition or $this is SubscriptionStatus or $this is SubscriptionTopic) implies (%resource is Citation or %resource is Evidence or %resource is EvidenceReport or %resource is EvidenceVariable or %resource is MedicinalProductDefinition or %resource is PackagedProductDefinition or %resource is AdministrableProductDefinition or %resource is Ingredient or %resource is ClinicalUseDefinition or %resource is RegulatedAuthorization or %resource is SubstanceDefinition or %resource is SubscriptionStatus or %resource is SubscriptionTopic)",
             human="Containing new R4B resources within R4 resources may cause interoperability issues if instances are shared with R4 systems",
             key="dom-r4b",
             severity="warning",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("mapping",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_sdf_2_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_sdf_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("mapping",),
             expression="name.exists() or uri.exists()",
             human="Must have at least a name or a uri (or both)",
             key="sdf-2",
             severity="error",
         )
 
-    @field_validator(*("snapshot",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_sdf_3_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_sdf_3_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("snapshot",),
             expression="element.all(definition.exists() and min.exists() and max.exists())",
             human="Each element definition in a snapshot must have a formal definition and cardinalities",
             key="sdf-3",
             severity="error",
         )
 
-    @field_validator(*("snapshot",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_sdf_8_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_sdf_8_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("snapshot",),
             expression="(%resource.kind = 'logical' or element.first().path = %resource.type) and element.tail().all(path.startsWith(%resource.snapshot.element.first().path&'.'))",
             human="All snapshot elements must start with the StructureDefinition's specified type for non-logical models, or with the same type name for logical models",
             key="sdf-8",
             severity="error",
         )
 
-    @field_validator(*("snapshot",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_sdf_24_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_sdf_24_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("snapshot",),
             expression="element.where(type.code='Reference' and id.endsWith('.reference') and type.targetProfile.exists() and id.substring(0,$this.length()-10) in %context.element.where(type.code='CodeableReference').id).exists().not()",
             human="For CodeableReference elements, target profiles must be listed on the CodeableReference, not the CodeableReference.reference",
             key="sdf-24",
             severity="error",
         )
 
-    @field_validator(*("snapshot",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_sdf_25_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_sdf_25_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("snapshot",),
             expression="element.where(type.code='CodeableConcept' and id.endsWith('.concept') and binding.exists() and id.substring(0,$this.length()-8) in %context.element.where(type.code='CodeableReference').id).exists().not()",
             human="For CodeableReference elements, bindings must be listed on the CodeableReference, not the CodeableReference.concept",
             key="sdf-25",
             severity="error",
         )
 
-    @field_validator(*("snapshot",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_sdf_8b_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_sdf_8b_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("snapshot",),
             expression="element.all(base.exists())",
             human="All snapshot elements must have a base definition",
             key="sdf-8b",
             severity="error",
         )
 
-    @field_validator(*("differential",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_sdf_20_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_sdf_20_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("differential",),
             expression="element.where(path.contains('.').not()).slicing.empty()",
             human="No slicing on the root element",
             key="sdf-20",
             severity="error",
         )
 
-    @field_validator(*("differential",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_sdf_8a_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_sdf_8a_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("differential",),
             expression="(%resource.kind = 'logical' or element.first().path.startsWith(%resource.type)) and (element.tail().empty() or element.tail().all(path.startsWith(%resource.differential.element.first().path.replaceMatches('\\..*','')&'.')))",
             human="In any differential, all the elements must start with the StructureDefinition's specified type for non-logical models, or with the same type name for logical models",
             key="sdf-8a",

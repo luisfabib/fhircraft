@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -86,29 +86,24 @@ class ExampleScenarioActor(BackboneElement):
         alias="_description",
     )
 
-    @field_validator(
-        *(
-            "description",
-            "title",
-            "type",
-            "key",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "description",
+                "title",
+                "type",
+                "key",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -153,29 +148,24 @@ class ExampleScenarioInstanceVersion(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "content",
-            "description",
-            "title",
-            "key",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "content",
+                "description",
+                "title",
+                "key",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -207,23 +197,18 @@ class ExampleScenarioInstanceContainedInstance(BackboneElement):
         alias="_versionReference",
     )
 
-    @field_validator(
-        *(
-            "versionReference",
-            "instanceReference",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "versionReference",
+                "instanceReference",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -314,77 +299,69 @@ class ExampleScenarioInstance(BackboneElement):
             base="structureProfile",
         )
 
-    @field_validator(
-        *(
-            "containedInstance",
-            "version",
-            "content",
-            "description",
-            "title",
-            "structureVersion",
-            "structureType",
-            "key",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "containedInstance",
+                "version",
+                "content",
+                "description",
+                "title",
+                "structureVersion",
+                "structureType",
+                "key",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("containedInstance",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_14_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_14_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("containedInstance",),
             expression="%resource.instance.where(key=%context.instanceReference).exists()",
             human="InstanceReference must be a key of an instance defined in the ExampleScenario",
             key="exs-14",
             severity="error",
         )
 
-    @field_validator(*("containedInstance",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_15_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_15_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("containedInstance",),
             expression="versionReference.empty() implies %resource.instance.where(key=%context.instanceReference).version.empty()",
             human="versionReference must be specified if the referenced instance defines versions",
             key="exs-15",
             severity="error",
         )
 
-    @field_validator(*("containedInstance",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_16_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_16_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("containedInstance",),
             expression="versionReference.exists() implies %resource.instance.where(key=%context.instanceReference).version.where(key=%context.versionReference).exists()",
             human="versionReference must be a key of a version within the instance pointed to by instanceReference",
             key="exs-16",
@@ -425,23 +402,18 @@ class ExampleScenarioProcessStepOperationRequest(BackboneElement):
         alias="_versionReference",
     )
 
-    @field_validator(
-        *(
-            "versionReference",
-            "instanceReference",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "versionReference",
+                "instanceReference",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -521,44 +493,39 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "response",
-            "request",
-            "receiverActive",
-            "initiatorActive",
-            "description",
-            "receiver",
-            "initiator",
-            "title",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "response",
+                "request",
+                "receiverActive",
+                "initiatorActive",
+                "description",
+                "receiver",
+                "initiator",
+                "title",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -594,26 +561,21 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "step",
-            "description",
-            "title",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "step",
+                "description",
+                "title",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -666,59 +628,52 @@ class ExampleScenarioProcessStep(BackboneElement):
         alias="_pause",
     )
 
-    @field_validator(
-        *(
-            "pause",
-            "alternative",
-            "operation",
-            "workflow",
-            "process",
-            "number",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "pause",
+                "alternative",
+                "operation",
+                "workflow",
+                "process",
+                "number",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("operation",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_17_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_17_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("operation",),
             expression="initiator.exists() implies initiator = 'OTHER' or %resource.actor.where(key=%context.initiator).exists()",
             human="If specified, initiator must be a key of an actor within the ExampleScenario",
             key="exs-17",
             severity="error",
         )
 
-    @field_validator(*("operation",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_18_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_18_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("operation",),
             expression="receiver.exists() implies receiver = 'OTHER' or %resource.actor.where(key=%context.receiver).exists()",
             human="If specified, receiver must be a key of an actor within the ExampleScenario",
             key="exs-18",
@@ -772,56 +727,49 @@ class ExampleScenarioProcess(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "step",
-            "postConditions",
-            "preConditions",
-            "description",
-            "title",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "step",
+                "postConditions",
+                "preConditions",
+                "description",
+                "title",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("step",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_13_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_13_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("step",),
             expression="alternative.title.count() = alternative.title.distinct().count()",
             human="Alternative titles must be unique within a step",
             key="exs-13",
             severity="error",
         )
 
-    @field_validator(*("step",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_22_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_22_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("step",),
             expression="(process.exists() implies workflow.empty() and operation.empty()) and (workflow.exists() implies operation.empty())",
             human="Can have a process, a workflow, one or more operations or none of these, but cannot have a combination",
             key="exs-22",
@@ -1044,176 +992,161 @@ class ExampleScenario(DomainResource):
             base="versionAlgorithm",
         )
 
-    @field_validator(
-        *(
-            "process",
-            "instance",
-            "actor",
-            "copyrightLabel",
-            "copyright",
-            "purpose",
-            "jurisdiction",
-            "useContext",
-            "description",
-            "contact",
-            "publisher",
-            "date",
-            "experimental",
-            "status",
-            "title",
-            "name",
-            "version",
-            "identifier",
-            "url",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "process",
+                "instance",
+                "actor",
+                "copyrightLabel",
+                "copyright",
+                "purpose",
+                "jurisdiction",
+                "useContext",
+                "description",
+                "contact",
+                "publisher",
+                "date",
+                "experimental",
+                "status",
+                "title",
+                "name",
+                "version",
+                "identifier",
+                "url",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
             severity="error",
         )
 
-    @field_validator(*("url",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_cnl_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("url",),
             expression="exists() implies matches('^[^|# ]+$')",
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",
             severity="warning",
         )
 
-    @field_validator(*("actor",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_19_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_19_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("actor",),
             expression="%resource.process.descendants().select(operation).where(initiator=%context.key or receiver=%context.key).exists()",
             human="Actor should be referenced in at least one operation",
             key="exs-19",
             severity="warning",
         )
 
-    @field_validator(*("actor",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_23_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_23_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("actor",),
             expression="key != 'OTHER'",
             human="actor.key canot be 'OTHER'",
             key="exs-23",
             severity="error",
         )
 
-    @field_validator(*("instance",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("instance",),
             expression="structureType.exists() and structureType.memberOf('http://hl7.org/fhir/ValueSet/resource-types').not() implies structureVersion.exists()",
             human="StructureVersion is required if structureType is not FHIR (but may still be present even if FHIR)",
             key="exs-1",
             severity="error",
         )
 
-    @field_validator(*("instance",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_2_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("instance",),
             expression="content.exists() implies version.empty()",
             human="instance.content is only allowed if there are no instance.versions",
             key="exs-2",
             severity="error",
         )
 
-    @field_validator(*("instance",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_10_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_10_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("instance",),
             expression="version.key.count() = version.key.distinct().count()",
             human="Version keys must be unique within an instance",
             key="exs-10",
             severity="error",
         )
 
-    @field_validator(*("instance",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_11_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_11_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("instance",),
             expression="version.title.count() = version.title.distinct().count()",
             human="Version titles must be unique within an instance",
             key="exs-11",
             severity="error",
         )
 
-    @field_validator(*("instance",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_20_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_20_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("instance",),
             expression="%resource.process.descendants().select(instanceReference).where($this=%context.key).exists()",
             human="Instance should be referenced in at least one location",
             key="exs-20",
             severity="warning",
         )
 
-    @field_validator(*("instance",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_21_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_21_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("instance",),
             expression="version.exists() implies version.key.intersect(%resource.process.descendants().where(instanceReference = %context.key).versionReference).exists()",
             human="Instance version should be referenced in at least one operation",
             key="exs-21",
             severity="warning",
         )
 
-    @field_validator(*("process",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_exs_5_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_exs_5_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("process",),
             expression="%resource.status='active' or %resource.status='retired' implies step.exists()",
             human="Processes must have steps if ExampleScenario status is active or required",
             key="exs-5",

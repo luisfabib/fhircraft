@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -24,7 +24,12 @@ from fhircraft.fhir.resources.datatypes.primitives import (
     Base64Binary,
 )
 
-from fhircraft.fhir.resources.datatypes.R4B.complex import Element, Meta, Reference, Resource
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
+    Element,
+    Meta,
+    Reference,
+    Resource,
+)
 
 
 class Binary(Resource):
@@ -43,7 +48,9 @@ class Binary(Resource):
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource.",
-        default_factory=lambda: Meta(profile=["http://hl7.org/fhir/StructureDefinition/Binary"]),
+        default_factory=lambda: Meta(
+            profile=["http://hl7.org/fhir/StructureDefinition/Binary"]
+        ),
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -90,23 +97,18 @@ class Binary(Resource):
         default="Binary",
     )
 
-    @field_validator(
-        *(
-            "data",
-            "securityContext",
-            "contentType",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "data",
+                "securityContext",
+                "contentType",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",

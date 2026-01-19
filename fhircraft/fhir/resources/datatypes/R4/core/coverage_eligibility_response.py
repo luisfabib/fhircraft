@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -111,14 +111,15 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
             base="used",
         )
 
-    @field_validator(
-        *("type", "modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "type",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -204,9 +205,11 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         description="Annual or lifetime",
         default=None,
     )
-    benefit: Optional[ListType[CoverageEligibilityResponseInsuranceItemBenefit]] = Field(
-        description="Benefit Summary",
-        default=None,
+    benefit: Optional[ListType[CoverageEligibilityResponseInsuranceItemBenefit]] = (
+        Field(
+            description="Benefit Summary",
+            default=None,
+        )
     )
     authorizationRequired: Optional[Boolean] = Field(
         description="Authorization required flag",
@@ -231,59 +234,54 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         alias="_authorizationUrl",
     )
 
-    @field_validator(
-        *(
-            "authorizationUrl",
-            "authorizationSupporting",
-            "authorizationRequired",
-            "benefit",
-            "term",
-            "unit",
-            "network",
-            "description",
-            "name",
-            "excluded",
-            "provider",
-            "modifier",
-            "productOrService",
-            "category",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "authorizationUrl",
+                "authorizationSupporting",
+                "authorizationRequired",
+                "benefit",
+                "term",
+                "unit",
+                "network",
+                "description",
+                "name",
+                "excluded",
+                "provider",
+                "modifier",
+                "productOrService",
+                "category",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -318,41 +316,35 @@ class CoverageEligibilityResponseInsurance(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "item",
-            "benefitPeriod",
-            "inforce",
-            "coverage",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "item",
+                "benefitPeriod",
+                "inforce",
+                "coverage",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(*("item",), mode="after", check_fields=None)
-    @classmethod
-    def FHIR_ces_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ces_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=("item",),
             expression="category.exists() xor productOrService.exists()",
             human="SHALL contain a category or a billcode but not both.",
             key="ces-1",
@@ -370,14 +362,15 @@ class CoverageEligibilityResponseError(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *("code", "modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "code",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -552,51 +545,46 @@ class CoverageEligibilityResponse(DomainResource):
             base="serviced",
         )
 
-    @field_validator(
-        *(
-            "error",
-            "form",
-            "preAuthRef",
-            "insurance",
-            "insurer",
-            "disposition",
-            "outcome",
-            "request",
-            "requestor",
-            "created",
-            "patient",
-            "purpose",
-            "status",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "error",
+                "form",
+                "preAuthRef",
+                "insurance",
+                "insurer",
+                "disposition",
+                "outcome",
+                "request",
+                "requestor",
+                "created",
+                "patient",
+                "purpose",
+                "status",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",

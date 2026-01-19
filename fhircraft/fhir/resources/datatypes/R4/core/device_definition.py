@@ -2,7 +2,7 @@
 import fhircraft.fhir.resources.validators as fhir_validators
 
 # Pydantic modules
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, model_validator, BaseModel
 from pydantic.fields import FieldInfo
 
 # Standard modules
@@ -71,26 +71,21 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
         alias="_jurisdiction",
     )
 
-    @field_validator(
-        *(
-            "jurisdiction",
-            "issuer",
-            "deviceIdentifier",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "jurisdiction",
+                "issuer",
+                "deviceIdentifier",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -122,23 +117,18 @@ class DeviceDefinitionDeviceName(BackboneElement):
         alias="_type",
     )
 
-    @field_validator(
-        *(
-            "type",
-            "name",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "type",
+                "name",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -170,23 +160,18 @@ class DeviceDefinitionSpecialization(BackboneElement):
         alias="_version",
     )
 
-    @field_validator(
-        *(
-            "version",
-            "systemType",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "version",
+                "systemType",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -208,23 +193,18 @@ class DeviceDefinitionCapability(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "description",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "description",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -250,26 +230,21 @@ class DeviceDefinitionProperty(BackboneElement):
         default=None,
     )
 
-    @field_validator(
-        *(
-            "valueCode",
-            "valueQuantity",
-            "type",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "valueCode",
+                "valueQuantity",
+                "type",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -305,26 +280,21 @@ class DeviceDefinitionMaterial(BackboneElement):
         alias="_allergenicIndicator",
     )
 
-    @field_validator(
-        *(
-            "allergenicIndicator",
-            "alternate",
-            "substance",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-            "modifierExtension",
-            "extension",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "allergenicIndicator",
+                "alternate",
+                "substance",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+                "modifierExtension",
+                "extension",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
@@ -390,9 +360,11 @@ class DeviceDefinition(DomainResource):
         description="Instance identifier",
         default=None,
     )
-    udiDeviceIdentifier: Optional[ListType[DeviceDefinitionUdiDeviceIdentifier]] = Field(
-        description="Unique Device Identifier (UDI) Barcode string",
-        default=None,
+    udiDeviceIdentifier: Optional[ListType[DeviceDefinitionUdiDeviceIdentifier]] = (
+        Field(
+            description="Unique Device Identifier (UDI) Barcode string",
+            default=None,
+        )
     )
     manufacturerString: Optional[String] = Field(
         description="Name of device manufacturer",
@@ -515,58 +487,53 @@ class DeviceDefinition(DomainResource):
             base="manufacturer",
         )
 
-    @field_validator(
-        *(
-            "material",
-            "parentDevice",
-            "quantity",
-            "note",
-            "onlineInformation",
-            "url",
-            "contact",
-            "owner",
-            "property_",
-            "capability",
-            "languageCode",
-            "physicalCharacteristics",
-            "shelfLifeStorage",
-            "safety",
-            "version",
-            "specialization",
-            "type",
-            "modelNumber",
-            "deviceName",
-            "udiDeviceIdentifier",
-            "identifier",
-            "modifierExtension",
-            "extension",
-            "text",
-            "language",
-            "implicitRules",
-            "meta",
-        ),
-        mode="after",
-        check_fields=None,
-    )
-    @classmethod
-    def FHIR_ele_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "material",
+                "parentDevice",
+                "quantity",
+                "note",
+                "onlineInformation",
+                "url",
+                "contact",
+                "owner",
+                "property_",
+                "capability",
+                "languageCode",
+                "physicalCharacteristics",
+                "shelfLifeStorage",
+                "safety",
+                "version",
+                "specialization",
+                "type",
+                "modelNumber",
+                "deviceName",
+                "udiDeviceIdentifier",
+                "identifier",
+                "modifierExtension",
+                "extension",
+                "text",
+                "language",
+                "implicitRules",
+                "meta",
+            ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
         )
 
-    @field_validator(
-        *("modifierExtension", "extension"), mode="after", check_fields=None
-    )
-    @classmethod
-    def FHIR_ext_1_constraint_validator(cls, value):
+    @model_validator(mode="after")
+    def FHIR_ext_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
-            cls,
-            value,
+            self,
+            elements=(
+                "modifierExtension",
+                "extension",
+            ),
             expression="extension.exists() != value.exists()",
             human="Must have either extensions or value[x], not both",
             key="ext-1",
