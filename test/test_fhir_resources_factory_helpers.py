@@ -231,24 +231,34 @@ class TestGetComplexFhirType(FactoryTestCase):
                 type="BackboneElement",
                 baseDefinition="http://hl7.org/fhir/StructureDefinition/BackboneElement",
                 derivation="specialization",
-                snapshot=StructureDefinitionSnapshot.model_validate(
-                    {
-                        "element": [
+                snapshot=StructureDefinitionSnapshot(
+                    element=[
                             {
-                                "id": "CustomType",
-                                "path": "CustomType",
+                                "id": "BackboneElement",
+                                "path": "BackboneElement",
                                 "min": 0,
                                 "max": "*",
+                                "definition": "A custom type for testing.",
+                                "base": {
+                                    "path": "BackboneElement",
+                                    "min": 0,
+                                    "max": "1",
+                                }
                             },
                             {
-                                "id": "CustomType.customField",
-                                "path": "CustomType.customField",
+                                "id": "BackboneElement.customField",
+                                "path": "BackboneElement.customField",
                                 "min": 0,
                                 "max": "1",
                                 "type": [{"code": "string"}],
+                                "definition": "A custom field in the custom type.",
+                                "base": {
+                                    "path": "BackboneElement.customField",
+                                    "min": 0,
+                                    "max": "1",
+                                }
                             },
                         ]
-                    }
                 ),
             )
         )
@@ -706,6 +716,10 @@ class TestConstructSliceModel(FactoryTestCase):
         profile = ["http://example.org/fhir/StructureDefinition/DummySlice"]
 
     class DummyElementDefinitionNode:
+        def __init__(self, definition):
+            self.definition = definition
+
+    class DummyElementDefinition:
         def __init__(self, type_=None, short="A dummy slice", min_=1, max_="*"):
             self.type = type_ or []
             self.short = short
@@ -733,7 +747,7 @@ class TestConstructSliceModel(FactoryTestCase):
         self.factory._parse_element_cardinality = mock.Mock(return_value=(1, 99999))
 
     def test_construct_slice_model_with_profile(self):
-        definition = self.DummyElementDefinitionNode(type_=[self.DummyType()])
+        definition = self.DummyElementDefinitionNode(definition=self.DummyElementDefinition(type_=[self.DummyType()]))
         result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel, "Test")  # type: ignore
         # Assertions
         self.factory.construct_resource_model.assert_called_once_with(  # type: ignore
@@ -747,7 +761,7 @@ class TestConstructSliceModel(FactoryTestCase):
         self.assertEqual(result.max_cardinality, 99999)
 
     def test_construct_slice_model_without_profile(self):
-        definition = self.DummyElementDefinitionNode(type_=[])
+        definition = self.DummyElementDefinitionNode(self.DummyElementDefinition(type_=[]))
         result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel, "Test")  # type: ignore
         self.factory._process_FHIR_structure_into_Pydantic_components.assert_called_once()  # type: ignore
         # Assertions
@@ -758,7 +772,7 @@ class TestConstructSliceModel(FactoryTestCase):
         self.assertEqual(result.max_cardinality, 99999)
 
     def test_construct_slice_model_base_is_FHIRSliceModel(self):
-        definition = self.DummyElementDefinitionNode(type_=[])
+        definition = self.DummyElementDefinitionNode(self.DummyElementDefinition(type_=[]))
         result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyFHIRSliceModel, "Test")  # type: ignore
         # Assertions
         self.factory._construct_model_with_properties.assert_called()  # type: ignore

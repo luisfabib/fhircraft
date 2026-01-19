@@ -553,7 +553,7 @@ class ResourceFactory:
             node_label="__root__",
             children={},
             slices={},
-            definition=R4_ElementDefinition.model_construct(),
+            definition=None,
         )
         for element in elements:
             current = root
@@ -584,6 +584,8 @@ class ResourceFactory:
                         sliceName,
                         StructureNode.model_validate(
                             {
+                                "id": ".".join(id_parts[: index + 1]),
+                                "path": ".".join(id_parts[: index + 1]),
                                 "node_label": sliceName,
                                 "path": "__root__",
                                 "root": root,
@@ -602,6 +604,8 @@ class ResourceFactory:
                         part,
                         StructureNode.model_validate(
                             {
+                                "id": ".".join(id_parts[: index + 1]),
+                                "path": ".".join(id_parts[: index + 1]),
                                 "node_label": part,
                                 "root": root,
                                 "path": "__root__",

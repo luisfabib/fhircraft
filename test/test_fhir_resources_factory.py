@@ -100,6 +100,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "TestResource",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of TestResource",
+                        "base": {"path": "TestResource", "min": 0, "max": "*"},
                     },
                     {
                         "id": "TestResource.class",
@@ -108,6 +110,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "short": "A class field",
+                        "definition": "A class field",
+                        "base": {"path": "TestResource.class", "min": 0, "max": "1"},
                     },
                     {
                         "id": "TestResource.import",
@@ -116,6 +120,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "short": "An import field",
+                        "definition": "An import field",
+                        "base": {"path": "TestResource.import", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -167,6 +173,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "TestResource",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of TestResource",
+                        "base": {"path": "TestResource", "min": 0, "max": "*"},
                     },
                     {
                         "id": "TestResource.class",
@@ -175,6 +183,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "short": "A class field",
+                        "definition": "A class field",
+                        "base": {"path": "TestResource.class", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -211,6 +221,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "TestResource",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of TestResource",
+                        "base": {"path": "TestResource", "min": 0, "max": "*"},
                     },
                     {
                         "id": "TestResource.class[x]",
@@ -219,6 +231,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}, {"code": "boolean"}],
                         "short": "A choice type field with keyword name",
+                        "definition": "A choice type field with keyword name",
+                        "base": {"path": "TestResource.class[x]", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -263,6 +277,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "TestResource",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of TestResource",
+                        "base": {"path": "TestResource", "min": 0, "max": "*"},
                     },
                     {
                         "id": "TestResource.for",
@@ -271,6 +287,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "short": "A primitive field with keyword name",
+                        "definition": "A primitive field with keyword name",
+                        "base": {"path": "TestResource.for", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -306,6 +324,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "BaseResource",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of BaseResource",
+                        "base": {"path": "BaseResource", "min": 0, "max": "*"},
                     },
                     {
                         "id": "BaseResource.baseField",
@@ -314,6 +334,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "short": "A field from the base resource",
+                        "definition": "A field from the base resource",
+                        "base": {"path": "BaseResource.baseField", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -337,6 +359,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "DerivedResource",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of DerivedResource",
+                        "base": {"path": "DerivedResource", "min": 0, "max": "*"},
                     },
                     {
                         "id": "DerivedResource.derivedField",
@@ -345,6 +369,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "short": "A field specific to the derived resource",
+                        "definition": "A field specific to the derived resource",
+                        "base": {"path": "DerivedResource.derivedField", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -389,6 +415,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "CachedBase",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of CachedBase",
+                        "base": {"path": "CachedBase", "min": 0, "max": "*"},
                     },
                     {
                         "id": "CachedBase.field1",
@@ -396,6 +424,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Field 1 of CachedBase",
+                        "base": {"path": "CachedBase.field1", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -418,6 +448,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "DerivedFromCached",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of DerivedFromCached",
+                        "base": {"path": "DerivedFromCached", "min": 0, "max": "*"},
                     },
                     {
                         "id": "DerivedFromCached.field2",
@@ -425,6 +457,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Field 2 of DerivedFromCached",
+                        "base": {"path": "DerivedFromCached.field2", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -475,6 +509,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "ResourceWithMissingBase",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of ResourceWithMissingBase",
+                        "base": {"path": "ResourceWithMissingBase", "min": 0, "max": "*"},
                     },
                     {
                         "id": "ResourceWithMissingBase.field1",
@@ -482,6 +518,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Field 1 of ResourceWithMissingBase",
+                        "base": {"path": "ResourceWithMissingBase.field1", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -514,6 +552,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "Patient",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
                     },
                     {
                         "id": "Patient.customField",
@@ -522,6 +562,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "short": "A custom extension field",
+                        "definition": "A custom extension field",
+                        "base": {"path": "Patient.customField", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -559,13 +601,15 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
-                    {"id": "Level1", "path": "Level1", "min": 0, "max": "*"},
+                    {"id": "Level1", "path": "Level1", "min": 0, "max": "*", "definition": "Base definition of Level1", "base": {"path": "Level1", "min": 0, "max": "*"}},
                     {
                         "id": "Level1.level1Field",
                         "path": "Level1.level1Field",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Level 1 field",
+                        "base": {"path": "Level1.level1Field", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -584,13 +628,15 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
-                    {"id": "Level2", "path": "Level2", "min": 0, "max": "*"},
+                    {"id": "Level2", "path": "Level2", "min": 0, "max": "*", "definition": "Base definition of Level2", "base": {"path": "Level2", "min": 0, "max": "*"}},
                     {
                         "id": "Level2.level2Field",
                         "path": "Level2.level2Field",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Level 2 field",
+                        "base": {"path": "Level2.level2Field", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -609,13 +655,15 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
-                    {"id": "Level3", "path": "Level3", "min": 0, "max": "*"},
+                    {"id": "Level3", "path": "Level3", "min": 0, "max": "*", "definition": "Base definition of Level3", "base": {"path": "Level3", "min": 0, "max": "*"}},
                     {
                         "id": "Level3.level3Field",
                         "path": "Level3.level3Field",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Level 3 field",
+                        "base": {"path": "Level3.level3Field", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -657,6 +705,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "BaseWithField",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of BaseWithField",
+                        "base": {"path": "BaseWithField", "min": 0, "max": "*"},
                     },
                     {
                         "id": "BaseWithField.sharedField",
@@ -664,6 +714,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Shared field in BaseWithField",
+                        "base": {"path": "BaseWithField.sharedField", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -686,6 +738,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "DerivedWithSameField",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of DerivedWithSameField",
+                        "base": {"path": "DerivedWithSameField", "min": 0, "max": "*"},
                     },
                     {
                         "id": "DerivedWithSameField.sharedField",
@@ -693,6 +747,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Shared field in DerivedWithSameField",
+                        "base": {"path": "DerivedWithSameField.sharedField", "min": 0, "max": "1"},
                     },
                     {
                         "id": "DerivedWithSameField.ownField",
@@ -700,6 +756,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Own field in DerivedWithSameField",
+                        "base": {"path": "DerivedWithSameField.ownField", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -740,6 +798,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "TestResource",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of TestResource",
+                        "base": {"path": "TestResource", "min": 0, "max": "*"},
                     },
                     {
                         "id": "TestResource.field1",
@@ -747,6 +807,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Field 1 of TestResource",
+                        "base": {"path": "TestResource.field1", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -783,6 +845,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "path": "StandaloneResource",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of StandaloneResource",
+                        "base": {"path": "StandaloneResource", "min": 0, "max": "*"},
                     },
                     {
                         "id": "StandaloneResource.field1",
@@ -790,6 +854,8 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Field 1 of StandaloneResource",
+                        "base": {"path": "StandaloneResource.field1", "min": 0, "max": "1"},
                     },
                 ]
             },
