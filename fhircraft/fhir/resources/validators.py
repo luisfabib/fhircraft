@@ -75,9 +75,9 @@ def _validate_FHIR_element_constraint(
     for item in ensure_list(value):
         try:
             valid = fhirpath.parse(expression).single(item, default=True)
-            error_message = f'[{key}] {human}. -> "{expression}"'
+            error_message = f'[{key}] {human}. -> {expression}'
             if element:
-                error_message = f'{element}\n\t[{key}] {human}. -> "{expression}"'
+                error_message = f'{element}\n\t{error_message}'
             if effective_severity == "warning" and not valid:
                 warnings.warn(error_message, FhirPathWarning)
             else:

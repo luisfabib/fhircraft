@@ -149,11 +149,12 @@ class ResourceFactoryValidators:
             )
         # Add the current field to the list of validated fields
         if constraint.expression:
-            self._validators[validator_name] = field_validator(
-                *validate_fields, mode="after"
+            self._validators[validator_name] = model_validator(
+                mode="after"
             )(
                 partial(
                     fhir_validators.validate_element_constraint,
+                    elements=validate_fields,
                     expression=constraint.expression,
                     human=constraint.human,
                     key=constraint.key,
