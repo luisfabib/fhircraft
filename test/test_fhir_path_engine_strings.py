@@ -1,5 +1,5 @@
 import pytest
-
+from unittest.mock import patch
 from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
     FHIRPathError,
@@ -35,19 +35,19 @@ def test_string_manipulation_function_checks_type():
 # -------------
 
 
-def test_indexOf_returns_empty_if_empty():
+def test_indexof_returns_empty_if_empty():
     collection = []
     result = IndexOf("").evaluate(collection, env)
     assert result == []
 
 
-def test_indexOf_returns_correct_index_of_substring():
+def test_indexof_returns_correct_index_of_substring():
     collection = [FHIRPathCollectionItem(value="mySubstringValue")]
     result = IndexOf("Substring").evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=2)]
 
 
-def test_indexOf_returns_correct_index_of_substring_with_fhirpath():
+def test_indexof_returns_correct_index_of_substring_with_fhirpath():
     collection = [FHIRPathCollectionItem(value="mySubstringValue")]
     result = IndexOf(EnvironmentVariable("%substring")).evaluate(
         collection, {"%substring": "Substring"}
@@ -55,13 +55,19 @@ def test_indexOf_returns_correct_index_of_substring_with_fhirpath():
     assert result == [FHIRPathCollectionItem(value=2)]
 
 
-def test_indexOf_returns_zero_if_empty_substring():
+def test_indexof_returns_zero_if_empty_substring():
     collection = [FHIRPathCollectionItem(value="mySubstringValue")]
     result = IndexOf("").evaluate(collection, env)
     assert result == [FHIRPathCollectionItem(value=0)]
 
+def test_indexof_uses_evaluation_context():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal("").evaluate) as mock_evaluate:
+        IndexOf(Literal("")).evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == collection[0].value
 
-def test_indexOf_string_representation():
+def test_indexof_string_representation():
     expression = IndexOf("Substring")
     assert str(expression) == "indexOf('Substring')"
 
@@ -108,6 +114,12 @@ def test_substring_returns_empty_if_start_out_of_bounds():
     result = Substring(100).evaluate(collection, env)
     assert result == []
 
+def test_substring_uses_evaluation_context():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal(0).evaluate) as mock_evaluate:
+        Substring(0, 5).evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == collection[0].value
 
 def test_substring_string_representation():
     expression = Substring(2, 11)
@@ -144,6 +156,12 @@ def test_startswith_returns_true_if_starts_with_prefix_with_fhirpath():
     )
     assert result == [FHIRPathCollectionItem(value=True)]
 
+def test_startswith_uses_evaluation_context():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal('mySub').evaluate) as mock_evaluate:
+        StartsWith("mySub").evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == collection[0].value
 
 def test_startswith_string_representation():
     expression = StartsWith("mySub")
@@ -181,6 +199,14 @@ def test_endswith_returns_true_if_ends_with_suffix_with_fhirpath():
     assert result == [FHIRPathCollectionItem(value=True)]
 
 
+def test_endswith_uses_evaluation_context():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal('mySub').evaluate) as mock_evaluate:
+        EndsWith("mySub").evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == collection[0].value
+
+
 def test_endswith_string_representation():
     expression = EndsWith("Value")
     assert str(expression) == "endsWith('Value')"
@@ -215,6 +241,14 @@ def test_contains_returns_true_if_substring_contained_with_fhirpath():
         collection, {"%substring": "Substring"}
     )
     assert result == [FHIRPathCollectionItem(value=True)]
+
+
+def test_contains_uses_evaluation_context():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal('mySub').evaluate) as mock_evaluate:
+        Contains("mySub").evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == collection[0].value
 
 
 def test_contains_string_representation():
@@ -309,6 +343,14 @@ def test_replace_pattern_with_fhirpath():
     assert result == [FHIRPathCollectionItem(value="yourSubstringValue")]
 
 
+def test_replace_uses_evaluation_context():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal('mySub').evaluate) as mock_evaluate:
+        Replace("mySub", "yourSub").evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == collection[0].value
+
+
 def test_replace_string_representation():
     expression = Replace("my", "your")
     assert str(expression) == "replace('my', 'your')"
@@ -345,6 +387,14 @@ def test_matches_returns_true_if_match_with_fhirpath():
     assert result == [FHIRPathCollectionItem(value=True)]
 
 
+def test_matches_uses_evaluation_context():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal('mySub').evaluate) as mock_evaluate:
+        Matches("mySub").evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == collection[0].value
+
+
 def test_matches_string_representation():
     expression = Matches(r"^(?:my).*")
     assert str(expression) == "matches('^(?:my).*')"
@@ -373,6 +423,15 @@ def test_replacematches_pattern_with_fhirpath():
         EnvironmentVariable("%pattern"), EnvironmentVariable("%replacement")
     ).evaluate(collection, {"%pattern": r"^(?:my)", "%replacement": "your"})
     assert result == [FHIRPathCollectionItem(value="yourSubstringValue")]
+
+
+def test_replacematches_uses_evaluation_context():
+    collection = [FHIRPathCollectionItem(value="mySubstringValue")]
+    with patch('fhircraft.fhir.path.engine.strings.Literal.evaluate', wraps=Literal('mySub').evaluate) as mock_evaluate:
+        ReplaceMatches("mySub", "yourSub").evaluate(collection, env)
+        mock_evaluate.assert_called()
+        assert mock_evaluate.call_args[0][1]["$this"] == collection[0].value
+
 
 
 def test_replacematches_string_representation():
