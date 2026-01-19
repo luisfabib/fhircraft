@@ -145,6 +145,8 @@ class Substring(StringManipulationFunction):
         """
         # Validate input collection
         self.validate_collection(collection)
+        if not collection:
+            return []
         # Get string value 
         string_item = collection[0].value
         # Update the evaluation context
@@ -166,7 +168,7 @@ class Substring(StringManipulationFunction):
         ) and not isinstance(end, int):
             raise FHIRPathError("Substring() end argument must resolve to an integer.")
         
-        if not collection or start > len(string_item) - 1:
+        if start > len(string_item) - 1:
             return []
         # Apply substring extraction
         if end is None:
