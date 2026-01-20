@@ -62,77 +62,172 @@ class Extension(Element):
         description="Value of extension",
         default=None,
     )
+    valueBase64Binary_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueBase64Binary extensions",
+        default=None,
+        alias="_valueBase64Binary",
+    )
     valueBoolean: Optional[Boolean] = Field(
         description="Value of extension",
         default=None,
+    )
+    valueBoolean_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueBoolean extensions",
+        default=None,
+        alias="_valueBoolean",
     )
     valueCanonical: Optional[Canonical] = Field(
         description="Value of extension",
         default=None,
     )
+    valueCanonical_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueCanonical extensions",
+        default=None,
+        alias="_valueCanonical",
+    )
     valueCode: Optional[Code] = Field(
         description="Value of extension",
         default=None,
+    )
+    valueCode_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueCode extensions",
+        default=None,
+        alias="_valueCode",
     )
     valueDate: Optional[Date] = Field(
         description="Value of extension",
         default=None,
     )
+    valueDate_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueDate extensions",
+        default=None,
+        alias="_valueDate",
+    )
     valueDateTime: Optional[DateTime] = Field(
         description="Value of extension",
         default=None,
+    )
+    valueDateTime_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
     )
     valueDecimal: Optional[Decimal] = Field(
         description="Value of extension",
         default=None,
     )
+    valueDecimal_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueDecimal extensions",
+        default=None,
+        alias="_valueDecimal",
+    )
     valueId: Optional[Id] = Field(
         description="Value of extension",
         default=None,
+    )
+    valueId_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueId extensions",
+        default=None,
+        alias="_valueId",
     )
     valueInstant: Optional[Instant] = Field(
         description="Value of extension",
         default=None,
     )
+    valueInstant_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueInstant extensions",
+        default=None,
+        alias="_valueInstant",
+    )
     valueInteger: Optional[Integer] = Field(
         description="Value of extension",
         default=None,
+    )
+    valueInteger_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueInteger extensions",
+        default=None,
+        alias="_valueInteger",
     )
     valueMarkdown: Optional[Markdown] = Field(
         description="Value of extension",
         default=None,
     )
+    valueMarkdown_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueMarkdown extensions",
+        default=None,
+        alias="_valueMarkdown",
+    )
     valueOid: Optional[Oid] = Field(
         description="Value of extension",
         default=None,
+    )
+    valueOid_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueOid extensions",
+        default=None,
+        alias="_valueOid",
     )
     valuePositiveInt: Optional[PositiveInt] = Field(
         description="Value of extension",
         default=None,
     )
+    valuePositiveInt_ext: Optional["Element"] = Field(
+        description="Placeholder element for valuePositiveInt extensions",
+        default=None,
+        alias="_valuePositiveInt",
+    )
     valueString: Optional[String] = Field(
         description="Value of extension",
         default=None,
+    )
+    valueString_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueString extensions",
+        default=None,
+        alias="_valueString",
     )
     valueTime: Optional[Time] = Field(
         description="Value of extension",
         default=None,
     )
+    valueTime_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueTime extensions",
+        default=None,
+        alias="_valueTime",
+    )
     valueUnsignedInt: Optional[UnsignedInt] = Field(
         description="Value of extension",
         default=None,
+    )
+    valueUnsignedInt_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueUnsignedInt extensions",
+        default=None,
+        alias="_valueUnsignedInt",
     )
     valueUri: Optional[Uri] = Field(
         description="Value of extension",
         default=None,
     )
+    valueUri_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueUri extensions",
+        default=None,
+        alias="_valueUri",
+    )
     valueUrl: Optional[Url] = Field(
         description="Value of extension",
         default=None,
     )
+    valueUrl_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueUrl extensions",
+        default=None,
+        alias="_valueUrl",
+    )
     valueUuid: Optional[Uuid] = Field(
         description="Value of extension",
         default=None,
+    )
+    valueUuid_ext: Optional["Element"] = Field(
+        description="Placeholder element for valueUuid extensions",
+        default=None,
+        alias="_valueUuid",
     )
     valueAddress: Optional["Address"] = Field(
         description="Value of extension",
