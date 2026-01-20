@@ -3,12 +3,12 @@ import keyword
 import tarfile
 from annotated_types import MaxLen, MinLen
 import pytest
-from typing import Optional, List
+from typing import Optional, List, Union
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from pydantic.aliases import AliasChoices
-from pydantic import ValidationError
+from pydantic import ValidationError, Field
 
 from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
 import fhircraft.fhir.resources.datatypes.primitives as primitives
@@ -17,8 +17,28 @@ from fhircraft.fhir.resources.factory import (
     ConstructionMode,
     _Unset,
 )
-from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft.fhir.resources.base import FHIRBaseModel, BaseModel
 from fhircraft.fhir.resources.definitions import StructureDefinition
+from fhircraft.fhir.resources.datatypes.R4B.complex import Extension, BackboneElement, Element
+from fhircraft.fhir.resources.base import FHIRSliceModel
+
+
+class MockType:
+    profile = ["http://example.org/fhir/StructureDefinition/DummySlice"]
+
+class MockElementDefinitionNode:
+    def __init__(self, definition, children=None, slices=None):
+        self.definition = definition
+        self.children = children or dict()
+        self.slices = slices or dict()
+
+class MockElementDefinition:
+    def __init__(self, type=None, short="A dummy slice", min=1, max="*", definition="Dummy element definition"):
+        self.type = type or []
+        self.short = short
+        self.min = min
+        self.max = max
+        self.definition = definition
 
 
 class FactoryTestCase(TestCase):
@@ -90,7 +110,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "description": "A test resource",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "TestResource",
             "fhirVersion": "4.3.0",
             "snapshot": {
@@ -163,7 +183,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "TestResource",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "TestResource",
             "fhirVersion": "4.3.0",
             "snapshot": {
@@ -211,7 +231,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "TestResource",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "TestResource",
             "fhirVersion": "4.3.0",
             "snapshot": {
@@ -267,7 +287,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "TestResource",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "TestResource",
             "fhirVersion": "4.3.0",
             "snapshot": {
@@ -314,7 +334,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "BaseResource",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "BaseResource",
             "fhirVersion": "4.3.0",
             "snapshot": {
@@ -348,7 +368,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "DerivedResource",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "DerivedResource",
             "baseDefinition": "http://example.org/StructureDefinition/BaseResource",
             "fhirVersion": "4.3.0",
@@ -405,7 +425,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "CachedBase",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "CachedBase",
             "fhirVersion": "4.3.0",
             "snapshot": {
@@ -437,7 +457,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "DerivedFromCached",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "DerivedFromCached",
             "baseDefinition": "http://example.org/StructureDefinition/CachedBase",
             "fhirVersion": "4.3.0",
@@ -498,7 +518,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "ResourceWithMissingBase",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "ResourceWithMissingBase",
             "baseDefinition": "http://example.org/StructureDefinition/NonExistentBase",
             "fhirVersion": "4.3.0",
@@ -541,7 +561,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "CustomPatient",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "fhirVersion": "4.3.0",
@@ -596,7 +616,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "Level1",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Level1",
             "fhirVersion": "4.3.0",
             "snapshot": {
@@ -622,7 +642,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "Level2",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Level2",
             "baseDefinition": "http://example.org/StructureDefinition/Level1",
             "fhirVersion": "4.3.0",
@@ -649,7 +669,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "Level3",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Level3",
             "baseDefinition": "http://example.org/StructureDefinition/Level2",
             "fhirVersion": "4.3.0",
@@ -695,7 +715,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "BaseWithField",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "BaseWithField",
             "fhirVersion": "4.3.0",
             "snapshot": {
@@ -727,7 +747,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "DerivedWithSameField",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "DerivedWithSameField",
             "baseDefinition": "http://example.org/StructureDefinition/BaseWithField",
             "fhirVersion": "4.3.0",
@@ -787,7 +807,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "TestResource",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "TestResource",
             "baseDefinition": "http://example.org/StructureDefinition/SomeBase",
             "fhirVersion": "4.3.0",
@@ -834,7 +854,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "name": "StandaloneResource",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "StandaloneResource",
             # No baseDefinition specified
             "fhirVersion": "4.3.0",
@@ -948,12 +968,21 @@ class TestResourceFactoryPackageMethods(TestCase):
             "name": "Patient",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/DomainResource",
             "derivation": "specialization",
             "snapshot": {
-                "element": [{"id": "Patient", "path": "Patient", "min": 0, "max": "*"}]
+                "element": [
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
+                ]
             },
         }
 
@@ -986,29 +1015,6 @@ class TestResourceFactoryPackageMethods(TestCase):
 
 
 class TestSliceModelInheritance(FactoryTestCase):
-    """
-    Test slice model inheritance functionality to ensure slice models inherit from both FHIRSliceModel and original element type.
-
-    This test class addresses the issue where slice models created by _construct_slice_model
-    during processing of sliced elements only inherit from FHIRSliceModel and not from the original element type.
-
-    Current Issue:
-    - When processing a resource with sliced elements (e.g., Patient with sliced extensions)
-    - The _construct_slice_model method creates slices that only inherit from FHIRSliceModel
-    - This breaks type compatibility because slices can't be used as the original type (Extension)
-
-    Expected Behavior:
-    - Slice models should inherit from BOTH their original element type AND FHIRSliceModel
-    - This enables: isinstance(slice, Extension) AND isinstance(slice, FHIRSliceModel)
-    - Provides access to both original type functionality and slice-specific functionality
-
-    Test Coverage:
-    - Resources with sliced extension elements
-    - Resources with sliced backbone elements
-    - Proper inheritance from both original type and FHIRSliceModel
-    - Assignment compatibility and type checking
-    - Slice-specific cardinality and validation functionality
-    """
 
     @pytest.mark.filterwarnings("ignore:.*dom-6.*")
     def test_resource_with_sliced_extensions_processes_correctly(self):
@@ -1020,7 +1026,7 @@ class TestSliceModelInheritance(FactoryTestCase):
             "name": "PatientWithSlicedExtensions",
             "status": "active",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "fhirVersion": "4.3.0",
@@ -1031,6 +1037,8 @@ class TestSliceModelInheritance(FactoryTestCase):
                         "path": "Patient",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
                     },
                     {
                         "id": "Patient.extension",
@@ -1042,6 +1050,8 @@ class TestSliceModelInheritance(FactoryTestCase):
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "Extension"}],
+                        "definition": "Extension field with slicing",
+                        "base": {"path": "Patient.extension", "min": 0, "max": "*"},
                     },
                     {
                         "id": "Patient.extension:birthPlace",
@@ -1051,6 +1061,8 @@ class TestSliceModelInheritance(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "Extension"}],
                         "short": "Birth place extension slice",
+                        "definition": "Birth place extension slice",
+                        "base": {"path": "Patient.extension", "min": 0, "max": "*"},
                     },
                     {
                         "id": "Patient.extension:birthPlace.url",
@@ -1059,6 +1071,8 @@ class TestSliceModelInheritance(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "uri"}],
                         "fixedUri": "http://hl7.org/fhir/StructureDefinition/patient-birthPlace",
+                        "definition": "URL for birth place extension",
+                        "base": {"path": "Extension.url", "min": 1, "max": "1"},
                     },
                     {
                         "id": "Patient.extension:birthPlace.valueAddress",
@@ -1066,6 +1080,8 @@ class TestSliceModelInheritance(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "Address"}],
+                        "definition": "Address value for birth place",
+                        "base": {"path": "Extension.valueAddress", "min": 0, "max": "1"},
                     },
                 ]
             },
@@ -1092,24 +1108,16 @@ class TestSliceModelInheritance(FactoryTestCase):
 
     def test_construct_slice_model_creates_dual_inheritance(self):
         """Test that _construct_slice_model creates models with dual inheritance."""
-        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
-        from fhircraft.fhir.resources.base import FHIRSliceModel
 
-        # Create a mock element definition for an extension slice
-        class MockElementDefinition:
-            def __init__(self):
-                self.type = []  # Empty type forces dynamic creation
-                self.short = "Test extension slice"
-                self.min = 0
-                self.max = "1"
-                self.children = {}  # No child elements
-
-        mock_definition = MockElementDefinition()
+        mock_node = MockElementDefinitionNode(
+            definition=MockElementDefinition(
+                type=[], short="Test extension slice", min=0, max="1"
+            ))
 
         # Call _construct_slice_model directly
         slice_model = self.factory._construct_slice_model(
             name="test-extension-slice",
-            definition=mock_definition,  # type: ignore
+            node=mock_node, 
             base=Extension,
             base_name="TestExtension",
         )
@@ -1131,26 +1139,20 @@ class TestSliceModelInheritance(FactoryTestCase):
         assert isinstance(instance, Extension), "Instance should be Extension"
         assert isinstance(instance, FHIRSliceModel), "Instance should be FHIRSliceModel"
 
+
     def test_construct_slice_model_with_backbone_element_base(self):
         """Test that _construct_slice_model works with BackboneElement base."""
-        from fhircraft.fhir.resources.datatypes.R4B.complex import BackboneElement
-        from fhircraft.fhir.resources.base import FHIRSliceModel
 
-        # Create a mock element definition for a backbone element slice
-        class MockElementDefinition:
-            def __init__(self):
-                self.type = []
-                self.short = "Test backbone element slice"
-                self.min = 1
-                self.max = "3"
-                self.children = {}
-
-        mock_definition = MockElementDefinition()
+        mock_node = MockElementDefinitionNode(
+            definition=MockElementDefinition(
+                type=[], short="Test backbone slice", min=1, max="3"
+            )
+        )
 
         # Call _construct_slice_model with BackboneElement base
         slice_model = self.factory._construct_slice_model(
             name="test-backbone-slice",
-            definition=mock_definition,  # type: ignore
+            node=mock_node,  # type: ignore
             base=BackboneElement,
             base_name="TestBackbone",
         )
@@ -1174,26 +1176,20 @@ class TestSliceModelInheritance(FactoryTestCase):
         ), "Instance should be BackboneElement"
         assert isinstance(instance, FHIRSliceModel), "Instance should be FHIRSliceModel"
 
+
     def test_slice_model_maintains_original_type_functionality(self):
         """Test that slice models maintain all functionality from their original type."""
-        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
-        from fhircraft.fhir.resources.base import FHIRSliceModel
 
-        # Create a mock element definition
-        class MockElementDefinition:
-            def __init__(self):
-                self.type = []
-                self.short = "Extension with value"
-                self.min = 0
-                self.max = "1"
-                self.children = {}
-
-        mock_definition = MockElementDefinition()
+        mock_node = MockElementDefinitionNode(
+            definition=MockElementDefinition(
+                type=[], short="Simple extension slice", min=0, max="1"
+            )
+        )
 
         # Create slice model
         ExtensionSlice = self.factory._construct_slice_model(
             name="simple-extension-slice",
-            definition=mock_definition,  # type: ignore
+            node=mock_node,  # type: ignore
             base=Extension,
             base_name="SimpleExtension",
         )
@@ -1222,25 +1218,17 @@ class TestSliceModelInheritance(FactoryTestCase):
 
     def test_slice_model_with_complex_inheritance_chain(self):
         """Test slice models work correctly with complex inheritance chains."""
-        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
-        from fhircraft.fhir.resources.datatypes.R4B.complex import Element
-        from fhircraft.fhir.resources.base import FHIRSliceModel
 
-        # Create a mock element definition
-        class MockElementDefinition:
-            def __init__(self):
-                self.type = []
-                self.short = "Complex extension slice"
-                self.min = 1
-                self.max = "1"
-                self.children = {}
-
-        mock_definition = MockElementDefinition()
+        mock_node = MockElementDefinitionNode(
+            definition=MockElementDefinition(
+                type=[], short="Complex extension slice", min=1, max="1"
+            )
+        )
 
         # Extension inherits from Element, which may inherit from other classes
         ExtensionSlice = self.factory._construct_slice_model(
-            name="complex-extension-slice",
-            definition=mock_definition,  # type: ignore
+            name="complex-mock_node-slice",
+            node=mock_node,  # type: ignore
             base=Extension,
             base_name="ComplexExtension",
         )
@@ -1266,31 +1254,18 @@ class TestSliceModelInheritance(FactoryTestCase):
 
     def test_slice_models_can_be_used_in_union_types(self):
         """Test that slice models work correctly in Union type validations."""
-        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
-        from fhircraft.fhir.resources.base import FHIRSliceModel
-        from typing import Union, List, Optional
-        from pydantic import BaseModel, Field
-
-        # Create mock element definitions
-        class MockElementDefinition:
-            def __init__(self, short_desc):
-                self.type = []
-                self.short = short_desc
-                self.min = 0
-                self.max = "1"
-                self.children = {}
 
         # Create two different Extension slices using _construct_slice_model
         ExtensionSliceA = self.factory._construct_slice_model(
             name="extension-a-slice",
-            definition=MockElementDefinition("Extension A slice"),  # type: ignore
+            node=MockElementDefinitionNode(definition=MockElementDefinition(short="Extension A slice", min=0, max="1")),  # type: ignore
             base=Extension,
             base_name="ExtensionA",
         )
 
         ExtensionSliceB = self.factory._construct_slice_model(
             name="extension-b-slice",
-            definition=MockElementDefinition("Extension B slice"),  # type: ignore
+            node=MockElementDefinitionNode(definition=MockElementDefinition(short="Extension B slice", min=0, max="1")),  # type: ignore
             base=Extension,
             base_name="ExtensionB",
         )
@@ -1322,23 +1297,16 @@ class TestSliceModelInheritance(FactoryTestCase):
 
     def test_slice_model_cardinality_preserved(self):
         """Test that slice models preserve cardinality information from FHIRSliceModel."""
-        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
-        from fhircraft.fhir.resources.base import FHIRSliceModel
 
-        # Create mock element definition with custom cardinality
-        class MockElementDefinition:
-            def __init__(self):
-                self.type = []
-                self.short = "Extension with custom cardinality"
-                self.min = 2  # Custom cardinality
-                self.max = "5"
-                self.children = {}
-
-        mock_definition = MockElementDefinition()
+        mock_node = MockElementDefinitionNode(
+            definition=MockElementDefinition(
+                type=[], short="Cardinality extension slice", min=2, max="5"
+            )
+        )
 
         ExtensionSlice = self.factory._construct_slice_model(
             name="cardinality-extension-slice",
-            definition=mock_definition,  # type: ignore
+            node=mock_node,  # type: ignore
             base=Extension,
             base_name="CardinalityExtension",
         )
@@ -1356,24 +1324,17 @@ class TestSliceModelInheritance(FactoryTestCase):
     @pytest.mark.filterwarnings("ignore:.*dom-6.*")
     def test_slice_models_can_be_assigned_to_original_type_fields(self):
         """Test that slice models can be assigned to fields expecting the original type."""
-        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
-        from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
 
-        # Create a mock element definition
-        class MockElementDefinition:
-            def __init__(self):
-                self.type = []
-                self.short = "Patient extension slice"
-                self.min = 0
-                self.max = "1"
-                self.children = {}
-
-        mock_definition = MockElementDefinition()
+        mock_node = MockElementDefinitionNode(
+            definition=MockElementDefinition(
+                type=[], short="Patient extension slice", min=0, max="1"
+            )
+        )
 
         # Create extension slice
         ExtensionSlice = self.factory._construct_slice_model(
             name="patient-extension-slice",
-            definition=mock_definition,  # type: ignore
+            node=mock_node,  # type: ignore
             base=Extension,
             base_name="PatientExtension",
         )
@@ -1397,25 +1358,17 @@ class TestSliceModelInheritance(FactoryTestCase):
 
     def test_slice_models_preserve_method_resolution_order(self):
         """Test that slice models have proper method resolution order."""
-        from fhircraft.fhir.resources.datatypes.R4B.complex.extension import Extension
-        from fhircraft.fhir.resources.datatypes.R4B.complex import Element
-        from fhircraft.fhir.resources.base import FHIRSliceModel
 
-        # Create a mock element definition
-        class MockElementDefinition:
-            def __init__(self):
-                self.type = []
-                self.short = "Test MRO slice"
-                self.min = 0
-                self.max = "1"
-                self.children = {}
-
-        mock_definition = MockElementDefinition()
+        mock_node = MockElementDefinitionNode(
+            definition=MockElementDefinition(
+                type=[], short="MRO test slice", min=0, max="1"
+            )
+        )
 
         # Create slice model
         ExtensionSlice = self.factory._construct_slice_model(
             name="mro-test-slice",
-            definition=mock_definition,  # type: ignore
+            node=mock_node, 
             base=Extension,
             base_name="MROTestExtension",
         )
@@ -1464,11 +1417,18 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestSnapshot",
             "status": "draft",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "snapshot": {
                 "element": [
-                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -1487,12 +1447,19 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestDifferential",
             "status": "draft",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "differential": {
                 "element": [
-                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -1511,17 +1478,31 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestBoth",
             "status": "draft",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "snapshot": {
                 "element": [
-                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
                 ]
             },
             "differential": {
                 "element": [
-                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -1540,11 +1521,18 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestSnapshot",
             "status": "draft",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "snapshot": {
                 "element": [
-                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -1563,12 +1551,19 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestDifferential",
             "status": "draft",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "differential": {
                 "element": [
-                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -1587,11 +1582,18 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestNoSnapshot",
             "status": "draft",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "differential": {
                 "element": [
-                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -1609,11 +1611,18 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestNoDifferential",
             "status": "draft",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "snapshot": {
                 "element": [
-                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -1631,7 +1640,7 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestEmpty",
             "status": "draft",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient"
         }
         sd = StructureDefinition.model_validate(sd_dict)
@@ -1663,7 +1672,7 @@ class TestResolveAndConstructBaseModel(FactoryTestCase):
             "status": "draft",
             "kind": "resource",
             "type": "Resource",
-            "abstract": False,
+            "abstract": True,
         }
         sd = StructureDefinition.model_validate(sd_dict)
         
@@ -1684,7 +1693,7 @@ class TestResolveAndConstructBaseModel(FactoryTestCase):
                 "status": "draft",
                 "kind": "resource",
                 "type": "Resource",
-                "abstract": False,
+                "abstract": True,
                 "baseDefinition": base_url
             }
             sd = StructureDefinition.model_validate(sd_dict)
@@ -1719,7 +1728,7 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "4.3.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "derivation": "constraint",
@@ -1730,13 +1739,17 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
                         "path": "Patient",
                         "short": "Test patient profile",
                         "min": 0,
-                        "max": "*"
+                        "max": "*",
+                        "definition": "Test patient profile",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
                     },
                     {
                         "id": "Patient.identifier",
                         "path": "Patient.identifier",
                         "min": 1,
-                        "max": "*"
+                        "max": "*",
+                        "definition": "Patient identifier",
+                        "base": {"path": "Patient.identifier", "min": 0, "max": "*"},
                     }
                 ]
             }
@@ -1762,7 +1775,7 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "4.3.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "derivation": "constraint",
@@ -1796,7 +1809,7 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "4.3.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "derivation": "constraint",
@@ -1806,7 +1819,9 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
                         "id": "Patient",
                         "path": "Patient",
                         "min": 0,
-                        "max": "*"
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
             }
@@ -1834,7 +1849,7 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "4.3.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "derivation": "constraint",
@@ -1879,7 +1894,7 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "4.3.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "derivation": "constraint",
@@ -1890,7 +1905,8 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
                         "path": "Patient",
                         "min": 0,
                         "max": "*",
-                        "base": {"path": "Patient", "min": 0, "max": "*"}
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
                     },
                     {
                         "id": "Patient.id",
@@ -1898,6 +1914,7 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "id"}],
+                        "definition": "Patient id",
                         "base": {"path": "Resource.id", "min": 0, "max": "1"}
                     }
                 ]
@@ -1922,7 +1939,7 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "4.3.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "snapshot": {
                 "element": [
@@ -1931,7 +1948,8 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
                         "path": "Patient",
                         "min": 0,
                         "max": "*",
-                        "base": {"path": "Patient", "min": 0, "max": "*"}
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
             }
@@ -1955,7 +1973,7 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "4.3.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "snapshot": {
                 "element": [
@@ -1964,7 +1982,8 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
                         "path": "Patient",
                         "min": 0,
                         "max": "*",
-                        "base": {"path": "Patient", "min": 0, "max": "*"}
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
             }
@@ -2019,12 +2038,19 @@ class TestFactoryConfigConstructionMode(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "4.3.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "differential": {
                 "element": [
-                    {"id": "Patient", "path": "Patient", "min": 0, "max": "*"}
+                    {
+                        "id": "Patient",
+                        "path": "Patient",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Patient",
+                        "base": {"path": "Patient", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -2050,23 +2076,27 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
                     {
-                        "id": "MockBase",
-                        "path": "MockBase",
+                        "id": "Resource",
+                        "path": "Resource",
                         "min": 0,
                         "max": "*",
+                        "definition": "Base definition of MockBase",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
                     },
                     {
-                        "id": "MockBase.element",
-                        "path": "MockBase.element",
+                        "id": "Resource.element",
+                        "path": "Resource.element",
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "string"}],
                         "short": "A field specific to the derived resource",
+                        "definition": "A field specific to the derived resource",
+                        "base": {"path": "Resource.element", "min": 0, "max": "*"},
                     },
                 ]
             },
@@ -2086,12 +2116,19 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
-            "type": "Patient",
+            "abstract": True,
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base",
             "differential": {
                 "element": [
-                    {"id": "MockBase.element", "path": "MockBase.element", "min": 0, "max": "2"}
+                    {
+                        "id": "Resource.element",
+                        "path": "Resource.element",
+                        "min": 0,
+                        "max": "2",
+                        "definition": "Constrained element",
+                        "base": {"path": "Resource.element", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -2129,12 +2166,19 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
-            "type": "Patient",
+            "abstract": True,
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base",
             "differential": {
                 "element": [
-                    {"id": "MockBase.element", "path": "MockBase.element", "min": 1, "max": "*"}
+                    {
+                        "id": "Resource.element",
+                        "path": "Resource.element",
+                        "min": 1,
+                        "max": "*",
+                        "definition": "Required element",
+                        "base": {"path": "Resource.element", "min": 0, "max": "*"},
+                    }
                 ]
             }
         }
@@ -2173,14 +2217,14 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseStatus", "path": "MockBaseStatus", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseStatus.status",
-                        "path": "MockBaseStatus.status",
+                        "id": "Resource.status",
+                        "path": "Resource.status",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "code"}],
@@ -2200,14 +2244,14 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
-            "type": "Patient",
+            "abstract": True,
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base-status",
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseStatus.status",
-                        "path": "MockBaseStatus.status",
+                        "id": "Resource.status",
+                        "path": "Resource.status",
                         "fixedCode": "active"
                     }
                 ]
@@ -2242,14 +2286,14 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseCoding", "path": "MockBaseCoding", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseCoding.code",
-                        "path": "MockBaseCoding.code",
+                        "id": "Resource.code",
+                        "path": "Resource.code",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "Coding"}],
@@ -2270,13 +2314,13 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "fhirVersion": "5.0.0",
             "kind": "resource",
             "abstract": False,
-            "type": "Patient",
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base-coding",
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseCoding.code",
-                        "path": "MockBaseCoding.code",
+                        "id": "Resource.code",
+                        "path": "Resource.code",
                         "patternCoding": {
                             "system": "http://example.org/codesystem",
                             "code": "test-code"
@@ -2320,10 +2364,10 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseChoice", "path": "MockBaseChoice", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseChoice.value[x]",
-                        "path": "MockBaseChoice.value[x]",
+                        "id": "Resource.value[x]",
+                        "path": "Resource.value[x]",
                         "min": 0,
                         "max": "1",
                         "type": [
@@ -2353,8 +2397,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseChoice.value[x]",
-                        "path": "MockBaseChoice.value[x]",
+                        "id": "Resource.value[x]",
+                        "path": "Resource.value[x]",
                         "min": 0,
                         "max": "1",
                         "type": [
@@ -2396,10 +2440,10 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseTelecom", "path": "MockBaseTelecom", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseTelecom.telecom",
-                        "path": "MockBaseTelecom.telecom",
+                        "id": "Resource.telecom",
+                        "path": "Resource.telecom",
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "ContactPoint"}],
@@ -2420,13 +2464,13 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "fhirVersion": "5.0.0",
             "kind": "resource",
             "abstract": False,
-            "type": "Patient",
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base-telecom",
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseTelecom.telecom",
-                        "path": "MockBaseTelecom.telecom",
+                        "id": "Resource.telecom",
+                        "path": "Resource.telecom",
                         "min": 1,
                         "max": "*"
                     }
@@ -2474,10 +2518,10 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseIdentifier", "path": "MockBaseIdentifier", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseIdentifier.identifier",
-                        "path": "MockBaseIdentifier.identifier",
+                        "id": "Resource.identifier",
+                        "path": "Resource.identifier",
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "Identifier"}],
@@ -2498,13 +2542,13 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "fhirVersion": "5.0.0",
             "kind": "resource",
             "abstract": False,
-            "type": "Patient",
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base-identifier",
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseIdentifier.identifier",
-                        "path": "MockBaseIdentifier.identifier",
+                        "id": "Resource.identifier",
+                        "path": "Resource.identifier",
                         "min": 1,
                         "max": "3"
                     },
@@ -2542,10 +2586,10 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseConstraint", "path": "MockBaseConstraint", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseConstraint.value",
-                        "path": "MockBaseConstraint.value",
+                        "id": "Resource.value",
+                        "path": "Resource.value",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "integer"}],
@@ -2566,13 +2610,13 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "fhirVersion": "5.0.0",
             "kind": "resource",
             "abstract": False,
-            "type": "Patient",
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base-constraint",
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseConstraint",
-                        "path": "MockBaseConstraint",
+                        "id": "Resource",
+                        "path": "Resource",
                         "constraint": [
                             {
                                 "key": "val-1",
@@ -2622,24 +2666,24 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseMulti", "path": "MockBaseMulti", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseMulti.status",
-                        "path": "MockBaseMulti.status",
+                        "id": "Resource.status",
+                        "path": "Resource.status",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "code"}],
                     },
                     {
-                        "id": "MockBaseMulti.priority",
-                        "path": "MockBaseMulti.priority",
+                        "id": "Resource.priority",
+                        "path": "Resource.priority",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "code"}],
                     },
                     {
-                        "id": "MockBaseMulti.text",
-                        "path": "MockBaseMulti.text",
+                        "id": "Resource.text",
+                        "path": "Resource.text",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
@@ -2660,24 +2704,24 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "fhirVersion": "5.0.0",
             "kind": "resource",
             "abstract": False,
-            "type": "Patient",
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base-multi",
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseMulti.status",
-                        "path": "MockBaseMulti.status",
+                        "id": "Resource.status",
+                        "path": "Resource.status",
                         "min": 1,  # Make required
                         "fixedCode": "active"  # Fix value
                     },
                     {
-                        "id": "MockBaseMulti.priority",
-                        "path": "MockBaseMulti.priority",
+                        "id": "Resource.priority",
+                        "path": "Resource.priority",
                         "patternCode": "high"  # Pattern constraint
                     },
                     {
-                        "id": "MockBaseMulti.text",
-                        "path": "MockBaseMulti.text",
+                        "id": "Resource.text",
+                        "path": "Resource.text",
                         "min": 1,  # Make required
                         "max": "1"
                     }
@@ -2732,24 +2776,24 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseComplex", "path": "MockBaseComplex", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseComplex.field1",
-                        "path": "MockBaseComplex.field1",
+                        "id": "Resource.field1",
+                        "path": "Resource.field1",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
                     },
                     {
-                        "id": "MockBaseComplex.field2",
-                        "path": "MockBaseComplex.field2",
+                        "id": "Resource.field2",
+                        "path": "Resource.field2",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "integer"}],
                     },
                     {
-                        "id": "MockBaseComplex.field3",
-                        "path": "MockBaseComplex.field3",
+                        "id": "Resource.field3",
+                        "path": "Resource.field3",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "boolean"}],
@@ -2770,13 +2814,13 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "fhirVersion": "5.0.0",
             "kind": "resource",
             "abstract": False,
-            "type": "Patient",
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base-complex",
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseComplex.field1",
-                        "path": "MockBaseComplex.field1",
+                        "id": "Resource.field1",
+                        "path": "Resource.field1",
                         "min": 1  # Only constrain field1
                     }
                 ]
@@ -2819,17 +2863,17 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseExtension", "path": "MockBaseExtension", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseExtension.extension",
-                        "path": "MockBaseExtension.extension",
+                        "id": "Resource.extension",
+                        "path": "Resource.extension",
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "Extension"}],
                     },
                     {
-                        "id": "MockBaseExtension.extension.url",
-                        "path": "MockBaseExtension.extension.url",
+                        "id": "Resource.extension.url",
+                        "path": "Resource.extension.url",
                         "min": 1,
                         "max": "1",
                         "type": [{"code": "uri"}],
@@ -2850,13 +2894,13 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "fhirVersion": "5.0.0",
             "kind": "resource",
             "abstract": False,
-            "type": "Patient",
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base-extension",
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseExtension.extension",
-                        "path": "MockBaseExtension.extension",
+                        "id": "Resource.extension",
+                        "path": "Resource.extension",
                         "slicing": {
                             "discriminator": [
                                 {
@@ -2870,45 +2914,45 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "max": "*"
                     },
                     {
-                        "id": "MockBaseExtension.extension:birthPlace",
-                        "path": "MockBaseExtension.extension",
+                        "id": "Resource.extension:birthPlace",
+                        "path": "Resource.extension",
                         "sliceName": "birthPlace",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "Extension"}],
                     },
                     {
-                        "id": "MockBaseExtension.extension:birthPlace.url",
-                        "path": "MockBaseExtension.extension.url",
+                        "id": "Resource.extension:birthPlace.url",
+                        "path": "Resource.extension.url",
                         "min": 1,
                         "max": "1",
                         "fixedUri": "http://example.org/birthPlace"
                     },
                     {
-                        "id": "MockBaseExtension.extension:birthPlace.valueString",
-                        "path": "MockBaseExtension.extension.valueString",
+                        "id": "Resource.extension:birthPlace.valueString",
+                        "path": "Resource.extension.valueString",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
                     },
                     {
-                        "id": "MockBaseExtension.extension:nationality",
-                        "path": "MockBaseExtension.extension",
+                        "id": "Resource.extension:nationality",
+                        "path": "Resource.extension",
                         "sliceName": "nationality",
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "Extension"}],
                     },
                     {
-                        "id": "MockBaseExtension.extension:nationality.url",
-                        "path": "MockBaseExtension.extension.url",
+                        "id": "Resource.extension:nationality.url",
+                        "path": "Resource.extension.url",
                         "min": 1,
                         "max": "1",
                         "fixedUri": "http://example.org/nationality"
                     },
                     {
-                        "id": "MockBaseExtension.extension:nationality.valueCodeableConcept",
-                        "path": "MockBaseExtension.extension.valueCodeableConcept",
+                        "id": "Resource.extension:nationality.valueCodeableConcept",
+                        "path": "Resource.extension.valueCodeableConcept",
                         "min": 1,
                         "max": "1",
                         "type": [{"code": "CodeableConcept"}],
@@ -2967,24 +3011,24 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "MockBaseComponent", "path": "MockBaseComponent", "min": 0, "max": "*"},
+                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
                     {
-                        "id": "MockBaseComponent.component",
-                        "path": "MockBaseComponent.component",
+                        "id": "Resource.component",
+                        "path": "Resource.component",
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "BackboneElement"}],
                     },
                     {
-                        "id": "MockBaseComponent.component.code",
-                        "path": "MockBaseComponent.component.code",
+                        "id": "Resource.component.code",
+                        "path": "Resource.component.code",
                         "min": 1,
                         "max": "1",
                         "type": [{"code": "CodeableConcept"}],
                     },
                     {
-                        "id": "MockBaseComponent.component.value[x]",
-                        "path": "MockBaseComponent.component.value[x]",
+                        "id": "Resource.component.value[x]",
+                        "path": "Resource.component.value[x]",
                         "min": 0,
                         "max": "1",
                         "type": [
@@ -3013,8 +3057,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "differential": {
                 "element": [
                     {
-                        "id": "MockBaseComponent.component",
-                        "path": "MockBaseComponent.component",
+                        "id": "Resource.component",
+                        "path": "Resource.component",
                         "slicing": {
                             "discriminator": [
                                 {
@@ -3028,15 +3072,15 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "max": "*"
                     },
                     {
-                        "id": "MockBaseComponent.component:systolic",
-                        "path": "MockBaseComponent.component",
+                        "id": "Resource.component:systolic",
+                        "path": "Resource.component",
                         "sliceName": "systolic",
                         "min": 1,
                         "max": "1",
                     },
                     {
-                        "id": "MockBaseComponent.component:systolic.code",
-                        "path": "MockBaseComponent.component.code",
+                        "id": "Resource.component:systolic.code",
+                        "path": "Resource.component.code",
                         "patternCodeableConcept": {
                             "coding": [
                                 {
@@ -3047,22 +3091,22 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         }
                     },
                     {
-                        "id": "MockBaseComponent.component:systolic.valueQuantity",
-                        "path": "MockBaseComponent.component.valueQuantity",
+                        "id": "Resource.component:systolic.valueQuantity",
+                        "path": "Resource.component.valueQuantity",
                         "min": 1,
                         "max": "1",
                         "type": [{"code": "Quantity"}],
                     },
                     {
-                        "id": "MockBaseComponent.component:diastolic",
-                        "path": "MockBaseComponent.component",
+                        "id": "Resource.component:diastolic",
+                        "path": "Resource.component",
                         "sliceName": "diastolic",
                         "min": 1,
                         "max": "1",
                     },
                     {
-                        "id": "MockBaseComponent.component:diastolic.code",
-                        "path": "MockBaseComponent.component.code",
+                        "id": "Resource.component:diastolic.code",
+                        "path": "Resource.component.code",
                         "patternCodeableConcept": {
                             "coding": [
                                 {
@@ -3073,8 +3117,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         }
                     },
                     {
-                        "id": "MockBaseComponent.component:diastolic.valueQuantity",
-                        "path": "MockBaseComponent.component.valueQuantity",
+                        "id": "Resource.component:diastolic.valueQuantity",
+                        "path": "Resource.component.valueQuantity",
                         "min": 1,
                         "max": "1",
                         "type": [{"code": "Quantity"}],
