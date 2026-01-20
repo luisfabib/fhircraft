@@ -97,8 +97,8 @@ class ConstructionMode(str, Enum):
 class StructureNode(BaseModel):
     """A node in the ElementDefinition tree structure."""
 
-    id: str = Field(...)
-    path: str = Field(...)
+    id: str | None = Field(default=None)
+    path: str | None = Field(default=None)
     node_label: str = Field(...)
     children: Dict[str, "StructureNode"] = Field(default_factory=dict)
     slices: Dict[str, "StructureNode"] = Field(default_factory=dict)
@@ -202,9 +202,7 @@ class ResourceFactoryValidators:
                 validate_fields.extend(validator.keywords.get("elements", []))
         # Add the current field to the list of validated fields
         if constraint.expression:
-            self._validators[validator_name] = model_validator(
-                mode="after"
-            )(
+            self._validators[validator_name] = model_validator(mode="after")(
                 partial(
                     fhir_validators.validate_element_constraint,
                     elements=validate_fields,
@@ -535,15 +533,14 @@ class ResourceFactory:
 
         Args:
             elements (List[ElementDefinition]):
-                A list of ElementDefinition objects representing the structure to be organized.
+                A list of `ElementDefinition` objects representing the structure to be organized.
 
         Returns:
             List[StructureNode]:
-                A list of top-level StructureNode objects representing the root children of the constructed tree.
-
+                A list of top-level `StructureNode` objects representing the root children of the constructed tree.
         Notes:
-            - Slice definitions (e.g., "element:sliceName") are handled by creating separate nodes under the appropriate parent.
-            - Each node in the tree is an instance of StructureNode, with children and slices populated as needed.
+            - Slice definitions (e.g., `element:sliceName`) are handled by creating separate nodes under the appropriate parent.
+            - Each node in the tree is an instance of `StructureNode`, with children and slices populated as needed.
             - The root node is a synthetic node and is not included in the returned list.
             - For differential mode, missing parent elements are created as placeholder nodes automatically.
         """
@@ -584,13 +581,17 @@ class ResourceFactory:
                         sliceName,
                         StructureNode.model_validate(
                             {
-                                "id": ".".join(id_parts[: index + 1]),
-                                "path": ".".join(id_parts[: index + 1]),
                                 "node_label": sliceName,
                                 "path": "__root__",
                                 "root": root,
                                 "children": {},
                                 "slices": {},
+                                "id": (
+                                    element.id if index == len(id_parts) - 1 else None
+                                ),
+                                "path": (
+                                    element.path if index == len(id_parts) - 1 else None
+                                ),
                                 "definition": (
                                     element if index == len(id_parts) - 1 else None
                                 ),
@@ -604,11 +605,15 @@ class ResourceFactory:
                         part,
                         StructureNode.model_validate(
                             {
-                                "id": ".".join(id_parts[: index + 1]),
-                                "path": ".".join(id_parts[: index + 1]),
                                 "node_label": part,
                                 "root": root,
                                 "path": "__root__",
+                                "id": (
+                                    element.id if index == len(id_parts) - 1 else None
+                                ),
+                                "path": (
+                                    element.path if index == len(id_parts) - 1 else None
+                                ),
                                 "definition": (
                                     element if index == len(id_parts) - 1 else None
                                 ),
@@ -1287,7 +1292,7 @@ class ResourceFactory:
                 [capitalize(label).strip() for label in reference_path.split(".")[1:]]
             )
             ElementDefinitionType = get_complex_FHIR_type(
-                "ElementDefinition", self.Config.FHIR_release
+                "ElementDefinitionType", self.Config.FHIR_release
             )
 
             node.definition.type = [ElementDefinitionType(code=backbone_model_name)]  # type: ignore
@@ -1367,6 +1372,7 @@ class ResourceFactory:
                     f"SNAPSHOT mode requested but StructureDefinition '{structure_definition.name}' "
                     "does not have a snapshot element."
                 )
+            return ConstructionMode.SNAPSHOT
         elif mode == ConstructionMode.DIFFERENTIAL:
             if (
                 not structure_definition.differential
@@ -1376,33 +1382,32 @@ class ResourceFactory:
                     f"DIFFERENTIAL mode requested but StructureDefinition '{structure_definition.name}' "
                     "does not have a differential element."
                 )
-        else:
-            return ConstructionMode.AUTO
-
-        # AUTO mode: detect based on available elements
-        has_differential = (
-            structure_definition.differential is not None
-            and structure_definition.differential.element is not None
-            and len(structure_definition.differential.element) > 0
-        )
-        has_snapshot = (
-            structure_definition.snapshot is not None
-            and structure_definition.snapshot.element is not None
-            and len(structure_definition.snapshot.element) > 0
-        )
-
-        if not has_differential and not has_snapshot:
-            raise ValueError(
-                f"Invalid StructureDefinition '{structure_definition.name}': "
-                "Must have either 'snapshot' or 'differential' with elements (FHIR constraint sdf-6)."
-            )
-
-        # Prefer differential if both are present (typical for profiles)
-        # Otherwise use whichever is available
-        if has_differential:
             return ConstructionMode.DIFFERENTIAL
         else:
-            return ConstructionMode.SNAPSHOT
+            # AUTO mode: detect based on available elements
+            has_differential = (
+                structure_definition.differential is not None
+                and structure_definition.differential.element is not None
+                and len(structure_definition.differential.element) > 0
+            )
+            has_snapshot = (
+                structure_definition.snapshot is not None
+                and structure_definition.snapshot.element is not None
+                and len(structure_definition.snapshot.element) > 0
+            )
+
+            if not has_differential and not has_snapshot:
+                raise ValueError(
+                    f"Invalid StructureDefinition '{structure_definition.name}': "
+                    "Must have either 'snapshot' or 'differential' with elements (FHIR constraint sdf-6)."
+                )
+
+            # Prefer differential if both are present (typical for profiles)
+            # Otherwise use whichever is available
+            if has_differential:
+                return ConstructionMode.DIFFERENTIAL
+            else:
+                return ConstructionMode.SNAPSHOT
 
     def _resolve_and_construct_base_model(
         self,
@@ -1509,7 +1514,7 @@ class ResourceFactory:
 
     def _process_FHIR_structure_into_Pydantic_components(
         self,
-        structure: StructureNode,
+        root_node: StructureNode,
         base: Any | None = None,
         resource_name: str = "Unknown",
     ) -> Tuple[
@@ -1531,8 +1536,8 @@ class ResourceFactory:
         fields = {}
         validators = ResourceFactoryValidators()
         properties = {}
-        for name, node in structure.children.items():
-            if not node.definition:
+        for name, node in root_node.children.items():
+            if node.definition is None:
                 raise ValueError(f"Element definition for '{name}' is missing.")
             # Handle Python reserved keywords for field names early
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
@@ -1897,7 +1902,7 @@ class ResourceFactory:
         assert (
             len(nodes) == 1
         ), f"StructureDefinition {resolved_mode.value} must have exactly one root element."
-        structure = nodes[0]
+        root_node = nodes[0]
         resource_type = _structure_definition.type
         # Configure the factory for the current FHIR environment
         if not _structure_definition.fhirVersion:
@@ -1908,14 +1913,15 @@ class ResourceFactory:
         # Process the FHIR resource's elements & constraints into Pydantic fields & validators
         fields, validators, properties = (
             self._process_FHIR_structure_into_Pydantic_components(
-                structure,
+                root_node,
                 resource_name=_structure_definition.name,
                 base=base,
             )
         )
         # Process resource-level constraints
-        for constraint in structure.definition.constraint or []:
-            validators.add_model_constraint_validator(constraint)
+        if root_node.definition:
+            for constraint in root_node.definition.constraint or []:
+                validators.add_model_constraint_validator(constraint)
 
         # If the resource has metadata, prefill the information
         if "meta" in fields or "meta" in getattr(base, "model_fields", {}):

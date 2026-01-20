@@ -19,12 +19,17 @@ from fhircraft.fhir.resources.factory import (
 )
 from fhircraft.fhir.resources.base import FHIRBaseModel, BaseModel
 from fhircraft.fhir.resources.definitions import StructureDefinition
-from fhircraft.fhir.resources.datatypes.R4B.complex import Extension, BackboneElement, Element
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
+    Extension,
+    BackboneElement,
+    Element,
+)
 from fhircraft.fhir.resources.base import FHIRSliceModel
 
 
 class MockType:
     profile = ["http://example.org/fhir/StructureDefinition/DummySlice"]
+
 
 class MockElementDefinitionNode:
     def __init__(self, definition, children=None, slices=None):
@@ -32,8 +37,16 @@ class MockElementDefinitionNode:
         self.children = children or dict()
         self.slices = slices or dict()
 
+
 class MockElementDefinition:
-    def __init__(self, type=None, short="A dummy slice", min=1, max="*", definition="Dummy element definition"):
+    def __init__(
+        self,
+        type=None,
+        short="A dummy slice",
+        min=1,
+        max="*",
+        definition="Dummy element definition",
+    ):
         self.type = type or []
         self.short = short
         self.min = min
@@ -48,7 +61,9 @@ class FactoryTestCase(TestCase):
         super().setUpClass()
         cls.factory = ResourceFactory()
         cls.factory.Config = cls.factory.FactoryConfig(
-            FHIR_release="R4B", FHIR_version="4.3.0", construction_mode=ConstructionMode.SNAPSHOT
+            FHIR_release="R4B",
+            FHIR_version="4.3.0",
+            construction_mode=ConstructionMode.SNAPSHOT,
         )
 
 
@@ -355,7 +370,11 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "type": [{"code": "string"}],
                         "short": "A field from the base resource",
                         "definition": "A field from the base resource",
-                        "base": {"path": "BaseResource.baseField", "min": 0, "max": "1"},
+                        "base": {
+                            "path": "BaseResource.baseField",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                 ]
             },
@@ -390,7 +409,11 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "type": [{"code": "string"}],
                         "short": "A field specific to the derived resource",
                         "definition": "A field specific to the derived resource",
-                        "base": {"path": "DerivedResource.derivedField", "min": 0, "max": "1"},
+                        "base": {
+                            "path": "DerivedResource.derivedField",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                 ]
             },
@@ -478,7 +501,11 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "definition": "Field 2 of DerivedFromCached",
-                        "base": {"path": "DerivedFromCached.field2", "min": 0, "max": "1"},
+                        "base": {
+                            "path": "DerivedFromCached.field2",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                 ]
             },
@@ -530,7 +557,11 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "min": 0,
                         "max": "*",
                         "definition": "Base definition of ResourceWithMissingBase",
-                        "base": {"path": "ResourceWithMissingBase", "min": 0, "max": "*"},
+                        "base": {
+                            "path": "ResourceWithMissingBase",
+                            "min": 0,
+                            "max": "*",
+                        },
                     },
                     {
                         "id": "ResourceWithMissingBase.field1",
@@ -539,7 +570,11 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "definition": "Field 1 of ResourceWithMissingBase",
-                        "base": {"path": "ResourceWithMissingBase.field1", "min": 0, "max": "1"},
+                        "base": {
+                            "path": "ResourceWithMissingBase.field1",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                 ]
             },
@@ -621,7 +656,14 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
-                    {"id": "Level1", "path": "Level1", "min": 0, "max": "*", "definition": "Base definition of Level1", "base": {"path": "Level1", "min": 0, "max": "*"}},
+                    {
+                        "id": "Level1",
+                        "path": "Level1",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Level1",
+                        "base": {"path": "Level1", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Level1.level1Field",
                         "path": "Level1.level1Field",
@@ -648,7 +690,14 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
-                    {"id": "Level2", "path": "Level2", "min": 0, "max": "*", "definition": "Base definition of Level2", "base": {"path": "Level2", "min": 0, "max": "*"}},
+                    {
+                        "id": "Level2",
+                        "path": "Level2",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Level2",
+                        "base": {"path": "Level2", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Level2.level2Field",
                         "path": "Level2.level2Field",
@@ -675,7 +724,14 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
-                    {"id": "Level3", "path": "Level3", "min": 0, "max": "*", "definition": "Base definition of Level3", "base": {"path": "Level3", "min": 0, "max": "*"}},
+                    {
+                        "id": "Level3",
+                        "path": "Level3",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Level3",
+                        "base": {"path": "Level3", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Level3.level3Field",
                         "path": "Level3.level3Field",
@@ -735,7 +791,11 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "definition": "Shared field in BaseWithField",
-                        "base": {"path": "BaseWithField.sharedField", "min": 0, "max": "1"},
+                        "base": {
+                            "path": "BaseWithField.sharedField",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                 ]
             },
@@ -768,7 +828,11 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "definition": "Shared field in DerivedWithSameField",
-                        "base": {"path": "DerivedWithSameField.sharedField", "min": 0, "max": "1"},
+                        "base": {
+                            "path": "DerivedWithSameField.sharedField",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                     {
                         "id": "DerivedWithSameField.ownField",
@@ -777,7 +841,11 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "definition": "Own field in DerivedWithSameField",
-                        "base": {"path": "DerivedWithSameField.ownField", "min": 0, "max": "1"},
+                        "base": {
+                            "path": "DerivedWithSameField.ownField",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                 ]
             },
@@ -875,7 +943,11 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "string"}],
                         "definition": "Field 1 of StandaloneResource",
-                        "base": {"path": "StandaloneResource.field1", "min": 0, "max": "1"},
+                        "base": {
+                            "path": "StandaloneResource.field1",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                 ]
             },
@@ -1081,7 +1153,11 @@ class TestSliceModelInheritance(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "Address"}],
                         "definition": "Address value for birth place",
-                        "base": {"path": "Extension.valueAddress", "min": 0, "max": "1"},
+                        "base": {
+                            "path": "Extension.valueAddress",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                 ]
             },
@@ -1112,12 +1188,13 @@ class TestSliceModelInheritance(FactoryTestCase):
         mock_node = MockElementDefinitionNode(
             definition=MockElementDefinition(
                 type=[], short="Test extension slice", min=0, max="1"
-            ))
+            )
+        )
 
         # Call _construct_slice_model directly
         slice_model = self.factory._construct_slice_model(
             name="test-extension-slice",
-            node=mock_node, 
+            node=mock_node,
             base=Extension,
             base_name="TestExtension",
         )
@@ -1138,7 +1215,6 @@ class TestSliceModelInheritance(FactoryTestCase):
         instance = slice_model(url="http://example.com/test", valueString="test value")
         assert isinstance(instance, Extension), "Instance should be Extension"
         assert isinstance(instance, FHIRSliceModel), "Instance should be FHIRSliceModel"
-
 
     def test_construct_slice_model_with_backbone_element_base(self):
         """Test that _construct_slice_model works with BackboneElement base."""
@@ -1175,7 +1251,6 @@ class TestSliceModelInheritance(FactoryTestCase):
             instance, BackboneElement
         ), "Instance should be BackboneElement"
         assert isinstance(instance, FHIRSliceModel), "Instance should be FHIRSliceModel"
-
 
     def test_slice_model_maintains_original_type_functionality(self):
         """Test that slice models maintain all functionality from their original type."""
@@ -1368,7 +1443,7 @@ class TestSliceModelInheritance(FactoryTestCase):
         # Create slice model
         ExtensionSlice = self.factory._construct_slice_model(
             name="mro-test-slice",
-            node=mock_node, 
+            node=mock_node,
             base=Extension,
             base_name="MROTestExtension",
         )
@@ -1430,12 +1505,12 @@ class TestDetectConstructionMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
         sd = StructureDefinition.model_validate(sd_dict)
-        
+
         mode = self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
-        
+
         assert mode == ConstructionMode.SNAPSHOT
 
     def test_detects_differential_mode_with_differential_only(self):
@@ -1461,12 +1536,12 @@ class TestDetectConstructionMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
         sd = StructureDefinition.model_validate(sd_dict)
-        
+
         mode = self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
-        
+
         assert mode == ConstructionMode.DIFFERENTIAL
 
     def test_prefers_differential_when_both_present(self):
@@ -1504,12 +1579,12 @@ class TestDetectConstructionMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
         sd = StructureDefinition.model_validate(sd_dict)
-        
+
         mode = self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
-        
+
         assert mode == ConstructionMode.DIFFERENTIAL
 
     def test_respects_explicit_snapshot_mode(self):
@@ -1534,12 +1609,12 @@ class TestDetectConstructionMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
         sd = StructureDefinition.model_validate(sd_dict)
-        
+
         mode = self.factory._detect_construction_mode(sd, ConstructionMode.SNAPSHOT)
-        
+
         assert mode == ConstructionMode.SNAPSHOT
 
     def test_respects_explicit_differential_mode(self):
@@ -1565,12 +1640,12 @@ class TestDetectConstructionMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
         sd = StructureDefinition.model_validate(sd_dict)
-        
+
         mode = self.factory._detect_construction_mode(sd, ConstructionMode.DIFFERENTIAL)
-        
+
         assert mode == ConstructionMode.DIFFERENTIAL
 
     def test_raises_error_when_snapshot_requested_but_missing(self):
@@ -1595,10 +1670,10 @@ class TestDetectConstructionMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
         sd = StructureDefinition.model_validate(sd_dict)
-        
+
         with pytest.raises(ValueError, match="SNAPSHOT mode requested but"):
             self.factory._detect_construction_mode(sd, ConstructionMode.SNAPSHOT)
 
@@ -1624,10 +1699,10 @@ class TestDetectConstructionMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
         sd = StructureDefinition.model_validate(sd_dict)
-        
+
         with pytest.raises(ValueError, match="DIFFERENTIAL mode requested but"):
             self.factory._detect_construction_mode(sd, ConstructionMode.DIFFERENTIAL)
 
@@ -1641,11 +1716,13 @@ class TestDetectConstructionMode(FactoryTestCase):
             "status": "draft",
             "kind": "resource",
             "abstract": True,
-            "type": "Patient"
+            "type": "Patient",
         }
         sd = StructureDefinition.model_validate(sd_dict)
-        
-        with pytest.raises(ValueError, match="Must have either 'snapshot' or 'differential'"):
+
+        with pytest.raises(
+            ValueError, match="Must have either 'snapshot' or 'differential'"
+        ):
             self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
 
 
@@ -1664,7 +1741,7 @@ class TestResolveAndConstructBaseModel(FactoryTestCase):
         base_url = "http://example.org/StructureDefinition/cached-base"
         cached_model = type("CachedBase", (FHIRBaseModel,), {})
         self.factory.construction_cache[base_url] = cached_model
-        
+
         sd_dict = {
             "resourceType": "StructureDefinition",
             "url": "http://example.org/StructureDefinition/test",
@@ -1675,16 +1752,16 @@ class TestResolveAndConstructBaseModel(FactoryTestCase):
             "abstract": True,
         }
         sd = StructureDefinition.model_validate(sd_dict)
-        
+
         result = self.factory._resolve_and_construct_base_model(base_url, sd)
-        
+
         assert result is cached_model
 
     def test_detects_circular_reference(self):
         """Test that circular references are detected and FHIRBaseModel is returned."""
         base_url = "http://example.org/StructureDefinition/circular"
         self.factory.paths_in_processing.add(base_url)
-        
+
         try:
             sd_dict = {
                 "resourceType": "StructureDefinition",
@@ -1694,13 +1771,13 @@ class TestResolveAndConstructBaseModel(FactoryTestCase):
                 "kind": "resource",
                 "type": "Resource",
                 "abstract": True,
-                "baseDefinition": base_url
+                "baseDefinition": base_url,
             }
             sd = StructureDefinition.model_validate(sd_dict)
-            
+
             with pytest.warns(UserWarning, match="Circular reference detected"):
                 result = self.factory._resolve_and_construct_base_model(base_url, sd)
-            
+
             assert result == FHIRBaseModel
         finally:
             # Clean up the paths_in_processing
@@ -1750,17 +1827,16 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
                         "max": "*",
                         "definition": "Patient identifier",
                         "base": {"path": "Patient.identifier", "min": 0, "max": "*"},
-                    }
+                    },
                 ]
-            }
+            },
         }
-        
+
         # This should auto-detect DIFFERENTIAL mode
         model = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.AUTO
+            structure_definition=differential_sd, mode=ConstructionMode.AUTO
         )
-        
+
         assert model is not None
         assert model.__name__ == "TestPatientProfile"
         assert hasattr(model, "model_fields")
@@ -1780,22 +1856,14 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "derivation": "constraint",
             "differential": {
-                "element": [
-                    {
-                        "id": "Patient",
-                        "path": "Patient",
-                        "min": 0,
-                        "max": "*"
-                    }
-                ]
-            }
+                "element": [{"id": "Patient", "path": "Patient", "min": 0, "max": "*"}]
+            },
         }
-        
+
         model = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         assert model is not None
         assert model.__name__ == "TestPatientProfile2"
 
@@ -1824,19 +1892,18 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
-        
+
         model1 = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # Second construction should return cached model
         model2 = self.factory.construct_resource_model(
             canonical_url=differential_sd["url"]
         )
-        
+
         assert model1 is model2
 
     def test_differential_inherits_from_base(self):
@@ -1854,22 +1921,14 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
             "derivation": "constraint",
             "differential": {
-                "element": [
-                    {
-                        "id": "Patient",
-                        "path": "Patient",
-                        "min": 0,
-                        "max": "*"
-                    }
-                ]
-            }
+                "element": [{"id": "Patient", "path": "Patient", "min": 0, "max": "*"}]
+            },
         }
-        
+
         model = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # Should inherit from FHIRBaseModel (since base Patient might not be available)
         assert issubclass(model, FHIRBaseModel)
 
@@ -1915,17 +1974,16 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
                         "max": "1",
                         "type": [{"code": "id"}],
                         "definition": "Patient id",
-                        "base": {"path": "Resource.id", "min": 0, "max": "1"}
-                    }
+                        "base": {"path": "Resource.id", "min": 0, "max": "1"},
+                    },
                 ]
-            }
+            },
         }
-        
+
         model = self.factory.construct_resource_model(
-            structure_definition=snapshot_sd,
-            mode=ConstructionMode.AUTO
+            structure_definition=snapshot_sd, mode=ConstructionMode.AUTO
         )
-        
+
         assert model is not None
         assert model.__name__ == "TestSnapshotPatient"
 
@@ -1952,14 +2010,13 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
-        
+
         model = self.factory.construct_resource_model(
-            structure_definition=snapshot_sd,
-            mode=ConstructionMode.SNAPSHOT
+            structure_definition=snapshot_sd, mode=ConstructionMode.SNAPSHOT
         )
-        
+
         assert model is not None
         assert model.__name__ == "TestSnapshotExplicit"
 
@@ -1986,14 +2043,12 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
-        
+
         # Don't specify mode - should default to AUTO
-        model = self.factory.construct_resource_model(
-            structure_definition=snapshot_sd
-        )
-        
+        model = self.factory.construct_resource_model(structure_definition=snapshot_sd)
+
         assert model is not None
         assert model.__name__ == "TestBackwardCompat"
 
@@ -2013,19 +2068,16 @@ class TestFactoryConfigConstructionMode(FactoryTestCase):
         config = self.factory.FactoryConfig(
             FHIR_release="R4B",
             FHIR_version="4.3.0",
-            construction_mode=ConstructionMode.DIFFERENTIAL
+            construction_mode=ConstructionMode.DIFFERENTIAL,
         )
-        
+
         assert hasattr(config, "construction_mode")
         assert config.construction_mode == ConstructionMode.DIFFERENTIAL
 
     def test_factory_config_construction_mode_default(self):
         """Test that FactoryConfig construction_mode has default value."""
-        config = self.factory.FactoryConfig(
-            FHIR_release="R4B",
-            FHIR_version="4.3.0"
-        )
-        
+        config = self.factory.FactoryConfig(FHIR_release="R4B", FHIR_version="4.3.0")
+
         assert config.construction_mode == ConstructionMode.AUTO
 
     def test_construct_sets_construction_mode_in_config(self):
@@ -2052,17 +2104,17 @@ class TestFactoryConfigConstructionMode(FactoryTestCase):
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
-        
+
         self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.AUTO
+            structure_definition=differential_sd, mode=ConstructionMode.AUTO
         )
-        
+
         # Config should be set during construction
         assert hasattr(self.factory, "Config")
         assert self.factory.Config.construction_mode == ConstructionMode.DIFFERENTIAL
+
 
 class TestFactoryDifferentialConstruction(FactoryTestCase):
     """Test that Factory correctly sets construction mode for differential SDs."""
@@ -2105,7 +2157,6 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
         self.factory.construct_resource_model(structure_definition=base_sd)
         return super().setUp()
 
-
     def test_construct_diff_max_cardinality(self):
         """Test that construct_resource_model sets construction_mode in Config."""
         differential_sd = {
@@ -2130,32 +2181,43 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "base": {"path": "Resource.element", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
-        self.assertIn('element', mock_resource.model_fields)
+
+        self.assertIn("element", mock_resource.model_fields)
         # Assert element
-        element = mock_resource.model_fields.get('element')
-        assert element is not None, 'Profiled element field not found in model fields'
-        assert element.annotation == Optional[List[primitives.String]], 'Profiled element field does not have correct type annotation'
+        element = mock_resource.model_fields.get("element")
+        assert element is not None, "Profiled element field not found in model fields"
+        assert (
+            element.annotation == Optional[List[primitives.String]]
+        ), "Profiled element field does not have correct type annotation"
 
         # Assert metadata
         element_metadata = element.metadata
-        assert element_metadata is not None, 'No metadata found for profiled element'
-        self.assertEqual(next((meta for meta in element_metadata if isinstance(meta, MaxLen))).max_length, 2, 'Profiled max. cardinality has not been correctly set')
-        
-        # Test valid dataset        
-        self.assertIsNotNone(mock_resource.model_validate({'element': ['test']}), 'Valid dataset did not validate correctly')
-        # Test invalid dataset
-        with self.assertRaises(ValidationError, msg='Invalid dataset did not raise ValidationError'):
-            mock_resource.model_validate({'element': ['test1', 'test2', 'test3']})
+        assert element_metadata is not None, "No metadata found for profiled element"
+        self.assertEqual(
+            next(
+                (meta for meta in element_metadata if isinstance(meta, MaxLen))
+            ).max_length,
+            2,
+            "Profiled max. cardinality has not been correctly set",
+        )
 
-        
+        # Test valid dataset
+        self.assertIsNotNone(
+            mock_resource.model_validate({"element": ["test"]}),
+            "Valid dataset did not validate correctly",
+        )
+        # Test invalid dataset
+        with self.assertRaises(
+            ValidationError, msg="Invalid dataset did not raise ValidationError"
+        ):
+            mock_resource.model_validate({"element": ["test1", "test2", "test3"]})
+
     def test_construct_diff_min_cardinality(self):
         """Test that construct_resource_model sets construction_mode in Config."""
         differential_sd = {
@@ -2180,31 +2242,42 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "base": {"path": "Resource.element", "min": 0, "max": "*"},
                     }
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
-        self.assertIn('element', mock_resource.model_fields)
+
+        self.assertIn("element", mock_resource.model_fields)
         # Assert element
-        element = mock_resource.model_fields.get('element')
-        assert element is not None, 'Profiled element field not found in model fields'
-        assert element.annotation == Optional[List[primitives.String]], 'Profiled element field does not have correct type annotation'
+        element = mock_resource.model_fields.get("element")
+        assert element is not None, "Profiled element field not found in model fields"
+        assert (
+            element.annotation == Optional[List[primitives.String]]
+        ), "Profiled element field does not have correct type annotation"
 
         # Assert metadata
         element_metadata = element.metadata
-        assert element_metadata is not None, 'No metadata found for profiled element'
-        self.assertEqual(next((meta for meta in element_metadata if isinstance(meta, MinLen))).min_length, 1, 'Profiled min. cardinality has not been correctly set')
-        
-        # Test valid dataset        
-        self.assertIsNotNone(mock_resource.model_validate({'element': ['test']}), 'Valid dataset did not validate correctly')
-        # Test invalid dataset
-        with self.assertRaises(ValidationError, msg='Invalid dataset did not raise ValidationError'):
-            mock_resource.model_validate({'element': []})
+        assert element_metadata is not None, "No metadata found for profiled element"
+        self.assertEqual(
+            next(
+                (meta for meta in element_metadata if isinstance(meta, MinLen))
+            ).min_length,
+            1,
+            "Profiled min. cardinality has not been correctly set",
+        )
 
+        # Test valid dataset
+        self.assertIsNotNone(
+            mock_resource.model_validate({"element": ["test"]}),
+            "Valid dataset did not validate correctly",
+        )
+        # Test invalid dataset
+        with self.assertRaises(
+            ValidationError, msg="Invalid dataset did not raise ValidationError"
+        ):
+            mock_resource.model_validate({"element": []})
 
     def test_construct_diff_fixed_value_constraint(self):
         """Test that differential can add fixed value constraints to elements."""
@@ -2221,20 +2294,29 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.status",
                         "path": "Resource.status",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "code"}],
+                        "definition": "The status of the resource",
+                        "base": {"path": "Resource.status", "min": 0, "max": "1"},
                     },
                 ]
             },
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Apply fixed value constraint in differential
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -2252,28 +2334,26 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                     {
                         "id": "Resource.status",
                         "path": "Resource.status",
-                        "fixedCode": "active"
+                        "fixedCode": "active",
                     }
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # Status field should exist
-        self.assertIn('status', mock_resource.model_fields)
-        
+        self.assertIn("status", mock_resource.model_fields)
+
         # Test that only the fixed value is accepted
-        instance = mock_resource.model_validate({'status': 'active'})
-        self.assertEqual(instance.status.value, 'active')
-        
+        instance = mock_resource.model_validate({"status": "active"})
+        self.assertEqual(instance.status.value, "active")
+
         # Test that other values are rejected
         with self.assertRaises(ValidationError):
-            mock_resource.model_validate({'status': 'inactive'})
-
+            mock_resource.model_validate({"status": "inactive"})
 
     def test_construct_diff_pattern_value_constraint(self):
         """Test that differential can add pattern value constraints to elements."""
@@ -2290,20 +2370,29 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.code",
                         "path": "Resource.code",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "Coding"}],
+                        "definition": "A code field",
+                        "base": {"path": "Resource.code", "min": 0, "max": "1"},
                     },
                 ]
             },
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Apply pattern constraint in differential
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -2323,31 +2412,37 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "path": "Resource.code",
                         "patternCoding": {
                             "system": "http://example.org/codesystem",
-                            "code": "test-code"
-                        }
+                            "code": "test-code",
+                        },
                     }
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # Code field should exist and have a pattern validator
-        self.assertIn('code', mock_resource.model_fields)
-        
+        self.assertIn("code", mock_resource.model_fields)
+
         # Check that model has the pattern constraint validator
-        validator_names = [name for name in dir(mock_resource) if 'pattern_constraint' in name]
-        self.assertTrue(len(validator_names) > 0, "Pattern constraint validator not found")
-        
-        mock_resource.model_validate({'code': {'system': 'http://example.org/codesystem', 'code': 'test-code'}})
-        
+        validator_names = [
+            name for name in dir(mock_resource) if "pattern_constraint" in name
+        ]
+        self.assertTrue(
+            len(validator_names) > 0, "Pattern constraint validator not found"
+        )
+
+        mock_resource.model_validate(
+            {"code": {"system": "http://example.org/codesystem", "code": "test-code"}}
+        )
+
         # Test that other values are rejected
         with self.assertRaises(ValidationError):
-            mock_resource.model_validate({'code': {'system': 'http://wrong-system', 'code': 'wrong-code'}})
-
+            mock_resource.model_validate(
+                {"code": {"system": "http://wrong-system", "code": "wrong-code"}}
+            )
 
     def test_construct_diff_type_choice_element(self):
         """Test that differential can constrain type choice elements."""
@@ -2360,20 +2455,29 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.value[x]",
                         "path": "Resource.value[x]",
                         "min": 0,
                         "max": "1",
+                        "definition": "A value that can be of multiple types",
+                        "base": {"path": "Resource.value[x]", "min": 0, "max": "1"},
                         "type": [
                             {"code": "string"},
                             {"code": "integer"},
-                            {"code": "boolean"}
+                            {"code": "boolean"},
                         ],
                     },
                 ]
@@ -2381,7 +2485,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Constrain type choice to only string and integer in differential
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -2403,27 +2507,25 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "max": "1",
                         "type": [
                             {"code": "string"},
-                        ]
+                        ],
                     }
                 ]
-            }
+            },
         }
-        
-        mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
-        )
-        
-        # Test that property accessor works
-        self.assertTrue(hasattr(mock_resource, 'value'))
-        
-        # Test valid data with string
-        instance = mock_resource.model_validate({'valueString': 'test'})
-        self.assertEqual(instance.value, 'test')
-        
-        with self.assertRaises(ValidationError):
-            mock_resource.model_validate({'valueInteger': 2})
 
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
+        )
+
+        # Test that property accessor works
+        self.assertTrue(hasattr(mock_resource, "value"))
+
+        # Test valid data with string
+        instance = mock_resource.model_validate({"valueString": "test"})
+        self.assertEqual(instance.value, "test")
+
+        with self.assertRaises(ValidationError):
+            mock_resource.model_validate({"valueInteger": 2})
 
     def test_construct_diff_nested_backbone_element(self):
         """Test that differential can constrain nested backbone elements."""
@@ -2436,24 +2538,33 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.telecom",
                         "path": "Resource.telecom",
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "ContactPoint"}],
+                        "definition": "Contact details for the resource",
+                        "base": {"path": "Resource.telecom", "min": 0, "max": "*"},
                     },
                 ]
             },
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Constrain telecom in differential to be required
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -2472,39 +2583,40 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "id": "Resource.telecom",
                         "path": "Resource.telecom",
                         "min": 1,
-                        "max": "*"
+                        "max": "*",
                     }
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # Telecom field should exist
-        self.assertIn('telecom', mock_resource.model_fields)
-        
+        self.assertIn("telecom", mock_resource.model_fields)
+
         # Check that it's required (min cardinality 1)
-        telecom_metadata = mock_resource.model_fields['telecom'].metadata
-        self.assertEqual(next((meta for meta in telecom_metadata if isinstance(meta, MinLen))).min_length, 1)
-        
+        telecom_metadata = mock_resource.model_fields["telecom"].metadata
+        self.assertEqual(
+            next(
+                (meta for meta in telecom_metadata if isinstance(meta, MinLen))
+            ).min_length,
+            1,
+        )
+
         # Test valid data with required telecom
-        instance = mock_resource.model_validate({
-            'telecom': [{'system': 'phone', 'value': '555-1234'}]
-        })
+        instance = mock_resource.model_validate(
+            {"telecom": [{"system": "phone", "value": "555-1234"}]}
+        )
         self.assertIsNotNone(instance.telecom)
-        
+
         # Test invalid data without required telecom
         with self.assertRaises(ValidationError):
-            mock_resource.model_validate({
-                'telecom': []
-            })
+            mock_resource.model_validate({"telecom": []})
 
-
-    def test_construct_diff_element_slicing(self):
-        """Test that differential can add constraint to sliced elements."""
+    def test_construct_diff_element_cardinality(self):
+        """Test that differential can constrain element cardinality."""
         # Create base with identifier field that can be sliced
         base_sd = {
             "resourceType": "StructureDefinition",
@@ -2514,16 +2626,25 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.identifier",
                         "path": "Resource.identifier",
                         "min": 0,
                         "max": "*",
+                        "base": {"path": "Resource.identifier", "min": 0, "max": "*"},
+                        "definition": "An identifier for the resource",
                         "type": [{"code": "Identifier"}],
                     },
                 ]
@@ -2531,7 +2652,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Constrain identifier field cardinality in differential
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -2550,26 +2671,34 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "id": "Resource.identifier",
                         "path": "Resource.identifier",
                         "min": 1,
-                        "max": "3"
+                        "max": "3",
                     },
                 ]
-            }
+            },
         }
-        
-        mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
-        )
-        
-        # Identifier field should exist with new constraints
-        self.assertIn('identifier', mock_resource.model_fields)
-        identifier = mock_resource.model_fields['identifier']
-        identifier_metadata = identifier.metadata
-        
-        # Verify constraints
-        self.assertEqual(next((meta for meta in identifier_metadata if isinstance(meta, MinLen))).min_length, 1)
-        self.assertEqual(next((meta for meta in identifier_metadata if isinstance(meta, MaxLen))).max_length, 3)
 
+        mock_resource = self.factory.construct_resource_model(
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
+        )
+
+        # Identifier field should exist with new constraints
+        self.assertIn("identifier", mock_resource.model_fields)
+        identifier = mock_resource.model_fields["identifier"]
+        identifier_metadata = identifier.metadata
+
+        # Verify constraints
+        self.assertEqual(
+            next(
+                (meta for meta in identifier_metadata if isinstance(meta, MinLen))
+            ).min_length,
+            1,
+        )
+        self.assertEqual(
+            next(
+                (meta for meta in identifier_metadata if isinstance(meta, MaxLen))
+            ).max_length,
+            3,
+        )
 
     def test_construct_diff_constraint_invariant(self):
         """Test that differential can add constraint invariants to elements."""
@@ -2582,16 +2711,25 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.value",
                         "path": "Resource.value",
                         "min": 0,
                         "max": "1",
+                        "definition": "A value field",
+                        "base": {"path": "Resource.value", "min": 0, "max": "1"},
                         "type": [{"code": "integer"}],
                     },
                 ]
@@ -2599,7 +2737,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Add constraint in differential
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -2622,34 +2760,36 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                                 "key": "val-1",
                                 "severity": "error",
                                 "human": "Value must be positive",
-                                "expression": "value > 0"
+                                "expression": "value > 0",
                             }
-                        ]
+                        ],
                     }
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # Value field should exist
-        self.assertIn('value', mock_resource.model_fields)
-        
+        self.assertIn("value", mock_resource.model_fields)
+
         # Check that constraint validator was added
-        validator_names = [name for name in dir(mock_resource) if 'val-1' in name or 'constraint' in name.lower()]
+        validator_names = [
+            name
+            for name in dir(mock_resource)
+            if "val-1" in name or "constraint" in name.lower()
+        ]
         self.assertTrue(len(validator_names) > 0, "Constraint validator not found")
 
         # Check that valid value passes
-        instance = mock_resource.model_validate({'value': 5})
+        instance = mock_resource.model_validate({"value": 5})
         self.assertEqual(instance.value, 5)
 
         # Check that invalid value raises error
         with self.assertRaises(ValidationError):
-            mock_resource.model_validate({'value': -2})
-
+            mock_resource.model_validate({"value": -2})
 
     def test_construct_diff_multiple_elements_constraints(self):
         """Test that differential can apply different constraint types to multiple elements."""
@@ -2662,17 +2802,26 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.status",
                         "path": "Resource.status",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "code"}],
+                        "definition": "Status field",
+                        "base": {"path": "Resource.status", "min": 0, "max": "1"},
                     },
                     {
                         "id": "Resource.priority",
@@ -2680,6 +2829,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "code"}],
+                        "definition": "Priority field",
+                        "base": {"path": "Resource.priority", "min": 0, "max": "1"},
                     },
                     {
                         "id": "Resource.text",
@@ -2687,13 +2838,15 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "Text field",
+                        "base": {"path": "Resource.text", "min": 0, "max": "1"},
                     },
                 ]
             },
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Apply different constraints to different elements
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -2712,54 +2865,49 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "id": "Resource.status",
                         "path": "Resource.status",
                         "min": 1,  # Make required
-                        "fixedCode": "active"  # Fix value
+                        "fixedCode": "active",  # Fix value
                     },
                     {
                         "id": "Resource.priority",
                         "path": "Resource.priority",
-                        "patternCode": "high"  # Pattern constraint
+                        "patternCode": "high",  # Pattern constraint
                     },
                     {
                         "id": "Resource.text",
                         "path": "Resource.text",
                         "min": 1,  # Make required
-                        "max": "1"
-                    }
+                        "max": "1",
+                    },
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # All fields should exist
-        self.assertIn('status', mock_resource.model_fields)
-        self.assertIn('priority', mock_resource.model_fields)
-        self.assertIn('text', mock_resource.model_fields)
-        
+        self.assertIn("status", mock_resource.model_fields)
+        self.assertIn("priority", mock_resource.model_fields)
+        self.assertIn("text", mock_resource.model_fields)
+
         # Test valid instance with all constraints satisfied
-        instance = mock_resource.model_validate({
-            'status': 'active',
-            'priority': 'high',
-            'text': 'Test text'
-        })
-        self.assertEqual(instance.status.value, 'active')
-        
+        instance = mock_resource.model_validate(
+            {"status": "active", "priority": "high", "text": "Test text"}
+        )
+        self.assertEqual(instance.status.value, "active")
+
         # Test that fixed value is enforced
         with self.assertRaises(ValidationError):
-            mock_resource.model_validate({
-                'status': 'inactive',
-                'text': 'Test text'
-            })
+            mock_resource.model_validate({"status": "inactive", "text": "Test text"})
 
         # Test that pattern is enforced
         with self.assertRaises(ValidationError):
-            mock_resource.model_validate({
-                'priority': 'wrong',
-            })
-
+            mock_resource.model_validate(
+                {
+                    "priority": "wrong",
+                }
+            )
 
     def test_construct_diff_inherits_base_structure(self):
         """Test that differential models properly inherit complete structure from base."""
@@ -2772,17 +2920,26 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.field1",
                         "path": "Resource.field1",
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "string"}],
+                        "definition": "First field",
+                        "base": {"path": "Resource.field1", "min": 0, "max": "1"},
                     },
                     {
                         "id": "Resource.field2",
@@ -2790,6 +2947,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "integer"}],
+                        "definition": "Second field",
+                        "base": {"path": "Resource.field2", "min": 0, "max": "1"},
                     },
                     {
                         "id": "Resource.field3",
@@ -2797,13 +2956,15 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "min": 0,
                         "max": "1",
                         "type": [{"code": "boolean"}],
+                        "definition": "Third field",
+                        "base": {"path": "Resource.field3", "min": 0, "max": "1"},
                     },
                 ]
             },
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Differential only constrains one field
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -2821,32 +2982,28 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                     {
                         "id": "Resource.field1",
                         "path": "Resource.field1",
-                        "min": 1  # Only constrain field1
+                        "min": 1,  # Only constrain field1
                     }
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # All fields from base should be present
-        self.assertIn('field1', mock_resource.model_fields)
-        self.assertIn('field2', mock_resource.model_fields)
-        self.assertIn('field3', mock_resource.model_fields)
-        
+        self.assertIn("field1", mock_resource.model_fields)
+        self.assertIn("field2", mock_resource.model_fields)
+        self.assertIn("field3", mock_resource.model_fields)
+
         # Other fields should work normally
-        instance = mock_resource.model_validate({
-            'field1': 'required_value',
-            'field2': 42,
-            'field3': True
-        })
-        self.assertEqual(instance.field1, 'required_value')
+        instance = mock_resource.model_validate(
+            {"field1": "required_value", "field2": 42, "field3": True}
+        )
+        self.assertEqual(instance.field1, "required_value")
         self.assertEqual(instance.field2, 42)
         self.assertEqual(instance.field3, True)
-
 
     def test_construct_diff_sliced_elements_with_discriminators(self):
         """Test that differential can define sliced elements with discriminators and named slices."""
@@ -2859,17 +3016,26 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.extension",
                         "path": "Resource.extension",
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "Extension"}],
+                        "definition": "Extensions for the resource",
+                        "base": {"path": "Resource.extension", "min": 0, "max": "*"},
                     },
                     {
                         "id": "Resource.extension.url",
@@ -2877,13 +3043,19 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "min": 1,
                         "max": "1",
                         "type": [{"code": "uri"}],
-                    }
+                        "definition": "URL of the extension",
+                        "base": {
+                            "path": "Resource.extension.url",
+                            "min": 1,
+                            "max": "1",
+                        },
+                    },
                 ]
             },
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Define slicing on extension with discriminators and named slices
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -2902,16 +3074,11 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "id": "Resource.extension",
                         "path": "Resource.extension",
                         "slicing": {
-                            "discriminator": [
-                                {
-                                    "type": "value",
-                                    "path": "url"
-                                }
-                            ],
-                            "rules": "open"
+                            "discriminator": [{"type": "value", "path": "url"}],
+                            "rules": "open",
                         },
                         "min": 0,
-                        "max": "*"
+                        "max": "*",
                     },
                     {
                         "id": "Resource.extension:birthPlace",
@@ -2926,7 +3093,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "path": "Resource.extension.url",
                         "min": 1,
                         "max": "1",
-                        "fixedUri": "http://example.org/birthPlace"
+                        "fixedUri": "http://example.org/birthPlace",
                     },
                     {
                         "id": "Resource.extension:birthPlace.valueString",
@@ -2948,7 +3115,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "path": "Resource.extension.url",
                         "min": 1,
                         "max": "1",
-                        "fixedUri": "http://example.org/nationality"
+                        "fixedUri": "http://example.org/nationality",
                     },
                     {
                         "id": "Resource.extension:nationality.valueCodeableConcept",
@@ -2958,43 +3125,42 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "type": [{"code": "CodeableConcept"}],
                     },
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # Extension field should exist
-        self.assertIn('extension', mock_resource.model_fields)
-        
+        self.assertIn("extension", mock_resource.model_fields)
+
         # Check for slice-specific fields (if factory creates them)
         fields = mock_resource.model_fields
-        slice_fields = [f for f in fields.keys() if 'birthPlace' in f or 'nationality' in f]
-        
+        slice_fields = [
+            f for f in fields.keys() if "birthPlace" in f or "nationality" in f
+        ]
+
         # If slices are created as separate fields, they should exist
         if slice_fields:
             self.assertTrue(len(slice_fields) > 0, "Slice fields should be created")
-        
+
         # Test that base extension field still works
-        instance = mock_resource.model_validate({
-            'extension': [
-                {
-                    'url': 'http://example.org/birthPlace',
-                    'valueString': 'New York'
-                },
-                {
-                    'url': 'http://example.org/nationality',
-                    'valueCodeableConcept': {
-                        'coding': [{'system': 'http://example.org', 'code': 'US'}]
-                    }
-                }
-            ]
-        })
+        instance = mock_resource.model_validate(
+            {
+                "extension": [
+                    {"url": "http://example.org/birthPlace", "valueString": "New York"},
+                    {
+                        "url": "http://example.org/nationality",
+                        "valueCodeableConcept": {
+                            "coding": [{"system": "http://example.org", "code": "US"}]
+                        },
+                    },
+                ]
+            }
+        )
         self.assertIsNotNone(instance.extension)
         self.assertEqual(len(instance.extension), 2)
-
 
     def test_construct_diff_sliced_backbone_elements(self):
         """Test that differential can slice backbone elements with specific constraints."""
@@ -3007,17 +3173,26 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "status": "draft",
             "fhirVersion": "5.0.0",
             "kind": "resource",
-            "abstract": False,
+            "abstract": True,
             "type": "Resource",
             "snapshot": {
                 "element": [
-                    {"id": "Resource", "path": "Resource", "min": 0, "max": "*"},
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    },
                     {
                         "id": "Resource.component",
                         "path": "Resource.component",
                         "min": 0,
                         "max": "*",
                         "type": [{"code": "BackboneElement"}],
+                        "definition": "Component backbone element",
+                        "base": {"path": "Resource.component", "min": 0, "max": "*"},
                     },
                     {
                         "id": "Resource.component.code",
@@ -3025,6 +3200,12 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "min": 1,
                         "max": "1",
                         "type": [{"code": "CodeableConcept"}],
+                        "definition": "Code for the component",
+                        "base": {
+                            "path": "Resource.component.code",
+                            "min": 1,
+                            "max": "1",
+                        },
                     },
                     {
                         "id": "Resource.component.value[x]",
@@ -3035,13 +3216,19 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                             {"code": "Quantity"},
                             {"code": "string"},
                         ],
+                        "definition": "Value for the component",
+                        "base": {
+                            "path": "Resource.component.value[x]",
+                            "min": 0,
+                            "max": "1",
+                        },
                     },
                 ]
             },
         }
         self.factory.repository.load_from_definitions(base_sd)
         self.factory.construct_resource_model(structure_definition=base_sd)
-        
+
         # Slice component by code
         differential_sd = {
             "resourceType": "StructureDefinition",
@@ -3052,7 +3239,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "fhirVersion": "5.0.0",
             "kind": "resource",
             "abstract": False,
-            "type": "Observation",
+            "type": "Resource",
             "baseDefinition": "http://example.org/StructureDefinition/mock-base-component",
             "differential": {
                 "element": [
@@ -3060,16 +3247,11 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "id": "Resource.component",
                         "path": "Resource.component",
                         "slicing": {
-                            "discriminator": [
-                                {
-                                    "type": "pattern",
-                                    "path": "code"
-                                }
-                            ],
-                            "rules": "open"
+                            "discriminator": [{"type": "pattern", "path": "code"}],
+                            "rules": "open",
                         },
                         "min": 2,
-                        "max": "*"
+                        "max": "*",
                     },
                     {
                         "id": "Resource.component:systolic",
@@ -3082,13 +3264,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "id": "Resource.component:systolic.code",
                         "path": "Resource.component.code",
                         "patternCodeableConcept": {
-                            "coding": [
-                                {
-                                    "system": "http://loinc.org",
-                                    "code": "8480-6"
-                                }
-                            ]
-                        }
+                            "coding": [{"system": "http://loinc.org", "code": "8480-6"}]
+                        },
                     },
                     {
                         "id": "Resource.component:systolic.valueQuantity",
@@ -3108,13 +3285,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "id": "Resource.component:diastolic.code",
                         "path": "Resource.component.code",
                         "patternCodeableConcept": {
-                            "coding": [
-                                {
-                                    "system": "http://loinc.org",
-                                    "code": "8462-4"
-                                }
-                            ]
-                        }
+                            "coding": [{"system": "http://loinc.org", "code": "8462-4"}]
+                        },
                     },
                     {
                         "id": "Resource.component:diastolic.valueQuantity",
@@ -3124,39 +3296,43 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         "type": [{"code": "Quantity"}],
                     },
                 ]
-            }
+            },
         }
-        
+
         mock_resource = self.factory.construct_resource_model(
-            structure_definition=differential_sd,
-            mode=ConstructionMode.DIFFERENTIAL
+            structure_definition=differential_sd, mode=ConstructionMode.DIFFERENTIAL
         )
-        
+
         # Component field should exist
-        self.assertIn('component', mock_resource.model_fields)
-        
+        self.assertIn("component", mock_resource.model_fields)
+
         # Check cardinality constraint (min 2)
-        component_metadata = mock_resource.model_fields['component'].metadata
-        self.assertEqual(next((meta for meta in component_metadata if isinstance(meta, MinLen))).min_length, 2)
-        
+        component_metadata = mock_resource.model_fields["component"].metadata
+        self.assertEqual(
+            next(
+                (meta for meta in component_metadata if isinstance(meta, MinLen))
+            ).min_length,
+            2,
+        )
+
         # Test valid instance with both required slices
-        instance = mock_resource.model_validate({
-            'component': [
-                {
-                    'code': {
-                        'coding': [{'system': 'http://loinc.org', 'code': '8480-6'}]
+        instance = mock_resource.model_validate(
+            {
+                "component": [
+                    {
+                        "code": {
+                            "coding": [{"system": "http://loinc.org", "code": "8480-6"}]
+                        },
+                        "valueQuantity": {"value": 120, "unit": "mmHg"},
                     },
-                    'valueQuantity': {'value': 120, 'unit': 'mmHg'}
-                },
-                {
-                    'code': {
-                        'coding': [{'system': 'http://loinc.org', 'code': '8462-4'}]
+                    {
+                        "code": {
+                            "coding": [{"system": "http://loinc.org", "code": "8462-4"}]
+                        },
+                        "valueQuantity": {"value": 80, "unit": "mmHg"},
                     },
-                    'valueQuantity': {'value': 80, 'unit': 'mmHg'}
-                }
-            ]
-        })
+                ]
+            }
+        )
         self.assertIsNotNone(instance.component)
         self.assertEqual(len(instance.component), 2)
-
-        
