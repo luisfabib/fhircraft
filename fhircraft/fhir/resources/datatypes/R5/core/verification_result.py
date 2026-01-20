@@ -310,7 +310,7 @@ class VerificationResult(DomainResource):
         description="The fhirpath location(s) within the resource that was validated",
         default=None,
     )
-    targetLocation_ext: Optional[Element] = Field(
+    targetLocation_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for targetLocation extensions",
         default=None,
         alias="_targetLocation",

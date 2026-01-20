@@ -43,7 +43,7 @@ class Address(Element):
         description="Street name, number, direction \u0026 P.O. Box etc.",
         default=None,
     )
-    line_ext: Optional[Element] = Field(
+    line_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for line extensions",
         default=None,
         alias="_line",

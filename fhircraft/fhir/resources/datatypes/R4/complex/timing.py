@@ -19,7 +19,7 @@ class Timing(BackboneElement):
         description="When the event occurs",
         default=None,
     )
-    event_ext: Optional[Element] = Field(
+    event_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for event extensions",
         default=None,
         alias="_event",

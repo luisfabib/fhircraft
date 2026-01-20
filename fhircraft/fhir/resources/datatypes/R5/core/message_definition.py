@@ -265,7 +265,7 @@ class MessageDefinition(DomainResource):
         description="Takes the place of",
         default=None,
     )
-    replaces_ext: Optional[Element] = Field(
+    replaces_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for replaces extensions",
         default=None,
         alias="_replaces",
@@ -367,7 +367,7 @@ class MessageDefinition(DomainResource):
         description="Protocol/workflow this is part of",
         default=None,
     )
-    parent_ext: Optional[Element] = Field(
+    parent_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for parent extensions",
         default=None,
         alias="_parent",

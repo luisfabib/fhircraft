@@ -42,7 +42,7 @@ class SubstanceProteinSubunit(BackboneElement):
         description="Index of primary sequences of amino acids linked through peptide bonds in order of decreasing length. Sequences of the same length will be ordered by molecular weight. Subunits that have identical sequences will be repeated and have sequential subscripts",
         default=None,
     )
-    subunit_ext: Optional[Element] = Field(
+    subunit_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for subunit extensions",
         default=None,
         alias="_subunit",
@@ -204,7 +204,7 @@ class SubstanceProtein(DomainResource):
         description="The disulphide bond between two cysteine residues either on the same subunit or on two different subunits shall be described. The position of the disulfide bonds in the SubstanceProtein shall be listed in increasing order of subunit number and position within subunit followed by the abbreviation of the amino acids involved. The disulfide linkage positions shall actually contain the amino acid Cysteine at the respective positions",
         default=None,
     )
-    disulfideLinkage_ext: Optional[Element] = Field(
+    disulfideLinkage_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for disulfideLinkage extensions",
         default=None,
         alias="_disulfideLinkage",

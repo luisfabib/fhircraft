@@ -43,7 +43,7 @@ class HumanName(Element):
         description="Given names (not always \u0027first\u0027). Includes middle names",
         default=None,
     )
-    given_ext: Optional[Element] = Field(
+    given_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for given extensions",
         default=None,
         alias="_given",
@@ -52,7 +52,7 @@ class HumanName(Element):
         description="Parts that come before the name",
         default=None,
     )
-    prefix_ext: Optional[Element] = Field(
+    prefix_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for prefix extensions",
         default=None,
         alias="_prefix",
@@ -61,7 +61,7 @@ class HumanName(Element):
         description="Parts that come after the name",
         default=None,
     )
-    suffix_ext: Optional[Element] = Field(
+    suffix_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for suffix extensions",
         default=None,
         alias="_suffix",

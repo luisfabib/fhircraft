@@ -114,7 +114,7 @@ class AuditEventAgent(BackboneElement):
         description="Policy that authorized the agent participation in the event",
         default=None,
     )
-    policy_ext: Optional[Element] = Field(
+    policy_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for policy extensions",
         default=None,
         alias="_policy",

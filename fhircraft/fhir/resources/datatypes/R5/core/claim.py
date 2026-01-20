@@ -565,7 +565,7 @@ class ClaimInsurance(BackboneElement):
         description="Prior authorization reference number",
         default=None,
     )
-    preAuthRef_ext: Optional[Element] = Field(
+    preAuthRef_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for preAuthRef extensions",
         default=None,
         alias="_preAuthRef",
@@ -1001,7 +1001,7 @@ class ClaimItem(BackboneElement):
         description="Applicable careTeam members",
         default=None,
     )
-    careTeamSequence_ext: Optional[Element] = Field(
+    careTeamSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for careTeamSequence extensions",
         default=None,
         alias="_careTeamSequence",
@@ -1010,7 +1010,7 @@ class ClaimItem(BackboneElement):
         description="Applicable diagnoses",
         default=None,
     )
-    diagnosisSequence_ext: Optional[Element] = Field(
+    diagnosisSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for diagnosisSequence extensions",
         default=None,
         alias="_diagnosisSequence",
@@ -1019,7 +1019,7 @@ class ClaimItem(BackboneElement):
         description="Applicable procedures",
         default=None,
     )
-    procedureSequence_ext: Optional[Element] = Field(
+    procedureSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for procedureSequence extensions",
         default=None,
         alias="_procedureSequence",
@@ -1028,7 +1028,7 @@ class ClaimItem(BackboneElement):
         description="Applicable exception and supporting information",
         default=None,
     )
-    informationSequence_ext: Optional[Element] = Field(
+    informationSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for informationSequence extensions",
         default=None,
         alias="_informationSequence",

@@ -429,7 +429,7 @@ class SubstanceSourceMaterial(DomainResource):
         description="The parent substance of the Herbal Drug, or Herbal preparation",
         default=None,
     )
-    parentSubstanceName_ext: Optional[Element] = Field(
+    parentSubstanceName_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for parentSubstanceName extensions",
         default=None,
         alias="_parentSubstanceName",
@@ -442,7 +442,7 @@ class SubstanceSourceMaterial(DomainResource):
         description="The place/region where the plant is harvested or the places/regions where the animal source material has its habitat",
         default=None,
     )
-    geographicalLocation_ext: Optional[Element] = Field(
+    geographicalLocation_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for geographicalLocation extensions",
         default=None,
         alias="_geographicalLocation",

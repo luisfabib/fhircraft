@@ -54,7 +54,7 @@ class ProdCharacteristic(BackboneElement):
         description="Where applicable, the color can be specified An appropriate controlled vocabulary shall be used The term and the term identifier shall be used",
         default=None,
     )
-    color_ext: Optional[Element] = Field(
+    color_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for color extensions",
         default=None,
         alias="_color",
@@ -63,7 +63,7 @@ class ProdCharacteristic(BackboneElement):
         description="Where applicable, the imprint can be specified as text",
         default=None,
     )
-    imprint_ext: Optional[Element] = Field(
+    imprint_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for imprint extensions",
         default=None,
         alias="_imprint",

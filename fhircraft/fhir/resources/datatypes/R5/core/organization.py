@@ -174,7 +174,7 @@ class Organization(DomainResource):
         description="A list of alternate names that the organization is known as, or was known as in the past",
         default=None,
     )
-    alias_ext: Optional[Element] = Field(
+    alias_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",

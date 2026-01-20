@@ -71,7 +71,7 @@ class InventoryItemName(BackboneElement):
         description="The name or designation of the item",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
+    name_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for name extensions",
         default=None,
         alias="_name",

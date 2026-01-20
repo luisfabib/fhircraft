@@ -393,7 +393,7 @@ class CapabilityStatementRestResource(BackboneElement):
         description="Use-case specific profiles",
         default=None,
     )
-    supportedProfile_ext: Optional[Element] = Field(
+    supportedProfile_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for supportedProfile extensions",
         default=None,
         alias="_supportedProfile",
@@ -487,7 +487,7 @@ class CapabilityStatementRestResource(BackboneElement):
         description="literal | logical | resolves | enforced | local",
         default=None,
     )
-    referencePolicy_ext: Optional[Element] = Field(
+    referencePolicy_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for referencePolicy extensions",
         default=None,
         alias="_referencePolicy",
@@ -496,7 +496,7 @@ class CapabilityStatementRestResource(BackboneElement):
         description="_include values supported by the server",
         default=None,
     )
-    searchInclude_ext: Optional[Element] = Field(
+    searchInclude_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for searchInclude extensions",
         default=None,
         alias="_searchInclude",
@@ -505,7 +505,7 @@ class CapabilityStatementRestResource(BackboneElement):
         description="_revinclude values supported by the server",
         default=None,
     )
-    searchRevInclude_ext: Optional[Element] = Field(
+    searchRevInclude_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for searchRevInclude extensions",
         default=None,
         alias="_searchRevInclude",
@@ -798,7 +798,7 @@ class CapabilityStatementRest(BackboneElement):
         description="Compartments served/used by system",
         default=None,
     )
-    compartment_ext: Optional[Element] = Field(
+    compartment_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for compartment extensions",
         default=None,
         alias="_compartment",
@@ -1251,7 +1251,7 @@ class CapabilityStatement(DomainResource):
         description="Canonical URL of another capability statement this implements",
         default=None,
     )
-    instantiates_ext: Optional[Element] = Field(
+    instantiates_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for instantiates extensions",
         default=None,
         alias="_instantiates",
@@ -1260,7 +1260,7 @@ class CapabilityStatement(DomainResource):
         description="Canonical URL of another capability statement this adds to",
         default=None,
     )
-    imports_ext: Optional[Element] = Field(
+    imports_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for imports extensions",
         default=None,
         alias="_imports",
@@ -1286,7 +1286,7 @@ class CapabilityStatement(DomainResource):
         description="formats supported (xml | json | ttl | mime type)",
         default=None,
     )
-    format_ext: Optional[Element] = Field(
+    format_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for format extensions",
         default=None,
         alias="_format",
@@ -1295,7 +1295,7 @@ class CapabilityStatement(DomainResource):
         description="Patch formats supported",
         default=None,
     )
-    patchFormat_ext: Optional[Element] = Field(
+    patchFormat_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for patchFormat extensions",
         default=None,
         alias="_patchFormat",
@@ -1304,7 +1304,7 @@ class CapabilityStatement(DomainResource):
         description="Languages supported",
         default=None,
     )
-    acceptLanguage_ext: Optional[Element] = Field(
+    acceptLanguage_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for acceptLanguage extensions",
         default=None,
         alias="_acceptLanguage",
@@ -1313,7 +1313,7 @@ class CapabilityStatement(DomainResource):
         description="Implementation guides supported",
         default=None,
     )
-    implementationGuide_ext: Optional[Element] = Field(
+    implementationGuide_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for implementationGuide extensions",
         default=None,
         alias="_implementationGuide",

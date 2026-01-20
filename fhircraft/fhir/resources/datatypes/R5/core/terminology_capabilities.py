@@ -62,7 +62,7 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
         description="Version covered by this statement",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
+    version_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",
@@ -148,7 +148,7 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
         description="Operations supported for the property",
         default=None,
     )
-    op_ext: Optional[Element] = Field(
+    op_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for op extensions",
         default=None,
         alias="_op",
@@ -209,7 +209,7 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         description="Language Displays supported",
         default=None,
     )
-    language_ext: Optional[Element] = Field(
+    language_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for language extensions",
         default=None,
         alias="_language",

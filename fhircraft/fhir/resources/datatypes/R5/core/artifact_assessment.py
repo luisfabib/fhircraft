@@ -87,7 +87,7 @@ class ArtifactAssessmentContent(BackboneElement):
         description="What the comment is directed to",
         default=None,
     )
-    path_ext: Optional[Element] = Field(
+    path_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for path extensions",
         default=None,
         alias="_path",

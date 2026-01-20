@@ -158,7 +158,7 @@ class DeviceName(BackboneElement):
         description="registered-name | user-friendly-name | patient-reported-name",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
+    type_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for type extensions",
         default=None,
         alias="_type",
@@ -269,7 +269,7 @@ class DeviceConformsTo(BackboneElement):
         description="Specific form or variant of the standard",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
+    version_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",

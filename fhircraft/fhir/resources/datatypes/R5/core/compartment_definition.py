@@ -58,7 +58,7 @@ class CompartmentDefinitionResource(BackboneElement):
         description="Search Parameter Name, or chained parameters",
         default=None,
     )
-    param_ext: Optional[Element] = Field(
+    param_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for param extensions",
         default=None,
         alias="_param",

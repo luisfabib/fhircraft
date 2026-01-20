@@ -42,7 +42,7 @@ class VirtualServiceDetail(DataType):
         description="Address to see alternative connection details",
         default=None,
     )
-    additionalInfo_ext: Optional[Element] = Field(
+    additionalInfo_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for additionalInfo extensions",
         default=None,
         alias="_additionalInfo",

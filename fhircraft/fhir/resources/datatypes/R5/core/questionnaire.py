@@ -754,7 +754,7 @@ class Questionnaire(DomainResource):
         description="Based on Questionnaire",
         default=None,
     )
-    derivedFrom_ext: Optional[Element] = Field(
+    derivedFrom_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",
@@ -781,7 +781,7 @@ class Questionnaire(DomainResource):
         description="Resource that can be subject of QuestionnaireResponse",
         default=None,
     )
-    subjectType_ext: Optional[Element] = Field(
+    subjectType_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for subjectType extensions",
         default=None,
         alias="_subjectType",

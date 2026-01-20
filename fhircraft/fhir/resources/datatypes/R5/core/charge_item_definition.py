@@ -275,7 +275,7 @@ class ChargeItemDefinition(DomainResource):
         description="Underlying externally-defined charge item definition",
         default=None,
     )
-    derivedFromUri_ext: Optional[Element] = Field(
+    derivedFromUri_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromUri extensions",
         default=None,
         alias="_derivedFromUri",
@@ -284,7 +284,7 @@ class ChargeItemDefinition(DomainResource):
         description="A larger definition of which this particular definition is a component or step",
         default=None,
     )
-    partOf_ext: Optional[Element] = Field(
+    partOf_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for partOf extensions",
         default=None,
         alias="_partOf",
@@ -293,7 +293,7 @@ class ChargeItemDefinition(DomainResource):
         description="Completed or terminated request(s) whose function is taken by this new request",
         default=None,
     )
-    replaces_ext: Optional[Element] = Field(
+    replaces_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for replaces extensions",
         default=None,
         alias="_replaces",

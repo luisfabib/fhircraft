@@ -774,7 +774,6 @@ class ResourceFactory:
     ) -> Tuple[Any, FieldInfo]:
         """
         Constructs a Pydantic field based on the provided parameters.
-        Constructs a Pydantic field based on the provided parameters.
 
         Args:
             field_type (type): The type of the field.
@@ -1482,6 +1481,7 @@ class ResourceFactory:
     def _construct_primitive_extension_field(
         self,
         name: str,
+        max_card: int = 1,
     ) -> dict[str, Tuple[Any, FieldInfo]]:
         """
         Constructs a Pydantic field for a FHIR primitive extension.
@@ -1498,16 +1498,18 @@ class ResourceFactory:
         safe_ext_field_name, ext_validation_alias = (
             self._handle_python_reserved_keyword(f"{name}_ext")
         )
+        placeholder_type = get_complex_FHIR_type(
+            "Element", self.Config.FHIR_release if self.Config else "4.3.0"
+        )
+        if max_card > 1:
+            placeholder_type = List[Optional[placeholder_type]]
         return {
             safe_ext_field_name: self._construct_Pydantic_field(
-                get_complex_FHIR_type(
-                    "Element", self.Config.FHIR_release if self.Config else "4.3.0"
-                ),
+                placeholder_type,
                 min_card=0,
-                max_card=1,
+                max_card=max_card,
                 alias=f"_{name}",
                 validation_alias=ext_validation_alias,
-                default=None,
                 description=f"Placeholder element for {name} extensions",
             )
         }
@@ -1764,7 +1766,7 @@ class ResourceFactory:
             # -------------------------------------
             if hasattr(primitives, str(field_type)):
                 # If the field is of primitive type, add aliased field to accomodate their extensions
-                fields.update(self._construct_primitive_extension_field(name))
+                fields.update(self._construct_primitive_extension_field(name, max_card))
         return fields, validators, properties
 
     def construct_resource_model(
