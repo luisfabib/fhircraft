@@ -7,8 +7,8 @@ from pydantic import ValidationError
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.datatypes.R4.complex import Coding
-from fhircraft.fhir.resources.definitions.element_definition import (
-    ElementDefinitionDiscriminator,
+from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
+    ElementDefinitionSlicingDiscriminator,
 )
 from fhircraft.fhir.resources.datatypes.utils import (  # Type checking functions; Type conversion functions; Complex type utilities; Utility functions
     FHIRTypeError,
@@ -334,11 +334,11 @@ def test_is_fhir_complex_type(value, fhir_type, expected):
     "value,fhir_type,expected",
     [
         (
-            ElementDefinitionDiscriminator(type="value", path="example"),
-            ElementDefinitionDiscriminator,
+            ElementDefinitionSlicingDiscriminator(type="value", path="example"),
+            ElementDefinitionSlicingDiscriminator,
             True,
         ),
-        ("not-elementdefinition", ElementDefinitionDiscriminator, False),
+        ("not-elementdefinition", ElementDefinitionSlicingDiscriminator, False),
     ],
 )
 def test_is_fhir_resource_type(value, fhir_type, expected):

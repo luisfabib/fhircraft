@@ -23,14 +23,14 @@ from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMapGroupRuleTargetParameter,
     StructureMapStructure,
 )
-from fhircraft.fhir.resources.definitions.element_definition import (
+from fhircraft.fhir.resources.datatypes.R4B.core.structure_definition import (
+    StructureDefinition,
+    StructureDefinitionSnapshot,
+)
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
     ElementDefinition,
     ElementDefinitionType,
 )
-from fhircraft.fhir.resources.definitions.structure_definition import (
-    StructureDefinitionSnapshot,
-)
-from fhircraft.fhir.resources.factory import StructureDefinition
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 EXAMPLES_DIRECTORY = "test/static/fhir-mapping-language/R5"

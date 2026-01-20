@@ -13,7 +13,6 @@ Recommended imports:
 """
 
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
-from fhircraft.fhir.resources.definitions import ElementDefinition, StructureDefinition
 from fhircraft.fhir.resources.factory import ResourceFactory, construct_resource_model
 from fhircraft.fhir.resources.repository import (
     CompositeStructureDefinitionRepository,
@@ -25,8 +24,6 @@ from fhircraft.fhir.resources.repository import (
 __all__ = [
     "FHIRBaseModel",
     "FHIRSliceModel",
-    "StructureDefinition",
-    "ElementDefinition",
     "CompositeStructureDefinitionRepository",
     "HttpStructureDefinitionRepository",
     "PackageStructureDefinitionRepository",

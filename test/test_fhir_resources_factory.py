@@ -18,7 +18,7 @@ from fhircraft.fhir.resources.factory import (
     _Unset,
 )
 from fhircraft.fhir.resources.base import FHIRBaseModel, BaseModel
-from fhircraft.fhir.resources.definitions import StructureDefinition
+from fhircraft.fhir.resources.datatypes.R4B.core import StructureDefinition
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Extension,
     BackboneElement,
