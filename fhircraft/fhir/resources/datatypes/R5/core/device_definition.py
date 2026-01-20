@@ -313,7 +313,7 @@ class DeviceDefinitionConformsTo(BackboneElement):
         description="The specific form or variant of the standard, specification or formal guidance",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
+    version_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",
@@ -1151,7 +1151,7 @@ class DeviceDefinition(DomainResource):
         description="lot-number | manufactured-date | serial-number | expiration-date | biological-source | software-version",
         default=None,
     )
-    productionIdentifierInUDI_ext: Optional[Element] = Field(
+    productionIdentifierInUDI_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for productionIdentifierInUDI extensions",
         default=None,
         alias="_productionIdentifierInUDI",

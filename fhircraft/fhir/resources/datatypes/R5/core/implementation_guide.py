@@ -131,7 +131,7 @@ class ImplementationGuideGlobal(BackboneElement):
         description="Profile that all resources must conform to",
         default=None,
     )
-    profile_ext: Optional[Element] = Field(
+    profile_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for profile extensions",
         default=None,
         alias="_profile",
@@ -212,7 +212,7 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         description="Versions this applies to (if different to IG)",
         default=None,
     )
-    fhirVersion_ext: Optional[Element] = Field(
+    fhirVersion_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for fhirVersion extensions",
         default=None,
         alias="_fhirVersion",
@@ -649,7 +649,7 @@ class ImplementationGuideManifestPage(BackboneElement):
         description="Anchor available on the page",
         default=None,
     )
-    anchor_ext: Optional[Element] = Field(
+    anchor_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for anchor extensions",
         default=None,
         alias="_anchor",
@@ -703,7 +703,7 @@ class ImplementationGuideManifest(BackboneElement):
         description="Image within the IG",
         default=None,
     )
-    image_ext: Optional[Element] = Field(
+    image_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for image extensions",
         default=None,
         alias="_image",
@@ -712,7 +712,7 @@ class ImplementationGuideManifest(BackboneElement):
         description="Additional linkable file in IG",
         default=None,
     )
-    other_ext: Optional[Element] = Field(
+    other_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for other extensions",
         default=None,
         alias="_other",

@@ -267,7 +267,7 @@ class ServiceRequest(DomainResource):
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[Element] = Field(
+    instantiatesCanonical_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesCanonical extensions",
         default=None,
         alias="_instantiatesCanonical",
@@ -276,7 +276,7 @@ class ServiceRequest(DomainResource):
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[Element] = Field(
+    instantiatesUri_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesUri extensions",
         default=None,
         alias="_instantiatesUri",

@@ -71,7 +71,7 @@ class OperationOutcomeIssue(BackboneElement):
         description="Deprecated: Path of element(s) related to issue",
         default=None,
     )
-    location_ext: Optional[Element] = Field(
+    location_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for location extensions",
         default=None,
         alias="_location",
@@ -80,7 +80,7 @@ class OperationOutcomeIssue(BackboneElement):
         description="FHIRPath of element(s) related to issue",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
+    expression_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for expression extensions",
         default=None,
         alias="_expression",

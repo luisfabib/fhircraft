@@ -410,7 +410,7 @@ class MeasureGroup(BackboneElement):
         description="Logic used by the measure group",
         default=None,
     )
-    library_ext: Optional[Element] = Field(
+    library_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for library extensions",
         default=None,
         alias="_library",
@@ -778,7 +778,7 @@ class Measure(DomainResource):
         description="Describes the clinical usage of the measure",
         default=None,
     )
-    usage_ext: Optional[Element] = Field(
+    usage_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for usage extensions",
         default=None,
         alias="_usage",

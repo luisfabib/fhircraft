@@ -90,7 +90,7 @@ class MedicinalProductDefinitionNamePart(BackboneElement):
         description="A fragment of a product name",
         default=None,
     )
-    part_ext: Optional[Element] = Field(
+    part_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for part extensions",
         default=None,
         alias="_part",

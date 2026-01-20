@@ -530,7 +530,7 @@ class ClinicalUseDefinition(DomainResource):
         description="Logic used by the clinical use definition",
         default=None,
     )
-    library_ext: Optional[Element] = Field(
+    library_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for library extensions",
         default=None,
         alias="_library",

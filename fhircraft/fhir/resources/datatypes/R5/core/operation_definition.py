@@ -157,7 +157,7 @@ class OperationDefinitionParameter(BackboneElement):
         description="instance | type | system",
         default=None,
     )
-    scope_ext: Optional[Element] = Field(
+    scope_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for scope extensions",
         default=None,
         alias="_scope",
@@ -202,7 +202,7 @@ class OperationDefinitionParameter(BackboneElement):
         description="Allowed sub-type this parameter can have (if type is abstract)",
         default=None,
     )
-    allowedType_ext: Optional[Element] = Field(
+    allowedType_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for allowedType extensions",
         default=None,
         alias="_allowedType",
@@ -211,7 +211,7 @@ class OperationDefinitionParameter(BackboneElement):
         description="If type is Reference | canonical, allowed targets. If type is \u0027Resource\u0027, then this constrains the allowed resource types",
         default=None,
     )
-    targetProfile_ext: Optional[Element] = Field(
+    targetProfile_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for targetProfile extensions",
         default=None,
         alias="_targetProfile",
@@ -299,7 +299,7 @@ class OperationDefinitionOverload(BackboneElement):
         description="Name of parameter to include in overload",
         default=None,
     )
-    parameterName_ext: Optional[Element] = Field(
+    parameterName_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for parameterName extensions",
         default=None,
         alias="_parameterName",
@@ -573,7 +573,7 @@ class OperationDefinition(DomainResource):
         description="Types this operation applies to",
         default=None,
     )
-    resource_ext: Optional[Element] = Field(
+    resource_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for resource extensions",
         default=None,
         alias="_resource",

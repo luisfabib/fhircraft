@@ -405,7 +405,7 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of | part-of | amends | amended-with | appends | appended-with | cites | cited-by | comments-on | comment-in | contains | contained-in | corrects | correction-in | replaces | replaced-with | retracts | retracted-by | signs | similar-to | supports | supported-with | transforms | transformed-into | transformed-with | documents | specification-of | created-with | cite-as | reprint | reprint-of",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
+    type_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for type extensions",
         default=None,
         alias="_type",
@@ -513,7 +513,7 @@ class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
         description="Name of the database or title of the book or journal",
         default=None,
     )
-    title_ext: Optional[Element] = Field(
+    title_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for title extensions",
         default=None,
         alias="_title",
@@ -1211,7 +1211,7 @@ class Citation(DomainResource):
         description="Language of the resource content",
         default=None,
     )
-    language_ext: Optional[Element] = Field(
+    language_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for language extensions",
         default=None,
         alias="_language",

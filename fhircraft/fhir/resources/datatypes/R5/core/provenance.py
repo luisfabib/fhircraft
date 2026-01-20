@@ -144,7 +144,7 @@ class ProvenanceEntity(BackboneElement):
         description="revision | quotation | source | instantiates | removal",
         default=None,
     )
-    role_ext: Optional[Element] = Field(
+    role_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for role extensions",
         default=None,
         alias="_role",
@@ -264,7 +264,7 @@ class Provenance(DomainResource):
         description="Policy or plan the activity was defined by",
         default=None,
     )
-    policy_ext: Optional[Element] = Field(
+    policy_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for policy extensions",
         default=None,
         alias="_policy",

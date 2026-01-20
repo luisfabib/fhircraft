@@ -226,7 +226,7 @@ class TestScriptMetadataCapability(BackboneElement):
         description="Which origin server these requirements apply to",
         default=None,
     )
-    origin_ext: Optional[Element] = Field(
+    origin_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for origin extensions",
         default=None,
         alias="_origin",
@@ -235,7 +235,7 @@ class TestScriptMetadataCapability(BackboneElement):
         description="Which server these requirements apply to",
         default=None,
     )
-    destination_ext: Optional[Element] = Field(
+    destination_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for destination extensions",
         default=None,
         alias="_destination",
@@ -244,7 +244,7 @@ class TestScriptMetadataCapability(BackboneElement):
         description="Links to the FHIR specification",
         default=None,
     )
-    link_ext: Optional[Element] = Field(
+    link_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for link extensions",
         default=None,
         alias="_link",
@@ -2288,7 +2288,7 @@ class TestScript(DomainResource):
         description="Reference of the validation profile",
         default=None,
     )
-    profile_ext: Optional[Element] = Field(
+    profile_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for profile extensions",
         default=None,
         alias="_profile",

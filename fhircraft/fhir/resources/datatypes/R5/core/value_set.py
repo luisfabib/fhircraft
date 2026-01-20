@@ -256,7 +256,7 @@ class ValueSetComposeInclude(BackboneElement):
         description="Select the contents included in this value set",
         default=None,
     )
-    valueSet_ext: Optional[Element] = Field(
+    valueSet_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for valueSet extensions",
         default=None,
         alias="_valueSet",
@@ -1033,7 +1033,7 @@ class ValueSetExpansion(BackboneElement):
         description="Identifies the value set expansion (business identifier)",
         default=None,
     )
-    identifier_ext: Optional[Element] = Field(
+    identifier_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for identifier extensions",
         default=None,
         alias="_identifier",

@@ -239,7 +239,7 @@ class CoverageEligibilityRequestItem(BackboneElement):
         description="Applicable exception or supporting information",
         default=None,
     )
-    supportingInfoSequence_ext: Optional[Element] = Field(
+    supportingInfoSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for supportingInfoSequence extensions",
         default=None,
         alias="_supportingInfoSequence",
@@ -401,7 +401,7 @@ class CoverageEligibilityRequest(DomainResource):
         description="auth-requirements | benefits | discovery | validation",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
+    purpose_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for purpose extensions",
         default=None,
         alias="_purpose",

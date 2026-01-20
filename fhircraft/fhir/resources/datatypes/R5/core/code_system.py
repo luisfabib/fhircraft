@@ -76,7 +76,7 @@ class CodeSystemFilter(BackboneElement):
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | child-of | descendent-leaf | exists",
         default=None,
     )
-    operator_ext: Optional[Element] = Field(
+    operator_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for operator extensions",
         default=None,
         alias="_operator",

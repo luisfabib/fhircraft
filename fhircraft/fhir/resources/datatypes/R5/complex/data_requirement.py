@@ -29,7 +29,7 @@ class DataRequirement(Element):
         description="The profile of the required data",
         default=None,
     )
-    profile_ext: Optional[Element] = Field(
+    profile_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for profile extensions",
         default=None,
         alias="_profile",
@@ -46,7 +46,7 @@ class DataRequirement(Element):
         description="Indicates specific structure elements that are referenced by the knowledge module",
         default=None,
     )
-    mustSupport_ext: Optional[Element] = Field(
+    mustSupport_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for mustSupport extensions",
         default=None,
         alias="_mustSupport",

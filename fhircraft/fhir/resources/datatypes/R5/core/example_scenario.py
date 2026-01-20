@@ -848,7 +848,7 @@ class ExampleScenario(DomainResource):
         description="Business version of the example scenario",
         default=None,
     )
-    version_ext: Optional[Element] = Field(
+    version_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",

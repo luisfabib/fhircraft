@@ -256,7 +256,7 @@ class ActorDefinition(DomainResource):
         description="Reference to more information about the actor",
         default=None,
     )
-    reference_ext: Optional[Element] = Field(
+    reference_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for reference extensions",
         default=None,
         alias="_reference",
@@ -274,7 +274,7 @@ class ActorDefinition(DomainResource):
         description="Definition of this actor in another context / IG",
         default=None,
     )
-    derivedFrom_ext: Optional[Element] = Field(
+    derivedFrom_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",

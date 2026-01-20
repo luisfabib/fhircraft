@@ -316,7 +316,7 @@ class Permission(DomainResource):
         description="The date that permission was asserted",
         default=None,
     )
-    date_ext: Optional[Element] = Field(
+    date_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for date extensions",
         default=None,
         alias="_date",

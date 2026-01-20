@@ -113,7 +113,7 @@ class ConsentVerification(BackboneElement):
         description="When consent verified",
         default=None,
     )
-    verificationDate_ext: Optional[Element] = Field(
+    verificationDate_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for verificationDate extensions",
         default=None,
         alias="_verificationDate",

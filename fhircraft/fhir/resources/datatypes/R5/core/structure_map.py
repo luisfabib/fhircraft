@@ -288,7 +288,7 @@ class StructureMapGroupRuleSource(BackboneElement):
         description="first | not_first | last | not_last | only_one",
         default=None,
     )
-    listMode_ext: Optional[Element] = Field(
+    listMode_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for listMode extensions",
         default=None,
         alias="_listMode",

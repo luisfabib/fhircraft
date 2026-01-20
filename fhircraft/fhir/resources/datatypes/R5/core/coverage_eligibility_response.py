@@ -418,7 +418,7 @@ class CoverageEligibilityResponseError(BackboneElement):
         description="FHIRPath of element(s) related to issue",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
+    expression_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for expression extensions",
         default=None,
         alias="_expression",
@@ -516,7 +516,7 @@ class CoverageEligibilityResponse(DomainResource):
         description="auth-requirements | benefits | discovery | validation",
         default=None,
     )
-    purpose_ext: Optional[Element] = Field(
+    purpose_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for purpose extensions",
         default=None,
         alias="_purpose",

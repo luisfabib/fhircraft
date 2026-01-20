@@ -463,7 +463,7 @@ class ConditionDefinition(DomainResource):
         description="Formal Definition for the condition",
         default=None,
     )
-    definition_ext: Optional[Element] = Field(
+    definition_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for definition extensions",
         default=None,
         alias="_definition",

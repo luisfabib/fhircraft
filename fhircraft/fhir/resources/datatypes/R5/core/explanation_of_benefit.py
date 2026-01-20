@@ -545,7 +545,7 @@ class ExplanationOfBenefitInsurance(BackboneElement):
         description="Prior authorization reference number",
         default=None,
     )
-    preAuthRef_ext: Optional[Element] = Field(
+    preAuthRef_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for preAuthRef extensions",
         default=None,
         alias="_preAuthRef",
@@ -945,7 +945,7 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="Applicable note numbers",
         default=None,
     )
-    noteNumber_ext: Optional[Element] = Field(
+    noteNumber_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for noteNumber extensions",
         default=None,
         alias="_noteNumber",
@@ -1211,7 +1211,7 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Applicable care team members",
         default=None,
     )
-    careTeamSequence_ext: Optional[Element] = Field(
+    careTeamSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for careTeamSequence extensions",
         default=None,
         alias="_careTeamSequence",
@@ -1220,7 +1220,7 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Applicable diagnoses",
         default=None,
     )
-    diagnosisSequence_ext: Optional[Element] = Field(
+    diagnosisSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for diagnosisSequence extensions",
         default=None,
         alias="_diagnosisSequence",
@@ -1229,7 +1229,7 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Applicable procedures",
         default=None,
     )
-    procedureSequence_ext: Optional[Element] = Field(
+    procedureSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for procedureSequence extensions",
         default=None,
         alias="_procedureSequence",
@@ -1238,7 +1238,7 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Applicable exception and supporting information",
         default=None,
     )
-    informationSequence_ext: Optional[Element] = Field(
+    informationSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for informationSequence extensions",
         default=None,
         alias="_informationSequence",
@@ -1789,7 +1789,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Item sequence number",
         default=None,
     )
-    itemSequence_ext: Optional[Element] = Field(
+    itemSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for itemSequence extensions",
         default=None,
         alias="_itemSequence",
@@ -1798,7 +1798,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Detail sequence number",
         default=None,
     )
-    detailSequence_ext: Optional[Element] = Field(
+    detailSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for detailSequence extensions",
         default=None,
         alias="_detailSequence",
@@ -1807,7 +1807,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Subdetail sequence number",
         default=None,
     )
-    subDetailSequence_ext: Optional[Element] = Field(
+    subDetailSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for subDetailSequence extensions",
         default=None,
         alias="_subDetailSequence",

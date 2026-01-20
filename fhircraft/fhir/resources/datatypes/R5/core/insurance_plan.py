@@ -470,7 +470,7 @@ class InsurancePlan(DomainResource):
         description="Alternate names",
         default=None,
     )
-    alias_ext: Optional[Element] = Field(
+    alias_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",
