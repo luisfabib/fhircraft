@@ -58,7 +58,7 @@ class ElementDefinitionSlicingDiscriminator(Element):
         description="value | exists | type | profile | position",
         default=None,
     )
-    type_ext: Optional[Element] = Field(
+    type_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for type extensions",
         default=None,
         alias="_type",
@@ -209,7 +209,7 @@ class ElementDefinitionType(Element):
         description="Data type or Resource (reference to definition)",
         default=None,
     )
-    code_ext: Optional[Element] = Field(
+    code_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for code extensions",
         default=None,
         alias="_code",
@@ -218,7 +218,7 @@ class ElementDefinitionType(Element):
         description="Profiles (StructureDefinition or IG) - one must apply",
         default=None,
     )
-    profile_ext: Optional[Element] = Field(
+    profile_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for profile extensions",
         default=None,
         alias="_profile",
@@ -227,7 +227,7 @@ class ElementDefinitionType(Element):
         description="Profile (StructureDefinition or IG) on the Reference/canonical target - one must apply",
         default=None,
     )
-    targetProfile_ext: Optional[Element] = Field(
+    targetProfile_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for targetProfile extensions",
         default=None,
         alias="_targetProfile",
@@ -236,7 +236,7 @@ class ElementDefinitionType(Element):
         description="contained | referenced | bundled - how aggregated",
         default=None,
     )
-    aggregation_ext: Optional[Element] = Field(
+    aggregation_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for aggregation extensions",
         default=None,
         alias="_aggregation",
@@ -1007,7 +1007,7 @@ class ElementDefinition(BackboneType):
         description="xmlAttr | xmlText | typeAttr | cdaText | xhtml",
         default=None,
     )
-    representation_ext: Optional[Element] = Field(
+    representation_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for representation extensions",
         default=None,
         alias="_representation",
@@ -1087,7 +1087,7 @@ class ElementDefinition(BackboneType):
         description="Other names",
         default=None,
     )
-    alias_ext: Optional[Element] = Field(
+    alias_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",
@@ -2280,7 +2280,7 @@ class ElementDefinition(BackboneType):
         description="Reference to invariant about presence",
         default=None,
     )
-    condition_ext: Optional[Element] = Field(
+    condition_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for condition extensions",
         default=None,
         alias="_condition",
@@ -2302,7 +2302,7 @@ class ElementDefinition(BackboneType):
         description="Extensions that are allowed to replace a primitive value",
         default=None,
     )
-    valueAlternatives_ext: Optional[Element] = Field(
+    valueAlternatives_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for valueAlternatives extensions",
         default=None,
         alias="_valueAlternatives",

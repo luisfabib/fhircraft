@@ -198,7 +198,7 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         description="Name of the reviewing program",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
+    name_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for name extensions",
         default=None,
         alias="_name",
@@ -630,7 +630,7 @@ class MedicationKnowledgeStorageGuideline(BackboneElement):
         description="Reference to additional information",
         default=None,
     )
-    reference_ext: Optional[Element] = Field(
+    reference_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for reference extensions",
         default=None,
         alias="_reference",

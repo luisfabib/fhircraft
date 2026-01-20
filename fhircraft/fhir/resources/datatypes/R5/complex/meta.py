@@ -43,7 +43,7 @@ class Meta(DataType):
         description="Profiles this resource claims to conform to",
         default=None,
     )
-    profile_ext: Optional[Element] = Field(
+    profile_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for profile extensions",
         default=None,
         alias="_profile",

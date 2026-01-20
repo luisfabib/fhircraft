@@ -410,7 +410,7 @@ class StructureDefinition(FHIRBaseModel):
         description="FHIRPath invariants - when the extension can be used",
         default=None,
     )
-    contextInvariant_ext: Optional[Element] = Field(
+    contextInvariant_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for contextInvariant extensions",
         default=None,
         alias="_contextInvariant",

@@ -323,7 +323,7 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
         description="Applicable note numbers",
         default=None,
     )
-    noteNumber_ext: Optional[Element] = Field(
+    noteNumber_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for noteNumber extensions",
         default=None,
         alias="_noteNumber",
@@ -374,7 +374,7 @@ class ClaimResponseItemDetail(BackboneElement):
         description="Claim detail instance identifier",
         default=None,
     )
-    detailSequence_ext: Optional[Element] = Field(
+    detailSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for detailSequence extensions",
         default=None,
         alias="_detailSequence",
@@ -445,7 +445,7 @@ class ClaimResponseItem(BackboneElement):
         description="Claim item instance identifier",
         default=None,
     )
-    itemSequence_ext: Optional[Element] = Field(
+    itemSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for itemSequence extensions",
         default=None,
         alias="_itemSequence",
@@ -814,7 +814,7 @@ class ClaimResponseAddItem(BackboneElement):
         description="Subdetail sequence number",
         default=None,
     )
-    subdetailSequence_ext: Optional[Element] = Field(
+    subdetailSequence_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for subdetailSequence extensions",
         default=None,
         alias="_subdetailSequence",
@@ -1300,7 +1300,7 @@ class ClaimResponseError(BackboneElement):
         description="FHIRPath of element(s) related to issue",
         default=None,
     )
-    expression_ext: Optional[Element] = Field(
+    expression_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for expression extensions",
         default=None,
         alias="_expression",

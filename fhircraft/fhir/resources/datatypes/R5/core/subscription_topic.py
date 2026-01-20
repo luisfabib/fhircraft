@@ -151,7 +151,7 @@ class SubscriptionTopicResourceTrigger(BackboneElement):
         description="create | update | delete",
         default=None,
     )
-    supportedInteraction_ext: Optional[Element] = Field(
+    supportedInteraction_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for supportedInteraction extensions",
         default=None,
         alias="_supportedInteraction",
@@ -293,7 +293,7 @@ class SubscriptionTopicCanFilterBy(BackboneElement):
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
-    comparator_ext: Optional[Element] = Field(
+    comparator_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for comparator extensions",
         default=None,
         alias="_comparator",
@@ -302,7 +302,7 @@ class SubscriptionTopicCanFilterBy(BackboneElement):
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
     )
-    modifier_ext: Optional[Element] = Field(
+    modifier_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for modifier extensions",
         default=None,
         alias="_modifier",
@@ -357,7 +357,7 @@ class SubscriptionTopicNotificationShape(BackboneElement):
         description="Include directives, rooted in the resource for this shape",
         default=None,
     )
-    include_ext: Optional[Element] = Field(
+    include_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for include extensions",
         default=None,
         alias="_include",
@@ -366,7 +366,7 @@ class SubscriptionTopicNotificationShape(BackboneElement):
         description="Reverse include directives, rooted in the resource for this shape",
         default=None,
     )
-    revInclude_ext: Optional[Element] = Field(
+    revInclude_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for revInclude extensions",
         default=None,
         alias="_revInclude",
@@ -505,7 +505,7 @@ class SubscriptionTopic(DomainResource):
         description="Based on FHIR protocol or definition",
         default=None,
     )
-    derivedFrom_ext: Optional[Element] = Field(
+    derivedFrom_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",

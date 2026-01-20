@@ -62,7 +62,7 @@ class SubstanceDefinitionMoiety(BackboneElement):
         description="Textual name for this moiety substance",
         default=None,
     )
-    name_ext: Optional[Element] = Field(
+    name_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for name extensions",
         default=None,
         alias="_name",
@@ -369,7 +369,7 @@ class SubstanceDefinitionStructureRepresentation(BackboneElement):
         description="The structural representation as a text string in a standard format",
         default=None,
     )
-    representation_ext: Optional[Element] = Field(
+    representation_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for representation extensions",
         default=None,
         alias="_representation",
@@ -906,7 +906,7 @@ class SubstanceDefinition(DomainResource):
         description="Language of the resource content",
         default=None,
     )
-    language_ext: Optional[Element] = Field(
+    language_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for language extensions",
         default=None,
         alias="_language",

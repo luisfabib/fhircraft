@@ -140,7 +140,7 @@ class ChargeItem(DomainResource):
         description="Defining information about the code of this charge item",
         default=None,
     )
-    definitionUri_ext: Optional[Element] = Field(
+    definitionUri_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for definitionUri extensions",
         default=None,
         alias="_definitionUri",
@@ -149,7 +149,7 @@ class ChargeItem(DomainResource):
         description="Resource defining the code of this ChargeItem",
         default=None,
     )
-    definitionCanonical_ext: Optional[Element] = Field(
+    definitionCanonical_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for definitionCanonical extensions",
         default=None,
         alias="_definitionCanonical",

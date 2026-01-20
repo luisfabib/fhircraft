@@ -139,7 +139,7 @@ class ContractTermSecurityLabel(BackboneElement):
         description="Link to Security Labels",
         default=None,
     )
-    number_ext: Optional[Element] = Field(
+    number_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for number extensions",
         default=None,
         alias="_number",
@@ -385,7 +385,7 @@ class ContractTermOffer(BackboneElement):
         description="Pointer to text",
         default=None,
     )
-    linkId_ext: Optional[Element] = Field(
+    linkId_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for linkId extensions",
         default=None,
         alias="_linkId",
@@ -394,7 +394,7 @@ class ContractTermOffer(BackboneElement):
         description="Offer restriction numbers",
         default=None,
     )
-    securityLabelNumber_ext: Optional[Element] = Field(
+    securityLabelNumber_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for securityLabelNumber extensions",
         default=None,
         alias="_securityLabelNumber",
@@ -1005,7 +1005,7 @@ class ContractTermAction(BackboneElement):
         description="Pointer to specific item",
         default=None,
     )
-    contextLinkId_ext: Optional[Element] = Field(
+    contextLinkId_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for contextLinkId extensions",
         default=None,
         alias="_contextLinkId",
@@ -1035,7 +1035,7 @@ class ContractTermAction(BackboneElement):
         description="Pointer to specific item",
         default=None,
     )
-    requesterLinkId_ext: Optional[Element] = Field(
+    requesterLinkId_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for requesterLinkId extensions",
         default=None,
         alias="_requesterLinkId",
@@ -1056,7 +1056,7 @@ class ContractTermAction(BackboneElement):
         description="Pointer to specific item",
         default=None,
     )
-    performerLinkId_ext: Optional[Element] = Field(
+    performerLinkId_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for performerLinkId extensions",
         default=None,
         alias="_performerLinkId",
@@ -1069,7 +1069,7 @@ class ContractTermAction(BackboneElement):
         description="Pointer to specific item",
         default=None,
     )
-    reasonLinkId_ext: Optional[Element] = Field(
+    reasonLinkId_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for reasonLinkId extensions",
         default=None,
         alias="_reasonLinkId",
@@ -1604,7 +1604,7 @@ class Contract(DomainResource):
         description="Acronym or short name",
         default=None,
     )
-    alias_ext: Optional[Element] = Field(
+    alias_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",

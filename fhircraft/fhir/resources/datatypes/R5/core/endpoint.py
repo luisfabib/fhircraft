@@ -48,7 +48,7 @@ class EndpointPayload(BackboneElement):
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,
     )
-    mimeType_ext: Optional[Element] = Field(
+    mimeType_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for mimeType extensions",
         default=None,
         alias="_mimeType",
@@ -195,7 +195,7 @@ class Endpoint(DomainResource):
         description="Usage depends on the channel type",
         default=None,
     )
-    header_ext: Optional[Element] = Field(
+    header_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for header extensions",
         default=None,
         alias="_header",

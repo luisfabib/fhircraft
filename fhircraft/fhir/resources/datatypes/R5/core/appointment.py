@@ -349,7 +349,7 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="Specific dates for a recurring set of appointments (no template)",
         default=None,
     )
-    occurrenceDate_ext: Optional[Element] = Field(
+    occurrenceDate_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for occurrenceDate extensions",
         default=None,
         alias="_occurrenceDate",
@@ -370,7 +370,7 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="Any dates that should be excluded from the series",
         default=None,
     )
-    excludingDate_ext: Optional[Element] = Field(
+    excludingDate_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for excludingDate extensions",
         default=None,
         alias="_excludingDate",
@@ -379,7 +379,7 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="Any recurrence IDs that should be excluded from the recurrence",
         default=None,
     )
-    excludingRecurrenceId_ext: Optional[Element] = Field(
+    excludingRecurrenceId_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for excludingRecurrenceId extensions",
         default=None,
         alias="_excludingRecurrenceId",

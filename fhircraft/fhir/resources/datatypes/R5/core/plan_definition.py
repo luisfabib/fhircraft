@@ -740,7 +740,7 @@ class PlanDefinitionAction(BackboneElement):
         description="What goals this action supports",
         default=None,
     )
-    goalId_ext: Optional[Element] = Field(
+    goalId_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for goalId extensions",
         default=None,
         alias="_goalId",
@@ -1332,7 +1332,7 @@ class PlanDefinition(DomainResource):
         description="Logic used by the plan definition",
         default=None,
     )
-    library_ext: Optional[Element] = Field(
+    library_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for library extensions",
         default=None,
         alias="_library",

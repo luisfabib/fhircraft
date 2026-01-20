@@ -459,7 +459,7 @@ class SpecimenDefinition(DomainResource):
         description="Based on FHIR definition of another SpecimenDefinition",
         default=None,
     )
-    derivedFromCanonical_ext: Optional[Element] = Field(
+    derivedFromCanonical_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromCanonical extensions",
         default=None,
         alias="_derivedFromCanonical",
@@ -468,7 +468,7 @@ class SpecimenDefinition(DomainResource):
         description="Based on external definition",
         default=None,
     )
-    derivedFromUri_ext: Optional[Element] = Field(
+    derivedFromUri_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromUri extensions",
         default=None,
         alias="_derivedFromUri",

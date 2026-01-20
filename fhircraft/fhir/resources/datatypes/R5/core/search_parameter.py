@@ -299,7 +299,7 @@ class SearchParameter(DomainResource):
         description="The resource type(s) this search parameter applies to",
         default=None,
     )
-    base_ext: Optional[Element] = Field(
+    base_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for base extensions",
         default=None,
         alias="_base",
@@ -344,7 +344,7 @@ class SearchParameter(DomainResource):
         description="Types of resource (if a resource reference)",
         default=None,
     )
-    target_ext: Optional[Element] = Field(
+    target_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for target extensions",
         default=None,
         alias="_target",
@@ -371,7 +371,7 @@ class SearchParameter(DomainResource):
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
-    comparator_ext: Optional[Element] = Field(
+    comparator_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for comparator extensions",
         default=None,
         alias="_comparator",
@@ -380,7 +380,7 @@ class SearchParameter(DomainResource):
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
     )
-    modifier_ext: Optional[Element] = Field(
+    modifier_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for modifier extensions",
         default=None,
         alias="_modifier",
@@ -389,7 +389,7 @@ class SearchParameter(DomainResource):
         description="Chained names supported",
         default=None,
     )
-    chain_ext: Optional[Element] = Field(
+    chain_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for chain extensions",
         default=None,
         alias="_chain",

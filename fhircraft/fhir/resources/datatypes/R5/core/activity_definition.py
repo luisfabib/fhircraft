@@ -433,7 +433,7 @@ class ActivityDefinition(DomainResource):
         description="Logic used by the activity definition",
         default=None,
     )
-    library_ext: Optional[Element] = Field(
+    library_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for library extensions",
         default=None,
         alias="_library",
@@ -548,7 +548,7 @@ class ActivityDefinition(DomainResource):
         description="What specimens are required to perform this action",
         default=None,
     )
-    specimenRequirement_ext: Optional[Element] = Field(
+    specimenRequirement_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for specimenRequirement extensions",
         default=None,
         alias="_specimenRequirement",
@@ -557,7 +557,7 @@ class ActivityDefinition(DomainResource):
         description="What observations are required to perform this action",
         default=None,
     )
-    observationRequirement_ext: Optional[Element] = Field(
+    observationRequirement_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for observationRequirement extensions",
         default=None,
         alias="_observationRequirement",
@@ -566,7 +566,7 @@ class ActivityDefinition(DomainResource):
         description="What observations must be produced by this action",
         default=None,
     )
-    observationResultRequirement_ext: Optional[Element] = Field(
+    observationResultRequirement_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for observationResultRequirement extensions",
         default=None,
         alias="_observationResultRequirement",

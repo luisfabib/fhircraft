@@ -247,7 +247,7 @@ class DetectedIssue(DomainResource):
         description="Description and context",
         default=None,
     )
-    detail_ext: Optional[Element] = Field(
+    detail_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for detail extensions",
         default=None,
         alias="_detail",

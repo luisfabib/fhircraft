@@ -82,7 +82,7 @@ class ElementDefinitionDiscriminator(Element):
     type: Code = Field(
         description="value | exists | pattern | type | profile",
     )
-    type_ext: Optional[Element] = Field(
+    type_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for type extensions",
         default=None,
         alias="_type",
@@ -728,7 +728,7 @@ class ElementDefinition(FHIRBaseModel):
         description="xmlAttr | xmlText | typeAttr | cdaText | xhtml",
         default=None,
     )
-    representation_ext: Optional[Extension] = Field(
+    representation_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for representation extensions",
         default=None,
         alias="_representation",
@@ -808,7 +808,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Other names",
         default=None,
     )
-    alias_ext: Optional[Extension] = Field(
+    alias_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",
@@ -1567,7 +1567,7 @@ class ElementDefinition(FHIRBaseModel):
         description="Reference to invariant about presence",
         default=None,
     )
-    condition_ext: Optional[Extension] = Field(
+    condition_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for condition extensions",
         default=None,
         alias="_condition",

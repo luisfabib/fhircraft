@@ -73,7 +73,7 @@ class RequirementsStatement(BackboneElement):
         description="SHALL | SHOULD | MAY | SHOULD-NOT",
         default=None,
     )
-    conformance_ext: Optional[Element] = Field(
+    conformance_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for conformance extensions",
         default=None,
         alias="_conformance",
@@ -100,7 +100,7 @@ class RequirementsStatement(BackboneElement):
         description="Another statement this clarifies/restricts ([url#]key)",
         default=None,
     )
-    derivedFrom_ext: Optional[Element] = Field(
+    derivedFrom_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",
@@ -118,7 +118,7 @@ class RequirementsStatement(BackboneElement):
         description="Design artifact that satisfies this requirement",
         default=None,
     )
-    satisfiedBy_ext: Optional[Element] = Field(
+    satisfiedBy_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for satisfiedBy extensions",
         default=None,
         alias="_satisfiedBy",
@@ -127,7 +127,7 @@ class RequirementsStatement(BackboneElement):
         description="External artifact (rule/document etc. that) created this requirement",
         default=None,
     )
-    reference_ext: Optional[Element] = Field(
+    reference_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for reference extensions",
         default=None,
         alias="_reference",
@@ -393,7 +393,7 @@ class Requirements(DomainResource):
         description="Actor for these requirements",
         default=None,
     )
-    actor_ext: Optional[Element] = Field(
+    actor_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for actor extensions",
         default=None,
         alias="_actor",

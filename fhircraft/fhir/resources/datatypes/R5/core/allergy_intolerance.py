@@ -228,7 +228,7 @@ class AllergyIntolerance(DomainResource):
         description="food | medication | environment | biologic",
         default=None,
     )
-    category_ext: Optional[Element] = Field(
+    category_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for category extensions",
         default=None,
         alias="_category",

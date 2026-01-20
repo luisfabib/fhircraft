@@ -804,7 +804,7 @@ class ConceptMapGroup(BackboneElement):
         description="Target system that the concepts are to be mapped to",
         default=None,
     )
-    target_ext: Optional[Element] = Field(
+    target_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for target extensions",
         default=None,
         alias="_target",

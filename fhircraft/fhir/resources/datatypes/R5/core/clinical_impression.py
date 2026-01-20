@@ -204,7 +204,7 @@ class ClinicalImpression(DomainResource):
         description="Clinical Protocol followed",
         default=None,
     )
-    protocol_ext: Optional[Element] = Field(
+    protocol_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for protocol extensions",
         default=None,
         alias="_protocol",

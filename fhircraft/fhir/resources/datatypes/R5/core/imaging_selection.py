@@ -95,7 +95,7 @@ class ImagingSelectionInstanceImageRegion2D(BackboneElement):
         description="Specifies the coordinates that define the image region",
         default=None,
     )
-    coordinate_ext: Optional[Element] = Field(
+    coordinate_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for coordinate extensions",
         default=None,
         alias="_coordinate",
@@ -194,7 +194,7 @@ class ImagingSelectionInstance(BackboneElement):
         description="The selected subset of the SOP Instance",
         default=None,
     )
-    subset_ext: Optional[Element] = Field(
+    subset_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for subset extensions",
         default=None,
         alias="_subset",

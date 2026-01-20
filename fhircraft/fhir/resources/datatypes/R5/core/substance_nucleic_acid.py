@@ -154,7 +154,7 @@ class SubstanceNucleicAcidSubunit(BackboneElement):
         description="Index of linear sequences of nucleic acids in order of decreasing length. Sequences of the same length will be ordered by molecular weight. Subunits that have identical sequences will be repeated and have sequential subscripts",
         default=None,
     )
-    subunit_ext: Optional[Element] = Field(
+    subunit_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for subunit extensions",
         default=None,
         alias="_subunit",
