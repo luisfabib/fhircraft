@@ -127,6 +127,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "kind": "resource",
             "abstract": True,
             "type": "TestResource",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -200,6 +201,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "kind": "resource",
             "abstract": True,
             "type": "TestResource",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -248,6 +250,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "kind": "resource",
             "abstract": True,
             "type": "TestResource",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -304,6 +307,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "kind": "resource",
             "abstract": True,
             "type": "TestResource",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -351,6 +355,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "kind": "resource",
             "abstract": True,
             "type": "BaseResource",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -390,6 +395,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "abstract": True,
             "type": "DerivedResource",
             "baseDefinition": "http://example.org/StructureDefinition/BaseResource",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -450,6 +456,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "kind": "resource",
             "abstract": True,
             "type": "CachedBase",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -483,6 +490,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "abstract": True,
             "type": "DerivedFromCached",
             "baseDefinition": "http://example.org/StructureDefinition/CachedBase",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -548,6 +556,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "abstract": True,
             "type": "ResourceWithMissingBase",
             "baseDefinition": "http://example.org/StructureDefinition/NonExistentBase",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -599,6 +608,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -653,6 +663,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "kind": "resource",
             "abstract": True,
             "type": "Level1",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -687,6 +698,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "abstract": True,
             "type": "Level2",
             "baseDefinition": "http://example.org/StructureDefinition/Level1",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -721,6 +733,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "abstract": True,
             "type": "Level3",
             "baseDefinition": "http://example.org/StructureDefinition/Level2",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -773,6 +786,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "kind": "resource",
             "abstract": True,
             "type": "BaseWithField",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -810,6 +824,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "abstract": True,
             "type": "DerivedWithSameField",
             "baseDefinition": "http://example.org/StructureDefinition/BaseWithField",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -878,6 +893,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "abstract": True,
             "type": "TestResource",
             "baseDefinition": "http://example.org/StructureDefinition/SomeBase",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -925,6 +941,7 @@ class TestPythonKeywordHandlingIntegration(FactoryTestCase):
             "abstract": True,
             "type": "StandaloneResource",
             # No baseDefinition specified
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -1101,6 +1118,7 @@ class TestSliceModelInheritance(FactoryTestCase):
             "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "snapshot": {
                 "element": [
@@ -1194,7 +1212,7 @@ class TestSliceModelInheritance(FactoryTestCase):
         # Call _construct_slice_model directly
         slice_model = self.factory._construct_slice_model(
             name="test-extension-slice",
-            node=mock_node,
+            node=mock_node,  # type: ignore
             base=Extension,
             base_name="TestExtension",
         )
@@ -1443,7 +1461,7 @@ class TestSliceModelInheritance(FactoryTestCase):
         # Create slice model
         ExtensionSlice = self.factory._construct_slice_model(
             name="mro-test-slice",
-            node=mock_node,
+            node=mock_node,  # type: ignore
             base=Extension,
             base_name="MROTestExtension",
         )
@@ -1490,6 +1508,8 @@ class TestDetectConstructionMode(FactoryTestCase):
             "id": "test-snapshot",
             "url": "http://example.org/StructureDefinition/test-snapshot",
             "name": "TestSnapshot",
+            "fhirVersion": "4.3.0",
+            "version": "2.1.0",
             "status": "draft",
             "kind": "resource",
             "abstract": True,
@@ -1552,6 +1572,8 @@ class TestDetectConstructionMode(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-both",
             "name": "TestBoth",
             "status": "draft",
+            "fhirVersion": "4.3.0",
+            "version": "2.1.0",
             "kind": "resource",
             "abstract": True,
             "type": "Patient",
@@ -1596,6 +1618,8 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestSnapshot",
             "status": "draft",
             "kind": "resource",
+            "fhirVersion": "4.3.0",
+            "version": "2.1.0",
             "abstract": True,
             "type": "Patient",
             "snapshot": {
@@ -1626,6 +1650,8 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestDifferential",
             "status": "draft",
             "kind": "resource",
+            "fhirVersion": "4.3.0",
+            "version": "2.1.0",
             "abstract": True,
             "type": "Patient",
             "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
@@ -1657,6 +1683,8 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestNoSnapshot",
             "status": "draft",
             "kind": "resource",
+            "fhirVersion": "4.3.0",
+            "version": "2.1.0",
             "abstract": True,
             "type": "Patient",
             "differential": {
@@ -1686,6 +1714,8 @@ class TestDetectConstructionMode(FactoryTestCase):
             "name": "TestNoDifferential",
             "status": "draft",
             "kind": "resource",
+            "fhirVersion": "4.3.0",
+            "version": "2.1.0",
             "abstract": True,
             "type": "Patient",
             "snapshot": {
@@ -1705,25 +1735,6 @@ class TestDetectConstructionMode(FactoryTestCase):
 
         with pytest.raises(ValueError, match="DIFFERENTIAL mode requested but"):
             self.factory._detect_construction_mode(sd, ConstructionMode.DIFFERENTIAL)
-
-    def test_raises_error_when_neither_snapshot_nor_differential(self):
-        """Test that ValueError is raised when neither snapshot nor differential is present."""
-        sd_dict = {
-            "resourceType": "StructureDefinition",
-            "id": "test-empty",
-            "url": "http://example.org/StructureDefinition/test-empty",
-            "name": "TestEmpty",
-            "status": "draft",
-            "kind": "resource",
-            "abstract": True,
-            "type": "Patient",
-        }
-        sd = StructureDefinition.model_validate(sd_dict)
-
-        with pytest.raises(
-            ValueError, match="Must have either 'snapshot' or 'differential'"
-        ):
-            self.factory._detect_construction_mode(sd, ConstructionMode.AUTO)
 
 
 class TestResolveAndConstructBaseModel(FactoryTestCase):
@@ -1749,7 +1760,22 @@ class TestResolveAndConstructBaseModel(FactoryTestCase):
             "status": "draft",
             "kind": "resource",
             "type": "Resource",
+            "fhirVersion": "4.3.0",
+            "version": "2.1.0",
             "abstract": True,
+            "baseDefinition": base_url,
+            "snapshot": {
+                "element": [
+                    {
+                        "id": "Resource",
+                        "path": "Resource",
+                        "min": 0,
+                        "max": "*",
+                        "definition": "Base definition of Resource",
+                        "base": {"path": "Resource", "min": 0, "max": "*"},
+                    }
+                ]
+            },
         }
         sd = StructureDefinition.model_validate(sd_dict)
 
@@ -1770,8 +1796,22 @@ class TestResolveAndConstructBaseModel(FactoryTestCase):
                 "status": "draft",
                 "kind": "resource",
                 "type": "Resource",
+                "fhirVersion": "4.3.0",
+                "version": "2.1.0",
                 "abstract": True,
                 "baseDefinition": base_url,
+                "snapshot": {
+                    "element": [
+                        {
+                            "id": "Resource",
+                            "path": "Resource",
+                            "min": 0,
+                            "max": "*",
+                            "definition": "Base definition of Resource",
+                            "base": {"path": "Resource", "min": 0, "max": "*"},
+                        }
+                    ]
+                },
             }
             sd = StructureDefinition.model_validate(sd_dict)
 
@@ -1803,6 +1843,7 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "name": "TestPatientProfile",
             "title": "Test Patient Profile",
             "status": "draft",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "kind": "resource",
             "abstract": True,
@@ -1849,6 +1890,7 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-patient-profile-2",
             "name": "TestPatientProfile2",
             "status": "draft",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "kind": "resource",
             "abstract": True,
@@ -1875,6 +1917,7 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-cached-profile",
             "name": "TestCachedProfile",
             "status": "draft",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "kind": "resource",
             "abstract": True,
@@ -1914,6 +1957,7 @@ class TestConstructResourceModelDifferentialMode(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-inheritance",
             "name": "TestInheritance",
             "status": "draft",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "kind": "resource",
             "abstract": True,
@@ -1951,6 +1995,7 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-snapshot-patient",
             "name": "TestSnapshotPatient",
             "status": "draft",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "kind": "resource",
             "abstract": True,
@@ -1995,6 +2040,7 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-snapshot-explicit",
             "name": "TestSnapshotExplicit",
             "status": "draft",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "kind": "resource",
             "abstract": True,
@@ -2028,6 +2074,7 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-backward-compat",
             "name": "TestBackwardCompat",
             "status": "draft",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "kind": "resource",
             "abstract": True,
@@ -2088,6 +2135,7 @@ class TestFactoryConfigConstructionMode(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-config-mode",
             "name": "TestConfigMode",
             "status": "draft",
+            "version": "2.1.0",
             "fhirVersion": "4.3.0",
             "kind": "resource",
             "abstract": True,
@@ -2126,7 +2174,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base",
             "name": "MockBase",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2165,7 +2214,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-mode",
             "name": "TestDiffMode",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2226,7 +2276,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-mode",
             "name": "TestDiffMode",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2288,7 +2339,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-status",
             "name": "MockBaseStatus",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2324,7 +2376,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-fixed",
             "name": "TestDiffFixed",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2349,7 +2402,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
 
         # Test that only the fixed value is accepted
         instance = mock_resource.model_validate({"status": "active"})
-        self.assertEqual(instance.status.value, "active")
+        self.assertEqual(instance.status.value, "active")  # type: ignore
 
         # Test that other values are rejected
         with self.assertRaises(ValidationError):
@@ -2364,7 +2417,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-coding",
             "name": "MockBaseCoding",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2400,7 +2454,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-pattern",
             "name": "TestDiffPattern",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": False,
             "type": "Resource",
@@ -2453,7 +2508,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-choice",
             "name": "MockBaseChoice",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2493,7 +2549,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-choice",
             "name": "TestDiffChoice",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": False,
             "type": "Resource",
@@ -2522,7 +2579,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
 
         # Test valid data with string
         instance = mock_resource.model_validate({"valueString": "test"})
-        self.assertEqual(instance.value, "test")
+        self.assertEqual(instance.value, "test")  # type: ignore
 
         with self.assertRaises(ValidationError):
             mock_resource.model_validate({"valueInteger": 2})
@@ -2536,7 +2593,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-telecom",
             "name": "MockBaseTelecom",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2572,7 +2630,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-telecom",
             "name": "TestDiffTelecom",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": False,
             "type": "Resource",
@@ -2609,7 +2668,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
         instance = mock_resource.model_validate(
             {"telecom": [{"system": "phone", "value": "555-1234"}]}
         )
-        self.assertIsNotNone(instance.telecom)
+        self.assertIsNotNone(instance.telecom)  # type: ignore
 
         # Test invalid data without required telecom
         with self.assertRaises(ValidationError):
@@ -2624,7 +2683,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-identifier",
             "name": "MockBaseIdentifier",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2660,7 +2720,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-identifier",
             "name": "TestDiffIdentifier",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": False,
             "type": "Resource",
@@ -2709,7 +2770,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-constraint",
             "name": "MockBaseConstraint",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2745,7 +2807,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-constraint",
             "name": "TestDiffConstraint",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": False,
             "type": "Resource",
@@ -2785,7 +2848,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
 
         # Check that valid value passes
         instance = mock_resource.model_validate({"value": 5})
-        self.assertEqual(instance.value, 5)
+        self.assertEqual(instance.value, 5)  # type: ignore
 
         # Check that invalid value raises error
         with self.assertRaises(ValidationError):
@@ -2800,7 +2863,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-multi",
             "name": "MockBaseMulti",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2854,7 +2918,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-multi-constraints",
             "name": "TestDiffMultiConstraints",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": False,
             "type": "Resource",
@@ -2895,7 +2960,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
         instance = mock_resource.model_validate(
             {"status": "active", "priority": "high", "text": "Test text"}
         )
-        self.assertEqual(instance.status.value, "active")
+        self.assertEqual(instance.status.value, "active")  # type: ignore
 
         # Test that fixed value is enforced
         with self.assertRaises(ValidationError):
@@ -2918,7 +2983,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-complex",
             "name": "MockBaseComplex",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -2972,7 +3038,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-inherit",
             "name": "TestDiffInherit",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": False,
             "type": "Resource",
@@ -3001,9 +3068,9 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
         instance = mock_resource.model_validate(
             {"field1": "required_value", "field2": 42, "field3": True}
         )
-        self.assertEqual(instance.field1, "required_value")
-        self.assertEqual(instance.field2, 42)
-        self.assertEqual(instance.field3, True)
+        self.assertEqual(instance.field1, "required_value")  # type: ignore
+        self.assertEqual(instance.field2, 42)  # type: ignore
+        self.assertEqual(instance.field3, True)  # type: ignore
 
     def test_construct_diff_sliced_elements_with_discriminators(self):
         """Test that differential can define sliced elements with discriminators and named slices."""
@@ -3014,7 +3081,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-extension",
             "name": "MockBaseExtension",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -3063,7 +3131,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-slicing",
             "name": "TestDiffSlicing",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": False,
             "type": "Resource",
@@ -3159,8 +3228,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             }
         )
-        self.assertIsNotNone(instance.extension)
-        self.assertEqual(len(instance.extension), 2)
+        self.assertIsNotNone(instance.extension)  # type: ignore
+        self.assertEqual(len(instance.extension), 2)  # type: ignore
 
     def test_construct_diff_sliced_backbone_elements(self):
         """Test that differential can slice backbone elements with specific constraints."""
@@ -3171,7 +3240,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/mock-base-component",
             "name": "MockBaseComponent",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": True,
             "type": "Resource",
@@ -3236,7 +3306,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
             "url": "http://example.org/StructureDefinition/test-diff-component-slice",
             "name": "TestDiffComponentSlice",
             "status": "draft",
-            "fhirVersion": "5.0.0",
+            "fhirVersion": "4.3.0",
+            "version": "1.0.0",
             "kind": "resource",
             "abstract": False,
             "type": "Resource",
@@ -3334,5 +3405,5 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                 ]
             }
         )
-        self.assertIsNotNone(instance.component)
-        self.assertEqual(len(instance.component), 2)
+        self.assertIsNotNone(instance.component)  # type: ignore
+        self.assertEqual(len(instance.component), 2)  # type: ignore

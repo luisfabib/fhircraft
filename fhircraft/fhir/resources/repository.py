@@ -43,7 +43,7 @@ FHIR_VERSION_TO_STRUCTURE_DEFINITION = {
 }
 
 
-def get_structure_definition_class(fhir_version: Optional[str] = None):
+def get_structure_definition_class(fhir_version: str):
     """
     Get the appropriate StructureDefinition class for a given FHIR version.
 
@@ -53,10 +53,6 @@ def get_structure_definition_class(fhir_version: Optional[str] = None):
     Returns:
         The appropriate StructureDefinition class
     """
-    if not fhir_version:
-        # Default to R4 if no version specified
-        return StructureDefinitionR4
-
     # Get the FHIR release from version string
     release = get_FHIR_release_from_version(fhir_version)
     return FHIR_VERSION_TO_STRUCTURE_DEFINITION.get(release, StructureDefinitionR4)
@@ -76,12 +72,9 @@ def validate_structure_definition(
         Validated StructureDefinition instance
     """
     # Try the detected/specified version first
-    if fhir_version:
+    if fhir_version := (fhir_version or data.get("fhirVersion")):
         structure_def_class = get_structure_definition_class(fhir_version)
-        try:
-            return structure_def_class.model_validate(data)
-        except ValidationError:
-            pass  # Fall through to try other versions
+        return structure_def_class.model_validate(data)
 
     # Try all version-specific classes if no version specified or validation failed
     for version_class in [
@@ -93,10 +86,9 @@ def validate_structure_definition(
             return version_class.model_validate(data)
         except ValidationError:
             continue
-
-    # If all fail, use the detected version class and let the error bubble up
-    structure_def_class = get_structure_definition_class(fhir_version)
-    return structure_def_class.model_validate(data)
+    raise RuntimeError(
+        "Failed to validate structure definition with any known FHIR version."
+    )
 
 
 def detect_fhir_version_from_data(data: Dict[str, Any]) -> Optional[str]:
@@ -398,8 +390,7 @@ class PackageStructureDefinitionRepository(
         base_url, version = self.parse_canonical_url(resource.url)
 
         # Use the structure definition's version field if no version in URL
-        if not version and resource.version:
-            version = resource.version
+        version = version or resource.version
 
         if not version:
             raise ValueError(
@@ -632,7 +623,7 @@ class PackageStructureDefinitionRepository(
 
         if structure_def_count == 0:
             raise RuntimeError(
-                f"No StructureDefinition resources found in package {package_name}@{package_version}"
+                f"No valid StructureDefinition resources found in package {package_name}@{package_version}"
             )
 
         if errors:
@@ -868,6 +859,9 @@ class CompositeStructureDefinitionRepository(
             ValueError: If a duplicate StructureDefinition is added and fail_if_exists is True.
 
         """
+        print(
+            f"Adding StructureDefinition with URL: {resource.url} and version: {resource.version}"
+        )
         if not resource.url:
             raise ValueError(
                 "StructureDefinition must have a 'url' field to be added to the repository."
@@ -876,8 +870,7 @@ class CompositeStructureDefinitionRepository(
         base_url, version = self.parse_canonical_url(resource.url)
 
         # Use the structure definition's version field if no version in URL
-        if not version:
-            version = resource.version or resource.fhirVersion
+        version = version or resource.version
 
         if not version:
             raise ValueError(

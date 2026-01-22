@@ -227,7 +227,6 @@ class TestStructureDefinitionRepository:
         repo = empty_repository
         invalid_data = SAMPLE_PATIENT_R4.copy()
         del invalid_data["version"]
-
         patient = StructureDefinitionR4.model_validate(invalid_data)
 
         with pytest.raises(ValueError, match="must have a version"):
@@ -239,9 +238,10 @@ class TestStructureDefinitionRepository:
         invalid_data = SAMPLE_PATIENT_R4.copy()
         del invalid_data["url"]
 
+        patient = StructureDefinitionR4.model_validate(invalid_data)
         # This should fail at StructureDefinition validation level
-        with pytest.raises(Exception):
-            StructureDefinitionR4.model_validate(invalid_data)
+        with pytest.raises(ValueError):
+            repo.add(patient)
 
     def test_get_structure_definition(self, populated_repository):
         """Test retrieving structure definitions."""
@@ -946,13 +946,25 @@ def valid_structure_definition(
         "resourceType": "StructureDefinition",
         "url": url,
         "version": version,
+        "fhirVersion": "4.0.1",
         "name": "TestStructureDefinition",
         "status": "active",
         "kind": "resource",
-        "abstract": False,
+        "abstract": True,
         "type": "Observation",
         "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
-        "derivation": "constraint",
+        "snapshot": {
+            "element": [
+                {
+                    "id": "Observation",
+                    "path": "Observation",
+                    "min": 0,
+                    "max": "*",
+                    "definition": "A test observation",
+                    "base": {"path": "Observation", "min": 0, "max": "*"},
+                }
+            ]
+        },
     }
 
 
@@ -988,7 +1000,7 @@ class TestProcessPackageTar:
         tar_bytes = make_tarfile_with_structuredefs([])
         with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
             with pytest.raises(
-                RuntimeError, match="No StructureDefinition resources found"
+                RuntimeError, match="No valid StructureDefinition resources found"
             ):
                 self.repo._process_package_tar(tar, "testpkg", "1.0.0")
 
@@ -1003,7 +1015,7 @@ class TestProcessPackageTar:
         tar_bytes.seek(0)
         with tarfile.open(fileobj=tar_bytes, mode="r") as tar:
             with pytest.raises(
-                RuntimeError, match="No StructureDefinition resources found"
+                RuntimeError, match="No valid StructureDefinition resources found"
             ):
                 self.repo._process_package_tar(tar, "testpkg", "1.0.0")
 

@@ -10,6 +10,7 @@ from typing import (
     List,
     Optional,
     Type,
+    Literal,
     TypeVar,
     Union,
     get_args,
@@ -390,7 +391,9 @@ def merge_dicts(dict1: dict, dict2: dict) -> dict:
     return merged_dict
 
 
-def get_FHIR_release_from_version(version: str) -> str:
+def get_FHIR_release_from_version(
+    version: str,
+) -> Literal["DSTU2", "STU3", "R4", "R4B", "R5", "R6"]:
     # Check format of the version string
     if not re.match(r"^\d+\.\d+\.\d+$", version):
         raise ValueError(f'FHIR version must be in "x.y.z" format, got "{version}"')
@@ -402,14 +405,6 @@ def get_FHIR_release_from_version(version: str) -> str:
         return "DSTU2"
     elif version_tuple >= (1, 1, 0) and version_tuple <= (3, 0, 2):
         return "STU3"
-    elif version_tuple >= (3, 2, 0) and version_tuple <= (4, 0, 1):
-        return "R4"
-    elif version_tuple >= (4, 1, 0) and version_tuple <= (4, 3, 0):
-        return "R4B"
-    elif version_tuple >= (4, 2, 0) and version_tuple <= (5, 0, 0):
-        return "R5"
-    elif version_tuple >= (6, 0, 0):
-        return "R6"
     elif version_tuple >= (3, 2, 0) and version_tuple <= (4, 0, 1):
         return "R4"
     elif version_tuple >= (4, 1, 0) and version_tuple <= (4, 3, 0):

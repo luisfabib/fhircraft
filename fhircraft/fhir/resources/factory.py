@@ -1284,8 +1284,8 @@ class ResourceFactory:
         parts = reference_path.split(".")
 
         # Detect cycles
-        if reference_path in self.paths_in_processing or node.path.startswith(
-            reference_path + "."
+        if reference_path in self.paths_in_processing or (
+            node.path and node.path.startswith(reference_path + ".")
         ):
             backbone_model_name = capitalize(resource_name).strip() + "".join(
                 [capitalize(label).strip() for label in reference_path.split(".")[1:]]
@@ -1539,8 +1539,12 @@ class ResourceFactory:
         validators = ResourceFactoryValidators()
         properties = {}
         for name, node in root_node.children.items():
-            if node.definition is None:
-                raise ValueError(f"Element definition for '{name}' is missing.")
+
+            if not node.definition:
+                if node.children or node.slices:
+                    continue
+                else:
+                    raise ValueError(f"Element definition for '{name}' is missing.")
             # Handle Python reserved keywords for field names early
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
                 name
@@ -1556,6 +1560,9 @@ class ResourceFactory:
             # -------------------------------------
             if node.definition.contentReference:
                 node = self._resolve_content_reference(node, resource_name)
+                assert (
+                    node.definition is not None
+                ), f"Node definition could not be resolved for {node.path}"
 
             # -------------------------------------
             # Type resolution
@@ -1606,7 +1613,7 @@ class ResourceFactory:
                         and not field.endswith("_ext")
                         and (forbidden_type := field.replace(basename, ""))
                         not in [
-                            _type.__name__ if isinstance(_type, type) else str(_type)
+                            (_type.__name__ if isinstance(_type, type) else str(_type))
                             for _type in field_types
                         ]
                     ]
@@ -1691,6 +1698,9 @@ class ResourceFactory:
             # -------------------------------------
             elif node.children:
                 # Process element children
+                assert (
+                    node.path is not None
+                ), "Node path cannot be None when processing children"
                 assert isinstance(field_type, type) and issubclass(
                     field_type, BaseModel
                 ), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {node.path}"
@@ -1732,6 +1742,8 @@ class ResourceFactory:
                         self._parse_element_cardinality(
                             node.children["extension"].definition
                         )
+                        if node.children["extension"].definition
+                        else (0, 99999)
                     )
                     # Add slicing cardinality validator for field
                     subfield_validators.add_slicing_validator(field="extension")
@@ -1782,6 +1794,7 @@ class ResourceFactory:
         ) = None,
         base_model: type[ModelT] | None = None,
         mode: ConstructionMode | str = ConstructionMode.AUTO,
+        fhir_release: Literal["DSTU2", "STU3", "R4", "R4B", "R5", "R6"] | None = None,
     ) -> type[ModelT | BaseModel]:
         """
         Constructs a Pydantic model based on the provided FHIR structure definition.
@@ -1791,6 +1804,7 @@ class ResourceFactory:
             structure_definition: The FHIR StructureDefinition to build the model from specified as a filename or as a dictionary.
             base_model: Optional base model to inherit from (overrides baseDefinition in differential mode).
             mode: Construction mode (SNAPSHOT, DIFFERENTIAL, or AUTO). Defaults to AUTO which auto-detects.
+            fhir_release: Optional FHIR release version ("DSTU2", "STU3", "R4", "R4B", "R5", "R6") to use for model construction.
 
         Returns:
             The constructed Pydantic model representing the FHIR resource.
@@ -1830,11 +1844,26 @@ class ResourceFactory:
         # Detect the appropriate construction mode
         resolved_mode = self._detect_construction_mode(_structure_definition, mode)
 
+        if not _structure_definition.fhirVersion:
+            if not fhir_release:
+                raise ValueError(
+                    "StructureDefinition does not specify FHIR version. Please provide fhir_release."
+                )
+        else:
+            if fhir_release and fhir_release != get_FHIR_release_from_version(
+                _structure_definition.fhirVersion
+            ):
+                raise ValueError(
+                    "Provided fhir_release does not match StructureDefinition's fhirVersion."
+                )
+            else:
+                fhir_release = get_FHIR_release_from_version(
+                    _structure_definition.fhirVersion
+                )
+
         self.Config = self.FactoryConfig(
-            FHIR_release=get_FHIR_release_from_version(
-                _structure_definition.fhirVersion or "4.3.0"
-            ),
-            FHIR_version=_structure_definition.fhirVersion or "4.3.0",
+            FHIR_release=fhir_release,
+            FHIR_version=_structure_definition.fhirVersion or "",
             construction_mode=resolved_mode,
         )
 
@@ -1847,7 +1876,7 @@ class ResourceFactory:
                     # Resolve and store the base StructureDefinition for snapshot merging
                     try:
                         _base_structure_definition = self.resolve_structure_definition(
-                            base_canonical_url
+                            base_canonical_url, version=structure_definition.fhirVersion  # type: ignore
                         )
                     except Exception as e:
                         # Base StructureDefinition not in repository
