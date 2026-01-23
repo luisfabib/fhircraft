@@ -336,7 +336,7 @@ class FhirMappingLanguageParser(FhirPathParser):
                 dict(
                     resourceType="ConceptMap",
                     status="draft",
-                    name=p[2],
+                    id=p[2],
                     group=[
                         self.ConceptMapGroup(
                             source=source,

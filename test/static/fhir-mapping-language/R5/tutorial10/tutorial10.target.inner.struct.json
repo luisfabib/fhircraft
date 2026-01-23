@@ -11,7 +11,7 @@
   "name": "TRightInner",
   "status": "draft",
   "fhirVersion": "4.0.1",
-  "kind": "logical",
+  "kind": "complex-type",
   "abstract": true,
   "type": "TRightInner",
   "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Base",

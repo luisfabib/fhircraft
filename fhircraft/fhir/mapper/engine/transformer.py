@@ -15,8 +15,14 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Identifier,
     Quantity,
 )
+from fhircraft.fhir.resources.datatypes.R4.core.structure_map import (
+    StructureMapGroupRuleTargetParameter as R4_StructureMapParameter,
+)
+from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
+    StructureMapGroupRuleTargetParameter as R4B_StructureMapParameter,
+)
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
-    StructureMapGroupRuleTargetParameter as StructureMapParameter,
+    StructureMapGroupRuleTargetParameter as R5_StructureMapParameter,
 )
 
 from .exceptions import MappingError, RuleProcessingError
@@ -63,7 +69,12 @@ def validate_transform_parameters(
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(
-            scope: MappingScope, parameters: List[StructureMapParameter]
+            scope: MappingScope,
+            parameters: (
+                List[R4_StructureMapParameter]
+                | List[R4B_StructureMapParameter]
+                | List[R5_StructureMapParameter]
+            ),
         ) -> Any:
             error = ""
             if not signatures:
@@ -133,7 +144,14 @@ class MappingTransformer:
         }
 
     def execute(
-        self, name: str, scope: MappingScope, parameters: List[StructureMapParameter]
+        self,
+        name: str,
+        scope: MappingScope,
+        parameters: (
+            List[R4_StructureMapParameter]
+            | List[R4B_StructureMapParameter]
+            | List[R5_StructureMapParameter]
+        ),
     ) -> Any:
         """
         Executes a registered FHIR Mapping Language transform by name.
@@ -276,7 +294,12 @@ class MappingTransformer:
 
     @staticmethod
     def _append_transform(
-        scope: MappingScope, parameters: List[StructureMapParameter]
+        scope: MappingScope,
+        parameters: (
+            List[R4_StructureMapParameter]
+            | List[R4B_StructureMapParameter]
+            | List[R5_StructureMapParameter]
+        ),
     ) -> str:
         """
         Appends the string representations of the provided parameters.

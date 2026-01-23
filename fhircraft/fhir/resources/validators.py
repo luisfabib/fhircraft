@@ -16,7 +16,12 @@ T = TypeVar("T", bound=BaseModel)
 
 
 def _validate_FHIR_element_constraint(
-    value: Any, expression: str, human: str, key: str, severity: str, element: str | None = None
+    value: Any,
+    expression: str,
+    human: str,
+    key: str,
+    severity: str,
+    element: str | None = None,
 ):
     """
     Validate FHIR element constraint against a FHIRPath expression.
@@ -46,28 +51,28 @@ def _validate_FHIR_element_constraint(
     # Check configuration for validation control
     config = get_config()
     validation_config = config.validation
-    
+
     # Skip validation if mode is 'skip'
-    if validation_config.mode == 'skip':
+    if validation_config.mode == "skip":
         return value
-    
+
     # Skip if this specific constraint is disabled
     if key in validation_config.disabled_constraints:
         return value
-    
+
     # Skip if all warnings are disabled and this is a warning
     if severity == "warning" and (
         validation_config.disable_warnings or validation_config.disable_warning_severity
     ):
         return value
-    
+
     # Skip if all errors are disabled and this is an error
     if severity == "error" and validation_config.disable_errors:
         return value
-    
+
     # In lenient mode, convert errors to warnings
     effective_severity = severity
-    if validation_config.mode == 'lenient' and severity == "error":
+    if validation_config.mode == "lenient" and severity == "error":
         effective_severity = "warning"
 
     if value is None:
@@ -75,9 +80,9 @@ def _validate_FHIR_element_constraint(
     for item in ensure_list(value):
         try:
             valid = fhirpath.parse(expression).single(item, default=True)
-            error_message = f'[{key}] {human}. -> {expression}'
+            error_message = f"[{key}] {human}. -> {expression}"
             if element:
-                error_message = f'{element}\n\t{error_message}'
+                error_message = f"{element}\n\t{error_message}"
             if effective_severity == "warning" and not valid:
                 warnings.warn(error_message, FhirPathWarning)
             else:
@@ -96,7 +101,12 @@ def _validate_FHIR_element_constraint(
 
 
 def validate_element_constraint(
-    instance: T, elements: Sequence[str], expression: str, human: str, key: str, severity: str
+    instance: T,
+    elements: Sequence[str],
+    expression: str,
+    human: str,
+    key: str,
+    severity: str,
 ) -> T:
     """
     Validates a FHIR element constraint based on a FHIRPath expression.
@@ -172,26 +182,25 @@ def validate_FHIR_element_pattern(
         pattern = pattern[0]
     _element = element[0] if isinstance(element, list) else element
     if isinstance(_element, FHIRBaseModel):
-        print('CHECK',merge_dicts(_element.model_dump(), pattern.model_dump()))
-        print('VALUE',_element.model_dump())
         assert (
             merge_dicts(_element.model_dump(), pattern.model_dump())
             == _element.model_dump()
         ), f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2)}"
     elif isinstance(_element, dict) and isinstance(pattern, dict):
-        print('CHECK',_element)
-        print('VALUE',pattern)
-        assert merge_dicts(_element, pattern) == _element, f"Value does not fulfill pattern: {pattern}"
-    else: 
         assert (
-            _element == pattern
+            merge_dicts(_element, pattern) == _element
         ), f"Value does not fulfill pattern: {pattern}"
+    else:
+        assert _element == pattern, f"Value does not fulfill pattern: {pattern}"
     return element
 
 
 def validate_type_choice_element(
-    instance: T, field_types: List[Any], field_name_base: str, required: bool = False,
-    non_allowed_types: List[Any] | None = None
+    instance: T,
+    field_types: List[Any],
+    field_name_base: str,
+    required: bool = False,
+    non_allowed_types: List[Any] | None = None,
 ) -> T:
     """
     Validate the type choice element for a given instance.
@@ -233,7 +242,7 @@ def validate_type_choice_element(
     assert not required or (
         required and types_set_count > 0
     ), f"Type choice element {field_name_base}[x] must have one value set. Got {types_set_count}."
-    
+
     # Check that non-allowed types are not set
     if non_allowed_types:
         for non_allowed_type in non_allowed_types:
@@ -243,10 +252,10 @@ def validate_type_choice_element(
                 else non_allowed_type.__name__
             )
             value = getattr(instance, field_name, None)
-            assert value is None, (
-                f"Type choice element {field_name_base}[x] cannot use non-allowed type '{non_allowed_type}'. "
-            )
-    
+            assert (
+                value is None
+            ), f"Type choice element {field_name_base}[x] cannot use non-allowed type '{non_allowed_type}'. "
+
     return instance
 
 

@@ -861,9 +861,6 @@ class CompositeStructureDefinitionRepository(
             ValueError: If a duplicate StructureDefinition is added and fail_if_exists is True.
 
         """
-        print(
-            f"Adding StructureDefinition with URL: {resource.url} and version: {resource.version}"
-        )
         if not resource.url:
             raise ValueError(
                 "StructureDefinition must have a 'url' field to be added to the repository."

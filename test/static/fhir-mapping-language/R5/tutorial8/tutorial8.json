@@ -3,7 +3,7 @@
   "contained": [
     {
       "resourceType": "ConceptMap",
-      "name": "TutorialMap",
+      "id": "TutorialMap",
       "status": "draft",
       "group": [
         {
@@ -15,7 +15,7 @@
               "target": [
                 {
                   "code": "nach-da",
-                  "relationship": "equivalent"
+                  "equivalence": "equivalent"
                 }
               ]
             },
@@ -24,7 +24,7 @@
               "target": [
                 {
                   "code": "test",
-                  "relationship": "equivalent"
+                  "equivalence": "equivalent"
                 }
               ]
             }

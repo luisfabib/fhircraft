@@ -1954,12 +1954,13 @@ class ResourceFactory:
             for constraint in root_node.definition.constraint or []:
                 validators.add_model_constraint_validator(constraint)
 
+        if _structure_definition.kind in ("resource", "logical"):
+            fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
         # If the resource has metadata, prefill the information
         if "meta" in fields or "meta" in getattr(base, "model_fields", {}):
             Meta = get_complex_FHIR_type(
                 "Meta", self.Config.FHIR_release if self.Config else "4.3.0"
             )
-            fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
             fields["meta"] = (
                 Optional[Meta],
                 Field(

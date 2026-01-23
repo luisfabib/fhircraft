@@ -5,9 +5,23 @@ from typing import Any, Dict, List, Optional, Set, TypeVar, Union
 from pydantic import BaseModel
 
 from fhircraft.fhir.path.engine.core import FHIRPath
-from fhircraft.fhir.resources.datatypes.R5.core.concept_map import ConceptMap
+from fhircraft.fhir.resources.datatypes.R4.core.concept_map import (
+    ConceptMap as R4_ConceptMap,
+)
+from fhircraft.fhir.resources.datatypes.R4B.core.concept_map import (
+    ConceptMap as R4B_ConceptMap,
+)
+from fhircraft.fhir.resources.datatypes.R5.core.concept_map import (
+    ConceptMap as R5_ConceptMap,
+)
+from fhircraft.fhir.resources.datatypes.R4.core.structure_map import (
+    StructureMapGroup as R4_StructureMapGroup,
+)
+from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
+    StructureMapGroup as R4B_StructureMapGroup,
+)
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
-    StructureMapGroup,
+    StructureMapGroup as R5_StructureMapGroup,
 )
 
 from .exceptions import MappingError
@@ -34,16 +48,22 @@ class MappingScope:
     target_instances: Dict[str, BaseModel] = field(default_factory=dict)
     """The target instances being mapped"""
 
-    concept_maps: Dict[str, ConceptMap] = field(default_factory=dict)
+    concept_maps: Dict[str, R4_ConceptMap | R4B_ConceptMap | R5_ConceptMap] = field(
+        default_factory=dict
+    )
     """Registry of available concept maps for value transformations"""
 
-    groups: OrderedDict[str, StructureMapGroup] = field(default_factory=OrderedDict)
+    groups: OrderedDict[
+        str, R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup
+    ] = field(default_factory=OrderedDict)
     """The groups defined on this scope"""
 
     variables: Dict[str, FHIRPath] = field(default_factory=dict)
     """Registry of variables mapped to resolved FHIRPath expressions"""
 
-    default_groups: Dict[str, StructureMapGroup] = field(default_factory=dict)
+    default_groups: Dict[
+        str, R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup
+    ] = field(default_factory=dict)
     """Registry of default mapping groups by type signature"""
 
     processing_rules: Set[str] = field(default_factory=set)
@@ -80,7 +100,9 @@ class MappingScope:
             **self.source_instances,
         }
 
-    def get_concept_map(self, identifier: str) -> ConceptMap:
+    def get_concept_map(
+        self, identifier: str
+    ) -> R4_ConceptMap | R4B_ConceptMap | R5_ConceptMap:
         """
         Retrieve a ConceptMap by its identifier from the current scope or any parent scopes.
 
@@ -176,9 +198,11 @@ class MappingScope:
             f"Type '{identifier}' not found in current or parent scopes."
         )
 
-    def resolve_symbol(
-        self, identifier: str
-    ) -> Union[FHIRPath, type[BaseModel], StructureMapGroup]:
+    def resolve_symbol(self, identifier: str) -> Union[
+        FHIRPath,
+        type[BaseModel],
+        R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup,
+    ]:
         """
         Resolves a symbol (variable, type, or group) by its identifier from the current scope or any parent scopes.
 
@@ -186,7 +210,7 @@ class MappingScope:
             identifier (str): The name of the symbol to resolve.
 
         Returns:
-            Union[FHIRPath, type[BaseModel], StructureMapGroup]: The resolved symbol, which can be a variable, a type, or a group.
+            value: The resolved symbol, which can be a variable, a type, or a group.
 
         Raises:
             MappingError: If the symbol cannot be found in the current or any parent scopes.
@@ -194,7 +218,7 @@ class MappingScope:
         # Handle special _DefaultMappingGroup_ symbol
         if identifier == "_DefaultMappingGroup_":
             return self._resolve_default_mapping_group()
-        
+
         # Check local scope first
         if identifier in self.variables:
             return self.variables[identifier]
@@ -246,23 +270,25 @@ class MappingScope:
             or identifier in self.groups
         )
 
-    def _resolve_default_mapping_group(self) -> StructureMapGroup:
+    def _resolve_default_mapping_group(
+        self,
+    ) -> R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup:
         """
         Resolves the _DefaultMappingGroup_ symbol by looking for appropriate default groups
         based on current context types.
-        
+
         Returns:
             StructureMapGroup: A default mapping group or a generated copy group
         """
         # Try to find default groups in current or parent scopes
         scope = self
         while scope:
-            if hasattr(scope, 'default_groups') and scope.default_groups:
+            if hasattr(scope, "default_groups") and scope.default_groups:
                 # For now, return any available default group
                 # In the future, we could enhance this to select based on current types
                 return next(iter(scope.default_groups.values()))
             scope = scope.parent
-        
+
         # If no default group found, create a simple copy group
         from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
             StructureMapGroup,
@@ -272,7 +298,7 @@ class MappingScope:
             StructureMapGroupRuleTarget,
             StructureMapGroupRuleTargetParameter,
         )
-        
+
         return StructureMapGroup(
             name="_GeneratedCopyGroup_",
             typeMode="none",
@@ -314,7 +340,14 @@ class MappingScope:
 
     def get_all_visible_symbols(
         self,
-    ) -> Dict[str, Union[FHIRPath, type[BaseModel], StructureMapGroup]]:
+    ) -> Dict[
+        str,
+        Union[
+            FHIRPath,
+            type[BaseModel],
+            R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup,
+        ],
+    ]:
         """
         Retrieves all visible symbols in the current scope, including those inherited from parent scopes.
 

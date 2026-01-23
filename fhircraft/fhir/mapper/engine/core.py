@@ -14,9 +14,13 @@ from pydantic import BaseModel, ConfigDict
 
 import fhircraft.fhir.path.engine as fhirpath
 from fhircraft.fhir.resources.datatypes.R5.core.concept_map import ConceptMap
+
+from fhircraft.fhir.resources.datatypes.R4 import core as R4_models
+from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
+from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
+
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
-    StructureMapGroup,
     StructureMapGroupRule,
     StructureMapGroupRuleSource,
     StructureMapGroupRuleTarget,
@@ -87,7 +91,9 @@ class FHIRMappingEngine:
 
     def execute(
         self,
-        structure_map: StructureMap,
+        structure_map: (
+            R4_models.StructureMap | R4B_models.StructureMap | R5_models.StructureMap
+        ),
         sources: tuple[BaseModel | dict],
         targets: tuple[BaseModel | dict] | None = None,
         group: str | None = None,
@@ -149,12 +155,16 @@ class FHIRMappingEngine:
                 **produced_models,
             },
             groups=OrderedDict(
-                [(str(group.name), group) for group in structure_map.group or []]
+                [(str(group.name), group) for group in structure_map.group or []]  # type: ignore
             ),
             concept_maps={
-                str(map.name): map
+                str(map.id): map
                 for map in (structure_map.contained or [])
-                if isinstance(map, ConceptMap) and map.name
+                if isinstance(
+                    map,
+                    (R4_models.ConceptMap, R4B_models.ConceptMap, R5_models.ConceptMap),
+                )
+                and map.id
             },
         )
 
@@ -162,7 +172,7 @@ class FHIRMappingEngine:
         self._build_default_group_registry(structure_map, global_scope)
 
         # Parse and validate constants
-        for const in structure_map.const or []:
+        for const in getattr(structure_map, "const", None) or []:
             if not const.name:
                 raise ValueError("Constant must have a name")
             if const.name in source_models or const.name in target_models:
@@ -292,7 +302,11 @@ class FHIRMappingEngine:
         )
 
     def _build_default_group_registry(
-        self, structure_map: StructureMap, global_scope: MappingScope
+        self,
+        structure_map: (
+            R4_models.StructureMap | R4B_models.StructureMap | R5_models.StructureMap
+        ),
+        global_scope: MappingScope,
     ):
         """
         Builds a registry of default mapping groups based on typeMode.
@@ -313,7 +327,11 @@ class FHIRMappingEngine:
 
     def process_group(
         self,
-        group: StructureMapGroup,
+        group: (
+            R4B_models.StructureMapGroup
+            | R5_models.StructureMapGroup
+            | R4_models.StructureMapGroup
+        ),
         parameters: list[FHIRPath] | tuple[FHIRPath],
         scope: MappingScope,
         is_dependent: bool = False,
@@ -323,9 +341,9 @@ class FHIRMappingEngine:
         and executing the group's rules in the correct order, handling special list modes ('first' and 'last').
 
         Args:
-            group (StructureMapGroup): The group definition containing mapping rules and input definitions.
-            parameters (list[FHIRPath] | tuple[FHIRPath]): The input parameters to be mapped, corresponding to the group's input definitions.
-            scope (MappingScope): The parent mapping scope to use as the basis for the group's local scope.
+            group: The group definition containing mapping rules and input definitions.
+            parameters: The input parameters to be mapped, corresponding to the group's input definitions.
+            scope: The parent mapping scope to use as the basis for the group's local scope.
 
         Raises:
             MappingError: If the number of provided parameters does not match the group's input definitions.
@@ -407,7 +425,13 @@ class FHIRMappingEngine:
             self.process_rule(rule, group_scope)
 
     def process_rule(
-        self, rule: StructureMapGroupRule, scope: MappingScope
+        self,
+        rule: (
+            R4_models.StructureMapGroupRule
+            | R4B_models.StructureMapGroupRule
+            | R5_models.StructureMapGroupRule
+        ),
+        scope: MappingScope,
     ) -> MappingScope:
         """
         Processes a single StructureMap rule within the given mapping scope.
@@ -422,8 +446,8 @@ class FHIRMappingEngine:
             - Merging results from each iteration back into the main scope.
 
         Args:
-            rule (StructureMapGroupRule): The rule to process.
-            scope (MappingScope): The current mapping scope.
+            rule: The rule to process.
+            scope: The current mapping scope.
 
         Returns:
             MappingScope: The updated mapping scope after processing the rule.
@@ -543,14 +567,29 @@ class FHIRMappingEngine:
                             raise RuleProcessingError(
                                 f"Dependent group or rule '{dependent.name}' not found"
                             )
-                        if not isinstance(dependent_group, StructureMapGroup):
+                        if not isinstance(
+                            dependent_group,
+                            (
+                                R4B_models.StructureMapGroup,
+                                R5_models.StructureMapGroup,
+                                R4_models.StructureMapGroup,
+                            ),
+                        ):
                             raise RuleProcessingError(
                                 f"Dependent '{dependent.name}' is not a group"
                             )
-                        parameters = [
-                            iteration_scope.resolve_fhirpath(param.value)
-                            for param in dependent.parameter or []
-                        ]
+                        # R5-specific logic
+                        if _parameters := getattr(dependent, "parameter", None):
+                            parameters = [
+                                iteration_scope.resolve_fhirpath(param.value)
+                                for param in _parameters or []
+                            ]
+                        # R4 and R4B-specific logic
+                        elif _variables := getattr(dependent, "variable", None):
+                            parameters = [
+                                iteration_scope.resolve_fhirpath(var)
+                                for var in _variables or []
+                            ]
                         self.process_group(
                             dependent_group,
                             parameters,
@@ -570,7 +609,13 @@ class FHIRMappingEngine:
         return scope
 
     def process_source(
-        self, source: StructureMapGroupRuleSource, scope: MappingScope
+        self,
+        source: (
+            R4_models.StructureMapGroupRuleSource
+            | R4B_models.StructureMapGroupRuleSource
+            | R5_models.StructureMapGroupRuleSource
+        ),
+        scope: MappingScope,
     ) -> str:
         """
         Processes a StructureMapGroupRuleSource object within a given MappingScope and returns the variable name
@@ -582,8 +627,8 @@ class FHIRMappingEngine:
         provided by the source or generated uniquely.
 
         Args:
-            source (StructureMapGroupRuleSource): The source mapping definition containing context, element, listMode, and variable.
-            scope (MappingScope): The current mapping scope used to resolve FHIRPath and store variables.
+            source: The source mapping definition containing context, element, listMode, and variable.
+            scope: The current mapping scope used to resolve FHIRPath and store variables.
 
         Returns:
             str: The variable name under which the resolved FHIRPath expression is stored in the scope.
@@ -618,7 +663,11 @@ class FHIRMappingEngine:
 
     def process_target(
         self,
-        target: StructureMapGroupRuleTarget,
+        target: (
+            R4_models.StructureMapGroupRuleTarget
+            | R4B_models.StructureMapGroupRuleTarget
+            | R5_models.StructureMapGroupRuleTarget
+        ),
         scope: MappingScope,
     ) -> Any:
         """
@@ -656,7 +705,7 @@ class FHIRMappingEngine:
 
         transform = target.transform
         if transform:
-            target.parameter = target.parameter or []
+            target.parameter = target.parameter or []  # type: ignore
             # Execute the transform
             transformed_value = self.transformer.execute(
                 transform, scope, target.parameter
@@ -711,7 +760,11 @@ class FHIRMappingEngine:
         return issues
 
     def _resolve_structure_definitions(
-        self, structure_map: StructureMap, mode: StructureMapModelMode
+        self,
+        structure_map: (
+            R4_models.StructureMap | R4B_models.StructureMap | R5_models.StructureMap
+        ),
+        mode: StructureMapModelMode,
     ) -> Dict[str, type[BaseModel] | type[ArbitraryModel]]:
         """
         Resolves and constructs resource models for the specified mode from the given StructureMap.
@@ -810,7 +863,8 @@ class FHIRMappingEngine:
                     elif hasattr(entry, "__dict__"):
                         validated_entries[alias] = source_model(**entry.__dict__)
                         return True
-                except Exception:
+                except Exception as e:
+                    print(e)
                     continue
             return False
 

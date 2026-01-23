@@ -11,6 +11,9 @@ from fhircraft.fhir.mapper.engine.core import (
     StructureMapModelMode,
 )
 from fhircraft.config import with_config
+from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
+    StructureMap as R4B_StructureMap,
+)
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
     StructureMapConst,
@@ -24,11 +27,11 @@ from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMapGroupRuleTargetParameter,
     StructureMapStructure,
 )
-from fhircraft.fhir.resources.datatypes.R4B.core.structure_definition import (
+from fhircraft.fhir.resources.datatypes.R4.core.structure_definition import (
     StructureDefinition,
     StructureDefinitionSnapshot,
 )
-from fhircraft.fhir.resources.datatypes.R4B.complex import (
+from fhircraft.fhir.resources.datatypes.R4.complex import (
     ElementDefinition,
     ElementDefinitionType,
     ElementDefinitionBase,
@@ -70,7 +73,7 @@ def test_integration_tutorial_examples(directory):
         ),
         encoding="utf8",
     ) as file:
-        structure_map = StructureMap.model_validate(json.load(file))
+        structure_map = R4B_StructureMap.model_validate(json.load(file))
     structure_definitions = []
     for _, _, files in os.walk(
         os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), directory)
@@ -113,7 +116,6 @@ def test_integration_tutorial_examples(directory):
     result = engine.execute(structure_map, input)
     assert isinstance(result[0], BaseModel)
     result = result[0].model_dump(mode="json", exclude_unset=False)
-    expected_result.pop("resourceType", None)
     if expected_result != result:
         print("Result:")
         pprint.pprint(result)
