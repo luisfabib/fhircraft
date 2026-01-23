@@ -37,23 +37,27 @@ snapshot_structure_def = {
     "type": "Resource",
     "url": "http://example.org/fhir/StructureDefinition/LegacyPatient",
     "fhirVersion": "4.0.1",
-    "kind": "resource",
+    "kind": "logical",
     "status": "draft",
-    "abstract": False,
+    "abstract": True,
     "snapshot": {
         "element": [
             {
                 "id": "LegacyPatient",
                 "path": "LegacyPatient",
                 "min": 0,
-                "max": "*"
+                "max": "*",
+                "definition": "A legacy patient",
+                "base": {"path": "Resource", "min": 0, "max": "*"},
             },
             {
                 "id": "LegacyPatient.fullName",
                 "path": "LegacyPatient.fullName",
                 "min": 1,
                 "max": "1",
-                "type": [{"code": "string"}]
+                "type": [{"code": "string"}],
+                "definition": "A legacy patient's full name",
+                "base": {"path": "Resource", "min": 0, "max": "*"},
             }
         ]
     }

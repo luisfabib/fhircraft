@@ -58,7 +58,18 @@ from .monetary_component import MonetaryComponent
 from .extended_contact_detail import ExtendedContactDetail
 from .virtual_service_detail import VirtualServiceDetail
 from .dosage import Dosage
-from .element_definition import ElementDefinition
+from .element_definition import (
+    ElementDefinition,
+    ElementDefinitionType,
+    ElementDefinitionBase,
+    ElementDefinitionBinding,
+    ElementDefinitionBindingAdditional,
+    ElementDefinitionConstraint,
+    ElementDefinitionSlicing,
+    ElementDefinitionSlicingDiscriminator,
+    ElementDefinitionExample,
+    ElementDefinitionMapping,
+)
 
 __all__ = [
     "Address",
@@ -83,6 +94,15 @@ __all__ = [
     "Dosage",
     "Duration",
     "Element",
+    "ElementDefinitionType",
+    "ElementDefinitionBase",
+    "ElementDefinitionBinding",
+    "ElementDefinitionBindingAdditional",
+    "ElementDefinitionConstraint",
+    "ElementDefinitionMapping",
+    "ElementDefinitionSlicing",
+    "ElementDefinitionSlicingDiscriminator",
+    "ElementDefinitionExample",
     "ElementDefinition",
     "Expression",
     "ExtendedContactDetail",
@@ -169,4 +189,13 @@ TriggerDefinition.model_rebuild()
 UsageContext.model_rebuild()
 VirtualServiceDetail.model_rebuild()
 ElementDefinition.model_rebuild()
+ElementDefinitionType.model_rebuild()
+ElementDefinitionBase.model_rebuild()
+ElementDefinitionBinding.model_rebuild()
+ElementDefinitionBindingAdditional.model_rebuild()
+ElementDefinitionConstraint.model_rebuild()
+ElementDefinitionSlicing.model_rebuild()
+ElementDefinitionSlicingDiscriminator.model_rebuild()
+ElementDefinitionExample.model_rebuild()
+ElementDefinitionMapping.model_rebuild()
 Extension.model_rebuild()

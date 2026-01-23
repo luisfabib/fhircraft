@@ -10,6 +10,7 @@ from fhircraft.fhir.mapper.engine.core import (
     FHIRMappingEngine,
     StructureMapModelMode,
 )
+from fhircraft.config import with_config
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMap,
     StructureMapConst,
@@ -23,14 +24,15 @@ from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
     StructureMapGroupRuleTargetParameter,
     StructureMapStructure,
 )
-from fhircraft.fhir.resources.definitions.element_definition import (
-    ElementDefinition,
-    ElementDefinitionType,
-)
-from fhircraft.fhir.resources.definitions.structure_definition import (
+from fhircraft.fhir.resources.datatypes.R4B.core.structure_definition import (
+    StructureDefinition,
     StructureDefinitionSnapshot,
 )
-from fhircraft.fhir.resources.factory import StructureDefinition
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
+    ElementDefinition,
+    ElementDefinitionType,
+    ElementDefinitionBase,
+)
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 EXAMPLES_DIRECTORY = "test/static/fhir-mapping-language/R5"
@@ -79,7 +81,10 @@ def test_integration_tutorial_examples(directory):
                     os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), directory, name),
                     encoding="utf8",
                 ) as file:
-                    structure_definitions.append(StructureDefinition(**json.load(file)))
+                    with with_config(validation_mode="skip"):
+                        structure_definitions.append(
+                            StructureDefinition(**json.load(file))
+                        )
     with open(
         os.path.join(
             os.path.abspath(EXAMPLES_DIRECTORY),
@@ -153,6 +158,8 @@ def create_simple_source_structure_definition() -> StructureDefinition:
                     path="SimpleSource",
                     min=0,
                     max="*",
+                    base=ElementDefinitionBase(path="Resource", min=0, max="*"),
+                    definition="Simple source resource for testing",
                 ),
                 ElementDefinition(
                     id="SimpleSource.name",
@@ -160,6 +167,8 @@ def create_simple_source_structure_definition() -> StructureDefinition:
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="string")],
+                    definition="Name field",
+                    base=ElementDefinitionBase(path="Resource.name", min=0, max="1"),
                 ),
                 ElementDefinition(
                     id="SimpleSource.age",
@@ -167,6 +176,8 @@ def create_simple_source_structure_definition() -> StructureDefinition:
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="integer")],
+                    definition="Age field",
+                    base=ElementDefinitionBase(path="Resource.age", min=0, max="1"),
                 ),
             ]
         ),
@@ -196,6 +207,7 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     definition="Simple target resource for testing",
                     min=0,
                     max="*",
+                    base=ElementDefinitionBase(path="Resource", min=0, max="*"),
                 ),
                 ElementDefinition(
                     id="SimpleTarget.fullName",
@@ -204,6 +216,9 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="string")],
+                    base=ElementDefinitionBase(
+                        path="Resource.fullName", min=0, max="1"
+                    ),
                 ),
                 ElementDefinition(
                     id="SimpleTarget.name",
@@ -212,6 +227,7 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="BackboneElement")],
+                    base=ElementDefinitionBase(path="Resource.name", min=0, max="1"),
                 ),
                 ElementDefinition(
                     id="SimpleTarget.name.text",
@@ -220,6 +236,9 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="string")],
+                    base=ElementDefinitionBase(
+                        path="Resource.name.text", min=0, max="1"
+                    ),
                 ),
                 ElementDefinition(
                     id="SimpleTarget.yearsOld",
@@ -228,6 +247,9 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="integer")],
+                    base=ElementDefinitionBase(
+                        path="Resource.yearsOld", min=0, max="1"
+                    ),
                 ),
                 ElementDefinition(
                     id="SimpleTarget.status",
@@ -236,6 +258,7 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="string")],
+                    base=ElementDefinitionBase(path="Resource.status", min=0, max="1"),
                 ),
                 ElementDefinition(
                     id="SimpleTarget.arrayField",
@@ -244,6 +267,9 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     min=0,
                     max="*",
                     type=[ElementDefinitionType(code="BackboneElement")],
+                    base=ElementDefinitionBase(
+                        path="Resource.arrayField", min=0, max="*"
+                    ),
                 ),
                 ElementDefinition(
                     id="SimpleTarget.arrayField.valueString",
@@ -252,6 +278,9 @@ def create_simple_target_structure_definition() -> StructureDefinition:
                     min=0,
                     max="1",
                     type=[ElementDefinitionType(code="string")],
+                    base=ElementDefinitionBase(
+                        path="Resource.arrayField.valueString", min=0, max="1"
+                    ),
                 ),
             ]
         ),

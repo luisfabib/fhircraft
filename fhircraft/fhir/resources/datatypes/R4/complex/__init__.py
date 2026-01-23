@@ -51,9 +51,17 @@ from .substance_amount import SubstanceAmount
 from .timing import Timing
 from .trigger_definition import TriggerDefinition
 from .usage_context import UsageContext
-
-
-from .element_definition import ElementDefinition
+from .element_definition import (
+    ElementDefinition,
+    ElementDefinitionType,
+    ElementDefinitionBase,
+    ElementDefinitionBinding,
+    ElementDefinitionConstraint,
+    ElementDefinitionSlicing,
+    ElementDefinitionSlicingDiscriminator,
+    ElementDefinitionExample,
+    ElementDefinitionMapping,
+)
 
 __all__ = [
     "Address",
@@ -73,6 +81,14 @@ __all__ = [
     "Dosage",
     "Duration",
     "Element",
+    "ElementDefinitionType",
+    "ElementDefinitionBase",
+    "ElementDefinitionBinding",
+    "ElementDefinitionConstraint",
+    "ElementDefinitionSlicing",
+    "ElementDefinitionSlicingDiscriminator",
+    "ElementDefinitionExample",
+    "ElementDefinitionMapping",
     "ElementDefinition",
     "Expression",
     "Extension",
@@ -150,4 +166,12 @@ Timing.model_rebuild()
 TriggerDefinition.model_rebuild()
 UsageContext.model_rebuild()
 ElementDefinition.model_rebuild()
+ElementDefinitionType.model_rebuild()
+ElementDefinitionBase.model_rebuild()
+ElementDefinitionBinding.model_rebuild()
+ElementDefinitionConstraint.model_rebuild()
+ElementDefinitionSlicing.model_rebuild()
+ElementDefinitionSlicingDiscriminator.model_rebuild()
+ElementDefinitionExample.model_rebuild()
+ElementDefinitionMapping.model_rebuild()
 Extension.model_rebuild()

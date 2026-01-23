@@ -17,8 +17,116 @@ from fhircraft.fhir.packages import (
     FHIRPackageRegistryError,
     PackageNotFoundError,
 )
-from fhircraft.fhir.resources.definitions import StructureDefinition
+from fhircraft.fhir.resources.datatypes.R4.core import (
+    StructureDefinition as StructureDefinitionR4,
+)
+from fhircraft.fhir.resources.datatypes.R4B.core import (
+    StructureDefinition as StructureDefinitionR4B,
+)
+from fhircraft.fhir.resources.datatypes.R5.core import (
+    StructureDefinition as StructureDefinitionR5,
+)
 from fhircraft.utils import get_FHIR_release_from_version, load_env_variables
+
+
+# Union type for all supported StructureDefinition versions
+StructureDefinitionUnion = Union[
+    StructureDefinitionR4, StructureDefinitionR4B, StructureDefinitionR5
+]
+
+
+# Version-specific StructureDefinition mapping
+FHIR_VERSION_TO_STRUCTURE_DEFINITION = {
+    "R4": StructureDefinitionR4,
+    "R4B": StructureDefinitionR4B,
+    "R5": StructureDefinitionR5,
+}
+
+
+def get_structure_definition_class(fhir_version: str):
+    """
+    Get the appropriate StructureDefinition class for a given FHIR version.
+
+    Args:
+        fhir_version: FHIR version string (e.g., "4.0.0", "R4", "4.3.0", "R4B", "5.0.0", "R5")
+
+    Returns:
+        The appropriate StructureDefinition class
+    """
+    # Get the FHIR release from version string
+    release = get_FHIR_release_from_version(fhir_version)
+    return FHIR_VERSION_TO_STRUCTURE_DEFINITION.get(release, StructureDefinitionR4)
+
+
+def validate_structure_definition(
+    data: Dict[str, Any], fhir_version: Optional[str] = None
+) -> StructureDefinitionUnion:
+    """
+    Validate structure definition data using the appropriate version-specific class.
+
+    Args:
+        data: Raw structure definition data
+        fhir_version: FHIR version string
+
+    Returns:
+        Validated StructureDefinition instance
+    """
+    if isinstance(data, StructureDefinitionUnion):
+        return data
+    # Try the detected/specified version first
+    if fhir_version := (fhir_version or data.get("fhirVersion")):
+        structure_def_class = get_structure_definition_class(fhir_version)
+        return structure_def_class.model_validate(data)
+
+    # Try all version-specific classes if no version specified or validation failed
+    for version_class in [
+        StructureDefinitionR4,
+        StructureDefinitionR4B,
+        StructureDefinitionR5,
+    ]:
+        try:
+            return version_class.model_validate(data)
+        except ValidationError:
+            continue
+    raise RuntimeError(
+        "Failed to validate structure definition with any known FHIR version."
+    )
+
+
+def detect_fhir_version_from_data(data: Dict[str, Any]) -> Optional[str]:
+    """
+    Attempt to detect FHIR version from structure definition data.
+
+    Args:
+        data: Structure definition data
+
+    Returns:
+        Detected FHIR version string or None if not detectable
+    """
+    # Try to detect from fhirVersion field
+    if "fhirVersion" in data:
+        return data["fhirVersion"]
+
+    # Try to detect from version field
+    version = data.get("version", "")
+    if version.startswith("5."):
+        return "5.0.0"
+    elif version.startswith("4.3"):
+        return "4.3.0"
+    elif version.startswith("4."):
+        return "4.0.0"
+
+    # Try to detect from version patterns in URL
+    url = data.get("url", "")
+    if "/R5/" in url or "5.0" in url:
+        return "5.0.0"
+    elif "/R4B/" in url or "4.3" in url:
+        return "4.3.0"
+    elif "/R4/" in url or "4.0" in url:
+        return "4.0.0"
+
+    # Default to R4 if cannot detect
+    return "4.0.0"
 
 
 class StructureDefinitionNotFoundError(FileNotFoundError):
@@ -31,7 +139,12 @@ class AbstractRepository(ABC, Generic[T]):
     """Abstract base class for generic repositories."""
 
     @abstractmethod
-    def get(self, canonical_url: str, version: Optional[str] = None) -> T:
+    def get(
+        self,
+        canonical_url: str,
+        version: Optional[str] = None,
+        fhir_version: Optional[str] = None,
+    ) -> T:
         """Retrieve a resource by canonical URL and optional version."""
         pass
 
@@ -76,15 +189,18 @@ class AbstractRepository(ABC, Generic[T]):
         return base_url
 
 
-class HttpStructureDefinitionRepository(AbstractRepository[StructureDefinition]):
+class HttpStructureDefinitionRepository(AbstractRepository[StructureDefinitionUnion]):
     """Repository that downloads structure definitions from the internet."""
 
     def __init__(self):
         self._internet_enabled = True
 
     def get(
-        self, canonical_url: str, version: Optional[str] = None
-    ) -> StructureDefinition:
+        self,
+        canonical_url: str,
+        version: Optional[str] = None,
+        fhir_version: Optional[str] = None,
+    ) -> StructureDefinitionUnion:
         """Download structure definition from the internet."""
         if not self._internet_enabled:
             raise RuntimeError(
@@ -103,9 +219,11 @@ class HttpStructureDefinitionRepository(AbstractRepository[StructureDefinition])
         )
 
         try:
-            return self.__download_structure_definition(download_url)
+            return self.__download_structure_definition(
+                download_url, fhir_version or target_version
+            )
         except ValidationError as ve:
-            raise ValidationError(
+            raise RuntimeError(
                 f"Validation error for structure definition from {download_url}: {ve}"
             )
         except Exception as e:
@@ -113,7 +231,7 @@ class HttpStructureDefinitionRepository(AbstractRepository[StructureDefinition])
                 f"Failed to download structure definition from {download_url}: {e}"
             )
 
-    def add(self, resource: StructureDefinition) -> None:
+    def add(self, resource: StructureDefinitionUnion) -> None:
         """HTTP repository doesn't support adding definitions."""
         raise NotImplementedError(
             "HttpStructureDefinitionRepository doesn't support adding definitions"
@@ -140,12 +258,15 @@ class HttpStructureDefinitionRepository(AbstractRepository[StructureDefinition])
         """Enable or disable internet access."""
         self._internet_enabled = enabled
 
-    def __download_structure_definition(self, profile_url: str) -> StructureDefinition:
+    def __download_structure_definition(
+        self, profile_url: str, fhir_version: Optional[str] = None
+    ) -> StructureDefinitionUnion:
         """
         Downloads the structure definition of a FHIR resource from the provided profile URL.
 
         Parameters:
             profile_url (str): The URL of the FHIR profile from which to retrieve the structure definition.
+            fhir_version (str, optional): The FHIR version to use for validation.
 
         Returns:
             StructureDefinition: A validated StructureDefinition object.
@@ -193,10 +314,16 @@ class HttpStructureDefinitionRepository(AbstractRepository[StructureDefinition])
             allow_redirects=True,
         )
         response.raise_for_status()
-        return StructureDefinition.model_validate(response.json())
+        data = response.json()
+
+        # Detect FHIR version from data if not provided
+        detected_version = fhir_version or detect_fhir_version_from_data(data)
+        return validate_structure_definition(data, detected_version)
 
 
-class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinition]):
+class PackageStructureDefinitionRepository(
+    AbstractRepository[StructureDefinitionUnion]
+):
     """Repository that can load FHIR packages from package registries."""
 
     def __init__(
@@ -217,16 +344,19 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
         self._package_client = FHIRPackageRegistryClient(
             base_url=registry_base_url, timeout=timeout
         )
-        # Structure: {base_url: {version: StructureDefinition}}
-        self._local_definitions: Dict[str, Dict[str, StructureDefinition]] = {}
+        # Structure: {base_url: {version: StructureDefinitionUnion}}
+        self._local_definitions: Dict[str, Dict[str, StructureDefinitionUnion]] = {}
         # Track latest versions: {base_url: latest_version}
         self._latest_versions: Dict[str, str] = {}
         # Track loaded packages to avoid duplicate loading
         self._loaded_packages: Dict[str, str] = {}  # {package_name: version}
 
     def get(
-        self, canonical_url: str, version: Optional[str] = None
-    ) -> StructureDefinition:
+        self,
+        canonical_url: str,
+        version: Optional[str] = None,
+        fhir_version: Optional[str] = None,
+    ) -> StructureDefinitionUnion:
         """Get structure definition from loaded packages."""
         base_url, parsed_version = self.parse_canonical_url(canonical_url)
         target_version = version or parsed_version
@@ -252,7 +382,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
             f"Load the appropriate package first using load_package()."
         )
 
-    def add(self, resource: StructureDefinition) -> None:
+    def add(self, resource: StructureDefinitionUnion) -> None:
         """Add a structure definition to the repository."""
         if not resource.url:
             raise ValueError(
@@ -262,8 +392,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
         base_url, version = self.parse_canonical_url(resource.url)
 
         # Use the structure definition's version field if no version in URL
-        if not version and resource.version:
-            version = resource.version
+        version = version or resource.version
 
         if not version:
             raise ValueError(
@@ -483,8 +612,10 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
 
                         # Check if it's a StructureDefinition resource
                         if json_data.get("resourceType") == "StructureDefinition":
-                            structure_def = StructureDefinition.model_validate(
-                                json_data
+                            # Detect FHIR version and use appropriate class
+                            detected_version = detect_fhir_version_from_data(json_data)
+                            structure_def = validate_structure_definition(
+                                json_data, detected_version
                             )
                             self.add(structure_def)
                             structure_def_count += 1
@@ -494,7 +625,7 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
 
         if structure_def_count == 0:
             raise RuntimeError(
-                f"No StructureDefinition resources found in package {package_name}@{package_version}"
+                f"No valid StructureDefinition resources found in package {package_name}@{package_version}"
             )
 
         if errors:
@@ -568,7 +699,9 @@ class PackageStructureDefinitionRepository(AbstractRepository[StructureDefinitio
         self._loaded_packages.clear()
 
 
-class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinition]):
+class CompositeStructureDefinitionRepository(
+    AbstractRepository[StructureDefinitionUnion]
+):
     """
     CompositeStructureDefinitionRepository provides a unified interface for managing, retrieving, and caching FHIR
     StructureDefinition resources from multiple sources, including local storage, FHIR packages, and online repositories.
@@ -589,8 +722,8 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
         registry_base_url: Optional[str] = None,
         timeout: float = 30.0,
     ):
-        # Structure: {base_url: {version: StructureDefinition}}
-        self._local_definitions: Dict[str, Dict[str, StructureDefinition]] = {}
+        # Structure: {base_url: {version: StructureDefinitionUnion}}
+        self._local_definitions: Dict[str, Dict[str, StructureDefinitionUnion]] = {}
         # Track latest versions: {base_url: latest_version}
         self._latest_versions: Dict[str, str] = {}
         self._internet_enabled = internet_enabled
@@ -606,8 +739,11 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
             )
 
     def get(
-        self, canonical_url: str, version: Optional[str] = None
-    ) -> StructureDefinition:
+        self,
+        canonical_url: str,
+        version: Optional[str] = None,
+        fhir_version: Optional[str] = None,
+    ) -> StructureDefinitionUnion:
         """
         Retrieve a StructureDefinition resource by its canonical URL and optional version.
 
@@ -653,7 +789,7 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
         ):
             try:
                 structure_definition = self._package_repository.get(
-                    canonical_url, version
+                    canonical_url, version, fhir_version
                 )
                 # Cache it locally for future use
                 self.add(structure_definition)
@@ -684,15 +820,19 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
                     None,
                 )
                 if entry:
-                    structure_def = StructureDefinition.model_validate(
-                        entry["resource"]
+                    # Detect FHIR version and use appropriate class
+                    detected_version = detect_fhir_version_from_data(entry["resource"])
+                    structure_def = validate_structure_definition(
+                        entry["resource"], detected_version
                     )
                     self.add(structure_def)
                     return structure_def
 
         # Fall back to internet if enabled
         if self._internet_enabled:
-            structure_definition = self._http_repository.get(canonical_url, version)
+            structure_definition = self._http_repository.get(
+                canonical_url, version, fhir_version
+            )
             if structure_definition:
                 # Cache it locally for future use
                 self.add(structure_definition)
@@ -703,7 +843,9 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
             f"Structure definition not found for {base_url}{version_info}. Either load it locally, load the appropriate package, or enable internet access to download it."
         )
 
-    def add(self, resource: StructureDefinition, fail_if_exists: bool = False) -> None:
+    def add(
+        self, resource: StructureDefinitionUnion, fail_if_exists: bool = False
+    ) -> None:
         """
         Adds a StructureDefinition to the local repository.
 
@@ -719,6 +861,9 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
             ValueError: If a duplicate StructureDefinition is added and fail_if_exists is True.
 
         """
+        print(
+            f"Adding StructureDefinition with URL: {resource.url} and version: {resource.version}"
+        )
         if not resource.url:
             raise ValueError(
                 "StructureDefinition must have a 'url' field to be added to the repository."
@@ -727,8 +872,7 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
         base_url, version = self.parse_canonical_url(resource.url)
 
         # Use the structure definition's version field if no version in URL
-        if not version:
-            version = resource.version or resource.fhirVersion
+        version = version or resource.version or "unversioned"
 
         if not version:
             raise ValueError(
@@ -892,7 +1036,7 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
                 raise RuntimeError(f"Failed to load {file_path}: {e}")
 
     def load_from_definitions(
-        self, *definitions: Dict[str, Any] | StructureDefinition
+        self, *definitions: Union[Dict[str, Any], StructureDefinitionUnion]
     ) -> None:
         """
         Loads FHIR structure definitions from one or more pre-loaded dictionaries.
@@ -900,15 +1044,29 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
         The method validates each dictionary and adds the resulting StructureDefinition
         object to the repository.
         Args:
-            *definitions (Dict[str, Any]): One or more dictionaries representing FHIR StructureDefinition resources.
+            *definitions (Union[Dict[str, Any], StructureDefinitionUnion]): One or more dictionaries or StructureDefinition instances representing FHIR StructureDefinition resources.
         Raises:
             ValidationError: If any of the provided dictionaries do not conform to the StructureDefinition model.
         """
 
         """Load structure definitions from pre-loaded dictionaries."""
         for structure_def in definitions:
-            structure_definition = StructureDefinition.model_validate(structure_def)
-            self.add(structure_definition)
+            if isinstance(structure_def, dict):
+                # Detect FHIR version and use appropriate class
+                detected_version = detect_fhir_version_from_data(structure_def)
+                structure_definition = validate_structure_definition(
+                    structure_def, detected_version
+                )
+                self.add(structure_definition)
+            elif isinstance(
+                structure_def,
+                (StructureDefinitionR4, StructureDefinitionR4B, StructureDefinitionR5),
+            ):
+                self.add(structure_def)
+            else:
+                raise ValueError(
+                    f"Expected dict or StructureDefinition, got {type(structure_def)}"
+                )
 
     def set_internet_enabled(self, enabled: bool) -> None:
         """
@@ -994,7 +1152,9 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
             del self._local_definitions[base_url]
             self._latest_versions.pop(base_url, None)
 
-    def __load_json_structure_definition(self, file_path: Path) -> StructureDefinition:
+    def __load_json_structure_definition(
+        self, file_path: Path
+    ) -> StructureDefinitionUnion:
         """
         Loads a FHIR StructureDefinition from a JSON file.
         Args:
@@ -1008,7 +1168,10 @@ class CompositeStructureDefinitionRepository(AbstractRepository[StructureDefinit
         """
 
         with open(file_path, "r", encoding="utf-8") as file:
-            return StructureDefinition.model_validate(json.load(file))
+            data = json.load(file)
+            # Detect FHIR version and use appropriate class
+            detected_version = detect_fhir_version_from_data(data)
+            return validate_structure_definition(data, detected_version)
 
     # Package-specific convenience methods
     def load_package(self, package_name: str, version: Optional[str] = None) -> None:
