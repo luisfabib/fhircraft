@@ -2686,8 +2686,8 @@ class ElementDefinition(BackboneElement):
     def FHIR_eld_19_constraint_model_validator(self):
         return validate_model_constraint(
             self,
-            expression="path.matches('[^\\s\\.,:;\\\\'\"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\.[^\\s\\.,:;\\\\'\"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\[x\\])?(\\:[^\\s\\.]+)?)*')",
-            human="Element names cannot include some special characters",
+            expression="""path.matches('^[^\\s\\.,:;\\\'"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\.[^\\s\\.,:;\\\'"\\/|?!@#$%&*()\\[\\]{}]{1,64}(\\[x\\])?(\\:[^\\s\\.]+)?)*$')""",
+            human="Element path SHALL be expressed as a set of '.'-separated components with each component restricted to a maximum of 64 characters and with some limits on the allowed choice of characters",
             key="eld-19",
             severity="error",
         )
@@ -2696,8 +2696,8 @@ class ElementDefinition(BackboneElement):
     def FHIR_eld_20_constraint_model_validator(self):
         return validate_model_constraint(
             self,
-            expression="path.matches('[A-Za-z][A-Za-z0-9]*(\\.[a-z][A-Za-z0-9]*(\\[x])?)*')",
-            human="Element names should be simple alphanumerics with a max of 64 characters, or code generation tools may be broken",
+            expression="""path.matches('^[A-Za-z][A-Za-z0-9](\\.[a-z][A-Za-z0-9](\\[x])?)*$')""",
+            human="The first component of the path should be UpperCamelCase.  Additional components (following a '.') should be lowerCamelCase.  If this syntax is not adhered to, code generation tools may be broken. Logical models may be less concerned about this implication.",
             key="eld-20",
             severity="warning",
         )
