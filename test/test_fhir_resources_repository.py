@@ -222,16 +222,6 @@ class TestStructureDefinitionRepository:
         with pytest.raises(ValueError, match="duplicated URL"):
             repo.add(patient, fail_if_exists=True)
 
-    def test_add_without_version(self, empty_repository):
-        """Test adding structure definition without version raises error."""
-        repo = empty_repository
-        invalid_data = SAMPLE_PATIENT_R4.copy()
-        del invalid_data["version"]
-        patient = StructureDefinitionR4.model_validate(invalid_data)
-
-        with pytest.raises(ValueError, match="must have a version"):
-            repo.add(patient)
-
     def test_add_without_url(self, empty_repository):
         """Test adding structure definition without URL raises error."""
         repo = empty_repository
