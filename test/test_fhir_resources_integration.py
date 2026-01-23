@@ -8,6 +8,7 @@ from pathlib import Path
 from pydantic import BaseModel
 import pytest
 
+from fhircraft.config import with_config
 from fhircraft.fhir.resources.factory import (
     ConstructionMode,
     construct_resource_model,
@@ -59,14 +60,16 @@ fhir_resources_test_cases = {
 
 
 def _assert_construct_core_resource(version, resource_label, filename):
-    # Disable internet access to ensure we use local definitions
-    factory.disable_internet_access()
-    # Load the FHIR resource definition from local files
-    factory.load_definitions_from_files(
-        Path(CORE_DEFINITIONS_DIRECTORY)
-        / Path(version)
-        / Path(f"{resource_label.lower()}.profile.json")
-    )
+
+    with with_config(validation_mode="skip"):
+        # Disable internet access to ensure we use local definitions
+        factory.disable_internet_access()
+        # Load the FHIR resource definition from local files
+        factory.load_definitions_from_files(
+            Path(CORE_DEFINITIONS_DIRECTORY)
+            / Path(version)
+            / Path(f"{resource_label.lower()}.profile.json")
+        )
 
     fhir_version = {
         "R4B": "4.3.0",
@@ -169,11 +172,12 @@ def test_construct_profiled_resource(mode, filename):
 
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
-        # Disable internet access to ensure we use local definitions
-        factory.disable_internet_access()
-        # Load the FHIR resource definition from local files
-        factory.load_definitions_from_directory(Path(PROFILES_DEFINTIONS_DIRECTORY))
-        factory.clear_cache()
+        with with_config(validation_mode="skip"):
+            # Disable internet access to ensure we use local definitions
+            factory.disable_internet_access()
+            # Load the FHIR resource definition from local files
+            factory.load_definitions_from_directory(Path(PROFILES_DEFINTIONS_DIRECTORY))
+            factory.clear_cache()
         # Generate source code for Pydantic FHIR model
         resource = construct_resource_model(
             canonical_url=fhir_resource["meta"]["profile"][0],
