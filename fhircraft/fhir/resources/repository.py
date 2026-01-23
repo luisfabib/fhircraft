@@ -71,6 +71,8 @@ def validate_structure_definition(
     Returns:
         Validated StructureDefinition instance
     """
+    if isinstance(data, StructureDefinitionUnion):
+        return data
     # Try the detected/specified version first
     if fhir_version := (fhir_version or data.get("fhirVersion")):
         structure_def_class = get_structure_definition_class(fhir_version)
@@ -870,7 +872,7 @@ class CompositeStructureDefinitionRepository(
         base_url, version = self.parse_canonical_url(resource.url)
 
         # Use the structure definition's version field if no version in URL
-        version = version or resource.version
+        version = version or resource.version or "unversioned"
 
         if not version:
             raise ValueError(

@@ -20,7 +20,10 @@ from pydantic import BaseModel
 from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
 from fhircraft.fhir.resources.datatypes.R5.core.concept_map import ConceptMap
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import StructureMap
-from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
+from fhircraft.fhir.resources.repository import (
+    CompositeStructureDefinitionRepository,
+    validate_structure_definition,
+)
 
 from .parser import FhirMappingLanguageParser
 
@@ -273,14 +276,8 @@ class FHIRMapper:
         Raises:
             ValueError: If structure definition is invalid or already exists
         """
-        from fhircraft.fhir.resources.definitions import StructureDefinition
-
-        if isinstance(structure_definition, dict):
-            struct_def = StructureDefinition(**structure_definition)
-        else:
-            struct_def = structure_definition
-
-        self.repository.add(struct_def, fail_if_exists=fail_if_exists)
+        structure_definition = validate_structure_definition(structure_definition)
+        self.repository.add(structure_definition, fail_if_exists=fail_if_exists)
 
     def add_structure_definitions_from_file(
         self, file_path: Union[str, Path], fail_if_exists: bool = False
@@ -299,7 +296,6 @@ class FHIRMapper:
             FileNotFoundError: If file doesn't exist
             ValueError: If file format is invalid
         """
-        from fhircraft.fhir.resources.definitions import StructureDefinition
 
         path = Path(file_path)
         if not path.exists():
@@ -314,16 +310,18 @@ class FHIRMapper:
         if isinstance(data, dict):
             if data.get("resourceType") == "StructureDefinition":
                 # Single StructureDefinition
-                struct_def = StructureDefinition(**data)
-                self.repository.add(struct_def, fail_if_exists=fail_if_exists)
+                structure_definition = validate_structure_definition(data)
+                self.repository.add(structure_definition, fail_if_exists=fail_if_exists)
                 count = 1
             elif data.get("resourceType") == "Bundle" and data.get("entry"):
                 # Bundle containing StructureDefinitions
                 for entry in data["entry"]:
                     resource = entry.get("resource", {})
                     if resource.get("resourceType") == "StructureDefinition":
-                        struct_def = StructureDefinition(**resource)
-                        self.repository.add(struct_def, fail_if_exists=fail_if_exists)
+                        structure_definition = validate_structure_definition(resource)
+                        self.repository.add(
+                            structure_definition, fail_if_exists=fail_if_exists
+                        )
                         count += 1
             else:
                 raise ValueError(
