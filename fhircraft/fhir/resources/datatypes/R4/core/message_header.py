@@ -137,8 +137,6 @@ class MessageHeaderSource(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",

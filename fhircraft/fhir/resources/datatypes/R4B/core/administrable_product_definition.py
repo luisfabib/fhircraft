@@ -235,8 +235,6 @@ class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
@@ -249,10 +247,12 @@ class AdministrableProductDefinition(DomainResource):
     """
     A medicinal product in the final form which is suitable for administering to a patient (after any mixing of multiple components, dissolution etc. has been performed).
     """
+
     _abstract = False
     _type = "AdministrableProductDefinition"
-    _canonical_url = "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
-
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
+    )
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -352,6 +352,7 @@ class AdministrableProductDefinition(DomainResource):
         description="The path by which the product is taken into or makes contact with the body",
         default=None,
     )
+
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(

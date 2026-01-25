@@ -209,8 +209,6 @@ class IngredientSubstanceStrength(BackboneElement):
                 "textPresentation",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
