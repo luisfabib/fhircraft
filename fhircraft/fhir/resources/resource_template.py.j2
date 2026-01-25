@@ -28,6 +28,23 @@ class {{ model.__name__ }}({% for base in model.__bases__ %}{{ base.__name__ }}{
     min_cardinality: ClassVar[int] = {{model.min_cardinality}}
     max_cardinality: ClassVar[int] = {{model.max_cardinality}}
     {% endif %}
+
+    {% if model._fhir_release %}
+    _fhir_release = "{{ model._fhir_release }}"
+    {% endif %}
+    {% if model._type %}
+    _type = "{{ model._type }}"
+    {% endif %}
+    {% if model._kind %}
+    _kind = "{{ model._kind }}"
+    {% endif %}
+    {% if model._abstract %}
+    _abstract = {{ model._abstract }}
+    {% endif %}
+    {% if model._canonical_url %}
+    _canonical_url: str = "{{ model._canonical_url }}"
+    {% endif %}
+
     {% if not model_data.fields %}
     pass
     {% endif %}
