@@ -29,7 +29,7 @@
     "valueCode" : "fhir"
   }],
   "url" : "http://hl7.org/fhir/StructureDefinition/Basic",
-  "version" : "5.0.0",
+  "version" : "4.0.1",
   "name" : "Basic",
   "status" : "draft",
   "experimental" : false,
@@ -258,11 +258,7 @@
         }],
         "strength" : "required",
         "description" : "IETF language tag for a human language",
-        "valueSet" : "http://hl7.org/fhir/ValueSet/all-languages|5.0.0",
-        "additional" : [{
-          "purpose" : "starter",
-          "valueSet" : "http://hl7.org/fhir/ValueSet/languages"
-        }]
+        "valueSet" : "http://hl7.org/fhir/ValueSet/all-languages|5.0.0"
       }
     },
     {

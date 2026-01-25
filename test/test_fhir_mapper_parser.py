@@ -7,6 +7,9 @@ import pytest
 from fhircraft.fhir.mapper.lexer import FhirMappingLanguageLexer
 from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import *
+from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
+    StructureMap as R4B_StructureMap,
+)
 
 
 def add_rules_to_basic_map(rules, documentation=None):
@@ -1113,8 +1116,10 @@ def test_parser_integration(directory, parser):
     ) as file:
         expected_StructureMap = json.load(file)
 
-    parsed_map = parser.parse(map_script).model_dump(exclude=("text", "status", "meta"))
-    expected_map = StructureMap.model_validate(expected_StructureMap).model_dump(
+    parsed_map = parser.parse(map_script, fhir_release="R4B").model_dump(
+        exclude=("text", "status", "meta")
+    )
+    expected_map = R4B_StructureMap.model_validate(expected_StructureMap).model_dump(
         exclude=("text", "status", "meta")
     )
     if parsed_map != expected_map:

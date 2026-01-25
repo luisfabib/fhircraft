@@ -74,6 +74,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     @classmethod
     def _validate_polymorphic_fields(cls, value: Any, info) -> Any:
         """Apply polymorphic deserialization to FHIR fields during validation."""
+
         # Check if polymorphic deserialization is enabled
         if not cls._enable_polymorphic_deserialization:
             return value

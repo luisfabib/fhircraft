@@ -51,10 +51,7 @@
           "dependent": [
             {
               "name": "ab_content",
-              "parameter": [
-                {"valueId": "s_aa"},
-                {"valueId": "t_aa"}
-              ]
+              "variable": ["s_aa", "t_aa"]
             }
           ]
         }
