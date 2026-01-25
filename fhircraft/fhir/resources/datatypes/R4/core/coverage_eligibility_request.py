@@ -237,7 +237,7 @@ class CoverageEligibilityRequest(DomainResource):
 
     _abstract = False
     _type = "CoverageEligibilityRequest"
-    _canonical_url: str = (
+    _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityRequest"
     )
 

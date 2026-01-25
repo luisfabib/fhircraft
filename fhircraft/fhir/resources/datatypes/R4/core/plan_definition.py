@@ -641,7 +641,7 @@ class PlanDefinition(DomainResource):
 
     _abstract = False
     _type = "PlanDefinition"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/PlanDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PlanDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

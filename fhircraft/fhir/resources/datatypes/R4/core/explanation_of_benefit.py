@@ -1699,7 +1699,7 @@ class ExplanationOfBenefit(DomainResource):
 
     _abstract = False
     _type = "ExplanationOfBenefit"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/ExplanationOfBenefit"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExplanationOfBenefit"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

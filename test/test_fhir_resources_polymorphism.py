@@ -13,18 +13,31 @@ from fhircraft.fhir.resources.base import FHIRBaseModel
 
 
 class MockResource(FHIRBaseModel):
+
+    _kind = "resource"
+    _type = "MockResource"
+
     id: Optional[str] = None
 
 
 class MockStringSpecializedResource(MockResource):
+    _kind = "resource"
+    _type = "MockStringSpecializedResource"
+
     valueString: str | None
 
 
 class MockIntegerSpecializedResource(MockResource):
+    _kind = "resource"
+    _type = "MockIntegerSpecializedResource"
+
     valueInteger: int
 
 
 class MockModel(MockResource):
+    _kind = "resource"
+    _type = "MockModel"
+
     anyResource: MockResource
 
 
@@ -250,11 +263,18 @@ class TestPolymorphicUtilityMethods:
 class ComplexBaseResource(FHIRBaseModel):
     """Independent base resource for complex tests."""
 
+    _kind = "resource"
+    _type = "ComplexBaseResource"
+    _abstract = True
+
     id: Optional[str] = None
 
 
 class ComplexStringResource(ComplexBaseResource):
     """String specialized resource for complex tests."""
+
+    _kind = "resource"
+    _type = "ComplexStringResource"
 
     valueString: Optional[str] = None
 
@@ -262,11 +282,17 @@ class ComplexStringResource(ComplexBaseResource):
 class ComplexIntegerResource(ComplexBaseResource):
     """Integer specialized resource for complex tests."""
 
+    _kind = "resource"
+    _type = "ComplexIntegerResource"
+
     valueInteger: int
 
 
 class ComplexBooleanResource(ComplexBaseResource):
     """Boolean specialized resource for complex tests."""
+
+    _kind = "resource"
+    _type = "ComplexBooleanResource"
 
     valueBoolean: bool
     complexField: Optional[str] = None
@@ -274,6 +300,9 @@ class ComplexBooleanResource(ComplexBaseResource):
 
 class ComplexNestedResource(ComplexBaseResource):
     """Nested resource container for complex tests."""
+
+    _kind = "resource"
+    _type = "ComplexNestedResource"
 
     nestedResource: Optional[ComplexBaseResource] = None
     resourceList: List[ComplexBaseResource] = Field(default_factory=list)
@@ -283,6 +312,9 @@ class ComplexNestedResource(ComplexBaseResource):
 class ComplexDoubleNestedResource(ComplexBaseResource):
     """Double nested resource for complex tests."""
 
+    _kind = "resource"
+    _type = "ComplexDoubleNestedResource"
+
     level1: Optional[ComplexNestedResource] = None
     level1List: List[ComplexNestedResource] = Field(default_factory=list)
 
@@ -290,12 +322,18 @@ class ComplexDoubleNestedResource(ComplexBaseResource):
 class ComplexAdvancedResource(ComplexStringResource):
     """Advanced resource inheriting from ComplexStringResource."""
 
+    _kind = "resource"
+    _type = "ComplexAdvancedResource"
+
     advancedField: Optional[int] = None
     metadata: Optional[dict] = None
 
 
 class ComplexContainerResource(ComplexBaseResource):
     """Container that can hold multiple different specialized resources."""
+
+    _kind = "resource"
+    _type = "ComplexContainerResource"
 
     primaryResource: Optional[ComplexBaseResource] = None
     secondaryResources: List[ComplexBaseResource] = Field(default_factory=list)
@@ -530,16 +568,22 @@ class TestComplexPolymorphicScenarios:
         # Create mock models for the test to avoid FHIR validation constraints
 
         class MockExtension(FHIRBaseModel):
+            _kind = "complex-type"
+
             url: str
             valueString: Optional[str] = None
 
         class MockHumanName(FHIRBaseModel):
+            _kind = "complex-type"
+
             use: Optional[str] = None
             family: Optional[str] = None
             given: Optional[List[str]] = None
 
         class MockPatient(FHIRBaseModel):
-            resourceType: str = "Patient"
+            _kind = "resource"
+            _type = "Patient"
+
             id: Optional[str] = None
             active: Optional[bool] = None
             name: Optional[List[MockHumanName]] = None
@@ -608,31 +652,38 @@ class TestComplexPolymorphicScenarios:
         # Create mock models for the test to avoid FHIR validation constraints
 
         class MockExtension(FHIRBaseModel):
+            _kind = "complex-type"
             url: str
             valueString: Optional[str] = None
 
         class MockCoding(FHIRBaseModel):
+            _kind = "complex-type"
             system: Optional[str] = None
             code: Optional[str] = None
             display: Optional[str] = None
 
         class MockCodeableConcept(FHIRBaseModel):
+            _kind = "complex-type"
             coding: Optional[List[MockCoding]] = None
 
         class MockObservation(FHIRBaseModel):
-            resourceType: str = "Observation"
+            _kind = "resource"
+            _type = "Observation"
+
             id: Optional[str] = None
             status: Optional[str] = None
             code: Optional[MockCodeableConcept] = None
             valueString: Optional[str] = None
 
         class MockHumanName(FHIRBaseModel):
+            _kind = "complex-type"
             use: Optional[str] = None
             family: Optional[str] = None
             given: Optional[List[str]] = None
 
         class MockPatient(FHIRBaseModel):
-            resourceType: str = "Patient"
+            _kind = "resource"
+            _type = "Patient"
             id: Optional[str] = None
             active: Optional[bool] = None
             name: Optional[List[MockHumanName]] = None

@@ -143,7 +143,7 @@ class RiskAssessment(DomainResource):
 
     _abstract = False
     _type = "RiskAssessment"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/RiskAssessment"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/RiskAssessment"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

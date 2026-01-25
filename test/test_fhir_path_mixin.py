@@ -44,7 +44,7 @@ class MockAddress:
 class MockPatient(FHIRPathMixin):
     """Mock FHIR Patient resource for testing."""
 
-    resourceType: str = "Patient"
+    _type = "Patient"
     id: Optional[str] = None
     active: Optional[bool] = None
     name: Optional[List[MockHumanName]] = None

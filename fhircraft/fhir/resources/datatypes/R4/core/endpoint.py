@@ -29,7 +29,7 @@ class Endpoint(DomainResource):
 
     _abstract = False
     _type = "Endpoint"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Endpoint"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Endpoint"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

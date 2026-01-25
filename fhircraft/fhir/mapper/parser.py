@@ -334,7 +334,6 @@ class FhirMappingLanguageParser(FhirPathParser):
             target = p[4][1]
             p[0] = self.ConceptMap.model_validate(
                 dict(
-                    resourceType="ConceptMap",
                     status="draft",
                     id=p[2],
                     group=[

@@ -58,7 +58,7 @@ class DocumentManifest(DomainResource):
 
     _abstract = False
     _type = "DocumentManifest"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/DocumentManifest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DocumentManifest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

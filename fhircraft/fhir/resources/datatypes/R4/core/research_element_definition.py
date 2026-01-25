@@ -246,9 +246,7 @@ class ResearchElementDefinition(DomainResource):
 
     _abstract = False
     _type = "ResearchElementDefinition"
-    _canonical_url: str = (
-        "http://hl7.org/fhir/StructureDefinition/ResearchElementDefinition"
-    )
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchElementDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

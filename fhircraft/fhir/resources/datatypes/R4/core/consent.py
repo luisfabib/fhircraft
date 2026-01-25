@@ -270,8 +270,8 @@ class Consent(DomainResource):
     """
 
     _abstract = False
-    _type: str = "Consent"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Consent"
+    _type = "Consent"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Consent"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

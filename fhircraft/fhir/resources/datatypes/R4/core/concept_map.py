@@ -439,8 +439,8 @@ class ConceptMap(DomainResource):
     """
 
     _abstract = False
-    _type: str = "ConceptMap"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/ConceptMap"
+    _type = "ConceptMap"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ConceptMap"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

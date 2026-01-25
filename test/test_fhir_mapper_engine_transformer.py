@@ -20,7 +20,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 
 
 class MockResource(BaseModel):
-    resourceType: str = "MockResource"
+    _type = "MockResource"
     id: str = "1234"
     baz: str | None = None
     foo: int | None = None

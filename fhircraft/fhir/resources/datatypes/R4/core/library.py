@@ -41,7 +41,7 @@ class Library(DomainResource):
 
     _abstract = False
     _type = "Library"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Library"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Library"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

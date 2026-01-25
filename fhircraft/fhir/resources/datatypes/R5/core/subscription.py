@@ -36,6 +36,10 @@ class SubscriptionFilterBy(BackboneElement):
     The filter properties to be applied to narrow the subscription topic stream.  When multiple filters are applied, evaluates to true if all the conditions applicable to that resource are met; otherwise it returns false (i.e., logical AND).
     """
 
+    resourceType: Optional[String] = Field(
+        description="Allowed Resource (reference to definition) for this Subscription filter",
+        default=None,
+    )
     resourceType_ext: Optional[Element] = Field(
         description="Placeholder element for resourceType extensions",
         default=None,

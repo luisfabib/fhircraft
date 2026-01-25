@@ -932,7 +932,7 @@ class CapabilityStatement(DomainResource):
 
     _abstract = False
     _type = "CapabilityStatement"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/CapabilityStatement"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CapabilityStatement"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

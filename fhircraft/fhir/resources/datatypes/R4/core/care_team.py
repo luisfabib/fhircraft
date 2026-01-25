@@ -71,7 +71,7 @@ class CareTeam(DomainResource):
 
     _abstract = False
     _type = "CareTeam"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/CareTeam"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CareTeam"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

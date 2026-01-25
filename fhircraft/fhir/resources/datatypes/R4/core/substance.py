@@ -120,7 +120,7 @@ class Substance(DomainResource):
 
     _abstract = False
     _type = "Substance"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Substance"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Substance"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

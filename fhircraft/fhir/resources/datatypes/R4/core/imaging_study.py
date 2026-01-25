@@ -229,7 +229,7 @@ class ImagingStudy(DomainResource):
 
     _abstract = False
     _type = "ImagingStudy"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/ImagingStudy"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImagingStudy"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

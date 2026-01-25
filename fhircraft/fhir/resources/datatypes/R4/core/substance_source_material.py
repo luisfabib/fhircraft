@@ -302,9 +302,7 @@ class SubstanceSourceMaterial(DomainResource):
 
     _abstract = False
     _type = "SubstanceSourceMaterial"
-    _canonical_url: str = (
-        "http://hl7.org/fhir/StructureDefinition/SubstanceSourceMaterial"
-    )
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubstanceSourceMaterial"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

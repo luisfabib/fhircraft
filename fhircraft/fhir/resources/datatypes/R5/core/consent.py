@@ -252,7 +252,6 @@ class ConsentProvision(BackboneElement):
                 "data",
                 "dataPeriod",
                 "code",
-                "resourceType",
                 "documentType",
                 "purpose",
                 "securityLabel",

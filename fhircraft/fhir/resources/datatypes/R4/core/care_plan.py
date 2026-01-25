@@ -267,7 +267,7 @@ class CarePlan(DomainResource):
 
     _abstract = False
     _type = "CarePlan"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/CarePlan"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CarePlan"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

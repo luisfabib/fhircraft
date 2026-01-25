@@ -104,7 +104,7 @@ class Procedure(DomainResource):
 
     _abstract = False
     _type = "Procedure"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Procedure"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Procedure"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

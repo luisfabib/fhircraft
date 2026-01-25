@@ -293,7 +293,7 @@ class Observation(DomainResource):
 
     _abstract = False
     _type = "Observation"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Observation"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Observation"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

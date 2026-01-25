@@ -1038,7 +1038,7 @@ class StructureMap(DomainResource):
 
     _abstract = False
     _type = "StructureMap"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/StructureMap"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureMap"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

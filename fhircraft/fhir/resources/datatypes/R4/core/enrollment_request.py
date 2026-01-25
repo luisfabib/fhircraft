@@ -25,7 +25,7 @@ class EnrollmentRequest(DomainResource):
 
     _abstract = False
     _type = "EnrollmentRequest"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/EnrollmentRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EnrollmentRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

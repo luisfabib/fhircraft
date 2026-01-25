@@ -39,7 +39,7 @@ class Binary(Resource):
 
     _abstract = False
     _type = "Binary"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Binary"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Binary"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

@@ -38,7 +38,7 @@ class Evidence(DomainResource):
 
     _abstract = False
     _type = "Evidence"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Evidence"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Evidence"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

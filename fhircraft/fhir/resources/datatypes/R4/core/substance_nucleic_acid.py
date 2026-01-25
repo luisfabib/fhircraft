@@ -205,7 +205,7 @@ class SubstanceNucleicAcid(DomainResource):
 
     _abstract = False
     _type = "SubstanceNucleicAcid"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/SubstanceNucleicAcid"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubstanceNucleicAcid"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

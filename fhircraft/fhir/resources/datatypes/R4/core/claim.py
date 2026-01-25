@@ -946,7 +946,7 @@ class Claim(DomainResource):
 
     _abstract = False
     _type = "Claim"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Claim"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Claim"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

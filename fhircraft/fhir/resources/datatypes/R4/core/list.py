@@ -85,7 +85,7 @@ class List(DomainResource):
 
     _abstract = False
     _type = "List"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/List"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/List"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

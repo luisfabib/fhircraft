@@ -740,7 +740,7 @@ class ValueSet(DomainResource):
 
     _abstract = False
     _type = "ValueSet"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/ValueSet"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ValueSet"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

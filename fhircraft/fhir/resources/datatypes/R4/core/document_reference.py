@@ -153,7 +153,7 @@ class DocumentReference(DomainResource):
 
     _abstract = False
     _type = "DocumentReference"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/DocumentReference"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DocumentReference"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

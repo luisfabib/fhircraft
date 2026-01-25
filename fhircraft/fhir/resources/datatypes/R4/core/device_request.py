@@ -102,7 +102,7 @@ class DeviceRequest(DomainResource):
 
     _abstract = False
     _type = "DeviceRequest"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/DeviceRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

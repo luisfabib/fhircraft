@@ -140,7 +140,7 @@ class MessageDefinition(DomainResource):
 
     _abstract = False
     _type = "MessageDefinition"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/MessageDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MessageDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

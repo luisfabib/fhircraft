@@ -70,7 +70,7 @@ class CatalogEntry(DomainResource):
 
     _abstract = False
     _type = "CatalogEntry"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/CatalogEntry"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CatalogEntry"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

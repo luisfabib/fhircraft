@@ -29,7 +29,7 @@ class DeviceUseStatement(DomainResource):
 
     _abstract = False
     _type = "DeviceUseStatement"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/DeviceUseStatement"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceUseStatement"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

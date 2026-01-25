@@ -220,7 +220,7 @@ class ImmunizationRecommendation(DomainResource):
 
     _abstract = False
     _type = "ImmunizationRecommendation"
-    _canonical_url: str = (
+    _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation"
     )
 

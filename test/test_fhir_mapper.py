@@ -200,7 +200,7 @@ def test_arbitrary_source_to_fhir_target():
     patient = targets[0]
 
     # Verify the target is a valid FHIR Patient
-    assert patient.resourceType == "Patient"
+    assert patient._type == "Patient"
     assert patient.name[0].given[0] == "Alice"
     assert patient.name[0].family == "Johnson"
     assert str(patient.birthDate) == "1985-03-15"

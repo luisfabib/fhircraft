@@ -173,7 +173,7 @@ class Patient(DomainResource):
 
     _abstract = False
     _type = "Patient"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Patient"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Patient"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

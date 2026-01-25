@@ -356,7 +356,7 @@ class Bundle(Resource):
 
     _abstract = False
     _type = "Bundle"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Bundle"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Bundle"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

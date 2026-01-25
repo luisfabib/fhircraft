@@ -168,7 +168,7 @@ class Coverage(DomainResource):
 
     _abstract = False
     _type = "Coverage"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Coverage"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Coverage"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

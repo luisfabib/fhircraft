@@ -152,9 +152,7 @@ class PaymentReconciliation(DomainResource):
 
     _abstract = False
     _type = "PaymentReconciliation"
-    _canonical_url: str = (
-        "http://hl7.org/fhir/StructureDefinition/PaymentReconciliation"
-    )
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PaymentReconciliation"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

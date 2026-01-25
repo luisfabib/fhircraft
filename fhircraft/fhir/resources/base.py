@@ -15,7 +15,7 @@ from pydantic import (
     ConfigDict,
     ValidationError,
     PrivateAttr,
-    field_serializer,
+    model_validator,
     field_validator,
     model_serializer,
 )
@@ -70,7 +70,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     _abstract: ClassVar[bool] = False
     _kind: ClassVar[
         FhirBaseModelKind | Literal["primitive", "complex-type", "resource", "logical"]
-    ]
+    ] = "logical"
     _type: ClassVar[str]
     _canonical_url: ClassVar[str | None]
 
@@ -97,11 +97,26 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         # After construction, propagate context to all nested fields
         self._set_resource_context()
 
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_resource_type(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "resourceType" in data:
+            if data["resourceType"] != cls._type:
+                raise ValueError(
+                    f"Invalid resourceType '{data['resourceType']}' for model '{cls.__name__}', expected '{cls._type}'."
+                )
+
+        elif isinstance(data, FHIRBaseModel):
+            if data._type != cls._type:
+                raise ValueError(
+                    f"Invalid resourceType '{data._type}' for model '{cls.__name__}', expected '{cls._type}'."
+                )
+        return data
+
     @field_validator("*", mode="before")
     @classmethod
     def _validate_polymorphic_fields(cls, value: Any, info) -> Any:
         """Apply polymorphic deserialization to FHIR fields during validation."""
-
         # Check if polymorphic deserialization is enabled
         if not cls._enable_polymorphic_deserialization:
             return value
@@ -193,6 +208,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                             data[field_name] = (
                                 self._serialize_fhir_field_polymorphically(value)
                             )
+            if self._is_resource and hasattr(self, "_type"):
+                data["resourceType"] = self._type
 
             return data
         finally:

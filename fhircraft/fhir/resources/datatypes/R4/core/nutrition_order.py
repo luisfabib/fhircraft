@@ -349,7 +349,7 @@ class NutritionOrder(DomainResource):
 
     _abstract = False
     _type = "NutritionOrder"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/NutritionOrder"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/NutritionOrder"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

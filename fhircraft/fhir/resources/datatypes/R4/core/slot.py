@@ -32,7 +32,7 @@ class Slot(DomainResource):
 
     _abstract = False
     _type = "Slot"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Slot"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Slot"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

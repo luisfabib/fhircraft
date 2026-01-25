@@ -231,7 +231,7 @@ class SubstanceReferenceInformation(DomainResource):
 
     _abstract = False
     _type = "SubstanceReferenceInformation"
-    _canonical_url: str = (
+    _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/SubstanceReferenceInformation"
     )
 

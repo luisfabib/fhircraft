@@ -31,7 +31,7 @@ from fhircraft.fhir.path.exceptions import FHIRPathRuntimeError
 from fhircraft.fhir.resources.datatypes.R4 import core, complex
 from fhircraft.fhir.resources.datatypes import primitives
 
-env = {'%fhirRelease': "R4"}
+env = {"%fhirRelease": "R4"}
 
 
 @pytest.mark.parametrize(
@@ -335,7 +335,7 @@ class TestLiteral(TestCase):
 class MockPatient:
     """Mock FHIR Patient resource for testing."""
 
-    resourceType: str = "Patient"
+    _type = "Patient"
     name: Optional[List[dict]] = None
     gender: Optional[str] = None
     birthDate: Optional[str] = None

@@ -1618,7 +1618,7 @@ class TestScript(DomainResource):
 
     _abstract = False
     _type = "TestScript"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/TestScript"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/TestScript"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

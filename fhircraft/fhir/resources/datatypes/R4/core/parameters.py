@@ -473,7 +473,7 @@ class Parameters(Resource):
 
     _abstract = False
     _type = "Parameters"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Parameters"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Parameters"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

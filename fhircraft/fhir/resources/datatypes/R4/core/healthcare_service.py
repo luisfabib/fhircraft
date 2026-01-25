@@ -170,7 +170,7 @@ class HealthcareService(DomainResource):
 
     _abstract = False
     _type = "HealthcareService"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/HealthcareService"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/HealthcareService"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

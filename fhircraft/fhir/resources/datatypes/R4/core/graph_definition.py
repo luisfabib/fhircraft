@@ -244,7 +244,7 @@ class GraphDefinition(DomainResource):
 
     _abstract = False
     _type = "GraphDefinition"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/GraphDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/GraphDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

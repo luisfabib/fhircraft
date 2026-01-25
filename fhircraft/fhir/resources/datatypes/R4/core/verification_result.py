@@ -212,7 +212,7 @@ class VerificationResult(DomainResource):
 
     _abstract = False
     _type = "VerificationResult"
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/VerificationResult"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/VerificationResult"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",

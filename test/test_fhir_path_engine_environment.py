@@ -8,17 +8,21 @@ from fhircraft.fhir.resources.base import FHIRBaseModel
 
 
 class MockPatient(FHIRBaseModel):
-    resourceType: str = "Patient"
+    _kind = "resource"
+    _type = "Patient"
     id: str
     contained: list
 
 
 class MockReference(FHIRBaseModel):
+    _kind = "complex-type"
+
     reference: str
 
 
 class MockObservation(FHIRBaseModel):
-    resourceType: str = "Observation"
+    _kind = "resource"
+    _type = "Observation"
     subject: MockReference
 
 

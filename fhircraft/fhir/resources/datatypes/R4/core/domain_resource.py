@@ -18,7 +18,7 @@ class DomainResource(Resource):
     _type = "DomainResource"
     _kind = "resource"
     _abstract = True
-    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/DomainResource"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DomainResource"
 
     text: Optional[Narrative] = Field(
         description="Text summary of the resource, for human interpretation",

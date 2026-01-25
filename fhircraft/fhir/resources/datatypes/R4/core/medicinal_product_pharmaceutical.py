@@ -197,7 +197,7 @@ class MedicinalProductPharmaceutical(DomainResource):
 
     _abstract = False
     _type = "MedicinalProductPharmaceutical"
-    _canonical_url: str = (
+    _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/MedicinalProductPharmaceutical"
     )
 
