@@ -78,10 +78,6 @@ class DocumentReferenceAttester(BackboneElement):
                 "mode",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -111,8 +107,6 @@ class DocumentReferenceRelatesTo(BackboneElement):
             elements=(
                 "target",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -189,8 +183,6 @@ class DocumentReferenceContent(BackboneElement):
             elements=(
                 "profile",
                 "attachment",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),

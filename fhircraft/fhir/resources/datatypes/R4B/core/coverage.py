@@ -67,10 +67,6 @@ class CoverageClass(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -100,8 +96,6 @@ class CoverageCostToBeneficiaryException(BackboneElement):
             elements=(
                 "period",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -148,8 +142,6 @@ class CoverageCostToBeneficiary(BackboneElement):
             elements=(
                 "exception",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
