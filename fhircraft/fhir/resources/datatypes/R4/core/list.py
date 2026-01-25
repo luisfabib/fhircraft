@@ -1,25 +1,8 @@
-# Fhircraft modules
-from enum import Enum
-
-# Standard modules
-from typing import Literal, Optional, Union
-
-# Pydantic modules
-from pydantic import BaseModel, Field, model_validator
-from pydantic.fields import FieldInfo
-
-import fhircraft
+from pydantic import Field, model_validator
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.utils import model_rebuild_all
+from typing import List as ListType, Optional
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from typing import List as ListType
-from typing import Literal, Optional
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import (
@@ -37,11 +20,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Extension,
     Identifier,
     Meta,
-    Narrative,
     Reference,
-    Resource,
-    DomainResource,
+    Narrative,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ListEntry(BackboneElement):
@@ -87,12 +70,6 @@ class ListEntry(BackboneElement):
                 "flag",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -105,6 +82,10 @@ class List(DomainResource):
     """
     A list is a curated collection of resources.
     """
+
+    _abstract = False
+    _type = "List"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/List"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -226,10 +207,6 @@ class List(DomainResource):
     emptyReason: Optional[CodeableConcept] = Field(
         description="Why list is empty",
         default=None,
-    )
-    resourceType: Literal["List"] = Field(
-        description=None,
-        default="List",
     )
 
     @model_validator(mode="after")

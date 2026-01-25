@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,18 +16,18 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     CodeableConcept,
     BackboneElement,
     Timing,
+    Annotation,
     Quantity,
     Ratio,
-    Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class NutritionOrderOralDietNutrient(BackboneElement):
@@ -64,8 +51,6 @@ class NutritionOrderOralDietNutrient(BackboneElement):
             elements=(
                 "amount",
                 "modifier",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -97,8 +82,6 @@ class NutritionOrderOralDietTexture(BackboneElement):
             elements=(
                 "foodType",
                 "modifier",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -155,14 +138,6 @@ class NutritionOrderOralDiet(BackboneElement):
                 "nutrient",
                 "schedule",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
                 "modifierExtension",
@@ -225,12 +200,6 @@ class NutritionOrderSupplement(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -275,8 +244,6 @@ class NutritionOrderEnteralFormulaAdministration(BackboneElement):
             elements=(
                 "quantity",
                 "schedule",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -375,18 +342,6 @@ class NutritionOrderEnteralFormula(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -399,6 +354,10 @@ class NutritionOrder(DomainResource):
     """
     A request to supply a diet, formula feeding (enteral) or oral nutritional supplement to a patient/resident.
     """
+
+    _abstract = False
+    _type = "NutritionOrder"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/NutritionOrder"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -546,10 +505,6 @@ class NutritionOrder(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments",
         default=None,
-    )
-    resourceType: Literal["NutritionOrder"] = Field(
-        description=None,
-        default="NutritionOrder",
     )
 
     @model_validator(mode="after")

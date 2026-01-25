@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,15 +18,15 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     BackboneElement,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AppointmentParticipant(BackboneElement):
@@ -110,6 +97,10 @@ class Appointment(DomainResource):
     """
     A booking of a healthcare event among patient(s), practitioner(s), related person(s) and/or device(s) for a specific date/time. This may result in one or more Encounter(s).
     """
+
+    _abstract = False
+    _type = "Appointment"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Appointment"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -292,10 +283,6 @@ class Appointment(DomainResource):
     requestedPeriod: Optional[ListType[Period]] = Field(
         description="Potential date/time interval(s) requested to allocate the appointment within",
         default=None,
-    )
-    resourceType: Literal["Appointment"] = Field(
-        description=None,
-        default="Appointment",
     )
 
     @model_validator(mode="after")

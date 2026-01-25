@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     Quantity,
-    BackboneElement,
     CodeableConcept,
-    DomainResource,
+    BackboneElement,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MolecularSequenceReferenceSeq(BackboneElement):
@@ -133,18 +120,6 @@ class MolecularSequenceReferenceSeq(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -219,14 +194,6 @@ class MolecularSequenceVariant(BackboneElement):
                 "observedAllele",
                 "end",
                 "start",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
                 "modifierExtension",
@@ -320,16 +287,6 @@ class MolecularSequenceQualityRoc(BackboneElement):
                 "numFP",
                 "numTP",
                 "score",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
                 "modifierExtension",
@@ -491,28 +448,6 @@ class MolecularSequenceQuality(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -596,14 +531,6 @@ class MolecularSequenceRepository(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -645,8 +572,6 @@ class MolecularSequenceStructureVariantOuter(BackboneElement):
                 "start",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -686,8 +611,6 @@ class MolecularSequenceStructureVariantInner(BackboneElement):
             elements=(
                 "end",
                 "start",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -748,12 +671,6 @@ class MolecularSequenceStructureVariant(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -766,6 +683,10 @@ class MolecularSequence(DomainResource):
     """
     Raw data describing a biological sequence.
     """
+
+    _abstract = False
+    _type = "MolecularSequence"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MolecularSequence"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -899,10 +820,6 @@ class MolecularSequence(DomainResource):
     structureVariant: Optional[ListType[MolecularSequenceStructureVariant]] = Field(
         description="Structural variant",
         default=None,
-    )
-    resourceType: Literal["MolecularSequence"] = Field(
-        description=None,
-        default="MolecularSequence",
     )
 
     @model_validator(mode="after")

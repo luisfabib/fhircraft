@@ -16,6 +16,8 @@ class DataRequirement(Element):
     Describes a required data item
     """
 
+    _type = "DataRequirement"
+
     type: Optional[Code] = Field(
         description="The type of the required data",
         default=None,

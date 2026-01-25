@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,15 +16,15 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Reference,
+    Signature,
     Period,
     CodeableConcept,
     BackboneElement,
-    Signature,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ProvenanceAgent(BackboneElement):
@@ -71,12 +58,6 @@ class ProvenanceAgent(BackboneElement):
                 "who",
                 "role",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -120,12 +101,6 @@ class ProvenanceEntityAgent(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -167,10 +142,6 @@ class ProvenanceEntity(BackboneElement):
                 "role",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -183,6 +154,10 @@ class Provenance(DomainResource):
     """
     Provenance of a resource is a record that describes entities and processes involved in producing and delivering or otherwise influencing that resource. Provenance provides a critical foundation for assessing authenticity, enabling trust, and allowing reproducibility. Provenance assertions are a form of contextual metadata and can themselves become important records with their own provenance. Provenance statement indicates clinical significance in terms of confidence in authenticity, reliability, and trustworthiness, integrity, and stage in lifecycle (e.g. Document Completion - has the artifact been legally authenticated), all of which may impact security, privacy, and trust policies.
     """
+
+    _abstract = False
+    _type = "Provenance"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Provenance"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -291,10 +266,6 @@ class Provenance(DomainResource):
     signature: Optional[ListType[Signature]] = Field(
         description="Signature on target",
         default=None,
-    )
-    resourceType: Literal["Provenance"] = Field(
-        description=None,
-        default="Provenance",
     )
 
     @property

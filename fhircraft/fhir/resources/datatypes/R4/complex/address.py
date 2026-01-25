@@ -13,6 +13,8 @@ class Address(Element):
     An address expressed using postal conventions (as opposed to GPS or other location definition formats)
     """
 
+    _type = "Address"
+
     use: Optional[Code] = Field(
         description="home | work | temp | old | billing - purpose of this address",
         default=None,

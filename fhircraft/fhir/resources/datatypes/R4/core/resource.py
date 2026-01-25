@@ -1,33 +1,24 @@
-# Fhircraft modules
+from typing import Optional
+
+from pydantic import Field, model_validator
+
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
-
-NoneType = type(None)
-
-# Dynamic modules
-
 from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, Literal
-
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
+from fhircraft.fhir.resources.datatypes.primitives import *
 
 from fhircraft.fhir.resources.datatypes.R4.complex import Element, Meta
 
 
 class Resource(FHIRBaseModel):
     """
-    This is the base resource type for everything.
+    Base Resource
     """
 
     _fhir_release = "R4"
+    _type = "Resource"
+    _kind = "resource"
+    _abstract = True
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Resource"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -39,10 +30,8 @@ class Resource(FHIRBaseModel):
         alias="_id",
     )
     meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Resource"]
-        ),
+        description="Metadata about the resource",
+        default=None,
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -61,10 +50,6 @@ class Resource(FHIRBaseModel):
         description="Placeholder element for language extensions",
         default=None,
         alias="_language",
-    )
-    resourceType: Literal["Resource"] = Field(
-        description=None,
-        default="Resource",
     )
 
     @model_validator(mode="after")

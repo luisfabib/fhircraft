@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
@@ -23,76 +10,15 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
+    Ratio,
     Identifier,
     CodeableConcept,
     Reference,
     BackboneElement,
-    Ratio,
-    DomainResource,
 )
-
-
-class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
-    BackboneElement
-):
-    """
-    Strength expressed in terms of a reference substance.
-    """
-
-    substance: Optional[CodeableConcept] = Field(
-        description="Relevant reference substance",
-        default=None,
-    )
-    strength: Optional[Ratio] = Field(
-        description="Strength expressed in terms of a reference substance",
-        default=None,
-    )
-    strengthLowLimit: Optional[Ratio] = Field(
-        description="Strength expressed in terms of a reference substance",
-        default=None,
-    )
-    measurementPoint: Optional[String] = Field(
-        description="For when strength is measured at a particular point or distance",
-        default=None,
-    )
-    measurementPoint_ext: Optional[Element] = Field(
-        description="Placeholder element for measurementPoint extensions",
-        default=None,
-        alias="_measurementPoint",
-    )
-    country: Optional[ListType[CodeableConcept]] = Field(
-        description="The country or countries for which the strength range applies",
-        default=None,
-    )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "country",
-                "measurementPoint",
-                "strengthLowLimit",
-                "strength",
-                "substance",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
@@ -130,7 +56,9 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
         default=None,
     )
     referenceStrength: Optional[
-        ListType[MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength]
+        ListType[
+            "MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength"
+        ]
     ] = Field(
         description="Strength expressed in terms of a reference substance",
         default=None,
@@ -148,16 +76,6 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength(BackboneElement):
                 "concentration",
                 "presentationLowLimit",
                 "presentation",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
                 "modifierExtension",
@@ -205,12 +123,6 @@ class MedicinalProductIngredientSpecifiedSubstance(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -262,12 +174,6 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength(
                 "strengthLowLimit",
                 "strength",
                 "substance",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
                 "modifierExtension",
@@ -337,16 +243,6 @@ class MedicinalProductIngredientSubstanceStrength(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -378,8 +274,6 @@ class MedicinalProductIngredientSubstance(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -392,6 +286,12 @@ class MedicinalProductIngredient(DomainResource):
     """
     An ingredient of a manufactured item or pharmaceutical product.
     """
+
+    _abstract = False
+    _type = "MedicinalProductIngredient"
+    _canonical_url: str = (
+        "http://hl7.org/fhir/StructureDefinition/MedicinalProductIngredient"
+    )
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -474,10 +374,6 @@ class MedicinalProductIngredient(DomainResource):
     substance: Optional[MedicinalProductIngredientSubstance] = Field(
         description="The ingredient substance",
         default=None,
-    )
-    resourceType: Literal["MedicinalProductIngredient"] = Field(
-        description=None,
-        default="MedicinalProductIngredient",
     )
 
     @model_validator(mode="after")

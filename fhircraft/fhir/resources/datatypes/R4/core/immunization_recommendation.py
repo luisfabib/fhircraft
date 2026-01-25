@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,14 +16,14 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
+    CodeableConcept,
     Reference,
     BackboneElement,
-    CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
@@ -65,8 +52,6 @@ class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
             elements=(
                 "value",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -206,20 +191,6 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -250,6 +221,12 @@ class ImmunizationRecommendation(DomainResource):
     """
     A patient's point-in-time set of recommendations (i.e. forecasting) according to a published schedule with optional supporting justification.
     """
+
+    _abstract = False
+    _type = "ImmunizationRecommendation"
+    _canonical_url: str = (
+        "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation"
+    )
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -328,10 +305,6 @@ class ImmunizationRecommendation(DomainResource):
             description="Vaccine administration recommendations",
             default=None,
         )
-    )
-    resourceType: Literal["ImmunizationRecommendation"] = Field(
-        description=None,
-        default="ImmunizationRecommendation",
     )
 
     @model_validator(mode="after")

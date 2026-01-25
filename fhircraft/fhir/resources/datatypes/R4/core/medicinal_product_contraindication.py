@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -23,14 +10,14 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Reference,
     CodeableConcept,
-    BackboneElement,
     Population,
-    DomainResource,
+    BackboneElement,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicinalProductContraindicationOtherTherapy(BackboneElement):
@@ -87,6 +74,12 @@ class MedicinalProductContraindication(DomainResource):
     """
     The clinical particulars - indications, contraindications etc. of a medicinal product, including for regulatory purposes.
     """
+
+    _abstract = False
+    _type = "MedicinalProductContraindication"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/MedicinalProductContraindication"
+    )
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -168,10 +161,6 @@ class MedicinalProductContraindication(DomainResource):
     population: Optional[ListType[Population]] = Field(
         description="The population group to which this applies",
         default=None,
-    )
-    resourceType: Literal["MedicinalProductContraindication"] = Field(
-        description=None,
-        default="MedicinalProductContraindication",
     )
 
     @model_validator(mode="after")

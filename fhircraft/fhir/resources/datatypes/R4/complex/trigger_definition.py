@@ -17,6 +17,8 @@ class TriggerDefinition(Element):
     Defines an expected trigger for a module
     """
 
+    _type = "TriggerDefinition"
+
     type: Optional[Code] = Field(
         description="named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended",
         default=None,

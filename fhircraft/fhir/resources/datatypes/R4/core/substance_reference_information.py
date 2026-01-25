@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -23,16 +10,16 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     BackboneElement,
     CodeableConcept,
     Reference,
+    Range,
     Identifier,
     Quantity,
-    Range,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubstanceReferenceInformationGene(BackboneElement):
@@ -61,10 +48,6 @@ class SubstanceReferenceInformationGene(BackboneElement):
                 "source",
                 "gene",
                 "geneSequenceOrigin",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -101,10 +84,6 @@ class SubstanceReferenceInformationGeneElement(BackboneElement):
                 "source",
                 "element",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -146,12 +125,6 @@ class SubstanceReferenceInformationClassification(BackboneElement):
                 "subtype",
                 "classification",
                 "domain",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -236,16 +209,6 @@ class SubstanceReferenceInformationTarget(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -267,6 +230,12 @@ class SubstanceReferenceInformation(DomainResource):
     """
     Todo.
     """
+
+    _abstract = False
+    _type = "SubstanceReferenceInformation"
+    _canonical_url: str = (
+        "http://hl7.org/fhir/StructureDefinition/SubstanceReferenceInformation"
+    )
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -345,10 +314,6 @@ class SubstanceReferenceInformation(DomainResource):
     target: Optional[ListType[SubstanceReferenceInformationTarget]] = Field(
         description="Todo",
         default=None,
-    )
-    resourceType: Literal["SubstanceReferenceInformation"] = Field(
-        description=None,
-        default="SubstanceReferenceInformation",
     )
 
     @model_validator(mode="after")

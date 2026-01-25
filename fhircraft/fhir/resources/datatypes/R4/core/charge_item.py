@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -39,10 +25,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Timing,
     BackboneElement,
     Quantity,
-    Money,
     Annotation,
-    DomainResource,
+    Money,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ChargeItemPerformer(BackboneElement):
@@ -68,8 +55,6 @@ class ChargeItemPerformer(BackboneElement):
                 "function",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -82,6 +67,10 @@ class ChargeItem(DomainResource):
     """
     The resource ChargeItem describes the provision of healthcare provider products for a certain patient, therefore referring not only to the product, but containing in addition details of the provision, like date, time, amounts and participating organizations and persons. Main Usage of the ChargeItem is to enable the billing process and internal cost allocation.
     """
+
+    _abstract = False
+    _type = "ChargeItem"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/ChargeItem"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -282,10 +271,6 @@ class ChargeItem(DomainResource):
     supportingInformation: Optional[ListType[Reference]] = Field(
         description="Further information supporting this charge",
         default=None,
-    )
-    resourceType: Literal["ChargeItem"] = Field(
-        description=None,
-        default="ChargeItem",
     )
 
     @property

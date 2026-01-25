@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,14 +16,14 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     CodeableConcept,
     BackboneElement,
-    SubstanceAmount,
     Attachment,
-    DomainResource,
+    SubstanceAmount,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
@@ -77,12 +64,6 @@ class SubstancePolymerMonomerSetStartingMaterial(BackboneElement):
                 "material",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -116,8 +97,6 @@ class SubstancePolymerMonomerSet(BackboneElement):
                 "ratioType",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -147,8 +126,6 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation(BackboneElement):
             elements=(
                 "amount",
                 "degree",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -190,10 +167,6 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation(BackboneElement):
                 "attachment",
                 "representation",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -253,12 +226,6 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -310,12 +277,6 @@ class SubstancePolymerRepeat(BackboneElement):
                 "numberOfUnits",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -328,6 +289,10 @@ class SubstancePolymer(DomainResource):
     """
     Todo.
     """
+
+    _abstract = False
+    _type = "SubstancePolymer"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubstancePolymer"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -406,10 +371,6 @@ class SubstancePolymer(DomainResource):
     repeat: Optional[ListType[SubstancePolymerRepeat]] = Field(
         description="Todo",
         default=None,
-    )
-    resourceType: Literal["SubstancePolymer"] = Field(
-        description=None,
-        default="SubstancePolymer",
     )
 
     @model_validator(mode="after")

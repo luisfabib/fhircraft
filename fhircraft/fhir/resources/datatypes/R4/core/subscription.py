@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,12 +16,12 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
-    ContactPoint,
     BackboneElement,
-    DomainResource,
+    ContactPoint,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubscriptionChannel(BackboneElement):
@@ -90,12 +77,6 @@ class SubscriptionChannel(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -108,6 +89,10 @@ class Subscription(DomainResource):
     """
     The subscription resource is used to define a push-based subscription from a server to another system. Once a subscription is registered with the server, the server checks every resource that is created or updated, and if the resource matches the given criteria, it sends a message on the defined "channel" so that another system can take an appropriate action.
     """
+
+    _abstract = False
+    _type = "Subscription"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Subscription"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -210,10 +195,6 @@ class Subscription(DomainResource):
     channel: Optional[SubscriptionChannel] = Field(
         description="The channel on which to report matches to the criteria",
         default=None,
-    )
-    resourceType: Literal["Subscription"] = Field(
-        description=None,
-        default="Subscription",
     )
 
     @model_validator(mode="after")

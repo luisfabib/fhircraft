@@ -13,6 +13,8 @@ class Money(Element):
     An amount of economic utility in some recognized currency
     """
 
+    _type = "Money"
+
     value: Optional[Decimal] = Field(
         description="Numerical value (with implicit precision)",
         default=None,

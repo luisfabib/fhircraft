@@ -12,6 +12,8 @@ class Attachment(Element):
     Content in a format defined elsewhere
     """
 
+    _type = "Attachment"
+
     contentType: Optional[Code] = Field(
         description="Mime type of the content, with charset etc.",
         default=None,

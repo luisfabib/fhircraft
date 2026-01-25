@@ -13,6 +13,8 @@ class Narrative(Element):
     Human-readable summary of the resource (essential clinical and business information)
     """
 
+    _type = "Narrative"
+
     status: Optional[Code] = Field(
         description="generated | extensions | additional | empty",
         default=None,

@@ -89,8 +89,6 @@ class MedicationIngredient(BackboneElement):
                 "item",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -139,8 +137,6 @@ class MedicationBatch(BackboneElement):
             elements=(
                 "expirationDate",
                 "lotNumber",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),

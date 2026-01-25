@@ -28,14 +28,18 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Reference,
-    Resource,
 )
+from .resource import Resource
 
 
 class Binary(Resource):
     """
     A resource that represents the data of a single raw artifact as digital content accessible in its native format.  A Binary resource can contain any content, whether text, image, pdf, zip archive, etc.
     """
+
+    _abstract = False
+    _type = "Binary"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Binary"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -91,10 +95,6 @@ class Binary(Resource):
         description="Placeholder element for data extensions",
         default=None,
         alias="_data",
-    )
-    resourceType: Literal["Binary"] = Field(
-        description=None,
-        default="Binary",
     )
 
     @model_validator(mode="after")

@@ -1,26 +1,9 @@
-# Fhircraft modules
-from enum import Enum
-
-# Standard modules
-from typing import Literal, Optional, Union
-
-# Pydantic modules
-from pydantic import BaseModel, Field, model_validator
-from pydantic.fields import FieldInfo
-
-import fhircraft
+from pydantic import Field, model_validator
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.utils import model_rebuild_all
+from typing import List as ListType, Literal, Optional
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from typing import List as ListType, Literal, Optional
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import (
     Base64Binary,
     Boolean,
@@ -53,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     ContactDetail,
     ContactPoint,
     Contributor,
+    UsageContext,
     Count,
     DataRequirement,
     Distance,
@@ -72,13 +56,12 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Ratio,
     Reference,
     RelatedArtifact,
-    Resource,
     SampledData,
     Signature,
     Timing,
     TriggerDefinition,
-    UsageContext,
 )
+from .resource import Resource
 
 
 class ParametersParameter(BackboneElement):
@@ -415,8 +398,6 @@ class ParametersParameter(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -490,6 +471,10 @@ class Parameters(Resource):
     This resource is a non-persisted resource used to pass information into and back from an [operation](https://hl7.org/fhir/R4/operations.html). It has no other use, and there is no RESTful endpoint associated with it.
     """
 
+    _abstract = False
+    _type = "Parameters"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Parameters"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -526,10 +511,6 @@ class Parameters(Resource):
     parameter: Optional[ListType[ParametersParameter]] = Field(
         description="Operation Parameter",
         default=None,
-    )
-    resourceType: Literal["Parameters"] = Field(
-        description=None,
-        default="Parameters",
     )
 
     @model_validator(mode="after")

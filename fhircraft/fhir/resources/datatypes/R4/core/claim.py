@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -40,11 +26,12 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Period,
     BackboneElement,
     Quantity,
+    Money,
     Attachment,
     Address,
-    Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ClaimRelated(BackboneElement):
@@ -73,10 +60,6 @@ class ClaimRelated(BackboneElement):
                 "reference",
                 "relationship",
                 "claim",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -108,8 +91,6 @@ class ClaimPayee(BackboneElement):
             elements=(
                 "party",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -166,12 +147,6 @@ class ClaimCareTeam(BackboneElement):
                 "responsible",
                 "provider",
                 "sequence",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
                 "modifierExtension",
@@ -279,12 +254,6 @@ class ClaimSupportingInfo(BackboneElement):
                 "sequence",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -364,12 +333,6 @@ class ClaimDiagnosis(BackboneElement):
                 "sequence",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -443,12 +406,6 @@ class ClaimProcedure(BackboneElement):
                 "date",
                 "type",
                 "sequence",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -538,16 +495,6 @@ class ClaimInsurance(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -597,8 +544,6 @@ class ClaimAccident(BackboneElement):
             elements=(
                 "type",
                 "date",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -700,22 +645,6 @@ class ClaimItemDetailSubDetail(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -805,24 +734,6 @@ class ClaimItemDetail(BackboneElement):
                 "category",
                 "revenue",
                 "sequence",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
                 "modifierExtension",
@@ -1022,34 +933,6 @@ class ClaimItem(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1080,6 +963,10 @@ class Claim(DomainResource):
     """
     A provider issued list of professional services and products which have been provided, or are to be provided, to a patient which is sent to an insurer for reimbursement.
     """
+
+    _abstract = False
+    _type = "Claim"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Claim"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -1252,10 +1139,6 @@ class Claim(DomainResource):
     total: Optional[Money] = Field(
         description="Total claim cost",
         default=None,
-    )
-    resourceType: Literal["Claim"] = Field(
-        description=None,
-        default="Claim",
     )
 
     @model_validator(mode="after")

@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,17 +16,17 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
+    Coding,
     Reference,
     Attachment,
     BackboneElement,
     Period,
-    Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ConsentPolicy(BackboneElement):
@@ -73,8 +60,6 @@ class ConsentPolicy(BackboneElement):
             elements=(
                 "uri",
                 "authority",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -123,10 +108,6 @@ class ConsentVerification(BackboneElement):
                 "verified",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -156,8 +137,6 @@ class ConsentProvisionActor(BackboneElement):
             elements=(
                 "reference",
                 "role",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -194,8 +173,6 @@ class ConsentProvisionData(BackboneElement):
             elements=(
                 "reference",
                 "meaning",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -283,22 +260,6 @@ class ConsentProvision(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -311,6 +272,10 @@ class Consent(DomainResource):
     """
     A record of a healthcare consumer’s  choices, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
     """
+
+    _abstract = False
+    _type: str = "Consent"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Consent"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -426,10 +391,6 @@ class Consent(DomainResource):
     provision: Optional[ConsentProvision] = Field(
         description="Constraints to the base Consent.policyRule",
         default=None,
-    )
-    resourceType: Literal["Consent"] = Field(
-        description=None,
-        default="Consent",
     )
 
     @property

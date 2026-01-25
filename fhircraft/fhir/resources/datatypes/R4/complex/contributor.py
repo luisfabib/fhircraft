@@ -12,6 +12,8 @@ class Contributor(Element):
     Contributor information
     """
 
+    _type = "Contributor"
+
     type: Optional[Code] = Field(
         description="author | editor | reviewer | endorser",
         default=None,

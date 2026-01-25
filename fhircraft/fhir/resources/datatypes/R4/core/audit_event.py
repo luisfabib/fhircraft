@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Coding,
     Period,
     CodeableConcept,
     BackboneElement,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AuditEventAgentNetwork(BackboneElement):
@@ -72,8 +59,6 @@ class AuditEventAgentNetwork(BackboneElement):
             elements=(
                 "type",
                 "address",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -176,22 +161,6 @@ class AuditEventAgent(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -231,10 +200,6 @@ class AuditEventSource(BackboneElement):
                 "type",
                 "observer",
                 "site",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -387,18 +352,6 @@ class AuditEventEntity(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -411,6 +364,10 @@ class AuditEvent(DomainResource):
     """
     A record of an event made for purposes of maintaining a security log. Typical uses include detection of intrusion attempts and monitoring for inappropriate usage.
     """
+
+    _abstract = False
+    _type = "AuditEvent"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/AuditEvent"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -524,10 +481,6 @@ class AuditEvent(DomainResource):
     entity: Optional[ListType[AuditEventEntity]] = Field(
         description="Data or objects used",
         default=None,
-    )
-    resourceType: Literal["AuditEvent"] = Field(
-        description=None,
-        default="AuditEvent",
     )
 
     @model_validator(mode="after")

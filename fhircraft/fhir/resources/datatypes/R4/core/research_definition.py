@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,23 +19,27 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
+    RelatedArtifact,
     Identifier,
     CodeableConcept,
     Reference,
     ContactDetail,
     UsageContext,
     Period,
-    RelatedArtifact,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ResearchDefinition(DomainResource):
     """
     The ResearchDefinition resource describes the conditional state (population and any exposures being compared within the population) and outcome (if specified) that the knowledge (evidence, assertion, recommendation) is about.
     """
+
+    _abstract = False
+    _type = "ResearchDefinition"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/ResearchDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -328,10 +319,6 @@ class ResearchDefinition(DomainResource):
     outcome: Optional[Reference] = Field(
         description="What outcome?",
         default=None,
-    )
-    resourceType: Literal["ResearchDefinition"] = Field(
-        description=None,
-        default="ResearchDefinition",
     )
 
     @property

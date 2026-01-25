@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -23,13 +10,13 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Reference,
-    BackboneElement,
     CodeableConcept,
-    DomainResource,
+    BackboneElement,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicinalProductInteractionInteractant(BackboneElement):
@@ -67,6 +54,12 @@ class MedicinalProductInteraction(DomainResource):
     """
     The interactions of the medicinal product with other medicinal products, or other forms of interactions.
     """
+
+    _abstract = False
+    _type = "MedicinalProductInteraction"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/MedicinalProductInteraction"
+    )
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -151,10 +144,6 @@ class MedicinalProductInteraction(DomainResource):
     management: Optional[CodeableConcept] = Field(
         description="Actions for managing the interaction",
         default=None,
-    )
-    resourceType: Literal["MedicinalProductInteraction"] = Field(
-        description=None,
-        default="MedicinalProductInteraction",
     )
 
     @model_validator(mode="after")

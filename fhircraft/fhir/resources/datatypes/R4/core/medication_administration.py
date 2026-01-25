@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,18 +10,18 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     CodeableConcept,
     Period,
+    Ratio,
     BackboneElement,
     Annotation,
     Quantity,
-    Ratio,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationAdministrationPerformer(BackboneElement):
@@ -58,8 +45,6 @@ class MedicationAdministrationPerformer(BackboneElement):
             elements=(
                 "actor",
                 "function",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -130,12 +115,6 @@ class MedicationAdministrationDosage(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -157,6 +136,10 @@ class MedicationAdministration(DomainResource):
     """
     Describes the event of a patient consuming or otherwise being administered a medication.  This may be as simple as swallowing a tablet or it may be a long running infusion.  Related resources tie this event to the authorizing prescription, and the specific encounter between patient and health care practitioner.
     """
+
+    _abstract = False
+    _type = "MedicationAdministration"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationAdministration"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -305,10 +288,6 @@ class MedicationAdministration(DomainResource):
     eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of events of interest in the lifecycle",
         default=None,
-    )
-    resourceType: Literal["MedicationAdministration"] = Field(
-        description=None,
-        default="MedicationAdministration",
     )
 
     @property

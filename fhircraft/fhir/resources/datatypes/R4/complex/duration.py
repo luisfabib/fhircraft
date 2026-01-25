@@ -11,6 +11,8 @@ class Duration(Quantity):
     A length of time
     """
 
+    _type = "Quantity"
+
     @model_validator(mode="after")
     def FHIR_drt_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(

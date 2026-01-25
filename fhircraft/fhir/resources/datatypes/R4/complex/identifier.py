@@ -16,6 +16,8 @@ class Identifier(Element):
     An identifier intended for computation
     """
 
+    _type = "Identifier"
+
     use: Optional[Code] = Field(
         description="usual | official | temp | secondary | old (If known)",
         default=None,

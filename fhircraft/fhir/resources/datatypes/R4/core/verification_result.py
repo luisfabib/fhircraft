@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,15 +16,15 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Reference,
     CodeableConcept,
     Timing,
     BackboneElement,
     Signature,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class VerificationResultPrimarySource(BackboneElement):
@@ -91,16 +78,6 @@ class VerificationResultPrimarySource(BackboneElement):
                 "communicationMethod",
                 "type",
                 "who",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
                 "modifierExtension",
@@ -183,18 +160,6 @@ class VerificationResultAttestation(BackboneElement):
                 "extension",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -236,10 +201,6 @@ class VerificationResultValidator(BackboneElement):
                 "organization",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -252,6 +213,10 @@ class VerificationResult(DomainResource):
     """
     Describes validation requirements, source(s), status and dates for one or more elements.
     """
+
+    _abstract = False
+    _type = "VerificationResult"
+    _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/VerificationResult"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -382,10 +347,6 @@ class VerificationResult(DomainResource):
     validator: Optional[ListType[VerificationResultValidator]] = Field(
         description="Information about the entity validating information",
         default=None,
-    )
-    resourceType: Literal["VerificationResult"] = Field(
-        description=None,
-        default="VerificationResult",
     )
 
     @model_validator(mode="after")
