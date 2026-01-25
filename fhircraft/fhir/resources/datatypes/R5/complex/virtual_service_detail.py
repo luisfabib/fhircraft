@@ -18,6 +18,8 @@ class VirtualServiceDetail(DataType):
     Virtual Service Contact Details
     """
 
+    _type = "VirtualServiceDetail"
+
     channelType: Optional[Coding] = Field(
         description="Channel Type",
         default=None,

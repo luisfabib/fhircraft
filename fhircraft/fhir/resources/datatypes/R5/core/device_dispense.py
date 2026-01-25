@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -38,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     Quantity,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceDispensePerformer(BackboneElement):
@@ -77,6 +65,10 @@ class DeviceDispense(DomainResource):
     """
     Indicates that a device is to be or has been dispensed for a named person/patient.  This includes a description of the product (supply) provided and the instructions for using the device.
     """
+
+    _abstract = False
+    _type = "DeviceDispense"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceDispense"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -230,10 +222,6 @@ class DeviceDispense(DomainResource):
     eventHistory: Optional[List[Reference]] = Field(
         description="A list of relevant lifecycle events",
         default=None,
-    )
-    resourceType: Literal["DeviceDispense"] = Field(
-        description=None,
-        default="DeviceDispense",
     )
 
     @model_validator(mode="after")

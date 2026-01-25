@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -41,6 +28,8 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     RelatedArtifact,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 from .canonical_resource import CanonicalResource
 
 
@@ -49,39 +38,10 @@ class MetadataResource(CanonicalResource):
     Common Interface declaration for conformance and knowledge artifact resources.
     """
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/MetadataResource"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
+    _abstract = True
+    _type = "MetadataResource"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MetadataResource"
+
     text: Optional[Narrative] = Field(
         description="Text summary of the resource, for human interpretation",
         default=None,
@@ -280,10 +240,6 @@ class MetadataResource(CanonicalResource):
     relatedArtifact: Optional[List[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc",
         default=None,
-    )
-    resourceType: Literal["MetadataResource"] = Field(
-        description=None,
-        default="MetadataResource",
     )
 
     @property

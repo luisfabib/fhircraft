@@ -39,9 +39,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Meta,
     Narrative,
     Reference,
-    Resource,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ListEntry(BackboneElement):
@@ -99,6 +99,10 @@ class List(DomainResource):
     """
     A List is a curated collection of resources, for things such as problem lists, allergy lists, facility list, organization list, etc.
     """
+
+    _abstract = False
+    _type = "List"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/List"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -220,10 +224,6 @@ class List(DomainResource):
     emptyReason: Optional[CodeableConcept] = Field(
         description="Why list is empty",
         default=None,
-    )
-    resourceType: Literal["List"] = Field(
-        description=None,
-        default="List",
     )
 
     @model_validator(mode="after")

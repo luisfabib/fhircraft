@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -35,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -45,8 +32,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     RelatedArtifact,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CodeSystemFilter(BackboneElement):
@@ -411,6 +399,10 @@ class CodeSystem(DomainResource):
     The CodeSystem resource is used to declare the existence of and describe a code system or code system supplement and its key properties, and optionally define a part or all of its content.
     """
 
+    _abstract = False
+    _type = "CodeSystem"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CodeSystem"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -726,10 +718,6 @@ class CodeSystem(DomainResource):
     concept: Optional[List[CodeSystemConcept]] = Field(
         description="Concepts in the code system",
         default=None,
-    )
-    resourceType: Literal["CodeSystem"] = Field(
-        description=None,
-        default="CodeSystem",
     )
 
     @property

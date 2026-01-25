@@ -16,6 +16,8 @@ class BackboneType(Element):
     Base for datatypes that can carry modifier extensions
     """
 
+    _type = "BackboneType"
+
     modifierExtension: Optional[List["Extension"]] = Field(
         description="Extensions that cannot be ignored even if unrecognized",
         default=None,

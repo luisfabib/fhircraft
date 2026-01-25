@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -38,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     ExtendedContactDetail,
     BackboneElement,
     Availability,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class HealthcareServiceEligibility(BackboneElement):
@@ -82,6 +70,10 @@ class HealthcareService(DomainResource):
     """
     The details of a healthcare service available at a location or in a catalog.  In the case where there is a hierarchy of services (for example, Lab -> Pathology -> Wound Cultures), this can be represented using a set of linked HealthcareServices.
     """
+
+    _abstract = False
+    _type = "HealthcareService"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/HealthcareService"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -248,10 +240,6 @@ class HealthcareService(DomainResource):
     endpoint: Optional[List[Reference]] = Field(
         description="Technical endpoints providing access to electronic services operated for the healthcare service",
         default=None,
-    )
-    resourceType: Literal["HealthcareService"] = Field(
-        description=None,
-        default="HealthcareService",
     )
 
     @model_validator(mode="after")

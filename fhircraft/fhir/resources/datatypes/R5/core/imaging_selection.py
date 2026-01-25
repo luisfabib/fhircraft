@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -39,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     CodeableReference,
     Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImagingSelectionPerformer(BackboneElement):
@@ -230,6 +218,10 @@ class ImagingSelection(DomainResource):
     A selection of DICOM SOP instances and/or frames within a single Study and Series. This might include additional specifics such as an image region, an Observation UID or a Segmentation Number, allowing linkage to an Observation Resource or transferring this information along with the ImagingStudy Resource.
     """
 
+    _abstract = False
+    _type = "ImagingSelection"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImagingSelection"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -376,10 +368,6 @@ class ImagingSelection(DomainResource):
     instance: Optional[List[ImagingSelectionInstance]] = Field(
         description="The selected instances",
         default=None,
-    )
-    resourceType: Literal["ImagingSelection"] = Field(
-        description=None,
-        default="ImagingSelection",
     )
 
     @model_validator(mode="after")

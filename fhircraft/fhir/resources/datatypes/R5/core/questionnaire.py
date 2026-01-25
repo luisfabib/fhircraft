@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -35,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -47,8 +34,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Reference,
     Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class QuestionnaireItemEnableWhen(BackboneElement):
@@ -620,6 +608,10 @@ class Questionnaire(DomainResource):
     A structured set of questions intended to guide the collection of answers from end-users. Questionnaires provide detailed control over order, presentation, phraseology and grouping to allow coherent, consistent data collection.
     """
 
+    _abstract = False
+    _type = "Questionnaire"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Questionnaire"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -853,10 +845,6 @@ class Questionnaire(DomainResource):
     item: Optional[List[QuestionnaireItem]] = Field(
         description="Questions and sections within the Questionnaire",
         default=None,
-    )
-    resourceType: Literal["Questionnaire"] = Field(
-        description=None,
-        default="Questionnaire",
     )
 
     @property

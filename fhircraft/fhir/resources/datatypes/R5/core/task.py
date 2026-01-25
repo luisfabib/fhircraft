@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -44,7 +32,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -80,8 +67,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Availability,
     ExtendedContactDetail,
     Dosage,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class TaskPerformer(BackboneElement):
@@ -977,6 +965,10 @@ class Task(DomainResource):
     A task to be performed.
     """
 
+    _abstract = False
+    _type = "Task"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Task"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1202,10 +1194,6 @@ class Task(DomainResource):
     output: Optional[List[TaskOutput]] = Field(
         description="Information produced as part of task",
         default=None,
-    )
-    resourceType: Literal["Task"] = Field(
-        description=None,
-        default="Task",
     )
 
     @model_validator(mode="after")

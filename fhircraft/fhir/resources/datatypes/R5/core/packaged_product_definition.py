@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -43,8 +30,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     ProductShelfLife,
     Attachment,
     CodeableReference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
@@ -350,6 +338,10 @@ class PackagedProductDefinition(DomainResource):
     A medically related item or items, in a container or package.
     """
 
+    _abstract = False
+    _type = "PackagedProductDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -482,10 +474,6 @@ class PackagedProductDefinition(DomainResource):
     characteristic: Optional[List[PackagedProductDefinitionCharacteristic]] = Field(
         description='Allows the key features to be recorded, such as "hospital pack", "nurse prescribable"',
         default=None,
-    )
-    resourceType: Literal["PackagedProductDefinition"] = Field(
-        description=None,
-        default="PackagedProductDefinition",
     )
 
     @model_validator(mode="after")

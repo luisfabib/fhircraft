@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -34,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -43,8 +30,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     BackboneElement,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class TestScriptOrigin(BackboneElement):
@@ -494,47 +482,6 @@ class TestScriptVariable(BackboneElement):
         )
 
 
-class TestScriptSetupActionOperationRequestHeader(BackboneElement):
-    """
-    Header elements would be used to set HTTP headers.
-    """
-
-    field: Optional[String] = Field(
-        description="HTTP header field name",
-        default=None,
-    )
-    field_ext: Optional[Element] = Field(
-        description="Placeholder element for field extensions",
-        default=None,
-        alias="_field",
-    )
-    value: Optional[String] = Field(
-        description="HTTP headerfield value",
-        default=None,
-    )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "field",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class TestScriptSetupActionOperation(BackboneElement):
     """
     The operation to perform.
@@ -634,9 +581,11 @@ class TestScriptSetupActionOperation(BackboneElement):
         default=None,
         alias="_params",
     )
-    requestHeader: Optional[List[TestScriptSetupActionOperationRequestHeader]] = Field(
-        description="Each operation can have one or more header elements",
-        default=None,
+    requestHeader: Optional[List["TestScriptSetupActionOperationRequestHeader"]] = (
+        Field(
+            description="Each operation can have one or more header elements",
+            default=None,
+        )
     )
     requestId: Optional[Id] = Field(
         description="Fixture Id of mapped request",
@@ -721,47 +670,6 @@ class TestScriptSetupActionOperation(BackboneElement):
             human="All FHIR elements must have a @value or children",
             key="ele-1",
             severity="error",
-        )
-
-
-class TestScriptSetupActionAssertRequirement(BackboneElement):
-    """
-    Links or references providing traceability to the testing requirements for this assert.
-    """
-
-    linkUri: Optional[Uri] = Field(
-        description="Link or reference to the testing requirement",
-        default=None,
-    )
-    linkUri_ext: Optional[Element] = Field(
-        description="Placeholder element for linkUri extensions",
-        default=None,
-        alias="_linkUri",
-    )
-    linkCanonical: Optional[Canonical] = Field(
-        description="Link or reference to the testing requirement",
-        default=None,
-    )
-    linkCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for linkCanonical extensions",
-        default=None,
-        alias="_linkCanonical",
-    )
-
-    @property
-    def link(self):
-        return fhir_validators.get_type_choice_value_by_base(
-            self,
-            base="link",
-        )
-
-    @model_validator(mode="after")
-    def link_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[Uri, Canonical],
-            field_name_base="link",
-            required=False,
         )
 
 
@@ -986,7 +894,7 @@ class TestScriptSetupActionAssert(BackboneElement):
         default=None,
         alias="_warningOnly",
     )
-    requirement: Optional[List[TestScriptSetupActionAssertRequirement]] = Field(
+    requirement: Optional[List["TestScriptSetupActionAssertRequirement"]] = Field(
         description="Links or references to the testing requirements",
         default=None,
     )
@@ -1904,6 +1812,10 @@ class TestScript(DomainResource):
     A structured set of tests against a FHIR server or client implementation to determine compliance against the FHIR specification.
     """
 
+    _abstract = False
+    _type = "TestScript"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/TestScript"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -2134,10 +2046,6 @@ class TestScript(DomainResource):
     teardown: Optional[TestScriptTeardown] = Field(
         description="A series of required clean up steps",
         default=None,
-    )
-    resourceType: Literal["TestScript"] = Field(
-        description=None,
-        default="TestScript",
     )
 
     @property

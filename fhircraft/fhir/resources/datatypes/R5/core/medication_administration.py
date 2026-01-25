@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -41,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Annotation,
     Quantity,
     Ratio,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationAdministrationPerformer(BackboneElement):
@@ -157,6 +145,10 @@ class MedicationAdministration(DomainResource):
     """
     Describes the event of a patient consuming or otherwise being administered a medication.  This may be as simple as swallowing a tablet or it may be a long running infusion. Related resources tie this event to the authorizing prescription, and the specific encounter between patient and health care practitioner. This event can also be used to record waste using a status of not-done and the appropriate statusReason.
     """
+
+    _abstract = False
+    _type = "MedicationAdministration"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationAdministration"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -318,10 +310,6 @@ class MedicationAdministration(DomainResource):
     eventHistory: Optional[List[Reference]] = Field(
         description="A list of events of interest in the lifecycle",
         default=None,
-    )
-    resourceType: Literal["MedicationAdministration"] = Field(
-        description=None,
-        default="MedicationAdministration",
     )
 
     @property

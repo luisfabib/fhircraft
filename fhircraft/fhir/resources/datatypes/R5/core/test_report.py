@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,12 +19,12 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class TestReportParticipant(BackboneElement):
@@ -141,47 +129,6 @@ class TestReportSetupActionOperation(BackboneElement):
         )
 
 
-class TestReportSetupActionAssertRequirement(BackboneElement):
-    """
-    Links or references providing traceability to the testing requirements for this assert.
-    """
-
-    linkUri: Optional[Uri] = Field(
-        description="Link or reference to the testing requirement",
-        default=None,
-    )
-    linkUri_ext: Optional[Element] = Field(
-        description="Placeholder element for linkUri extensions",
-        default=None,
-        alias="_linkUri",
-    )
-    linkCanonical: Optional[Canonical] = Field(
-        description="Link or reference to the testing requirement",
-        default=None,
-    )
-    linkCanonical_ext: Optional[Element] = Field(
-        description="Placeholder element for linkCanonical extensions",
-        default=None,
-        alias="_linkCanonical",
-    )
-
-    @property
-    def link(self):
-        return fhir_validators.get_type_choice_value_by_base(
-            self,
-            base="link",
-        )
-
-    @model_validator(mode="after")
-    def link_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[Uri, Canonical],
-            field_name_base="link",
-            required=False,
-        )
-
-
 class TestReportSetupActionAssert(BackboneElement):
     """
     The results of the assertion performed on the previous operations.
@@ -214,7 +161,7 @@ class TestReportSetupActionAssert(BackboneElement):
         default=None,
         alias="_detail",
     )
-    requirement: Optional[List[TestReportSetupActionAssertRequirement]] = Field(
+    requirement: Optional[List["TestReportSetupActionAssertRequirement"]] = Field(
         description="Links or references to the testing requirements",
         default=None,
     )
@@ -599,6 +546,10 @@ class TestReport(DomainResource):
     A summary of information based on the results of executing a TestScript.
     """
 
+    _abstract = False
+    _type = "TestReport"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/TestReport"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -730,10 +681,6 @@ class TestReport(DomainResource):
     teardown: Optional[TestReportTeardown] = Field(
         description="The results of running the series of required clean up steps",
         default=None,
-    )
-    resourceType: Literal["TestReport"] = Field(
-        description=None,
-        default="TestReport",
     )
 
     @model_validator(mode="after")

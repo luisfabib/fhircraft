@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -40,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     BackboneElement,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ExampleScenarioActor(BackboneElement):
@@ -724,6 +712,10 @@ class ExampleScenario(DomainResource):
     A walkthrough of a workflow showing the interaction between systems and the instances shared, possibly including the evolution of instances over time.
     """
 
+    _abstract = False
+    _type = "ExampleScenario"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExampleScenario"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -921,10 +913,6 @@ class ExampleScenario(DomainResource):
     process: Optional[List[ExampleScenarioProcess]] = Field(
         description="Major process within scenario",
         default=None,
-    )
-    resourceType: Literal["ExampleScenario"] = Field(
-        description=None,
-        default="ExampleScenario",
     )
 
     @property

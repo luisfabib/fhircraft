@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Instant
 
@@ -23,15 +11,15 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Quantity,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceMetricCalibration(BackboneElement):
@@ -89,6 +77,10 @@ class DeviceMetric(DomainResource):
     """
     Describes a measurement, calculation or setting capability of a device.  The DeviceMetric resource is derived from the ISO/IEEE 11073-10201 Domain Information Model standard, but is more widely applicable.
     """
+
+    _abstract = False
+    _type = "DeviceMetric"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceMetric"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -189,10 +181,6 @@ class DeviceMetric(DomainResource):
     calibration: Optional[List[DeviceMetricCalibration]] = Field(
         description="Describes the calibrations that have been performed or that are required to be performed",
         default=None,
-    )
-    resourceType: Literal["DeviceMetric"] = Field(
-        description=None,
-        default="DeviceMetric",
     )
 
     @model_validator(mode="after")

@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Integer
 
@@ -23,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -31,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     CodeableConcept,
     Range,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MolecularSequenceRelativeStartingSequence(BackboneElement):
@@ -282,6 +270,10 @@ class MolecularSequence(DomainResource):
     Representation of a molecular sequence.
     """
 
+    _abstract = False
+    _type = "MolecularSequence"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MolecularSequence"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -380,10 +372,6 @@ class MolecularSequence(DomainResource):
     relative: Optional[List[MolecularSequenceRelative]] = Field(
         description="A sequence defined relative to another sequence",
         default=None,
-    )
-    resourceType: Literal["MolecularSequence"] = Field(
-        description=None,
-        default="MolecularSequence",
     )
 
     @model_validator(mode="after")

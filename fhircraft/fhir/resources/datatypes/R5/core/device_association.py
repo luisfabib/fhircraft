@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -23,15 +11,15 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     CodeableConcept,
     Period,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceAssociationOperation(BackboneElement):
@@ -74,6 +62,10 @@ class DeviceAssociation(DomainResource):
     """
     A record of association of a device.
     """
+
+    _abstract = False
+    _type = "DeviceAssociation"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceAssociation"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -159,10 +151,6 @@ class DeviceAssociation(DomainResource):
     operation: Optional[List[DeviceAssociationOperation]] = Field(
         description="The details about the device when it is in use to describe its operation",
         default=None,
-    )
-    resourceType: Literal["DeviceAssociation"] = Field(
-        description=None,
-        default="DeviceAssociation",
     )
 
     @model_validator(mode="after")

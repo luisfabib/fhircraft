@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -34,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -44,8 +31,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     RelatedArtifact,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ValueSetComposeIncludeConceptDesignation(BackboneElement):
@@ -1133,6 +1121,10 @@ class ValueSet(DomainResource):
     A ValueSet resource instance specifies a set of codes drawn from one or more code systems, intended for use in a particular context. Value sets link between `CodeSystem` definitions and their use in [coded elements](https://hl7.org/fhir/R5/terminologies.html).
     """
 
+    _abstract = False
+    _type = "ValueSet"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ValueSet"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1385,10 +1377,6 @@ class ValueSet(DomainResource):
     scope: Optional[ValueSetScope] = Field(
         description="Description of the semantic space the Value Set Expansion is intended to cover and should further clarify the text in ValueSet.description",
         default=None,
-    )
-    resourceType: Literal["ValueSet"] = Field(
-        description=None,
-        default="ValueSet",
     )
 
     @property

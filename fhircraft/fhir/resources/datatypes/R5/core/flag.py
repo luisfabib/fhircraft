@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -23,20 +11,24 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class Flag(DomainResource):
     """
     Prospective warnings of potential issues when providing care to the patient.
     """
+
+    _abstract = False
+    _type = "Flag"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Flag"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -123,10 +115,6 @@ class Flag(DomainResource):
     author: Optional[Reference] = Field(
         description="Flag creator",
         default=None,
-    )
-    resourceType: Literal["Flag"] = Field(
-        description=None,
-        default="Flag",
     )
 
     @model_validator(mode="after")

@@ -10,6 +10,8 @@ class MoneyQuantity(Quantity):
     An amount of money.
     """
 
+    _type = "Quantity"
+
     @model_validator(mode="after")
     def FHIR_mtqy_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(

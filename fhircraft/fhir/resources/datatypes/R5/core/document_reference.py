@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -41,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     Attachment,
     Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DocumentReferenceAttester(BackboneElement):
@@ -197,6 +185,10 @@ class DocumentReference(DomainResource):
     """
     A reference to a document of any kind for any purpose. While the term “document” implies a more narrow focus, for this resource this “document” encompasses *any* serialized object with a mime-type, it includes formal patient-centric documents (CDA), clinical notes, scanned paper, non-patient specific documents like policy text, as well as a photo, video, or audio recording acquired or used in healthcare.  The DocumentReference resource provides metadata about the document so that the document can be discovered and managed.  The actual content may be inline base64 encoded data or provided by direct reference.
     """
+
+    _abstract = False
+    _type = "DocumentReference"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DocumentReference"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -363,10 +355,6 @@ class DocumentReference(DomainResource):
     content: Optional[List[DocumentReferenceContent]] = Field(
         description="Document referenced",
         default=None,
-    )
-    resourceType: Literal["DocumentReference"] = Field(
-        description=None,
-        default="DocumentReference",
     )
 
     @model_validator(mode="after")

@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     BackboneElement,
     CodeableConcept,
     Period,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ResearchSubjectProgress(BackboneElement):
@@ -107,6 +95,10 @@ class ResearchSubject(DomainResource):
     """
     A ResearchSubject is a participant or object which is the recipient of investigative activities in a research study.
     """
+
+    _abstract = False
+    _type = "ResearchSubject"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchSubject"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -207,10 +199,6 @@ class ResearchSubject(DomainResource):
     consent: Optional[List[Reference]] = Field(
         description="Agreement to participate in study",
         default=None,
-    )
-    resourceType: Literal["ResearchSubject"] = Field(
-        description=None,
-        default="ResearchSubject",
     )
 
     @model_validator(mode="after")

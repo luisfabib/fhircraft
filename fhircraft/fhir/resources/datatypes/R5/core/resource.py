@@ -1,31 +1,21 @@
-# Fhircraft modules
+from typing import Optional
+
+from pydantic import Field, model_validator
+
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
-
-NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, Literal
-
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
-
-from fhircraft.fhir.resources.datatypes.R5.complex import Meta, Base, Element
+from fhircraft.fhir.resources.datatypes.primitives import *
+from fhircraft.fhir.resources.datatypes.R5.complex import Base, Element, Meta
 
 
 class Resource(Base):
     """
-    This is the base resource type for everything.
+    Base Resource
     """
+
+    _abstract = True
+    _type = "Resource"
+    _kind = "resource"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Resource"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -37,10 +27,8 @@ class Resource(Base):
         alias="_id",
     )
     meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Resource"]
-        ),
+        description="Metadata about the resource",
+        default=None,
     )
     implicitRules: Optional[Uri] = Field(
         description="A set of rules under which this content was created",
@@ -60,10 +48,6 @@ class Resource(Base):
         default=None,
         alias="_language",
     )
-    resourceType: Literal["Resource"] = Field(
-        description=None,
-        default="Resource",
-    )
 
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_validator(self):
@@ -74,6 +58,16 @@ class Resource(Base):
                 "implicitRules",
                 "meta",
             ),
+            expression="hasValue() or (children().count() > id.count())",
+            human="All FHIR elements must have a @value or children",
+            key="ele-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_ele_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
             key="ele-1",

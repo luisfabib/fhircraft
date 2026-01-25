@@ -10,6 +10,9 @@ class Base(FHIRBaseModel):
     Base for all types and resources
     """
 
+    _abstract = True
+    _kind = "complex-type"
+    _type = "Base"
     _fhir_release = "R5"
 
     @model_validator(mode="after")

@@ -12,6 +12,8 @@ class Availability(Element):
     Availability data for an {item}
     """
 
+    _type = "Availability"
+
     availableTime: Optional[List[Element]] = Field(
         description="Times the {item} is available",
         default=None,

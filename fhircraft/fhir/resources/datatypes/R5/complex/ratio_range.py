@@ -12,6 +12,8 @@ class RatioRange(DataType):
     Range of ratio values
     """
 
+    _type = "RatioRange"
+
     lowNumerator: Optional[Quantity] = Field(
         description="Low Numerator limit",
         default=None,

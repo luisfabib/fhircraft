@@ -12,6 +12,8 @@ class PrimitiveType(DataType):
     Parent type for DataTypes with a simple value
     """
 
+    _type = "PrimitiveType"
+
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(

@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -45,8 +32,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Duration,
     Range,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
@@ -323,6 +311,10 @@ class SpecimenDefinition(DomainResource):
     A kind of specimen with associated set of requirements.
     """
 
+    _abstract = False
+    _type = "SpecimenDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SpecimenDefinition"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -581,10 +573,6 @@ class SpecimenDefinition(DomainResource):
     typeTested: Optional[List[SpecimenDefinitionTypeTested]] = Field(
         description="Specimen in container intended for testing by lab",
         default=None,
-    )
-    resourceType: Literal["SpecimenDefinition"] = Field(
-        description=None,
-        default="SpecimenDefinition",
     )
 
     @property

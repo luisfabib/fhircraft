@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -40,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Range,
     Period,
     Timing,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SupplyRequestParameter(BackboneElement):
@@ -111,6 +99,10 @@ class SupplyRequest(DomainResource):
     """
     A record of a non-patient specific request for a medication, substance, device, certain types of biologically derived product, and nutrition product used in the healthcare setting.
     """
+
+    _abstract = False
+    _type = "SupplyRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SupplyRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -252,10 +244,6 @@ class SupplyRequest(DomainResource):
     deliverTo: Optional[Reference] = Field(
         description="The destination of the supply",
         default=None,
-    )
-    resourceType: Literal["SupplyRequest"] = Field(
-        description=None,
-        default="SupplyRequest",
     )
 
     @property

@@ -12,6 +12,8 @@ class BackboneElement(Element):
     Base for elements defined inside a resource
     """
 
+    _type = "BackboneElement"
+
     modifierExtension: Optional[List[Extension]] = Field(
         description="Extensions that cannot be ignored even if unrecognized",
         default=None,

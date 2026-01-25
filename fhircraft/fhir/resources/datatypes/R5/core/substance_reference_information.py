@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -23,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     BackboneElement,
     CodeableConcept,
@@ -31,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Identifier,
     Quantity,
     Range,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubstanceReferenceInformationGene(BackboneElement):
@@ -203,6 +191,12 @@ class SubstanceReferenceInformation(DomainResource):
     Todo.
     """
 
+    _abstract = False
+    _type = "SubstanceReferenceInformation"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/SubstanceReferenceInformation"
+    )
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -274,10 +268,6 @@ class SubstanceReferenceInformation(DomainResource):
     target: Optional[List[SubstanceReferenceInformationTarget]] = Field(
         description="Todo",
         default=None,
-    )
-    resourceType: Literal["SubstanceReferenceInformation"] = Field(
-        description=None,
-        default="SubstanceReferenceInformation",
     )
 
     @model_validator(mode="after")

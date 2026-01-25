@@ -10,6 +10,8 @@ class DataType(Element):
     Reuseable Types
     """
 
+    _type = "DataType"
+
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(

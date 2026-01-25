@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -37,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     CodeableReference,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class RegulatedAuthorizationCase(BackboneElement):
@@ -115,6 +103,10 @@ class RegulatedAuthorization(DomainResource):
     """
     Regulatory approval, clearance or licencing related to a regulated product, treatment, facility or activity that is cited in a guidance, regulation, rule or legislative act. An example is Market Authorization relating to a Medicinal Product.
     """
+
+    _abstract = False
+    _type = "RegulatedAuthorization"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/RegulatedAuthorization"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -234,10 +226,6 @@ class RegulatedAuthorization(DomainResource):
     case: Optional[RegulatedAuthorizationCase] = Field(
         description="The case or regulatory procedure for granting or amending a regulated authorization. Note: This area is subject to ongoing review and the workgroup is seeking implementer feedback on its use (see link at bottom of page)",
         default=None,
-    )
-    resourceType: Literal["RegulatedAuthorization"] = Field(
-        description=None,
-        default="RegulatedAuthorization",
     )
 
     @model_validator(mode="after")

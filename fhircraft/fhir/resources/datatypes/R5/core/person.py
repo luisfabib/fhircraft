@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     HumanName,
@@ -40,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Attachment,
     BackboneElement,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PersonCommunication(BackboneElement):
@@ -120,6 +108,10 @@ class Person(DomainResource):
     """
     Demographics and administrative information about a person independent of a specific health-related context.
     """
+
+    _abstract = False
+    _type = "Person"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Person"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -250,10 +242,6 @@ class Person(DomainResource):
     link: Optional[List[PersonLink]] = Field(
         description="Link to a resource that concerns the same actual person",
         default=None,
-    )
-    resourceType: Literal["Person"] = Field(
-        description=None,
-        default="Person",
     )
 
     @property

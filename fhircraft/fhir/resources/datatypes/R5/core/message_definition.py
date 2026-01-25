@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -40,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MessageDefinitionFocus(BackboneElement):
@@ -150,6 +138,10 @@ class MessageDefinition(DomainResource):
     """
     Defines the characteristics of a message that can be shared between systems, including the type of event that initiates the message, the content to be transmitted and what response(s), if any, are permitted.
     """
+
+    _abstract = False
+    _type = "MessageDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MessageDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -411,10 +403,6 @@ class MessageDefinition(DomainResource):
         description="Placeholder element for graph extensions",
         default=None,
         alias="_graph",
-    )
-    resourceType: Literal["MessageDefinition"] = Field(
-        description=None,
-        default="MessageDefinition",
     )
 
     @property

@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -39,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     Period,
     Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CoverageEligibilityResponseEvent(BackboneElement):
@@ -420,6 +408,12 @@ class CoverageEligibilityResponse(DomainResource):
     This resource provides eligibility and plan details from the processing of an CoverageEligibilityRequest resource.
     """
 
+    _abstract = False
+    _type = "CoverageEligibilityResponse"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityResponse"
+    )
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -573,10 +567,6 @@ class CoverageEligibilityResponse(DomainResource):
     error: Optional[List[CoverageEligibilityResponseError]] = Field(
         description="Processing errors",
         default=None,
-    )
-    resourceType: Literal["CoverageEligibilityResponse"] = Field(
-        description=None,
-        default="CoverageEligibilityResponse",
     )
 
     @property

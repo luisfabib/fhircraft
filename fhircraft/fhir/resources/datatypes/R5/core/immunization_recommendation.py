@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,14 +17,14 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     BackboneElement,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
@@ -187,6 +175,12 @@ class ImmunizationRecommendation(DomainResource):
     A patient's point-in-time set of recommendations (i.e. forecasting) according to a published schedule with optional supporting justification.
     """
 
+    _abstract = False
+    _type = "ImmunizationRecommendation"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation"
+    )
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -262,10 +256,6 @@ class ImmunizationRecommendation(DomainResource):
     recommendation: Optional[List[ImmunizationRecommendationRecommendation]] = Field(
         description="Vaccine administration recommendations",
         default=None,
-    )
-    resourceType: Literal["ImmunizationRecommendation"] = Field(
-        description=None,
-        default="ImmunizationRecommendation",
     )
 
     @model_validator(mode="after")

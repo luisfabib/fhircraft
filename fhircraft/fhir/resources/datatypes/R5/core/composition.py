@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -34,8 +21,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     RelatedArtifact,
     Period,
     CodeableReference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CompositionAttester(BackboneElement):
@@ -189,6 +177,10 @@ class Composition(DomainResource):
     """
     A set of healthcare-related information that is assembled together into a single logical package that provides a single coherent statement of meaning, establishes its own context and that has clinical attestation with regard to who is making the statement. A Composition defines the structure and narrative content necessary for a document. However, a Composition alone does not constitute a document. Rather, the Composition must be the first entry in a Bundle where Bundle.type=document, and any other resources referenced from Composition must be included as subsequent entries in the Bundle (for example Patient, Practitioner, Encounter, etc.).
     """
+
+    _abstract = False
+    _type = "Composition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Composition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -344,10 +336,6 @@ class Composition(DomainResource):
     section: Optional[List[CompositionSection]] = Field(
         description="Composition is broken into sections",
         default=None,
-    )
-    resourceType: Literal["Composition"] = Field(
-        description=None,
-        default="Composition",
     )
 
     @model_validator(mode="after")

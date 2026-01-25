@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -40,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Attachment,
     CodeableReference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ManufacturedItemDefinitionProperty(BackboneElement):
@@ -329,6 +317,12 @@ class ManufacturedItemDefinition(DomainResource):
     The definition and characteristics of a medicinal manufactured item, such as a tablet or capsule, as contained in a packaged medicinal product.
     """
 
+    _abstract = False
+    _type = "ManufacturedItemDefinition"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition"
+    )
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -429,10 +423,6 @@ class ManufacturedItemDefinition(DomainResource):
     component: Optional[List[ManufacturedItemDefinitionComponent]] = Field(
         description="Physical parts of the manufactured item, that it is intrisically made from. This is distinct from the ingredients that are part of its chemical makeup",
         default=None,
-    )
-    resourceType: Literal["ManufacturedItemDefinition"] = Field(
-        description=None,
-        default="ManufacturedItemDefinition",
     )
 
     @model_validator(mode="after")

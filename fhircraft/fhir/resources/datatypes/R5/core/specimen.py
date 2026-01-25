@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -34,8 +21,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     CodeableReference,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SpecimenFeature(BackboneElement):
@@ -296,6 +284,10 @@ class Specimen(DomainResource):
     A sample to be used for analysis.
     """
 
+    _abstract = False
+    _type = "Specimen"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Specimen"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -423,10 +415,6 @@ class Specimen(DomainResource):
     note: Optional[List[Annotation]] = Field(
         description="Comments",
         default=None,
-    )
-    resourceType: Literal["Specimen"] = Field(
-        description=None,
-        default="Specimen",
     )
 
     @model_validator(mode="after")

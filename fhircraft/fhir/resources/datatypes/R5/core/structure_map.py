@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -36,7 +24,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -44,8 +31,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class StructureMapStructure(BackboneElement):
@@ -812,6 +800,10 @@ class StructureMap(DomainResource):
     A Map of relationships between 2 structures that can be used to transform data.
     """
 
+    _abstract = False
+    _type = "StructureMap"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureMap"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1018,10 +1010,6 @@ class StructureMap(DomainResource):
     group: Optional[List[StructureMapGroup]] = Field(
         description="Named sections for reader convenience",
         default=None,
-    )
-    resourceType: Literal["StructureMap"] = Field(
-        description=None,
-        default="StructureMap",
     )
 
     @property

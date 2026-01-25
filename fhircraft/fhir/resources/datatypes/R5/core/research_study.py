@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     BackboneElement,
@@ -42,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Period,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ResearchStudyLabel(BackboneElement):
@@ -397,6 +385,10 @@ class ResearchStudy(DomainResource):
     A scientific study of nature that sometimes includes processes involved in health and disease. For example, clinical trials are research studies that involve people. These studies may be related to new ways to screen, prevent, diagnose, and treat disease. They may also study certain outcomes and certain groups of people by looking at data collected in the past or future.
     """
 
+    _abstract = False
+    _type = "ResearchStudy"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchStudy"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -613,10 +605,6 @@ class ResearchStudy(DomainResource):
     result: Optional[List[Reference]] = Field(
         description="Link to results generated during the study",
         default=None,
-    )
-    resourceType: Literal["ResearchStudy"] = Field(
-        description=None,
-        default="ResearchStudy",
     )
 
     @model_validator(mode="after")

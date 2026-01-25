@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -38,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Timing,
     BackboneElement,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AdverseEventParticipant(BackboneElement):
@@ -288,6 +276,10 @@ class AdverseEvent(DomainResource):
     An event (i.e. any change to current patient status) that may be related to unintended effects on a patient or research participant. The unintended effects may require additional monitoring, treatment, hospitalization, or may result in death. The AdverseEvent resource also extends to potential or avoided events that could have had such effects. There are two major domains where the AdverseEvent resource is expected to be used. One is in clinical care reported adverse events and the other is in reporting adverse events in clinical  research trial management.  Adverse events can be reported by healthcare providers, patients, caregivers or by medical products manufacturers.  Given the differences between these two concepts, we recommend consulting the domain specific implementation guides when implementing the AdverseEvent Resource. The implementation guides include specific extensions, value sets and constraints.
     """
 
+    _abstract = False
+    _type = "AdverseEvent"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/AdverseEvent"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -470,10 +462,6 @@ class AdverseEvent(DomainResource):
     note: Optional[List[Annotation]] = Field(
         description="Comment on adverse event",
         default=None,
-    )
-    resourceType: Literal["AdverseEvent"] = Field(
-        description=None,
-        default="AdverseEvent",
     )
 
     @property

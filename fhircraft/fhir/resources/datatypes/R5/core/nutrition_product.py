@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     CodeableConcept,
     Reference,
@@ -41,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Attachment,
     Identifier,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class NutritionProductNutrient(BackboneElement):
@@ -278,6 +266,10 @@ class NutritionProduct(DomainResource):
     A food or supplement that is consumed by patients.
     """
 
+    _abstract = False
+    _type = "NutritionProduct"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/NutritionProduct"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -371,10 +363,6 @@ class NutritionProduct(DomainResource):
     note: Optional[List[Annotation]] = Field(
         description="Comments made about the product",
         default=None,
-    )
-    resourceType: Literal["NutritionProduct"] = Field(
-        description=None,
-        default="NutritionProduct",
     )
 
     @model_validator(mode="after")

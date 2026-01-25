@@ -12,6 +12,8 @@ class Range(DataType):
     Set of values bounded by low and high
     """
 
+    _type = "Range"
+
     low: Optional[Quantity] = Field(
         description="Low limit",
         default=None,

@@ -1,19 +1,10 @@
 # Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional
 
 NoneType = type(None)
 
-# Dynamic modules
-from typing import Optional, Literal
-
+import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
     Uri,
@@ -24,15 +15,19 @@ from fhircraft.fhir.resources.datatypes.primitives import (
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Meta,
     Reference,
-    Resource,
     Element,
 )
+from .resource import Resource
 
 
 class Binary(Resource):
     """
     A resource that represents the data of a single raw artifact as digital content accessible in its native format.  A Binary resource can contain any content, whether text, image, pdf, zip archive, etc.
     """
+
+    _abstract = False
+    _type = "Binary"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Binary"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -88,10 +83,6 @@ class Binary(Resource):
         description="Placeholder element for data extensions",
         default=None,
         alias="_data",
-    )
-    resourceType: Literal["Binary"] = Field(
-        description=None,
-        default="Binary",
     )
 
     @model_validator(mode="after")

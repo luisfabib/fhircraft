@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -43,8 +30,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     Timing,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceRequestParameter(BackboneElement):
@@ -114,6 +102,10 @@ class DeviceRequest(DomainResource):
     """
     Represents a request a device to be provided to a specific patient. The device may be an implantable device to be subsequently implanted, or an external assistive device, such as a walker, to be delivered and subsequently be used.
     """
+
+    _abstract = False
+    _type = "DeviceRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -325,10 +317,6 @@ class DeviceRequest(DomainResource):
     relevantHistory: Optional[List[Reference]] = Field(
         description="Request provenance",
         default=None,
-    )
-    resourceType: Literal["DeviceRequest"] = Field(
-        description=None,
-        default="DeviceRequest",
     )
 
     @property
