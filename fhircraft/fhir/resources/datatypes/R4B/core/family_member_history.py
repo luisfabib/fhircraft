@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -28,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Range,
     Annotation,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class FamilyMemberHistoryCondition(BackboneElement):
@@ -119,6 +119,10 @@ class FamilyMemberHistory(DomainResource):
     """
     Significant health conditions for a person related to the patient relevant in the context of care for the patient.
     """
+
+    _abstract = False
+    _type = "FamilyMemberHistory"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/FamilyMemberHistory"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -332,10 +336,6 @@ class FamilyMemberHistory(DomainResource):
     condition: Optional[ListType[FamilyMemberHistoryCondition]] = Field(
         description="Condition that the related person had",
         default=None,
-    )
-    resourceType: Literal["FamilyMemberHistory"] = Field(
-        description=None,
-        default="FamilyMemberHistory",
     )
 
     @property

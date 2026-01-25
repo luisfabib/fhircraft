@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -26,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     ContactPoint,
     BackboneElement,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class HealthcareServiceEligibility(BackboneElement):
@@ -167,6 +167,10 @@ class HealthcareService(DomainResource):
     """
     The details of a healthcare service available at a location.
     """
+
+    _abstract = False
+    _type = "HealthcareService"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/HealthcareService"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -342,10 +346,6 @@ class HealthcareService(DomainResource):
     endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to electronic services operated for the healthcare service",
         default=None,
-    )
-    resourceType: Literal["HealthcareService"] = Field(
-        description=None,
-        default="HealthcareService",
     )
 
     @model_validator(mode="after")

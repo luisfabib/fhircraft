@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -30,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     Quantity,
     Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicinalProductDefinitionContact(BackboneElement):
@@ -334,6 +334,12 @@ class MedicinalProductDefinition(DomainResource):
     Detailed definition of a medicinal product, typically for uses other than direct patient care (e.g. regulatory use, drug catalogs, to support prescribing, adverse events management etc.).
     """
 
+    _abstract = False
+    _type = "MedicinalProductDefinition"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition"
+    )
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -520,10 +526,6 @@ class MedicinalProductDefinition(DomainResource):
             description='Key product features such as "sugar free", "modified release"',
             default=None,
         )
-    )
-    resourceType: Literal["MedicinalProductDefinition"] = Field(
-        description=None,
-        default="MedicinalProductDefinition",
     )
 
     @model_validator(mode="after")

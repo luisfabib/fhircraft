@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -19,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Coding,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DocumentReferenceRelatesTo(BackboneElement):
@@ -152,6 +152,10 @@ class DocumentReference(DomainResource):
     """
     A reference to a document of any kind for any purpose. Provides metadata about the document so that the document can be discovered and managed. The scope of a document is any seralized object with a mime-type, so includes formal patient centric documents (CDA), cliical notes, scanned paper, and non-patient specific documents like policy text.
     """
+
+    _abstract = False
+    _type = "DocumentReference"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DocumentReference"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -285,10 +289,6 @@ class DocumentReference(DomainResource):
     context: Optional[DocumentReferenceContext] = Field(
         description="Clinical context of document",
         default=None,
-    )
-    resourceType: Literal["DocumentReference"] = Field(
-        description=None,
-        default="DocumentReference",
     )
 
     @model_validator(mode="after")

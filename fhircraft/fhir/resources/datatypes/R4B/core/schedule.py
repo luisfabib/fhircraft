@@ -10,20 +10,24 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class Schedule(DomainResource):
     """
     A container for slots of time that may be available for booking appointments.
     """
+
+    _abstract = False
+    _type = "Schedule"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Schedule"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -115,10 +119,6 @@ class Schedule(DomainResource):
         description="Placeholder element for comment extensions",
         default=None,
         alias="_comment",
-    )
-    resourceType: Literal["Schedule"] = Field(
-        description=None,
-        default="Schedule",
     )
 
     @model_validator(mode="after")

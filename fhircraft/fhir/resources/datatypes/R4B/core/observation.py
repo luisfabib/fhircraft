@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -32,8 +31,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     SampledData,
     Annotation,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ObservationReferenceRange(BackboneElement):
@@ -295,6 +295,10 @@ class Observation(DomainResource):
     Measurements and simple assertions made about a patient, device or other subject.
     """
 
+    _abstract = False
+    _type = "Observation"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Observation"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -536,10 +540,6 @@ class Observation(DomainResource):
     component: Optional[ListType[ObservationComponent]] = Field(
         description="Component results",
         default=None,
-    )
-    resourceType: Literal["Observation"] = Field(
-        description=None,
-        default="Observation",
     )
 
     @property

@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     ContactDetail,
     UsageContext,
@@ -28,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Reference,
     Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CapabilityStatementSoftware(BackboneElement):
@@ -940,6 +940,10 @@ class CapabilityStatement(DomainResource):
     A Capability Statement documents a set of capabilities (behaviors) of a FHIR Server for a particular version of FHIR that may be used as a statement of actual server functionality or a statement of required or desired server implementation.
     """
 
+    _abstract = False
+    _type = "CapabilityStatement"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CapabilityStatement"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1182,10 +1186,6 @@ class CapabilityStatement(DomainResource):
     document: Optional[ListType[CapabilityStatementDocument]] = Field(
         description="Document definition",
         default=None,
-    )
-    resourceType: Literal["CapabilityStatement"] = Field(
-        description=None,
-        default="CapabilityStatement",
     )
 
     @model_validator(mode="after")

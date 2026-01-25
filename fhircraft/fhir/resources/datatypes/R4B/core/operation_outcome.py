@@ -10,12 +10,12 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     BackboneElement,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class OperationOutcomeIssue(BackboneElement):
@@ -101,6 +101,10 @@ class OperationOutcome(DomainResource):
     A collection of error, warning, or information messages that result from a system action.
     """
 
+    _abstract = False
+    _type = "OperationOutcome"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/OperationOutcome"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -153,10 +157,6 @@ class OperationOutcome(DomainResource):
     issue: Optional[ListType[OperationOutcomeIssue]] = Field(
         description="A single issue associated with the action",
         default=None,
-    )
-    resourceType: Literal["OperationOutcome"] = Field(
-        description=None,
-        default="OperationOutcome",
     )
 
     @model_validator(mode="after")

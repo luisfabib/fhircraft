@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Quantity,
     Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CoverageClass(BackboneElement):
@@ -165,6 +165,10 @@ class Coverage(DomainResource):
     """
     Financial instrument which may be used to reimburse or pay for health care products and services. Includes both insurance and self-payment.
     """
+
+    _abstract = False
+    _type = "Coverage"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Coverage"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -312,10 +316,6 @@ class Coverage(DomainResource):
     contract: Optional[ListType[Reference]] = Field(
         description="Contract details",
         default=None,
-    )
-    resourceType: Literal["Coverage"] = Field(
-        description=None,
-        default="Coverage",
     )
 
     @model_validator(mode="after")

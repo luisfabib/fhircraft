@@ -10,20 +10,24 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Attachment,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class BodyStructure(DomainResource):
     """
     Record details about an anatomical structure.  This resource may be used when a coded concept does not provide the necessary detail needed for the use case.
     """
+
+    _abstract = False
+    _type = "BodyStructure"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/BodyStructure"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -115,10 +119,6 @@ class BodyStructure(DomainResource):
     patient: Optional[Reference] = Field(
         description="Who this is about",
         default=None,
-    )
-    resourceType: Literal["BodyStructure"] = Field(
-        description=None,
-        default="BodyStructure",
     )
 
     @model_validator(mode="after")

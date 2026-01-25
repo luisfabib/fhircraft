@@ -16,15 +16,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Reference,
     Period,
     CodeableConcept,
     BackboneElement,
     Signature,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ProvenanceAgent(BackboneElement):
@@ -155,6 +155,10 @@ class Provenance(DomainResource):
     Provenance of a resource is a record that describes entities and processes involved in producing and delivering or otherwise influencing that resource. Provenance provides a critical foundation for assessing authenticity, enabling trust, and allowing reproducibility. Provenance assertions are a form of contextual metadata and can themselves become important records with their own provenance. Provenance statement indicates clinical significance in terms of confidence in authenticity, reliability, and trustworthiness, integrity, and stage in lifecycle (e.g. Document Completion - has the artifact been legally authenticated), all of which may impact security, privacy, and trust policies.
     """
 
+    _abstract = False
+    _type = "Provenance"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Provenance"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -262,10 +266,6 @@ class Provenance(DomainResource):
     signature: Optional[ListType[Signature]] = Field(
         description="Signature on target",
         default=None,
-    )
-    resourceType: Literal["Provenance"] = Field(
-        description=None,
-        default="Provenance",
     )
 
     @property

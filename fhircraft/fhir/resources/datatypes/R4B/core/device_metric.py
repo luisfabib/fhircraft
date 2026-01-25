@@ -10,15 +10,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Timing,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceMetricCalibration(BackboneElement):
@@ -76,6 +76,10 @@ class DeviceMetric(DomainResource):
     """
     Describes a measurement, calculation or setting capability of a medical device.
     """
+
+    _abstract = False
+    _type = "DeviceMetric"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceMetric"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -180,10 +184,6 @@ class DeviceMetric(DomainResource):
     calibration: Optional[ListType[DeviceMetricCalibration]] = Field(
         description="Describes the calibrations that have been performed or that are required to be performed",
         default=None,
-    )
-    resourceType: Literal["DeviceMetric"] = Field(
-        description=None,
-        default="DeviceMetric",
     )
 
     @model_validator(mode="after")

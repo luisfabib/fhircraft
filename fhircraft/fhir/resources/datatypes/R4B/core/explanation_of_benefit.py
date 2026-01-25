@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -32,8 +31,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Coding,
     Address,
     Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ExplanationOfBenefitRelated(BackboneElement):
@@ -1737,6 +1737,10 @@ class ExplanationOfBenefit(DomainResource):
     This resource provides: the claim details; adjudication details from the processing of a Claim; and optionally account balance information, for informing the subscriber of the benefits provided.
     """
 
+    _abstract = False
+    _type = "ExplanationOfBenefit"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExplanationOfBenefit"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1992,10 +1996,6 @@ class ExplanationOfBenefit(DomainResource):
     benefitBalance: Optional[ListType[ExplanationOfBenefitBenefitBalance]] = Field(
         description="Balance by Benefit Category",
         default=None,
-    )
-    resourceType: Literal["ExplanationOfBenefit"] = Field(
-        description=None,
-        default="ExplanationOfBenefit",
     )
 
     @model_validator(mode="after")

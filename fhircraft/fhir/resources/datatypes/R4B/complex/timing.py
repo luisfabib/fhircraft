@@ -16,6 +16,8 @@ class Timing(BackboneElement):
     A timing schedule that specifies an event that may occur multiple times
     """
 
+    _type = "Timing"
+
     event: Optional[List[DateTime]] = Field(
         description="When the event occurs",
         default=None,

@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -19,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Period,
     Timing,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SupplyDeliverySuppliedItem(BackboneElement):
@@ -77,6 +77,10 @@ class SupplyDelivery(DomainResource):
     """
     Record of delivery of what is supplied.
     """
+
+    _abstract = False
+    _type = "SupplyDelivery"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SupplyDelivery"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -188,10 +192,6 @@ class SupplyDelivery(DomainResource):
     receiver: Optional[ListType[Reference]] = Field(
         description="Who collected the Supply",
         default=None,
-    )
-    resourceType: Literal["SupplyDelivery"] = Field(
-        description=None,
-        default="SupplyDelivery",
     )
 
     @property

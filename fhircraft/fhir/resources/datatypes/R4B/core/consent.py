@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Period,
     Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ConsentPolicy(BackboneElement):
@@ -270,8 +270,12 @@ class ConsentProvision(BackboneElement):
 
 class Consent(DomainResource):
     """
-    A record of a healthcare consumer’s  choices, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
+    A record of a healthcare consumer's  choices, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
     """
+
+    _abstract = False
+    _type = "Consent"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Consent"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -387,10 +391,6 @@ class Consent(DomainResource):
     provision: Optional[ConsentProvision] = Field(
         description="Constraints to the base Consent.policyRule",
         default=None,
-    )
-    resourceType: Literal["Consent"] = Field(
-        description=None,
-        default="Consent",
     )
 
     @property

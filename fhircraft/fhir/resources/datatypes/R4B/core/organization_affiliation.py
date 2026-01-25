@@ -10,21 +10,25 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Period,
     Reference,
     CodeableConcept,
     ContactPoint,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class OrganizationAffiliation(DomainResource):
     """
     Defines an affiliation/assotiation/relationship between 2 distinct oganizations, that is not a part-of relationship/sub-division relationship.
     """
+
+    _abstract = False
+    _type = "OrganizationAffiliation"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/OrganizationAffiliation"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -127,10 +131,6 @@ class OrganizationAffiliation(DomainResource):
     endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for this role",
         default=None,
-    )
-    resourceType: Literal["OrganizationAffiliation"] = Field(
-        description=None,
-        default="OrganizationAffiliation",
     )
 
     @model_validator(mode="after")

@@ -10,19 +10,23 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AppointmentResponse(DomainResource):
     """
     A reply to an appointment request for a patient and/or practitioner(s), such as a confirmation or rejection.
     """
+    _abstract = False
+    _type = "AppointmentResponse"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/AppointmentResponse"
+
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -125,11 +129,6 @@ class AppointmentResponse(DomainResource):
         default=None,
         alias="_comment",
     )
-    resourceType: Literal["AppointmentResponse"] = Field(
-        description=None,
-        default="AppointmentResponse",
-    )
-
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(

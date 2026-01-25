@@ -18,15 +18,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ConceptMapGroupElementTargetDependsOn(BackboneElement):
@@ -442,6 +442,10 @@ class ConceptMap(DomainResource):
     A statement of relationships from one set of concepts to one or more other concepts - either concepts in code systems, or data element/data element concepts, or classes in class models.
     """
 
+    _abstract = False
+    _type = "ConceptMap"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ConceptMap"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -645,10 +649,6 @@ class ConceptMap(DomainResource):
     group: Optional[ListType[ConceptMapGroup]] = Field(
         description="Same source and target systems",
         default=None,
-    )
-    resourceType: Literal["ConceptMap"] = Field(
-        description=None,
-        default="ConceptMap",
     )
 
     @property

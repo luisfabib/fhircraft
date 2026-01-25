@@ -13,6 +13,8 @@ class Age(Quantity):
     A duration of time during which an organism (or a process) has existed
     """
 
+    _type = "Quantity"
+
     @model_validator(mode="after")
     def FHIR_age_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(

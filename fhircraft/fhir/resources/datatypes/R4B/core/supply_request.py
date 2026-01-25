@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -26,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Range,
     Period,
     Timing,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SupplyRequestParameter(BackboneElement):
@@ -97,6 +97,10 @@ class SupplyRequest(DomainResource):
     """
     A record of a request for a medication, substance or device used in the healthcare setting.
     """
+
+    _abstract = False
+    _type = "SupplyRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SupplyRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -238,10 +242,6 @@ class SupplyRequest(DomainResource):
     deliverTo: Optional[Reference] = Field(
         description="The destination of the supply",
         default=None,
-    )
-    resourceType: Literal["SupplyRequest"] = Field(
-        description=None,
-        default="SupplyRequest",
     )
 
     @property

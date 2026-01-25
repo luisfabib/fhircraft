@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -18,14 +17,19 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     ContactPoint,
     Period,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class Endpoint(DomainResource):
     """
     The technical details of an endpoint that can be used for electronic services, such as for web services providing XDS.b or a REST endpoint for another FHIR server. This may include any security context information.
     """
+
+    _abstract = False
+    _type = "Endpoint"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Endpoint"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -144,10 +148,6 @@ class Endpoint(DomainResource):
         description="Placeholder element for header extensions",
         default=None,
         alias="_header",
-    )
-    resourceType: Literal["Endpoint"] = Field(
-        description=None,
-        default="Endpoint",
     )
 
     @model_validator(mode="after")

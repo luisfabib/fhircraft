@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -24,8 +23,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Attachment,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CommunicationPayload(BackboneElement):
@@ -72,6 +72,10 @@ class Communication(DomainResource):
     """
     An occurrence of information being transmitted; e.g. an alert that was sent to a responsible provider, a public health agency that was notified about a reportable condition.
     """
+
+    _abstract = False
+    _type = "Communication"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Communication"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -243,10 +247,6 @@ class Communication(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the communication",
         default=None,
-    )
-    resourceType: Literal["Communication"] = Field(
-        description=None,
-        default="Communication",
     )
 
     @model_validator(mode="after")

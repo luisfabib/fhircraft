@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -30,14 +29,19 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     ParameterDefinition,
     DataRequirement,
     Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class Library(DomainResource):
     """
     The Library resource is a general-purpose container for knowledge asset definitions. It can be used to describe and expose existing knowledge assets such as logic libraries and information model descriptions, as well as to describe a collection of knowledge assets.
     """
+
+    _abstract = False
+    _type = "Library"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Library"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -290,10 +294,6 @@ class Library(DomainResource):
     content: Optional[ListType[Attachment]] = Field(
         description="Contents of the library, either embedded or referenced",
         default=None,
-    )
-    resourceType: Literal["Library"] = Field(
-        description=None,
-        default="Library",
     )
 
     @property

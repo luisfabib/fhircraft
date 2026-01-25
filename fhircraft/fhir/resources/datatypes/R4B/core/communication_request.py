@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Period,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CommunicationRequestPayload(BackboneElement):
@@ -73,6 +73,10 @@ class CommunicationRequest(DomainResource):
     """
     A request to convey information; e.g. the CDS system proposes that an alert be sent to a responsible provider, the CDS system proposes that the public health agency be notified about a reportable condition.
     """
+
+    _abstract = False
+    _type = "CommunicationRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CommunicationRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -239,10 +243,6 @@ class CommunicationRequest(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about communication request",
         default=None,
-    )
-    resourceType: Literal["CommunicationRequest"] = Field(
-        description=None,
-        default="CommunicationRequest",
     )
 
     @property

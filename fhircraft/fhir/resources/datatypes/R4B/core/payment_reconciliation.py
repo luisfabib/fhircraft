@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Period,
@@ -24,8 +23,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Money,
     BackboneElement,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PaymentReconciliationDetail(BackboneElement):
@@ -153,6 +153,10 @@ class PaymentReconciliation(DomainResource):
     """
     This resource provides the details including amount of a payment and allocates the payment items being paid.
     """
+
+    _abstract = False
+    _type = "PaymentReconciliation"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PaymentReconciliation"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -287,10 +291,6 @@ class PaymentReconciliation(DomainResource):
     processNote: Optional[ListType[PaymentReconciliationProcessNote]] = Field(
         description="Note concerning processing",
         default=None,
-    )
-    resourceType: Literal["PaymentReconciliation"] = Field(
-        description=None,
-        default="PaymentReconciliation",
     )
 
     @model_validator(mode="after")

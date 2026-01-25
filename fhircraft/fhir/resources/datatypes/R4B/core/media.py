@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -26,14 +25,19 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     Attachment,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class Media(DomainResource):
     """
     A photo, video, or audio recording acquired or used in healthcare. The actual content may be inline or provided by direct reference.
     """
+
+    _abstract = False
+    _type = "Media"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Media"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -215,10 +219,6 @@ class Media(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the media",
         default=None,
-    )
-    resourceType: Literal["Media"] = Field(
-        description=None,
-        default="Media",
     )
 
     @property

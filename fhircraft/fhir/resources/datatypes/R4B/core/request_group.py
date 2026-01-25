@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -31,8 +30,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Age,
     Period,
     Timing,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class RequestGroupActionCondition(BackboneElement):
@@ -355,6 +355,10 @@ class RequestGroup(DomainResource):
     A group of related requests that can be used to capture intended activities that have inter-dependencies such as "give this medication after that one".
     """
 
+    _abstract = False
+    _type = "RequestGroup"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/RequestGroup"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -505,10 +509,6 @@ class RequestGroup(DomainResource):
     action: Optional[ListType[RequestGroupAction]] = Field(
         description="Proposed actions, if any",
         default=None,
-    )
-    resourceType: Literal["RequestGroup"] = Field(
-        description=None,
-        default="RequestGroup",
     )
 
     @model_validator(mode="after")

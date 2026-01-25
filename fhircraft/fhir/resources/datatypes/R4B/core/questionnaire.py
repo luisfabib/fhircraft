@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
@@ -34,8 +33,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Reference,
     Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class QuestionnaireItemEnableWhen(BackboneElement):
@@ -574,6 +574,10 @@ class Questionnaire(DomainResource):
     A structured set of questions intended to guide the collection of answers from end-users. Questionnaires provide detailed control over order, presentation, phraseology and grouping to allow coherent, consistent data collection.
     """
 
+    _abstract = False
+    _type = "Questionnaire"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Questionnaire"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -785,10 +789,6 @@ class Questionnaire(DomainResource):
     item: Optional[ListType[QuestionnaireItem]] = Field(
         description="Questions and sections within the Questionnaire",
         default=None,
-    )
-    resourceType: Literal["Questionnaire"] = Field(
-        description=None,
-        default="Questionnaire",
     )
 
     @model_validator(mode="after")

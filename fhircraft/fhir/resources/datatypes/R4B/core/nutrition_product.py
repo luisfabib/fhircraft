@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     CodeableConcept,
     Reference,
@@ -28,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Identifier,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class NutritionProductNutrient(BackboneElement):
@@ -250,6 +250,10 @@ class NutritionProduct(DomainResource):
     A food or fluid product that is consumed by patients.
     """
 
+    _abstract = False
+    _type = "NutritionProduct"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/NutritionProduct"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -345,10 +349,6 @@ class NutritionProduct(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the product",
         default=None,
-    )
-    resourceType: Literal["NutritionProduct"] = Field(
-        description=None,
-        default="NutritionProduct",
     )
 
     @model_validator(mode="after")

@@ -17,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     BackboneElement,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class BiologicallyDerivedProductCollection(BackboneElement):
@@ -280,6 +280,12 @@ class BiologicallyDerivedProduct(DomainResource):
     into another (possibly the same) biological entity.
     """
 
+    _abstract = False
+    _type = "BiologicallyDerivedProduct"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProduct"
+    )
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -389,10 +395,6 @@ class BiologicallyDerivedProduct(DomainResource):
     storage: Optional[ListType[BiologicallyDerivedProductStorage]] = Field(
         description="Product storage",
         default=None,
-    )
-    resourceType: Literal["BiologicallyDerivedProduct"] = Field(
-        description=None,
-        default="BiologicallyDerivedProduct",
     )
 
     @model_validator(mode="after")

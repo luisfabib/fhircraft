@@ -17,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     CodeableConcept,
     Identifier,
     BackboneElement,
     Range,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ObservationDefinitionQuantitativeDetails(BackboneElement):
@@ -162,6 +162,10 @@ class ObservationDefinition(DomainResource):
     Set of definitional characteristics for a kind of observation or measurement produced or consumed by an orderable health care service.
     """
 
+    _abstract = False
+    _type = "ObservationDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ObservationDefinition"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -279,10 +283,6 @@ class ObservationDefinition(DomainResource):
     criticalCodedValueSet: Optional[Reference] = Field(
         description="Value set of critical coded values for the observations conforming to this ObservationDefinition",
         default=None,
-    )
-    resourceType: Literal["ObservationDefinition"] = Field(
-        description=None,
-        default="ObservationDefinition",
     )
 
     @model_validator(mode="after")

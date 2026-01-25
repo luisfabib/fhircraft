@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -26,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     BackboneElement,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImmunizationPerformer(BackboneElement):
@@ -282,6 +282,10 @@ class Immunization(DomainResource):
     Describes the event of a patient being administered a vaccine or a record of an immunization as reported by a patient, a clinician or another party.
     """
 
+    _abstract = False
+    _type = "Immunization"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Immunization"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -486,10 +490,6 @@ class Immunization(DomainResource):
     protocolApplied: Optional[ListType[ImmunizationProtocolApplied]] = Field(
         description="Protocol followed by the provider",
         default=None,
-    )
-    resourceType: Literal["Immunization"] = Field(
-        description=None,
-        default="Immunization",
     )
 
     @property

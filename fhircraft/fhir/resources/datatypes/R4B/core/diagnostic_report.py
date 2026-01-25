@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -24,8 +23,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     BackboneElement,
     Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DiagnosticReportMedia(BackboneElement):
@@ -68,6 +68,10 @@ class DiagnosticReport(DomainResource):
     """
     The findings and interpretation of diagnostic  tests performed on patients, groups of patients, devices, and locations, and/or specimens derived from these. The report includes clinical context such as requesting and provider information, and some mix of atomic results, images, textual and coded interpretations, and formatted representation of diagnostic reports.
     """
+
+    _abstract = False
+    _type = "DiagnosticReport"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -213,10 +217,6 @@ class DiagnosticReport(DomainResource):
     presentedForm: Optional[ListType[Attachment]] = Field(
         description="Entire report as issued",
         default=None,
-    )
-    resourceType: Literal["DiagnosticReport"] = Field(
-        description=None,
-        default="DiagnosticReport",
     )
 
     @property

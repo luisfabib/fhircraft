@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -19,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     ContactPoint,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CareTeamParticipant(BackboneElement):
@@ -68,6 +68,10 @@ class CareTeam(DomainResource):
     """
     The Care Team includes all the people and organizations who plan to participate in the coordination and delivery of care for a patient.
     """
+
+    _abstract = False
+    _type = "CareTeam"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CareTeam"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -179,10 +183,6 @@ class CareTeam(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the CareTeam",
         default=None,
-    )
-    resourceType: Literal["CareTeam"] = Field(
-        description=None,
-        default="CareTeam",
     )
 
     @model_validator(mode="after")

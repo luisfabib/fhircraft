@@ -22,7 +22,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -36,8 +35,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Timing,
     Annotation,
     Signature,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ContractContentDefinition(BackboneElement):
@@ -1318,6 +1318,10 @@ class Contract(DomainResource):
     Legally enforceable, formally recorded unilateral or bilateral directive i.e., a policy or agreement.
     """
 
+    _abstract = False
+    _type = "Contract"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Contract"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1551,10 +1555,6 @@ class Contract(DomainResource):
     legallyBindingReference: Optional[Reference] = Field(
         description="Binding Contract",
         default=None,
-    )
-    resourceType: Literal["Contract"] = Field(
-        description=None,
-        default="Contract",
     )
 
     @property

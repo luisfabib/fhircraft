@@ -20,15 +20,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     ContactDetail,
     UsageContext,
     CodeableConcept,
     BackboneElement,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImplementationGuideDependsOn(BackboneElement):
@@ -670,6 +670,10 @@ class ImplementationGuide(DomainResource):
     A set of rules of how a particular interoperability or standards problem is solved - typically through the use of FHIR resources. This resource is used to gather all the parts of an implementation guide into a logical whole and to publish a computable definition of all the parts.
     """
 
+    _abstract = False
+    _type = "ImplementationGuide"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImplementationGuide"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -863,10 +867,6 @@ class ImplementationGuide(DomainResource):
     manifest: Optional[ImplementationGuideManifest] = Field(
         description="Information about an assembled IG",
         default=None,
-    )
-    resourceType: Literal["ImplementationGuide"] = Field(
-        description=None,
-        default="ImplementationGuide",
     )
 
     @model_validator(mode="after")

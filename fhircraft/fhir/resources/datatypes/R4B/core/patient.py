@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     HumanName,
@@ -29,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Reference,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PatientContact(BackboneElement):
@@ -172,6 +172,10 @@ class Patient(DomainResource):
     """
     Demographics and other administrative information about an individual or animal receiving care or other health-related services.
     """
+
+    _abstract = False
+    _type = "Patient"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Patient"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -328,10 +332,6 @@ class Patient(DomainResource):
     link: Optional[ListType[PatientLink]] = Field(
         description="Link to another patient resource that concerns the same actual person",
         default=None,
-    )
-    resourceType: Literal["Patient"] = Field(
-        description=None,
-        default="Patient",
     )
 
     @property

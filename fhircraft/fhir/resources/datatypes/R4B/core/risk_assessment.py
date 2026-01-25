@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Range,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class RiskAssessmentPrediction(BackboneElement):
@@ -137,6 +137,10 @@ class RiskAssessment(DomainResource):
     """
     An assessment of the likely outcome(s) for a patient or other subject as well as the likelihood of each outcome.
     """
+
+    _abstract = False
+    _type = "RiskAssessment"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/RiskAssessment"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -273,10 +277,6 @@ class RiskAssessment(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments on the risk assessment",
         default=None,
-    )
-    resourceType: Literal["RiskAssessment"] = Field(
-        description=None,
-        default="RiskAssessment",
     )
 
     @property

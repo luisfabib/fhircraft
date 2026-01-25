@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -26,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     CodeableConcept,
     Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
@@ -344,6 +344,12 @@ class CoverageEligibilityResponse(DomainResource):
     This resource provides eligibility and plan details from the processing of an CoverageEligibilityRequest resource.
     """
 
+    _abstract = False
+    _type = "CoverageEligibilityResponse"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityResponse"
+    )
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -493,10 +499,6 @@ class CoverageEligibilityResponse(DomainResource):
     error: Optional[ListType[CoverageEligibilityResponseError]] = Field(
         description="Processing errors",
         default=None,
-    )
-    resourceType: Literal["CoverageEligibilityResponse"] = Field(
-        description=None,
-        default="CoverageEligibilityResponse",
     )
 
     @property

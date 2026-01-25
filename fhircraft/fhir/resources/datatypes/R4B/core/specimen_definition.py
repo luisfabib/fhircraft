@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -19,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Reference,
     Duration,
     Range,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
@@ -280,6 +280,10 @@ class SpecimenDefinition(DomainResource):
     A kind of specimen with associated set of requirements.
     """
 
+    _abstract = False
+    _type = "SpecimenDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SpecimenDefinition"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -357,10 +361,6 @@ class SpecimenDefinition(DomainResource):
     typeTested: Optional[ListType[SpecimenDefinitionTypeTested]] = Field(
         description="Specimen in container intended for testing by lab",
         default=None,
-    )
-    resourceType: Literal["SpecimenDefinition"] = Field(
-        description=None,
-        default="SpecimenDefinition",
     )
 
     @model_validator(mode="after")

@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -18,14 +17,19 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     CodeableConcept,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceUseStatement(DomainResource):
     """
     A record of a device being used by a patient where the record is the result of a report from the patient or another clinician.
     """
+
+    _abstract = False
+    _type = "DeviceUseStatement"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceUseStatement"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -150,10 +154,6 @@ class DeviceUseStatement(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Addition details (comments, instructions)",
         default=None,
-    )
-    resourceType: Literal["DeviceUseStatement"] = Field(
-        description=None,
-        default="DeviceUseStatement",
     )
 
     @property

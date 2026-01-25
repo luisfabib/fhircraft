@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Quantity,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class VisionPrescriptionLensSpecificationPrism(BackboneElement):
@@ -222,6 +222,10 @@ class VisionPrescription(DomainResource):
     An authorization for the provision of glasses and/or contact lenses to a patient.
     """
 
+    _abstract = False
+    _type = "VisionPrescription"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/VisionPrescription"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -317,10 +321,6 @@ class VisionPrescription(DomainResource):
     lensSpecification: Optional[ListType[VisionPrescriptionLensSpecification]] = Field(
         description="Vision lens authorization",
         default=None,
-    )
-    resourceType: Literal["VisionPrescription"] = Field(
-        description=None,
-        default="VisionPrescription",
     )
 
     @model_validator(mode="after")

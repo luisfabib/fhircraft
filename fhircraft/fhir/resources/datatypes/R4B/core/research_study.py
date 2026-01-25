@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -20,8 +19,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     Annotation,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ResearchStudyArm(BackboneElement):
@@ -110,6 +110,10 @@ class ResearchStudy(DomainResource):
     """
     A process where a researcher or organization plans and then executes a series of steps intended to increase the field of healthcare-related knowledge.  This includes studies of safety, efficacy, comparative effectiveness and other information about medications, devices, therapies and other interventional and investigative techniques.  A ResearchStudy involves the gathering of information about human or animal subjects.
     """
+
+    _abstract = False
+    _type = "ResearchStudy"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchStudy"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -270,10 +274,6 @@ class ResearchStudy(DomainResource):
     objective: Optional[ListType[ResearchStudyObjective]] = Field(
         description="A goal for the study",
         default=None,
-    )
-    resourceType: Literal["ResearchStudy"] = Field(
-        description=None,
-        default="ResearchStudy",
     )
 
     @model_validator(mode="after")

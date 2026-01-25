@@ -10,19 +10,23 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Period,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ResearchSubject(DomainResource):
     """
     A physical entity which is the primary unit of operational and/or administrative interest in a study.
     """
+
+    _abstract = False
+    _type = "ResearchSubject"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchSubject"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -119,10 +123,6 @@ class ResearchSubject(DomainResource):
     consent: Optional[Reference] = Field(
         description="Agreement to participate in study",
         default=None,
-    )
-    resourceType: Literal["ResearchSubject"] = Field(
-        description=None,
-        default="ResearchSubject",
     )
 
     @model_validator(mode="after")

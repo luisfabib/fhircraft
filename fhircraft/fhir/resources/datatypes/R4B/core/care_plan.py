@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -27,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Annotation,
     Timing,
     Quantity,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CarePlanActivityDetail(BackboneElement):
@@ -273,6 +273,10 @@ class CarePlan(DomainResource):
     Describes the intention of how one or more practitioners intend to deliver care for a particular patient, group or community for a period of time, possibly limited to care for a specific condition or set of conditions.
     """
 
+    _abstract = False
+    _type = "CarePlan"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CarePlan"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -448,10 +452,6 @@ class CarePlan(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments about the plan",
         default=None,
-    )
-    resourceType: Literal["CarePlan"] = Field(
-        description=None,
-        default="CarePlan",
     )
 
     @model_validator(mode="after")

@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -28,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Attachment,
     Ratio,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubstanceDefinitionMoiety(BackboneElement):
@@ -741,6 +741,10 @@ class SubstanceDefinition(DomainResource):
     The detailed description of a substance, typically at a level beyond what is used for prescribing.
     """
 
+    _abstract = False
+    _type = "SubstanceDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubstanceDefinition"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -875,10 +879,6 @@ class SubstanceDefinition(DomainResource):
     sourceMaterial: Optional[SubstanceDefinitionSourceMaterial] = Field(
         description="Material or taxonomic/anatomical source",
         default=None,
-    )
-    resourceType: Literal["SubstanceDefinition"] = Field(
-        description=None,
-        default="SubstanceDefinition",
     )
 
     @model_validator(mode="after")

@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
@@ -30,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Reference,
     BackboneElement,
     Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ChargeItemDefinitionApplicability(BackboneElement):
@@ -226,6 +226,10 @@ class ChargeItemDefinition(DomainResource):
     """
     The ChargeItemDefinition resource provides the properties that apply to the (billing) codes necessary to calculate costs and prices. The properties may differ largely depending on type and realm, therefore this resource gives only a rough structure and requires profiling for each type of billing code system.
     """
+
+    _abstract = False
+    _type = "ChargeItemDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -437,10 +441,6 @@ class ChargeItemDefinition(DomainResource):
     propertyGroup: Optional[ListType[ChargeItemDefinitionPropertyGroup]] = Field(
         description="Group of properties which are applicable under the same conditions",
         default=None,
-    )
-    resourceType: Literal["ChargeItemDefinition"] = Field(
-        description=None,
-        default="ChargeItemDefinition",
     )
 
     @model_validator(mode="after")

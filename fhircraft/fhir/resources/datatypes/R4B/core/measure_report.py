@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     BackboneElement,
     Quantity,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MeasureReportGroupPopulation(BackboneElement):
@@ -262,6 +262,10 @@ class MeasureReport(DomainResource):
     The MeasureReport resource contains the results of the calculation of a measure; and optionally a reference to the resources involved in that calculation.
     """
 
+    _abstract = False
+    _type = "MeasureReport"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MeasureReport"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -374,10 +378,6 @@ class MeasureReport(DomainResource):
     evaluatedResource: Optional[ListType[Reference]] = Field(
         description="What data was used to calculate the measure score",
         default=None,
-    )
-    resourceType: Literal["MeasureReport"] = Field(
-        description=None,
-        default="MeasureReport",
     )
 
     @model_validator(mode="after")

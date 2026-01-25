@@ -16,14 +16,14 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     BackboneElement,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
@@ -222,6 +222,12 @@ class ImmunizationRecommendation(DomainResource):
     A patient's point-in-time set of recommendations (i.e. forecasting) according to a published schedule with optional supporting justification.
     """
 
+    _abstract = False
+    _type = "ImmunizationRecommendation"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation"
+    )
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -299,10 +305,6 @@ class ImmunizationRecommendation(DomainResource):
             description="Vaccine administration recommendations",
             default=None,
         )
-    )
-    resourceType: Literal["ImmunizationRecommendation"] = Field(
-        description=None,
-        default="ImmunizationRecommendation",
     )
 
     @model_validator(mode="after")

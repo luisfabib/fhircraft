@@ -19,14 +19,14 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     ContactDetail,
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class GraphDefinitionLinkTargetCompartment(BackboneElement):
@@ -248,6 +248,10 @@ class GraphDefinition(DomainResource):
     A formal computable definition of a graph of resources - that is, a coherent set of resources that form a graph by following references. The Graph Definition resource defines a set and makes rules about the set.
     """
 
+    _abstract = False
+    _type = "GraphDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/GraphDefinition"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -411,10 +415,6 @@ class GraphDefinition(DomainResource):
     link: Optional[ListType[GraphDefinitionLink]] = Field(
         description="Links this graph makes rules about",
         default=None,
-    )
-    resourceType: Literal["GraphDefinition"] = Field(
-        description=None,
-        default="GraphDefinition",
     )
 
     @model_validator(mode="after")

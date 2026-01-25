@@ -18,14 +18,14 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     ContactDetail,
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SearchParameterComponent(BackboneElement):
@@ -73,6 +73,10 @@ class SearchParameter(DomainResource):
     """
     A search parameter that defines a named search item that can be used to search/filter on a resource.
     """
+
+    _abstract = False
+    _type = "SearchParameter"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SearchParameter"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -336,10 +340,6 @@ class SearchParameter(DomainResource):
     component: Optional[ListType[SearchParameterComponent]] = Field(
         description="For Composite resources to define the parts",
         default=None,
-    )
-    resourceType: Literal["SearchParameter"] = Field(
-        description=None,
-        default="SearchParameter",
     )
 
     @model_validator(mode="after")

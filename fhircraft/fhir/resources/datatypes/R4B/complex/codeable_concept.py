@@ -12,6 +12,8 @@ class CodeableConcept(Element):
     Concept - reference to a terminology or just  text
     """
 
+    _type = "CodeableConcept"
+
     coding: Optional[List[Coding]] = Field(
         description="Code defined by a terminology system",
         default=None,

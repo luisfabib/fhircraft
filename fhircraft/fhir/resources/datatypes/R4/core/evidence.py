@@ -17,6 +17,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
+    Reference,
     Extension,
     Identifier,
     ContactDetail,
@@ -30,17 +31,14 @@ from .resource import Resource
 from .domain_resource import DomainResource
 
 
-
-
-
 class Evidence(DomainResource):
     """
     The Evidence resource describes the conditional state (population and any exposures being compared within the population) and outcome (if specified) that the knowledge (evidence, assertion, recommendation) is about.
     """
+
     _abstract = False
     _type = "Evidence"
     _canonical_url: str = "http://hl7.org/fhir/StructureDefinition/Evidence"
-
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -267,8 +265,6 @@ class Evidence(DomainResource):
     outcome: Optional[ListType[Reference]] = Field(
         description="What outcome?",
         default=None,
-    )
-        default="Evidence",
     )
 
     @model_validator(mode="after")

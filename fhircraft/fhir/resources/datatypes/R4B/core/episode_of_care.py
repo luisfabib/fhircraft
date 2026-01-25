@@ -10,15 +10,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     BackboneElement,
     Period,
     CodeableConcept,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EpisodeOfCareStatusHistory(BackboneElement):
@@ -102,6 +102,10 @@ class EpisodeOfCare(DomainResource):
     """
     An association between a patient and an organization / healthcare provider(s) during which time encounters may occur. The managing organization assumes a level of responsibility for the patient during this time.
     """
+
+    _abstract = False
+    _type = "EpisodeOfCare"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EpisodeOfCare"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -204,10 +208,6 @@ class EpisodeOfCare(DomainResource):
     account: Optional[ListType[Reference]] = Field(
         description="The set of accounts that may be used for billing for this EpisodeOfCare",
         default=None,
-    )
-    resourceType: Literal["EpisodeOfCare"] = Field(
-        description=None,
-        default="EpisodeOfCare",
     )
 
     @model_validator(mode="after")

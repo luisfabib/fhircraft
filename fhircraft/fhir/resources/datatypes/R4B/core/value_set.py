@@ -21,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
@@ -29,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     BackboneElement,
     Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ValueSetComposeIncludeConceptDesignation(BackboneElement):
@@ -746,6 +746,10 @@ class ValueSet(DomainResource):
     A ValueSet resource instance specifies a set of codes drawn from one or more code systems, intended for use in a particular context. Value sets link between `CodeSystem` definitions and their use in [coded elements](https://hl7.org/fhir/R4B/terminologies.html).
     """
 
+    _abstract = False
+    _type = "ValueSet"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ValueSet"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -926,10 +930,6 @@ class ValueSet(DomainResource):
     expansion: Optional[ValueSetExpansion] = Field(
         description='Used when the value set is "expanded"',
         default=None,
-    )
-    resourceType: Literal["ValueSet"] = Field(
-        description=None,
-        default="ValueSet",
     )
 
     @model_validator(mode="after")

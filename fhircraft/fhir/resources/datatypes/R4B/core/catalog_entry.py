@@ -16,15 +16,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Period,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CatalogEntryRelatedEntry(BackboneElement):
@@ -67,6 +67,10 @@ class CatalogEntry(DomainResource):
     """
     Catalog entries are wrappers that contextualize items included in a catalog.
     """
+
+    _abstract = False
+    _type = "CatalogEntry"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CatalogEntry"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -188,10 +192,6 @@ class CatalogEntry(DomainResource):
     relatedEntry: Optional[ListType[CatalogEntryRelatedEntry]] = Field(
         description="An item that this catalog entry is related to",
         default=None,
-    )
-    resourceType: Literal["CatalogEntry"] = Field(
-        description=None,
-        default="CatalogEntry",
     )
 
     @model_validator(mode="after")

@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -26,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Money,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class InvoiceParticipant(BackboneElement):
@@ -228,6 +228,10 @@ class Invoice(DomainResource):
     Invoice containing collected ChargeItems from an Account with calculated individual and total price for Billing purpose.
     """
 
+    _abstract = False
+    _type = "Invoice"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Invoice"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -360,10 +364,6 @@ class Invoice(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the invoice",
         default=None,
-    )
-    resourceType: Literal["Invoice"] = Field(
-        description=None,
-        default="Invoice",
     )
 
     @model_validator(mode="after")

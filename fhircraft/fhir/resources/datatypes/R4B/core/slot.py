@@ -16,19 +16,23 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class Slot(DomainResource):
     """
     A slot of time on a schedule that may be available for booking appointments.
     """
+
+    _abstract = False
+    _type = "Slot"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Slot"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -147,10 +151,6 @@ class Slot(DomainResource):
         description="Placeholder element for comment extensions",
         default=None,
         alias="_comment",
-    )
-    resourceType: Literal["Slot"] = Field(
-        description=None,
-        default="Slot",
     )
 
     @model_validator(mode="after")

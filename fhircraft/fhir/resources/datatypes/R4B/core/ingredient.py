@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -19,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableReference,
     Ratio,
     RatioRange,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class IngredientManufacturer(BackboneElement):
@@ -273,6 +273,10 @@ class Ingredient(DomainResource):
     An ingredient of a manufactured item or pharmaceutical product.
     """
 
+    _abstract = False
+    _type = "Ingredient"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Ingredient"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -363,10 +367,6 @@ class Ingredient(DomainResource):
     substance: Optional[IngredientSubstance] = Field(
         description="The substance that comprises this ingredient",
         default=None,
-    )
-    resourceType: Literal["Ingredient"] = Field(
-        description=None,
-        default="Ingredient",
     )
 
     @model_validator(mode="after")

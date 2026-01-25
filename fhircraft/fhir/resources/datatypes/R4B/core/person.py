@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     HumanName,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Reference,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PersonLink(BackboneElement):
@@ -69,6 +69,10 @@ class Person(DomainResource):
     """
     Demographics and administrative information about a person independent of a specific health-related context.
     """
+
+    _abstract = False
+    _type = "Person"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Person"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -173,10 +177,6 @@ class Person(DomainResource):
     link: Optional[ListType[PersonLink]] = Field(
         description="Link to a resource that concerns the same actual person",
         default=None,
-    )
-    resourceType: Literal["Person"] = Field(
-        description=None,
-        default="Person",
     )
 
     @model_validator(mode="after")

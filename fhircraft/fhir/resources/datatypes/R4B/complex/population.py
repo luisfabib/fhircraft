@@ -16,6 +16,8 @@ class Population(BackboneElement):
     A definition of a set of people that apply to some clinically related context, for example people contraindicated for a certain medication
     """
 
+    _type = "Population"
+
     ageRange: Optional[Range] = Field(
         description="The age of the specific population",
         default=None,

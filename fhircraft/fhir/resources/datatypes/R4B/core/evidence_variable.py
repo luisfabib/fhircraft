@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Annotation,
@@ -31,8 +30,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Expression,
     Quantity,
     Range,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EvidenceVariableCharacteristicTimeFromStart(BackboneElement):
@@ -250,6 +250,10 @@ class EvidenceVariable(DomainResource):
     The EvidenceVariable resource describes an element that knowledge (Evidence) is about.
     """
 
+    _abstract = False
+    _type = "EvidenceVariable"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceVariable"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -459,10 +463,6 @@ class EvidenceVariable(DomainResource):
     category: Optional[ListType[EvidenceVariableCategory]] = Field(
         description="A grouping for ordinal or polychotomous variables",
         default=None,
-    )
-    resourceType: Literal["EvidenceVariable"] = Field(
-        description=None,
-        default="EvidenceVariable",
     )
 
     @model_validator(mode="after")

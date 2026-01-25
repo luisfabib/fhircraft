@@ -16,15 +16,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Ratio,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationIngredient(BackboneElement):
@@ -133,6 +133,10 @@ class Medication(DomainResource):
     This resource is primarily used for the identification and definition of a medication for the purposes of prescribing, dispensing, and administering a medication as well as for making statements about medication use.
     """
 
+    _abstract = False
+    _type = "Medication"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Medication"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -218,10 +222,6 @@ class Medication(DomainResource):
     batch: Optional[MedicationBatch] = Field(
         description="Details about packaged medications",
         default=None,
-    )
-    resourceType: Literal["Medication"] = Field(
-        description=None,
-        default="Medication",
     )
 
     @model_validator(mode="after")

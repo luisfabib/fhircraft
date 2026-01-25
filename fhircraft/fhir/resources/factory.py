@@ -1991,7 +1991,7 @@ class ResourceFactory:
             model._canonical_url = _structure_definition.url or None
             # Set the kind, type, canonical URL, and abstract status for the model
             if _structure_definition.kind:
-                model._kind = FhirBaseModelKind[_structure_definition.kind]
+                model._kind = FhirBaseModelKind(_structure_definition.kind)
             else:
                 model._kind = FhirBaseModelKind.LOGICAL
             if resource_type:

@@ -10,15 +10,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Period,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DetectedIssueEvidence(BackboneElement):
@@ -97,6 +97,10 @@ class DetectedIssue(DomainResource):
     """
     Indicates an actual or potential clinical issue with or between one or more active or proposed clinical actions for a patient; e.g. Drug-drug interaction, Ineffective treatment frequency, Procedure-condition conflict, etc.
     """
+
+    _abstract = False
+    _type = "DetectedIssue"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DetectedIssue"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -223,10 +227,6 @@ class DetectedIssue(DomainResource):
     mitigation: Optional[ListType[DetectedIssueMitigation]] = Field(
         description="Step taken to address",
         default=None,
-    )
-    resourceType: Literal["DetectedIssue"] = Field(
-        description=None,
-        default="DetectedIssue",
     )
 
     @property

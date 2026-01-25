@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Annotation,
     Dosage,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationDispensePerformer(BackboneElement):
@@ -110,6 +110,10 @@ class MedicationDispense(DomainResource):
     """
     Indicates that a medication product is to be or has been dispensed for a named person/patient.  This includes a description of the medication product (supply) provided and the instructions for administering the medication.  The medication dispense is the result of a pharmacy system responding to a medication order.
     """
+
+    _abstract = False
+    _type = "MedicationDispense"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationDispense"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -278,10 +282,6 @@ class MedicationDispense(DomainResource):
     eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of relevant lifecycle events",
         default=None,
-    )
-    resourceType: Literal["MedicationDispense"] = Field(
-        description=None,
-        default="MedicationDispense",
     )
 
     @property

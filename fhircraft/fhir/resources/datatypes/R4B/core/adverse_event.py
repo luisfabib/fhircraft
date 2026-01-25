@@ -10,14 +10,14 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AdverseEventSuspectEntityCausality(BackboneElement):
@@ -101,6 +101,10 @@ class AdverseEvent(DomainResource):
     """
     Actual or  potential/avoided event causing unintended physical injury resulting from or contributed to by medical care, a research study or other healthcare setting factors that requires additional monitoring, treatment, or hospitalization, or that results in death.
     """
+
+    _abstract = False
+    _type = "AdverseEvent"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/AdverseEvent"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -250,10 +254,6 @@ class AdverseEvent(DomainResource):
     study: Optional[ListType[Reference]] = Field(
         description="AdverseEvent.study",
         default=None,
-    )
-    resourceType: Literal["AdverseEvent"] = Field(
-        description=None,
-        default="AdverseEvent",
     )
 
     @model_validator(mode="after")

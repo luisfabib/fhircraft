@@ -16,21 +16,25 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Annotation,
     DataRequirement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class GuidanceResponse(DomainResource):
     """
     A guidance response is the formal response to a guidance request, including any output parameters returned by the evaluation, as well as the description of any proposed actions to be taken.
     """
+
+    _abstract = False
+    _type = "GuidanceResponse"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/GuidanceResponse"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -168,10 +172,6 @@ class GuidanceResponse(DomainResource):
     dataRequirement: Optional[ListType[DataRequirement]] = Field(
         description="Additional required data",
         default=None,
-    )
-    resourceType: Literal["GuidanceResponse"] = Field(
-        description=None,
-        default="GuidanceResponse",
     )
 
     @property

@@ -30,7 +30,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -63,8 +62,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     TriggerDefinition,
     UsageContext,
     Dosage,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class TaskRestriction(BackboneElement):
@@ -889,6 +889,10 @@ class Task(DomainResource):
     A task to be performed.
     """
 
+    _abstract = False
+    _type = "Task"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Task"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1101,10 +1105,6 @@ class Task(DomainResource):
     output: Optional[ListType[TaskOutput]] = Field(
         description="Information produced as part of task",
         default=None,
-    )
-    resourceType: Literal["Task"] = Field(
-        description=None,
-        default="Task",
     )
 
     @model_validator(mode="after")

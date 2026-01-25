@@ -1,21 +1,8 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -28,8 +15,8 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Reference,
-    Resource,
 )
+from .resource import Resource
 
 
 class Binary(Resource):
@@ -37,39 +24,10 @@ class Binary(Resource):
     A resource that represents the data of a single raw artifact as digital content accessible in its native format.  A Binary resource can contain any content, whether text, image, pdf, zip archive, etc.
     """
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Binary"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
+    _abstract = False
+    _type = "Binary"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Binary"
+
     contentType: Optional[Code] = Field(
         description="MimeType of the binary content",
         default=None,
@@ -91,10 +49,6 @@ class Binary(Resource):
         description="Placeholder element for data extensions",
         default=None,
         alias="_data",
-    )
-    resourceType: Literal["Binary"] = Field(
-        description=None,
-        default="Binary",
     )
 
     @model_validator(mode="after")

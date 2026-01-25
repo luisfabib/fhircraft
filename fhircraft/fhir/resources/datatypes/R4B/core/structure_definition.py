@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
@@ -28,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Coding,
     BackboneElement,
     ElementDefinition,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class StructureDefinitionMapping(BackboneElement):
@@ -201,6 +201,10 @@ class StructureDefinition(DomainResource):
     """
     A definition of a FHIR structure. This resource is used to describe the underlying resources, data types defined in FHIR, and also for describing extensions and constraints on resources and data types.
     """
+
+    _abstract = False
+    _type = "StructureDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -448,10 +452,6 @@ class StructureDefinition(DomainResource):
     differential: Optional[StructureDefinitionDifferential] = Field(
         description="Differential view of the structure",
         default=None,
-    )
-    resourceType: Literal["StructureDefinition"] = Field(
-        description=None,
-        default="StructureDefinition",
     )
 
     @model_validator(mode="after")

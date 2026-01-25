@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -19,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Reference,
     BackboneElement,
     HumanName,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class OrganizationContact(BackboneElement):
@@ -68,6 +68,10 @@ class Organization(DomainResource):
     """
     A formally or informally recognized grouping of people or organizations formed for the purpose of achieving some form of collective action.  Includes companies, institutions, corporations, departments, community groups, healthcare practice groups, payer/insurer, etc.
     """
+
+    _abstract = False
+    _type = "Organization"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Organization"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -172,10 +176,6 @@ class Organization(DomainResource):
     endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the organization",
         default=None,
-    )
-    resourceType: Literal["Organization"] = Field(
-        description=None,
-        default="Organization",
     )
 
     @model_validator(mode="after")

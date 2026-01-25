@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -24,8 +23,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     CodeableReference,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class RegulatedAuthorizationCase(BackboneElement):
@@ -102,6 +102,10 @@ class RegulatedAuthorization(DomainResource):
     """
     Regulatory approval, clearance or licencing related to a regulated product, treatment, facility or activity that is cited in a guidance, regulation, rule or legislative act. An example is Market Authorization relating to a Medicinal Product.
     """
+
+    _abstract = False
+    _type = "RegulatedAuthorization"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/RegulatedAuthorization"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -217,10 +221,6 @@ class RegulatedAuthorization(DomainResource):
     case: Optional[RegulatedAuthorizationCase] = Field(
         description="The case or regulatory procedure for granting or amending a regulated authorization. Note: This area is subject to ongoing review and the workgroup is seeking implementer feedback on its use (see link at bottom of page)",
         default=None,
-    )
-    resourceType: Literal["RegulatedAuthorization"] = Field(
-        description=None,
-        default="RegulatedAuthorization",
     )
 
     @model_validator(mode="after")

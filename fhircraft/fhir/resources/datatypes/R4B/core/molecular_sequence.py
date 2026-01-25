@@ -17,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     Quantity,
     BackboneElement,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MolecularSequenceReferenceSeq(BackboneElement):
@@ -684,6 +684,10 @@ class MolecularSequence(DomainResource):
     Raw data describing a biological sequence.
     """
 
+    _abstract = False
+    _type = "MolecularSequence"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MolecularSequence"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -816,10 +820,6 @@ class MolecularSequence(DomainResource):
     structureVariant: Optional[ListType[MolecularSequenceStructureVariant]] = Field(
         description="Structural variant",
         default=None,
-    )
-    resourceType: Literal["MolecularSequence"] = Field(
-        description=None,
-        default="MolecularSequence",
     )
 
     @model_validator(mode="after")

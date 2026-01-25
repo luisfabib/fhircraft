@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -22,8 +21,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Address,
     Quantity,
     Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class InsurancePlanContact(BackboneElement):
@@ -387,6 +387,10 @@ class InsurancePlan(DomainResource):
     Details of a Health Insurance product/plan provided by an organization.
     """
 
+    _abstract = False
+    _type = "InsurancePlan"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/InsurancePlan"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -506,10 +510,6 @@ class InsurancePlan(DomainResource):
     plan: Optional[ListType[InsurancePlanPlan]] = Field(
         description="Plan details",
         default=None,
-    )
-    resourceType: Literal["InsurancePlan"] = Field(
-        description=None,
-        default="InsurancePlan",
     )
 
     @model_validator(mode="after")

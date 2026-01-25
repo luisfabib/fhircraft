@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -20,8 +19,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Duration,
     Quantity,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SpecimenCollection(BackboneElement):
@@ -277,6 +277,10 @@ class Specimen(DomainResource):
     A sample to be used for analysis.
     """
 
+    _abstract = False
+    _type = "Specimen"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Specimen"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -387,10 +391,6 @@ class Specimen(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments",
         default=None,
-    )
-    resourceType: Literal["Specimen"] = Field(
-        description=None,
-        default="Specimen",
     )
 
     @model_validator(mode="after")

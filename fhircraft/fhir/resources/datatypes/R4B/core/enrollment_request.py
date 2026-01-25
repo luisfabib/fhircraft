@@ -10,18 +10,22 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EnrollmentRequest(DomainResource):
     """
     This resource provides the insurance enrollment details to the insurer regarding a specified coverage.
     """
+
+    _abstract = False
+    _type = "EnrollmentRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EnrollmentRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -109,10 +113,6 @@ class EnrollmentRequest(DomainResource):
     coverage: Optional[Reference] = Field(
         description="Insurance information",
         default=None,
-    )
-    resourceType: Literal["EnrollmentRequest"] = Field(
-        description=None,
-        default="EnrollmentRequest",
     )
 
     @model_validator(mode="after")

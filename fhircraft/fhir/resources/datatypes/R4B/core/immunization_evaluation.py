@@ -16,19 +16,23 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImmunizationEvaluation(DomainResource):
     """
     Describes a comparison of an immunization event against published recommendations to determine if the administration is "valid" in relation to those  recommendations.
     """
+
+    _abstract = False
+    _type = "ImmunizationEvaluation"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImmunizationEvaluation"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -178,10 +182,6 @@ class ImmunizationEvaluation(DomainResource):
         description="Placeholder element for seriesDosesString extensions",
         default=None,
         alias="_seriesDosesString",
-    )
-    resourceType: Literal["ImmunizationEvaluation"] = Field(
-        description=None,
-        default="ImmunizationEvaluation",
     )
 
     @property

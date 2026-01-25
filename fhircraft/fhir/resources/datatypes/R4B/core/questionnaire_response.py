@@ -21,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -29,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Coding,
     Quantity,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class QuestionnaireResponseItemAnswer(BackboneElement):
@@ -244,6 +244,10 @@ class QuestionnaireResponse(DomainResource):
     A structured set of questions and their answers. The questions are ordered and grouped into coherent subsets, corresponding to the structure of the grouping of the questionnaire being responded to.
     """
 
+    _abstract = False
+    _type = "QuestionnaireResponse"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -351,10 +355,6 @@ class QuestionnaireResponse(DomainResource):
     item: Optional[ListType[QuestionnaireResponseItem]] = Field(
         description="Groups and questions",
         default=None,
-    )
-    resourceType: Literal["QuestionnaireResponse"] = Field(
-        description=None,
-        default="QuestionnaireResponse",
     )
 
     @model_validator(mode="after")

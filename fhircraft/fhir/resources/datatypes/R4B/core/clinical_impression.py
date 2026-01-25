@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -18,8 +17,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     BackboneElement,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ClinicalImpressionInvestigation(BackboneElement):
@@ -98,6 +98,10 @@ class ClinicalImpression(DomainResource):
     """
     A record of a clinical assessment performed to determine what problem(s) may affect the patient and before planning the treatments or management strategies that are best to manage a patient's condition. Assessments are often 1:1 with a clinical consultation / encounter,  but this varies greatly depending on the clinical workflow. This resource is called "ClinicalImpression" rather than "ClinicalAssessment" to avoid confusion with the recording of assessment tools such as Apgar score.
     """
+
+    _abstract = False
+    _type = "ClinicalImpression"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ClinicalImpression"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -261,10 +265,6 @@ class ClinicalImpression(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the ClinicalImpression",
         default=None,
-    )
-    resourceType: Literal["ClinicalImpression"] = Field(
-        description=None,
-        default="ClinicalImpression",
     )
 
     @property

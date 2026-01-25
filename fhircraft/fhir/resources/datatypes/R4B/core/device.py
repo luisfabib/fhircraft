@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     ContactPoint,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceUdiCarrier(BackboneElement):
@@ -271,6 +271,10 @@ class Device(DomainResource):
     A type of a manufactured item that is used in the provision of healthcare without being substantially changed through that activity. The device may be a medical or non-medical device.
     """
 
+    _abstract = False
+    _type = "Device"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Device"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -473,10 +477,6 @@ class Device(DomainResource):
     parent: Optional[Reference] = Field(
         description="The device that this device is attached to or is part of",
         default=None,
-    )
-    resourceType: Literal["Device"] = Field(
-        description=None,
-        default="Device",
     )
 
     @model_validator(mode="after")

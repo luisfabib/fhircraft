@@ -16,12 +16,12 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     ContactPoint,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubscriptionChannel(BackboneElement):
@@ -89,6 +89,10 @@ class Subscription(DomainResource):
     """
     The subscription resource is used to define a push-based subscription from a server to another system. Once a subscription is registered with the server, the server checks every resource that is created or updated, and if the resource matches the given criteria, it sends a message on the defined "channel" so that another system can take an appropriate action.
     """
+
+    _abstract = False
+    _type = "Subscription"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Subscription"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -191,10 +195,6 @@ class Subscription(DomainResource):
     channel: Optional[SubscriptionChannel] = Field(
         description="The channel on which to report matches to the criteria",
         default=None,
-    )
-    resourceType: Literal["Subscription"] = Field(
-        description=None,
-        default="Subscription",
     )
 
     @model_validator(mode="after")

@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -28,14 +27,19 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     RelatedArtifact,
     TriggerDefinition,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EventDefinition(DomainResource):
     """
     The EventDefinition resource provides a reusable description of when a particular event can occur.
     """
+
+    _abstract = False
+    _type = "EventDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EventDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -276,10 +280,6 @@ class EventDefinition(DomainResource):
     trigger: Optional[ListType[TriggerDefinition]] = Field(
         description='"when" the event occurs (multiple = \u0027or\u0027)',
         default=None,
-    )
-    resourceType: Literal["EventDefinition"] = Field(
-        description=None,
-        default="EventDefinition",
     )
 
     @property

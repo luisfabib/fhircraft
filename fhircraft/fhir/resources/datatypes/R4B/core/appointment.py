@@ -18,15 +18,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     BackboneElement,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AppointmentParticipant(BackboneElement):
@@ -91,6 +91,10 @@ class Appointment(DomainResource):
     """
     A booking of a healthcare event among patient(s), practitioner(s), related person(s) and/or device(s) for a specific date/time. This may result in one or more Encounter(s).
     """
+
+    _abstract = False
+    _type = "Appointment"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Appointment"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -273,10 +277,6 @@ class Appointment(DomainResource):
     requestedPeriod: Optional[ListType[Period]] = Field(
         description="Potential date/time interval(s) requested to allocate the appointment within",
         default=None,
-    )
-    resourceType: Literal["Appointment"] = Field(
-        description=None,
-        default="Appointment",
     )
 
     @model_validator(mode="after")

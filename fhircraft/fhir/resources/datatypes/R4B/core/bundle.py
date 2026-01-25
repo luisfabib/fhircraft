@@ -34,9 +34,10 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Identifier,
     Meta,
-    Resource,
     Signature,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class BundleLink(BackboneElement):
@@ -372,6 +373,10 @@ class Bundle(Resource):
     A container for a collection of resources.
     """
 
+    _abstract = False
+    _type = "Bundle"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Bundle"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -447,10 +452,6 @@ class Bundle(Resource):
     signature: Optional[Signature] = Field(
         description="Digital Signature",
         default=None,
-    )
-    resourceType: Literal["Bundle"] = Field(
-        description=None,
-        default="Bundle",
     )
 
     @model_validator(mode="after")

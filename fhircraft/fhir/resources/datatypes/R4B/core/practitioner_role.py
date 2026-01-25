@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Period,
@@ -24,8 +23,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     ContactPoint,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PractitionerRoleAvailableTime(BackboneElement):
@@ -129,6 +129,10 @@ class PractitionerRole(DomainResource):
     """
     A specific set of Roles/Locations/specialties/services that a practitioner may perform at an organization for a period of time.
     """
+
+    _abstract = False
+    _type = "PractitionerRole"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PractitionerRole"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -244,10 +248,6 @@ class PractitionerRole(DomainResource):
     endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the practitioner with this role",
         default=None,
-    )
-    resourceType: Literal["PractitionerRole"] = Field(
-        description=None,
-        default="PractitionerRole",
     )
 
     @model_validator(mode="after")

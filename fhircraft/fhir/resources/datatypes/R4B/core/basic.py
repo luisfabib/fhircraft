@@ -10,19 +10,23 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class Basic(DomainResource):
     """
     Basic is used for handling concepts not yet defined in FHIR, narrative-only resources that don't map to an existing resource, and custom resources not appropriate for inclusion in the FHIR specification.
     """
+
+    _abstract = False
+    _type = "Basic"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Basic"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -97,10 +101,6 @@ class Basic(DomainResource):
     author: Optional[Reference] = Field(
         description="Who created",
         default=None,
-    )
-    resourceType: Literal["Basic"] = Field(
-        description=None,
-        default="Basic",
     )
 
     @model_validator(mode="after")

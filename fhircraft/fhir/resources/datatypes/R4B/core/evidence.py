@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -31,8 +30,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Quantity,
     Range,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EvidenceVariableDefinition(BackboneElement):
@@ -553,6 +553,10 @@ class Evidence(DomainResource):
     The Evidence Resource provides a machine-interpretable expression of an evidence concept including the evidence variables (eg population, exposures/interventions, comparators, outcomes, measured variables, confounding variables), the statistics, and the certainty of this evidence.
     """
 
+    _abstract = False
+    _type = "Evidence"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Evidence"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -760,10 +764,6 @@ class Evidence(DomainResource):
     certainty: Optional[ListType[EvidenceCertainty]] = Field(
         description="Certainty or quality of the evidence",
         default=None,
-    )
-    resourceType: Literal["Evidence"] = Field(
-        description=None,
-        default="Evidence",
     )
 
     @property

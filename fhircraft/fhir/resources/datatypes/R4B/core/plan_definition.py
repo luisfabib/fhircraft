@@ -20,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -38,8 +37,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     DataRequirement,
     Age,
     Timing,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PlanDefinitionGoalTarget(BackboneElement):
@@ -660,6 +660,10 @@ class PlanDefinition(DomainResource):
     This resource allows for the definition of various types of plans as a sharable, consumable, and executable artifact. The resource is general enough to support the description of a broad range of clinical and non-clinical artifacts such as clinical decision support rules, order sets, protocols, and drug quality specifications.
     """
 
+    _abstract = False
+    _type = "PlanDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PlanDefinition"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -925,10 +929,6 @@ class PlanDefinition(DomainResource):
     action: Optional[ListType[PlanDefinitionAction]] = Field(
         description="Action defined by the plan",
         default=None,
-    )
-    resourceType: Literal["PlanDefinition"] = Field(
-        description=None,
-        default="PlanDefinition",
     )
 
     @property

@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -28,14 +27,19 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     UsageContext,
     Period,
     RelatedArtifact,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ResearchDefinition(DomainResource):
     """
     The ResearchDefinition resource describes the conditional state (population and any exposures being compared within the population) and outcome (if specified) that the knowledge (evidence, assertion, recommendation) is about.
     """
+
+    _abstract = False
+    _type = "ResearchDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -315,10 +319,6 @@ class ResearchDefinition(DomainResource):
     outcome: Optional[Reference] = Field(
         description="What outcome?",
         default=None,
-    )
-    resourceType: Literal["ResearchDefinition"] = Field(
-        description=None,
-        default="ResearchDefinition",
     )
 
     @property

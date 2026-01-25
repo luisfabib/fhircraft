@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Annotation,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImagingStudySeriesPerformer(BackboneElement):
@@ -231,6 +231,10 @@ class ImagingStudy(DomainResource):
     Representation of the content produced in a DICOM imaging study. A study comprises a set of series, each of which includes a set of Service-Object Pair Instances (SOP Instances - images or other data) acquired or produced in a common context.  A series is of only one modality (e.g. X-ray, CT, MR, ultrasound), but a study may have multiple series of different modalities.
     """
 
+    _abstract = False
+    _type = "ImagingStudy"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImagingStudy"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -384,10 +388,6 @@ class ImagingStudy(DomainResource):
     series: Optional[ListType[ImagingStudySeries]] = Field(
         description="Each study has one or more series of instances",
         default=None,
-    )
-    resourceType: Literal["ImagingStudy"] = Field(
-        description=None,
-        default="ImagingStudy",
     )
 
     @model_validator(mode="after")

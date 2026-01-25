@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
@@ -27,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Coding,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MessageDefinitionFocus(BackboneElement):
@@ -137,6 +137,10 @@ class MessageDefinition(DomainResource):
     """
     Defines the characteristics of a message that can be shared between systems, including the type of event that initiates the message, the content to be transmitted and what response(s), if any, are permitted.
     """
+
+    _abstract = False
+    _type = "MessageDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MessageDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -376,10 +380,6 @@ class MessageDefinition(DomainResource):
         description="Placeholder element for graph extensions",
         default=None,
         alias="_graph",
-    )
-    resourceType: Literal["MessageDefinition"] = Field(
-        description=None,
-        default="MessageDefinition",
     )
 
     @property

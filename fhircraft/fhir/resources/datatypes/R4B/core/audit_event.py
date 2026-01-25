@@ -17,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Coding,
     Period,
     CodeableConcept,
     BackboneElement,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AuditEventAgentNetwork(BackboneElement):
@@ -365,6 +365,10 @@ class AuditEvent(DomainResource):
     A record of an event made for purposes of maintaining a security log. Typical uses include detection of intrusion attempts and monitoring for inappropriate usage.
     """
 
+    _abstract = False
+    _type = "AuditEvent"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/AuditEvent"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -477,10 +481,6 @@ class AuditEvent(DomainResource):
     entity: Optional[ListType[AuditEventEntity]] = Field(
         description="Data or objects used",
         default=None,
-    )
-    resourceType: Literal["AuditEvent"] = Field(
-        description=None,
-        default="AuditEvent",
     )
 
     @model_validator(mode="after")

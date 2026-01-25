@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     BackboneElement,
@@ -19,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Reference,
     Duration,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EncounterStatusHistory(BackboneElement):
@@ -288,6 +288,10 @@ class Encounter(DomainResource):
     An interaction between a patient and healthcare provider(s) for the purpose of providing healthcare service(s) or assessing the health status of a patient.
     """
 
+    _abstract = False
+    _type = "Encounter"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Encounter"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -433,10 +437,6 @@ class Encounter(DomainResource):
     partOf: Optional[Reference] = Field(
         description="Another Encounter this encounter is part of",
         default=None,
-    )
-    resourceType: Literal["Encounter"] = Field(
-        description=None,
-        default="Encounter",
     )
 
     @model_validator(mode="after")

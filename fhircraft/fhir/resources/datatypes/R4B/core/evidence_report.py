@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     UsageContext,
     Identifier,
@@ -29,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Range,
     Period,
     ContactDetail,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EvidenceReportSubjectCharacteristic(BackboneElement):
@@ -301,6 +301,10 @@ class EvidenceReport(DomainResource):
     The EvidenceReport Resource is a specialized container for a collection of resources and codable concepts, adapted to support compositions of Evidence, EvidenceVariable, and Citation resources and related concepts.
     """
 
+    _abstract = False
+    _type = "EvidenceReport"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceReport"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -445,10 +449,6 @@ class EvidenceReport(DomainResource):
     section: Optional[ListType[EvidenceReportSection]] = Field(
         description="Composition is broken into sections",
         default=None,
-    )
-    resourceType: Literal["EvidenceReport"] = Field(
-        description=None,
-        default="EvidenceReport",
     )
 
     @property

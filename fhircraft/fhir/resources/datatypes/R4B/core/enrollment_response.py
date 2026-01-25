@@ -10,18 +10,22 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EnrollmentResponse(DomainResource):
     """
     This resource provides enrollment and plan details from the processing of an EnrollmentRequest resource.
     """
+
+    _abstract = False
+    _type = "EnrollmentResponse"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EnrollmentResponse"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -123,10 +127,6 @@ class EnrollmentResponse(DomainResource):
     requestProvider: Optional[Reference] = Field(
         description="Responsible practitioner",
         default=None,
-    )
-    resourceType: Literal["EnrollmentResponse"] = Field(
-        description=None,
-        default="EnrollmentResponse",
     )
 
     @model_validator(mode="after")

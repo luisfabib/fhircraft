@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -20,8 +19,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Range,
     Annotation,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AllergyIntoleranceReaction(BackboneElement):
@@ -101,6 +101,10 @@ class AllergyIntolerance(DomainResource):
     """
     Risk of harmful or undesirable, physiological response which is unique to an individual and associated with exposure to a substance.
     """
+
+    _abstract = False
+    _type = "AllergyIntolerance"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/AllergyIntolerance"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -265,10 +269,6 @@ class AllergyIntolerance(DomainResource):
     reaction: Optional[ListType[AllergyIntoleranceReaction]] = Field(
         description="Adverse Reaction Events linked to exposure to substance",
         default=None,
-    )
-    resourceType: Literal["AllergyIntolerance"] = Field(
-        description=None,
-        default="AllergyIntolerance",
     )
 
     @property

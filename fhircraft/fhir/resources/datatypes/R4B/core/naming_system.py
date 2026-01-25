@@ -17,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     ContactDetail,
     CodeableConcept,
     UsageContext,
     BackboneElement,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class NamingSystemUniqueId(BackboneElement):
@@ -100,6 +100,10 @@ class NamingSystem(DomainResource):
     """
     A curated namespace that issues unique symbols within that namespace for the identification of concepts, people, devices, etc.  Represents a "System" used within the Identifier and Coding data types.
     """
+
+    _abstract = False
+    _type = "NamingSystem"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/NamingSystem"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -241,10 +245,6 @@ class NamingSystem(DomainResource):
     uniqueId: Optional[ListType[NamingSystemUniqueId]] = Field(
         description="Unique identifiers used for system",
         default=None,
-    )
-    resourceType: Literal["NamingSystem"] = Field(
-        description=None,
-        default="NamingSystem",
     )
 
     @model_validator(mode="after")

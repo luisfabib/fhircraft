@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -20,8 +19,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Annotation,
     Quantity,
     Ratio,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationAdministrationPerformer(BackboneElement):
@@ -136,6 +136,10 @@ class MedicationAdministration(DomainResource):
     """
     Describes the event of a patient consuming or otherwise being administered a medication.  This may be as simple as swallowing a tablet or it may be a long running infusion.  Related resources tie this event to the authorizing prescription, and the specific encounter between patient and health care practitioner.
     """
+
+    _abstract = False
+    _type = "MedicationAdministration"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationAdministration"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -284,10 +288,6 @@ class MedicationAdministration(DomainResource):
     eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of events of interest in the lifecycle",
         default=None,
-    )
-    resourceType: Literal["MedicationAdministration"] = Field(
-        description=None,
-        default="MedicationAdministration",
     )
 
     @property

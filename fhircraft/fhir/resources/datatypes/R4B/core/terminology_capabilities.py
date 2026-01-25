@@ -19,14 +19,14 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     ContactDetail,
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class TerminologyCapabilitiesSoftware(BackboneElement):
@@ -483,6 +483,10 @@ class TerminologyCapabilities(DomainResource):
     A TerminologyCapabilities resource documents a set of capabilities (behaviors) of a FHIR Terminology Server that may be used as a statement of actual server functionality or a statement of required or desired server implementation.
     """
 
+    _abstract = False
+    _type = "TerminologyCapabilities"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/TerminologyCapabilities"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -697,10 +701,6 @@ class TerminologyCapabilities(DomainResource):
     closure: Optional[TerminologyCapabilitiesClosure] = Field(
         description="Information about the [ConceptMap/$closure](https://hl7.org/fhir/R4B/conceptmap-operation-closure.html) operation",
         default=None,
-    )
-    resourceType: Literal["TerminologyCapabilities"] = Field(
-        description=None,
-        default="TerminologyCapabilities",
     )
 
     @model_validator(mode="after")

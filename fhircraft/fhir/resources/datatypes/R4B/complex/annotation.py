@@ -12,6 +12,8 @@ class Annotation(Element):
     Text node with attribution
     """
 
+    _type = "Annotation"
+
     authorReference: Optional[Reference] = Field(
         description="Individual responsible for the annotation",
         default=None,

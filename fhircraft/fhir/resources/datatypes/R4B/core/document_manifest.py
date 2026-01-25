@@ -10,14 +10,14 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DocumentManifestRelated(BackboneElement):
@@ -55,6 +55,10 @@ class DocumentManifest(DomainResource):
     """
     A collection of documents compiled for a purpose together with metadata that applies to the collection.
     """
+
+    _abstract = False
+    _type = "DocumentManifest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DocumentManifest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -172,10 +176,6 @@ class DocumentManifest(DomainResource):
     related: Optional[ListType[DocumentManifestRelated]] = Field(
         description="Related things",
         default=None,
-    )
-    resourceType: Literal["DocumentManifest"] = Field(
-        description=None,
-        default="DocumentManifest",
     )
 
     @model_validator(mode="after")

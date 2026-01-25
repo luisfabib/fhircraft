@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -26,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Ratio,
     Duration,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AdministrableProductDefinitionProperty(BackboneElement):
@@ -249,6 +249,10 @@ class AdministrableProductDefinition(DomainResource):
     """
     A medicinal product in the final form which is suitable for administering to a patient (after any mixing of multiple components, dissolution etc. has been performed).
     """
+    _abstract = False
+    _type = "AdministrableProductDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
+
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -348,11 +352,6 @@ class AdministrableProductDefinition(DomainResource):
         description="The path by which the product is taken into or makes contact with the body",
         default=None,
     )
-    resourceType: Literal["AdministrableProductDefinition"] = Field(
-        description=None,
-        default="AdministrableProductDefinition",
-    )
-
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(

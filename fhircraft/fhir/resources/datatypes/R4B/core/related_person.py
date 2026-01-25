@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -27,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Period,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class RelatedPersonCommunication(BackboneElement):
@@ -71,6 +71,10 @@ class RelatedPerson(DomainResource):
     """
     Information about a person that is involved in the care for a patient, but who is not the target of healthcare, nor has a formal responsibility in the care process.
     """
+
+    _abstract = False
+    _type = "RelatedPerson"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/RelatedPerson"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -183,10 +187,6 @@ class RelatedPerson(DomainResource):
     communication: Optional[ListType[RelatedPersonCommunication]] = Field(
         description="A language which may be used to communicate with about the patient\u0027s health",
         default=None,
-    )
-    resourceType: Literal["RelatedPerson"] = Field(
-        description=None,
-        default="RelatedPerson",
     )
 
     @model_validator(mode="after")

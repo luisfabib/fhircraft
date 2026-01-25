@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -18,8 +17,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     CodeableReference,
     Range,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ClinicalUseDefinitionContraindicationOtherTherapy(BackboneElement):
@@ -376,6 +376,10 @@ class ClinicalUseDefinition(DomainResource):
     A single issue - either an indication, contraindication, interaction or an undesirable effect for a medicinal product, medication, device or procedure.
     """
 
+    _abstract = False
+    _type = "ClinicalUseDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -473,10 +477,6 @@ class ClinicalUseDefinition(DomainResource):
     warning: Optional[ClinicalUseDefinitionWarning] = Field(
         description="Critical environmental, health or physical risks or hazards. For example \u0027Do not operate heavy machinery\u0027, \u0027May cause drowsiness\u0027",
         default=None,
-    )
-    resourceType: Literal["ClinicalUseDefinition"] = Field(
-        description=None,
-        default="ClinicalUseDefinition",
     )
 
     @model_validator(mode="after")

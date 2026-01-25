@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -28,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     Timing,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceRequestParameter(BackboneElement):
@@ -99,6 +99,10 @@ class DeviceRequest(DomainResource):
     """
     Represents a request for a patient to employ a medical device. The device may be an implantable device, or an external assistive device, such as a walker.
     """
+
+    _abstract = False
+    _type = "DeviceRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -291,10 +295,6 @@ class DeviceRequest(DomainResource):
     relevantHistory: Optional[ListType[Reference]] = Field(
         description="Request provenance",
         default=None,
-    )
-    resourceType: Literal["DeviceRequest"] = Field(
-        description=None,
-        default="DeviceRequest",
     )
 
     @property

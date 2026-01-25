@@ -53,6 +53,8 @@ class ElementDefinitionSlicingDiscriminator(Element):
     Designates which child elements are used to discriminate between the slices when processing an instance. If one or more discriminators are provided, the value of the child elements in the instance data SHALL completely distinguish which slice the element in the resource matches based on the allowed values for those elements in each of the slices.
     """
 
+    _type = "ElementDefinitionSlicingDiscriminator"
+
     type: Optional[Code] = Field(
         description="value | exists | pattern | type | profile",
         default=None,
@@ -93,6 +95,8 @@ class ElementDefinitionSlicing(Element):
     """
     Indicates that the element is sliced into a set of alternative definitions (i.e. in a structure definition, there are multiple different constraints on a single element in the base resource). Slicing can be used in any resource that has cardinality ..* on the base resource, or any resource with a choice of types. The set of slices is any elements that come after this in the element sequence that have the same path, until a shorter path occurs (the shorter path terminates the set).
     """
+
+    _type = "ElementDefinitionSlicing"
 
     discriminator: Optional[List[ElementDefinitionSlicingDiscriminator]] = Field(
         description="Element values that are used to distinguish the slices",
@@ -152,6 +156,8 @@ class ElementDefinitionBase(Element):
     Information about the base definition of the element, provided to make it unnecessary for tools to trace the deviation of the element through the derived and related profiles. When the element definition is not the original definition of an element - i.g. either in a constraint on another type, or for elements from a super type in a snap shot - then the information in provided in the element definition may be different to the base definition. On the original definition of the element, it will be same.
     """
 
+    _type = "ElementDefinitionBase"
+
     path: Optional[String] = Field(
         description="Path that identifies the base element",
         default=None,
@@ -203,6 +209,8 @@ class ElementDefinitionType(Element):
     """
     The data type or resource that the value of this element is permitted to be.
     """
+
+    _type = "ElementDefinitionType"
 
     code: Optional[Uri] = Field(
         description="Data type or Resource (reference to definition)",
@@ -277,6 +285,8 @@ class ElementDefinitionExample(Element):
     """
     A sample value for this element demonstrating the type of information that would typically be found in the element.
     """
+
+    _type = "ElementDefinitionExample"
 
     label: Optional[String] = Field(
         description="Describes the purpose of this example",
@@ -676,6 +686,8 @@ class ElementDefinitionConstraint(Element):
     Formal constraints such as co-occurrence and other constraints that can be computationally evaluated within the context of the instance.
     """
 
+    _type = "ElementDefinitionConstraint"
+
     key: Optional[Id] = Field(
         description="Target of \u0027condition\u0027 reference above",
         default=None,
@@ -772,6 +784,8 @@ class ElementDefinitionBinding(Element):
     Binds to a value set if this element is coded (code, Coding, CodeableConcept, Quantity), or the data types (string, uri).
     """
 
+    _type = "ElementDefinitionBinding"
+
     strength: Optional[Code] = Field(
         description="required | extensible | preferred | example",
         default=None,
@@ -823,6 +837,8 @@ class ElementDefinitionMapping(Element):
     """
     Identifies a concept from an external specification that roughly corresponds to this element.
     """
+
+    _type = "ElementDefinitionMapping"
 
     identity: Optional[Id] = Field(
         description="Reference to mapping declaration",
@@ -886,6 +902,8 @@ class ElementDefinition(BackboneElement):
     """
     Base StructureDefinition for ElementDefinition Type: Captures constraints on each element within the resource, profile, or extension.
     """
+
+    _type = "ElementDefinition"
 
     path: Optional[String] = Field(
         description="Path of the element in the hierarchy of elements",

@@ -17,13 +17,13 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     ContactDetail,
     UsageContext,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CompartmentDefinitionResource(BackboneElement):
@@ -81,6 +81,10 @@ class CompartmentDefinition(DomainResource):
     """
     A compartment definition that defines how resources are accessed on a server.
     """
+
+    _abstract = False
+    _type = "CompartmentDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CompartmentDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -241,10 +245,6 @@ class CompartmentDefinition(DomainResource):
     resource: Optional[ListType[CompartmentDefinitionResource]] = Field(
         description="How a resource is related to the compartment",
         default=None,
-    )
-    resourceType: Literal["CompartmentDefinition"] = Field(
-        description=None,
-        default="CompartmentDefinition",
     )
 
     @model_validator(mode="after")

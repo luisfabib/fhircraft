@@ -10,12 +10,12 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Reference,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class LinkageItem(BackboneElement):
@@ -58,6 +58,10 @@ class Linkage(DomainResource):
     """
     Identifies two or more records (resource instances) that refer to the same real-world "occurrence".
     """
+
+    _abstract = False
+    _type = "Linkage"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Linkage"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -124,10 +128,6 @@ class Linkage(DomainResource):
     item: Optional[ListType[LinkageItem]] = Field(
         description="Item to be linked",
         default=None,
-    )
-    resourceType: Literal["Linkage"] = Field(
-        description=None,
-        default="Linkage",
     )
 
     @model_validator(mode="after")

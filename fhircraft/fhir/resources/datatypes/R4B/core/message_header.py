@@ -17,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Coding,
     BackboneElement,
     Reference,
     ContactPoint,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MessageHeaderDestination(BackboneElement):
@@ -198,6 +198,10 @@ class MessageHeader(DomainResource):
     The header for a message exchange that is either requesting or responding to an action.  The reference(s) that are the subject of the action as well as other information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.
     """
 
+    _abstract = False
+    _type = "MessageHeader"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MessageHeader"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -304,10 +308,6 @@ class MessageHeader(DomainResource):
         description="Placeholder element for definition extensions",
         default=None,
         alias="_definition",
-    )
-    resourceType: Literal["MessageHeader"] = Field(
-        description=None,
-        default="MessageHeader",
     )
 
     @property

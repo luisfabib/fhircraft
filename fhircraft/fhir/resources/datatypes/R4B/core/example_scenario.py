@@ -18,15 +18,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ExampleScenarioActor(BackboneElement):
@@ -185,10 +185,6 @@ class ExampleScenarioInstance(BackboneElement):
         description="Placeholder element for resourceId extensions",
         default=None,
         alias="_resourceId",
-    )
-    resourceType: Optional[Code] = Field(
-        description="The type of the resource",
-        default=None,
     )
     resourceType_ext: Optional[Element] = Field(
         description="Placeholder element for resourceType extensions",
@@ -568,6 +564,10 @@ class ExampleScenario(DomainResource):
     Example of workflow instance.
     """
 
+    _abstract = False
+    _type = "ExampleScenario"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExampleScenario"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -734,10 +734,6 @@ class ExampleScenario(DomainResource):
         description="Placeholder element for workflow extensions",
         default=None,
         alias="_workflow",
-    )
-    resourceType: Literal["ExampleScenario"] = Field(
-        description=None,
-        default="ExampleScenario",
     )
 
     @model_validator(mode="after")

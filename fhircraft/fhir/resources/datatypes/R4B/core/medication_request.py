@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -29,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Duration,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationRequestDispenseRequestInitialFill(BackboneElement):
@@ -186,6 +186,10 @@ class MedicationRequest(DomainResource):
     """
     An order or request for both supply of the medication and the instructions for administration of the medication to a patient. The resource is called "MedicationRequest" rather than "MedicationPrescription" or "MedicationOrder" to generalize the use across inpatient and outpatient settings, including care plans, etc., and to harmonize with workflow patterns.
     """
+
+    _abstract = False
+    _type = "MedicationRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -411,10 +415,6 @@ class MedicationRequest(DomainResource):
     eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of events of interest in the lifecycle",
         default=None,
-    )
-    resourceType: Literal["MedicationRequest"] = Field(
-        description=None,
-        default="MedicationRequest",
     )
 
     @property

@@ -19,14 +19,14 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     ContactDetail,
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class OperationDefinitionParameterBinding(BackboneElement):
@@ -278,6 +278,10 @@ class OperationDefinition(DomainResource):
     """
     A formal computable definition of an operation (on the RESTful interface) or a named query (using the search interaction).
     """
+
+    _abstract = False
+    _type = "OperationDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/OperationDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -536,10 +540,6 @@ class OperationDefinition(DomainResource):
     overload: Optional[ListType[OperationDefinitionOverload]] = Field(
         description="Define overloaded variants for when  generating code",
         default=None,
-    )
-    resourceType: Literal["OperationDefinition"] = Field(
-        description=None,
-        default="OperationDefinition",
     )
 
     @model_validator(mode="after")

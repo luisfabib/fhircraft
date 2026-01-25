@@ -10,20 +10,24 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class Flag(DomainResource):
     """
     Prospective warnings of potential issues when providing care to the patient.
     """
+
+    _abstract = False
+    _type = "Flag"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Flag"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -110,10 +114,6 @@ class Flag(DomainResource):
     author: Optional[Reference] = Field(
         description="Flag creator",
         default=None,
-    )
-    resourceType: Literal["Flag"] = Field(
-        description=None,
-        default="Flag",
     )
 
     @model_validator(mode="after")

@@ -19,6 +19,8 @@ class UsageContext(Element):
     Describes the context of use for a conformance or knowledge resource
     """
 
+    _type = "UsageContext"
+
     code: Optional[Coding] = Field(
         description="Type of context being specified",
         default=None,

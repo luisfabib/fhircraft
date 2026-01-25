@@ -16,15 +16,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Period,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AccountCoverage(BackboneElement):
@@ -108,6 +108,10 @@ class Account(DomainResource):
     """
     A financial tool for tracking value accrued for a particular purpose.  In the healthcare field, used to track charges for a patient, cost centers, etc.
     """
+
+    _abstract = False
+    _type = "Account"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Account"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -216,10 +220,6 @@ class Account(DomainResource):
     partOf: Optional[Reference] = Field(
         description="Reference to a parent Account",
         default=None,
-    )
-    resourceType: Literal["Account"] = Field(
-        description=None,
-        default="Account",
     )
 
     @model_validator(mode="after")

@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -30,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     RelatedArtifact,
     BackboneElement,
     Expression,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MeasureGroupPopulation(BackboneElement):
@@ -258,6 +258,10 @@ class Measure(DomainResource):
     """
     The Measure resource provides the definition of a quality measure.
     """
+
+    _abstract = False
+    _type = "Measure"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Measure"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -590,10 +594,6 @@ class Measure(DomainResource):
     supplementalData: Optional[ListType[MeasureSupplementalData]] = Field(
         description="What other data should be reported with the measure",
         default=None,
-    )
-    resourceType: Literal["Measure"] = Field(
-        description=None,
-        default="Measure",
     )
 
     @property

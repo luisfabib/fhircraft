@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -30,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Address,
     Quantity,
     Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ClaimResponseItemAdjudication(BackboneElement):
@@ -885,6 +885,10 @@ class ClaimResponse(DomainResource):
     This resource provides the adjudication details from the processing of a Claim resource.
     """
 
+    _abstract = False
+    _type = "ClaimResponse"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ClaimResponse"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -1071,10 +1075,6 @@ class ClaimResponse(DomainResource):
     error: Optional[ListType[ClaimResponseError]] = Field(
         description="Processing errors",
         default=None,
-    )
-    resourceType: Literal["ClaimResponse"] = Field(
-        description=None,
-        default="ClaimResponse",
     )
 
     @model_validator(mode="after")

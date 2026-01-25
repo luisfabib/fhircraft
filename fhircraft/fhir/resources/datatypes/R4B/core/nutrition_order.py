@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -26,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Ratio,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class NutritionOrderOralDietNutrient(BackboneElement):
@@ -355,6 +355,10 @@ class NutritionOrder(DomainResource):
     A request to supply a diet, formula feeding (enteral) or oral nutritional supplement to a patient/resident.
     """
 
+    _abstract = False
+    _type = "NutritionOrder"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/NutritionOrder"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -501,10 +505,6 @@ class NutritionOrder(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments",
         default=None,
-    )
-    resourceType: Literal["NutritionOrder"] = Field(
-        description=None,
-        default="NutritionOrder",
     )
 
     @model_validator(mode="after")

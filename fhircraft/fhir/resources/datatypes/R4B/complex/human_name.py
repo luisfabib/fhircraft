@@ -12,6 +12,8 @@ class HumanName(Element):
     Name of a human - parts and usage
     """
 
+    _type = "HumanName"
+
     use: Optional[Code] = Field(
         description="usual | official | temp | nickname | anonymous | old | maiden",
         default=None,

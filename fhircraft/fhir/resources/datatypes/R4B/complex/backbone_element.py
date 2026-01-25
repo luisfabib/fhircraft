@@ -12,6 +12,8 @@ class BackboneElement(Element):
     Base for elements defined inside a resource
     """
 
+    _type = "BackboneElement"
+
     _fhir_release = "R4B"
 
     modifierExtension: Optional[List[Extension]] = Field(

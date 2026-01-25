@@ -18,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -27,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Quantity,
     Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CoverageEligibilityRequestSupportingInfo(BackboneElement):
@@ -239,6 +239,12 @@ class CoverageEligibilityRequest(DomainResource):
     The CoverageEligibilityRequest provides patient and insurance coverage information to an insurer for them to respond, in the form of an CoverageEligibilityResponse, with information regarding whether the stated coverage is valid and in-force and optionally to provide the insurance details of the policy.
     """
 
+    _abstract = False
+    _type = "CoverageEligibilityRequest"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityRequest"
+    )
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -371,10 +377,6 @@ class CoverageEligibilityRequest(DomainResource):
     item: Optional[ListType[CoverageEligibilityRequestItem]] = Field(
         description="Item to be evaluated for eligibiity",
         default=None,
-    )
-    resourceType: Literal["CoverageEligibilityRequest"] = Field(
-        description=None,
-        default="CoverageEligibilityRequest",
     )
 
     @property

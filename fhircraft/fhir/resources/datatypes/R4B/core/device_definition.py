@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     BackboneElement,
@@ -21,8 +20,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     ContactPoint,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
@@ -276,6 +276,10 @@ class DeviceDefinition(DomainResource):
     The characteristics, operational status and capabilities of a medical-related component of a medical device.
     """
 
+    _abstract = False
+    _type = "DeviceDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceDefinition"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -443,10 +447,6 @@ class DeviceDefinition(DomainResource):
     material: Optional[ListType[DeviceDefinitionMaterial]] = Field(
         description="A substance used to create the material(s) of which the device is made",
         default=None,
-    )
-    resourceType: Literal["DeviceDefinition"] = Field(
-        description=None,
-        default="DeviceDefinition",
     )
 
     @property

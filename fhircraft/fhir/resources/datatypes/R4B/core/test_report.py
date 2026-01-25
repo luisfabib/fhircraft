@@ -17,13 +17,13 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class TestReportParticipant(BackboneElement):
@@ -494,6 +494,10 @@ class TestReport(DomainResource):
     A summary of information based on the results of executing a TestScript.
     """
 
+    _abstract = False
+    _type = "TestReport"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/TestReport"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -620,10 +624,6 @@ class TestReport(DomainResource):
     teardown: Optional[TestReportTeardown] = Field(
         description="The results of running the series of required clean up steps",
         default=None,
-    )
-    resourceType: Literal["TestReport"] = Field(
-        description=None,
-        default="TestReport",
     )
 
     @model_validator(mode="after")

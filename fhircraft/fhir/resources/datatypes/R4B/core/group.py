@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -25,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Range,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class GroupCharacteristic(BackboneElement):
@@ -157,6 +157,10 @@ class Group(DomainResource):
     Represents a defined collection of entities that may be discussed or acted upon collectively but which are not expected to act collectively, and are not formally or legally recognized; i.e. a collection of entities that isn't an Organization.
     """
 
+    _abstract = False
+    _type = "Group"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Group"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -270,10 +274,6 @@ class Group(DomainResource):
     member: Optional[ListType[GroupMember]] = Field(
         description="Who or what is in group",
         default=None,
-    )
-    resourceType: Literal["Group"] = Field(
-        description=None,
-        default="Group",
     )
 
     @model_validator(mode="after")

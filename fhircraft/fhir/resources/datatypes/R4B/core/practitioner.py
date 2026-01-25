@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     HumanName,
@@ -27,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Period,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PractitionerQualification(BackboneElement):
@@ -76,6 +76,10 @@ class Practitioner(DomainResource):
     """
     A person who is directly or indirectly involved in the provisioning of healthcare.
     """
+
+    _abstract = False
+    _type = "Practitioner"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Practitioner"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -180,10 +184,6 @@ class Practitioner(DomainResource):
     communication: Optional[ListType[CodeableConcept]] = Field(
         description="A language the practitioner can use in patient communication",
         default=None,
-    )
-    resourceType: Literal["Practitioner"] = Field(
-        description=None,
-        default="Practitioner",
     )
 
     @model_validator(mode="after")

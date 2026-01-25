@@ -16,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -26,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Range,
     BackboneElement,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ProcedurePerformer(BackboneElement):
@@ -101,6 +101,10 @@ class Procedure(DomainResource):
     """
     An action that is or was performed on or for a patient. This can be a physical intervention like an operation, or less invasive like long term services, counseling, or hypnotherapy.
     """
+
+    _abstract = False
+    _type = "Procedure"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Procedure"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -303,10 +307,6 @@ class Procedure(DomainResource):
     usedCode: Optional[ListType[CodeableConcept]] = Field(
         description="Coded items used during the procedure",
         default=None,
-    )
-    resourceType: Literal["Procedure"] = Field(
-        description=None,
-        default="Procedure",
     )
 
     @property

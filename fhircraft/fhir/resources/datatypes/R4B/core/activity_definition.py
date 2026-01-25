@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -36,8 +35,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Dosage,
     Expression,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ActivityDefinitionParticipant(BackboneElement):
@@ -116,6 +116,10 @@ class ActivityDefinition(DomainResource):
     """
     This resource allows for the definition of some activity to be performed, independent of a particular patient, practitioner, or other performance context.
     """
+
+    _abstract = False
+    _type = "ActivityDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ActivityDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -501,10 +505,6 @@ class ActivityDefinition(DomainResource):
     dynamicValue: Optional[ListType[ActivityDefinitionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
         default=None,
-    )
-    resourceType: Literal["ActivityDefinition"] = Field(
-        description=None,
-        default="ActivityDefinition",
     )
 
     @property

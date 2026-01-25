@@ -19,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -33,8 +32,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     DataRequirement,
     Duration,
     Timing,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ResearchElementDefinitionCharacteristic(BackboneElement):
@@ -247,6 +247,10 @@ class ResearchElementDefinition(DomainResource):
     """
     The ResearchElementDefinition resource describes a "PICO" element that knowledge (evidence, assertion, recommendation) is about.
     """
+
+    _abstract = False
+    _type = "ResearchElementDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchElementDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -534,10 +538,6 @@ class ResearchElementDefinition(DomainResource):
     characteristic: Optional[ListType[ResearchElementDefinitionCharacteristic]] = Field(
         description="What defines the members of the research element",
         default=None,
-    )
-    resourceType: Literal["ResearchElementDefinition"] = Field(
-        description=None,
-        default="ResearchElementDefinition",
     )
 
     @property

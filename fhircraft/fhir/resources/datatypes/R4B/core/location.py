@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -26,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Address,
     BackboneElement,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class LocationPosition(BackboneElement):
@@ -146,6 +146,10 @@ class Location(DomainResource):
     """
     Details and position information for a physical place where services are provided and resources and participants may be stored, found, contained, or accommodated.
     """
+
+    _abstract = False
+    _type = "Location"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Location"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -293,10 +297,6 @@ class Location(DomainResource):
     endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the location",
         default=None,
-    )
-    resourceType: Literal["Location"] = Field(
-        description=None,
-        default="Location",
     )
 
     @model_validator(mode="after")

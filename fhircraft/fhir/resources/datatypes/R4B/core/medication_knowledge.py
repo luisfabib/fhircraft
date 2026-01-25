@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     CodeableConcept,
     Reference,
@@ -27,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Money,
     Dosage,
     Duration,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
@@ -682,6 +682,10 @@ class MedicationKnowledge(DomainResource):
     Information about a medication that is used to support knowledge.
     """
 
+    _abstract = False
+    _type = "MedicationKnowledge"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationKnowledge"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -841,10 +845,6 @@ class MedicationKnowledge(DomainResource):
     kinetics: Optional[ListType[MedicationKnowledgeKinetics]] = Field(
         description="The time course of drug absorption, distribution, metabolism and excretion of a medication from the body",
         default=None,
-    )
-    resourceType: Literal["MedicationKnowledge"] = Field(
-        description=None,
-        default="MedicationKnowledge",
     )
 
     @model_validator(mode="after")

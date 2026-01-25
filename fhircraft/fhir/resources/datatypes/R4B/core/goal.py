@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -28,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Ratio,
     Duration,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class GoalTarget(BackboneElement):
@@ -158,6 +158,10 @@ class Goal(DomainResource):
     """
     Describes the intended objective(s) for a patient, group or organization care, for example, weight loss, restoring an activity of daily living, obtaining herd immunity via immunization, meeting a process improvement objective, etc.
     """
+
+    _abstract = False
+    _type = "Goal"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Goal"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -295,10 +299,6 @@ class Goal(DomainResource):
     outcomeReference: Optional[ListType[Reference]] = Field(
         description="Observation that resulted from goal",
         default=None,
-    )
-    resourceType: Literal["Goal"] = Field(
-        description=None,
-        default="Goal",
     )
 
     @property

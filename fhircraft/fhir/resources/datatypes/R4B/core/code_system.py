@@ -21,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
@@ -29,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     BackboneElement,
     Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CodeSystemFilter(BackboneElement):
@@ -379,6 +379,10 @@ class CodeSystem(DomainResource):
     The CodeSystem resource is used to declare the existence of and describe a code system or code system supplement and its key properties, and optionally define a part or all of its content.
     """
 
+    _abstract = False
+    _type = "CodeSystem"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CodeSystem"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -626,10 +630,6 @@ class CodeSystem(DomainResource):
     concept: Optional[ListType[CodeSystemConcept]] = Field(
         description="Concepts in the code system",
         default=None,
-    )
-    resourceType: Literal["CodeSystem"] = Field(
-        description=None,
-        default="CodeSystem",
     )
 
     @model_validator(mode="after")

@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -28,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Money,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ChargeItemPerformer(BackboneElement):
@@ -67,6 +67,10 @@ class ChargeItem(DomainResource):
     """
     The resource ChargeItem describes the provision of healthcare provider products for a certain patient, therefore referring not only to the product, but containing in addition details of the provision, like date, time, amounts and participating organizations and persons. Main Usage of the ChargeItem is to enable the billing process and internal cost allocation.
     """
+
+    _abstract = False
+    _type = "ChargeItem"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ChargeItem"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -267,10 +271,6 @@ class ChargeItem(DomainResource):
     supportingInformation: Optional[ListType[Reference]] = Field(
         description="Further information supporting this charge",
         default=None,
-    )
-    resourceType: Literal["ChargeItem"] = Field(
-        description=None,
-        default="ChargeItem",
     )
 
     @property

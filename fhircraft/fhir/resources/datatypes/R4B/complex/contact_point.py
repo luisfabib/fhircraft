@@ -12,6 +12,8 @@ class ContactPoint(Element):
     Details of a Technology mediated contact point (phone, fax, email, etc.)
     """
 
+    _type = "ContactPoint"
+
     system: Optional[Code] = Field(
         description="phone | fax | email | pager | url | sms | other",
         default=None,
