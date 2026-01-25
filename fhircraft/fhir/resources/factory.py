@@ -38,7 +38,11 @@ import fhircraft.fhir.resources.datatypes.primitives as primitives
 # Internal modules
 from fhircraft.fhir.resources.datatypes.utils import get_fhir_resource_type
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+from fhircraft.fhir.resources.base import (
+    FHIRBaseModel,
+    FHIRSliceModel,
+    FhirBaseModelKind,
+)
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
 
 from fhircraft.fhir.resources.datatypes.R4.core import (
@@ -1954,8 +1958,6 @@ class ResourceFactory:
             for constraint in root_node.definition.constraint or []:
                 validators.add_model_constraint_validator(constraint)
 
-        if _structure_definition.kind in ("resource", "logical"):
-            fields["resourceType"] = (Literal[f"{resource_type}"], resource_type)
         # If the resource has metadata, prefill the information
         if "meta" in fields or "meta" in getattr(base, "model_fields", {}):
             Meta = get_complex_FHIR_type(
@@ -1981,6 +1983,30 @@ class ResourceFactory:
             properties=properties,
             docstring=_structure_definition.description,
         )
+
+        # Set structural model metadata
+        if issubclass(model, FHIRBaseModel):
+            # Set the FHIR release version for the model and canonical URL
+            model._fhir_release = self.Config.FHIR_release
+            model._canonical_url = _structure_definition.url or None
+            # Set the kind, type, canonical URL, and abstract status for the model
+            if _structure_definition.kind:
+                model._kind = FhirBaseModelKind[_structure_definition.kind]
+            else:
+                model._kind = FhirBaseModelKind.LOGICAL
+            if resource_type:
+                model._type = resource_type
+            else:
+                model._type = _structure_definition.type or _structure_definition.name
+            if _structure_definition.abstract is not None:
+                model._abstract = bool(_structure_definition.abstract)
+            elif (
+                base and issubclass(base, FHIRBaseModel) and base._abstract is not None
+            ):
+                model._abstract = base._abstract
+            else:
+                model._abstract = False
+
         # Add the current model to the cache
         self.construction_cache[str(_structure_definition.url)] = model
         return model
