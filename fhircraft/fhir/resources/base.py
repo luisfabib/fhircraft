@@ -18,6 +18,8 @@ from pydantic import (
     model_validator,
     field_validator,
     model_serializer,
+    SerializerFunctionWrapHandler,
+    SerializationInfo,
 )
 from pydantic_core import PydanticUndefined
 
@@ -163,7 +165,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return value
 
     @model_serializer(mode="wrap")
-    def _serialize_polymorphic_fields(self, serializer, info) -> Any:
+    def _serialize_polymorphic_fields(
+        self, serializer: SerializerFunctionWrapHandler, info: SerializationInfo
+    ) -> Any:
         """Apply polymorphic serialization to FHIR fields during serialization."""
         # Check if polymorphic serialization is enabled
         if (
@@ -208,7 +212,11 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                             data[field_name] = (
                                 self._serialize_fhir_field_polymorphically(value)
                             )
-            if self._is_resource and hasattr(self, "_type"):
+            if (
+                self._is_resource
+                and hasattr(self, "_type")
+                and "resourceType" not in list(info.exclude or [])
+            ):
                 data["resourceType"] = self._type
 
             return data
