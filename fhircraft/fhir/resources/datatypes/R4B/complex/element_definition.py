@@ -2680,7 +2680,7 @@ class ElementDefinition(BackboneElement):
     def FHIR_eld_20_constraint_model_validator(self):
         return validate_model_constraint(
             self,
-            expression="""path.matches('^[A-Za-z][A-Za-z0-9](\\.[a-z][A-Za-z0-9](\\[x])?)*$')""",
+            expression="""path.matches('^[A-Za-z][A-Za-z0-9]*(\\.[a-z][A-Za-z0-9]*(\\[x])?)*$')""",
             human="The first component of the path should be UpperCamelCase.  Additional components (following a '.') should be lowerCamelCase.  If this syntax is not adhered to, code generation tools may be broken. Logical models may be less concerned about this implication.",
             key="eld-20",
             severity="warning",
