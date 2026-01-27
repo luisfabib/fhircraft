@@ -650,7 +650,6 @@ def test_simple_mapping_scenarios(test_name, source_data, expected_target, rules
     result = result[0].model_dump(
         mode="json", exclude_unset=False, exclude={"resourceType", "meta"}
     )
-    expected_target["resourceType"] = "SimpleTarget"
     if expected_target != result:
         print("Result:")
         pprint.pprint(result)
