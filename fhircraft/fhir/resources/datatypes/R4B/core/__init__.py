@@ -1,6 +1,7 @@
 from .resource import *
 from .account import *
 from .activity_definition import *
+from .administrable_product_definition import *
 from .adverse_event import *
 from .allergy_intolerance import *
 from .appointment import *
@@ -20,12 +21,14 @@ from .charge_item_definition import *
 from .claim import *
 from .claim_response import *
 from .clinical_impression import *
+from .clinical_use_definition import *
 from .code_system import *
 from .communication import *
 from .communication_request import *
 from .compartment_definition import *
 from .composition import *
 from .concept_map import *
+from .citation import *
 from .condition import *
 from .consent import *
 from .contract import *
@@ -49,6 +52,7 @@ from .enrollment_response import *
 from .episode_of_care import *
 from .event_definition import *
 from .evidence import *
+from .evidence_report import *
 from .evidence_variable import *
 from .example_scenario import *
 from .explanation_of_benefit import *
@@ -63,6 +67,7 @@ from .imaging_study import *
 from .immunization import *
 from .immunization_evaluation import *
 from .immunization_recommendation import *
+from .ingredient import *
 from .implementation_guide import *
 from .insurance_plan import *
 from .invoice import *
@@ -79,6 +84,7 @@ from .medication_dispense import *
 from .medication_knowledge import *
 from .medication_request import *
 from .medication_statement import *
+from .medicinal_product_definition import *
 from .message_definition import *
 from .message_header import *
 from .molecular_sequence import *
@@ -90,6 +96,7 @@ from .operation_definition import *
 from .operation_outcome import *
 from .organization import *
 from .organization_affiliation import *
+from .packaged_product_definition import *
 from .parameters import *
 from .patient import *
 from .payment_notice import *
@@ -102,6 +109,7 @@ from .procedure import *
 from .provenance import *
 from .questionnaire import *
 from .questionnaire_response import *
+from .regulated_authorization import *
 from .related_person import *
 from .request_group import *
 from .research_definition import *
@@ -118,7 +126,10 @@ from .specimen_definition import *
 from .structure_definition import *
 from .structure_map import *
 from .subscription import *
+from .subscription_status import *
+from .subscription_topic import *
 from .substance import *
+from .substance_definition import *
 from .supply_delivery import *
 from .supply_request import *
 from .task import *
