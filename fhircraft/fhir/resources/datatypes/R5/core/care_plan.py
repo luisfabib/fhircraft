@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -38,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     BackboneElement,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CarePlanActivity(BackboneElement):
@@ -70,10 +58,6 @@ class CarePlanActivity(BackboneElement):
                 "performedActivity",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -86,6 +70,10 @@ class CarePlan(DomainResource):
     """
     Describes the intention of how one or more practitioners intend to deliver care for a particular patient, group or community for a period of time, possibly limited to care for a specific condition or set of conditions.
     """
+
+    _abstract = False
+    _type = "CarePlan"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CarePlan"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -262,10 +250,6 @@ class CarePlan(DomainResource):
     note: Optional[List[Annotation]] = Field(
         description="Comments about the plan",
         default=None,
-    )
-    resourceType: Literal["CarePlan"] = Field(
-        description=None,
-        default="CarePlan",
     )
 
     @model_validator(mode="after")

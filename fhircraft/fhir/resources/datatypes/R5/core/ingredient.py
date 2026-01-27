@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -39,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Ratio,
     RatioRange,
     Quantity,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class IngredientManufacturer(BackboneElement):
@@ -69,8 +57,6 @@ class IngredientManufacturer(BackboneElement):
             elements=(
                 "manufacturer",
                 "role",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -131,10 +117,6 @@ class IngredientSubstanceStrengthReferenceStrength(BackboneElement):
                 "country",
                 "measurementPoint",
                 "substance",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -260,16 +242,6 @@ class IngredientSubstanceStrength(BackboneElement):
                 "textPresentation",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -319,8 +291,6 @@ class IngredientSubstance(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -333,6 +303,10 @@ class Ingredient(DomainResource):
     """
     An ingredient of a manufactured item or pharmaceutical product.
     """
+
+    _abstract = False
+    _type = "Ingredient"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Ingredient"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -437,10 +411,6 @@ class Ingredient(DomainResource):
     substance: Optional[IngredientSubstance] = Field(
         description="The substance that comprises this ingredient",
         default=None,
-    )
-    resourceType: Literal["Ingredient"] = Field(
-        description=None,
-        default="Ingredient",
     )
 
     @model_validator(mode="after")

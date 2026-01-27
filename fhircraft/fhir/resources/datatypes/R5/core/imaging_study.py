@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -39,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Annotation,
     BackboneElement,
     Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImagingStudySeriesPerformer(BackboneElement):
@@ -64,8 +52,6 @@ class ImagingStudySeriesPerformer(BackboneElement):
             elements=(
                 "actor",
                 "function",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -122,12 +108,6 @@ class ImagingStudySeriesInstance(BackboneElement):
                 "number",
                 "sopClass",
                 "uid",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -236,28 +216,6 @@ class ImagingStudySeries(BackboneElement):
                 "uid",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -270,6 +228,10 @@ class ImagingStudy(DomainResource):
     """
     Representation of the content produced in a DICOM imaging study. A study comprises a set of series, each of which includes a set of Service-Object Pair Instances (SOP Instances - images or other data) acquired or produced in a common context.  A series is of only one modality (e.g. X-ray, CT, MR, ultrasound), but a study may have multiple series of different modalities.
     """
+
+    _abstract = False
+    _type = "ImagingStudy"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImagingStudy"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -416,10 +378,6 @@ class ImagingStudy(DomainResource):
     series: Optional[List[ImagingStudySeries]] = Field(
         description="Each study has one or more series of instances",
         default=None,
-    )
-    resourceType: Literal["ImagingStudy"] = Field(
-        description=None,
-        default="ImagingStudy",
     )
 
     @model_validator(mode="after")

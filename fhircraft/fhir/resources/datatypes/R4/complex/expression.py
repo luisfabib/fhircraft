@@ -13,6 +13,8 @@ class Expression(Element):
     An expression that can be used to generate a value
     """
 
+    _type = "Expression"
+
     description: Optional[String] = Field(
         description="Natural language description of the condition",
         default=None,

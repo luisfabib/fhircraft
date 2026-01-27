@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Integer
 
@@ -23,14 +10,14 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     CodeableConcept,
     BackboneElement,
-    Attachment,
     Identifier,
-    DomainResource,
+    Attachment,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubstanceNucleicAcidSubunitLinkage(BackboneElement):
@@ -81,12 +68,6 @@ class SubstanceNucleicAcidSubunitLinkage(BackboneElement):
                 "connectivity",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -131,10 +112,6 @@ class SubstanceNucleicAcidSubunitSugar(BackboneElement):
                 "residueSite",
                 "name",
                 "identifier",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -213,20 +190,6 @@ class SubstanceNucleicAcidSubunit(BackboneElement):
                 "subunit",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -239,6 +202,10 @@ class SubstanceNucleicAcid(DomainResource):
     """
     Nucleic acids are defined by three distinct elements: the base, sugar and linkage. Individual substance/moiety IDs will be created for each of these elements. The nucleotide sequence will be always entered in the 5’-3’ direction.
     """
+
+    _abstract = False
+    _type = "SubstanceNucleicAcid"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubstanceNucleicAcid"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -318,10 +285,6 @@ class SubstanceNucleicAcid(DomainResource):
     subunit: Optional[ListType[SubstanceNucleicAcidSubunit]] = Field(
         description="Subunits are listed in order of decreasing length; sequences of the same length will be ordered by molecular weight; subunits that have identical sequences will be repeated multiple times",
         default=None,
-    )
-    resourceType: Literal["SubstanceNucleicAcid"] = Field(
-        description=None,
-        default="SubstanceNucleicAcid",
     )
 
     @model_validator(mode="after")

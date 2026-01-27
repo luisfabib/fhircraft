@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,19 +16,23 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
-    Reference,
     CodeableConcept,
-    DomainResource,
+    Reference,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImmunizationEvaluation(DomainResource):
     """
     Describes a comparison of an immunization event against published recommendations to determine if the administration is "valid" in relation to those  recommendations.
     """
+
+    _abstract = False
+    _type = "ImmunizationEvaluation"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImmunizationEvaluation"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -191,10 +182,6 @@ class ImmunizationEvaluation(DomainResource):
         description="Placeholder element for seriesDosesString extensions",
         default=None,
         alias="_seriesDosesString",
-    )
-    resourceType: Literal["ImmunizationEvaluation"] = Field(
-        description=None,
-        default="ImmunizationEvaluation",
     )
 
     @property

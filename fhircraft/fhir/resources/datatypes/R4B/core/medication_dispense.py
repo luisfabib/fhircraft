@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -38,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Annotation,
     Dosage,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationDispensePerformer(BackboneElement):
@@ -63,8 +50,6 @@ class MedicationDispensePerformer(BackboneElement):
             elements=(
                 "actor",
                 "function",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -113,12 +98,6 @@ class MedicationDispenseSubstitution(BackboneElement):
                 "wasSubstituted",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -131,6 +110,10 @@ class MedicationDispense(DomainResource):
     """
     Indicates that a medication product is to be or has been dispensed for a named person/patient.  This includes a description of the medication product (supply) provided and the instructions for administering the medication.  The medication dispense is the result of a pharmacy system responding to a medication order.
     """
+
+    _abstract = False
+    _type = "MedicationDispense"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationDispense"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -299,10 +282,6 @@ class MedicationDispense(DomainResource):
     eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of relevant lifecycle events",
         default=None,
-    )
-    resourceType: Literal["MedicationDispense"] = Field(
-        description=None,
-        default="MedicationDispense",
     )
 
     @property

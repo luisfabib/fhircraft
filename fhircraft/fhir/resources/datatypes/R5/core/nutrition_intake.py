@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -41,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Timing,
     Quantity,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class NutritionIntakeConsumedItem(BackboneElement):
@@ -98,18 +86,6 @@ class NutritionIntakeConsumedItem(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -139,8 +115,6 @@ class NutritionIntakeIngredientLabel(BackboneElement):
             elements=(
                 "amount",
                 "nutrient",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -174,8 +148,6 @@ class NutritionIntakePerformer(BackboneElement):
                 "function",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -188,6 +160,10 @@ class NutritionIntake(DomainResource):
     """
     A record of food or fluid that is being consumed by a patient.  A NutritionIntake may indicate that the patient may be consuming the food or fluid now or has consumed the food or fluid in the past.  The source of this information can be the patient, significant other (such as a family member or spouse), or a clinician.  A common scenario where this information is captured is during the history taking process during a patient visit or stay or through an app that tracks food or fluids consumed.   The consumption information may come from sources such as the patient's memory, from a nutrition label,  or from a clinician documenting observed intake.
     """
+
+    _abstract = False
+    _type = "NutritionIntake"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/NutritionIntake"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -355,10 +331,6 @@ class NutritionIntake(DomainResource):
     note: Optional[List[Annotation]] = Field(
         description="Further information about the consumption",
         default=None,
-    )
-    resourceType: Literal["NutritionIntake"] = Field(
-        description=None,
-        default="NutritionIntake",
     )
 
     @property

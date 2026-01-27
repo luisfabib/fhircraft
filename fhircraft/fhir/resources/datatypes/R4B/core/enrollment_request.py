@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,18 +10,22 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EnrollmentRequest(DomainResource):
     """
     This resource provides the insurance enrollment details to the insurer regarding a specified coverage.
     """
+
+    _abstract = False
+    _type = "EnrollmentRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EnrollmentRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -122,10 +113,6 @@ class EnrollmentRequest(DomainResource):
     coverage: Optional[Reference] = Field(
         description="Insurance information",
         default=None,
-    )
-    resourceType: Literal["EnrollmentRequest"] = Field(
-        description=None,
-        default="EnrollmentRequest",
     )
 
     @model_validator(mode="after")

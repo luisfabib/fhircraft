@@ -19,6 +19,8 @@ class Dosage(BackboneType):
     How the medication is/was taken or should be taken
     """
 
+    _type = "Dosage"
+
     sequence: Optional[Integer] = Field(
         description="The order of the dosage instructions",
         default=None,

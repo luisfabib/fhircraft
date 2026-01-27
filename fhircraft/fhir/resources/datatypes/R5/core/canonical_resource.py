@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -38,12 +25,17 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     UsageContext,
     CodeableConcept,
 )
+from .resource import Resource
 
 
 class CanonicalResource(Resource):
     """
     Common Interface declaration for conformance and knowledge artifact resources.
     """
+
+    _abstract = True
+    _type = "CanonicalResource"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CanonicalResource"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -230,10 +222,6 @@ class CanonicalResource(Resource):
         description="Placeholder element for copyrightLabel extensions",
         default=None,
         alias="_copyrightLabel",
-    )
-    resourceType: Literal["CanonicalResource"] = Field(
-        description=None,
-        default="CanonicalResource",
     )
 
     @property

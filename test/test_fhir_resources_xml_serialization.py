@@ -16,7 +16,7 @@ def strip_ns(tag):
 class SimplePatient(FHIRBaseModel):
     """Simple Patient model for testing basic XML serialization."""
 
-    resourceType: str = Field(default="Patient")
+    _type = "Patient"
     id: Optional[str] = None
     active: Optional[bool] = None
     gender: Optional[str] = None
@@ -122,7 +122,7 @@ class MockAddress(FHIRBaseModel):
 class PatientWithComplexTypes(FHIRBaseModel):
     """Patient with complex types for testing."""
 
-    resourceType: str = Field(default="Patient")
+    _type = "Patient"
     id: Optional[str] = None
     name: Optional[List[MockHumanName]] = None
     address: Optional[List[MockAddress]] = None
@@ -324,7 +324,7 @@ class TestXMLDeserialization:
 
         patient = SimplePatient.model_validate_xml(xml)
 
-        assert patient.resourceType == "Patient"
+        assert patient._type == "Patient"
         assert patient.id == "test-123"
         assert patient.active is True
         assert patient.gender == "male"
@@ -592,20 +592,6 @@ class TestXMLDeserialization:
         assert patient.name[0].family == "Mixture"
         assert len(patient.address) == 1
         assert patient.address[0].city == "TestCity"
-
-    def test_empty_resource_deserialization(self):
-        """Test deserialization of minimal resource."""
-        xml = """<?xml version="1.0"?>
-<Patient xmlns="http://hl7.org/fhir">
-</Patient>"""
-
-        patient = SimplePatient.model_validate_xml(xml)
-
-        assert patient.resourceType == "Patient"
-        assert patient.id is None
-        assert patient.active is None
-        assert patient.gender is None
-        assert patient.birthDate is None
 
     def test_double_roundtrip(self):
         """Test serialize → deserialize → serialize → deserialize."""

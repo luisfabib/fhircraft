@@ -16,6 +16,8 @@ class ProductShelfLife(BackboneElement):
     The shelf-life and storage information for a medicinal product item or container can be described using this class
     """
 
+    _type = "BackboneElement"
+
     identifier: Optional[Identifier] = Field(
         description="Unique identifier for the packaged Medicinal Product",
         default=None,

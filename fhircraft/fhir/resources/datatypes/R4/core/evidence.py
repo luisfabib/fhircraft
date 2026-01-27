@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +17,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
+    Reference,
     Extension,
     Identifier,
     ContactDetail,
@@ -39,15 +26,19 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     CodeableConcept,
     Period,
     RelatedArtifact,
-    Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class Evidence(DomainResource):
     """
     The Evidence resource describes the conditional state (population and any exposures being compared within the population) and outcome (if specified) that the knowledge (evidence, assertion, recommendation) is about.
     """
+
+    _abstract = False
+    _type = "Evidence"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Evidence"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -274,10 +265,6 @@ class Evidence(DomainResource):
     outcome: Optional[ListType[Reference]] = Field(
         description="What outcome?",
         default=None,
-    )
-    resourceType: Literal["Evidence"] = Field(
-        description=None,
-        default="Evidence",
     )
 
     @model_validator(mode="after")

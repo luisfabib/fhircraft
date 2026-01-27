@@ -18,6 +18,8 @@ class ProdCharacteristic(BackboneElement):
     The marketing status describes the date when a medicinal product is actually put on the market or the date as of which it is no longer available
     """
 
+    _type = "ProdCharacteristic"
+
     height: Optional[Quantity] = Field(
         description="Where applicable, the height can be specified using a numerical value and its unit of measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used",
         default=None,

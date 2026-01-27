@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -34,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
@@ -42,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     BackboneElement,
     Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CodeSystemFilter(BackboneElement):
@@ -97,12 +84,6 @@ class CodeSystemFilter(BackboneElement):
                 "operator",
                 "description",
                 "code",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -166,12 +147,6 @@ class CodeSystemProperty(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -216,10 +191,6 @@ class CodeSystemConceptDesignation(BackboneElement):
                 "value",
                 "use",
                 "language",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -393,16 +364,6 @@ class CodeSystemConcept(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -415,6 +376,10 @@ class CodeSystem(DomainResource):
     """
     The CodeSystem resource is used to declare the existence of and describe a code system or code system supplement and its key properties, and optionally define a part or all of its content.
     """
+
+    _abstract = False
+    _type = "CodeSystem"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CodeSystem"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -663,10 +628,6 @@ class CodeSystem(DomainResource):
     concept: Optional[ListType[CodeSystemConcept]] = Field(
         description="Concepts in the code system",
         default=None,
-    )
-    resourceType: Literal["CodeSystem"] = Field(
-        description=None,
-        default="CodeSystem",
     )
 
     @model_validator(mode="after")

@@ -1,22 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
-
+import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
     Uri,
@@ -27,12 +14,10 @@ from fhircraft.fhir.resources.datatypes.primitives import (
     DateTime,
     Instant,
 )
-
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -41,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     CodeableReference,
     Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AccountCoverage(BackboneElement):
@@ -71,8 +57,6 @@ class AccountCoverage(BackboneElement):
             elements=(
                 "priority",
                 "coverage",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -114,10 +98,6 @@ class AccountGuarantor(BackboneElement):
                 "period",
                 "onHold",
                 "party",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -186,16 +166,6 @@ class AccountDiagnosis(BackboneElement):
                 "sequence",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -257,16 +227,6 @@ class AccountProcedure(BackboneElement):
                 "sequence",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -296,8 +256,6 @@ class AccountRelatedAccount(BackboneElement):
             elements=(
                 "account",
                 "relationship",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -348,12 +306,6 @@ class AccountBalance(BackboneElement):
                 "aggregate",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -366,6 +318,10 @@ class Account(DomainResource):
     """
     A financial tool for tracking value accrued for a particular purpose.  In the healthcare field, used to track charges for a patient, cost centers, etc.
     """
+
+    _abstract = False
+    _type = "Account"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Account"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -503,10 +459,6 @@ class Account(DomainResource):
         description="Placeholder element for calculatedAt extensions",
         default=None,
         alias="_calculatedAt",
-    )
-    resourceType: Literal["Account"] = Field(
-        description=None,
-        default="Account",
     )
 
     @model_validator(mode="after")

@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -40,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class TerminologyCapabilitiesSoftware(BackboneElement):
@@ -75,8 +63,6 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
             elements=(
                 "version",
                 "name",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -120,8 +106,6 @@ class TerminologyCapabilitiesImplementation(BackboneElement):
                 "description",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -161,8 +145,6 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
             elements=(
                 "op",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -241,16 +223,6 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -307,12 +279,6 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
                 "uri",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -352,8 +318,6 @@ class TerminologyCapabilitiesExpansionParameter(BackboneElement):
             elements=(
                 "documentation",
                 "name",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -420,14 +384,6 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
                 "incomplete",
                 "paging",
                 "hierarchical",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -535,6 +491,10 @@ class TerminologyCapabilities(DomainResource):
     """
     A TerminologyCapabilities resource documents a set of capabilities (behaviors) of a FHIR Terminology Server that may be used as a statement of actual server functionality or a statement of required or desired server implementation.
     """
+
+    _abstract = False
+    _type = "TerminologyCapabilities"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/TerminologyCapabilities"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -776,10 +736,6 @@ class TerminologyCapabilities(DomainResource):
     closure: Optional[TerminologyCapabilitiesClosure] = Field(
         description="Information about the [ConceptMap/$closure](https://hl7.org/fhir/R5/conceptmap-operation-closure.html) operation",
         default=None,
-    )
-    resourceType: Literal["TerminologyCapabilities"] = Field(
-        description=None,
-        default="TerminologyCapabilities",
     )
 
     @property

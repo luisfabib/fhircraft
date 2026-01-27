@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -33,8 +19,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Duration,
     Quantity,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SpecimenCollection(BackboneElement):
@@ -108,14 +95,6 @@ class SpecimenCollection(BackboneElement):
                 "quantity",
                 "duration",
                 "collector",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -197,10 +176,6 @@ class SpecimenProcessing(BackboneElement):
                 "description",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -276,14 +251,6 @@ class SpecimenContainer(BackboneElement):
                 "identifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -305,6 +272,10 @@ class Specimen(DomainResource):
     """
     A sample to be used for analysis.
     """
+
+    _abstract = False
+    _type = "Specimen"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Specimen"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -416,10 +387,6 @@ class Specimen(DomainResource):
     note: Optional[ListType[Annotation]] = Field(
         description="Comments",
         default=None,
-    )
-    resourceType: Literal["Specimen"] = Field(
-        description=None,
-        default="Specimen",
     )
 
     @model_validator(mode="after")

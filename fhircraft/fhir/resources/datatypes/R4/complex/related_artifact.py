@@ -14,6 +14,8 @@ class RelatedArtifact(Element):
     Related artifacts for a knowledge resource
     """
 
+    _type = "RelatedArtifact"
+
     type: Optional[Code] = Field(
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of",
         default=None,

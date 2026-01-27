@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -33,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -42,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     BackboneElement,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CapabilityStatementSoftware(BackboneElement):
@@ -87,10 +75,6 @@ class CapabilityStatementSoftware(BackboneElement):
                 "releaseDate",
                 "version",
                 "name",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -139,10 +123,6 @@ class CapabilityStatementImplementation(BackboneElement):
                 "description",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -189,10 +169,6 @@ class CapabilityStatementRestSecurity(BackboneElement):
                 "cors",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -232,8 +208,6 @@ class CapabilityStatementRestResourceInteraction(BackboneElement):
             elements=(
                 "documentation",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -297,12 +271,6 @@ class CapabilityStatementRestResourceSearchParam(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -352,10 +320,6 @@ class CapabilityStatementRestResourceOperation(BackboneElement):
                 "documentation",
                 "definition",
                 "name",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -544,40 +508,6 @@ class CapabilityStatementRestResource(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -617,8 +547,6 @@ class CapabilityStatementRestInteraction(BackboneElement):
             elements=(
                 "documentation",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -682,12 +610,6 @@ class CapabilityStatementRestSearchParam(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -737,10 +659,6 @@ class CapabilityStatementRestOperation(BackboneElement):
                 "documentation",
                 "definition",
                 "name",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -819,20 +737,6 @@ class CapabilityStatementRest(BackboneElement):
                 "mode",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -880,8 +784,6 @@ class CapabilityStatementMessagingEndpoint(BackboneElement):
                 "protocol",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -921,8 +823,6 @@ class CapabilityStatementMessagingSupportedMessage(BackboneElement):
             elements=(
                 "definition",
                 "mode",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -978,12 +878,6 @@ class CapabilityStatementMessaging(BackboneElement):
                 "endpoint",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1035,10 +929,6 @@ class CapabilityStatementDocument(BackboneElement):
                 "mode",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1051,6 +941,10 @@ class CapabilityStatement(DomainResource):
     """
     A Capability Statement documents a set of capabilities (behaviors) of a FHIR Server or Client for a particular version of FHIR that may be used as a statement of actual server functionality or a statement of required or desired server implementation.
     """
+
+    _abstract = False
+    _type = "CapabilityStatement"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CapabilityStatement"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -1329,10 +1223,6 @@ class CapabilityStatement(DomainResource):
     document: Optional[List[CapabilityStatementDocument]] = Field(
         description="Document definition",
         default=None,
-    )
-    resourceType: Literal["CapabilityStatement"] = Field(
-        description=None,
-        default="CapabilityStatement",
     )
 
     @property

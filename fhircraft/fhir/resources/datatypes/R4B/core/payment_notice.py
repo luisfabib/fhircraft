@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,20 +16,24 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     Money,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PaymentNotice(DomainResource):
     """
     This resource provides the status of the payment for goods and services rendered, and the request and response resource references.
     """
+
+    _abstract = False
+    _type = "PaymentNotice"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PaymentNotice"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -155,10 +146,6 @@ class PaymentNotice(DomainResource):
     paymentStatus: Optional[CodeableConcept] = Field(
         description="Issued or cleared Status of the payment",
         default=None,
-    )
-    resourceType: Literal["PaymentNotice"] = Field(
-        description=None,
-        default="PaymentNotice",
     )
 
     @model_validator(mode="after")

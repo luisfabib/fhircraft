@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     CodeableConcept,
     Identifier,
+    Reference,
     BackboneElement,
     Range,
-    Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ObservationDefinitionQuantitativeDetails(BackboneElement):
@@ -82,12 +69,6 @@ class ObservationDefinitionQuantitativeDetails(BackboneElement):
                 "conversionFactor",
                 "unit",
                 "customaryUnit",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -166,20 +147,6 @@ class ObservationDefinitionQualifiedInterval(BackboneElement):
                 "category",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -192,6 +159,10 @@ class ObservationDefinition(DomainResource):
     """
     Set of definitional characteristics for a kind of observation or measurement produced or consumed by an orderable health care service.
     """
+
+    _abstract = False
+    _type = "ObservationDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ObservationDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -310,10 +281,6 @@ class ObservationDefinition(DomainResource):
     criticalCodedValueSet: Optional[Reference] = Field(
         description="Value set of critical coded values for the observations conforming to this ObservationDefinition",
         default=None,
-    )
-    resourceType: Literal["ObservationDefinition"] = Field(
-        description=None,
-        default="ObservationDefinition",
     )
 
     @model_validator(mode="after")

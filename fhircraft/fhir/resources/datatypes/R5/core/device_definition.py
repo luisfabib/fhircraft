@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     BackboneElement,
@@ -47,46 +34,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Annotation,
     UsageContext,
-    DomainResource,
 )
-
-
-class DeviceDefinitionUdiDeviceIdentifierMarketDistribution(BackboneElement):
-    """
-    Indicates where and when the device is available on the market.
-    """
-
-    marketPeriod: Optional[Period] = Field(
-        description="Begin and end dates for the commercial distribution of the device",
-        default=None,
-    )
-    subJurisdiction: Optional[Uri] = Field(
-        description="National state or territory where the device is commercialized",
-        default=None,
-    )
-    subJurisdiction_ext: Optional[Element] = Field(
-        description="Placeholder element for subJurisdiction extensions",
-        default=None,
-        alias="_subJurisdiction",
-    )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subJurisdiction",
-                "marketPeriod",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
@@ -122,7 +72,7 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
         alias="_jurisdiction",
     )
     marketDistribution: Optional[
-        List[DeviceDefinitionUdiDeviceIdentifierMarketDistribution]
+        List["DeviceDefinitionUdiDeviceIdentifierMarketDistribution"]
     ] = Field(
         description="Indicates whether and when the device is available on the market",
         default=None,
@@ -137,12 +87,6 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
                 "jurisdiction",
                 "issuer",
                 "deviceIdentifier",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -206,12 +150,6 @@ class DeviceDefinitionRegulatoryIdentifier(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -253,8 +191,6 @@ class DeviceDefinitionDeviceName(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -284,8 +220,6 @@ class DeviceDefinitionClassification(BackboneElement):
             elements=(
                 "justification",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -334,12 +268,6 @@ class DeviceDefinitionConformsTo(BackboneElement):
                 "category",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -374,8 +302,6 @@ class DeviceDefinitionHasPart(BackboneElement):
             elements=(
                 "count",
                 "reference",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -414,8 +340,6 @@ class DeviceDefinitionPackagingDistributor(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -450,8 +374,6 @@ class DeviceDefinitionUdiDeviceIdentifierMarketDistribution(BackboneElement):
             elements=(
                 "subJurisdiction",
                 "marketPeriod",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -512,12 +434,6 @@ class DeviceDefinitionPackagingUdiDeviceIdentifier(BackboneElement):
                 "deviceIdentifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -576,16 +492,6 @@ class DeviceDefinitionPackaging(BackboneElement):
                 "identifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -625,10 +531,6 @@ class DeviceDefinitionVersion(BackboneElement):
                 "value",
                 "component",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -755,8 +657,6 @@ class DeviceDefinitionLink(BackboneElement):
                 "relation",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -801,10 +701,6 @@ class DeviceDefinitionMaterial(BackboneElement):
                 "allergenicIndicator",
                 "alternate",
                 "substance",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -873,18 +769,6 @@ class DeviceDefinitionGuideline(BackboneElement):
                 "useContext",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -931,10 +815,6 @@ class DeviceDefinitionCorrectiveAction(BackboneElement):
                 "recall",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -976,12 +856,6 @@ class DeviceDefinitionChargeItem(BackboneElement):
                 "chargeItemCode",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -994,6 +868,10 @@ class DeviceDefinition(DomainResource):
     """
     This is a specialized resource that defines the characteristics and capabilities of a device.
     """
+
+    _abstract = False
+    _type = "DeviceDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -1167,10 +1045,6 @@ class DeviceDefinition(DomainResource):
     chargeItem: Optional[List[DeviceDefinitionChargeItem]] = Field(
         description="Billing code or reference associated with the device",
         default=None,
-    )
-    resourceType: Literal["DeviceDefinition"] = Field(
-        description=None,
-        default="DeviceDefinition",
     )
 
     @model_validator(mode="after")

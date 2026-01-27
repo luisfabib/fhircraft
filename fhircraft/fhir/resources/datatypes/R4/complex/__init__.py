@@ -29,7 +29,6 @@ from .count import Count
 from .distance import Distance
 from .duration import Duration
 from .data_requirement import DataRequirement
-from .domain_resource import DomainResource
 from .dosage import Dosage
 from .expression import Expression
 from .human_name import HumanName
@@ -43,7 +42,6 @@ from .product_shelf_life import ProductShelfLife
 from .range import Range
 from .ratio import Ratio
 from .related_artifact import RelatedArtifact
-from .resource import Resource
 from .sampled_data import SampledData
 from .signature import Signature
 from .simple_quantity import SimpleQuantity
@@ -77,7 +75,6 @@ __all__ = [
     "Count",
     "DataRequirement",
     "Distance",
-    "DomainResource",
     "Dosage",
     "Duration",
     "Element",
@@ -109,7 +106,6 @@ __all__ = [
     "Ratio",
     "Reference",
     "RelatedArtifact",
-    "Resource",
     "SampledData",
     "Signature",
     "SimpleQuantity",
@@ -143,7 +139,6 @@ Count.model_rebuild()
 Distance.model_rebuild()
 Duration.model_rebuild()
 DataRequirement.model_rebuild()
-DomainResource.model_rebuild()
 Dosage.model_rebuild()
 Expression.model_rebuild()
 HumanName.model_rebuild()
@@ -157,7 +152,6 @@ ProductShelfLife.model_rebuild()
 Range.model_rebuild()
 Ratio.model_rebuild()
 RelatedArtifact.model_rebuild()
-Resource.model_rebuild()
 SampledData.model_rebuild()
 Signature.model_rebuild()
 SimpleQuantity.model_rebuild()

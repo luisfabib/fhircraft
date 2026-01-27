@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     BackboneElement,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class BiologicallyDerivedProductCollection(BackboneElement):
@@ -82,8 +69,6 @@ class BiologicallyDerivedProductCollection(BackboneElement):
             elements=(
                 "source",
                 "collector",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -154,10 +139,6 @@ class BiologicallyDerivedProductProcessing(BackboneElement):
                 "additive",
                 "procedure",
                 "description",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -285,12 +266,6 @@ class BiologicallyDerivedProductStorage(BackboneElement):
                 "description",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -304,6 +279,12 @@ class BiologicallyDerivedProduct(DomainResource):
         A material substance originating from a biological entity intended to be transplanted or infused
     into another (possibly the same) biological entity.
     """
+
+    _abstract = False
+    _type = "BiologicallyDerivedProduct"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProduct"
+    )
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -414,10 +395,6 @@ class BiologicallyDerivedProduct(DomainResource):
     storage: Optional[ListType[BiologicallyDerivedProductStorage]] = Field(
         description="Product storage",
         default=None,
-    )
-    resourceType: Literal["BiologicallyDerivedProduct"] = Field(
-        description=None,
-        default="BiologicallyDerivedProduct",
     )
 
     @model_validator(mode="after")

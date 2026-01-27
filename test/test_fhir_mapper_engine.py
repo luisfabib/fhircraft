@@ -141,7 +141,6 @@ class SimpleTarget(BaseModel):
 def create_simple_source_structure_definition() -> StructureDefinition:
     """Create StructureDefinition for SimpleSource."""
     return StructureDefinition(
-        resourceType="StructureDefinition",
         id="SimpleSource",
         url="http://example.org/StructureDefinition/SimpleSource",
         name="SimpleSource",
@@ -189,7 +188,6 @@ def create_simple_source_structure_definition() -> StructureDefinition:
 def create_simple_target_structure_definition() -> StructureDefinition:
     """Create StructureDefinition for SimpleTarget."""
     return StructureDefinition(
-        resourceType="StructureDefinition",
         id="SimpleTarget",
         url="http://example.org/StructureDefinition/SimpleTarget",
         name="SimpleTarget",
@@ -292,7 +290,6 @@ def create_simple_target_structure_definition() -> StructureDefinition:
 def create_simple_structure_map(map_content: str) -> StructureMap:
     """Helper to create a StructureMap from mapping content for testing."""
     return StructureMap(
-        resourceType="StructureMap",
         id="simple-test-map",
         url="http://example.org/StructureMap/simple-test",
         name="SimpleTestMap",

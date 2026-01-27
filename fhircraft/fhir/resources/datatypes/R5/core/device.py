@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableReference,
@@ -45,8 +32,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     ContactPoint,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceUdiCarrier(BackboneElement):
@@ -122,16 +110,6 @@ class DeviceUdiCarrier(BackboneElement):
                 "deviceIdentifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -181,10 +159,6 @@ class DeviceName(BackboneElement):
                 "display",
                 "type",
                 "value",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -238,12 +212,6 @@ class DeviceVersion(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -283,10 +251,6 @@ class DeviceConformsTo(BackboneElement):
                 "version",
                 "specification",
                 "category",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -394,6 +358,10 @@ class Device(DomainResource):
     """
     This resource describes the properties (regulated, has real time clock, etc.), adminstrative (manufacturer name, model number, serial number, firmware, etc.), and type (knee replacement, blood pressure cuff, MRI, etc.) of a physical unit (these values do not change much within a given module, for example the serail number, manufacturer name, and model number). An actual unit may consist of several modules in a distinct hierarchy and these are represented by multiple Device resources and bound through the 'parent' element.
     """
+
+    _abstract = False
+    _type = "Device"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Device"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -621,10 +589,6 @@ class Device(DomainResource):
     parent: Optional[Reference] = Field(
         description="The higher level or encompassing device that this device is a logical part of",
         default=None,
-    )
-    resourceType: Literal["Device"] = Field(
-        description=None,
-        default="Device",
     )
 
     @model_validator(mode="after")

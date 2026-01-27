@@ -34,9 +34,10 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Identifier,
     Meta,
-    Resource,
     Signature,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class BundleLink(BackboneElement):
@@ -70,8 +71,6 @@ class BundleLink(BackboneElement):
             elements=(
                 "url",
                 "relation",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -115,8 +114,6 @@ class BundleEntryLink(BackboneElement):
                 "relation",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -156,8 +153,6 @@ class BundleEntrySearch(BackboneElement):
             elements=(
                 "score",
                 "mode",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -241,16 +236,6 @@ class BundleEntryRequest(BackboneElement):
                 "method",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -316,12 +301,6 @@ class BundleEntryResponse(BackboneElement):
                 "status",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -377,14 +356,6 @@ class BundleEntry(BackboneElement):
                 "link",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
@@ -397,6 +368,10 @@ class Bundle(Resource):
     """
     A container for a collection of resources.
     """
+
+    _abstract = False
+    _type = "Bundle"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Bundle"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -473,10 +448,6 @@ class Bundle(Resource):
     signature: Optional[Signature] = Field(
         description="Digital Signature",
         default=None,
-    )
-    resourceType: Literal["Bundle"] = Field(
-        description=None,
-        default="Bundle",
     )
 
     @model_validator(mode="after")

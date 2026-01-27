@@ -13,6 +13,8 @@ class ParameterDefinition(Element):
     Definition of a parameter to a module
     """
 
+    _type = "ParameterDefinition"
+
     name: Optional[Code] = Field(
         description="Name used to access the parameter value",
         default=None,

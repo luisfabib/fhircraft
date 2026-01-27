@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     UsageContext,
     Identifier,
@@ -42,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Range,
     Period,
     ContactDetail,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EvidenceReportSubjectCharacteristic(BackboneElement):
@@ -111,10 +99,6 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -153,8 +137,6 @@ class EvidenceReportSubject(BackboneElement):
             elements=(
                 "note",
                 "characteristic",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -208,12 +190,6 @@ class EvidenceReportRelatesToTarget(BackboneElement):
                 "url",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -248,8 +224,6 @@ class EvidenceReportRelatesTo(BackboneElement):
             elements=(
                 "target",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -343,28 +317,6 @@ class EvidenceReportSection(BackboneElement):
                 "title",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -377,6 +329,10 @@ class EvidenceReport(DomainResource):
     """
     The EvidenceReport Resource is a specialized container for a collection of resources and codeable concepts, adapted to support compositions of Evidence, EvidenceVariable, and Citation resources and related concepts.
     """
+
+    _abstract = False
+    _type = "EvidenceReport"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceReport"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -522,10 +478,6 @@ class EvidenceReport(DomainResource):
     section: Optional[List[EvidenceReportSection]] = Field(
         description="Composition is broken into sections",
         default=None,
-    )
-    resourceType: Literal["EvidenceReport"] = Field(
-        description=None,
-        default="EvidenceReport",
     )
 
     @property

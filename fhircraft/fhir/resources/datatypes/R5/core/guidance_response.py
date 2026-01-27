@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -37,14 +24,19 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Annotation,
     DataRequirement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class GuidanceResponse(DomainResource):
     """
     A guidance response is the formal response to a guidance request, including any output parameters returned by the evaluation, as well as the description of any proposed actions to be taken.
     """
+
+    _abstract = False
+    _type = "GuidanceResponse"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/GuidanceResponse"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -178,10 +170,6 @@ class GuidanceResponse(DomainResource):
     dataRequirement: Optional[List[DataRequirement]] = Field(
         description="Additional required data",
         default=None,
-    )
-    resourceType: Literal["GuidanceResponse"] = Field(
-        description=None,
-        default="GuidanceResponse",
     )
 
     @property

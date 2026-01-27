@@ -16,6 +16,8 @@ class MarketingStatus(BackboneElement):
     The marketing status describes the date when a medicinal product is actually put on the market or the date as of which it is no longer available
     """
 
+    _type = "BackboneElement"
+
     country: Optional[CodeableConcept] = Field(
         description="The country in which the marketing authorisation has been granted shall be specified It should be specified using the ISO 3166 \u2011 1 alpha-2 code elements",
         default=None,

@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -38,92 +25,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Reference,
     Attachment,
-    DomainResource,
 )
-
-
-class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark(
-    BackboneElement
-):
-    """
-    The distance in centimeters a certain observation is made from a body landmark.
-    """
-
-    device: Optional[List[CodeableReference]] = Field(
-        description="Measurement device",
-        default=None,
-    )
-    value: Optional[List[Quantity]] = Field(
-        description="Measured distance from body landmark",
-        default=None,
-    )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "device",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
-class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
-    """
-    Body locations in relation to a specific body landmark (tatoo, scar, other body structure).
-    """
-
-    landmarkDescription: Optional[List[CodeableConcept]] = Field(
-        description="Body ]andmark description",
-        default=None,
-    )
-    clockFacePosition: Optional[List[CodeableConcept]] = Field(
-        description="Clockface orientation",
-        default=None,
-    )
-    distanceFromLandmark: Optional[
-        List[BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark]
-    ] = Field(
-        description="Landmark relative location",
-        default=None,
-    )
-    surfaceOrientation: Optional[List[CodeableConcept]] = Field(
-        description="Relative landmark surface orientation",
-        default=None,
-    )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "surfaceOrientation",
-                "distanceFromLandmark",
-                "clockFacePosition",
-                "landmarkDescription",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class BodyStructureIncludedStructure(BackboneElement):
@@ -140,7 +44,7 @@ class BodyStructureIncludedStructure(BackboneElement):
         default=None,
     )
     bodyLandmarkOrientation: Optional[
-        List[BodyStructureIncludedStructureBodyLandmarkOrientation]
+        List["BodyStructureIncludedStructureBodyLandmarkOrientation"]
     ] = Field(
         description="Landmark relative location",
         default=None,
@@ -166,14 +70,6 @@ class BodyStructureIncludedStructure(BackboneElement):
                 "structure",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -205,8 +101,6 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark(
             elements=(
                 "value",
                 "device",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -250,12 +144,6 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
                 "distanceFromLandmark",
                 "clockFacePosition",
                 "landmarkDescription",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -306,14 +194,6 @@ class BodyStructureExcludedStructure(BackboneElement):
                 "structure",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -326,6 +206,10 @@ class BodyStructure(DomainResource):
     """
     Record details about an anatomical structure.  This resource may be used when a coded concept does not provide the necessary detail needed for the use case.
     """
+
+    _abstract = False
+    _type = "BodyStructure"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/BodyStructure"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -417,10 +301,6 @@ class BodyStructure(DomainResource):
     patient: Optional[Reference] = Field(
         description="Who this is about",
         default=None,
-    )
-    resourceType: Literal["BodyStructure"] = Field(
-        description=None,
-        default="BodyStructure",
     )
 
     @model_validator(mode="after")

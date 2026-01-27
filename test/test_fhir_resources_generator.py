@@ -401,6 +401,9 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         class Slice(FHIRSliceModel):
             min_cardinality: ClassVar[int] = 0
             max_cardinality: ClassVar[int] = 2
+
+            _kind = "logical"
+
             valueString: str = Field(
                 description="A string value",
             )
@@ -427,6 +430,11 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         class ExtensionSlice(Extension, FHIRSliceModel):
             min_cardinality: ClassVar[int] = 1
             max_cardinality: ClassVar[int] = 1
+
+            _fhir_release = "R4B"
+            _type = "Extension"
+            _kind = "complex-type"
+            
             url: str = Field(
                 description="Extension URL",
             )

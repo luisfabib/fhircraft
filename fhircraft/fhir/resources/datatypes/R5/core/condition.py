@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -34,8 +21,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     CodeableReference,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ConditionParticipant(BackboneElement):
@@ -59,8 +47,6 @@ class ConditionParticipant(BackboneElement):
             elements=(
                 "actor",
                 "function",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -99,10 +85,6 @@ class ConditionStage(BackboneElement):
                 "summary",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -115,6 +97,10 @@ class Condition(DomainResource):
     """
     A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
     """
+
+    _abstract = False
+    _type = "Condition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Condition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -285,10 +271,6 @@ class Condition(DomainResource):
     note: Optional[List[Annotation]] = Field(
         description="Additional information about the Condition",
         default=None,
-    )
-    resourceType: Literal["Condition"] = Field(
-        description=None,
-        default="Condition",
     )
 
     @property

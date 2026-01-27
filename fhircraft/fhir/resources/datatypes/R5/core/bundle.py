@@ -1,26 +1,9 @@
-# Fhircraft modules
-from enum import Enum
-
-# Standard modules
-from typing import Literal, Optional, Union
-
-# Pydantic modules
-from pydantic import BaseModel, Field, model_validator
-from pydantic.fields import FieldInfo
-
-import fhircraft
-import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.utils import model_rebuild_all
+from pydantic import Field, model_validator
+from typing import List, Optional
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from typing import List, Literal, Optional
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
+import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import (
     Code,
     Decimal,
@@ -34,9 +17,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Identifier,
     Meta,
-    Resource,
     Signature,
 )
+from .resource import Resource
 
 
 class BundleLink(BackboneElement):
@@ -70,8 +53,6 @@ class BundleLink(BackboneElement):
             elements=(
                 "url",
                 "relation",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -115,8 +96,6 @@ class BundleEntryLink(BackboneElement):
                 "relation",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -156,8 +135,6 @@ class BundleEntrySearch(BackboneElement):
             elements=(
                 "score",
                 "mode",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -241,16 +218,6 @@ class BundleEntryRequest(BackboneElement):
                 "method",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -316,12 +283,6 @@ class BundleEntryResponse(BackboneElement):
                 "status",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -377,14 +338,6 @@ class BundleEntry(BackboneElement):
                 "link",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -397,6 +350,10 @@ class Bundle(Resource):
     """
     A container for a collection of resources.
     """
+
+    _abstract = False
+    _type = "Bundle"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Bundle"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -477,10 +434,6 @@ class Bundle(Resource):
     issues: Optional[Resource] = Field(
         description="Issues with the Bundle",
         default=None,
-    )
-    resourceType: Literal["Bundle"] = Field(
-        description=None,
-        default="Bundle",
     )
 
     @model_validator(mode="after")

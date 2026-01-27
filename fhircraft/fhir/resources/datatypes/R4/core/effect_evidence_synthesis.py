@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,19 +19,19 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
     Annotation,
     UsageContext,
     CodeableConcept,
+    BackboneElement,
     Period,
     RelatedArtifact,
     Reference,
-    BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EffectEvidenceSynthesisSampleSize(BackboneElement):
@@ -88,10 +75,6 @@ class EffectEvidenceSynthesisSampleSize(BackboneElement):
                 "numberOfParticipants",
                 "numberOfStudies",
                 "description",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -143,12 +126,6 @@ class EffectEvidenceSynthesisResultsByExposure(BackboneElement):
                 "variantState",
                 "exposureState",
                 "description",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -205,12 +182,6 @@ class EffectEvidenceSynthesisEffectEstimatePrecisionEstimate(BackboneElement):
                 "from_",
                 "level",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -276,16 +247,6 @@ class EffectEvidenceSynthesisEffectEstimate(BackboneElement):
                 "description",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -320,10 +281,6 @@ class EffectEvidenceSynthesisCertaintyCertaintySubcomponent(BackboneElement):
                 "note",
                 "rating",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -364,10 +321,6 @@ class EffectEvidenceSynthesisCertainty(BackboneElement):
                 "rating",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -380,6 +333,10 @@ class EffectEvidenceSynthesis(DomainResource):
     """
     The EffectEvidenceSynthesis resource describes the difference in an outcome between exposures states in a population where the effect estimate is derived from a combination of research studies.
     """
+
+    _abstract = False
+    _type = "EffectEvidenceSynthesis"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EffectEvidenceSynthesis"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -618,10 +575,6 @@ class EffectEvidenceSynthesis(DomainResource):
     certainty: Optional[ListType[EffectEvidenceSynthesisCertainty]] = Field(
         description="How certain is the effect",
         default=None,
-    )
-    resourceType: Literal["EffectEvidenceSynthesis"] = Field(
-        description=None,
-        default="EffectEvidenceSynthesis",
     )
 
     @model_validator(mode="after")

@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Instant
 
@@ -23,19 +10,23 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AppointmentResponse(DomainResource):
     """
     A reply to an appointment request for a patient and/or practitioner(s), such as a confirmation or rejection.
     """
+    _abstract = False
+    _type = "AppointmentResponse"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/AppointmentResponse"
+
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -138,11 +129,6 @@ class AppointmentResponse(DomainResource):
         default=None,
         alias="_comment",
     )
-    resourceType: Literal["AppointmentResponse"] = Field(
-        description=None,
-        default="AppointmentResponse",
-    )
-
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(

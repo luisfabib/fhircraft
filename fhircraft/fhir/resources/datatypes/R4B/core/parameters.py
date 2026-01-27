@@ -72,13 +72,14 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Ratio,
     Reference,
     RelatedArtifact,
-    Resource,
     SampledData,
     Signature,
     Timing,
     TriggerDefinition,
     UsageContext,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ParametersParameter(BackboneElement):
@@ -415,8 +416,6 @@ class ParametersParameter(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -490,6 +489,10 @@ class Parameters(Resource):
     This resource is a non-persisted resource used to pass information into and back from an [operation](https://hl7.org/fhir/R4B/operations.html). It has no other use, and there is no RESTful endpoint associated with it.
     """
 
+    _abstract = False
+    _type = "Parameters"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Parameters"
+
     id: Optional[String] = Field(
         description="Logical id of this artifact",
         default=None,
@@ -526,10 +529,6 @@ class Parameters(Resource):
     parameter: Optional[ListType[ParametersParameter]] = Field(
         description="Operation Parameter",
         default=None,
-    )
-    resourceType: Literal["Parameters"] = Field(
-        description=None,
-        default="Parameters",
     )
 
     @model_validator(mode="after")

@@ -13,6 +13,8 @@ class xhtml(Element):
     Primitive Type xhtml
     """
 
+    _type = "xhtml"
+
     value: Optional[String] = Field(
         description="Actual xhtml",
         default=None,

@@ -10,6 +10,7 @@ from pydantic import BaseModel
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 
+from fhircraft.fhir.path.engine import environment
 from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
 
 T = TypeVar("T", bound=BaseModel)
@@ -17,6 +18,7 @@ T = TypeVar("T", bound=BaseModel)
 
 def _validate_FHIR_element_constraint(
     value: Any,
+    instance: Any,
     expression: str,
     human: str,
     key: str,
@@ -28,6 +30,7 @@ def _validate_FHIR_element_constraint(
 
     Args:
         value (Any): The value to validate.
+        instance (Any): The instance containing the value.
         expression (str): The FHIRPath expression to evaluate.
         human (str): A human-readable description of the constraint.
         key (str): The key associated with the constraint.
@@ -77,9 +80,17 @@ def _validate_FHIR_element_constraint(
 
     if value is None:
         return value
+
+    environment = (
+        {"%fhirRelease": release}
+        if (release := getattr(instance, "_fhir_release", None))
+        else {}
+    )
     for item in ensure_list(value):
         try:
-            valid = fhirpath.parse(expression).single(item, default=True)
+            valid = fhirpath.parse(expression).single(
+                item, default=True, environment=environment
+            )
             error_message = f"[{key}] {human}. -> {expression}"
             if element:
                 error_message = f"{element}\n\t{error_message}"
@@ -130,7 +141,9 @@ def validate_element_constraint(
         value = getattr(instance, element)
         if not value:
             continue
-        _validate_FHIR_element_constraint(value, expression, human, key, severity)
+        _validate_FHIR_element_constraint(
+            value, instance, expression, human, key, severity
+        )
     return instance
 
 
@@ -154,7 +167,9 @@ def validate_model_constraint(
         AssertionError: If the validation fails and severity is not `warning`.
         Warning: If the validation fails and severity is `warning`.
     """
-    return _validate_FHIR_element_constraint(instance, expression, human, key, severity)
+    return _validate_FHIR_element_constraint(
+        instance, instance, expression, human, key, severity
+    )
 
 
 def validate_FHIR_element_pattern(

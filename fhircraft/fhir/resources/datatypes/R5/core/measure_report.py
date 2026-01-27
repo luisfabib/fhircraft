@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -41,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Range,
     Duration,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MeasureReportGroupPopulation(BackboneElement):
@@ -96,16 +84,6 @@ class MeasureReportGroupPopulation(BackboneElement):
                 "count",
                 "code",
                 "linkId",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -176,8 +154,6 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
                 "linkId",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -246,16 +222,6 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
                 "count",
                 "code",
                 "linkId",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -357,8 +323,6 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
                 "component",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -416,10 +380,6 @@ class MeasureReportGroupStratifier(BackboneElement):
                 "stratum",
                 "code",
                 "linkId",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -509,14 +469,6 @@ class MeasureReportGroup(BackboneElement):
                 "linkId",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -538,6 +490,10 @@ class MeasureReport(DomainResource):
     """
     The MeasureReport resource contains the results of the calculation of a measure; and optionally a reference to the resources involved in that calculation.
     """
+
+    _abstract = False
+    _type = "MeasureReport"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MeasureReport"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -680,10 +636,6 @@ class MeasureReport(DomainResource):
     evaluatedResource: Optional[List[Reference]] = Field(
         description="What data was used to calculate the measure score",
         default=None,
-    )
-    resourceType: Literal["MeasureReport"] = Field(
-        description=None,
-        default="MeasureReport",
     )
 
     @model_validator(mode="after")

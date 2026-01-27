@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +19,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
+    Timing,
     Extension,
     Identifier,
     ContactDetail,
@@ -47,9 +34,9 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     DataRequirement,
     TriggerDefinition,
     Duration,
-    Timing,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EvidenceVariableCharacteristic(BackboneElement):
@@ -169,14 +156,6 @@ class EvidenceVariableCharacteristic(BackboneElement):
                 "description",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -214,6 +193,10 @@ class EvidenceVariable(DomainResource):
     """
     The EvidenceVariable resource describes a "PICO" element that knowledge (evidence, assertion, recommendation) is about.
     """
+
+    _abstract = False
+    _type = "EvidenceVariable"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceVariable"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -441,10 +424,6 @@ class EvidenceVariable(DomainResource):
     characteristic: Optional[ListType[EvidenceVariableCharacteristic]] = Field(
         description="What defines the members of the evidence element",
         default=None,
-    )
-    resourceType: Literal["EvidenceVariable"] = Field(
-        description=None,
-        default="EvidenceVariable",
     )
 
     @model_validator(mode="after")

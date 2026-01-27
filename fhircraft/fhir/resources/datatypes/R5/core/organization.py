@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -37,8 +24,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Reference,
     BackboneElement,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class OrganizationQualification(BackboneElement):
@@ -76,12 +64,6 @@ class OrganizationQualification(BackboneElement):
                 "identifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -94,6 +76,10 @@ class Organization(DomainResource):
     """
     A formally or informally recognized grouping of people or organizations formed for the purpose of achieving some form of collective action.  Includes companies, institutions, corporations, departments, community groups, healthcare practice groups, payer/insurer, etc.
     """
+
+    _abstract = False
+    _type = "Organization"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Organization"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -203,10 +189,6 @@ class Organization(DomainResource):
     qualification: Optional[List[OrganizationQualification]] = Field(
         description="Qualifications, certifications, accreditations, licenses, training, etc. pertaining to the provision of care",
         default=None,
-    )
-    resourceType: Literal["Organization"] = Field(
-        description=None,
-        default="Organization",
     )
 
     @model_validator(mode="after")

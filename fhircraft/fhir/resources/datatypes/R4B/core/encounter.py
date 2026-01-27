@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, PositiveInt
 
@@ -23,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     BackboneElement,
@@ -32,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     CodeableConcept,
     Reference,
     Duration,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EncounterStatusHistory(BackboneElement):
@@ -62,8 +49,6 @@ class EncounterStatusHistory(BackboneElement):
             elements=(
                 "period",
                 "status",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -95,8 +80,6 @@ class EncounterClassHistory(BackboneElement):
             elements=(
                 "period",
                 "class_",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -133,10 +116,6 @@ class EncounterParticipant(BackboneElement):
                 "individual",
                 "period",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -178,10 +157,6 @@ class EncounterDiagnosis(BackboneElement):
                 "rank",
                 "use",
                 "condition",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -250,22 +225,6 @@ class EncounterHospitalization(BackboneElement):
                 "preAdmissionIdentifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -312,12 +271,6 @@ class EncounterLocation(BackboneElement):
                 "location",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -330,6 +283,10 @@ class Encounter(DomainResource):
     """
     An interaction between a patient and healthcare provider(s) for the purpose of providing healthcare service(s) or assessing the health status of a patient.
     """
+
+    _abstract = False
+    _type = "Encounter"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Encounter"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -476,10 +433,6 @@ class Encounter(DomainResource):
     partOf: Optional[Reference] = Field(
         description="Another Encounter this encounter is part of",
         default=None,
-    )
-    resourceType: Literal["Encounter"] = Field(
-        description=None,
-        default="Encounter",
     )
 
     @model_validator(mode="after")

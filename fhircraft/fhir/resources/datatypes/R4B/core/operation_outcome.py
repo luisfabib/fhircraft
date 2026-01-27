@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -23,12 +10,12 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     BackboneElement,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class OperationOutcomeIssue(BackboneElement):
@@ -99,16 +86,6 @@ class OperationOutcomeIssue(BackboneElement):
                 "severity",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -121,6 +98,10 @@ class OperationOutcome(DomainResource):
     """
     A collection of error, warning, or information messages that result from a system action.
     """
+
+    _abstract = False
+    _type = "OperationOutcome"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/OperationOutcome"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -174,10 +155,6 @@ class OperationOutcome(DomainResource):
     issue: Optional[ListType[OperationOutcomeIssue]] = Field(
         description="A single issue associated with the action",
         default=None,
-    )
-    resourceType: Literal["OperationOutcome"] = Field(
-        description=None,
-        default="OperationOutcome",
     )
 
     @model_validator(mode="after")

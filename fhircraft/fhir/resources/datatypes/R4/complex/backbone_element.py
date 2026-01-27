@@ -15,6 +15,7 @@ class BackboneElement(Element):
     """
 
     _fhir_release = "R4"
+    _type = "BackboneElement"
 
     modifierExtension: Optional[List[Extension]] = Field(
         description="Extensions that cannot be ignored even if unrecognized",

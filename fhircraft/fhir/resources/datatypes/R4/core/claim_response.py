@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -41,10 +27,11 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     BackboneElement,
     Money,
     Address,
-    Quantity,
     Attachment,
-    DomainResource,
+    Quantity,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ClaimResponseItemAdjudication(BackboneElement):
@@ -83,12 +70,6 @@ class ClaimResponseItemAdjudication(BackboneElement):
                 "amount",
                 "reason",
                 "category",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -137,12 +118,6 @@ class ClaimResponseItemDetailAdjudication(BackboneElement):
                 "category",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -187,10 +162,6 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
                 "adjudication",
                 "noteNumber",
                 "subDetailSequence",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -244,12 +215,6 @@ class ClaimResponseItemDetail(BackboneElement):
                 "detailSequence",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -299,12 +264,6 @@ class ClaimResponseItem(BackboneElement):
                 "adjudication",
                 "noteNumber",
                 "itemSequence",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -376,20 +335,6 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
                 "quantity",
                 "modifier",
                 "productOrService",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -466,22 +411,6 @@ class ClaimResponseAddItemDetail(BackboneElement):
                 "quantity",
                 "modifier",
                 "productOrService",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -649,36 +578,6 @@ class ClaimResponseAddItem(BackboneElement):
                 "itemSequence",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -726,8 +625,6 @@ class ClaimResponseTotal(BackboneElement):
             elements=(
                 "amount",
                 "category",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -786,16 +683,6 @@ class ClaimResponsePayment(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -850,12 +737,6 @@ class ClaimResponseProcessNote(BackboneElement):
                 "text",
                 "type",
                 "number",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -919,14 +800,6 @@ class ClaimResponseInsurance(BackboneElement):
                 "sequence",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -983,12 +856,6 @@ class ClaimResponseError(BackboneElement):
                 "itemSequence",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1001,6 +868,10 @@ class ClaimResponse(DomainResource):
     """
     This resource provides the adjudication details from the processing of a Claim resource.
     """
+
+    _abstract = False
+    _type = "ClaimResponse"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ClaimResponse"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -1188,10 +1059,6 @@ class ClaimResponse(DomainResource):
     error: Optional[ListType[ClaimResponseError]] = Field(
         description="Processing errors",
         default=None,
-    )
-    resourceType: Literal["ClaimResponse"] = Field(
-        description=None,
-        default="ClaimResponse",
     )
 
     @model_validator(mode="after")

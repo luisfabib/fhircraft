@@ -12,6 +12,8 @@ class ContactDetail(Element):
     Contact information
     """
 
+    _type = "ContactDetail"
+
     name: Optional[String] = Field(
         description="Name of an individual to contact",
         default=None,

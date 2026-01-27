@@ -1,18 +1,17 @@
-# Fhircraft modules
-from fhircraft.utils import model_rebuild_all
 from fhircraft.fhir.resources.datatypes.primitives import *
 import fhircraft.fhir.resources.validators as fhir_validators
 
-# Pydantic modules
 from pydantic import Field, model_validator
 
-# Standard modules
-from typing import Optional, Literal
+from typing import Optional
 
 NoneType = type(None)
 
 # Dynamic modules
-from typing import Optional, List as ListType, Literal
+from typing import Optional, List as ListType
+
+from .resource import Resource
+from .domain_resource import DomainResource
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -26,14 +25,12 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Period,
     BackboneElement,
-    DomainResource,
 )
 
 
@@ -63,8 +60,6 @@ class AccountCoverage(BackboneElement):
             elements=(
                 "priority",
                 "coverage",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -108,10 +103,6 @@ class AccountGuarantor(BackboneElement):
                 "party",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -124,6 +115,10 @@ class Account(DomainResource):
     """
     A financial tool for tracking value accrued for a particular purpose.  In the healthcare field, used to track charges for a patient, cost centers, etc.
     """
+
+    _abstract = False
+    _type = "Account"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Account"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -232,10 +227,6 @@ class Account(DomainResource):
     partOf: Optional[Reference] = Field(
         description="Reference to a parent Account",
         default=None,
-    )
-    resourceType: Literal["Account"] = Field(
-        description=None,
-        default="Account",
     )
 
     @model_validator(mode="after")

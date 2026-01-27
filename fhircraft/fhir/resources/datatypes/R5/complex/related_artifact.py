@@ -18,6 +18,8 @@ class RelatedArtifact(DataType):
     Related artifacts for a knowledge resource
     """
 
+    _type = "RelatedArtifact"
+
     type: Optional[Code] = Field(
         description="documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of | part-of | amends | amended-with | appends | appended-with | cites | cited-by | comments-on | comment-in | contains | contained-in | corrects | correction-in | replaces | replaced-with | retracts | retracted-by | signs | similar-to | supports | supported-with | transforms | transformed-into | transformed-with | documents | specification-of | created-with | cite-as",
         default=None,

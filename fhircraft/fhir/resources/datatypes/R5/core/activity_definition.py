@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -51,8 +38,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Dosage,
     Expression,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ActivityDefinitionParticipant(BackboneElement):
@@ -103,14 +91,6 @@ class ActivityDefinitionParticipant(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -147,8 +127,6 @@ class ActivityDefinitionDynamicValue(BackboneElement):
                 "path",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -161,6 +139,10 @@ class ActivityDefinition(DomainResource):
     """
     This resource allows for the definition of some activity to be performed, independent of a particular patient, practitioner, or other performance context.
     """
+
+    _abstract = False
+    _type = "ActivityDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ActivityDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -583,10 +565,6 @@ class ActivityDefinition(DomainResource):
     dynamicValue: Optional[List[ActivityDefinitionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
         default=None,
-    )
-    resourceType: Literal["ActivityDefinition"] = Field(
-        description=None,
-        default="ActivityDefinition",
     )
 
     @property

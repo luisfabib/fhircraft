@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -33,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -51,8 +37,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     DataRequirement,
     Age,
     Timing,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PlanDefinitionGoalTarget(BackboneElement):
@@ -95,8 +82,6 @@ class PlanDefinitionGoalTarget(BackboneElement):
             elements=(
                 "due",
                 "measure",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -164,18 +149,6 @@ class PlanDefinitionGoal(BackboneElement):
                 "category",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
@@ -210,8 +183,6 @@ class PlanDefinitionActionCondition(BackboneElement):
             elements=(
                 "expression",
                 "kind",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -270,8 +241,6 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
                 "actionId",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -317,8 +286,6 @@ class PlanDefinitionActionParticipant(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -353,8 +320,6 @@ class PlanDefinitionActionDynamicValue(BackboneElement):
             elements=(
                 "expression",
                 "path",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -643,52 +608,6 @@ class PlanDefinitionAction(BackboneElement):
                 "prefix",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -728,6 +647,10 @@ class PlanDefinition(DomainResource):
     """
     This resource allows for the definition of various types of plans as a sharable, consumable, and executable artifact. The resource is general enough to support the description of a broad range of clinical and non-clinical artifacts such as clinical decision support rules, order sets, protocols, and drug quality specifications.
     """
+
+    _abstract = False
+    _type = "PlanDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PlanDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -994,10 +917,6 @@ class PlanDefinition(DomainResource):
     action: Optional[ListType[PlanDefinitionAction]] = Field(
         description="Action defined by the plan",
         default=None,
-    )
-    resourceType: Literal["PlanDefinition"] = Field(
-        description=None,
-        default="PlanDefinition",
     )
 
     @property

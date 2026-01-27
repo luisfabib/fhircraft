@@ -14,6 +14,8 @@ class SampledData(Element):
     A series of measurements taken by a device
     """
 
+    _type = "SampledData"
+
     origin: Optional[Quantity] = Field(
         description="Zero value and units",
         default=None,

@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Instant
 
@@ -23,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -32,8 +18,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Attachment,
     Coding,
     Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DocumentReferenceRelatesTo(BackboneElement):
@@ -62,8 +49,6 @@ class DocumentReferenceRelatesTo(BackboneElement):
             elements=(
                 "target",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -95,8 +80,6 @@ class DocumentReferenceContent(BackboneElement):
             elements=(
                 "format",
                 "attachment",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -155,18 +138,6 @@ class DocumentReferenceContext(BackboneElement):
                 "encounter",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -179,6 +150,10 @@ class DocumentReference(DomainResource):
     """
     A reference to a document of any kind for any purpose. Provides metadata about the document so that the document can be discovered and managed. The scope of a document is any seralized object with a mime-type, so includes formal patient centric documents (CDA), cliical notes, scanned paper, and non-patient specific documents like policy text.
     """
+
+    _abstract = False
+    _type = "DocumentReference"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DocumentReference"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -312,10 +287,6 @@ class DocumentReference(DomainResource):
     context: Optional[DocumentReferenceContext] = Field(
         description="Clinical context of document",
         default=None,
-    )
-    resourceType: Literal["DocumentReference"] = Field(
-        description=None,
-        default="DocumentReference",
     )
 
     @model_validator(mode="after")

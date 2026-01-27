@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,8 +19,8 @@ from fhircraft.fhir.resources.datatypes.primitives import (
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
+    Reference,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
@@ -41,9 +28,9 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     CodeableConcept,
     BackboneElement,
     Coding,
-    Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class TestScriptOrigin(BackboneElement):
@@ -72,8 +59,6 @@ class TestScriptOrigin(BackboneElement):
             elements=(
                 "profile",
                 "index",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -110,8 +95,6 @@ class TestScriptDestination(BackboneElement):
             elements=(
                 "profile",
                 "index",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -153,8 +136,6 @@ class TestScriptMetadataLink(BackboneElement):
             elements=(
                 "description",
                 "url",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -248,18 +229,6 @@ class TestScriptMetadataCapability(BackboneElement):
                 "required",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -289,8 +258,6 @@ class TestScriptMetadata(BackboneElement):
             elements=(
                 "capability",
                 "link",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -337,10 +304,6 @@ class TestScriptFixture(BackboneElement):
                 "resource",
                 "autodelete",
                 "autocreate",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -442,63 +405,6 @@ class TestScriptVariable(BackboneElement):
                 "description",
                 "defaultValue",
                 "name",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
-class TestScriptSetupActionOperationRequestHeader(BackboneElement):
-    """
-    Header elements would be used to set HTTP headers.
-    """
-
-    field: Optional[String] = Field(
-        description="HTTP header field name",
-        default=None,
-    )
-    field_ext: Optional[Element] = Field(
-        description="Placeholder element for field extensions",
-        default=None,
-        alias="_field",
-    )
-    value: Optional[String] = Field(
-        description="HTTP headerfield value",
-        default=None,
-    )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "field",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -608,7 +514,7 @@ class TestScriptSetupActionOperation(BackboneElement):
         default=None,
         alias="_params",
     )
-    requestHeader: Optional[ListType[TestScriptSetupActionOperationRequestHeader]] = (
+    requestHeader: Optional[ListType["TestScriptSetupActionOperationRequestHeader"]] = (
         Field(
             description="Each operation can have one or more header elements",
             default=None,
@@ -682,38 +588,6 @@ class TestScriptSetupActionOperation(BackboneElement):
                 "label",
                 "resource",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -957,48 +831,6 @@ class TestScriptSetupActionAssert(BackboneElement):
                 "label",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1028,8 +860,6 @@ class TestScriptSetupAction(BackboneElement):
             elements=(
                 "assert_",
                 "operation",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -1152,8 +982,6 @@ class TestScriptSetupActionOperationRequestHeader(BackboneElement):
             elements=(
                 "value",
                 "field",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -1337,38 +1165,6 @@ class TestScriptTestActionOperation(BackboneElement):
                 "label",
                 "resource",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -1612,48 +1408,6 @@ class TestScriptTestActionAssert(BackboneElement):
                 "label",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1683,8 +1437,6 @@ class TestScriptTestAction(BackboneElement):
             elements=(
                 "assert_",
                 "operation",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -1777,10 +1529,6 @@ class TestScriptTest(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -1867,6 +1615,10 @@ class TestScript(DomainResource):
     """
     A structured set of tests against a FHIR server or client implementation to determine compliance against the FHIR specification.
     """
+
+    _abstract = False
+    _type = "TestScript"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/TestScript"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -2067,10 +1819,6 @@ class TestScript(DomainResource):
     teardown: Optional[TestScriptTeardown] = Field(
         description="A series of required clean up steps",
         default=None,
-    )
-    resourceType: Literal["TestScript"] = Field(
-        description=None,
-        default="TestScript",
     )
 
     @model_validator(mode="after")

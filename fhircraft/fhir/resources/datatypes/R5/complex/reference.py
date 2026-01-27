@@ -15,6 +15,8 @@ class Reference(DataType):
     A reference from one resource to another
     """
 
+    _type = "Reference"
+
     reference: Optional[String] = Field(
         description="Literal reference, Relative, internal or absolute URL",
         default=None,

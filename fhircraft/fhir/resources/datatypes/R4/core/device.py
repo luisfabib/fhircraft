@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,17 +16,17 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
     BackboneElement,
     CodeableConcept,
     Quantity,
-    ContactPoint,
     Annotation,
-    DomainResource,
+    ContactPoint,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceUdiCarrier(BackboneElement):
@@ -115,16 +102,6 @@ class DeviceUdiCarrier(BackboneElement):
                 "deviceIdentifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -166,8 +143,6 @@ class DeviceDeviceName(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -202,8 +177,6 @@ class DeviceSpecialization(BackboneElement):
             elements=(
                 "version",
                 "systemType",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -247,10 +220,6 @@ class DeviceVersion(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -287,10 +256,6 @@ class DeviceProperty(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -303,6 +268,10 @@ class Device(DomainResource):
     """
     A type of a manufactured item that is used in the provision of healthcare without being substantially changed through that activity. The device may be a medical or non-medical device.
     """
+
+    _abstract = False
+    _type = "Device"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Device"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -506,10 +475,6 @@ class Device(DomainResource):
     parent: Optional[Reference] = Field(
         description="The parent device",
         default=None,
-    )
-    resourceType: Literal["Device"] = Field(
-        description=None,
-        default="Device",
     )
 
     @model_validator(mode="after")

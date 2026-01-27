@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -39,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     CodeableReference,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class CommunicationRequestPayload(BackboneElement):
@@ -82,6 +70,10 @@ class CommunicationRequest(DomainResource):
     """
     A request to convey information; e.g. the CDS system proposes that an alert be sent to a responsible provider, the CDS system proposes that the public health agency be notified about a reportable condition.
     """
+
+    _abstract = False
+    _type = "CommunicationRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/CommunicationRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -253,10 +245,6 @@ class CommunicationRequest(DomainResource):
     note: Optional[List[Annotation]] = Field(
         description="Comments made about communication request",
         default=None,
-    )
-    resourceType: Literal["CommunicationRequest"] = Field(
-        description=None,
-        default="CommunicationRequest",
     )
 
     @property

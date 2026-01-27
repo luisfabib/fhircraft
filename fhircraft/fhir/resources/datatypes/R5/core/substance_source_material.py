@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -23,13 +11,13 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     CodeableConcept,
     Identifier,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubstanceSourceMaterialFractionDescription(BackboneElement):
@@ -58,8 +46,6 @@ class SubstanceSourceMaterialFractionDescription(BackboneElement):
             elements=(
                 "materialType",
                 "fraction",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -96,8 +82,6 @@ class SubstanceSourceMaterialOrganismAuthor(BackboneElement):
             elements=(
                 "authorDescription",
                 "authorType",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -166,14 +150,6 @@ class SubstanceSourceMaterialOrganismHybrid(BackboneElement):
                 "maternalOrganismId",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -213,12 +189,6 @@ class SubstanceSourceMaterialOrganismOrganismGeneral(BackboneElement):
                 "class_",
                 "phylum",
                 "kingdom",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -287,20 +257,6 @@ class SubstanceSourceMaterialOrganism(BackboneElement):
                 "family",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -332,8 +288,6 @@ class SubstanceSourceMaterialPartDescription(BackboneElement):
                 "part",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -346,6 +300,10 @@ class SubstanceSourceMaterial(DomainResource):
     """
     Source material shall capture information on the taxonomic and anatomical origins as well as the fraction of a material that can result in or can be modified to form a substance. This set of data elements shall be used to define polymer substances isolated from biological matrices. Taxonomic and anatomical origins shall be described using a controlled vocabulary as required. This information is captured for naturally derived polymers ( . starch) and structurally diverse substances. For Organisms belonging to the Kingdom Plantae the Substance level defines the fresh material of a single species or infraspecies, the Herbal Drug and the Herbal preparation. For Herbal preparations, the fraction information will be captured at the Substance information level and additional information for herbal extracts will be captured at the Specified Substance Group 1 information level. See for further explanation the Substance Class: Structurally Diverse and the herbal annex.
     """
+
+    _abstract = False
+    _type = "SubstanceSourceMaterial"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubstanceSourceMaterial"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -464,10 +422,6 @@ class SubstanceSourceMaterial(DomainResource):
     partDescription: Optional[List[SubstanceSourceMaterialPartDescription]] = Field(
         description="To do",
         default=None,
-    )
-    resourceType: Literal["SubstanceSourceMaterial"] = Field(
-        description=None,
-        default="SubstanceSourceMaterial",
     )
 
     @model_validator(mode="after")

@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -44,8 +30,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Age,
     Period,
     Timing,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class RequestGroupActionCondition(BackboneElement):
@@ -74,8 +61,6 @@ class RequestGroupActionCondition(BackboneElement):
             elements=(
                 "expression",
                 "kind",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -132,8 +117,6 @@ class RequestGroupActionRelatedAction(BackboneElement):
             elements=(
                 "relationship",
                 "actionId",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -342,40 +325,6 @@ class RequestGroupAction(BackboneElement):
                 "prefix",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -397,6 +346,10 @@ class RequestGroup(DomainResource):
     """
     A group of related requests that can be used to capture intended activities that have inter-dependencies such as "give this medication after that one".
     """
+
+    _abstract = False
+    _type = "RequestGroup"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/RequestGroup"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -548,10 +501,6 @@ class RequestGroup(DomainResource):
     action: Optional[ListType[RequestGroupAction]] = Field(
         description="Proposed actions, if any",
         default=None,
-    )
-    resourceType: Literal["RequestGroup"] = Field(
-        description=None,
-        default="RequestGroup",
     )
 
     @model_validator(mode="after")

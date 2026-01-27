@@ -52,6 +52,8 @@ class Extension(DataType):
     Optional Extensions Element
     """
 
+    _type = "Extension"
+
     url: Optional[String] = Field(
         description="identifies the meaning of the extension",
         default=None,

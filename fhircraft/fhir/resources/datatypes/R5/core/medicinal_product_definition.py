@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -44,8 +31,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     Quantity,
     Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicinalProductDefinitionContact(BackboneElement):
@@ -69,8 +57,6 @@ class MedicinalProductDefinitionContact(BackboneElement):
             elements=(
                 "contact",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -109,8 +95,6 @@ class MedicinalProductDefinitionNamePart(BackboneElement):
                 "part",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -145,10 +129,6 @@ class MedicinalProductDefinitionNameUsage(BackboneElement):
                 "language",
                 "jurisdiction",
                 "country",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -197,12 +177,6 @@ class MedicinalProductDefinitionName(BackboneElement):
                 "productName",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -232,8 +206,6 @@ class MedicinalProductDefinitionCrossReference(BackboneElement):
             elements=(
                 "type",
                 "product",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -275,12 +247,6 @@ class MedicinalProductDefinitionOperation(BackboneElement):
                 "organization",
                 "effectiveDate",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -393,6 +359,12 @@ class MedicinalProductDefinition(DomainResource):
     """
     Detailed definition of a medicinal product, typically for uses other than direct patient care (e.g. regulatory use, drug catalogs, to support prescribing, adverse events management etc.).
     """
+
+    _abstract = False
+    _type = "MedicinalProductDefinition"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition"
+    )
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -580,10 +552,6 @@ class MedicinalProductDefinition(DomainResource):
     characteristic: Optional[List[MedicinalProductDefinitionCharacteristic]] = Field(
         description='Key product features such as "sugar free", "modified release"',
         default=None,
-    )
-    resourceType: Literal["MedicinalProductDefinition"] = Field(
-        description=None,
-        default="MedicinalProductDefinition",
     )
 
     @model_validator(mode="after")

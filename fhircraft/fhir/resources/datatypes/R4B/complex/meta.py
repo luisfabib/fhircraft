@@ -12,6 +12,8 @@ class Meta(Element):
     Metadata about a resource
     """
 
+    _type = "Meta"
+
     versionId: Optional[Id] = Field(
         description="Version specific identifier",
         default=None,

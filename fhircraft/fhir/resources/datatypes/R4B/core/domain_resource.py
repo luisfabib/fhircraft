@@ -1,90 +1,40 @@
-# Fhircraft modules
+from typing import List, Optional
+
+from pydantic import Field, model_validator
+
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
-
-NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
-
-from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
-
+from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.datatypes.R4B.complex import (
-    Element,
-    Meta,
-    Narrative,
-    Resource,
     Extension,
+    Narrative,
 )
+from .resource import Resource
 
 
 class DomainResource(Resource):
     """
-    A resource that includes narrative, extensions, and contained resources.
+    A resource with narrative, extensions, and contained resources
     """
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/DomainResource"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
+    _abstract = True
+    _type = "DomainResource"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DomainResource"
+
     text: Optional[Narrative] = Field(
         description="Text summary of the resource, for human interpretation",
         default=None,
     )
-    contained: Optional[ListType[Resource]] = Field(
+    contained: Optional[List[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
     )
-    extension: Optional[ListType[Extension]] = Field(
+    extension: Optional[List[Extension]] = Field(
         description="Additional content defined by implementations",
         default=None,
     )
-    modifierExtension: Optional[ListType[Extension]] = Field(
+    modifierExtension: Optional[List[Extension]] = Field(
         description="Extensions that cannot be ignored",
         default=None,
-    )
-    resourceType: Literal["DomainResource"] = Field(
-        description=None,
-        default="DomainResource",
     )
 
     @model_validator(mode="after")

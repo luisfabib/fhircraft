@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -33,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     CodeableConcept,
     Period,
@@ -43,8 +30,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     Range,
     Ratio,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AuditEventOutcome(BackboneElement):
@@ -68,8 +56,6 @@ class AuditEventOutcome(BackboneElement):
             elements=(
                 "detail",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -167,18 +153,6 @@ class AuditEventAgent(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -222,10 +196,6 @@ class AuditEventSource(BackboneElement):
                 "type",
                 "observer",
                 "site",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -451,18 +421,6 @@ class AuditEventEntityAgent(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -528,16 +486,6 @@ class AuditEventEntity(BackboneElement):
                 "what",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -550,6 +498,10 @@ class AuditEvent(DomainResource):
     """
     A record of an event relevant for purposes such as operations, privacy, security, maintenance, and performance analysis.
     """
+
+    _abstract = False
+    _type = "AuditEvent"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/AuditEvent"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -679,10 +631,6 @@ class AuditEvent(DomainResource):
     entity: Optional[List[AuditEventEntity]] = Field(
         description="Data or objects used",
         default=None,
-    )
-    resourceType: Literal["AuditEvent"] = Field(
-        description=None,
-        default="AuditEvent",
     )
 
     @property

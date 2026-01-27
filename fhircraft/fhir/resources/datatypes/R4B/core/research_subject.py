@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code
 
@@ -23,19 +10,23 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Period,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ResearchSubject(DomainResource):
     """
     A physical entity which is the primary unit of operational and/or administrative interest in a study.
     """
+
+    _abstract = False
+    _type = "ResearchSubject"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchSubject"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -132,10 +123,6 @@ class ResearchSubject(DomainResource):
     consent: Optional[Reference] = Field(
         description="Agreement to participate in study",
         default=None,
-    )
-    resourceType: Literal["ResearchSubject"] = Field(
-        description=None,
-        default="ResearchSubject",
     )
 
     @model_validator(mode="after")

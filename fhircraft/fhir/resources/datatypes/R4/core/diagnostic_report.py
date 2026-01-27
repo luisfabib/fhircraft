@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,16 +16,16 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
+    Attachment,
     Reference,
     CodeableConcept,
     Period,
     BackboneElement,
-    Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DiagnosticReportMedia(BackboneElement):
@@ -69,8 +56,6 @@ class DiagnosticReportMedia(BackboneElement):
                 "comment",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -83,6 +68,10 @@ class DiagnosticReport(DomainResource):
     """
     The findings and interpretation of diagnostic  tests performed on patients, groups of patients, devices, and locations, and/or specimens derived from these. The report includes clinical context such as requesting and provider information, and some mix of atomic results, images, textual and coded interpretations, and formatted representation of diagnostic reports.
     """
+
+    _abstract = False
+    _type = "DiagnosticReport"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -228,10 +217,6 @@ class DiagnosticReport(DomainResource):
     presentedForm: Optional[ListType[Attachment]] = Field(
         description="Entire report as issued",
         default=None,
-    )
-    resourceType: Literal["DiagnosticReport"] = Field(
-        description=None,
-        default="DiagnosticReport",
     )
 
     @property

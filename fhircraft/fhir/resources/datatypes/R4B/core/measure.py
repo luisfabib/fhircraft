@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -43,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     RelatedArtifact,
     BackboneElement,
     Expression,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MeasureGroupPopulation(BackboneElement):
@@ -78,10 +65,6 @@ class MeasureGroupPopulation(BackboneElement):
                 "criteria",
                 "description",
                 "code",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -123,10 +106,6 @@ class MeasureGroupStratifierComponent(BackboneElement):
                 "criteria",
                 "description",
                 "code",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -175,12 +154,6 @@ class MeasureGroupStratifier(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
@@ -225,12 +198,6 @@ class MeasureGroup(BackboneElement):
                 "population",
                 "description",
                 "code",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -279,12 +246,6 @@ class MeasureSupplementalData(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -297,6 +258,10 @@ class Measure(DomainResource):
     """
     The Measure resource provides the definition of a quality measure.
     """
+
+    _abstract = False
+    _type = "Measure"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Measure"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -629,10 +594,6 @@ class Measure(DomainResource):
     supplementalData: Optional[ListType[MeasureSupplementalData]] = Field(
         description="What other data should be reported with the measure",
         default=None,
-    )
-    resourceType: Literal["Measure"] = Field(
-        description=None,
-        default="Measure",
     )
 
     @property

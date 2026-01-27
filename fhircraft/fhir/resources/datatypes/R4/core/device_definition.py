@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
@@ -23,19 +10,19 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     BackboneElement,
     Reference,
     CodeableConcept,
     ProductShelfLife,
+    Annotation,
     ProdCharacteristic,
     Quantity,
     ContactPoint,
-    Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
@@ -81,10 +68,6 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
                 "deviceIdentifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -124,8 +107,6 @@ class DeviceDefinitionDeviceName(BackboneElement):
             elements=(
                 "type",
                 "name",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -169,8 +150,6 @@ class DeviceDefinitionSpecialization(BackboneElement):
                 "systemType",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -200,8 +179,6 @@ class DeviceDefinitionCapability(BackboneElement):
             elements=(
                 "description",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -238,10 +215,6 @@ class DeviceDefinitionProperty(BackboneElement):
                 "valueCode",
                 "valueQuantity",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -290,10 +263,6 @@ class DeviceDefinitionMaterial(BackboneElement):
                 "substance",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -306,6 +275,10 @@ class DeviceDefinition(DomainResource):
     """
     The characteristics, operational status and capabilities of a medical-related component of a medical device.
     """
+
+    _abstract = False
+    _type = "DeviceDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -474,10 +447,6 @@ class DeviceDefinition(DomainResource):
     material: Optional[ListType[DeviceDefinitionMaterial]] = Field(
         description="A substance used to create the material(s) of which the device is made",
         default=None,
-    )
-    resourceType: Literal["DeviceDefinition"] = Field(
-        description=None,
-        default="DeviceDefinition",
     )
 
     @property

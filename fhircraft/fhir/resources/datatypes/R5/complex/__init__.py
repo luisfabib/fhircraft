@@ -37,8 +37,6 @@ from .money_quantity import MoneyQuantity
 from .simple_quantity import SimpleQuantity
 from .availability import Availability
 from .data_requirement import DataRequirement
-from .resource import Resource
-from .domain_resource import DomainResource
 from .expression import Expression
 from .human_name import HumanName
 from .marketing_status import MarketingStatus
@@ -90,7 +88,6 @@ __all__ = [
     "DataRequirement",
     "DataType",
     "Distance",
-    "DomainResource",
     "Dosage",
     "Duration",
     "Element",
@@ -125,7 +122,6 @@ __all__ = [
     "RatioRange",
     "Reference",
     "RelatedArtifact",
-    "Resource",
     "SampledData",
     "Signature",
     "SimpleQuantity",
@@ -167,7 +163,6 @@ MoneyQuantity.model_rebuild()
 SimpleQuantity.model_rebuild()
 Availability.model_rebuild()
 DataRequirement.model_rebuild()
-DomainResource.model_rebuild()
 Dosage.model_rebuild()
 Expression.model_rebuild()
 ExtendedContactDetail.model_rebuild()
@@ -181,7 +176,6 @@ Range.model_rebuild()
 Ratio.model_rebuild()
 RatioRange.model_rebuild()
 RelatedArtifact.model_rebuild()
-Resource.model_rebuild()
 SampledData.model_rebuild()
 Signature.model_rebuild()
 Timing.model_rebuild()

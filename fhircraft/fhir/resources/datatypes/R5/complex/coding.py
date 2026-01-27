@@ -12,6 +12,8 @@ class Coding(Element):
     A reference to a code defined by a terminology system
     """
 
+    _type = "Coding"
+
     system: Optional[Uri] = Field(
         description="Identity of the terminology system",
         default=None,

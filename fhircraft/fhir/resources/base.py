@@ -1,21 +1,25 @@
 from copy import copy
+import enum
 from functools import lru_cache
 import json
 import threading
 import warnings
-from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args
+from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args, Literal
 from typing_extensions import Self
 from xml.etree.ElementTree import Element as ET_Element, tostring, SubElement
 from xml.dom import minidom
-from pydantic.main import IncEx, ExtraValues
+from pydantic.main import IncEx
+from pydantic.config import ExtraValues
 from pydantic import (
     BaseModel,
     ConfigDict,
     ValidationError,
     PrivateAttr,
-    field_serializer,
+    model_validator,
     field_validator,
     model_serializer,
+    SerializerFunctionWrapHandler,
+    SerializationInfo,
 )
 from pydantic_core import PydanticUndefined
 
@@ -25,6 +29,15 @@ from fhircraft.utils import get_all_models_from_field
 
 # Thread-local context to track polymorphic operations to prevent recursion
 _polymorphic_context = threading.local()
+
+
+class FhirBaseModelKind(str, enum.Enum):
+    """Enumeration of StructureMap model modes."""
+
+    LOGICAL = "logical"
+    PRIMITIVE = "primitive"
+    COMPLEX_TYPE = "complex-type"
+    RESOURCE = "resource"
 
 
 def _get_polymorphic_deserialization_stack():
@@ -55,6 +68,14 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     )
     _fhir_release: ClassVar[str]
 
+    # Structureal metadata
+    _abstract: ClassVar[bool] = False
+    _kind: ClassVar[
+        FhirBaseModelKind | Literal["primitive", "complex-type", "resource", "logical"]
+    ] = "logical"
+    _type: ClassVar[str]
+    _canonical_url: ClassVar[str | None]
+
     # Configuration for polymorphic behavior
     _enable_polymorphic_serialization: ClassVar[bool] = True
     _enable_polymorphic_deserialization: ClassVar[bool] = True
@@ -65,16 +86,39 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     _resource: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
     _index: Union[int, None] = PrivateAttr(default=None)
 
+    @property
+    def _is_resource(self) -> bool:
+        """Check if this instance is a FHIR resource."""
+        return (
+            self._kind == FhirBaseModelKind.RESOURCE
+            or self._kind == FhirBaseModelKind.LOGICAL
+        )
+
     def model_post_init(self, context: Any) -> None:
         """Initialize model and set up parent tracking."""
         # After construction, propagate context to all nested fields
         self._set_resource_context()
 
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_resource_type(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "resourceType" in data:
+            if data["resourceType"] != cls._type:
+                raise ValueError(
+                    f"Invalid resourceType '{data['resourceType']}' for model '{cls.__name__}', expected '{cls._type}'."
+                )
+
+        elif isinstance(data, FHIRBaseModel):
+            if data._type != cls._type:
+                raise ValueError(
+                    f"Invalid resourceType '{data._type}' for model '{cls.__name__}', expected '{cls._type}'."
+                )
+        return data
+
     @field_validator("*", mode="before")
     @classmethod
     def _validate_polymorphic_fields(cls, value: Any, info) -> Any:
         """Apply polymorphic deserialization to FHIR fields during validation."""
-
         # Check if polymorphic deserialization is enabled
         if not cls._enable_polymorphic_deserialization:
             return value
@@ -121,7 +165,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return value
 
     @model_serializer(mode="wrap")
-    def _serialize_polymorphic_fields(self, serializer, info) -> Any:
+    def _serialize_polymorphic_fields(
+        self, serializer: SerializerFunctionWrapHandler, info: SerializationInfo
+    ) -> Any:
         """Apply polymorphic serialization to FHIR fields during serialization."""
         # Check if polymorphic serialization is enabled
         if (
@@ -166,6 +212,12 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                             data[field_name] = (
                                 self._serialize_fhir_field_polymorphically(value)
                             )
+            if (
+                self._is_resource
+                and hasattr(self, "_type")
+                and "resourceType" not in list(info.exclude or [])
+            ):
+                data["resourceType"] = self._type
 
             return data
         finally:
@@ -240,7 +292,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         Args:
             parent: The parent FHIRBaseModel instance (if this is a nested field)
             root: The root resource instance (top-level resource)
-            resource: The immediate parent resource instance (has resourceType)
+            resource: The immediate parent resource instance
             index: The index of this instance in a list (if applicable)
         """
         # Set parent
@@ -262,8 +314,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
         # Set resource: if this instance is a resource, it becomes the _resource
         # otherwise inherit from parent or explicit resource parameter
-        if hasattr(self, "resourceType"):
-            # This is a resource itself
+        if self._is_resource:
+            # This is a resource or logical model itself
             object.__setattr__(self, "_resource", self)
         elif resource is not None:
             # Explicit resource provided
@@ -292,9 +344,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             # Single FHIR model - set context
             # Determine resource: if self is a resource, use self; otherwise use self's _resource
             resource_context = (
-                self
-                if hasattr(self, "resourceType")
-                else getattr(self, "_resource", None)
+                self if self._is_resource else getattr(self, "_resource", None)
             )
             value._set_resource_context(
                 parent=self,
@@ -307,9 +357,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             if not isinstance(value, FHIRList):
                 # Replace the list with FHIRList
                 resource_context = (
-                    self
-                    if hasattr(self, "resourceType")
-                    else getattr(self, "_resource", None)
+                    self if self._is_resource else getattr(self, "_resource", None)
                 )
                 fhir_list = FHIRList(
                     value,
@@ -325,9 +373,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             else:
                 # Update context of existing FHIRList
                 resource_context = (
-                    self
-                    if hasattr(self, "resourceType")
-                    else getattr(self, "_resource", None)
+                    self if self._is_resource else getattr(self, "_resource", None)
                 )
                 value._parent = self
                 value._root = getattr(self, "_root_resource", self)
@@ -374,8 +420,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         register_namespace("", "http://hl7.org/fhir")
 
         # Determine the root element name BEFORE filtering (so exclude_defaults doesn't affect it)
-        if hasattr(self, "resourceType"):
-            root_name = self.resourceType
+        if self._is_resource:
+            root_name = self._type
         else:
             root_name = self.__class__.__name__
 
@@ -416,7 +462,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         return xml_str
 
     def _build_xml_element(
-        self, parent: ET_Element, data: Dict[str, Any], parent_name: str = None
+        self, parent: ET_Element, data: Dict[str, Any], parent_name: str | None = None
     ):
         """
         Recursively build XML elements from the data dictionary.
@@ -476,15 +522,16 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         # Handle different value types
         if isinstance(value, dict):
             # For resources in arrays (like contained), wrap in proper element
-            if "resourceType" in value and value["resourceType"]:
+            if isinstance(value, FHIRBaseModel) and value._is_resource:
                 # Create a child element with the resource type name
                 resource_elem = SubElement(
-                    field_elem, f'{{http://hl7.org/fhir}}{value["resourceType"]}'
+                    field_elem, f"{{http://hl7.org/fhir}}{value._type}"
                 )
-                self._build_xml_element(resource_elem, value, value["resourceType"])
+                self._build_xml_element(resource_elem, value, value._type)
             else:
                 # Complex type - build directly into field_elem
                 self._build_xml_element(field_elem, value, field_name)
+
         elif isinstance(value, (str, int, float, bool)):
             # Primitive type - use value attribute
             field_elem.set(
@@ -553,7 +600,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         )
 
         # Set up resource context for the root instance if it's a resource
-        if hasattr(instance, "resourceType"):
+        if instance._is_resource:
             instance._set_resource_context(
                 parent=None, root=instance, resource=instance
             )
@@ -583,7 +630,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         )
 
         # Set up resource context for the root instance if it's a resource
-        if hasattr(instance, "resourceType"):
+        if instance._is_resource:
             instance._set_resource_context(
                 parent=None, root=instance, resource=instance
             )
@@ -592,7 +639,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     @classmethod
     def model_validate_xml(
-        cls, xml_data: str, *, strict: bool = None, context: Any = None
+        cls, xml_data: str, *, strict: bool | None = None, context: Any = None
     ) -> Self:
         """
         Deserialize FHIR XML data into a model instance.
@@ -618,8 +665,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     @classmethod
     def _xml_element_to_dict(
-        cls, element: ET_Element, model_class: Type = None
-    ) -> Dict[str, Any]:
+        cls, element: ET_Element, model_class: Type | None = None
+    ) -> Any:
         """
         Convert an XML element tree to a dictionary structure.
 
@@ -637,10 +684,6 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
         # Start with an empty dict
         result = {}
-
-        # Add resourceType if this looks like a resource
-        if tag and tag[0].isupper():
-            result["resourceType"] = tag
 
         # Handle primitive value attribute
         if "value" in element.attrib:

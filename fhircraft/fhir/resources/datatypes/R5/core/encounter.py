@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -33,8 +20,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Period,
     VirtualServiceDetail,
     Duration,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class EncounterParticipant(BackboneElement):
@@ -63,10 +51,6 @@ class EncounterParticipant(BackboneElement):
                 "actor",
                 "period",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -100,8 +84,6 @@ class EncounterReason(BackboneElement):
                 "use",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -131,8 +113,6 @@ class EncounterDiagnosis(BackboneElement):
             elements=(
                 "use",
                 "condition",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -188,16 +168,6 @@ class EncounterAdmission(BackboneElement):
                 "preAdmissionIdentifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -244,12 +214,6 @@ class EncounterLocation(BackboneElement):
                 "location",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -262,6 +226,10 @@ class Encounter(DomainResource):
     """
     An interaction between healthcare provider(s), and/or patient(s) for the purpose of providing healthcare service(s) or assessing the health status of patient(s).
     """
+
+    _abstract = False
+    _type = "Encounter"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Encounter"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -438,10 +406,6 @@ class Encounter(DomainResource):
     location: Optional[List[EncounterLocation]] = Field(
         description="List of locations where the patient has been",
         default=None,
-    )
-    resourceType: Literal["Encounter"] = Field(
-        description=None,
-        default="Encounter",
     )
 
     @model_validator(mode="after")

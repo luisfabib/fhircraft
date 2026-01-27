@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,15 +10,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Period,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DetectedIssueEvidence(BackboneElement):
@@ -55,8 +42,6 @@ class DetectedIssueEvidence(BackboneElement):
             elements=(
                 "detail",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -100,10 +85,6 @@ class DetectedIssueMitigation(BackboneElement):
                 "action",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -116,6 +97,10 @@ class DetectedIssue(DomainResource):
     """
     Indicates an actual or potential clinical issue with or between one or more active or proposed clinical actions for a patient; e.g. Drug-drug interaction, Ineffective treatment frequency, Procedure-condition conflict, etc.
     """
+
+    _abstract = False
+    _type = "DetectedIssue"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DetectedIssue"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -242,10 +227,6 @@ class DetectedIssue(DomainResource):
     mitigation: Optional[ListType[DetectedIssueMitigation]] = Field(
         description="Step taken to address",
         default=None,
-    )
-    resourceType: Literal["DetectedIssue"] = Field(
-        description=None,
-        default="DetectedIssue",
     )
 
     @property

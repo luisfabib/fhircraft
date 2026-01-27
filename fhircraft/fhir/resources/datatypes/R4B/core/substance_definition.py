@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -41,8 +27,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Quantity,
     Attachment,
     Ratio,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubstanceDefinitionMoiety(BackboneElement):
@@ -121,18 +108,6 @@ class SubstanceDefinitionMoiety(BackboneElement):
                 "name",
                 "identifier",
                 "role",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -252,10 +227,6 @@ class SubstanceDefinitionMolecularWeight(BackboneElement):
                 "method",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -290,10 +261,6 @@ class SubstanceDefinitionStructureMolecularWeight(BackboneElement):
                 "amount",
                 "type",
                 "method",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -340,12 +307,6 @@ class SubstanceDefinitionStructureRepresentation(BackboneElement):
                 "format",
                 "representation",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -421,20 +382,6 @@ class SubstanceDefinitionStructure(BackboneElement):
                 "stereochemistry",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
@@ -486,14 +433,6 @@ class SubstanceDefinitionCode(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -533,10 +472,6 @@ class SubstanceDefinitionNameOfficial(BackboneElement):
                 "date",
                 "status",
                 "authority",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -623,26 +558,6 @@ class SubstanceDefinitionName(BackboneElement):
                 "status",
                 "type",
                 "name",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -735,14 +650,6 @@ class SubstanceDefinitionRelationship(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -807,14 +714,6 @@ class SubstanceDefinitionSourceMaterial(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -827,6 +726,10 @@ class SubstanceDefinition(DomainResource):
     """
     The detailed description of a substance, typically at a level beyond what is used for prescribing.
     """
+
+    _abstract = False
+    _type = "SubstanceDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubstanceDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -962,10 +865,6 @@ class SubstanceDefinition(DomainResource):
     sourceMaterial: Optional[SubstanceDefinitionSourceMaterial] = Field(
         description="Material or taxonomic/anatomical source",
         default=None,
-    )
-    resourceType: Literal["SubstanceDefinition"] = Field(
-        description=None,
-        default="SubstanceDefinition",
     )
 
     @model_validator(mode="after")

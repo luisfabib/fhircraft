@@ -16,6 +16,10 @@ class Element(Base):
     Base for all elements
     """
 
+    _abstract = False
+    _kind = "complex-type"
+    _type = "Element"
+
     id: Optional[String] = Field(
         description="Unique id for inter-element referencing",
         default=None,

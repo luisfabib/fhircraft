@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -43,8 +30,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Annotation,
     BackboneElement,
     Coding,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class AppointmentParticipant(BackboneElement):
@@ -93,14 +81,6 @@ class AppointmentParticipant(BackboneElement):
                 "actor",
                 "period",
                 "type",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -204,20 +184,6 @@ class AppointmentRecurrenceTemplateWeeklyTemplate(BackboneElement):
                 "monday",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -267,12 +233,6 @@ class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
                 "dayOfWeek",
                 "nthWeekOfMonth",
                 "dayOfMonth",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -402,24 +362,6 @@ class AppointmentRecurrenceTemplate(BackboneElement):
                 "timezone",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -432,6 +374,10 @@ class Appointment(DomainResource):
     """
     A booking of a healthcare event among patient(s), practitioner(s), related person(s) and/or device(s) for a specific date/time. This may result in one or more Encounter(s).
     """
+
+    _abstract = False
+    _type = "Appointment"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Appointment"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -654,10 +600,6 @@ class Appointment(DomainResource):
     recurrenceTemplate: Optional[List[AppointmentRecurrenceTemplate]] = Field(
         description="Details of the recurrence pattern/template used to generate occurrences",
         default=None,
-    )
-    resourceType: Literal["Appointment"] = Field(
-        description=None,
-        default="Appointment",
     )
 
     @model_validator(mode="after")

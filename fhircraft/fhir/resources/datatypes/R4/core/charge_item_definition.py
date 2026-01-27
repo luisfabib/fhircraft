@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -33,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
@@ -43,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Reference,
     BackboneElement,
     Money,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ChargeItemDefinitionApplicability(BackboneElement):
@@ -88,10 +75,6 @@ class ChargeItemDefinitionApplicability(BackboneElement):
                 "expression",
                 "language",
                 "description",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -145,10 +128,6 @@ class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
                 "description",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -200,12 +179,6 @@ class ChargeItemDefinitionPropertyGroupPriceComponent(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -241,8 +214,6 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
                 "applicability",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -255,6 +226,10 @@ class ChargeItemDefinition(DomainResource):
     """
     The ChargeItemDefinition resource provides the properties that apply to the (billing) codes necessary to calculate costs and prices. The properties may differ largely depending on type and realm, therefore this resource gives only a rough structure and requires profiling for each type of billing code system.
     """
+
+    _abstract = False
+    _type = "ChargeItemDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -466,10 +441,6 @@ class ChargeItemDefinition(DomainResource):
     propertyGroup: Optional[ListType[ChargeItemDefinitionPropertyGroup]] = Field(
         description="Group of properties which are applicable under the same conditions",
         default=None,
-    )
-    resourceType: Literal["ChargeItemDefinition"] = Field(
-        description=None,
-        default="ChargeItemDefinition",
     )
 
     @model_validator(mode="after")

@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -33,8 +20,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     CodeableReference,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class DeviceUsageAdherence(BackboneElement):
@@ -60,8 +48,6 @@ class DeviceUsageAdherence(BackboneElement):
                 "code",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -74,6 +60,10 @@ class DeviceUsage(DomainResource):
     """
     A record of a device being used by a patient where the record is the result of a report from the patient or a clinician.
     """
+
+    _abstract = False
+    _type = "DeviceUsage"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceUsage"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -214,10 +204,6 @@ class DeviceUsage(DomainResource):
     note: Optional[List[Annotation]] = Field(
         description="Addition details (comments, instructions)",
         default=None,
-    )
-    resourceType: Literal["DeviceUsage"] = Field(
-        description=None,
-        default="DeviceUsage",
     )
 
     @property

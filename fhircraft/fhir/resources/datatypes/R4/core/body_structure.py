@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
@@ -23,20 +10,24 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Attachment,
     Reference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class BodyStructure(DomainResource):
     """
     Record details about an anatomical structure.  This resource may be used when a coded concept does not provide the necessary detail needed for the use case.
     """
+
+    _abstract = False
+    _type = "BodyStructure"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/BodyStructure"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -128,10 +119,6 @@ class BodyStructure(DomainResource):
     patient: Optional[Reference] = Field(
         description="Who this is about",
         default=None,
-    )
-    resourceType: Literal["BodyStructure"] = Field(
-        description=None,
-        default="BodyStructure",
     )
 
     @model_validator(mode="after")

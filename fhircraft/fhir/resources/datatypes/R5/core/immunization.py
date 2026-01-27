@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -39,8 +26,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Quantity,
     BackboneElement,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ImmunizationPerformer(BackboneElement):
@@ -64,8 +52,6 @@ class ImmunizationPerformer(BackboneElement):
             elements=(
                 "actor",
                 "function",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -97,8 +83,6 @@ class ImmunizationProgramEligibility(BackboneElement):
             elements=(
                 "programStatus",
                 "program",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -145,10 +129,6 @@ class ImmunizationReaction(BackboneElement):
                 "reported",
                 "manifestation",
                 "date",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -212,14 +192,6 @@ class ImmunizationProtocolApplied(BackboneElement):
                 "series",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -232,6 +204,10 @@ class Immunization(DomainResource):
     """
     Describes the event of a patient being administered a vaccine or a record of an immunization as reported by a patient, a clinician or another party.
     """
+
+    _abstract = False
+    _type = "Immunization"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Immunization"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -432,10 +408,6 @@ class Immunization(DomainResource):
     protocolApplied: Optional[List[ImmunizationProtocolApplied]] = Field(
         description="Protocol followed by the provider",
         default=None,
-    )
-    resourceType: Literal["Immunization"] = Field(
-        description=None,
-        default="Immunization",
     )
 
     @property

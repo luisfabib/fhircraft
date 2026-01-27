@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
@@ -41,8 +28,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     BackboneElement,
     ElementDefinition,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class StructureDefinitionMapping(BackboneElement):
@@ -98,12 +86,6 @@ class StructureDefinitionMapping(BackboneElement):
                 "identity",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -143,8 +125,6 @@ class StructureDefinitionContext(BackboneElement):
             elements=(
                 "expression",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -233,6 +213,10 @@ class StructureDefinition(DomainResource):
     """
     A definition of a FHIR structure. This resource is used to describe the underlying resources, data types defined in FHIR, and also for describing extensions and constraints on resources and data types.
     """
+
+    _abstract = False
+    _type = "StructureDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -502,10 +486,6 @@ class StructureDefinition(DomainResource):
     differential: Optional[StructureDefinitionDifferential] = Field(
         description="Differential view of the structure",
         default=None,
-    )
-    resourceType: Literal["StructureDefinition"] = Field(
-        description=None,
-        default="StructureDefinition",
     )
 
     @property

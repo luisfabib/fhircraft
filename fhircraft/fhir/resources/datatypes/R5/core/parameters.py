@@ -76,13 +76,14 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     RatioRange,
     Reference,
     RelatedArtifact,
-    Resource,
     SampledData,
     Signature,
     Timing,
     TriggerDefinition,
     UsageContext,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ParametersParameter(BackboneElement):
@@ -435,8 +436,6 @@ class ParametersParameter(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -513,6 +512,8 @@ class Parameters(Resource):
     """
     This resource is used to pass information into and back from an operation (whether invoked directly from REST or within a messaging environment).  It is not persisted or allowed to be referenced by other resources except as described in the definition of the Parameters resource.
     """
+    _type = "Parameters"
+
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -551,11 +552,6 @@ class Parameters(Resource):
         description="Operation Parameter",
         default=None,
     )
-    resourceType: Literal["Parameters"] = Field(
-        description=None,
-        default="Parameters",
-    )
-
     @model_validator(mode="after")
     def FHIR_ele_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(

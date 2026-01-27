@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, DateTime
 
@@ -23,7 +10,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -31,8 +17,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Period,
     Annotation,
     Dosage,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationStatement(DomainResource):
@@ -41,6 +28,10 @@ class MedicationStatement(DomainResource):
 
     The primary difference between a medication statement and a medication administration is that the medication administration has complete administration information and is based on actual administration information from the person who administered the medication.  A medication statement is often, if not always, less specific.  There is no required date/time when the medication was administered, in fact we only know that a source has reported the patient is taking this medication, where details such as time, quantity, or rate or even medication product may be incomplete or missing or less precise.  As stated earlier, the medication statement information may come from the patient's memory, from a prescription bottle or from a list of medications the patient, clinician or other party maintains.  Medication administration is more formal and is not missing detailed information.
     """
+
+    _abstract = False
+    _type = "MedicationStatement"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationStatement"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -181,10 +172,6 @@ class MedicationStatement(DomainResource):
     dosage: Optional[ListType[Dosage]] = Field(
         description="Details of how medication is/was taken or should be taken",
         default=None,
-    )
-    resourceType: Literal["MedicationStatement"] = Field(
-        description=None,
-        default="MedicationStatement",
     )
 
     @property

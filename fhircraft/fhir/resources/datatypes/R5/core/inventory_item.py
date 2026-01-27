@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +20,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -45,8 +32,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Annotation,
     Address,
     Duration,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class InventoryItemName(BackboneElement):
@@ -87,10 +75,6 @@ class InventoryItemName(BackboneElement):
                 "nameType",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -120,8 +104,6 @@ class InventoryItemResponsibleOrganization(BackboneElement):
             elements=(
                 "organization",
                 "role",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -165,8 +147,6 @@ class InventoryItemDescription(BackboneElement):
                 "language",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -201,10 +181,6 @@ class InventoryItemAssociation(BackboneElement):
                 "quantity",
                 "relatedItem",
                 "associationType",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -401,14 +377,6 @@ class InventoryItemInstance(BackboneElement):
                 "identifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -421,6 +389,10 @@ class InventoryItem(DomainResource):
     """
     functional description of an inventory item used in inventory and supply-related workflows.
     """
+
+    _abstract = False
+    _type = "InventoryItem"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/InventoryItem"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -533,10 +505,6 @@ class InventoryItem(DomainResource):
     productReference: Optional[Reference] = Field(
         description="Link to a product resource used in clinical workflows",
         default=None,
-    )
-    resourceType: Literal["InventoryItem"] = Field(
-        description=None,
-        default="InventoryItem",
     )
 
     @model_validator(mode="after")

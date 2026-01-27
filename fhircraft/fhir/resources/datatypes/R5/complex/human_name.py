@@ -12,6 +12,8 @@ class HumanName(DataType):
     Name of a human or other living entity - parts and usage
     """
 
+    _type = "HumanName"
+
     use: Optional[Code] = Field(
         description="usual | official | temp | nickname | anonymous | old | maiden",
         default=None,

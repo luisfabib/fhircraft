@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +16,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -37,8 +23,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     Quantity,
     Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ManufacturedItemDefinitionProperty(BackboneElement):
@@ -117,6 +104,12 @@ class ManufacturedItemDefinition(DomainResource):
     """
     The definition and characteristics of a medicinal manufactured item, such as a tablet or capsule, as contained in a packaged medicinal product.
     """
+
+    _abstract = False
+    _type = "ManufacturedItemDefinition"
+    _canonical_url = (
+        "http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition"
+    )
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -201,10 +194,6 @@ class ManufacturedItemDefinition(DomainResource):
     property_: Optional[ListType[ManufacturedItemDefinitionProperty]] = Field(
         description="General characteristics of this item",
         default=None,
-    )
-    resourceType: Literal["ManufacturedItemDefinition"] = Field(
-        description=None,
-        default="ManufacturedItemDefinition",
     )
 
     @model_validator(mode="after")

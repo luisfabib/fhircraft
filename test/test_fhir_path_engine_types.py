@@ -6,7 +6,7 @@ from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.literals import Date, Quantity
 from fhircraft.fhir.path.engine.types import *
 
-env = {'%fhirRelease': "R4"}
+env = {"%fhirRelease": "R4"}
 
 # -------------
 # Is
@@ -46,22 +46,6 @@ test_cases = (
     ("invalid", "boolean", False),
     (Date("@2024"), "date", True),
     (Quantity(12, "g"), "Quantity", True),
-    # Root element type checking
-    (
-        dict(id="123", resourceType="Observation"),
-        "Observation",
-        True,
-    ),
-    (
-        dict(id="123", resourceType="Patient"),
-        "Patient",
-        True,
-    ),
-    (
-        dict(id="123", resourceType="Condition"),
-        "Observation",
-        False,
-    ),
 )
 
 

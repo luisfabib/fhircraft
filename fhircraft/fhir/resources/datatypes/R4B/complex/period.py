@@ -12,6 +12,8 @@ class Period(Element):
     Time range defined by start and end date/time
     """
 
+    _type = "Period"
+
     start: Optional[DateTime] = Field(
         description="Starting time with inclusive boundary",
         default=None,

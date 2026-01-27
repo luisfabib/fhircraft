@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -46,8 +33,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Duration,
     Ratio,
     Attachment,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
@@ -71,8 +59,6 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
             elements=(
                 "reference",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -104,8 +90,6 @@ class MedicationKnowledgeMonograph(BackboneElement):
             elements=(
                 "source",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -164,10 +148,6 @@ class MedicationKnowledgeCost(BackboneElement):
                 "effectiveDate",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -213,8 +193,6 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -244,8 +222,6 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage(BackboneElemen
             elements=(
                 "dosage",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -349,12 +325,6 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline(BackboneElement):
                 "treatmentIntent",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -386,8 +356,6 @@ class MedicationKnowledgeIndicationGuideline(BackboneElement):
             elements=(
                 "dosingGuideline",
                 "indication",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -444,8 +412,6 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
             elements=(
                 "classification",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -513,10 +479,6 @@ class MedicationKnowledgePackagingCost(BackboneElement):
                 "effectiveDate",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -555,8 +517,6 @@ class MedicationKnowledgePackaging(BackboneElement):
             elements=(
                 "packagedProduct",
                 "cost",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -661,12 +621,6 @@ class MedicationKnowledgeStorageGuideline(BackboneElement):
                 "reference",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -703,8 +657,6 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
                 "type",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -734,8 +686,6 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
             elements=(
                 "period",
                 "quantity",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -777,12 +727,6 @@ class MedicationKnowledgeRegulatory(BackboneElement):
                 "schedule",
                 "substitution",
                 "regulatoryAuthority",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -833,8 +777,6 @@ class MedicationKnowledgeDefinitionalIngredient(BackboneElement):
             elements=(
                 "type",
                 "item",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -966,14 +908,6 @@ class MedicationKnowledgeDefinitional(BackboneElement):
                 "definition",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -986,6 +920,10 @@ class MedicationKnowledge(DomainResource):
     """
     Information about a medication that is used to support knowledge.
     """
+
+    _abstract = False
+    _type = "MedicationKnowledge"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationKnowledge"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -1134,10 +1072,6 @@ class MedicationKnowledge(DomainResource):
     definitional: Optional[MedicationKnowledgeDefinitional] = Field(
         description="Minimal definition information about the medication",
         default=None,
-    )
-    resourceType: Literal["MedicationKnowledge"] = Field(
-        description=None,
-        default="MedicationKnowledge",
     )
 
     @model_validator(mode="after")

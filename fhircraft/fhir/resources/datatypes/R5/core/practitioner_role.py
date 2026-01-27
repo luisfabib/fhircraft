@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import String, Uri, Code, Boolean
 
@@ -23,7 +11,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Period,
@@ -31,14 +18,19 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableConcept,
     ExtendedContactDetail,
     Availability,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PractitionerRole(DomainResource):
     """
     A specific set of Roles/Locations/specialties/services that a practitioner may perform, or has performed at an organization during a period of time.
     """
+
+    _abstract = False
+    _type = "PractitionerRole"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PractitionerRole"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -149,10 +141,6 @@ class PractitionerRole(DomainResource):
     endpoint: Optional[List[Reference]] = Field(
         description="Endpoints for interacting with the practitioner in this role",
         default=None,
-    )
-    resourceType: Literal["PractitionerRole"] = Field(
-        description=None,
-        default="PractitionerRole",
     )
 
     @model_validator(mode="after")

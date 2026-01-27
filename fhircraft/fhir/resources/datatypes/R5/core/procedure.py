@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,7 +18,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Reference,
@@ -42,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneElement,
     CodeableReference,
     Annotation,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ProcedurePerformer(BackboneElement):
@@ -79,12 +67,6 @@ class ProcedurePerformer(BackboneElement):
                 "function",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -116,8 +98,6 @@ class ProcedureFocalDevice(BackboneElement):
                 "action",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -130,6 +110,10 @@ class Procedure(DomainResource):
     """
     An action that is or was performed on or for a patient, practitioner, device, organization, or location. For example, this can be a physical intervention on a patient like an operation, or less invasive like long term services, counseling, or hypnotherapy.  This can be a quality or safety inspection for a location, organization, or device.  This can be an accreditation procedure on a practitioner for licensing.
     """
+
+    _abstract = False
+    _type = "Procedure"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/Procedure"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -350,10 +334,6 @@ class Procedure(DomainResource):
     supportingInfo: Optional[List[Reference]] = Field(
         description="Extra information relevant to the procedure",
         default=None,
-    )
-    resourceType: Literal["Procedure"] = Field(
-        description=None,
-        default="Procedure",
     )
 
     @property

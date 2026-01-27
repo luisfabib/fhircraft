@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,7 +17,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -38,8 +25,9 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Expression,
     Range,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ClinicalUseDefinitionContraindicationOtherTherapy(BackboneElement):
@@ -63,8 +51,6 @@ class ClinicalUseDefinitionContraindicationOtherTherapy(BackboneElement):
             elements=(
                 "treatment",
                 "relationshipType",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -120,16 +106,6 @@ class ClinicalUseDefinitionContraindication(BackboneElement):
                 "diseaseSymptomProcedure",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -159,8 +135,6 @@ class ClinicalUseDefinitionIndicationOtherTherapy(BackboneElement):
             elements=(
                 "treatment",
                 "relationshipType",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -237,18 +211,6 @@ class ClinicalUseDefinitionIndication(BackboneElement):
                 "comorbidity",
                 "diseaseStatus",
                 "diseaseSymptomProcedure",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -337,14 +299,6 @@ class ClinicalUseDefinitionInteraction(BackboneElement):
                 "interactant",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -379,10 +333,6 @@ class ClinicalUseDefinitionUndesirableEffect(BackboneElement):
                 "frequencyOfOccurrence",
                 "classification",
                 "symptomConditionEffect",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -421,8 +371,6 @@ class ClinicalUseDefinitionWarning(BackboneElement):
                 "description",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -435,6 +383,10 @@ class ClinicalUseDefinition(DomainResource):
     """
     A single issue - either an indication, contraindication, interaction or an undesirable effect for a medicinal product, medication, device or procedure.
     """
+
+    _abstract = False
+    _type = "ClinicalUseDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -542,10 +494,6 @@ class ClinicalUseDefinition(DomainResource):
     warning: Optional[ClinicalUseDefinitionWarning] = Field(
         description="Critical environmental, health or physical risks or hazards. For example \u0027Do not operate heavy machinery\u0027, \u0027May cause drowsiness\u0027",
         default=None,
-    )
-    resourceType: Literal["ClinicalUseDefinition"] = Field(
-        description=None,
-        default="ClinicalUseDefinition",
     )
 
     @model_validator(mode="after")

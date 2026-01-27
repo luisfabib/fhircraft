@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,15 +18,15 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     ContactDetail,
     UsageContext,
     CodeableConcept,
     BackboneElement,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ExampleScenarioActor(BackboneElement):
@@ -95,12 +82,6 @@ class ExampleScenarioActor(BackboneElement):
                 "actorId",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -140,8 +121,6 @@ class ExampleScenarioInstanceVersion(BackboneElement):
             elements=(
                 "description",
                 "versionId",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -185,8 +164,6 @@ class ExampleScenarioInstanceContainedInstance(BackboneElement):
                 "resourceId",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -208,10 +185,6 @@ class ExampleScenarioInstance(BackboneElement):
         description="Placeholder element for resourceId extensions",
         default=None,
         alias="_resourceId",
-    )
-    resourceType: Optional[Code] = Field(
-        description="The type of the resource",
-        default=None,
     )
     resourceType_ext: Optional[Element] = Field(
         description="Placeholder element for resourceType extensions",
@@ -260,16 +233,6 @@ class ExampleScenarioInstance(BackboneElement):
                 "resourceId",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
@@ -309,8 +272,6 @@ class ExampleScenarioProcessStepOperationRequest(BackboneElement):
             elements=(
                 "versionId",
                 "resourceId",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -424,24 +385,6 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
                 "number",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -488,10 +431,6 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
                 "title",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -536,12 +475,6 @@ class ExampleScenarioProcessStep(BackboneElement):
                 "operation",
                 "pause",
                 "process",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -610,14 +543,6 @@ class ExampleScenarioProcess(BackboneElement):
                 "title",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
             human="All FHIR elements must have a @value or children unless an empty Parameters resource",
@@ -630,6 +555,10 @@ class ExampleScenario(DomainResource):
     """
     Example of workflow instance.
     """
+
+    _abstract = False
+    _type = "ExampleScenario"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExampleScenario"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -797,10 +726,6 @@ class ExampleScenario(DomainResource):
         description="Placeholder element for workflow extensions",
         default=None,
         alias="_workflow",
-    )
-    resourceType: Literal["ExampleScenario"] = Field(
-        description=None,
-        default="ExampleScenario",
     )
 
     @model_validator(mode="after")

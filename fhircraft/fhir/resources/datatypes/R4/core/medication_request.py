@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -31,19 +18,19 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
     Reference,
     Annotation,
+    Period,
     Dosage,
     BackboneElement,
     Quantity,
     Duration,
-    Period,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MedicationRequestDispenseRequestInitialFill(BackboneElement):
@@ -67,8 +54,6 @@ class MedicationRequestDispenseRequestInitialFill(BackboneElement):
             elements=(
                 "duration",
                 "quantity",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -130,18 +115,6 @@ class MedicationRequestDispenseRequest(BackboneElement):
                 "validityPeriod",
                 "dispenseInterval",
                 "initialFill",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -211,6 +184,10 @@ class MedicationRequest(DomainResource):
     """
     An order or request for both supply of the medication and the instructions for administration of the medication to a patient. The resource is called "MedicationRequest" rather than "MedicationPrescription" or "MedicationOrder" to generalize the use across inpatient and outpatient settings, including care plans, etc., and to harmonize with workflow patterns.
     """
+
+    _abstract = False
+    _type = "MedicationRequest"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -436,10 +413,6 @@ class MedicationRequest(DomainResource):
     eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of events of interest in the lifecycle",
         default=None,
-    )
-    resourceType: Literal["MedicationRequest"] = Field(
-        description=None,
-        default="MedicationRequest",
     )
 
     @property

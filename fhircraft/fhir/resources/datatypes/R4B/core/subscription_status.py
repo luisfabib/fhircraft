@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -29,13 +16,13 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     BackboneElement,
     Reference,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class SubscriptionStatusNotificationEvent(BackboneElement):
@@ -81,12 +68,6 @@ class SubscriptionStatusNotificationEvent(BackboneElement):
                 "eventNumber",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -99,6 +80,10 @@ class SubscriptionStatus(DomainResource):
     """
     The SubscriptionStatus resource describes the state of a Subscription during notifications.
     """
+
+    _abstract = False
+    _type = "SubscriptionStatus"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubscriptionStatus"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -196,10 +181,6 @@ class SubscriptionStatus(DomainResource):
     error: Optional[ListType[CodeableConcept]] = Field(
         description="List of errors on the subscription",
         default=None,
-    )
-    resourceType: Literal["SubscriptionStatus"] = Field(
-        description=None,
-        default="SubscriptionStatus",
     )
 
     @model_validator(mode="after")

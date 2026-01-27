@@ -92,7 +92,6 @@ from .medicinal_product_pharmaceutical import *
 from .medicinal_product_undesirable_effect import *
 from .message_definition import *
 from .message_header import *
-from .metadata_resource import *
 from .molecular_sequence import *
 from .naming_system import *
 from .nutrition_order import *

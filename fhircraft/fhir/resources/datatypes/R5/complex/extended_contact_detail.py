@@ -20,6 +20,8 @@ class ExtendedContactDetail(DataType):
     Contact information
     """
 
+    _type = "ExtendedContactDetail"
+
     purpose: Optional[CodeableConcept] = Field(
         description="The type of contact",
         default=None,

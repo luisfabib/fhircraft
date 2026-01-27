@@ -15,6 +15,8 @@ class Element(FHIRBaseModel):
     Base for all elements
     """
 
+    _type = "Element"
+    _kind = "complex-type"
     _fhir_release = "R4B"
 
     id: Optional[String] = Field(

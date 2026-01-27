@@ -17,6 +17,8 @@ class MonetaryComponent(DataType):
     Availability data for an {item}
     """
 
+    _type = "MonetaryComponent"
+
     type: Optional[Code] = Field(
         description="base | surcharge | deduction | discount | tax | informational",
         default=None,

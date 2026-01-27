@@ -1,21 +1,9 @@
-# Fhircraft modules
-import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List
 
 NoneType = type(None)
 
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List, Literal
+import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,21 +20,25 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     Coding,
     ContactDetail,
     UsageContext,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class ActorDefinition(DomainResource):
     """
     The ActorDefinition resource is used to describe an actor - a human or an application that plays a role in data exchange, and that may have obligations associated with the role the actor plays.
     """
+
+    _abstract = False
+    _type = "ActorDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/ActorDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -278,10 +270,6 @@ class ActorDefinition(DomainResource):
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",
-    )
-    resourceType: Literal["ActorDefinition"] = Field(
-        description=None,
-        default="ActorDefinition",
     )
 
     @property

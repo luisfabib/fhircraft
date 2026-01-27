@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -30,15 +17,15 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Coding,
     BackboneElement,
     Reference,
     ContactPoint,
     CodeableConcept,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class MessageHeaderDestination(BackboneElement):
@@ -82,12 +69,6 @@ class MessageHeaderDestination(BackboneElement):
                 "endpoint",
                 "target",
                 "name",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -156,14 +137,6 @@ class MessageHeaderSource(BackboneElement):
                 "name",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -210,10 +183,6 @@ class MessageHeaderResponse(BackboneElement):
                 "identifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -226,6 +195,10 @@ class MessageHeader(DomainResource):
     """
     The header for a message exchange that is either requesting or responding to an action.  The reference(s) that are the subject of the action as well as other information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.
     """
+
+    _abstract = False
+    _type = "MessageHeader"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/MessageHeader"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -333,10 +306,6 @@ class MessageHeader(DomainResource):
         description="Placeholder element for definition extensions",
         default=None,
         alias="_definition",
-    )
-    resourceType: Literal["MessageHeader"] = Field(
-        description=None,
-        default="MessageHeader",
     )
 
     @property

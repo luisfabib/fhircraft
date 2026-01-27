@@ -946,10 +946,7 @@ class RootElement(FHIRPath):
                 )
             ) or (
                 not isinstance(resource, dict)
-                and (
-                    not hasattr(resource, "resourceType")
-                    or not resource.resourceType == self.type
-                )
+                and (not hasattr(resource, "_type") or not resource._type == self.type)
             ):
                 raise FHIRPathError(
                     f"Root element must be a valid FHIR resource of type {self.type}."

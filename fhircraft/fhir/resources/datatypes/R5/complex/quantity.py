@@ -12,6 +12,8 @@ class Quantity(DataType):
     A measured or measurable amount
     """
 
+    _type = "Quantity"
+
     value: Optional[Decimal] = Field(
         description="Numerical value (with implicit precision)",
         default=None,

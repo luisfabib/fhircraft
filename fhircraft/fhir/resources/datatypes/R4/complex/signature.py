@@ -15,6 +15,8 @@ class Signature(Element):
     A Signature - XML DigSig, JWS, Graphical image of signature, etc.
     """
 
+    _type = "Signature"
+
     type: Optional[List[Coding]] = Field(
         description="Indication of the reason the entity signed the object(s)",
         default=None,

@@ -14,6 +14,8 @@ class Ratio(Element):
     A ratio of two Quantity values - a numerator and a denominator
     """
 
+    _type = "Ratio"
+
     numerator: Optional[Quantity] = Field(
         description="Numerator value",
         default=None,

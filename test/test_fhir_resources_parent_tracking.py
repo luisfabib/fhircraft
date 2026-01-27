@@ -15,7 +15,8 @@ from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRList
 class MockPatient(FHIRBaseModel):
     """Minimal Patient model for testing."""
 
-    resourceType: str = "Patient"
+    _type = "Patient"
+    _kind = "resource"
     id: Optional[str] = None
     name: Optional[str] = None
     contained: Optional[list[Union[MockPractitioner, MockObservation]]] = None
@@ -24,7 +25,8 @@ class MockPatient(FHIRBaseModel):
 class MockPractitioner(FHIRBaseModel):
     """Minimal Practitioner model for testing."""
 
-    resourceType: str = "Practitioner"
+    _type = "Practitioner"
+    _kind = "resource"
     id: Optional[str] = None
     name: Optional[str] = None
 
@@ -32,7 +34,8 @@ class MockPractitioner(FHIRBaseModel):
 class MockObservation(FHIRBaseModel):
     """Minimal Observation model for testing."""
 
-    resourceType: str = "Observation"
+    _type = "Observation"
+    _kind = "resource"
     id: Optional[str] = None
     subject: Optional[MockReference] = None
     performer: Optional[list[MockReference]] = None
@@ -41,6 +44,7 @@ class MockObservation(FHIRBaseModel):
 class MockReference(FHIRBaseModel):
     """Minimal Reference model for testing."""
 
+    _kind = "complex-type"
     reference: Optional[str] = None
 
 
@@ -412,7 +416,7 @@ class TestResourceAndIndexTracking:
         patient = MockPatient(id="p1", name="John")
 
         # Patient is a resource type, so _resource should point to itself
-        assert hasattr(patient, "resourceType")
+        assert hasattr(patient, "_type")
         assert patient._resource is patient
         assert patient._root_resource is patient
 
@@ -437,7 +441,7 @@ class TestResourceAndIndexTracking:
         # Reference is NOT a resource, so its _resource should be Observation
         reference = observation.subject
         assert reference
-        assert not hasattr(reference, "resourceType")
+        assert not hasattr(reference, "_type")
         assert reference._resource is observation  # Points to containing Observation
         assert reference._root_resource is patient  # Root is still Patient
 

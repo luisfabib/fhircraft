@@ -220,7 +220,6 @@ class TestGetComplexFhirType(FactoryTestCase):
         element_type = ElementDefinitionType(code="CustomType", profile=[profile_url])
         self.factory.repository.load_from_definitions(
             StructureDefinition(
-                resourceType="StructureDefinition",
                 url=profile_url,
                 name="CustomType",
                 version="1.0.0",
@@ -233,32 +232,32 @@ class TestGetComplexFhirType(FactoryTestCase):
                 derivation="specialization",
                 snapshot=StructureDefinitionSnapshot(
                     element=[
-                            {
-                                "id": "BackboneElement",
+                        {
+                            "id": "BackboneElement",
+                            "path": "BackboneElement",
+                            "min": 0,
+                            "max": "*",
+                            "definition": "A custom type for testing.",
+                            "base": {
                                 "path": "BackboneElement",
                                 "min": 0,
-                                "max": "*",
-                                "definition": "A custom type for testing.",
-                                "base": {
-                                    "path": "BackboneElement",
-                                    "min": 0,
-                                    "max": "1",
-                                }
+                                "max": "1",
                             },
-                            {
-                                "id": "BackboneElement.customField",
+                        },
+                        {
+                            "id": "BackboneElement.customField",
+                            "path": "BackboneElement.customField",
+                            "min": 0,
+                            "max": "1",
+                            "type": [{"code": "string"}],
+                            "definition": "A custom field in the custom type.",
+                            "base": {
                                 "path": "BackboneElement.customField",
                                 "min": 0,
                                 "max": "1",
-                                "type": [{"code": "string"}],
-                                "definition": "A custom field in the custom type.",
-                                "base": {
-                                    "path": "BackboneElement.customField",
-                                    "min": 0,
-                                    "max": "1",
-                                }
                             },
-                        ]
+                        },
+                    ]
                 ),
             )
         )
@@ -747,7 +746,9 @@ class TestConstructSliceModel(FactoryTestCase):
         self.factory._parse_element_cardinality = mock.Mock(return_value=(1, 99999))
 
     def test_construct_slice_model_with_profile(self):
-        definition = self.DummyElementDefinitionNode(definition=self.DummyElementDefinition(type_=[self.DummyType()]))
+        definition = self.DummyElementDefinitionNode(
+            definition=self.DummyElementDefinition(type_=[self.DummyType()])
+        )
         result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel, "Test")  # type: ignore
         # Assertions
         self.factory.construct_resource_model.assert_called_once_with(  # type: ignore
@@ -761,7 +762,9 @@ class TestConstructSliceModel(FactoryTestCase):
         self.assertEqual(result.max_cardinality, 99999)
 
     def test_construct_slice_model_without_profile(self):
-        definition = self.DummyElementDefinitionNode(self.DummyElementDefinition(type_=[]))
+        definition = self.DummyElementDefinitionNode(
+            self.DummyElementDefinition(type_=[])
+        )
         result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel, "Test")  # type: ignore
         self.factory._process_FHIR_structure_into_Pydantic_components.assert_called_once()  # type: ignore
         # Assertions
@@ -772,7 +775,9 @@ class TestConstructSliceModel(FactoryTestCase):
         self.assertEqual(result.max_cardinality, 99999)
 
     def test_construct_slice_model_base_is_FHIRSliceModel(self):
-        definition = self.DummyElementDefinitionNode(self.DummyElementDefinition(type_=[]))
+        definition = self.DummyElementDefinitionNode(
+            self.DummyElementDefinition(type_=[])
+        )
         result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyFHIRSliceModel, "Test")  # type: ignore
         # Assertions
         self.factory._construct_model_with_properties.assert_called()  # type: ignore

@@ -1,21 +1,8 @@
-# Fhircraft modules
 import fhircraft.fhir.resources.validators as fhir_validators
-
-# Pydantic modules
-from pydantic import Field, model_validator, BaseModel
-from pydantic.fields import FieldInfo
-
-# Standard modules
-from typing import Optional, Literal, Union
-from enum import Enum
+from pydantic import Field, model_validator
+from typing import Optional, List as ListType, Literal
 
 NoneType = type(None)
-
-# Dynamic modules
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
-
-from typing import Optional, List as ListType, Literal
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
@@ -32,7 +19,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Element,
     Meta,
     Narrative,
-    Resource,
     Extension,
     Identifier,
     CodeableConcept,
@@ -43,8 +29,9 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Duration,
     Attachment,
     CodeableReference,
-    DomainResource,
 )
+from .resource import Resource
+from .domain_resource import DomainResource
 
 
 class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
@@ -68,8 +55,6 @@ class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
             elements=(
                 "jurisdiction",
                 "code",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -121,8 +106,6 @@ class PackagedProductDefinitionPackageShelfLifeStorage(BackboneElement):
             elements=(
                 "specialPrecautionsForStorage",
                 "type",
-                "modifierExtension",
-                "extension",
                 "modifierExtension",
                 "extension",
             ),
@@ -237,8 +220,6 @@ class PackagedProductDefinitionPackageContainedItem(BackboneElement):
                 "item",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -319,24 +300,6 @@ class PackagedProductDefinitionPackage(BackboneElement):
                 "identifier",
                 "modifierExtension",
                 "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
-                "modifierExtension",
-                "extension",
             ),
             expression="hasValue() or (children().count() > id.count())",
             human="All FHIR elements must have a @value or children",
@@ -349,6 +312,10 @@ class PackagedProductDefinition(DomainResource):
     """
     A medically related item or items, in a container or package.
     """
+
+    _abstract = False
+    _type = "PackagedProductDefinition"
+    _canonical_url = "http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition"
 
     id: Optional[String] = Field(
         description="Logical id of this artifact",
@@ -478,10 +445,6 @@ class PackagedProductDefinition(DomainResource):
     package: Optional[PackagedProductDefinitionPackage] = Field(
         description="A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap",
         default=None,
-    )
-    resourceType: Literal["PackagedProductDefinition"] = Field(
-        description=None,
-        default="PackagedProductDefinition",
     )
 
     @model_validator(mode="after")
