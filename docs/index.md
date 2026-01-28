@@ -4,14 +4,18 @@ hide:
   - toc
 ---
 <style>
-. md-content {
+.md-content {
     max-width: 100%;
 }
-. md-content__inner {
+.md-content__inner {
     margin: 0 auto;
 }
 h1:first-of-type {
     display: none;
+}
+img.banner {
+    width: 50vw;
+    min-width: 300px;
 }
 .hero {
     text-align: center;
@@ -34,7 +38,7 @@ h1:first-of-type {
     flex-wrap:  wrap;
     margin-top:  2rem;
 }
-. button-primary, .button-secondary {
+.button-primary, .button-secondary {
     padding: 0.8rem 2rem;
     border-radius: 0.3rem;
     text-decoration:  none;
@@ -64,12 +68,15 @@ h1:first-of-type {
     margin-bottom:  3rem;
     font-weight: 700;
 }
+.md-button {
+    margin-bottom: .5rem;
+}
 </style>
 
 <div class="hero" markdown>
 
 <!-- PROJECT LOGO -->
-<img src="assets/images/logo-banner.png" class="banner" style="width:35vw">
+<img src="assets/images/logo-banner.png" class="banner">
 
 
 [![CI](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml/badge.svg?branch=main&event=push)](https://github.com/luisfabib/fhircraft/actions/workflows/CI.yaml?style=flat&labelColor=%231e293b)
@@ -179,7 +186,7 @@ For further information see the [Installation Guide](quickstart/installation.md)
 
 [Read the Guide](user-guide/overview.md){ .md-button .md-button--primary }
 [Technical Reference](reference/fhir-resources-base.md){ .md-button }
-[material-github: GitHub](https://github.com/luisfabib/fhircraft){ .md-button }
+[:material-github: GitHub](https://github.com/luisfabib/fhircraft){ .md-button }
 
 
 </div>
