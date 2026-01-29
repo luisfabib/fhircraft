@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 
 from pydantic import Field, model_validator
 
@@ -8,7 +8,172 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     BackboneElement,
     CodeableConcept,
     Element,
+    Period,
+    Range,
+    Duration,
 )
+
+
+class TimingRepeat(BackboneElement):
+    """
+    When the event is to occur
+    """
+
+    _type = "BackboneElement"
+
+    boundsDuration: Optional["Duration"] = Field(
+        description="Length/Range of lengths, or (Start and/or end) limits",
+        default=None,
+    )
+    boundsRange: Optional["Range"] = Field(
+        description="Length/Range of lengths, or (Start and/or end) limits",
+        default=None,
+    )
+    boundsPeriod: Optional["Period"] = Field(
+        description="Length/Range of lengths, or (Start and/or end) limits",
+        default=None,
+    )
+    count: Optional[PositiveInt] = Field(
+        description="Number of times to repeat",
+        default=None,
+    )
+    count_ext: Optional[Element] = Field(
+        description="Placeholder element for count extensions",
+        default=None,
+        alias="_count",
+    )
+    countMax: Optional[PositiveInt] = Field(
+        description="Maximum number of times to repeat",
+        default=None,
+    )
+    countMax_ext: Optional[Element] = Field(
+        description="Placeholder element for countMax extensions",
+        default=None,
+        alias="_countMax",
+    )
+    duration: Optional[Decimal] = Field(
+        description="How long when it happens",
+        default=None,
+    )
+    duration_ext: Optional[Element] = Field(
+        description="Placeholder element for duration extensions",
+        default=None,
+        alias="_duration",
+    )
+    durationMax: Optional[Decimal] = Field(
+        description="How long when it happens",
+        default=None,
+    )
+    durationMax_ext: Optional[Element] = Field(
+        description="Placeholder element for durationMax extensions",
+        default=None,
+        alias="_durationMax",
+    )
+    durationUnit: Optional[Code] = Field(
+        description="s | min | h | d | wk | mo | a",
+        default=None,
+    )
+    durationUnit_ext: Optional[Element] = Field(
+        description="Placeholder element for durationUnit extensions",
+        default=None,
+        alias="_durationUnit",
+    )
+    frequency: Optional[PositiveInt] = Field(
+        description="Event occurs frequency times per period",
+        default=None,
+    )
+    frequency_ext: Optional[Element] = Field(
+        description="Placeholder element for frequency extensions",
+        default=None,
+        alias="_frequency",
+    )
+    frequencyMax: Optional[PositiveInt] = Field(
+        description="Event occurs up to frequencyMax times per period",
+        default=None,
+    )
+    frequencyMax_ext: Optional[Element] = Field(
+        description="Placeholder element for frequencyMax extensions",
+        default=None,
+        alias="_frequencyMax",
+    )
+    period: Optional[Decimal] = Field(
+        description="Event occurs frequency times per period",
+        default=None,
+    )
+    period_ext: Optional[Element] = Field(
+        description="Placeholder element for period extensions",
+        default=None,
+        alias="_period",
+    )
+    periodMax: Optional[Decimal] = Field(
+        description="Event occurs up to periodMax times per period",
+        default=None,
+    )
+    periodMax_ext: Optional[Element] = Field(
+        description="Placeholder element for periodMax extensions",
+        default=None,
+        alias="_periodMax",
+    )
+    periodUnit: Optional[Code] = Field(
+        description="s | min | h | d | wk | mo | a",
+        default=None,
+    )
+    periodUnit_ext: Optional[Element] = Field(
+        description="Placeholder element for periodUnit extensions",
+        default=None,
+        alias="_periodUnit",
+    )
+    dayOfWeek: Optional[List[Code]] = Field(
+        description="mon | tue | wed | thu | fri | sat | sun",
+        default=None,
+    )
+    dayOfWeek_ext: Optional[Element] = Field(
+        description="Placeholder element for dayOfWeek extensions",
+        default=None,
+        alias="_dayOfWeek",
+    )
+    timeOfDay: Optional[List[Time]] = Field(
+        description="Specified time of day for action",
+        default=None,
+    )
+    timeOfDay_ext: Optional[Element] = Field(
+        description="Placeholder element for timeOfDay extensions",
+        default=None,
+        alias="_timeOfDay",
+    )
+    when: Optional[List[Code]] = Field(
+        description="Code for time period of occurrence",
+        default=None,
+    )
+    when_ext: Optional[Element] = Field(
+        description="Placeholder element for when extensions",
+        default=None,
+        alias="_when",
+    )
+    offset: Optional[UnsignedInt] = Field(
+        description="Minutes from event (before or after)",
+        default=None,
+    )
+    offset_ext: Optional[Element] = Field(
+        description="Placeholder element for offset extensions",
+        default=None,
+        alias="_offset",
+    )
+
+    @model_validator(mode="after")
+    def bounds_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=["Duration", "Range", "Period"],
+            field_name_base="bounds",
+        )
+
+    @property
+    def bounds(self):
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
+            base="bounds",
+        )
 
 
 class Timing(BackboneElement):
@@ -27,7 +192,7 @@ class Timing(BackboneElement):
         default=None,
         alias="_event",
     )
-    repeat: Optional[Element] = Field(
+    repeat: Optional[TimingRepeat] = Field(
         description="When the event is to occur",
         default=None,
     )

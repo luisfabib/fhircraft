@@ -28,7 +28,12 @@ from .age import Age
 from .count import Count
 from .distance import Distance
 from .duration import Duration
-from .data_requirement import DataRequirement
+from .data_requirement import (
+    DataRequirement,
+    DataRequirementCodeFilter,
+    DataRequirementDateFilter,
+    DataRequirementSort,
+)
 from .expression import Expression
 from .human_name import HumanName
 from .marketing_status import MarketingStatus
@@ -45,11 +50,11 @@ from .related_artifact import RelatedArtifact
 from .sampled_data import SampledData
 from .signature import Signature
 from .simple_quantity import SimpleQuantity
-from .timing import Timing
+from .timing import Timing, TimingRepeat
 from .trigger_definition import TriggerDefinition
 from .usage_context import UsageContext
 from .population import Population
-from .dosage import Dosage
+from .dosage import Dosage, DosageDoseAndRate
 from .element_definition import (
     ElementDefinition,
     ElementDefinitionType,
@@ -76,8 +81,12 @@ __all__ = [
     "Contributor",
     "Count",
     "DataRequirement",
+    "DataRequirementCodeFilter",
+    "DataRequirementDateFilter",
+    "DataRequirementSort",
     "Distance",
     "Dosage",
+    "DosageDoseAndRate",
     "Duration",
     "Element",
     "ElementDefinitionType",
@@ -113,6 +122,7 @@ __all__ = [
     "Signature",
     "SimpleQuantity",
     "Timing",
+    "TimingRepeat",
     "TriggerDefinition",
     "UsageContext",
     "xhtml",
@@ -142,7 +152,11 @@ Count.model_rebuild()
 Distance.model_rebuild()
 Duration.model_rebuild()
 DataRequirement.model_rebuild()
+DataRequirementCodeFilter.model_rebuild()
+DataRequirementDateFilter.model_rebuild()
+DataRequirementSort.model_rebuild()
 Dosage.model_rebuild()
+DosageDoseAndRate.model_rebuild()
 Expression.model_rebuild()
 HumanName.model_rebuild()
 MarketingStatus.model_rebuild()
@@ -160,6 +174,7 @@ SampledData.model_rebuild()
 Signature.model_rebuild()
 SimpleQuantity.model_rebuild()
 Timing.model_rebuild()
+TimingRepeat.model_rebuild()
 TriggerDefinition.model_rebuild()
 UsageContext.model_rebuild()
 ElementDefinition.model_rebuild()
