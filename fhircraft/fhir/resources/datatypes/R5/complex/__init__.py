@@ -36,7 +36,13 @@ from .duration import Duration
 from .money_quantity import MoneyQuantity
 from .simple_quantity import SimpleQuantity
 from .availability import Availability
-from .data_requirement import DataRequirement
+from .data_requirement import (
+    DataRequirement,
+    DataRequirementCodeFilter,
+    DataRequirementDateFilter,
+    DataRequirementValueFilter,
+    DataRequirementSort,
+)
 from .expression import Expression
 from .human_name import HumanName
 from .marketing_status import MarketingStatus
@@ -49,13 +55,13 @@ from .ratio_range import RatioRange
 from .related_artifact import RelatedArtifact
 from .sampled_data import SampledData
 from .signature import Signature
-from .timing import Timing
+from .timing import Timing, TimingRepeat
 from .trigger_definition import TriggerDefinition
 from .usage_context import UsageContext
 from .monetary_component import MonetaryComponent
 from .extended_contact_detail import ExtendedContactDetail
 from .virtual_service_detail import VirtualServiceDetail
-from .dosage import Dosage
+from .dosage import Dosage, DosageDoseAndRate
 from .element_definition import (
     ElementDefinition,
     ElementDefinitionType,
@@ -86,9 +92,14 @@ __all__ = [
     "Contributor",
     "Count",
     "DataRequirement",
+    "DataRequirementCodeFilter",
+    "DataRequirementDateFilter",
+    "DataRequirementValueFilter",
+    "DataRequirementSort",
     "DataType",
     "Distance",
     "Dosage",
+    "DosageDoseAndRate",
     "Duration",
     "Element",
     "ElementDefinitionType",
@@ -126,6 +137,7 @@ __all__ = [
     "Signature",
     "SimpleQuantity",
     "Timing",
+    "TimingRepeat",
     "TriggerDefinition",
     "UsageContext",
     "VirtualServiceDetail",
@@ -163,7 +175,12 @@ MoneyQuantity.model_rebuild()
 SimpleQuantity.model_rebuild()
 Availability.model_rebuild()
 DataRequirement.model_rebuild()
+DataRequirementCodeFilter.model_rebuild()
+DataRequirementDateFilter.model_rebuild()
+DataRequirementValueFilter.model_rebuild()
+DataRequirementSort.model_rebuild()
 Dosage.model_rebuild()
+DosageDoseAndRate.model_rebuild()
 Expression.model_rebuild()
 ExtendedContactDetail.model_rebuild()
 HumanName.model_rebuild()
@@ -179,6 +196,7 @@ RelatedArtifact.model_rebuild()
 SampledData.model_rebuild()
 Signature.model_rebuild()
 Timing.model_rebuild()
+TimingRepeat.model_rebuild()
 TriggerDefinition.model_rebuild()
 UsageContext.model_rebuild()
 VirtualServiceDetail.model_rebuild()
