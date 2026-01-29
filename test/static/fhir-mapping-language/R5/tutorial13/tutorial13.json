@@ -37,12 +37,12 @@
       ],
       "rule": [
         {
-          "name": "rule_ptr",
+          "name": "rule-ptr",
           "source": [
             {
               "context": "src",
               "element": "f1",
-              "variable": "s_f1"
+              "variable": "sf1"
             }
           ],
           "target": [
@@ -83,10 +83,10 @@
           ],
           "rule": [
             {
-              "name": "rule_s_f1",
+              "name": "rule-s-f1",
               "source": [
                 {
-                  "context": "s_f1"
+                  "context": "sf1"
                 }
               ],
               "target": [
@@ -103,7 +103,7 @@
                   "transform": "copy",
                   "parameter": [
                     {
-                      "valueId": "s_f1"
+                      "valueId": "sf1"
                     }
                   ]
                 }

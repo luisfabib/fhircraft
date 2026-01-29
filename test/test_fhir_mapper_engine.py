@@ -476,21 +476,21 @@ simple_mapping_test_cases = [
             StructureMapGroupRule(
                 source=[
                     StructureMapGroupRuleSource(
-                        context="src", element="name", variable="_name_"
+                        context="src", element="name", variable="-name-"
                     )
                 ],
                 target=[
                     StructureMapGroupRuleTarget(
-                        context="tgt", element="fullName", variable="_fullName_target_"
+                        context="tgt", element="fullName", variable="-fullName-target-"
                     )
                 ],
                 dependent=[
                     StructureMapGroupRuleDependent(
-                        name="_DefaultMappingGroup_",
+                        name="-DefaultMappingGroup-",
                         parameter=[
-                            StructureMapGroupRuleDependentParameter(valueId="_name_"),
+                            StructureMapGroupRuleDependentParameter(valueId="-name-"),
                             StructureMapGroupRuleDependentParameter(
-                                valueId="_fullName_target_"
+                                valueId="-fullName-target-"
                             ),
                         ],
                     )
@@ -500,21 +500,21 @@ simple_mapping_test_cases = [
             StructureMapGroupRule(
                 source=[
                     StructureMapGroupRuleSource(
-                        context="src", element="age", variable="_age_"
+                        context="src", element="age", variable="-age-"
                     )
                 ],
                 target=[
                     StructureMapGroupRuleTarget(
-                        context="tgt", element="yearsOld", variable="_yearsOld_target_"
+                        context="tgt", element="yearsOld", variable="-yearsOld-target-"
                     )
                 ],
                 dependent=[
                     StructureMapGroupRuleDependent(
-                        name="_DefaultMappingGroup_",
+                        name="-DefaultMappingGroup-",
                         parameter=[
-                            StructureMapGroupRuleDependentParameter(valueId="_age_"),
+                            StructureMapGroupRuleDependentParameter(valueId="-age-"),
                             StructureMapGroupRuleDependentParameter(
-                                valueId="_yearsOld_target_"
+                                valueId="-yearsOld-target-"
                             ),
                         ],
                     )
@@ -531,21 +531,21 @@ simple_mapping_test_cases = [
             StructureMapGroupRule(
                 source=[
                     StructureMapGroupRuleSource(
-                        context="src", element="name", variable="_name_"
+                        context="src", element="name", variable="-name-"
                     )
                 ],
                 target=[
                     StructureMapGroupRuleTarget(
-                        context="tgt", element="fullName", variable="_fullName_"
+                        context="tgt", element="fullName", variable="-fullName-"
                     )
                 ],
                 dependent=[
                     StructureMapGroupRuleDependent(
-                        name="_DefaultMappingGroup_",
+                        name="-DefaultMappingGroup-",
                         parameter=[
-                            StructureMapGroupRuleDependentParameter(valueId="_name_"),
+                            StructureMapGroupRuleDependentParameter(valueId="-name-"),
                             StructureMapGroupRuleDependentParameter(
-                                valueId="_fullName_"
+                                valueId="-fullName-"
                             ),
                         ],
                     )

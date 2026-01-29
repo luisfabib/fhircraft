@@ -639,7 +639,7 @@ class FhirMappingLanguageParser(FhirPathParser):
                 self.StructureMapGroupRuleSource(
                     context=(context := source_path.get("context")),
                     element=(element := source_path.get("element")),
-                    variable=(source_var := f"_{element or context}_"),
+                    variable=(source_var := f"-{element or context}-"),
                 )
             ],
             _targets=[
@@ -651,12 +651,12 @@ class FhirMappingLanguageParser(FhirPathParser):
                     ),
                     "variable": (
                         target_var := (
-                            source_var + "target_"
-                            if f"_{element}_" == source_var
-                            or f"_{context}_" == source_var
-                            or f"_{(subelement := target_path.get('subelements', [None])[-1])}_"
+                            source_var + "target-"
+                            if f"-{element}-" == source_var
+                            or f"-{context}-" == source_var
+                            or f"-{(subelement := target_path.get('subelements', [None])[-1])}-"
                             == source_var
-                            else f"_{subelement or element or context}_"
+                            else f"-{subelement or element or context}-"
                         )
                     ),
                 }
@@ -664,7 +664,7 @@ class FhirMappingLanguageParser(FhirPathParser):
             dependent={
                 "dependent": [
                     self.StructureMapGroupRuleDependent(
-                        name="_DefaultMappingGroup_",
+                        name="-DefaultMappingGroup-",
                         parameter=[  # type: ignore
                             self.StructureMapGroupRuleDependentParameter(
                                 valueId=source_var
@@ -698,7 +698,7 @@ class FhirMappingLanguageParser(FhirPathParser):
             _rule = rule
             if path and (subelements := path.get("subelements")):
                 for subelement in subelements:
-                    target_temp_variable = f"_{target.element}_"
+                    target_temp_variable = f"-{target.element}-"
                     target.variable = target_temp_variable
                     if self.fhir_release == "R5":
                         target = self.StructureMapGroupRuleTarget(

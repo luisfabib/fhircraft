@@ -34,7 +34,7 @@
       ],
       "rule": [
         {
-          "name": "rule_a20a",
+          "name": "rule-a20a",
           "source": [
             {
               "context": "src",

@@ -16,8 +16,8 @@ class SimpleSource(BaseModel):
 
 
 class SimpleTarget(BaseModel):
-    full_name: str | None = None
-    years_old: int | None = None
+    fullName: str | None = None
+    yearsOld: int | None = None
 
 
 def test_parse_mapping_script():
@@ -29,8 +29,8 @@ def test_parse_mapping_script():
     uses "http://example.org/StructureDefinition/SimpleTarget" alias SimpleTarget as target
 
     group main(source src: SimpleSource, target tgt: SimpleTarget) {
-        src.name -> tgt.full_name;
-        src.age -> tgt.years_old;
+        src.name -> tgt.fullName;
+        src.age -> tgt.yearsOld;
     }
     """
 
@@ -100,20 +100,20 @@ def test_list_groups():
     uses "http://example.org/StructureDefinition/SimpleSource" alias SimpleSource as source
     uses "http://example.org/StructureDefinition/SimpleTarget" alias SimpleTarget as target
 
-    group first_map(source src: SimpleSource, target tgt: SimpleTarget) {
-        src.name -> tgt.full_name;
+    group firstMap(source src: SimpleSource, target tgt: SimpleTarget) {
+        src.name -> tgt.fullName;
     }
 
-    group second_map(source src: SimpleSource, target tgt: SimpleTarget) {
-        src.age -> tgt.years_old;
+    group secondMap(source src: SimpleSource, target tgt: SimpleTarget) {
+        src.age -> tgt.yearsOld;
     }
     """
 
     mapper = FHIRMapper()
     groups = mapper.list_groups(script)
 
-    assert "first_map" in groups
-    assert "second_map" in groups
+    assert "firstMap" in groups
+    assert "secondMap" in groups
     assert len(groups) == 2
 
 
@@ -149,11 +149,11 @@ def test_execute_mapping_with_options():
     uses "http://example.org/StructureDefinition/SimpleSource" alias SimpleSource as source
     uses "http://example.org/StructureDefinition/SimpleTarget" alias SimpleTarget as target
 
-    group first_map(source src: SimpleSource, target tgt: SimpleTarget) {
+    group firstMap(source src: SimpleSource, target tgt: SimpleTarget) {
         src.name -> tgt.fullName;
     }
 
-    group second_map(source src: SimpleSource, target tgt: SimpleTarget) {
+    group secondMap(source src: SimpleSource, target tgt: SimpleTarget) {
         src.age -> tgt.yearsOld;
     }
     """
@@ -163,7 +163,7 @@ def test_execute_mapping_with_options():
     mapper = FHIRMapper()
     mapper.add_structure_definition(create_simple_source_structure_definition())
     mapper.add_structure_definition(create_simple_target_structure_definition())
-    result = mapper.execute_mapping(script, source, group="second_map")
+    result = mapper.execute_mapping(script, source, group="secondMap")
     assert len(result) == 1
 
 
@@ -173,9 +173,9 @@ def test_arbitrary_source_to_fhir_target():
 
     # Arbitrary source data (not a FHIR resource)
     source_data = {
-        "first_name": "Alice",
-        "last_name": "Johnson",
-        "birth_date": "1985-03-15",
+        "firstName": "Alice",
+        "lastName": "Johnson",
+        "birthDate": "1985-03-15",
     }
 
     # Mapping script - only declares FHIR target
@@ -186,10 +186,10 @@ def test_arbitrary_source_to_fhir_target():
     
     group main(source src, target patient: Patient) {
         src -> patient.name as name then {
-            src.first_name as first_name -> name.given = first_name;
-            src.last_name as last_name -> name.family = last_name;
+            src.firstName as firstName -> name.given = firstName;
+            src.lastName as lastName -> name.family = lastName;
         };
-        src.birth_date as bd -> patient.birthDate = bd;
+        src.birthDate as bd -> patient.birthDate = bd;
     }
     """
 

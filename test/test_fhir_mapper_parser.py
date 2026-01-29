@@ -17,7 +17,7 @@ def add_rules_to_basic_map(rules, documentation=None):
         group=[
             StructureMapGroup(
                 documentation=documentation,
-                name="map_example",
+                name="mapExample",
                 input=[
                     StructureMapGroupInput(name="src", mode="source"),
                     StructureMapGroupInput(name="tgt", mode="target"),
@@ -112,39 +112,39 @@ parser_test_cases = (
     ),
     # ----------------- CONSTANT DECLARATION  -----------------
     (
-        """let my_const = 12;""",
+        """let myConst = 12;""",
         StructureMap.model_construct(
-            const=[StructureMapConst(name="my_const", value="12")]
+            const=[StructureMapConst(name="myConst", value="12")]
         ),
     ),
     (
-        """let my_const = 'string';""",
+        """let myConst = 'string';""",
         StructureMap.model_construct(
-            const=[StructureMapConst(name="my_const", value="string")]
+            const=[StructureMapConst(name="myConst", value="string")]
         ),
     ),
     (
-        """let my_const = a.b.substring(1, 2);""",
+        """let myConst = a.b.substring(1, 2);""",
         StructureMap.model_construct(
-            const=[StructureMapConst(name="my_const", value="a.b.substring(1, 2)")]
+            const=[StructureMapConst(name="myConst", value="a.b.substring(1, 2)")]
         ),
     ),
     (
-        """let my_const_1 = 1; \n let my_const_2 = 2;""",
+        """let myConst1 = 1; \n let myConst2 = 2;""",
         StructureMap.model_construct(
             const=[
-                StructureMapConst(name="my_const_1", value="1"),
-                StructureMapConst(name="my_const_2", value="2"),
+                StructureMapConst(name="myConst1", value="1"),
+                StructureMapConst(name="myConst2", value="2"),
             ]
         ),
     ),
     # ----------------- GROUPS DECLARATION  -----------------
     (
-        """group map_example(source src, target tgt){}""",
+        """group mapExample(source src, target tgt){}""",
         StructureMap.model_construct(
             group=[
                 StructureMapGroup(
-                    name="map_example",
+                    name="mapExample",
                     input=[
                         StructureMapGroupInput(name="src", mode="source"),
                         StructureMapGroupInput(name="tgt", mode="target"),
@@ -155,11 +155,11 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src: typeA, target tgt: typeB){}""",
+        """group mapExample(source src: typeA, target tgt: typeB){}""",
         StructureMap.model_construct(
             group=[
                 StructureMapGroup(
-                    name="map_example",
+                    name="mapExample",
                     input=[
                         StructureMapGroupInput(name="src", mode="source", type="typeA"),
                         StructureMapGroupInput(name="tgt", mode="target", type="typeB"),
@@ -170,27 +170,27 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt) extends map_base {}""",
+        """group mapExample(source src, target tgt) extends mapBase {}""",
         StructureMap.model_construct(
             group=[
                 StructureMapGroup(
-                    name="map_example",
+                    name="mapExample",
                     input=[
                         StructureMapGroupInput(name="src", mode="source"),
                         StructureMapGroupInput(name="tgt", mode="target"),
                     ],
                     rule=None,
-                    extends="map_base",
+                    extends="mapBase",
                 )
             ]
         ),
     ),
     (
-        """group map_example(source src, target tgt) <<type+>> {}""",
+        """group mapExample(source src, target tgt) <<type+>> {}""",
         StructureMap.model_construct(
             group=[
                 StructureMapGroup(
-                    name="map_example",
+                    name="mapExample",
                     input=[
                         StructureMapGroupInput(name="src", mode="source"),
                         StructureMapGroupInput(name="tgt", mode="target"),
@@ -202,17 +202,17 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt) extends map_base <<type+>> {}""",
+        """group mapExample(source src, target tgt) extends mapBase <<type+>> {}""",
         StructureMap.model_construct(
             group=[
                 StructureMapGroup(
-                    name="map_example",
+                    name="mapExample",
                     input=[
                         StructureMapGroupInput(name="src", mode="source"),
                         StructureMapGroupInput(name="tgt", mode="target"),
                     ],
                     rule=None,
-                    extends="map_base",
+                    extends="mapBase",
                     typeMode="type-and-types",
                 )
             ]
@@ -220,7 +220,7 @@ parser_test_cases = (
     ),
     # ----------------- RULES DECLARATION  -----------------
     (
-        """group map_example(source src, target tgt){src.fieldA -> tgt.fieldB;}""",
+        """group mapExample(source src, target tgt){src.fieldA -> tgt.fieldB;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -228,25 +228,25 @@ parser_test_cases = (
                         StructureMapGroupRuleSource(
                             context="src",
                             element="fieldA",
-                            variable="_fieldA_",
+                            variable="-fieldA-",
                         )
                     ],
                     target=[
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="fieldB",
-                            variable="_fieldB_",
+                            variable="-fieldB-",
                         )
                     ],
                     dependent=[
                         StructureMapGroupRuleDependent(
-                            name="_DefaultMappingGroup_",
+                            name="-DefaultMappingGroup-",
                             parameter=[
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_fieldA_"
+                                    valueId="-fieldA-"
                                 ),
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_fieldB_"
+                                    valueId="-fieldB-"
                                 ),
                             ],
                         )
@@ -257,7 +257,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src -> tgt: fieldA, fieldB;}""",
+        """group mapExample(source src, target tgt){src -> tgt: fieldA, fieldB;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -265,25 +265,25 @@ parser_test_cases = (
                         StructureMapGroupRuleSource(
                             context="src",
                             element="fieldA",
-                            variable="_fieldA_",
+                            variable="-fieldA-",
                         )
                     ],
                     target=[
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="fieldA",
-                            variable="_fieldA_target_",
+                            variable="-fieldA-target-",
                         )
                     ],
                     dependent=[
                         StructureMapGroupRuleDependent(
-                            name="_DefaultMappingGroup_",
+                            name="-DefaultMappingGroup-",
                             parameter=[
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_fieldA_"
+                                    valueId="-fieldA-"
                                 ),
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_fieldA_target_"
+                                    valueId="-fieldA-target-"
                                 ),
                             ],
                         )
@@ -295,25 +295,25 @@ parser_test_cases = (
                         StructureMapGroupRuleSource(
                             context="src",
                             element="fieldB",
-                            variable="_fieldB_",
+                            variable="-fieldB-",
                         )
                     ],
                     target=[
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="fieldB",
-                            variable="_fieldB_target_",
+                            variable="-fieldB-target-",
                         )
                     ],
                     dependent=[
                         StructureMapGroupRuleDependent(
-                            name="_DefaultMappingGroup_",
+                            name="-DefaultMappingGroup-",
                             parameter=[
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_fieldB_"
+                                    valueId="-fieldB-"
                                 ),
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_fieldB_target_"
+                                    valueId="-fieldB-target-"
                                 ),
                             ],
                         )
@@ -324,30 +324,30 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA -> tgt.fieldB 'example_rule';}""",
+        """group mapExample(source src, target tgt){src.fieldA -> tgt.fieldB 'exampleRule';}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
-                    name="example_rule",
+                    name="exampleRule",
                     source=[
                         StructureMapGroupRuleSource(
-                            context="src", element="fieldA", variable="_fieldA_"
+                            context="src", element="fieldA", variable="-fieldA-"
                         )
                     ],
                     target=[
                         StructureMapGroupRuleTarget(
-                            context="tgt", element="fieldB", variable="_fieldB_"
+                            context="tgt", element="fieldB", variable="-fieldB-"
                         )
                     ],
                     dependent=[
                         StructureMapGroupRuleDependent(
-                            name="_DefaultMappingGroup_",
+                            name="-DefaultMappingGroup-",
                             parameter=[
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_fieldA_"
+                                    valueId="-fieldA-"
                                 ),
                                 StructureMapGroupRuleDependentParameter(
-                                    valueId="_fieldB_"
+                                    valueId="-fieldB-"
                                 ),
                             ],
                         )
@@ -357,7 +357,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA as a -> tgt.fieldB as b;}""",
+        """group mapExample(source src, target tgt){src.fieldA as a -> tgt.fieldB as b;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -381,7 +381,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA as a -> tgt.fieldB = a; src.fieldB as b -> tgt.fieldA = b;}""",
+        """group mapExample(source src, target tgt){src.fieldA as a -> tgt.fieldB = a; src.fieldB as b -> tgt.fieldA = b;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -426,7 +426,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA as a 0..* default(fhirpath.expr) where(fhirpath.expr) check('fhirpath.expr');}""",
+        """group mapExample(source src, target tgt){src.fieldA as a 0..* default(fhirpath.expr) where(fhirpath.expr) check('fhirpath.expr');}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -449,7 +449,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA as a -> create('Resource') as a;}""",
+        """group mapExample(source src, target tgt){src.fieldA as a -> create('Resource') as a;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -478,7 +478,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA as a -> tgt.fieldB = append('string');}""",
+        """group mapExample(source src, target tgt){src.fieldA as a -> tgt.fieldB = append('string');}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -508,7 +508,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA as a then { a.subfieldA as aa -> tgt.fieldA = aa;};}""",
+        """group mapExample(source src, target tgt){src.fieldA as a then { a.subfieldA as aa -> tgt.fieldA = aa;};}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -547,7 +547,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA as a -> tgt.fieldB as b then {a -> b.subfieldB = a;};}""",
+        """group mapExample(source src, target tgt){src.fieldA as a -> tgt.fieldB as b then {a -> b.subfieldB = a;};}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -591,7 +591,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA as a -> tgt.fieldB.subfieldB = a;}""",
+        """group mapExample(source src, target tgt){src.fieldA as a -> tgt.fieldB.subfieldB = a;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -606,7 +606,7 @@ parser_test_cases = (
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="fieldB",
-                            variable="_fieldB_",
+                            variable="-fieldB-",
                         )
                     ],
                     rule=[
@@ -618,7 +618,7 @@ parser_test_cases = (
                             ],
                             target=[
                                 StructureMapGroupRuleTarget(
-                                    context="_fieldB_",
+                                    context="-fieldB-",
                                     element="subfieldB",
                                     transform="copy",
                                     parameter=[
@@ -635,7 +635,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA as a -> tgt.fieldB.subfieldB.descendantB = a;}""",
+        """group mapExample(source src, target tgt){src.fieldA as a -> tgt.fieldB.subfieldB.descendantB = a;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -650,7 +650,7 @@ parser_test_cases = (
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="fieldB",
-                            variable="_fieldB_",
+                            variable="-fieldB-",
                         )
                     ],
                     rule=[
@@ -662,9 +662,9 @@ parser_test_cases = (
                             ],
                             target=[
                                 StructureMapGroupRuleTarget(
-                                    context="_fieldB_",
+                                    context="-fieldB-",
                                     element="subfieldB",
-                                    variable="_subfieldB_",
+                                    variable="-subfieldB-",
                                 )
                             ],
                             rule=[
@@ -676,7 +676,7 @@ parser_test_cases = (
                                     ],
                                     target=[
                                         StructureMapGroupRuleTarget(
-                                            context="_subfieldB_",
+                                            context="-subfieldB-",
                                             element="descendantB",
                                             transform="copy",
                                             parameter=[
@@ -695,7 +695,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.fieldA -> tgt.fieldB.subfieldB;}""",
+        """group mapExample(source src, target tgt){src.fieldA -> tgt.fieldB.subfieldB;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -703,39 +703,39 @@ parser_test_cases = (
                         StructureMapGroupRuleSource(
                             context="src",
                             element="fieldA",
-                            variable="_fieldA_",
+                            variable="-fieldA-",
                         )
                     ],
                     target=[
                         StructureMapGroupRuleTarget(
                             context="tgt",
                             element="fieldB",
-                            variable="_fieldB_",
+                            variable="-fieldB-",
                         )
                     ],
                     rule=[
                         StructureMapGroupRule(
                             source=[
                                 StructureMapGroupRuleSource(
-                                    context="_fieldA_",
+                                    context="-fieldA-",
                                 )
                             ],
                             target=[
                                 StructureMapGroupRuleTarget(
-                                    context="_fieldB_",
+                                    context="-fieldB-",
                                     element="subfieldB",
-                                    variable="_subfieldB_",
+                                    variable="-subfieldB-",
                                 )
                             ],
                             dependent=[
                                 StructureMapGroupRuleDependent(
-                                    name="_DefaultMappingGroup_",
+                                    name="-DefaultMappingGroup-",
                                     parameter=[
                                         StructureMapGroupRuleDependentParameter(
-                                            valueId="_fieldA_"
+                                            valueId="-fieldA-"
                                         ),
                                         StructureMapGroupRuleDependentParameter(
-                                            valueId="_subfieldB_"
+                                            valueId="-subfieldB-"
                                         ),
                                     ],
                                 )
@@ -784,17 +784,17 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt) extends base_group <<types>> {}""",
+        """group mapExample(source src, target tgt) extends baseGroup <<types>> {}""",
         StructureMap.model_construct(
             group=[
                 StructureMapGroup(
-                    name="map_example",
+                    name="mapExample",
                     input=[
                         StructureMapGroupInput(name="src", mode="source"),
                         StructureMapGroupInput(name="tgt", mode="target"),
                     ],
                     rule=None,
-                    extends="base_group",
+                    extends="baseGroup",
                     typeMode="types",
                 )
             ]
@@ -803,7 +803,7 @@ parser_test_cases = (
     (
         """
         // Just a comment
-        group map_example(source src, target tgt){
+        group mapExample(source src, target tgt){
             src.field -> tgt.field = create('TestResource') as tr;
         }""",
         add_rules_to_basic_map(
@@ -830,7 +830,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as f where(f = 10) -> tgt.field = f;}""",
+        """group mapExample(source src, target tgt){src.field as f where(f = 10) -> tgt.field = f;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -857,7 +857,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as f where(f > 10) -> tgt.field = f;}""",
+        """group mapExample(source src, target tgt){src.field as f where(f > 10) -> tgt.field = f;}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -884,7 +884,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as sf 1..1 check('sf != null') -> tgt.field = copy(sf);}""",
+        """group mapExample(source src, target tgt){src.field as sf 1..1 check('sf != null') -> tgt.field = copy(sf);}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -913,7 +913,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as sf -> tgt.field = truncate(sf, 5);}""",
+        """group mapExample(source src, target tgt){src.field as sf -> tgt.field = truncate(sf, 5);}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -940,7 +940,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as sf -> tgt.field = concatenate(sf, '-suffix');}""",
+        """group mapExample(source src, target tgt){src.field as sf -> tgt.field = concatenate(sf, '-suffix');}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -969,7 +969,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.a as sf -> tgt.b = evaluate(sf, '$this.a2 or $this.a3');}""",
+        """group mapExample(source src, target tgt){src.a as sf -> tgt.b = evaluate(sf, '$this.a2 or $this.a3');}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -998,7 +998,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.a as sf -> tgt.b = (a2 or a3);}""",
+        """group mapExample(source src, target tgt){src.a as sf -> tgt.b = (a2 or a3);}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -1026,7 +1026,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group map_example(source src, target tgt){src.field as sf -> tgt.field = evaluate('someExpr(sf)');}""",
+        """group mapExample(source src, target tgt){src.field as sf -> tgt.field = evaluate('someExpr(sf)');}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(

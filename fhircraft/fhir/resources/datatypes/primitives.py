@@ -110,8 +110,7 @@ Uri = TypeAliasType(
     "Uri",
     Annotated[
         str,
-        # Regex according to RFC 3986 (https://datatracker.ietf.org/doc/html/rfc3986#page-50)
-        Field(pattern=r"^(([^:\/?#\s]+):)(\/\/([^\/?#\s]*))?([^\s?#]+)(\?([^#]*))?(#(.*))?$"),
+        Field(pattern=r"^\S+$",),
     ],
 )
 
@@ -120,8 +119,7 @@ Url = TypeAliasType(
     "Url",
     Annotated[
         str,
-        # Regex according to RFC 1738 (https://datatracker.ietf.org/doc/html/rfc1738)
-        Field(pattern=r"^(?i)\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?]))$",),
+        Field(pattern=r"^\S+$",),
     ],
 )
 
@@ -130,8 +128,7 @@ Canonical = TypeAliasType(
     "Canonical",
     Annotated[
         str,
-        # Regex according to RFC 3986 (https://datatracker.ietf.org/doc/html/rfc3986#page-50)
-        Field(pattern=r"^(([^:\/?#\s]+):)(\/\/([^\/?#\s]*))?([^\s?#]+)(\?([^#]*))?(#(.*))?$"),
+        Field(pattern=r"^\S+$",),
     ],
 )
 

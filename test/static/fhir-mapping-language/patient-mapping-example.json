@@ -50,25 +50,25 @@
                         {
                            "context": "legacy",
                            "element": "firstName",
-                           "variable": "_firstName_"
+                           "variable": "-firstName-"
                         }
                      ],
                      "target": [
                         {
                            "context": "name",
                            "element": "given",
-                           "variable": "_given_"
+                           "variable": "-given-"
                         }
                      ],
                      "dependent": [
                         {
-                           "name": "_DefaultMappingGroup_",
+                           "name": "-DefaultMappingGroup-",
                            "parameter": [
                               {
-                                 "valueId": "_firstName_"
+                                 "valueId": "-firstName-"
                               },
                               {
-                                 "valueId": "_given_"
+                                 "valueId": "-given-"
                               }
                            ]
                         }
@@ -79,25 +79,25 @@
                         {
                            "context": "legacy",
                            "element": "lastName",
-                           "variable": "_lastName_"
+                           "variable": "-lastName-"
                         }
                      ],
                      "target": [
                         {
                            "context": "name",
                            "element": "family",
-                           "variable": "_family_"
+                           "variable": "-family-"
                         }
                      ],
                      "dependent": [
                         {
-                           "name": "_DefaultMappingGroup_",
+                           "name": "-DefaultMappingGroup-",
                            "parameter": [
                               {
-                                 "valueId": "_lastName_"
+                                 "valueId": "-lastName-"
                               },
                               {
-                                 "valueId": "_family_"
+                                 "valueId": "-family-"
                               }
                            ]
                         }
@@ -110,25 +110,25 @@
                   {
                      "context": "legacy",
                      "element": "dob",
-                     "variable": "_dob_"
+                     "variable": "-dob-"
                   }
                ],
                "target": [
                   {
                      "context": "patient",
                      "element": "birthDate",
-                     "variable": "_birthDate_"
+                     "variable": "-birthDate-"
                   }
                ],
                "dependent": [
                   {
-                     "name": "_DefaultMappingGroup_",
+                     "name": "-DefaultMappingGroup-",
                      "parameter": [
                         {
-                           "valueId": "_dob_"
+                           "valueId": "-dob-"
                         },
                         {
-                           "valueId": "_birthDate_"
+                           "valueId": "-birthDate-"
                         }
                      ]
                   }

@@ -33,7 +33,7 @@
       ],
       "rule": [
         {
-          "name": "rule_a21b",
+          "name": "rule-a21b",
           "source": [
             {
               "context": "src",
@@ -60,7 +60,7 @@
           ]
         },
         {
-          "name": "rule_a21c",
+          "name": "rule-a21c",
           "source": [
             {
               "context": "src",

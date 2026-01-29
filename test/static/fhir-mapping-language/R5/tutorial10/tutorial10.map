@@ -9,6 +9,6 @@ group tutorial(source src : TLeft, target tgt : TRight) {
   src.aa as a -> tgt.aa = a;
 }
 
-group ab_content(source src : TLeftInner, target tgt : TRightInner) <<types>> {
+group abContent(source src : TLeftInner, target tgt : TRightInner) <<types>> {
   src.ab as b -> tgt.ab = b;
 }
