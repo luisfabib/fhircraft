@@ -806,6 +806,7 @@ class TestCompositeRepositoryPackageIntegration:
         mock_member.isfile.return_value = True
         mock_member.name = "package/StructureDefinition-Patient.json"
         mock_file = MagicMock()
+        print("SAMPLE_PATIENT_R4:", SAMPLE_PATIENT_R4)
         mock_file.read.return_value = json.dumps(SAMPLE_PATIENT_R4).encode("utf-8")
         mock_tar.getmembers.return_value = [mock_member]
         mock_tar.extractfile.return_value = mock_file
