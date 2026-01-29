@@ -7,11 +7,75 @@ from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     BackboneType,
     Element,
-    Quantity,
+    SimpleQuantity,
     Ratio,
     CodeableConcept,
+    Range,
     Timing,
 )
+
+
+class DosageDoseAndRate(BackboneType):
+    """
+    Amount of medication administered
+    """
+
+    _type = "BackboneType"
+
+    type: Optional[CodeableConcept] = Field(
+        description="The kind of dose or rate specified",
+        default=None,
+    )
+    doseRange: Optional[Range] = Field(
+        description="Amount of medication per dose",
+        default=None,
+    )
+    doseQuantity: Optional[SimpleQuantity] = Field(
+        description="Amount of medication per dose",
+        default=None,
+    )
+    rateRatio: Optional[Ratio] = Field(
+        description="Amount of medication per unit of time",
+        default=None,
+    )
+    rateRange: Optional[Range] = Field(
+        description="Amount of medication per unit of time",
+        default=None,
+    )
+    rateQuantity: Optional[SimpleQuantity] = Field(
+        description="Amount of medication per unit of time",
+        default=None,
+    )
+
+    @model_validator(mode="after")
+    def dose_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=["Range", "SimpleQuantity"],
+            field_name_base="dose",
+        )
+
+    @property
+    def dose(self):
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
+            base="dose",
+        )
+
+    @model_validator(mode="after")
+    def rate_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=["Ratio", "Range", "SimpleQuantity"],
+            field_name_base="rate",
+        )
+
+    @property
+    def rate(self):
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
+            base="rate",
+        )
 
 
 class Dosage(BackboneType):
@@ -81,7 +145,7 @@ class Dosage(BackboneType):
         description="Technique for administering medication",
         default=None,
     )
-    doseAndRate: Optional[List[Element]] = Field(
+    doseAndRate: Optional[List[DosageDoseAndRate]] = Field(
         description="Amount of medication administered, to be administered or typical amount to be administered",
         default=None,
     )
@@ -89,11 +153,11 @@ class Dosage(BackboneType):
         description="Upper limit on medication per unit of time",
         default=None,
     )
-    maxDosePerAdministration: Optional[Quantity] = Field(
+    maxDosePerAdministration: Optional[SimpleQuantity] = Field(
         description="Upper limit on medication per administration",
         default=None,
     )
-    maxDosePerLifetime: Optional[Quantity] = Field(
+    maxDosePerLifetime: Optional[SimpleQuantity] = Field(
         description="Upper limit on medication per lifetime of the patient",
         default=None,
     )

@@ -8,7 +8,196 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Reference,
     CodeableConcept,
+    BackboneElement,
+    Coding,
+    Period,
+    Duration,
 )
+
+
+class DataRequirementCodeFilter(BackboneElement):
+    """
+    What codes are expected
+    """
+
+    _type = "BackboneElement"
+
+    path: Optional[String] = Field(
+        description="A code-valued attribute to filter on",
+        default=None,
+    )
+    path_ext: Optional[Element] = Field(
+        description="Placeholder element for path extensions",
+        default=None,
+        alias="_path",
+    )
+    searchParam: Optional[String] = Field(
+        description="A search parameter defined on the specified type",
+        default=None,
+    )
+    searchParam_ext: Optional[Element] = Field(
+        description="Placeholder element for searchParam extensions",
+        default=None,
+        alias="_searchParam",
+    )
+    valueSet: Optional[Canonical] = Field(
+        description="The valueset for the filter",
+        default=None,
+    )
+    valueSet_ext: Optional[Element] = Field(
+        description="Placeholder element for valueSet extensions",
+        default=None,
+        alias="_valueSet",
+    )
+    code: Optional[List[Coding]] = Field(
+        description="What code is expected",
+        default=None,
+    )
+
+
+class DataRequirementDateFilter(BackboneElement):
+    """
+    What dates/date ranges are expected
+    """
+
+    _type = "BackboneElement"
+
+    path: Optional[String] = Field(
+        description="A date-valued attribute to filter on",
+        default=None,
+    )
+    path_ext: Optional[Element] = Field(
+        description="Placeholder element for path extensions",
+        default=None,
+        alias="_path",
+    )
+    searchParam: Optional[String] = Field(
+        description="A date-valued parameter to search on",
+        default=None,
+    )
+    searchParam_ext: Optional[Element] = Field(
+        description="Placeholder element for searchParam extensions",
+        default=None,
+        alias="_searchParam",
+    )
+    valueDateTime: Optional[DateTime] = Field(
+        description="The value of the filter, as a dateTime",
+        default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
+    )
+    valuePeriod: Optional[Period] = Field(
+        description="The value of the filter, as a period",
+        default=None,
+    )
+    valueDuration: Optional[Duration] = Field(
+        description="The value of the filter, as a duration",
+        default=None,
+    )
+
+    @model_validator(mode="after")
+    def value_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=["DateTime", "Period", "Duration"],
+            field_name_base="value",
+        )
+
+    @property
+    def value(self):
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
+            base="value",
+        )
+
+
+class DataRequirementValueFilter(BackboneElement):
+    """
+    What values are expected
+    """
+
+    _type = "BackboneElement"
+
+    path: Optional[String] = Field(
+        description="An attribute to filter on",
+        default=None,
+    )
+    path_ext: Optional[Element] = Field(
+        description="Placeholder element for path extensions",
+        default=None,
+        alias="_path",
+    )
+    searchParam: Optional[String] = Field(
+        description="A parameter to search on",
+        default=None,
+    )
+    searchParam_ext: Optional[Element] = Field(
+        description="Placeholder element for searchParam extensions",
+        default=None,
+        alias="_searchParam",
+    )
+    valueDateTime: Optional[DateTime] = Field(
+        description="The value of the filter, as a dateTime",
+        default=None,
+    )
+    valueDateTime_ext: Optional[Element] = Field(
+        description="Placeholder element for valueDateTime extensions",
+        default=None,
+        alias="_valueDateTime",
+    )
+    valuePeriod: Optional[Period] = Field(
+        description="The value of the filter, as a period",
+        default=None,
+    )
+    valueDuration: Optional[Duration] = Field(
+        description="The value of the filter, as a duration",
+        default=None,
+    )
+
+    @model_validator(mode="after")
+    def value_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=["DateTime", "Period", "Duration"],
+            field_name_base="value",
+        )
+
+    @property
+    def value(self):
+        return fhir_validators.get_type_choice_value_by_base(
+            self,
+            base="value",
+        )
+
+
+class DataRequirementSort(BackboneElement):
+    """
+    Order of the results
+    """
+
+    _type = "BackboneElement"
+
+    path: Optional[String] = Field(
+        description="The name of the attribute to perform the sort",
+        default=None,
+    )
+    path_ext: Optional[Element] = Field(
+        description="Placeholder element for path extensions",
+        default=None,
+        alias="_path",
+    )
+    direction: Optional[Code] = Field(
+        description="The direction of the sort, ascending or descending",
+        default=None,
+    )
+    direction_ext: Optional[Element] = Field(
+        description="Placeholder element for direction extensions",
+        default=None,
+        alias="_direction",
+    )
 
 
 class DataRequirement(Element):
@@ -53,15 +242,15 @@ class DataRequirement(Element):
         default=None,
         alias="_mustSupport",
     )
-    codeFilter: Optional[List[Element]] = Field(
+    codeFilter: Optional[List[DataRequirementCodeFilter]] = Field(
         description="What codes are expected",
         default=None,
     )
-    dateFilter: Optional[List[Element]] = Field(
+    dateFilter: Optional[List[DataRequirementDateFilter]] = Field(
         description="What dates/date ranges are expected",
         default=None,
     )
-    valueFilter: Optional[List[Element]] = Field(
+    valueFilter: Optional[List[DataRequirementValueFilter]] = Field(
         description="What values are expected",
         default=None,
     )
@@ -74,7 +263,7 @@ class DataRequirement(Element):
         default=None,
         alias="_limit",
     )
-    sort: Optional[List[Element]] = Field(
+    sort: Optional[List[DataRequirementSort]] = Field(
         description="Order of the results",
         default=None,
     )
