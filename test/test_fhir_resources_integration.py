@@ -162,6 +162,7 @@ fhir_profiles_test_cases = [
     "mode", [ConstructionMode.DIFFERENTIAL, ConstructionMode.SNAPSHOT]
 )
 @pytest.mark.parametrize("filename", fhir_profiles_test_cases)
+@pytest.mark.filterwarnings("ignore:.*eld-24.*")
 def test_construct_profiled_resource(mode, filename):
     # Use the auto-generated model to validate a FHIR resource
     with open(
