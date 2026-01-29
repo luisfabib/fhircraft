@@ -33,7 +33,7 @@
       ],
       "rule": [
         {
-          "name": "rule_a21b",
+          "name": "rule-a21b",
           "source": [
             {
               "context": "src",

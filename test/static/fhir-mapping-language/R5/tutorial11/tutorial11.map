@@ -5,10 +5,10 @@ uses "http://hl7.org/fhir/StructureDefinition/tutorial-right-11" alias TRight as
 
 group tutorial(source src : TLeft, target tgt : TRight) {
 
-  src.e as s_e -> tgt.e as t_e then {
-    s_e -> t_e.f = s_e, t_e.g = 'g1' "rule_se_teg";
-  } "rule_se";
-  src.f as s_f -> tgt.e as t_e first then {
-    s_f -> t_e.f = s_f, t_e.g = 'g2' "rule_sf_teg";
-  } "rule_sf";
+  src.e as se -> tgt.e as te then {
+    se -> te.f = se, te.g = 'g1' "rule-se-teg";
+  } "rule-se";
+  src.f as sf -> tgt.e as te first then {
+    sf -> te.f = sf, te.g = 'g2' "rule-sf-teg";
+  } "rule-sf";
 }

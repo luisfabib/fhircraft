@@ -216,7 +216,7 @@ class MappingScope:
             MappingError: If the symbol cannot be found in the current or any parent scopes.
         """
         # Handle special _DefaultMappingGroup_ symbol
-        if identifier == "_DefaultMappingGroup_":
+        if identifier == "-DefaultMappingGroup-":
             return self._resolve_default_mapping_group()
 
         # Check local scope first
@@ -274,7 +274,7 @@ class MappingScope:
         self,
     ) -> R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup:
         """
-        Resolves the _DefaultMappingGroup_ symbol by looking for appropriate default groups
+        Resolves the -DefaultMappingGroup- symbol by looking for appropriate default groups
         based on current context types.
 
         Returns:
@@ -300,7 +300,7 @@ class MappingScope:
         )
 
         return StructureMapGroup(
-            name="_GeneratedCopyGroup_",
+            name="-GeneratedCopyGroup-",
             typeMode="none",
             input=[
                 StructureMapGroupInput(name="source", mode="source"),

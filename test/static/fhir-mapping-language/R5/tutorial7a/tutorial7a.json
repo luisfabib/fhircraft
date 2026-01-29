@@ -32,12 +32,12 @@
       ],
       "rule": [
         {
-          "name": "rule_aa",
+          "name": "rule-aa",
           "source": [
             {
               "context": "src",
               "element": "aa",
-              "variable": "s_aa"
+              "variable": "saa"
             }
           ],
           "target": [
@@ -45,22 +45,22 @@
               "context": "tgt",
               "contextType": "variable",
               "element": "aa",
-              "variable": "t_aa"
+              "variable": "taa"
             }
           ],
           "rule": [
             {
-              "name": "rule_ab",
+              "name": "rule-ab",
               "source": [
                 {
-                  "context": "s_aa",
+                  "context": "saa",
                   "element": "ab",
                   "variable": "ab"
                 }
               ],
               "target": [
                 {
-                  "context": "t_aa",
+                  "context": "taa",
                   "contextType": "variable",
                   "element": "ab",
                   "transform": "copy",

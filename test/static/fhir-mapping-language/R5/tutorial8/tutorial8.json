@@ -65,7 +65,7 @@
       ],
       "rule": [
         {
-          "name": "rule_d",
+          "name": "rule-d",
           "source": [
             {
               "context": "src",

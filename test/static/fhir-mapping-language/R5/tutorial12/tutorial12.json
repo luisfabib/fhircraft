@@ -32,22 +32,22 @@
       ],
       "rule": [
         {
-          "name": "rule_saz1",
+          "name": "rule-saz1",
           "source": [
             {
               "context": "src",
               "element": "az1",
-              "variable": "s_az1"
+              "variable": "saz1"
             }
           ],
           "rule": [
             {
-              "name": "rule_taz1",
+              "name": "rule-taz1",
               "source": [
                 {
-                  "context": "s_az1",
+                  "context": "saz1",
                   "element": "az3",
-                  "variable": "s_az3"
+                  "variable": "saz3"
                 }
               ],
               "target": [
@@ -55,22 +55,22 @@
                   "context": "tgt",
                   "contextType": "variable",
                   "element": "az1",
-                  "variable": "t_az1"
+                  "variable": "taz1"
                 }
               ],
               "rule": [
                 {
-                  "name": "rule_az2",
+                  "name": "rule-az2",
                   "source": [
                     {
-                      "context": "s_az1",
+                      "context": "saz1",
                       "element": "az2",
                       "variable": "az2"
                     }
                   ],
                   "target": [
                     {
-                      "context": "t_az1",
+                      "context": "taz1",
                       "contextType": "variable",
                       "element": "az2",
                       "transform": "copy",
@@ -83,21 +83,21 @@
                   ]
                 },
                 {
-                  "name": "rule_az3",
+                  "name": "rule-az3",
                   "source": [
                     {
-                      "context": "s_az3"
+                      "context": "saz3"
                     }
                   ],
                   "target": [
                     {
-                      "context": "t_az1",
+                      "context": "taz1",
                       "contextType": "variable",
                       "element": "az3",
                       "transform": "copy",
                       "parameter": [
                         {
-                          "valueId": "s_az3"
+                          "valueId": "saz3"
                         }
                       ]
                     }

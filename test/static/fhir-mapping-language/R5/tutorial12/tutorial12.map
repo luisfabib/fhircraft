@@ -6,16 +6,16 @@ uses "http://hl7.org/fhir/StructureDefinition/tutorial-right-12" alias TRight as
 group tutorial(source src : TLeft, target tgt : TRight) {
 
 // setting up a variable for the parent
-src.az1 as s_az1 then {
+src.az1 as saz1 then {
 
   // one tgt.az1 for each az3
-  s_az1.az3 as s_az3 -> tgt.az1 as t_az1 then {
+  saz1.az3 as saz3 -> tgt.az1 as taz1 then {
     // value for az2. Note that this refers to a previous context in the source
-    s_az1.az2 as az2 -> t_az1.az2 = az2 "rule_az2";
+    saz1.az2 as az2 -> taz1.az2 = az2 "rule-az2";
 
     // value for az3
-    s_az3 -> t_az1.az3 = s_az3 "rule_az3";
-  } "rule_taz1";
-} "rule_saz1";
+    saz3 -> taz1.az3 = saz3 "rule-az3";
+  } "rule-taz1";
+} "rule-saz1";
 
 }

@@ -7,6 +7,6 @@ uses "http://hl7.org/fhir/StructureDefinition/tutorial-left-5" alias TLeft as so
 uses "http://hl7.org/fhir/StructureDefinition/tutorial-right-5" alias TRight as target
 
 group tutorial(source src : TLeft, target tgt : TRight) {
-  src.a22 as a -> tgt.a22 = a "rule_a22";
+  src.a22 as a -> tgt.a22 = a "rule-a22";
 }
 

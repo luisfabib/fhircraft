@@ -32,12 +32,12 @@
       ],
       "rule": [
         {
-          "name": "rule_se",
+          "name": "rule-se",
           "source": [
             {
               "context": "src",
               "element": "e",
-              "variable": "s_e"
+              "variable": "se"
             }
           ],
           "target": [
@@ -45,31 +45,31 @@
               "context": "tgt",
               "contextType": "variable",
               "element": "e",
-              "variable": "t_e"
+              "variable": "te"
             }
           ],
           "rule": [
             {
-              "name": "rule_se_teg",
+              "name": "rule-se-teg",
               "source": [
                 {
-                  "context": "s_e"
+                  "context": "se"
                 }
               ],
               "target": [
                 {
-                  "context": "t_e",
+                  "context": "te",
                   "contextType": "variable",
                   "element": "f",
                   "transform": "copy",
                   "parameter": [
                     {
-                      "valueId": "s_e"
+                      "valueId": "se"
                     }
                   ]
                 },
                 {
-                  "context": "t_e",
+                  "context": "te",
                   "contextType": "variable",
                   "element": "g",
                   "transform": "copy",
@@ -84,12 +84,12 @@
           ]
         },
         {
-          "name": "rule_sf",
+          "name": "rule-sf",
           "source": [
             {
               "context": "src",
               "element": "f",
-              "variable": "s_f"
+              "variable": "sf"
             }
           ],
           "target": [
@@ -97,7 +97,7 @@
               "context": "tgt",
               "contextType": "variable",
               "element": "e",
-              "variable": "t_e",
+              "variable": "te",
               "listMode": [
                 "first"
               ]
@@ -105,26 +105,26 @@
           ],
           "rule": [
             {
-              "name": "rule_sf_teg",
+              "name": "rule-sf-teg",
               "source": [
                 {
-                  "context": "s_f"
+                  "context": "sf"
                 }
               ],
               "target": [
                 {
-                  "context": "t_e",
+                  "context": "te",
                   "contextType": "variable",
                   "element": "f",
                   "transform": "copy",
                   "parameter": [
                     {
-                      "valueId": "s_f"
+                      "valueId": "sf"
                     }
                   ]
                 },
                 {
-                  "context": "t_e",
+                  "context": "te",
                   "contextType": "variable",
                   "element": "g",
                   "transform": "copy",
