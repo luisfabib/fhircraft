@@ -103,17 +103,20 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     @model_validator(mode="before")
     @classmethod
     def _validate_resource_type(cls, data: Any) -> Any:
-        if isinstance(data, dict) and "resourceType" in data:
-            if data["resourceType"] != cls._type:
-                raise ValueError(
-                    f"Invalid resourceType '{data['resourceType']}' for model '{cls.__name__}', expected '{cls._type}'."
-                )
+        if not "resourceType" in cls.model_fields:
+            if isinstance(data, dict) and "resourceType" in data:
+                data = data.copy()
+                resource_type = data.pop("resourceType")
+                if resource_type != cls._type:
+                    raise ValueError(
+                        f"Invalid resourceType '{resource_type}' for model '{cls.__name__}', expected '{cls._type}'."
+                    )
 
-        elif isinstance(data, FHIRBaseModel):
-            if data._type != cls._type:
-                raise ValueError(
-                    f"Invalid resourceType '{data._type}' for model '{cls.__name__}', expected '{cls._type}'."
-                )
+            elif isinstance(data, FHIRBaseModel):
+                if data._type != cls._type:
+                    raise ValueError(
+                        f"Invalid resourceType '{data._type}' for model '{cls.__name__}', expected '{cls._type}'."
+                    )
         return data
 
     @field_validator("*", mode="before")
