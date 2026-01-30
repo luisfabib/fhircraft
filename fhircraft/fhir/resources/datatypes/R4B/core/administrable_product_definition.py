@@ -345,6 +345,7 @@ class AdministrableProductDefinition(DomainResource):
     property_: Optional[ListType[AdministrableProductDefinitionProperty]] = Field(
         description="Characteristics e.g. a product\u0027s onset of action",
         default=None,
+        alias="property",
     )
     routeOfAdministration: Optional[
         ListType[AdministrableProductDefinitionRouteOfAdministration]

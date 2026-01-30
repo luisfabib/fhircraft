@@ -133,6 +133,7 @@ class EncounterHistory(DomainResource):
     class_: Optional[CodeableConcept] = Field(
         description="Classification of patient encounter",
         default=None,
+        alias="class",
     )
     type: Optional[List[CodeableConcept]] = Field(
         description="Specific type of encounter",

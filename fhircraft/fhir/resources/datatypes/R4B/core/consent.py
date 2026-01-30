@@ -220,6 +220,7 @@ class ConsentProvision(BackboneElement):
     class_: Optional[ListType[Coding]] = Field(
         description="e.g. Resource Type, Profile, CDA, etc.",
         default=None,
+        alias="class",
     )
     code: Optional[ListType[CodeableConcept]] = Field(
         description="e.g. LOINC or SNOMED CT code, etc. in the content",

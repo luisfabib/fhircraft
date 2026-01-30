@@ -152,6 +152,7 @@ class ValueSetComposeIncludeFilter(BackboneElement):
     property_: Optional[Code] = Field(
         description="A property/filter defined by the code system",
         default=None,
+        alias="property",
     )
     property_ext: Optional[Element] = Field(
         description="Placeholder element for property extensions",
@@ -371,6 +372,7 @@ class ValueSetCompose(BackboneElement):
     property_: Optional[List[String]] = Field(
         description="Property to return if client doesn\u0027t override",
         default=None,
+        alias="property",
     )
     property_ext: Optional[Element] = Field(
         description="Placeholder element for property extensions",
@@ -914,6 +916,7 @@ class ValueSetExpansionContains(BackboneElement):
     property_: Optional[List[ValueSetExpansionContainsProperty]] = Field(
         description="Property value for the concept",
         default=None,
+        alias="property",
     )
     contains: Optional[List["ValueSetExpansionContains"]] = Field(
         description="Codes contained under this entry",
@@ -1001,6 +1004,7 @@ class ValueSetExpansion(BackboneElement):
     property_: Optional[List[ValueSetExpansionProperty]] = Field(
         description="Additional information supplied about each concept",
         default=None,
+        alias="property",
     )
     contains: Optional[List[ValueSetExpansionContains]] = Field(
         description="Codes in the value set",

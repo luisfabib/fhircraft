@@ -903,6 +903,7 @@ class ImplementationGuide(DomainResource):
     global_: Optional[List[ImplementationGuideGlobal]] = Field(
         description="Profiles that apply globally",
         default=None,
+        alias="global",
     )
     definition: Optional[ImplementationGuideDefinition] = Field(
         description="Information needed to build the IG",

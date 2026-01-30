@@ -320,6 +320,7 @@ class BiologicallyDerivedProduct(DomainResource):
     property_: Optional[List[BiologicallyDerivedProductProperty]] = Field(
         description="A property that is specific to this BiologicallyDerviedProduct instance",
         default=None,
+        alias="property",
     )
 
     @model_validator(mode="after")
