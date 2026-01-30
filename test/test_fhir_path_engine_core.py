@@ -171,6 +171,7 @@ class TestElement(TestCase):
             def __init__(self):
                 self.status = "active"
                 self.valueString = None
+                self.class_ = "classValue"
                 self.valueString_ext = {
                     type("Extension", (), {"valueId": "id1"})(),
                 }
@@ -191,6 +192,12 @@ class TestElement(TestCase):
         result = Element("status").evaluate(self.collection, env, create=False)
         assert len(result) == 1
         assert result[0].value == "active"
+
+    def test_evaluate_returns_correct_value_for_reserved_keywords(self):
+        # Should return the value of the field as a FHIRPathCollectionItem
+        result = Element("class").evaluate(self.collection, env, create=False)
+        assert len(result) == 1
+        assert result[0].value == "classValue"
 
     def test_evaluate_returns_empty_when_field_missing_and_create_false(self):
         # Should return empty list if field does not exist and create is False

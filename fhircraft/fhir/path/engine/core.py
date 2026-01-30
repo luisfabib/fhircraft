@@ -798,6 +798,10 @@ class Element(FHIRPath):
         child_collection = self._get_collection_by_label(collection, self.label, create)
         if not child_collection:
             child_collection = self._get_collection_by_label(
+                collection, f"{self.label}_", create
+            )
+        if not child_collection:
+            child_collection = self._get_collection_by_label(
                 collection, f"{self.label}_ext", create
             )
         if not child_collection and self.label in ["id", "extension"]:
