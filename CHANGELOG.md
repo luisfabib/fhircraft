@@ -7,6 +7,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## v0.6.0 - 2026-01-30
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.0...0.5.0)
+
+### Added
+
+- Added support for differential-based FHIR model construction allowing more efficient resource creation and modification ([#156](https://github.com/luisfabib/fhircraft/pull/156))
+    * Established using the `StructureDefinition.differential` as default behavior for contructing FHIR resource models. 
+    * Introduced `construction_mode` configuration to the resource factory with `SNAPSHOT`, `DIFFERENTIAL`, and `AUTO` modes to control how to build resource models from structure definitions
+- Added support for XML (de)serialization of FHIR resources through the new methods `model_dump_xml` and `model_validate_xml` ([#154](https://github.com/luisfabib/fhircraft/pull/154))
+- Added support for mapping arbitrary structures as sources in FHIR Mapping Language enabling more flexible data transformations without requiring a strict structure definition ([#153](https://github.com/luisfabib/fhircraft/pull/153))
+- Added support for nested target elements in FHIR Mapping Language parser to detect nested target paths and recursively expand them into intermediate targets with generated variables and nested rules, following the FHIR specification ([#160](https://github.com/luisfabib/fhircraft/pull/160))
+- Added suuport for identity transforms and default group mappings in the FHIR Mapping Language engine ([#165](https://github.com/luisfabib/fhircraft/pull/165), fixes [#164](https://github.com/luisfabib/fhircraft/issues/164))
+  - Enhanced the mapping engine to track groups with `StructureMap.group.typeMode` of `types` or `type-and-types` and makes them available for automatic invocation when using default mapping rules.
+  - Introduced an internal `_DefaultMappingGroup_` symbol both for the FML parser and mapping engine to denote a dynamic mapping group that resolves into an appropriate default mapping group based on type context, with fallback to a simple copy group.
+- Overhauled the  documentation ([#184](https://github.com/luisfabib/fhircraft/pull/184))
+  - Added new user guides with better storylines, clearer explanation, better examples and with references to external resources   
+  - Restructured the technical API reference for better navigation and removed internal (private) API documentation
+  - Added a new suite of tests that ensure that all documentation examples are error-free.
+- Added `ElementDefinition` models missing for all FHIR releases (R4, R4B, R5) ([#189](https://github.com/luisfabib/fhircraft/pull/189))
+- Missing nested backbone elements in `Dosage`, `Timing` and `DataRequirements` complex types across R4, R4B and R5 ([#224](https://github.com/luisfabib/fhircraft/pull/224))
+- Added multi-release FHIR Support for mapping parser and engine ([#221](https://github.com/luisfabib/fhircraft/pull/221))
+- Added new class variables to all `FHIRBaseModel` subclasses to contain FHIR metadata ([#212](https://github.com/luisfabib/fhircraft/pull/212))
+  - Added `_abstract` to indicate concrete resource implementations
+  - Added `_type` field containing the FHIR resource type name to replace the now removed Pydantic field `resourceType`
+  - Added `_canonical_url` containing the official HL7 FHIR structure definition URL
+
+### Changed
+
+- All Pydantic FHIR models now forbid extra fields for enhanced validation and strict FHIR conformance ([#223](https://github.com/luisfabib/fhircraft/pull/223))
+- Updated the FHIRPath and FHIR Mapping Language parsers and lexers to reduce overhead and wasteful instantiation greatly improving overall performance ([#155](https://github.com/luisfabib/fhircraft/pull/155))
+- Updated the type choice validator `validate_type_choice_element` to also check for the absence of types not permitted by the structure definition ([#156](https://github.com/luisfabib/fhircraft/pull/156))
+- Updated the FHIRPath mixin methods now include optional `environment` argument for custom environment variables ([#169](https://github.com/luisfabib/fhircraft/pull/169), fixes [#166](https://github.com/luisfabib/fhircraft/issues/166))
+- Changed FHIR model fields validation to support both name (`validate_by_name`) and alias (`validate_by_alias`) validation ([#175](https://github.com/luisfabib/fhircraft/pull/175))
+- Changed the FHIR Mapping Language comment handling to ignore comments rather than attempting to parse them as `StructureMap` documentation elements ([#182](https://github.com/luisfabib/fhircraft/pull/182))
+  
+- FHIR constraint validators refactored from field-level to model-level validation for proper environment access ([#201](https://github.com/luisfabib/fhircraft/pull/201))
+- Added multiple checks to raise errors in the mapping engine if critical elements are not set in the `StructureMap` resource ([#188](https://github.com/luisfabib/fhircraft/pull/188))
+- Refactored all FHIR element constraint validators from Pydantic's `@field_validator` decorator to `@model_validator(mode="after")` to ensure FHIRPath invariant constraint evaluated on fully built instances with access to environment variables ([#201](https://github.com/luisfabib/fhircraft/pull/201), fixes [#190](https://github.com/luisfabib/fhircraft/issues/190))
+- Updated the repository and factory methods to now use version-specific models instead of a bootstrapped `StructureDefinition` and `ElementDefinition` model. Avoids lost version-specific data when version-specific fields that were ignored during validation or during round-trip validation ([#210](https://github.com/luisfabib/fhircraft/pull/210))
+
+
+### Fixed
+
+- Improved the behavior of the code generator for factory-generated models, nested annotations, and type alias serialization ([#156](https://github.com/luisfabib/fhircraft/pull/156), fixes [#138](https://github.com/luisfabib/fhircraft/issues/138))
+- Updated the `GreaterThan`, `LessThan`, `LessEqualThan` and `GreaterEqualThan` FHIRPath operators to treat zero (`0`) as a valid value, preventing it from being skipped in comparisons ([#158](https://github.com/luisfabib/fhircraft/pull/158), fixes [#157](https://github.com/luisfabib/fhircraft/issues/157))
+- Fixed the evaluation of the FHIRPath `All` operator to properly evaluate the boolean values returned by the criteria expressions ([#158](https://github.com/luisfabib/fhircraft/pull/158))
+- Fixed `Extension` field types to use forward references to avoid import errors on runtime ([#159](https://github.com/luisfabib/fhircraft/pull/159))
+- Fixed the FHIRPath equality operator string representation to use single equals sign (`=`) to fix errors encountered during mapping ([#163](https://github.com/luisfabib/fhircraft/pull/163), fixes [#161](https://github.com/luisfabib/fhircraft/issues/161) and [#162](https://github.com/luisfabib/fhircraft/issues/162))
+- Updated the FHIRPath parser to support type specifiers containing resource names like `FHIR.Patient` ([#170](https://github.com/luisfabib/fhircraft/pull/170), fixes [#170](https://github.com/luisfabib/fhircraft/issues/170))
+- Updated the FHIRPath engine to support arguments of type `FHIRPath` in functions already taking `Literal` type values allowing runtime evaluation of dynamic input arguments ([#172](https://github.com/luisfabib/fhircraft/pull/172), fixes [#171](https://github.com/luisfabib/fhircraft/issues/171))
+- Fixed the FHIRPath lexer to correctly handle escaped quotes (`\'` and `\"`) in strings supporting escape sequences usch as regexes ([#181](https://github.com/luisfabib/fhircraft/pull/181), fixes [#181](https://github.com/luisfabib/fhircraft/issues/181))
+- Improved the code generator's handling of `default_factory` values containing lambda-functions or `BaseModel` instances ([#183](https://github.com/luisfabib/fhircraft/pull/183), fixes [#180](https://github.com/luisfabib/fhircraft/issues/180))
+- Fixed multiple bugs in the FHIR Mapping Language engine ([#188](https://github.com/luisfabib/fhircraft/pull/188))
+  - Fixed a bug leading to resolvable structure types not being recognized and treating all targets as `ArbitraryModel` instances and returning dictionaries (Fixes [#187](https://github.com/luisfabib/fhircraft/issues/187))
+  - Fixed structure definition resolution logic in mapping engine to use `StructureDefinition.name` as default alias when not specified
+  - Fixed HTML validation issues in FHIR Mapping Language parser when setting `StructureMap.text` with HTML-escaping mapping content
+- Fixed a `TypeError` in FHIRPath `Union` operation by removing unnecessary sorting that failed when collections contained incomparable types ([#196](https://github.com/luisfabib/fhircraft/pull/1196), fixes [#194](https://github.com/luisfabib/fhircraft/issues/194))
+- Fixed the environment variable precedence issue where default FHIRPath variables (`%context`, `%resource`, `%rootResource`, `%fhirRelease`) were overriding user-provided environment variables in nested evaluations. Custom environment variables now properly take precedence over system defaults when both are present ([#197](https://github.com/luisfabib/fhircraft/pull/197), fixes [#193](https://github.com/luisfabib/fhircraft/issues/193))
+- Resolved FHIRPath ambiguity issues where negative numbers conflicted with subtraction operators ([#198](https://github.com/luisfabib/fhircraft/pull/198), fixes [#198](https://github.com/luisfabib/fhircraft/issues/198))
+- Replaced `type.code.contains(':')` with `type.select(code.contains(':')).exists()` for the official FHIR `eld-11` constraint validation expression in `ElementDefinition` class for R5 release to properly handle collections with multiple `type.code` values ([#199](https://github.com/luisfabib/fhircraft/pull/199), fixes [#195](https://github.com/luisfabib/fhircraft/issues/195))
+- Fixed the incorrect resolution of the $this variable in FHIRPath expressions when used within nested function calls. Previously, $this would maintain the outer collection item context instead of updating to reflect the current evaluation context for certain FHIRPath functions ([#203](https://github.com/luisfabib/fhircraft/pull/203), fixes [#202](https://github.com/luisfabib/fhircraft/issues/202))
+- Added missing placeholder `*_ext` fields for all primitive `Extension.value[x]` choices ([#206](https://github.com/luisfabib/fhircraft/pull/206), fixes [#205](https://github.com/luisfabib/fhircraft/issues/205))
+- Fixed the model factory to now create placeholder elements for list-type elements with correct typing and update all model fields so primitive extension fields for list-type elements use `Optional[List[Optional[Element]]]` for FHIR compliance ([#207](https://github.com/luisfabib/fhircraft/pull/207), fixes [#204](https://github.com/luisfabib/fhircraft/issues/204))
+- Ensured that the `%fhirRelease` FHIRPath environment variable is available when evaluating FHIR invariant constraints ([#212](https://github.com/luisfabib/fhircraft/pull/212))
+- Enforced stronger validation and regex-patterns for string-representation of FHIR primitive types ([#222](https://github.com/luisfabib/fhircraft/pull/222))
+  - Fixed primitive type string representations to avoid partial matches leading to wrong type assignments or checks
+  - Fixed integer primitive types to reject out-of-range values for 32-bit signed integers (`Integer`, `PositiveInt`, `UnsignedInt`)
+  - Fixed integer primitive types to reject out-of-range values for 64-bit signed integers (`Integer64`)
+  - Enhanced the `Base64Binary` primitive type to validate proper base64 encoding and padding rule 
+- Added missing nested backbone elements in `Dosage`, `Timing` and `DataRequirements` complex types accross R4, R4B and R5 leading to errors when evaluating their invariant constraints ([#224](https://github.com/luisfabib/fhircraft/pull/224))
+
+### Removed  
+
+- Bootstrapped  `StructureDefinition` and `ElementDefinition` models containing only fields common to all releases and without validation ([#210](https://github.com/luisfabib/fhircraft/pull/210))
+- All resourceType fields from resource models that were redundant with new metadata system [#212](https://github.com/luisfabib/fhircraft/pull/212)
+- Duplicate `domain_resource.py` and `resource.py` modules in the R4, R4B, and R5 complex-type modules [#212](https://github.com/luisfabib/fhircraft/pull/212)
+  
+
+----------------- 
+
 ## v0.5.0 - 2025-12-19
 
 [GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.5.0) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.5.0...0.4.2)
