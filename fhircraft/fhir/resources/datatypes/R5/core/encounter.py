@@ -296,6 +296,7 @@ class Encounter(DomainResource):
     class_: Optional[List[CodeableConcept]] = Field(
         description="Classification of patient encounter context - e.g. Inpatient, outpatient",
         default=None,
+        alias="class",
     )
     priority: Optional[CodeableConcept] = Field(
         description="Indicates the urgency of the encounter",

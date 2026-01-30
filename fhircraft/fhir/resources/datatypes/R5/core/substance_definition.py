@@ -890,6 +890,7 @@ class SubstanceDefinition(DomainResource):
     property_: Optional[List[SubstanceDefinitionProperty]] = Field(
         description="General specifications for this substance",
         default=None,
+        alias="property",
     )
     referenceInformation: Optional[Reference] = Field(
         description="General information detailing this substance",
