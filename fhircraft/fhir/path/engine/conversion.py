@@ -70,7 +70,7 @@ class Iif(FHIRPathFunction):
             collection,
             get_expression_context(
                 environment,
-                collection[0] if collection else FHIRPathCollectionItem.wrap(None),
+                collection[0] if collection else FHIRPathCollectionItem.wrap([]),
                 0,
             ),
         )
