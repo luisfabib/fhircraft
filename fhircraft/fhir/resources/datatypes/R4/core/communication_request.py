@@ -75,6 +75,7 @@ class CommunicationRequest(DomainResource):
     """
 
     _abstract = False
+    _type = "CommunicationRequest"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CommunicationRequest"
 
     id: Optional[String] = Field(
