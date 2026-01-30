@@ -405,6 +405,7 @@ class DeviceDefinition(DomainResource):
     property_: Optional[ListType[DeviceDefinitionProperty]] = Field(
         description="The actual configuration settings of a device as it actually operates, e.g., regulation status, time properties",
         default=None,
+        alias="property",
     )
     owner: Optional[Reference] = Field(
         description="Organization responsible for device",

@@ -1004,6 +1004,7 @@ class DeviceDefinition(DomainResource):
     property_: Optional[List[DeviceDefinitionProperty]] = Field(
         description="Inherent, essentially fixed, characteristics of this kind of device, e.g., time properties, size, etc",
         default=None,
+        alias="property",
     )
     owner: Optional[Reference] = Field(
         description="Organization responsible for device",

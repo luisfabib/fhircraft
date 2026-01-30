@@ -341,6 +341,7 @@ class Coverage(DomainResource):
     class_: Optional[List[CoverageClass]] = Field(
         description="Additional coverage classifications",
         default=None,
+        alias="class",
     )
     order: Optional[PositiveInt] = Field(
         description="Relative order of the coverage",

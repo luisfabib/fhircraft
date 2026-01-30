@@ -37,6 +37,7 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
     property_: Optional[Uri] = Field(
         description="Reference to property mapping depends on",
         default=None,
+        alias="property",
     )
     property_ext: Optional[Element] = Field(
         description="Placeholder element for property extensions",
@@ -98,6 +99,7 @@ class ConceptMapGroupElementTargetProduct(BackboneElement):
     property_: Optional[Uri] = Field(
         description="Reference to property mapping depends on",
         default=None,
+        alias="property",
     )
     property_ext: Optional[Element] = Field(
         description="Placeholder element for property extensions",

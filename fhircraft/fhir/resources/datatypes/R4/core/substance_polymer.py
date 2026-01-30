@@ -344,6 +344,7 @@ class SubstancePolymer(DomainResource):
     class_: Optional[CodeableConcept] = Field(
         description="Todo",
         default=None,
+        alias="class",
     )
     geometry: Optional[CodeableConcept] = Field(
         description="Todo",

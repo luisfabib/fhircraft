@@ -841,6 +841,7 @@ class SubstanceDefinition(DomainResource):
     property_: Optional[ListType[SubstanceDefinitionProperty]] = Field(
         description="General specifications for this substance",
         default=None,
+        alias="property",
     )
     molecularWeight: Optional[ListType[SubstanceDefinitionMolecularWeight]] = Field(
         description="The molecular weight or weight range",

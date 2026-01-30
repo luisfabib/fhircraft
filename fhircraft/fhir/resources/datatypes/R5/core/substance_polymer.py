@@ -375,6 +375,7 @@ class SubstancePolymer(DomainResource):
     class_: Optional[CodeableConcept] = Field(
         description="Overall type of the polymer",
         default=None,
+        alias="class",
     )
     geometry: Optional[CodeableConcept] = Field(
         description="Polymer geometry, e.g. linear, branched, cross-linked, network or dendritic",

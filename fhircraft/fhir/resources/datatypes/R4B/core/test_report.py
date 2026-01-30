@@ -191,6 +191,7 @@ class TestReportSetupAction(BackboneElement):
     assert_: Optional[TestReportSetupActionAssert] = Field(
         description="The assertion to perform",
         default=None,
+        alias="assert",
     )
 
     @model_validator(mode="after")
@@ -361,6 +362,7 @@ class TestReportTestAction(BackboneElement):
     assert_: Optional[TestReportTestActionAssert] = Field(
         description="The assertion performed",
         default=None,
+        alias="assert",
     )
 
     @model_validator(mode="after")
