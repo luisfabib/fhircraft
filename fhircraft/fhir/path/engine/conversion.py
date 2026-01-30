@@ -61,18 +61,23 @@ class Iif(FHIRPathFunction):
             FHIRPathRuntimeError: If input collection has more than one item.
 
         """
-        criterion_collection = []
-        for index, item in enumerate(collection):
-            criterion_collection.extend(
-                self.criterion.evaluate(
-                    [item], get_expression_context(environment, item, index), create
-                )
+        if len(collection) > 1:
+            raise FHIRPathRuntimeError(
+                f"FHIRPath function {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection."
             )
 
-        if not criterion_collection:
-            criterion = False
-        else:
-            criterion = criterion_collection[0].value
+        criterion = self.criterion.single(
+            collection,
+            get_expression_context(
+                environment,
+                collection[0] if collection else FHIRPathCollectionItem.wrap(None),
+                0,
+            ),
+        )
+        if not isinstance(criterion, bool):
+            raise FHIRPathRuntimeError(
+                f"FHIRPath Iif function expected the criterion to evaluate to a single Boolean value, instead got {type(criterion)}."
+            )
 
         if criterion:
             if isinstance(self.true_result, FHIRPath):
