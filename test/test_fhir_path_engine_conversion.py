@@ -23,6 +23,7 @@ def test_iif_returns_empty_if_empty():
     result = Iif(Exists(), [FHIRPathCollectionItem.wrap(1)]).evaluate(collection, env)
     assert result == []
 
+
 def test_iif_returns_value_if_criterion_is_true():
     collection = [FHIRPathCollectionItem(value=True)]
     result = Iif(Exists(), [FHIRPathCollectionItem.wrap("return_value")]).evaluate(
@@ -39,6 +40,14 @@ def test_iif_returns_value_if_criterion_is_false():
         [FHIRPathCollectionItem.wrap("other_value")],
     ).evaluate(collection, env, create=False)
     assert result == [FHIRPathCollectionItem.wrap("other_value")]
+
+
+def test_iif_returns_true_if_criterion_is_empty():
+    collection = []
+    result = Iif(Empty(), [FHIRPathCollectionItem.wrap(True)]).evaluate(
+        collection, env, create=False
+    )
+    assert result == [FHIRPathCollectionItem.wrap(True)]
 
 
 def test_iif_returns_value_if_criterion_is_false_and_no_otherwise():
@@ -70,6 +79,7 @@ def test_iif_returns_evaluated_value_if_criterion_is_false_and_no_otherwise():
 def test_iif_string_representation():
     expression = Iif(Element("left"), Element("right"), Element("other"))
     assert str(expression) == "iif(left, right, other)"
+
 
 # ---------------------------
 # ToBoolean()
@@ -114,14 +124,17 @@ def test_toBoolean_converts_correctly_for_valid_type(value, expected):
     result = ToBoolean().evaluate(collection, env)
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
+
 def test_toBoolean_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     with pytest.raises(FHIRPathRuntimeError):
         ToBoolean().evaluate(collection, env)
 
+
 def test_toBoolean_string_representation():
     expression = ToBoolean()
     assert str(expression) == "toBoolean()"
+
 
 # ---------------------------
 # ConvertsToBoolean()
@@ -172,9 +185,11 @@ def test_convertsToBoolean_raises_error_for_multiple_items():
     with pytest.raises(FHIRPathRuntimeError):
         ConvertsToBoolean().evaluate(collection, env)
 
+
 def test_convertsToBoolean_string_representation():
     expression = ConvertsToBoolean()
     assert str(expression) == "convertsToBoolean()"
+
 
 # ---------------------------
 # ToInteger()
@@ -220,6 +235,7 @@ def test_toInteger_string_representation():
     expression = ToInteger()
     assert str(expression) == "toInteger()"
 
+
 # ---------------------------
 # ConvertsToInteger()
 # ---------------------------
@@ -264,6 +280,7 @@ def test_convertsToInteger_string_representation():
     expression = ConvertsToInteger()
     assert str(expression) == "convertsToInteger()"
 
+
 # ---------------------------
 # ToDecimal()
 # ---------------------------
@@ -307,6 +324,7 @@ def test_toDecimal_string_representation():
     expression = ToDecimal()
     assert str(expression) == "toDecimal()"
 
+
 # ---------------------------
 # ConvertsToDecimal()
 # ---------------------------
@@ -345,9 +363,11 @@ def test_convertsToDecimal_raises_error_for_multiple_items():
     with pytest.raises(FHIRPathRuntimeError):
         ConvertsToDecimal().evaluate(collection, env)
 
+
 def test_convertsToDecimal_string_representation():
     expression = ConvertsToDecimal()
     assert str(expression) == "convertsToDecimal()"
+
 
 # ---------------------------
 # ToDate()
@@ -387,9 +407,11 @@ def test_toDate_raises_error_for_multiple_items():
     with pytest.raises(FHIRPathRuntimeError):
         ToDate().evaluate(collection, env)
 
+
 def test_toDate_string_representation():
     expression = ToDate()
     assert str(expression) == "toDate()"
+
 
 # ---------------------------
 # ConvertsToDate()
@@ -428,6 +450,7 @@ def test_convertsToDate_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     with pytest.raises(FHIRPathRuntimeError):
         ConvertsToDate().evaluate(collection, env)
+
 
 def test_convertsToDate_string_representation():
     expression = ConvertsToDate()
@@ -472,9 +495,11 @@ def test_toDateTime_raises_error_for_multiple_items():
     with pytest.raises(FHIRPathRuntimeError):
         ToDateTime().evaluate(collection, env)
 
+
 def test_toDateTime_string_representation():
     expression = ToDateTime()
     assert str(expression) == "toDateTime()"
+
 
 # ---------------------------
 # ConvertsToDateTime()
@@ -514,9 +539,11 @@ def test_convertsToDateTime_raises_error_for_multiple_items():
     with pytest.raises(FHIRPathRuntimeError):
         ConvertsToDateTime().evaluate(collection, env)
 
+
 def test_convertsToDateTime_string_representation():
     expression = ConvertsToDateTime()
     assert str(expression) == "convertsToDateTime()"
+
 
 # ---------------------------
 # ToQuantity()
@@ -556,9 +583,11 @@ def test_toQuantity_raises_error_for_multiple_items():
     with pytest.raises(FHIRPathRuntimeError):
         ToQuantity().evaluate(collection, env)
 
+
 def test_toQuantity_string_representation():
     expression = ToQuantity()
     assert str(expression) == "toQuantity()"
+
 
 # ---------------------------
 # ConvertsToQuantity()
@@ -599,9 +628,11 @@ def test_convertsToQuantity_raises_error_for_multiple_items():
     with pytest.raises(FHIRPathRuntimeError):
         ConvertsToQuantity().evaluate(collection, env)
 
+
 def test_convertsToQuantity_string_representation():
     expression = ConvertsToQuantity()
     assert str(expression) == "convertsToQuantity()"
+
 
 # ---------------------------
 # ToString()
@@ -650,6 +681,7 @@ def test_toString_string_representation():
     expression = ToString()
     assert str(expression) == "toString()"
 
+
 # ---------------------------
 # ConvertsToString()
 # ---------------------------
@@ -691,9 +723,11 @@ def test_convertsToString_raises_error_for_multiple_items():
     with pytest.raises(FHIRPathRuntimeError):
         ConvertsToString().evaluate(collection, env)
 
+
 def test_convertsToString_string_representation():
     expression = ConvertsToString()
     assert str(expression) == "convertsToString()"
+
 
 # ---------------------------
 # ToTime()
@@ -733,9 +767,11 @@ def test_toTime_raises_error_for_multiple_items():
     with pytest.raises(FHIRPathRuntimeError):
         ToTime().evaluate(collection, env)
 
+
 def test_toTime_string_representation():
     expression = ToTime()
     assert str(expression) == "toTime()"
+
 
 # ---------------------------
 # ConvertsToTime()
@@ -774,6 +810,7 @@ def test_convertsToTime_raises_error_for_multiple_items():
     collection = [FHIRPathCollectionItem(value=1), FHIRPathCollectionItem(value=2)]
     with pytest.raises(FHIRPathRuntimeError):
         ConvertsToTime().evaluate(collection, env)
+
 
 def test_convertsToTime_string_representation():
     expression = ConvertsToTime()
