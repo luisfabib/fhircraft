@@ -61,29 +61,38 @@ class Iif(FHIRPathFunction):
             FHIRPathRuntimeError: If input collection has more than one item.
 
         """
-        criterion_collection = []
-        for index, item in enumerate(collection):
-            criterion_collection.extend(
-                self.criterion.evaluate(
-                    [item], get_expression_context(environment, item, index), create
-                )
+        if len(collection) > 1:
+            raise FHIRPathRuntimeError(
+                f"FHIRPath function {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection."
             )
 
-        if not criterion_collection:
-            criterion = False
-        else:
-            criterion = criterion_collection[0].value
+        eval_context = lambda collection: get_expression_context(
+            environment,
+            collection[0] if collection else FHIRPathCollectionItem.wrap(None),
+            0,
+        )
+
+        criterion = self.criterion.single(
+            collection,
+            environment=eval_context(collection),
+        )
+        if not isinstance(criterion, bool):
+            raise FHIRPathRuntimeError(
+                f"FHIRPath Iif function expected the criterion to evaluate to a single Boolean value, instead got {type(criterion)}."
+            )
 
         if criterion:
             if isinstance(self.true_result, FHIRPath):
-                return self.true_result.evaluate(collection, environment, create)
+                return self.true_result.evaluate(
+                    collection, eval_context(collection), create
+                )
             else:
                 return self.true_result
         else:
             if self.otherwise_result:
                 if isinstance(self.otherwise_result, FHIRPath):
                     return self.otherwise_result.evaluate(
-                        collection, environment, create
+                        collection, eval_context(collection), create
                     )
                 else:
                     return self.otherwise_result
