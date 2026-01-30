@@ -939,6 +939,7 @@ class TestScriptSetupAction(BackboneElement):
     assert_: Optional[TestScriptSetupActionAssert] = Field(
         description="The assertion to perform",
         default=None,
+        alias="assert",
     )
 
     @model_validator(mode="after")
@@ -1580,6 +1581,7 @@ class TestScriptTestAction(BackboneElement):
     assert_: Optional[TestScriptTestActionAssert] = Field(
         description="The setup assertion to perform",
         default=None,
+        alias="assert", 
     )
 
     @model_validator(mode="after")

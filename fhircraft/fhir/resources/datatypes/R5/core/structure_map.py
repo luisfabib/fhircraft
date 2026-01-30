@@ -985,6 +985,7 @@ class StructureMap(DomainResource):
     import_: Optional[List[Canonical]] = Field(
         description="Other maps used by this map (canonical URLs)",
         default=None,
+        alias="import",
     )
     import_ext: Optional[Element] = Field(
         description="Placeholder element for import extensions",

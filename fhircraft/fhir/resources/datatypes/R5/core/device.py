@@ -534,6 +534,7 @@ class Device(DomainResource):
     property_: Optional[List[DeviceProperty]] = Field(
         description="Inherent, essentially fixed, characteristics of the device.  e.g., time properties, size, material, etc.",
         default=None,
+        alias="property",
     )
     mode: Optional[CodeableConcept] = Field(
         description="The designated condition for performing a task",

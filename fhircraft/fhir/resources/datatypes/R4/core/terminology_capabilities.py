@@ -200,6 +200,7 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
     property_: Optional[ListType[Code]] = Field(
         description="Properties supported for $lookup",
         default=None,
+        alias="property",
     )
     property_ext: Optional[Element] = Field(
         description="Placeholder element for property extensions",

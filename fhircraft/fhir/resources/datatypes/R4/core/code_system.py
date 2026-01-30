@@ -345,6 +345,7 @@ class CodeSystemConcept(BackboneElement):
     property_: Optional[ListType[CodeSystemConceptProperty]] = Field(
         description="Property value for the concept",
         default=None,
+        alias="property",
     )
     concept: Optional[ListType["CodeSystemConcept"]] = Field(
         description="Child Concepts (is-a/contains/categorizes)",
@@ -622,6 +623,7 @@ class CodeSystem(DomainResource):
     property_: Optional[ListType[CodeSystemProperty]] = Field(
         description="Additional information supplied about each concept",
         default=None,
+        alias="property",
     )
     concept: Optional[ListType[CodeSystemConcept]] = Field(
         description="Concepts in the code system",

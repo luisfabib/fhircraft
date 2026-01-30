@@ -106,6 +106,7 @@ class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate(BackboneElement):
     from_: Optional[Decimal] = Field(
         description="Lower bound",
         default=None,
+        alias="from",
     )
     from_ext: Optional[Element] = Field(
         description="Placeholder element for from extensions",

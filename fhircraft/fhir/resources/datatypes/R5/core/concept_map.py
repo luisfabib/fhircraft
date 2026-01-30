@@ -511,6 +511,7 @@ class ConceptMapGroupElementTarget(BackboneElement):
     property_: Optional[List[ConceptMapGroupElementTargetProperty]] = Field(
         description="Property value for the source -\u003e target mapping",
         default=None,
+        alias="property",
     )
     dependsOn: Optional[List[ConceptMapGroupElementTargetDependsOn]] = Field(
         description="Other properties required for this mapping",
@@ -1094,6 +1095,7 @@ class ConceptMap(DomainResource):
     property_: Optional[List[ConceptMapProperty]] = Field(
         description="Additional properties of the mapping",
         default=None,
+        alias="property",
     )
     additionalAttribute: Optional[List[ConceptMapAdditionalAttribute]] = Field(
         description="Definition of an additional attribute to act as a data source or target",

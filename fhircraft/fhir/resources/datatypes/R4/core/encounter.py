@@ -67,6 +67,7 @@ class EncounterClassHistory(BackboneElement):
     class_: Optional[Coding] = Field(
         description="inpatient | outpatient | ambulatory | emergency +",
         default=None,
+        alias="class",
     )
     period: Optional[Period] = Field(
         description="The time that the episode was in the specified class",
@@ -355,6 +356,7 @@ class Encounter(DomainResource):
     class_: Optional[Coding] = Field(
         description="Classification of patient encounter",
         default=None,
+        alias="class",
     )
     classHistory: Optional[ListType[EncounterClassHistory]] = Field(
         description="List of past encounter classes",

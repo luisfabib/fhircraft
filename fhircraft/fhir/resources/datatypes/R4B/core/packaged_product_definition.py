@@ -271,6 +271,7 @@ class PackagedProductDefinitionPackage(BackboneElement):
     property_: Optional[ListType[PackagedProductDefinitionPackageProperty]] = Field(
         description="General characteristics of this item",
         default=None,
+        alias="property",
     )
     containedItem: Optional[ListType[PackagedProductDefinitionPackageContainedItem]] = (
         Field(

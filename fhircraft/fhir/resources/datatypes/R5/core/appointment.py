@@ -446,6 +446,7 @@ class Appointment(DomainResource):
     class_: Optional[List[CodeableConcept]] = Field(
         description="Classification when becoming an encounter",
         default=None,
+        alias="class",
     )
     serviceCategory: Optional[List[CodeableConcept]] = Field(
         description="A broad categorization of the service that is to be performed during this appointment",

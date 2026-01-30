@@ -1029,6 +1029,7 @@ class Task(DomainResource):
     for_: Optional[Reference] = Field(
         description="Beneficiary of the Task",
         default=None,
+        alias="for",
     )
     encounter: Optional[Reference] = Field(
         description="Healthcare event during which this task originated",

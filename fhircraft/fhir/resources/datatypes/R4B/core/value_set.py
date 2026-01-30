@@ -133,6 +133,7 @@ class ValueSetComposeIncludeFilter(BackboneElement):
     property_: Optional[Code] = Field(
         description="A property/filter defined by the code system",
         default=None,
+        alias="property",
     )
     property_ext: Optional[Element] = Field(
         description="Placeholder element for property extensions",

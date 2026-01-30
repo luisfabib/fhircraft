@@ -190,6 +190,7 @@ class ManufacturedItemDefinition(DomainResource):
     property_: Optional[ListType[ManufacturedItemDefinitionProperty]] = Field(
         description="General characteristics of this item",
         default=None,
+        alias="property",
     )
 
     @model_validator(mode="after")

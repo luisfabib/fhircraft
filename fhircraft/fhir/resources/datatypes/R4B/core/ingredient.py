@@ -338,6 +338,7 @@ class Ingredient(DomainResource):
     for_: Optional[ListType[Reference]] = Field(
         description="The product which this ingredient is a constituent part of",
         default=None,
+        alias="for",
     )
     role: Optional[CodeableConcept] = Field(
         description="Purpose of the ingredient within the product, e.g. active, inactive",

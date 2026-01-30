@@ -283,6 +283,7 @@ class ManufacturedItemDefinitionComponent(BackboneElement):
     property_: Optional[List[ManufacturedItemDefinitionComponentProperty]] = Field(
         description="General characteristics of this component",
         default=None,
+        alias="property",
     )
     component: Optional[List["ManufacturedItemDefinitionComponent"]] = Field(
         description="A component that this component contains or is made from",
@@ -413,6 +414,7 @@ class ManufacturedItemDefinition(DomainResource):
     property_: Optional[List[ManufacturedItemDefinitionProperty]] = Field(
         description="General characteristics of this item",
         default=None,
+        alias="property",
     )
     component: Optional[List[ManufacturedItemDefinitionComponent]] = Field(
         description="Physical parts of the manufactured item, that it is intrisically made from. This is distinct from the ingredients that are part of its chemical makeup",

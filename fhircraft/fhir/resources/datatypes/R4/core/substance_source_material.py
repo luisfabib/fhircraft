@@ -173,6 +173,7 @@ class SubstanceSourceMaterialOrganismOrganismGeneral(BackboneElement):
     class_: Optional[CodeableConcept] = Field(
         description="The class of an organism shall be specified",
         default=None,
+        alias="class",
     )
     order: Optional[CodeableConcept] = Field(
         description="The order of an organism shall be specified,",

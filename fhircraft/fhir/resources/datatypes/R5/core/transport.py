@@ -1070,6 +1070,7 @@ class Transport(DomainResource):
     for_: Optional[Reference] = Field(
         description="Beneficiary of the Transport",
         default=None,
+        alias="for",
     )
     encounter: Optional[Reference] = Field(
         description="Healthcare event during which this transport originated",
