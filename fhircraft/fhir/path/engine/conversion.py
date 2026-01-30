@@ -66,13 +66,15 @@ class Iif(FHIRPathFunction):
                 f"FHIRPath function {self.__str__()} expected a single-item collection, instead got a {len(collection)}-items collection."
             )
 
+        eval_context = lambda collection: get_expression_context(
+            environment,
+            collection[0] if collection else FHIRPathCollectionItem.wrap(None),
+            0,
+        )
+
         criterion = self.criterion.single(
             collection,
-            get_expression_context(
-                environment,
-                collection[0] if collection else FHIRPathCollectionItem.wrap([]),
-                0,
-            ),
+            environment=eval_context(collection),
         )
         if not isinstance(criterion, bool):
             raise FHIRPathRuntimeError(
@@ -81,14 +83,16 @@ class Iif(FHIRPathFunction):
 
         if criterion:
             if isinstance(self.true_result, FHIRPath):
-                return self.true_result.evaluate(collection, environment, create)
+                return self.true_result.evaluate(
+                    collection, eval_context(collection), create
+                )
             else:
                 return self.true_result
         else:
             if self.otherwise_result:
                 if isinstance(self.otherwise_result, FHIRPath):
                     return self.otherwise_result.evaluate(
-                        collection, environment, create
+                        collection, eval_context(collection), create
                     )
                 else:
                     return self.otherwise_result
