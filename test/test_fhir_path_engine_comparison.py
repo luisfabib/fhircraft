@@ -1,5 +1,8 @@
 import pytest
 from collections import namedtuple
+
+from fhircraft.fhir.resources.datatypes.R4.complex import Quantity, Duration
+
 from fhircraft.fhir.path.engine.literals import Quantity as FHIRPathQuantity
 from fhircraft.fhir.path.engine.comparison import *
 from fhircraft.fhir.path.engine.additional import GetValue
@@ -17,12 +20,32 @@ greater_than_cases = (
     (10, 5, True),
     (10, 5.0, True),
     ("abc", "ABC", True),
+    (
+        Quantity(value=12, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=4, code="m", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Quantity(value=12, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=120, code="cm", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Duration(value=12, code="s", system="http://unitsofmeasure.org"),
+        Duration(value=4, code="s", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Duration(value=12, code="min", system="http://unitsofmeasure.org"),
+        Duration(value=120, code="s", system="http://unitsofmeasure.org"),
+        True,
+    ),
     (FHIRPathQuantity(12, "m"), FHIRPathQuantity(4, "m"), True),
     (
         FHIRPathQuantity(4, "m"),
-        FHIRPathQuantity(4, "cm"),
+        FHIRPathQuantity(120, "cm"),
         True,
-    ),  # Unit conversion not implemented yet
+    ),
     ("@2018-03-01", "@2018-01-01", True),
     ("@2018-03", "@2018-03-01", False),
     ("@2018-03-01T10:30:00", "@2018-03-01T10:00:00", True),
@@ -60,12 +83,32 @@ less_than_cases = (
     (10, 5, False),
     (10, 5.0, False),
     ("abc", "ABC", False),
-    (FHIRPathQuantity(4, "m"), FHIRPathQuantity(40, "m"), True),
+    (
+        Quantity(value=12, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=4, code="m", system="http://unitsofmeasure.org"),
+        False,
+    ),
+    (
+        Quantity(value=12, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=120, code="cm", system="http://unitsofmeasure.org"),
+        False,
+    ),
+    (
+        Duration(value=12, code="s", system="http://unitsofmeasure.org"),
+        Duration(value=4, code="s", system="http://unitsofmeasure.org"),
+        False,
+    ),
+    (
+        Duration(value=12, code="min", system="http://unitsofmeasure.org"),
+        Duration(value=120, code="s", system="http://unitsofmeasure.org"),
+        False,
+    ),
+    (FHIRPathQuantity(12, "m"), FHIRPathQuantity(4, "m"), False),
     (
         FHIRPathQuantity(4, "m"),
-        FHIRPathQuantity(4, "cm"),
+        FHIRPathQuantity(120, "cm"),
         False,
-    ),  # Unit conversion not implemented yet
+    ),
     ("@2018-03-01", "@2018-01-01", False),
     ("@2018-03-01T10:30:00", "@2018-03-01T10:00:00", False),
     ("@2018-03-01T10", "@2018-03-01T10:30", True),
@@ -100,13 +143,58 @@ less_equal_than_cases = (
     (10, 5, False),
     (2.5, 5.0, True),
     ("abc", "ABC", False),
-    (FHIRPathQuantity(4, "m"), FHIRPathQuantity(4, "m"), True),
+    (
+        Quantity(value=12, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=4, code="m", system="http://unitsofmeasure.org"),
+        False,
+    ),
+    (
+        Quantity(value=1, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=1, code="m", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Quantity(value=12, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=120, code="cm", system="http://unitsofmeasure.org"),
+        False,
+    ),
+    (
+        Quantity(value=1, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=100, code="cm", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Duration(value=12, code="s", system="http://unitsofmeasure.org"),
+        Duration(value=4, code="s", system="http://unitsofmeasure.org"),
+        False,
+    ),
+    (
+        Duration(value=1, code="s", system="http://unitsofmeasure.org"),
+        Duration(value=1, code="s", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Duration(value=12, code="min", system="http://unitsofmeasure.org"),
+        Duration(value=120, code="s", system="http://unitsofmeasure.org"),
+        False,
+    ),
+    (
+        Duration(value=1, code="min", system="http://unitsofmeasure.org"),
+        Duration(value=60, code="s", system="http://unitsofmeasure.org"),
+        True,
+    ),
     (FHIRPathQuantity(12, "m"), FHIRPathQuantity(4, "m"), False),
+    (FHIRPathQuantity(1, "m"), FHIRPathQuantity(1, "m"), True),
     (
         FHIRPathQuantity(4, "m"),
-        FHIRPathQuantity(4, "cm"),
+        FHIRPathQuantity(120, "cm"),
         False,
-    ),  # Unit conversion not implemented yet
+    ),
+    (
+        FHIRPathQuantity(1, "m"),
+        FHIRPathQuantity(100, "cm"),
+        True,
+    ),
     ("@2018-03-01", "@2018-01-01", False),
     ("@2018-03-01T10:30:00", "@2018-03-01T10:00:00", False),
     ("@2018-03-01T10:30:00", "@2018-03-01T10:30:00.0", True),
@@ -141,13 +229,58 @@ greater_equal_than_cases = (
     (10, 5, True),
     (2.5, 5.0, False),
     ("abc", "ABC", True),
-    (FHIRPathQuantity(4, "m"), FHIRPathQuantity(4, "m"), True),
+    (
+        Quantity(value=12, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=4, code="m", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Quantity(value=1, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=1, code="m", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Quantity(value=12, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=120, code="cm", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Quantity(value=1, code="m", system="http://unitsofmeasure.org"),
+        Quantity(value=100, code="cm", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Duration(value=12, code="s", system="http://unitsofmeasure.org"),
+        Duration(value=4, code="s", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Duration(value=1, code="s", system="http://unitsofmeasure.org"),
+        Duration(value=1, code="s", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Duration(value=12, code="min", system="http://unitsofmeasure.org"),
+        Duration(value=120, code="s", system="http://unitsofmeasure.org"),
+        True,
+    ),
+    (
+        Duration(value=1, code="min", system="http://unitsofmeasure.org"),
+        Duration(value=60, code="s", system="http://unitsofmeasure.org"),
+        True,
+    ),
     (FHIRPathQuantity(12, "m"), FHIRPathQuantity(4, "m"), True),
+    (FHIRPathQuantity(1, "m"), FHIRPathQuantity(1, "m"), True),
     (
         FHIRPathQuantity(4, "m"),
-        FHIRPathQuantity(4, "cm"),
+        FHIRPathQuantity(120, "cm"),
         True,
-    ),  # Unit conversion not implemented yet
+    ),
+    (
+        FHIRPathQuantity(1, "m"),
+        FHIRPathQuantity(100, "cm"),
+        True,
+    ),
     ("@2018-03-01", "@2018-01-01", True),
     ("@2018-03-01T10:30:00", "@2018-03-01T10:00:00", True),
     ("@T10:30:00", "@T10:00:00", True),
