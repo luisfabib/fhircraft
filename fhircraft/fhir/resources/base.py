@@ -599,14 +599,17 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         cls, obj, *, strict=None, from_attributes=None, context=None
     ) -> Self:
         """Override model_validate to provide default kwargs for FHIR resources."""
+
         instance = super().model_validate(
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
 
         # Set up resource context for the root instance if it's a resource
-        if instance._is_resource:
+        if isinstance(instance, FHIRBaseModel):
             instance._set_resource_context(
-                parent=None, root=instance, resource=instance
+                parent=None,
+                root=instance if instance._is_resource else None,
+                resource=instance if instance._is_resource else None,
             )
 
         return instance
@@ -794,7 +797,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 try:
                     # Try to instantiate with the subclass
                     # Recursion is now prevented at the field validator level
-                    result = subclass.model_validate(value)
+                    result = subclass.model_validate(
+                        value,
+                    )
                     return result
                 except (ValidationError, ValueError, TypeError):
                     # If specific class fails, continue trying other subclasses
@@ -802,7 +807,9 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
             # If no subclass worked, try the base type as fallback
             try:
-                result = base_type.model_validate(value)
+                result = base_type.model_validate(
+                    value,
+                )
                 return result
             except (ValidationError, ValueError, TypeError):
                 # If base type also fails, return original value
