@@ -138,7 +138,7 @@
         "scheduledTiming": {
           "repeat": {
             "frequency": 1,
-            "period": 1,
+            "period": 1.0,
             "periodUnit": "d"
           }
         },
