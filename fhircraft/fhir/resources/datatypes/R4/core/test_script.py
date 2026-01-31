@@ -663,50 +663,6 @@ class TestScriptSetupAction(BackboneElement):
         alias="assert",
     )
 
-    @model_validator(mode="after")
-    def FHIR_tst_7_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("operation",),
-            expression="sourceId.exists() or (targetId.count() + url.count() + params.count() = 1) or (type.code in ('capabilities' |'search' | 'transaction' | 'history'))",
-            human="Setup operation SHALL contain either sourceId or targetId or params or url.",
-            key="tst-7",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tst_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("assert_",),
-            expression="extension.exists() or (contentType.count() + expression.count() + headerField.count() + minimumId.count() + navigationLinks.count() + path.count() + requestMethod.count() + resource.count() + responseCode.count() + response.count()  + validateProfileId.count() <=1)",
-            human="Only a single assertion SHALL be present within setup action assert element.",
-            key="tst-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tst_10_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("assert_",),
-            expression="compareToSourceId.empty() xor (compareToSourceExpression.exists() or compareToSourcePath.exists())",
-            human="Setup action assert SHALL contain either compareToSourceId and compareToSourceExpression, compareToSourceId and compareToSourcePath or neither.",
-            key="tst-10",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tst_12_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("assert_",),
-            expression="(response.empty() and responseCode.empty() and direction = 'request') or direction.empty() or direction = 'response'",
-            human="Setup action assert response and responseCode SHALL be empty when direction equals request",
-            key="tst-12",
-            severity="error",
-        )
-
 
 class TestScriptSetup(BackboneElement):
     """
@@ -717,17 +673,6 @@ class TestScriptSetup(BackboneElement):
         description="A setup operation or assert to perform",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_tst_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("action",),
-            expression="operation.exists() xor assert.exists()",
-            human="Setup action SHALL contain either an operation or assert but not both.",
-            key="tst-1",
-            severity="error",
-        )
 
 
 class TestScriptSetupActionOperationRequestHeader(BackboneElement):
@@ -1127,50 +1072,6 @@ class TestScriptTestAction(BackboneElement):
         alias="assert",
     )
 
-    @model_validator(mode="after")
-    def FHIR_tst_8_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("operation",),
-            expression="sourceId.exists() or (targetId.count() + url.count() + params.count() = 1) or (type.code in ('capabilities' | 'search' | 'transaction' | 'history'))",
-            human="Test operation SHALL contain either sourceId or targetId or params or url.",
-            key="tst-8",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tst_6_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("assert_",),
-            expression="extension.exists() or (contentType.count() + expression.count() + headerField.count() + minimumId.count() + navigationLinks.count() + path.count() + requestMethod.count() + resource.count() + responseCode.count() + response.count() + validateProfileId.count() <=1)",
-            human="Only a single assertion SHALL be present within test action assert element.",
-            key="tst-6",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tst_11_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("assert_",),
-            expression="compareToSourceId.empty() xor (compareToSourceExpression.exists() or compareToSourcePath.exists())",
-            human="Test action assert SHALL contain either compareToSourceId and compareToSourceExpression, compareToSourceId and compareToSourcePath or neither.",
-            key="tst-11",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tst_13_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("assert_",),
-            expression="(response.empty() and responseCode.empty() and direction = 'request') or direction.empty() or direction = 'response'",
-            human="Test action assert response and response and responseCode SHALL be empty when direction equals request",
-            key="tst-13",
-            severity="error",
-        )
-
 
 class TestScriptTest(BackboneElement):
     """
@@ -1200,17 +1101,6 @@ class TestScriptTest(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_tst_2_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("action",),
-            expression="operation.exists() xor assert.exists()",
-            human="Test action SHALL contain either an operation or assert but not both.",
-            key="tst-2",
-            severity="error",
-        )
-
 
 class TestScriptTeardownAction(BackboneElement):
     """
@@ -1221,17 +1111,6 @@ class TestScriptTeardownAction(BackboneElement):
         description="The teardown operation to perform",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_tst_9_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("operation",),
-            expression="sourceId.exists() or (targetId.count() + url.count() + params.count() = 1) or (type.code in ('capabilities' | 'search' | 'transaction' | 'history'))",
-            human="Teardown operation SHALL contain either sourceId or targetId or params or url.",
-            key="tst-9",
-            severity="error",
-        )
 
 
 class TestScriptTeardown(BackboneElement):
@@ -1419,13 +1298,34 @@ class TestScript(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_tst_4_constraint_validator(self):
+    def FHIR_tst_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="tst-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
-            elements=("metadata",),
-            expression="capability.required.exists() or capability.validated.exists()",
-            human="TestScript metadata capability SHALL contain required or validated or both.",
-            key="tst-4",
+            elements=("setup.action",),
+            expression="operation.exists() xor assert.exists()",
+            human="Setup action SHALL contain either an operation or assert but not both.",
+            key="tst-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_2_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("test.action",),
+            expression="operation.exists() xor assert.exists()",
+            human="Test action SHALL contain either an operation or assert but not both.",
+            key="tst-2",
             severity="error",
         )
 
@@ -1441,11 +1341,111 @@ class TestScript(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_tst_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
+    def FHIR_tst_4_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
             self,
-            expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="tst-0",
-            severity="warning",
+            elements=("metadata",),
+            expression="capability.required.exists() or capability.validated.exists()",
+            human="TestScript metadata capability SHALL contain required or validated or both.",
+            key="tst-4",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("setup.action.assert_",),
+            expression="extension.exists() or (contentType.count() + expression.count() + headerField.count() + minimumId.count() + navigationLinks.count() + path.count() + requestMethod.count() + resource.count() + responseCode.count() + response.count()  + validateProfileId.count() <=1)",
+            human="Only a single assertion SHALL be present within setup action assert element.",
+            key="tst-5",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_6_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("test.action.assert_",),
+            expression="extension.exists() or (contentType.count() + expression.count() + headerField.count() + minimumId.count() + navigationLinks.count() + path.count() + requestMethod.count() + resource.count() + responseCode.count() + response.count() + validateProfileId.count() <=1)",
+            human="Only a single assertion SHALL be present within test action assert element.",
+            key="tst-6",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_7_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("setup.action.operation",),
+            expression="sourceId.exists() or (targetId.count() + url.count() + params.count() = 1) or (type.code in ('capabilities' |'search' | 'transaction' | 'history'))",
+            human="Setup operation SHALL contain either sourceId or targetId or params or url.",
+            key="tst-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_8_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("test.action.operation",),
+            expression="sourceId.exists() or (targetId.count() + url.count() + params.count() = 1) or (type.code in ('capabilities' | 'search' | 'transaction' | 'history'))",
+            human="Test operation SHALL contain either sourceId or targetId or params or url.",
+            key="tst-8",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_9_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("teardown.action.operation",),
+            expression="sourceId.exists() or (targetId.count() + url.count() + params.count() = 1) or (type.code in ('capabilities' | 'search' | 'transaction' | 'history'))",
+            human="Teardown operation SHALL contain either sourceId or targetId or params or url.",
+            key="tst-9",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_10_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("setup.action.assert_",),
+            expression="compareToSourceId.empty() xor (compareToSourceExpression.exists() or compareToSourcePath.exists())",
+            human="Setup action assert SHALL contain either compareToSourceId and compareToSourceExpression, compareToSourceId and compareToSourcePath or neither.",
+            key="tst-10",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_12_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("setup.action.assert_",),
+            expression="(response.empty() and responseCode.empty() and direction = 'request') or direction.empty() or direction = 'response'",
+            human="Setup action assert response and responseCode SHALL be empty when direction equals request",
+            key="tst-12",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_11_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("test.action.assert_",),
+            expression="compareToSourceId.empty() xor (compareToSourceExpression.exists() or compareToSourcePath.exists())",
+            human="Test action assert SHALL contain either compareToSourceId and compareToSourceExpression, compareToSourceId and compareToSourcePath or neither.",
+            key="tst-11",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tst_13_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("test.action.assert_",),
+            expression="(response.empty() and responseCode.empty() and direction = 'request') or direction.empty() or direction = 'response'",
+            human="Test action assert response and response and responseCode SHALL be empty when direction equals request",
+            key="tst-13",
+            severity="error",
         )

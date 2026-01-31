@@ -154,17 +154,6 @@ class TestReportSetup(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_inv_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("action",),
-            expression="operation.exists() xor assert.exists()",
-            human="Setup action SHALL contain either an operation or assert but not both.",
-            key="inv-1",
-            severity="error",
-        )
-
 
 class TestReportTestActionOperation(BackboneElement):
     """
@@ -277,17 +266,6 @@ class TestReportTest(BackboneElement):
         description="A test operation or assert that was performed",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_inv_2_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("action",),
-            expression="operation.exists() xor assert.exists()",
-            human="Test action SHALL contain either an operation or assert but not both.",
-            key="inv-2",
-            severity="error",
-        )
 
 
 class TestReportTeardownAction(BackboneElement):
@@ -411,3 +389,25 @@ class TestReport(DomainResource):
         description="The results of running the series of required clean up steps",
         default=None,
     )
+
+    @model_validator(mode="after")
+    def FHIR_inv_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("setup.action",),
+            expression="operation.exists() xor assert.exists()",
+            human="Setup action SHALL contain either an operation or assert but not both.",
+            key="inv-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_inv_2_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("test.action",),
+            expression="operation.exists() xor assert.exists()",
+            human="Test action SHALL contain either an operation or assert but not both.",
+            key="inv-2",
+            severity="error",
+        )

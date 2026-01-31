@@ -639,6 +639,16 @@ class ImplementationGuide(DomainResource):
     )
 
     @model_validator(mode="after")
+    def FHIR_ig_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="ig-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_ig_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -647,16 +657,6 @@ class ImplementationGuide(DomainResource):
             human="If a resource has a groupingId, it must refer to a grouping defined in the Implementation Guide",
             key="ig-1",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ig_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="ig-0",
-            severity="warning",
         )
 
     @model_validator(mode="after")

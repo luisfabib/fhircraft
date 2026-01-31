@@ -490,17 +490,6 @@ class QuestionnaireItem(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_que_7_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("enableWhen",),
-            expression="operator = 'exists' implies (answer is Boolean)",
-            human="If the operator is 'exists', the value must be a boolean",
-            key="que-7",
-            severity="error",
-        )
-
 
 class Questionnaire(DomainResource):
     """
@@ -688,6 +677,16 @@ class Questionnaire(DomainResource):
     )
 
     @model_validator(mode="after")
+    def FHIR_que_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="que-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_que_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -695,6 +694,16 @@ class Questionnaire(DomainResource):
             expression="(type='group' implies item.empty().not()) and (type.trace('type')='display' implies item.trace('item').empty())",
             human="Group items must have nested items, display items cannot have nested items",
             key="que-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_que_2_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="descendants().linkId.isDistinct()",
+            human="The link ids for groups and questions must be unique within the questionnaire",
+            key="que-2",
             severity="error",
         )
 
@@ -739,6 +748,17 @@ class Questionnaire(DomainResource):
             expression="type!='display' or (required.empty() and repeats.empty())",
             human="Required and repeat aren't permitted for display items",
             key="que-6",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_que_7_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("item.enableWhen",),
+            expression="operator = 'exists' implies (answer is Boolean)",
+            human="If the operator is 'exists', the value must be a boolean",
+            key="que-7",
             severity="error",
         )
 
@@ -805,25 +825,5 @@ class Questionnaire(DomainResource):
             expression="repeats=true or initial.count() <= 1",
             human="Can only have multiple initial values for repeating items",
             key="que-13",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_que_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="que-0",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_que_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="descendants().linkId.isDistinct()",
-            human="The link ids for groups and questions must be unique within the questionnaire",
-            key="que-2",
             severity="error",
         )

@@ -220,6 +220,24 @@ class Condition(DomainResource):
         )
 
     @model_validator(mode="after")
+    def onset_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[DateTime, Age, Period, Range, String],
+            field_name_base="onset",
+            required=False,
+        )
+
+    @model_validator(mode="after")
+    def abatement_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[DateTime, Age, Period, Range, String],
+            field_name_base="abatement",
+            required=False,
+        )
+
+    @model_validator(mode="after")
     def FHIR_con_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -239,24 +257,6 @@ class Condition(DomainResource):
             human="evidence SHALL have code or details",
             key="con-2",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def onset_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[DateTime, Age, Period, Range, String],
-            field_name_base="onset",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def abatement_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[DateTime, Age, Period, Range, String],
-            field_name_base="abatement",
-            required=False,
         )
 
     @model_validator(mode="after")

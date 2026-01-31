@@ -526,17 +526,6 @@ class CapabilityStatementRest(BackboneElement):
         alias="_compartment",
     )
 
-    @model_validator(mode="after")
-    def FHIR_cpb_12_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("resource",),
-            expression="searchParam.select(name).isDistinct()",
-            human="Search parameter names must be unique in the context of a resource.",
-            key="cpb-12",
-            severity="error",
-        )
-
 
 class CapabilityStatementMessagingEndpoint(BackboneElement):
     """
@@ -926,6 +915,17 @@ class CapabilityStatement(DomainResource):
             expression="document.select(profile&mode).isDistinct()",
             human="The set of documents must be unique by the combination of profile and mode.",
             key="cpb-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cpb_12_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("rest.resource",),
+            expression="searchParam.select(name).isDistinct()",
+            human="Search parameter names must be unique in the context of a resource.",
+            key="cpb-12",
             severity="error",
         )
 

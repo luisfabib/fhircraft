@@ -604,6 +604,16 @@ class MolecularSequence(DomainResource):
     )
 
     @model_validator(mode="after")
+    def FHIR_msq_3_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="coordinateSystem = 1 or coordinateSystem = 0",
+            human="Only 0 and 1 are valid for coordinateSystem",
+            key="msq-3",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_msq_5_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -622,15 +632,5 @@ class MolecularSequence(DomainResource):
             expression="(genomeBuild.count()+referenceSeqId.count()+ referenceSeqPointer.count()+ referenceSeqString.count()) = 1",
             human="Have and only have one of the following elements in referenceSeq : 1. genomeBuild ; 2 referenceSeqId; 3. referenceSeqPointer;  4. referenceSeqString;",
             key="msq-6",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_msq_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="coordinateSystem = 1 or coordinateSystem = 0",
-            human="Only 0 and 1 are valid for coordinateSystem",
-            key="msq-3",
             severity="error",
         )

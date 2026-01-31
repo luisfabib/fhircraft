@@ -110,17 +110,6 @@ class StructureDefinitionSnapshot(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_sdf_10_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("element",),
-            expression="binding.empty() or binding.valueSet.exists() or binding.description.exists()",
-            human="provide either a binding reference or a description (or both)",
-            key="sdf-10",
-            severity="error",
-        )
-
 
 class StructureDefinitionDifferential(BackboneElement):
     """
@@ -440,16 +429,6 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_15a_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="(kind!='logical'  and differential.element.first().path.contains('.').not()) implies differential.element.first().type.empty()",
-            human='If the first element in a differential has no "." in the path and it\'s not a logical model, it has no type',
-            key="sdf-15a",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_sdf_4_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -490,6 +469,17 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
+    def FHIR_sdf_10_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("snapshot.element",),
+            expression="binding.empty() or binding.valueSet.exists() or binding.description.exists()",
+            human="provide either a binding reference or a description (or both)",
+            key="sdf-10",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_sdf_11_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -516,6 +506,16 @@ class StructureDefinition(DomainResource):
             expression="kind!='logical' implies snapshot.element.first().type.empty()",
             human="The first element in a snapshot has no type unless model is a logical model.",
             key="sdf-15",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_15a_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="(kind!='logical'  and differential.element.first().path.contains('.').not()) implies differential.element.first().type.empty()",
+            human='If the first element in a differential has no "." in the path and it\'s not a logical model, it has no type',
+            key="sdf-15a",
             severity="error",
         )
 

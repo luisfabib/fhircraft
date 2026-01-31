@@ -458,17 +458,6 @@ class Observation(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_obs_3_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("referenceRange",),
-            expression="low.exists() or high.exists() or text.exists()",
-            human="Must have at least a low or a high or text",
-            key="obs-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -496,6 +485,17 @@ class Observation(DomainResource):
             ],
             field_name_base="value",
             required=False,
+        )
+
+    @model_validator(mode="after")
+    def FHIR_obs_3_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("referenceRange",),
+            expression="low.exists() or high.exists() or text.exists()",
+            human="Must have at least a low or a high or text",
+            key="obs-3",
+            severity="error",
         )
 
     @model_validator(mode="after")

@@ -195,17 +195,6 @@ class ConceptMapGroupElement(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_cmd_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("target",),
-            expression="comment.exists() or equivalence.empty() or ((equivalence != 'narrower') and (equivalence != 'inexact'))",
-            human="If the map is narrower or inexact, there SHALL be some comments",
-            key="cmd-1",
-            severity="error",
-        )
-
 
 class ConceptMapGroupUnmapped(BackboneElement):
     """
@@ -299,28 +288,6 @@ class ConceptMapGroup(BackboneElement):
         description="What to do when there is no mapping for the source concept",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_cmd_2_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("unmapped",),
-            expression="(mode = 'fixed') implies code.exists()",
-            human="If the mode is 'fixed', a code must be provided",
-            key="cmd-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cmd_3_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("unmapped",),
-            expression="(mode = 'other-map') implies url.exists()",
-            human="If the mode is 'other-map', a url must be provided",
-            key="cmd-3",
-            severity="error",
-        )
 
 
 class ConceptMap(DomainResource):
@@ -540,4 +507,37 @@ class ConceptMap(DomainResource):
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cmd-0",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cmd_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.element.target",),
+            expression="comment.exists() or equivalence.empty() or ((equivalence != 'narrower') and (equivalence != 'inexact'))",
+            human="If the map is narrower or inexact, there SHALL be some comments",
+            key="cmd-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cmd_2_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.unmapped",),
+            expression="(mode = 'fixed') implies code.exists()",
+            human="If the mode is 'fixed', a code must be provided",
+            key="cmd-2",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cmd_3_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.unmapped",),
+            expression="(mode = 'other-map') implies url.exists()",
+            human="If the mode is 'other-map', a url must be provided",
+            key="cmd-3",
+            severity="error",
         )

@@ -819,28 +819,6 @@ class StructureMapGroupRule(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_smp_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("target",),
-            expression="element.exists() implies context.exists()",
-            human="Can only have an element if you have a context",
-            key="smp-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_smp_2_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("target",),
-            expression="context.exists() implies contextType.exists()",
-            human="Must have a contextType if you have a context",
-            key="smp-2",
-            severity="error",
-        )
-
 
 class StructureMapGroup(BackboneElement):
     """
@@ -1056,4 +1034,26 @@ class StructureMap(DomainResource):
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="smp-0",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_smp_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.rule.target",),
+            expression="element.exists() implies context.exists()",
+            human="Can only have an element if you have a context",
+            key="smp-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_smp_2_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.rule.target",),
+            expression="context.exists() implies contextType.exists()",
+            human="Must have a contextType if you have a context",
+            key="smp-2",
+            severity="error",
         )
