@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -54,23 +54,6 @@ class ClaimRelated(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reference",
-                "relationship",
-                "claim",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ClaimPayee(BackboneElement):
     """
@@ -85,22 +68,6 @@ class ClaimPayee(BackboneElement):
         description="Recipient reference",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "party",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimEvent(BackboneElement):
@@ -131,21 +98,6 @@ class ClaimEvent(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="when",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -193,25 +145,6 @@ class ClaimCareTeam(BackboneElement):
         description="Practitioner or provider specialization",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "specialty",
-                "role",
-                "responsible",
-                "provider",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimSupportingInfo(BackboneElement):
@@ -303,24 +236,6 @@ class ClaimSupportingInfo(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reason",
-                "code",
-                "category",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -361,7 +276,7 @@ class ClaimDiagnosis(BackboneElement):
         description="Nature of illness or problem",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Timing or nature of the diagnosis",
         default=None,
     )
@@ -375,23 +290,6 @@ class ClaimDiagnosis(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="diagnosis",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "onAdmission",
-                "type",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -418,7 +316,7 @@ class ClaimProcedure(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Category of Procedure",
         default=None,
     )
@@ -439,7 +337,7 @@ class ClaimProcedure(BackboneElement):
         description="Specific clinical procedure",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
@@ -449,24 +347,6 @@ class ClaimProcedure(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="procedure",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "udi",
-                "date",
-                "type",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -519,11 +399,11 @@ class ClaimInsurance(BackboneElement):
         default=None,
         alias="_businessArrangement",
     )
-    preAuthRef: Optional[List[String]] = Field(
+    preAuthRef: Optional[ListType[String]] = Field(
         description="Prior authorization reference number",
         default=None,
     )
-    preAuthRef_ext: Optional[List[Optional[Element]]] = Field(
+    preAuthRef_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for preAuthRef extensions",
         default=None,
         alias="_preAuthRef",
@@ -532,27 +412,6 @@ class ClaimInsurance(BackboneElement):
         description="Adjudication results",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "claimResponse",
-                "preAuthRef",
-                "businessArrangement",
-                "coverage",
-                "identifier",
-                "focal",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimAccident(BackboneElement):
@@ -590,22 +449,6 @@ class ClaimAccident(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "date",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def location_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -620,30 +463,14 @@ class ClaimItemBodySite(BackboneElement):
     Physical location where the service is performed or applies.
     """
 
-    site: Optional[List[CodeableReference]] = Field(
+    site: Optional[ListType[CodeableReference]] = Field(
         description="Location",
         default=None,
     )
-    subSite: Optional[List[CodeableConcept]] = Field(
+    subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Sub-location",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subSite",
-                "site",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimItemDetailSubDetail(BackboneElement):
@@ -660,7 +487,7 @@ class ClaimItemDetailSubDetail(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -680,11 +507,11 @@ class ClaimItemDetailSubDetail(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -717,39 +544,10 @@ class ClaimItemDetailSubDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "udi",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "patientPaid",
-                "programCode",
-                "modifier",
-                "productOrServiceEnd",
-                "productOrService",
-                "category",
-                "revenue",
-                "traceNumber",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimItemDetail(BackboneElement):
@@ -766,7 +564,7 @@ class ClaimItemDetail(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -786,11 +584,11 @@ class ClaimItemDetail(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -823,44 +621,14 @@ class ClaimItemDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-    subDetail: Optional[List[ClaimItemDetailSubDetail]] = Field(
+    subDetail: Optional[ListType[ClaimItemDetailSubDetail]] = Field(
         description="Product or service provided",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subDetail",
-                "udi",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "patientPaid",
-                "programCode",
-                "modifier",
-                "productOrServiceEnd",
-                "productOrService",
-                "category",
-                "revenue",
-                "traceNumber",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimItem(BackboneElement):
@@ -877,42 +645,42 @@ class ClaimItem(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
-    careTeamSequence: Optional[List[PositiveInt]] = Field(
+    careTeamSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable careTeam members",
         default=None,
     )
-    careTeamSequence_ext: Optional[List[Optional[Element]]] = Field(
+    careTeamSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for careTeamSequence extensions",
         default=None,
         alias="_careTeamSequence",
     )
-    diagnosisSequence: Optional[List[PositiveInt]] = Field(
+    diagnosisSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable diagnoses",
         default=None,
     )
-    diagnosisSequence_ext: Optional[List[Optional[Element]]] = Field(
+    diagnosisSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for diagnosisSequence extensions",
         default=None,
         alias="_diagnosisSequence",
     )
-    procedureSequence: Optional[List[PositiveInt]] = Field(
+    procedureSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable procedures",
         default=None,
     )
-    procedureSequence_ext: Optional[List[Optional[Element]]] = Field(
+    procedureSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for procedureSequence extensions",
         default=None,
         alias="_procedureSequence",
     )
-    informationSequence: Optional[List[PositiveInt]] = Field(
+    informationSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable exception and supporting information",
         default=None,
     )
-    informationSequence_ext: Optional[List[Optional[Element]]] = Field(
+    informationSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for informationSequence extensions",
         default=None,
         alias="_informationSequence",
@@ -933,15 +701,15 @@ class ClaimItem(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    request: Optional[List[Reference]] = Field(
+    request: Optional[ListType[Reference]] = Field(
         description="Request or Referral for Service",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Product or service billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -999,19 +767,19 @@ class ClaimItem(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-    bodySite: Optional[List[ClaimItemBodySite]] = Field(
+    bodySite: Optional[ListType[ClaimItemBodySite]] = Field(
         description="Anatomical location",
         default=None,
     )
-    encounter: Optional[List[Reference]] = Field(
+    encounter: Optional[ListType[Reference]] = Field(
         description="Encounters associated with the listed treatments",
         default=None,
     )
-    detail: Optional[List[ClaimItemDetail]] = Field(
+    detail: Optional[ListType[ClaimItemDetail]] = Field(
         description="Product or service provided",
         default=None,
     )
@@ -1028,43 +796,6 @@ class ClaimItem(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="location",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "detail",
-                "encounter",
-                "bodySite",
-                "udi",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "patientPaid",
-                "programCode",
-                "modifier",
-                "request",
-                "productOrServiceEnd",
-                "productOrService",
-                "category",
-                "revenue",
-                "informationSequence",
-                "procedureSequence",
-                "diagnosisSequence",
-                "careTeamSequence",
-                "traceNumber",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -1095,58 +826,11 @@ class Claim(DomainResource):
     _type = "Claim"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Claim"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for claim",
         default=None,
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -1213,7 +897,7 @@ class Claim(DomainResource):
         description="For whom to reserve funds",
         default=None,
     )
-    related: Optional[List[ClaimRelated]] = Field(
+    related: Optional[ListType[ClaimRelated]] = Field(
         description="Prior or corollary claims",
         default=None,
     )
@@ -1233,7 +917,7 @@ class Claim(DomainResource):
         description="Treatment referral",
         default=None,
     )
-    encounter: Optional[List[Reference]] = Field(
+    encounter: Optional[ListType[Reference]] = Field(
         description="Encounters associated with the listed treatments",
         default=None,
     )
@@ -1245,27 +929,27 @@ class Claim(DomainResource):
         description="Package billing code",
         default=None,
     )
-    event: Optional[List[ClaimEvent]] = Field(
+    event: Optional[ListType[ClaimEvent]] = Field(
         description="Event information",
         default=None,
     )
-    careTeam: Optional[List[ClaimCareTeam]] = Field(
+    careTeam: Optional[ListType[ClaimCareTeam]] = Field(
         description="Members of the care team",
         default=None,
     )
-    supportingInfo: Optional[List[ClaimSupportingInfo]] = Field(
+    supportingInfo: Optional[ListType[ClaimSupportingInfo]] = Field(
         description="Supporting information",
         default=None,
     )
-    diagnosis: Optional[List[ClaimDiagnosis]] = Field(
+    diagnosis: Optional[ListType[ClaimDiagnosis]] = Field(
         description="Pertinent diagnosis information",
         default=None,
     )
-    procedure: Optional[List[ClaimProcedure]] = Field(
+    procedure: Optional[ListType[ClaimProcedure]] = Field(
         description="Clinical procedures performed",
         default=None,
     )
-    insurance: Optional[List[ClaimInsurance]] = Field(
+    insurance: Optional[ListType[ClaimInsurance]] = Field(
         description="Patient insurance information",
         default=None,
     )
@@ -1277,7 +961,7 @@ class Claim(DomainResource):
         description="Paid by the patient",
         default=None,
     )
-    item: Optional[List[ClaimItem]] = Field(
+    item: Optional[ListType[ClaimItem]] = Field(
         description="Product or service provided",
         default=None,
     )
@@ -1285,117 +969,3 @@ class Claim(DomainResource):
         description="Total claim cost",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "total",
-                "item",
-                "patientPaid",
-                "accident",
-                "insurance",
-                "procedure",
-                "diagnosis",
-                "supportingInfo",
-                "careTeam",
-                "event",
-                "diagnosisRelatedGroup",
-                "facility",
-                "encounter",
-                "referral",
-                "payee",
-                "originalPrescription",
-                "prescription",
-                "related",
-                "fundsReserve",
-                "priority",
-                "provider",
-                "insurer",
-                "enterer",
-                "created",
-                "billablePeriod",
-                "patient",
-                "use",
-                "subType",
-                "type",
-                "status",
-                "traceNumber",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

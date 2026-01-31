@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -42,26 +42,10 @@ class NutritionProductNutrient(BackboneElement):
         description="The (relevant) nutrients in the product",
         default=None,
     )
-    amount: Optional[List[Ratio]] = Field(
+    amount: Optional[ListType[Ratio]] = Field(
         description="The amount of nutrient expressed in one or more units: X per pack / per serving / per dose",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "amount",
-                "item",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class NutritionProductIngredient(BackboneElement):
@@ -73,26 +57,10 @@ class NutritionProductIngredient(BackboneElement):
         description="The ingredient contained in the product",
         default=None,
     )
-    amount: Optional[List[Ratio]] = Field(
+    amount: Optional[ListType[Ratio]] = Field(
         description="The amount of ingredient that is in the product",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "amount",
-                "item",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class NutritionProductCharacteristic(BackboneElement):
@@ -152,21 +120,6 @@ class NutritionProductCharacteristic(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -192,7 +145,7 @@ class NutritionProductInstance(BackboneElement):
         description="The amount of items or instances",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="The identifier for the physical instance, typically a serial number or manufacturer number",
         default=None,
     )
@@ -237,27 +190,6 @@ class NutritionProductInstance(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "biologicalSourceEvent",
-                "useBy",
-                "expiry",
-                "lotNumber",
-                "name",
-                "identifier",
-                "quantity",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class NutritionProduct(DomainResource):
     """
@@ -268,53 +200,6 @@ class NutritionProduct(DomainResource):
     _type = "NutritionProduct"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/NutritionProduct"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     code: Optional[CodeableConcept] = Field(
         description="A code that can identify the detailed nutrients and ingredients in a specific food product",
         default=None,
@@ -328,127 +213,35 @@ class NutritionProduct(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Broad product groups or categories used to classify the product, such as Legume and Legume Products, Beverages, or Beef Products",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer, representative or officially responsible for the product",
         default=None,
     )
-    nutrient: Optional[List[NutritionProductNutrient]] = Field(
+    nutrient: Optional[ListType[NutritionProductNutrient]] = Field(
         description="The product\u0027s nutritional information expressed by the nutrients",
         default=None,
     )
-    ingredient: Optional[List[NutritionProductIngredient]] = Field(
+    ingredient: Optional[ListType[NutritionProductIngredient]] = Field(
         description="Ingredients contained in this product",
         default=None,
     )
-    knownAllergen: Optional[List[CodeableReference]] = Field(
+    knownAllergen: Optional[ListType[CodeableReference]] = Field(
         description="Known or suspected allergens that are a part of this product",
         default=None,
     )
-    characteristic: Optional[List[NutritionProductCharacteristic]] = Field(
+    characteristic: Optional[ListType[NutritionProductCharacteristic]] = Field(
         description="Specifies descriptive properties of the nutrition product",
         default=None,
     )
-    instance: Optional[List[NutritionProductInstance]] = Field(
+    instance: Optional[ListType[NutritionProductInstance]] = Field(
         description="One or several physical instances or occurrences of the nutrition product",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the product",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "note",
-                "instance",
-                "characteristic",
-                "knownAllergen",
-                "ingredient",
-                "nutrient",
-                "manufacturer",
-                "category",
-                "status",
-                "code",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -49,22 +49,6 @@ class HealthcareServiceEligibility(BackboneElement):
         alias="_comment",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "comment",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class HealthcareService(DomainResource):
     """
@@ -75,54 +59,7 @@ class HealthcareService(DomainResource):
     _type = "HealthcareService"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/HealthcareService"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifiers for this item",
         default=None,
     )
@@ -139,23 +76,23 @@ class HealthcareService(DomainResource):
         description="Organization that provides this service",
         default=None,
     )
-    offeredIn: Optional[List[Reference]] = Field(
+    offeredIn: Optional[ListType[Reference]] = Field(
         description="The service within which this service is offered",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Broad category of service being performed or delivered",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type of service that may be delivered or performed",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="Specialties handled by the HealthcareService",
         default=None,
     )
-    location: Optional[List[Reference]] = Field(
+    location: Optional[ListType[Reference]] = Field(
         description="Location(s) where service may be provided",
         default=None,
     )
@@ -190,35 +127,35 @@ class HealthcareService(DomainResource):
         description="Facilitates quick identification of the service",
         default=None,
     )
-    contact: Optional[List[ExtendedContactDetail]] = Field(
+    contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details for the HealthcareService",
         default=None,
     )
-    coverageArea: Optional[List[Reference]] = Field(
+    coverageArea: Optional[ListType[Reference]] = Field(
         description="Location(s) service is intended for/available to",
         default=None,
     )
-    serviceProvisionCode: Optional[List[CodeableConcept]] = Field(
+    serviceProvisionCode: Optional[ListType[CodeableConcept]] = Field(
         description="Conditions under which service is available/offered",
         default=None,
     )
-    eligibility: Optional[List[HealthcareServiceEligibility]] = Field(
+    eligibility: Optional[ListType[HealthcareServiceEligibility]] = Field(
         description="Specific eligibility requirements required to use the service",
         default=None,
     )
-    program: Optional[List[CodeableConcept]] = Field(
+    program: Optional[ListType[CodeableConcept]] = Field(
         description="Programs that this service is applicable to",
         default=None,
     )
-    characteristic: Optional[List[CodeableConcept]] = Field(
+    characteristic: Optional[ListType[CodeableConcept]] = Field(
         description="Collection of characteristics (attributes)",
         default=None,
     )
-    communication: Optional[List[CodeableConcept]] = Field(
+    communication: Optional[ListType[CodeableConcept]] = Field(
         description="The language that this service is offered in",
         default=None,
     )
-    referralMethod: Optional[List[CodeableConcept]] = Field(
+    referralMethod: Optional[ListType[CodeableConcept]] = Field(
         description="Ways that the service accepts referrals",
         default=None,
     )
@@ -231,116 +168,11 @@ class HealthcareService(DomainResource):
         default=None,
         alias="_appointmentRequired",
     )
-    availability: Optional[List[Availability]] = Field(
+    availability: Optional[ListType[Availability]] = Field(
         description="Times the healthcare service is available (including exceptions)",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to electronic services operated for the healthcare service",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "endpoint",
-                "availability",
-                "appointmentRequired",
-                "referralMethod",
-                "communication",
-                "characteristic",
-                "program",
-                "eligibility",
-                "serviceProvisionCode",
-                "coverageArea",
-                "contact",
-                "photo",
-                "extraDetails",
-                "comment",
-                "name",
-                "location",
-                "specialty",
-                "type",
-                "category",
-                "offeredIn",
-                "providedBy",
-                "active",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

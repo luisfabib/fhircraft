@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -74,24 +74,6 @@ class MessageDefinitionFocus(BackboneElement):
         alias="_max",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "max",
-                "min",
-                "profile",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MessageDefinitionAllowedResponse(BackboneElement):
     """
@@ -117,22 +99,6 @@ class MessageDefinitionAllowedResponse(BackboneElement):
         alias="_situation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "situation",
-                "message",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MessageDefinition(DomainResource):
     """
@@ -143,53 +109,6 @@ class MessageDefinition(DomainResource):
     _type = "MessageDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MessageDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="The cannonical URL for a given MessageDefinition",
         default=None,
@@ -199,7 +118,7 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for a given MessageDefinition",
         default=None,
     )
@@ -243,11 +162,11 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_title",
     )
-    replaces: Optional[List[Canonical]] = Field(
+    replaces: Optional[ListType[Canonical]] = Field(
         description="Takes the place of",
         default=None,
     )
-    replaces_ext: Optional[List[Optional[Element]]] = Field(
+    replaces_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for replaces extensions",
         default=None,
         alias="_replaces",
@@ -288,7 +207,7 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -301,11 +220,11 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for message definition (if applicable)",
         default=None,
     )
@@ -345,11 +264,11 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_base",
     )
-    parent: Optional[List[Canonical]] = Field(
+    parent: Optional[ListType[Canonical]] = Field(
         description="Protocol/workflow this is part of",
         default=None,
     )
-    parent_ext: Optional[List[Optional[Element]]] = Field(
+    parent_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for parent extensions",
         default=None,
         alias="_parent",
@@ -376,7 +295,7 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_category",
     )
-    focus: Optional[List[MessageDefinitionFocus]] = Field(
+    focus: Optional[ListType[MessageDefinitionFocus]] = Field(
         description="Resource(s) that are the subject of the event",
         default=None,
     )
@@ -389,7 +308,7 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_responseRequired",
     )
-    allowedResponse: Optional[List[MessageDefinitionAllowedResponse]] = Field(
+    allowedResponse: Optional[ListType[MessageDefinitionAllowedResponse]] = Field(
         description="Responses to this message",
         default=None,
     )
@@ -418,84 +337,6 @@ class MessageDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "graph",
-                "allowedResponse",
-                "responseRequired",
-                "focus",
-                "category",
-                "parent",
-                "base",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "replaces",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_md_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("focus",),
-            expression="max='*' or (max.toInteger() > 0)",
-            human="Max must be postive int or *",
-            key="md-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -521,4 +362,26 @@ class MessageDefinition(DomainResource):
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_md_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("focus",),
+            expression="max='*' or (max.toInteger() > 0)",
+            human="Max must be postive int or *",
+            key="md-1",
+            severity="error",
         )

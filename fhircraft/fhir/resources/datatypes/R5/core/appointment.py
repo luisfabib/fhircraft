@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -40,7 +40,7 @@ class AppointmentParticipant(BackboneElement):
     List of participants involved in the appointment.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in the appointment",
         default=None,
     )
@@ -70,25 +70,6 @@ class AppointmentParticipant(BackboneElement):
         default=None,
         alias="_status",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "status",
-                "required",
-                "actor",
-                "period",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AppointmentRecurrenceTemplateWeeklyTemplate(BackboneElement):
@@ -169,28 +150,6 @@ class AppointmentRecurrenceTemplateWeeklyTemplate(BackboneElement):
         alias="_weekInterval",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "weekInterval",
-                "sunday",
-                "saturday",
-                "friday",
-                "thursday",
-                "wednesday",
-                "tuesday",
-                "monday",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
     """
@@ -224,24 +183,6 @@ class AppointmentRecurrenceTemplateMonthlyTemplate(BackboneElement):
         alias="_monthInterval",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "monthInterval",
-                "dayOfWeek",
-                "nthWeekOfMonth",
-                "dayOfMonth",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class AppointmentRecurrenceTemplateYearlyTemplate(BackboneElement):
     """
@@ -257,21 +198,6 @@ class AppointmentRecurrenceTemplateYearlyTemplate(BackboneElement):
         default=None,
         alias="_yearInterval",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "yearInterval",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AppointmentRecurrenceTemplate(BackboneElement):
@@ -305,11 +231,11 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         default=None,
         alias="_occurrenceCount",
     )
-    occurrenceDate: Optional[List[Date]] = Field(
+    occurrenceDate: Optional[ListType[Date]] = Field(
         description="Specific dates for a recurring set of appointments (no template)",
         default=None,
     )
-    occurrenceDate_ext: Optional[List[Optional[Element]]] = Field(
+    occurrenceDate_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for occurrenceDate extensions",
         default=None,
         alias="_occurrenceDate",
@@ -326,48 +252,24 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="Information about yearly recurring appointments",
         default=None,
     )
-    excludingDate: Optional[List[Date]] = Field(
+    excludingDate: Optional[ListType[Date]] = Field(
         description="Any dates that should be excluded from the series",
         default=None,
     )
-    excludingDate_ext: Optional[List[Optional[Element]]] = Field(
+    excludingDate_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for excludingDate extensions",
         default=None,
         alias="_excludingDate",
     )
-    excludingRecurrenceId: Optional[List[PositiveInt]] = Field(
+    excludingRecurrenceId: Optional[ListType[PositiveInt]] = Field(
         description="Any recurrence IDs that should be excluded from the recurrence",
         default=None,
     )
-    excludingRecurrenceId_ext: Optional[List[Optional[Element]]] = Field(
+    excludingRecurrenceId_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for excludingRecurrenceId extensions",
         default=None,
         alias="_excludingRecurrenceId",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "excludingRecurrenceId",
-                "excludingDate",
-                "yearlyTemplate",
-                "monthlyTemplate",
-                "weeklyTemplate",
-                "occurrenceDate",
-                "occurrenceCount",
-                "lastOccurrenceDate",
-                "recurrenceType",
-                "timezone",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class Appointment(DomainResource):
@@ -379,54 +281,7 @@ class Appointment(DomainResource):
     _type = "Appointment"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Appointment"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this item",
         default=None,
     )
@@ -443,20 +298,20 @@ class Appointment(DomainResource):
         description="The coded reason for the appointment being cancelled",
         default=None,
     )
-    class_: Optional[List[CodeableConcept]] = Field(
+    class_: Optional[ListType[CodeableConcept]] = Field(
         description="Classification when becoming an encounter",
         default=None,
         alias="class",
     )
-    serviceCategory: Optional[List[CodeableConcept]] = Field(
+    serviceCategory: Optional[ListType[CodeableConcept]] = Field(
         description="A broad categorization of the service that is to be performed during this appointment",
         default=None,
     )
-    serviceType: Optional[List[CodeableReference]] = Field(
+    serviceType: Optional[ListType[CodeableReference]] = Field(
         description="The specific service that is to be performed during this appointment",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="The specialty of a practitioner that would be required to perform the service requested in this appointment",
         default=None,
     )
@@ -464,7 +319,7 @@ class Appointment(DomainResource):
         description="The style of appointment or patient that has been booked in the slot (not service type)",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Reason this appointment is scheduled",
         default=None,
     )
@@ -481,15 +336,15 @@ class Appointment(DomainResource):
         default=None,
         alias="_description",
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="Appointment replaced by this Appointment",
         default=None,
     )
-    virtualService: Optional[List[VirtualServiceDetail]] = Field(
+    virtualService: Optional[ListType[VirtualServiceDetail]] = Field(
         description="Connection details of a virtual service (e.g. conference call)",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Additional information to support the appointment",
         default=None,
     )
@@ -528,15 +383,15 @@ class Appointment(DomainResource):
         default=None,
         alias="_minutesDuration",
     )
-    requestedPeriod: Optional[List[Period]] = Field(
+    requestedPeriod: Optional[ListType[Period]] = Field(
         description="Potential date/time interval(s) requested to allocate the appointment within",
         default=None,
     )
-    slot: Optional[List[Reference]] = Field(
+    slot: Optional[ListType[Reference]] = Field(
         description="The slots that this appointment is filling",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="The set of accounts that may be used for billing for this Appointment",
         default=None,
     )
@@ -558,15 +413,15 @@ class Appointment(DomainResource):
         default=None,
         alias="_cancellationDate",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional comments",
         default=None,
     )
-    patientInstruction: Optional[List[CodeableReference]] = Field(
+    patientInstruction: Optional[ListType[CodeableReference]] = Field(
         description="Detailed information and instructions for the patient",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="The request this appointment is allocated to assess",
         default=None,
     )
@@ -574,7 +429,7 @@ class Appointment(DomainResource):
         description="The patient or group associated with the appointment",
         default=None,
     )
-    participant: Optional[List[AppointmentParticipant]] = Field(
+    participant: Optional[ListType[AppointmentParticipant]] = Field(
         description="Participants involved in appointment",
         default=None,
     )
@@ -596,74 +451,10 @@ class Appointment(DomainResource):
         default=None,
         alias="_occurrenceChanged",
     )
-    recurrenceTemplate: Optional[List[AppointmentRecurrenceTemplate]] = Field(
+    recurrenceTemplate: Optional[ListType[AppointmentRecurrenceTemplate]] = Field(
         description="Details of the recurrence pattern/template used to generate occurrences",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "recurrenceTemplate",
-                "occurrenceChanged",
-                "recurrenceId",
-                "participant",
-                "subject",
-                "basedOn",
-                "patientInstruction",
-                "note",
-                "cancellationDate",
-                "created",
-                "account",
-                "slot",
-                "requestedPeriod",
-                "minutesDuration",
-                "end",
-                "start",
-                "originatingAppointment",
-                "previousAppointment",
-                "supportingInformation",
-                "virtualService",
-                "replaces",
-                "description",
-                "priority",
-                "reason",
-                "appointmentType",
-                "specialty",
-                "serviceType",
-                "serviceCategory",
-                "class_",
-                "cancellationReason",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_app_1_constraint_validator(self):
@@ -734,54 +525,4 @@ class Appointment(DomainResource):
             human="Cancellation date is only used for appointments that have been cancelled, or noshow",
             key="app-7",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )

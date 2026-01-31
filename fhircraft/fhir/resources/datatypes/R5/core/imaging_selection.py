@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -45,22 +45,6 @@ class ImagingSelectionPerformer(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "actor",
-                "function",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ImagingSelectionInstanceImageRegion2D(BackboneElement):
     """
@@ -77,31 +61,15 @@ class ImagingSelectionInstanceImageRegion2D(BackboneElement):
         default=None,
         alias="_regionType",
     )
-    coordinate: Optional[List[Decimal]] = Field(
+    coordinate: Optional[ListType[Decimal]] = Field(
         description="Specifies the coordinates that define the image region",
         default=None,
     )
-    coordinate_ext: Optional[List[Optional[Element]]] = Field(
+    coordinate_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for coordinate extensions",
         default=None,
         alias="_coordinate",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "coordinate",
-                "regionType",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ImagingSelectionInstanceImageRegion3D(BackboneElement):
@@ -118,7 +86,7 @@ class ImagingSelectionInstanceImageRegion3D(BackboneElement):
         default=None,
         alias="_regionType",
     )
-    coordinate: Optional[List[Decimal]] = Field(
+    coordinate: Optional[ListType[Decimal]] = Field(
         description="Specifies the coordinates that define the image region",
         default=None,
     )
@@ -127,22 +95,6 @@ class ImagingSelectionInstanceImageRegion3D(BackboneElement):
         default=None,
         alias="_coordinate",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "coordinate",
-                "regionType",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ImagingSelectionInstance(BackboneElement):
@@ -172,43 +124,23 @@ class ImagingSelectionInstance(BackboneElement):
         description="DICOM SOP Class UID",
         default=None,
     )
-    subset: Optional[List[String]] = Field(
+    subset: Optional[ListType[String]] = Field(
         description="The selected subset of the SOP Instance",
         default=None,
     )
-    subset_ext: Optional[List[Optional[Element]]] = Field(
+    subset_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for subset extensions",
         default=None,
         alias="_subset",
     )
-    imageRegion2D: Optional[List[ImagingSelectionInstanceImageRegion2D]] = Field(
+    imageRegion2D: Optional[ListType[ImagingSelectionInstanceImageRegion2D]] = Field(
         description="A specific 2D region in a DICOM image / frame",
         default=None,
     )
-    imageRegion3D: Optional[List[ImagingSelectionInstanceImageRegion3D]] = Field(
+    imageRegion3D: Optional[ListType[ImagingSelectionInstanceImageRegion3D]] = Field(
         description="A specific 3D region in a DICOM frame of reference",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "imageRegion3D",
-                "imageRegion2D",
-                "subset",
-                "sopClass",
-                "number",
-                "uid",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ImagingSelection(DomainResource):
@@ -220,54 +152,7 @@ class ImagingSelection(DomainResource):
     _type = "ImagingSelection"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImagingSelection"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for Imaging Selection",
         default=None,
     )
@@ -293,15 +178,15 @@ class ImagingSelection(DomainResource):
         default=None,
         alias="_issued",
     )
-    performer: Optional[List[ImagingSelectionPerformer]] = Field(
+    performer: Optional[ListType[ImagingSelectionPerformer]] = Field(
         description="Selector of the instances (human or machine)",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Associated request",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classifies the imaging selection",
         default=None,
     )
@@ -318,11 +203,11 @@ class ImagingSelection(DomainResource):
         default=None,
         alias="_studyUid",
     )
-    derivedFrom: Optional[List[Reference]] = Field(
+    derivedFrom: Optional[ListType[Reference]] = Field(
         description="The imaging study from which the imaging selection is derived",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="The network service providing retrieval for the images referenced in the imaging selection",
         default=None,
     )
@@ -357,110 +242,11 @@ class ImagingSelection(DomainResource):
         description="Body part examined",
         default=None,
     )
-    focus: Optional[List[Reference]] = Field(
+    focus: Optional[ListType[Reference]] = Field(
         description="Related resource that is the focus for the imaging selection",
         default=None,
     )
-    instance: Optional[List[ImagingSelectionInstance]] = Field(
+    instance: Optional[ListType[ImagingSelectionInstance]] = Field(
         description="The selected instances",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "instance",
-                "focus",
-                "bodySite",
-                "frameOfReferenceUid",
-                "seriesNumber",
-                "seriesUid",
-                "endpoint",
-                "derivedFrom",
-                "studyUid",
-                "code",
-                "category",
-                "basedOn",
-                "performer",
-                "issued",
-                "subject",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

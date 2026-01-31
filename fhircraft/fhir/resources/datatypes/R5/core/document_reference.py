@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -56,23 +56,6 @@ class DocumentReferenceAttester(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "party",
-                "time",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class DocumentReferenceRelatesTo(BackboneElement):
     """
@@ -87,22 +70,6 @@ class DocumentReferenceRelatesTo(BackboneElement):
         description="Target of the relationship",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "target",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class DocumentReferenceContentProfile(BackboneElement):
@@ -159,26 +126,10 @@ class DocumentReferenceContent(BackboneElement):
         description="Where to access the document",
         default=None,
     )
-    profile: Optional[List[DocumentReferenceContentProfile]] = Field(
+    profile: Optional[ListType[DocumentReferenceContentProfile]] = Field(
         description="Content profile rules for the document",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "profile",
-                "attachment",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class DocumentReference(DomainResource):
@@ -190,54 +141,7 @@ class DocumentReference(DomainResource):
     _type = "DocumentReference"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DocumentReference"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifiers for the document",
         default=None,
     )
@@ -250,7 +154,7 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_version",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Procedure that caused this media to be created",
         default=None,
     )
@@ -272,7 +176,7 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_docStatus",
     )
-    modality: Optional[List[CodeableConcept]] = Field(
+    modality: Optional[ListType[CodeableConcept]] = Field(
         description="Imaging modality used",
         default=None,
     )
@@ -280,7 +184,7 @@ class DocumentReference(DomainResource):
         description="Kind of document (LOINC if possible)",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Categorization of document",
         default=None,
     )
@@ -288,15 +192,15 @@ class DocumentReference(DomainResource):
         description="Who/what is the subject of the document",
         default=None,
     )
-    context: Optional[List[Reference]] = Field(
+    context: Optional[ListType[Reference]] = Field(
         description="Context of the document content",
         default=None,
     )
-    event: Optional[List[CodeableReference]] = Field(
+    event: Optional[ListType[CodeableReference]] = Field(
         description="Main clinical acts documented",
         default=None,
     )
-    bodySite: Optional[List[CodeableReference]] = Field(
+    bodySite: Optional[ListType[CodeableReference]] = Field(
         description="Body part included",
         default=None,
     )
@@ -321,11 +225,11 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_date",
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the document",
         default=None,
     )
-    attester: Optional[List[DocumentReferenceAttester]] = Field(
+    attester: Optional[ListType[DocumentReferenceAttester]] = Field(
         description="Attests to accuracy of the document",
         default=None,
     )
@@ -333,7 +237,7 @@ class DocumentReference(DomainResource):
         description="Organization which maintains the document",
         default=None,
     )
-    relatesTo: Optional[List[DocumentReferenceRelatesTo]] = Field(
+    relatesTo: Optional[ListType[DocumentReferenceRelatesTo]] = Field(
         description="Relationships to other documents",
         default=None,
     )
@@ -346,69 +250,14 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_description",
     )
-    securityLabel: Optional[List[CodeableConcept]] = Field(
+    securityLabel: Optional[ListType[CodeableConcept]] = Field(
         description="Document security-tags",
         default=None,
     )
-    content: Optional[List[DocumentReferenceContent]] = Field(
+    content: Optional[ListType[DocumentReferenceContent]] = Field(
         description="Document referenced",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "content",
-                "securityLabel",
-                "description",
-                "relatesTo",
-                "custodian",
-                "attester",
-                "author",
-                "date",
-                "period",
-                "practiceSetting",
-                "facilityType",
-                "bodySite",
-                "event",
-                "context",
-                "subject",
-                "category",
-                "type",
-                "modality",
-                "docStatus",
-                "status",
-                "basedOn",
-                "version",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_docRef_1_constraint_model_validator(self):
@@ -427,55 +276,5 @@ class DocumentReference(DomainResource):
             expression="practiceSetting.empty() or context.where(resolve() is Encounter).empty()",
             human="practiceSetting SHALL only be present if context is not present",
             key="docRef-2",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
             severity="warning",
         )

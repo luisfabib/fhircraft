@@ -49,22 +49,6 @@ class BundleLink(BackboneElement):
         alias="_url",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "url",
-                "relation",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class BundleEntryLink(BackboneElement):
     """
@@ -90,22 +74,6 @@ class BundleEntryLink(BackboneElement):
         alias="_url",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "url",
-                "relation",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class BundleEntrySearch(BackboneElement):
     """
@@ -130,22 +98,6 @@ class BundleEntrySearch(BackboneElement):
         default=None,
         alias="_score",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "score",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class BundleEntryRequest(BackboneElement):
@@ -208,26 +160,6 @@ class BundleEntryRequest(BackboneElement):
         alias="_ifNoneExist",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "ifNoneExist",
-                "ifMatch",
-                "ifModifiedSince",
-                "ifNoneMatch",
-                "url",
-                "method",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class BundleEntryResponse(BackboneElement):
     """
@@ -275,24 +207,6 @@ class BundleEntryResponse(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "lastModified",
-                "etag",
-                "location",
-                "status",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class BundleEntry(BackboneElement):
     """
@@ -329,25 +243,6 @@ class BundleEntry(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "response",
-                "request",
-                "search",
-                "fullUrl",
-                "link",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class Bundle(Resource):
     """
@@ -358,37 +253,6 @@ class Bundle(Resource):
     _type = "Bundle"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Bundle"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
     identifier: Optional[Identifier] = Field(
         description="Persistent identifier for the bundle",
         default=None,
@@ -434,50 +298,6 @@ class Bundle(Resource):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "signature",
-                "entry",
-                "link",
-                "total",
-                "timestamp",
-                "type",
-                "identifier",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("entry",),
-            expression="resource.exists() or request.exists() or response.exists()",
-            human="must be a resource unless there's a request or response",
-            key="bdl-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_8_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("entry",),
-            expression="fullUrl.contains('/_history/').not()",
-            human="fullUrl cannot be a version specific reference",
-            key="bdl-8",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_bdl_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -518,12 +338,34 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
+    def FHIR_bdl_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("entry",),
+            expression="resource.exists() or request.exists() or response.exists()",
+            human="must be a resource unless there's a request or response",
+            key="bdl-5",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_bdl_7_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'history') or entry.where(fullUrl.exists()).select(fullUrl&resource.meta.versionId).isDistinct()",
             human="FullUrl must be unique in a bundle, or else entries with the same fullUrl must have different meta.versionId (except in history bundles)",
             key="bdl-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_8_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("entry",),
+            expression="fullUrl.contains('/_history/').not()",
+            human="fullUrl cannot be a version specific reference",
+            key="bdl-8",
             severity="error",
         )
 

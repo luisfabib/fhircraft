@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -57,11 +57,11 @@ class RequirementsStatement(BackboneElement):
         default=None,
         alias="_label",
     )
-    conformance: Optional[List[Code]] = Field(
+    conformance: Optional[ListType[Code]] = Field(
         description="SHALL | SHOULD | MAY | SHOULD-NOT",
         default=None,
     )
-    conformance_ext: Optional[List[Optional[Element]]] = Field(
+    conformance_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for conformance extensions",
         default=None,
         alias="_conformance",
@@ -88,7 +88,7 @@ class RequirementsStatement(BackboneElement):
         description="Another statement this clarifies/restricts ([url#]key)",
         default=None,
     )
-    derivedFrom_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFrom_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",
@@ -102,52 +102,28 @@ class RequirementsStatement(BackboneElement):
         default=None,
         alias="_parent",
     )
-    satisfiedBy: Optional[List[Url]] = Field(
+    satisfiedBy: Optional[ListType[Url]] = Field(
         description="Design artifact that satisfies this requirement",
         default=None,
     )
-    satisfiedBy_ext: Optional[List[Optional[Element]]] = Field(
+    satisfiedBy_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for satisfiedBy extensions",
         default=None,
         alias="_satisfiedBy",
     )
-    reference: Optional[List[Url]] = Field(
+    reference: Optional[ListType[Url]] = Field(
         description="External artifact (rule/document etc. that) created this requirement",
         default=None,
     )
-    reference_ext: Optional[List[Optional[Element]]] = Field(
+    reference_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for reference extensions",
         default=None,
         alias="_reference",
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Who asked for this statement",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "source",
-                "reference",
-                "satisfiedBy",
-                "parent",
-                "derivedFrom",
-                "requirement",
-                "conditionality",
-                "conformance",
-                "label",
-                "key",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class Requirements(DomainResource):
@@ -159,53 +135,6 @@ class Requirements(DomainResource):
     _type = "Requirements"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Requirements"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this Requirements, represented as a URI (globally unique)",
         default=None,
@@ -215,7 +144,7 @@ class Requirements(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the Requirements (business identifier)",
         default=None,
     )
@@ -295,7 +224,7 @@ class Requirements(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -308,11 +237,11 @@ class Requirements(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for Requirements (if applicable)",
         default=None,
     )
@@ -343,7 +272,7 @@ class Requirements(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    derivedFrom: Optional[List[Canonical]] = Field(
+    derivedFrom: Optional[ListType[Canonical]] = Field(
         description="Other set of Requirements this builds on",
         default=None,
     )
@@ -352,7 +281,7 @@ class Requirements(DomainResource):
         default=None,
         alias="_derivedFrom",
     )
-    reference: Optional[List[Url]] = Field(
+    reference: Optional[ListType[Url]] = Field(
         description="External artifact (rule/document etc. that) created this set of requirements",
         default=None,
     )
@@ -361,16 +290,16 @@ class Requirements(DomainResource):
         default=None,
         alias="_reference",
     )
-    actor: Optional[List[Canonical]] = Field(
+    actor: Optional[ListType[Canonical]] = Field(
         description="Actor for these requirements",
         default=None,
     )
-    actor_ext: Optional[List[Optional[Element]]] = Field(
+    actor_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for actor extensions",
         default=None,
         alias="_actor",
     )
-    statement: Optional[List[RequirementsStatement]] = Field(
+    statement: Optional[ListType[RequirementsStatement]] = Field(
         description="Actual statement as markdown",
         default=None,
     )
@@ -380,69 +309,6 @@ class Requirements(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "statement",
-                "actor",
-                "reference",
-                "derivedFrom",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -461,5 +327,16 @@ class Requirements(DomainResource):
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
             severity="warning",
         )

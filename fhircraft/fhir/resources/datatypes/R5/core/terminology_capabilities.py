@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,27 +50,11 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
         description="Version covered by this statement",
         default=None,
     )
-    version_ext: Optional[List[Optional[Element]]] = Field(
+    version_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "version",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TerminologyCapabilitiesImplementation(BackboneElement):
@@ -97,22 +81,6 @@ class TerminologyCapabilitiesImplementation(BackboneElement):
         alias="_url",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "url",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
     """
@@ -128,31 +96,15 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
         default=None,
         alias="_code",
     )
-    op: Optional[List[Code]] = Field(
+    op: Optional[ListType[Code]] = Field(
         description="Operations supported for the property",
         default=None,
     )
-    op_ext: Optional[List[Optional[Element]]] = Field(
+    op_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for op extensions",
         default=None,
         alias="_op",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "op",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
@@ -187,20 +139,20 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         default=None,
         alias="_compositional",
     )
-    language: Optional[List[Code]] = Field(
+    language: Optional[ListType[Code]] = Field(
         description="Language Displays supported",
         default=None,
     )
-    language_ext: Optional[List[Optional[Element]]] = Field(
+    language_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for language extensions",
         default=None,
         alias="_language",
     )
-    filter: Optional[List[TerminologyCapabilitiesCodeSystemVersionFilter]] = Field(
+    filter: Optional[ListType[TerminologyCapabilitiesCodeSystemVersionFilter]] = Field(
         description="Filter Properties supported",
         default=None,
     )
-    property_: Optional[List[Code]] = Field(
+    property_: Optional[ListType[Code]] = Field(
         description="Properties supported for $lookup",
         default=None,
         alias="property",
@@ -210,26 +162,6 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         default=None,
         alias="_property",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "property_",
-                "filter",
-                "language",
-                "compositional",
-                "isDefault",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TerminologyCapabilitiesCodeSystem(BackboneElement):
@@ -246,7 +178,7 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         default=None,
         alias="_uri",
     )
-    version: Optional[List[TerminologyCapabilitiesCodeSystemVersion]] = Field(
+    version: Optional[ListType[TerminologyCapabilitiesCodeSystemVersion]] = Field(
         description="Version of Code System supported",
         default=None,
     )
@@ -268,24 +200,6 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         default=None,
         alias="_subsumption",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subsumption",
-                "content",
-                "version",
-                "uri",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TerminologyCapabilitiesExpansionParameter(BackboneElement):
@@ -311,22 +225,6 @@ class TerminologyCapabilitiesExpansionParameter(BackboneElement):
         default=None,
         alias="_documentation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TerminologyCapabilitiesExpansion(BackboneElement):
@@ -361,7 +259,7 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         default=None,
         alias="_incomplete",
     )
-    parameter: Optional[List[TerminologyCapabilitiesExpansionParameter]] = Field(
+    parameter: Optional[ListType[TerminologyCapabilitiesExpansionParameter]] = Field(
         description="Supported expansion parameter",
         default=None,
     )
@@ -374,25 +272,6 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         default=None,
         alias="_textFilter",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "textFilter",
-                "parameter",
-                "incomplete",
-                "paging",
-                "hierarchical",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TerminologyCapabilitiesValidateCode(BackboneElement):
@@ -410,21 +289,6 @@ class TerminologyCapabilitiesValidateCode(BackboneElement):
         alias="_translations",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "translations",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TerminologyCapabilitiesTranslation(BackboneElement):
     """
@@ -440,21 +304,6 @@ class TerminologyCapabilitiesTranslation(BackboneElement):
         default=None,
         alias="_needsMap",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "needsMap",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TerminologyCapabilitiesClosure(BackboneElement):
@@ -472,21 +321,6 @@ class TerminologyCapabilitiesClosure(BackboneElement):
         alias="_translation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "translation",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TerminologyCapabilities(DomainResource):
     """
@@ -497,53 +331,6 @@ class TerminologyCapabilities(DomainResource):
     _type = "TerminologyCapabilities"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/TerminologyCapabilities"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this terminology capabilities, represented as a URI (globally unique)",
         default=None,
@@ -553,7 +340,7 @@ class TerminologyCapabilities(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the terminology capabilities",
         default=None,
     )
@@ -633,7 +420,7 @@ class TerminologyCapabilities(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -646,11 +433,11 @@ class TerminologyCapabilities(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for terminology capabilities (if applicable)",
         default=None,
     )
@@ -707,7 +494,7 @@ class TerminologyCapabilities(DomainResource):
         default=None,
         alias="_lockedDate",
     )
-    codeSystem: Optional[List[TerminologyCapabilitiesCodeSystem]] = Field(
+    codeSystem: Optional[ListType[TerminologyCapabilitiesCodeSystem]] = Field(
         description="A code system supported by the server",
         default=None,
     )
@@ -745,61 +532,22 @@ class TerminologyCapabilities(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
             self,
-            elements=(
-                "closure",
-                "translation",
-                "validateCode",
-                "codeSearch",
-                "expansion",
-                "codeSystem",
-                "lockedDate",
-                "implementation",
-                "software",
-                "kind",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
         )
 
     @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
             self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -822,47 +570,6 @@ class TerminologyCapabilities(DomainResource):
             human="If there is more than one version, a version code must be defined",
             key="tcp-1",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tcp_7_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("codeSystem",),
-            expression="version.code.isDistinct()",
-            human="Each version.code element must be distinct for a particular code system.",
-            key="tcp-7",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tcp_8_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("codeSystem",),
-            expression="version.where(isDefault = true).count() <= 1",
-            human="A codeSystem element instance may have at most one version.isDefault element with a value of 'true'.",
-            key="tcp-8",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -912,5 +619,27 @@ class TerminologyCapabilities(DomainResource):
             expression="codeSystem.uri.isDistinct()",
             human="Each instance of the codeSystem element must represent a distinct code system.",
             key="tcp-6",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tcp_7_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("codeSystem",),
+            expression="version.code.isDistinct()",
+            human="Each version.code element must be distinct for a particular code system.",
+            key="tcp-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tcp_8_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("codeSystem",),
+            expression="version.where(isDefault = true).count() <= 1",
+            human="A codeSystem element instance may have at most one version.isDefault element with a value of 'true'.",
+            key="tcp-8",
             severity="error",
         )

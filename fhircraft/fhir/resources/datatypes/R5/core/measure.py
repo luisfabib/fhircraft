@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -55,22 +55,6 @@ class MeasureTerm(BackboneElement):
         alias="_definition",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "definition",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MeasureGroupPopulation(BackboneElement):
     """
@@ -121,38 +105,6 @@ class MeasureGroupPopulation(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "aggregateMethod",
-                "inputPopulationId",
-                "groupDefinition",
-                "criteria",
-                "description",
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_mea_3_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-3",
-            severity="warning",
-        )
-
 
 class MeasureGroupStratifierComponent(BackboneElement):
     """
@@ -190,36 +142,6 @@ class MeasureGroupStratifierComponent(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "groupDefinition",
-                "criteria",
-                "description",
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_mea_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-5",
-            severity="warning",
-        )
-
 
 class MeasureGroupStratifier(BackboneElement):
     """
@@ -256,41 +178,10 @@ class MeasureGroupStratifier(BackboneElement):
         description="A group resource that defines this population",
         default=None,
     )
-    component: Optional[List[MeasureGroupStratifierComponent]] = Field(
+    component: Optional[ListType[MeasureGroupStratifierComponent]] = Field(
         description="Stratifier criteria component for the measure",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "component",
-                "groupDefinition",
-                "criteria",
-                "description",
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_mea_4_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-4",
-            severity="warning",
-        )
 
 
 class MeasureGroup(BackboneElement):
@@ -320,7 +211,7 @@ class MeasureGroup(BackboneElement):
         default=None,
         alias="_description",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="process | outcome | structure | patient-reported-outcome | composite",
         default=None,
     )
@@ -362,20 +253,20 @@ class MeasureGroup(BackboneElement):
         description="increase | decrease",
         default=None,
     )
-    library: Optional[List[Canonical]] = Field(
+    library: Optional[ListType[Canonical]] = Field(
         description="Logic used by the measure group",
         default=None,
     )
-    library_ext: Optional[List[Optional[Element]]] = Field(
+    library_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for library extensions",
         default=None,
         alias="_library",
     )
-    population: Optional[List[MeasureGroupPopulation]] = Field(
+    population: Optional[ListType[MeasureGroupPopulation]] = Field(
         description="Population criteria",
         default=None,
     )
-    stratifier: Optional[List[MeasureGroupStratifier]] = Field(
+    stratifier: Optional[ListType[MeasureGroupStratifier]] = Field(
         description="Stratifier criteria for the measure",
         default=None,
     )
@@ -385,43 +276,6 @@ class MeasureGroup(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="subject",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "stratifier",
-                "population",
-                "library",
-                "improvementNotation",
-                "rateAggregation",
-                "scoringUnit",
-                "scoring",
-                "basis",
-                "type",
-                "description",
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_mea_2_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-2",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -452,7 +306,7 @@ class MeasureSupplementalData(BackboneElement):
         description="Meaning of the supplemental data",
         default=None,
     )
-    usage: Optional[List[CodeableConcept]] = Field(
+    usage: Optional[ListType[CodeableConcept]] = Field(
         description="supplemental-data | risk-adjustment-factor",
         default=None,
     )
@@ -470,36 +324,6 @@ class MeasureSupplementalData(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "criteria",
-                "description",
-                "usage",
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_mea_6_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-6",
-            severity="warning",
-        )
-
 
 class Measure(DomainResource):
     """
@@ -510,53 +334,6 @@ class Measure(DomainResource):
     _type = "Measure"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Measure"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this measure, represented as a URI (globally unique)",
         default=None,
@@ -566,7 +343,7 @@ class Measure(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the measure",
         default=None,
     )
@@ -672,7 +449,7 @@ class Measure(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -685,11 +462,11 @@ class Measure(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for measure (if applicable)",
         default=None,
     )
@@ -706,7 +483,7 @@ class Measure(DomainResource):
         description="Describes the clinical usage of the measure",
         default=None,
     )
-    usage_ext: Optional[List[Optional[Element]]] = Field(
+    usage_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for usage extensions",
         default=None,
         alias="_usage",
@@ -751,31 +528,31 @@ class Measure(DomainResource):
         description="When the measure is expected to be used",
         default=None,
     )
-    topic: Optional[List[CodeableConcept]] = Field(
+    topic: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the measure, such as Education, Treatment, Assessment, etc",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc",
         default=None,
     )
-    library: Optional[List[Canonical]] = Field(
+    library: Optional[ListType[Canonical]] = Field(
         description="Logic used by the measure",
         default=None,
     )
@@ -805,7 +582,7 @@ class Measure(DomainResource):
         description="opportunity | all-or-nothing | linear | weighted",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="process | outcome | structure | patient-reported-outcome | composite",
         default=None,
     )
@@ -849,7 +626,7 @@ class Measure(DomainResource):
         description="increase | decrease",
         default=None,
     )
-    term: Optional[List[MeasureTerm]] = Field(
+    term: Optional[ListType[MeasureTerm]] = Field(
         description="Defined terms used in the measure documentation",
         default=None,
     )
@@ -862,11 +639,11 @@ class Measure(DomainResource):
         default=None,
         alias="_guidance",
     )
-    group: Optional[List[MeasureGroup]] = Field(
+    group: Optional[ListType[MeasureGroup]] = Field(
         description="Population criteria group",
         default=None,
     )
-    supplementalData: Optional[List[MeasureSupplementalData]] = Field(
+    supplementalData: Optional[ListType[MeasureSupplementalData]] = Field(
         description="What other data should be reported with the measure",
         default=None,
     )
@@ -883,92 +660,6 @@ class Measure(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="subject",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "supplementalData",
-                "group",
-                "guidance",
-                "term",
-                "improvementNotation",
-                "clinicalRecommendationStatement",
-                "rationale",
-                "rateAggregation",
-                "riskAdjustment",
-                "type",
-                "compositeScoring",
-                "scoringUnit",
-                "scoring",
-                "disclaimer",
-                "library",
-                "relatedArtifact",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "topic",
-                "effectivePeriod",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "usage",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "basis",
-                "experimental",
-                "status",
-                "subtitle",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -1000,6 +691,17 @@ class Measure(DomainResource):
         )
 
     @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_mea_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -1007,4 +709,59 @@ class Measure(DomainResource):
             human="Stratifier SHALL be either a single criteria or a set of criteria components",
             key="mea-1",
             severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_2_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-2",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_3_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.population.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-3",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_4_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.stratifier.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-4",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.stratifier.component.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-5",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_6_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("supplementalData.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-6",
+            severity="warning",
         )

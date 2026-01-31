@@ -61,35 +61,6 @@ class Coding(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "userSelected",
-                "display",
-                "code",
-                "version",
-                "system",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("extension",),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_cod_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -97,14 +68,4 @@ class Coding(Element):
             human="A Coding SHOULD NOT have a display unless a code is also present.  Computation on Coding.display alone is generally unsafe.  Consider using CodeableConcept.text",
             key="cod-1",
             severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )

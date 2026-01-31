@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -52,22 +52,6 @@ class TestPlanDependency(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "predecessor",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TestPlanTestCaseDependency(BackboneElement):
     """
@@ -87,22 +71,6 @@ class TestPlanTestCaseDependency(BackboneElement):
         description="Link to predecessor test plans",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "predecessor",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TestPlanTestCaseTestRunScript(BackboneElement):
@@ -136,21 +104,6 @@ class TestPlanTestCaseTestRunScript(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "language",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -178,22 +131,6 @@ class TestPlanTestCaseTestRun(BackboneElement):
         description="The test cases in a structured language e.g. gherkin, Postman, or FHIR TestScript",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "script",
-                "narrative",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TestPlanTestCaseTestData(BackboneElement):
@@ -231,22 +168,6 @@ class TestPlanTestCaseTestData(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "content",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -261,35 +182,18 @@ class TestPlanTestCaseAssertion(BackboneElement):
     The test assertions - the expectations of test results from the execution of the test case.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Assertion type - for example \u0027informative\u0027 or \u0027required\u0027 ",
         default=None,
     )
-    object: Optional[List[CodeableReference]] = Field(
+    object: Optional[ListType[CodeableReference]] = Field(
         description="The focus or object of the assertion",
         default=None,
     )
-    result: Optional[List[CodeableReference]] = Field(
+    result: Optional[ListType[CodeableReference]] = Field(
         description="The actual result assertion",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "result",
-                "object",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TestPlanTestCase(BackboneElement):
@@ -306,46 +210,26 @@ class TestPlanTestCase(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    scope: Optional[List[Reference]] = Field(
+    scope: Optional[ListType[Reference]] = Field(
         description="The scope or artifact covered by the case",
         default=None,
     )
-    dependency: Optional[List[TestPlanTestCaseDependency]] = Field(
+    dependency: Optional[ListType[TestPlanTestCaseDependency]] = Field(
         description="Required criteria to execute the test case",
         default=None,
     )
-    testRun: Optional[List[TestPlanTestCaseTestRun]] = Field(
+    testRun: Optional[ListType[TestPlanTestCaseTestRun]] = Field(
         description="The actual test to be executed",
         default=None,
     )
-    testData: Optional[List[TestPlanTestCaseTestData]] = Field(
+    testData: Optional[ListType[TestPlanTestCaseTestData]] = Field(
         description="The test data used in the test case",
         default=None,
     )
-    assertion: Optional[List[TestPlanTestCaseAssertion]] = Field(
+    assertion: Optional[ListType[TestPlanTestCaseAssertion]] = Field(
         description="Test assertions or expectations",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "assertion",
-                "testData",
-                "testRun",
-                "dependency",
-                "scope",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class TestPlan(DomainResource):
@@ -357,53 +241,6 @@ class TestPlan(DomainResource):
     _type = "TestPlan"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/TestPlan"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this test plan, represented as a URI (globally unique)",
         default=None,
@@ -413,7 +250,7 @@ class TestPlan(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier identifier for the test plan",
         default=None,
     )
@@ -493,7 +330,7 @@ class TestPlan(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -506,11 +343,11 @@ class TestPlan(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction where the test plan applies (if applicable)",
         default=None,
     )
@@ -541,11 +378,11 @@ class TestPlan(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the Test Plan - can be acceptance, unit, performance",
         default=None,
     )
-    scope: Optional[List[Reference]] = Field(
+    scope: Optional[ListType[Reference]] = Field(
         description="What is being tested with this Test Plan - a conformance resource, or narrative criteria, or an external reference",
         default=None,
     )
@@ -558,7 +395,7 @@ class TestPlan(DomainResource):
         default=None,
         alias="_testTools",
     )
-    dependency: Optional[List[TestPlanDependency]] = Field(
+    dependency: Optional[ListType[TestPlanDependency]] = Field(
         description="The required criteria to execute the test plan - e.g. preconditions, previous tests",
         default=None,
     )
@@ -571,7 +408,7 @@ class TestPlan(DomainResource):
         default=None,
         alias="_exitCriteria",
     )
-    testCase: Optional[List[TestPlanTestCase]] = Field(
+    testCase: Optional[ListType[TestPlanTestCase]] = Field(
         description="The test cases that constitute this plan",
         default=None,
     )
@@ -581,71 +418,6 @@ class TestPlan(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "testCase",
-                "exitCriteria",
-                "dependency",
-                "testTools",
-                "scope",
-                "category",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -664,5 +436,16 @@ class TestPlan(DomainResource):
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
             severity="warning",
         )

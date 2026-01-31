@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -42,11 +42,11 @@ class CompartmentDefinitionResource(BackboneElement):
         default=None,
         alias="_code",
     )
-    param: Optional[List[String]] = Field(
+    param: Optional[ListType[String]] = Field(
         description="Search Parameter Name, or chained parameters",
         default=None,
     )
-    param_ext: Optional[List[Optional[Element]]] = Field(
+    param_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for param extensions",
         default=None,
         alias="_param",
@@ -79,25 +79,6 @@ class CompartmentDefinitionResource(BackboneElement):
         alias="_endParam",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "endParam",
-                "startParam",
-                "documentation",
-                "param",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CompartmentDefinition(DomainResource):
     """
@@ -108,53 +89,6 @@ class CompartmentDefinition(DomainResource):
     _type = "CompartmentDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CompartmentDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this compartment definition, represented as a URI (globally unique)",
         default=None,
@@ -240,7 +174,7 @@ class CompartmentDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -253,7 +187,7 @@ class CompartmentDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
@@ -284,7 +218,7 @@ class CompartmentDefinition(DomainResource):
         default=None,
         alias="_search",
     )
-    resource: Optional[List[CompartmentDefinitionResource]] = Field(
+    resource: Optional[ListType[CompartmentDefinitionResource]] = Field(
         description="How a resource is related to the compartment",
         default=None,
     )
@@ -297,50 +231,12 @@ class CompartmentDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
             self,
-            elements=(
-                "resource",
-                "search",
-                "code",
-                "purpose",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
         )
 
     @model_validator(mode="after")
@@ -352,15 +248,6 @@ class CompartmentDefinition(DomainResource):
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",
             severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
         )
 
     @model_validator(mode="after")

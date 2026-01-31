@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,7 +50,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
         description="Expresses the type of characteristic",
         default=None,
     )
-    method: Optional[List[CodeableConcept]] = Field(
+    method: Optional[ListType[CodeableConcept]] = Field(
         description="Method for how the characteristic value was determined",
         default=None,
     )
@@ -105,24 +105,6 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "offset",
-                "device",
-                "method",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -155,27 +137,10 @@ class EvidenceVariableCharacteristicDefinitionByCombination(BackboneElement):
         default=None,
         alias="_threshold",
     )
-    characteristic: Optional[List["EvidenceVariableCharacteristic"]] = Field(
+    characteristic: Optional[ListType["EvidenceVariableCharacteristic"]] = Field(
         description="A defining factor of the characteristic",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "characteristic",
-                "threshold",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
@@ -192,7 +157,7 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
@@ -239,24 +204,6 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "range",
-                "quantity",
-                "note",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def event_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -289,7 +236,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
@@ -360,9 +307,11 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Length of time in which the characteristic is met",
         default=None,
     )
-    timeFromEvent: Optional[List[EvidenceVariableCharacteristicTimeFromEvent]] = Field(
-        description="Timing in which the characteristic is determined",
-        default=None,
+    timeFromEvent: Optional[ListType[EvidenceVariableCharacteristicTimeFromEvent]] = (
+        Field(
+            description="Timing in which the characteristic is determined",
+            default=None,
+        )
     )
 
     @property
@@ -377,32 +326,6 @@ class EvidenceVariableCharacteristic(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="duration",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "timeFromEvent",
-                "definitionByCombination",
-                "definitionByTypeAndValue",
-                "definitionId",
-                "definitionExpression",
-                "definitionCodeableConcept",
-                "definitionCanonical",
-                "definitionReference",
-                "exclude",
-                "note",
-                "description",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -459,21 +382,6 @@ class EvidenceVariableCategory(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -492,53 +400,6 @@ class EvidenceVariable(DomainResource):
     _type = "EvidenceVariable"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceVariable"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this evidence variable, represented as a URI (globally unique)",
         default=None,
@@ -548,7 +409,7 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the evidence variable",
         default=None,
     )
@@ -637,7 +498,7 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -650,11 +511,11 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
@@ -707,23 +568,23 @@ class EvidenceVariable(DomainResource):
         description="When the resource is expected to be used",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc",
         default=None,
     )
@@ -736,7 +597,7 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_actual",
     )
-    characteristic: Optional[List[EvidenceVariableCharacteristic]] = Field(
+    characteristic: Optional[ListType[EvidenceVariableCharacteristic]] = Field(
         description="A defining factor of the EvidenceVariable",
         default=None,
     )
@@ -749,7 +610,7 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_handling",
     )
-    category: Optional[List[EvidenceVariableCategory]] = Field(
+    category: Optional[ListType[EvidenceVariableCategory]] = Field(
         description="A grouping for ordinal or polychotomous variables",
         default=None,
     )
@@ -762,64 +623,22 @@ class EvidenceVariable(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
             self,
-            elements=(
-                "category",
-                "handling",
-                "characteristic",
-                "actual",
-                "relatedArtifact",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "effectivePeriod",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "useContext",
-                "note",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "shortTitle",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
         )
 
     @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
             self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -843,25 +662,3 @@ class EvidenceVariable(DomainResource):
             key="evv-1",
             severity="error",
         )
-
-    @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
-        )
-
-
-EvidenceVariableCharacteristicDefinitionByCombination.model_rebuild()

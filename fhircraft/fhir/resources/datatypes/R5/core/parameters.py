@@ -1,26 +1,8 @@
-# Fhircraft modules
-from enum import Enum
+from pydantic import Field, model_validator
 
-# Standard modules
-from typing import Literal, Optional, Union
+from typing import List as ListType, Optional
 
-# Pydantic modules
-from pydantic import BaseModel, Field, model_validator
-from pydantic.fields import FieldInfo
-
-import fhircraft
 import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.utils import model_rebuild_all
-
-NoneType = type(None)
-
-# Dynamic modules
-
-from typing import List, Literal, Optional
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.primitives import (
     Base64Binary,
     Boolean,
@@ -83,7 +65,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     UsageContext,
 )
 from .resource import Resource
-from .domain_resource import DomainResource
 
 
 class ParametersParameter(BackboneElement):
@@ -415,7 +396,7 @@ class ParametersParameter(BackboneElement):
         description="If parameter is a whole resource",
         default=None,
     )
-    part: Optional[List["ParametersParameter"]] = Field(
+    part: Optional[ListType["ParametersParameter"]] = Field(
         description="Named part of a multi-part parameter",
         default=None,
     )
@@ -425,22 +406,6 @@ class ParametersParameter(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="value",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "part",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -512,59 +477,13 @@ class Parameters(Resource):
     """
     This resource is used to pass information into and back from an operation (whether invoked directly from REST or within a messaging environment).  It is not persisted or allowed to be referenced by other resources except as described in the definition of the Parameters resource.
     """
+
     _type = "Parameters"
 
-
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    parameter: Optional[List[ParametersParameter]] = Field(
+    parameter: Optional[ListType[ParametersParameter]] = Field(
         description="Operation Parameter",
         default=None,
     )
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "parameter",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_inv_1_constraint_validator(self):

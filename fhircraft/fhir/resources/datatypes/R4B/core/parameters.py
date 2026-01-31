@@ -1,26 +1,10 @@
-# Fhircraft modules
-from enum import Enum
-
-# Standard modules
-from typing import Literal, Optional, Union
-
-# Pydantic modules
-from pydantic import BaseModel, Field, model_validator
-from pydantic.fields import FieldInfo
-
-import fhircraft
-import fhircraft.fhir.resources.validators as fhir_validators
-from fhircraft.fhir.resources.base import FHIRBaseModel
-from fhircraft.fhir.resources.datatypes.primitives import *
-from fhircraft.utils import model_rebuild_all
+from pydantic import Field, model_validator
 
 NoneType = type(None)
 
-# Dynamic modules
+from typing import List as ListType, Optional
 
-from typing import List as ListType, Literal, Optional
-
-from fhircraft.fhir.resources.base import FHIRBaseModel
+import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import (
     Base64Binary,
     Boolean,
@@ -60,7 +44,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Duration,
     Element,
     Expression,
-    Extension,
     HumanName,
     Identifier,
     Meta,
@@ -408,76 +391,60 @@ class ParametersParameter(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "part",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[
-                Base64Binary,
-                Boolean,
-                Canonical,
-                Code,
-                Date,
-                DateTime,
-                Decimal,
-                Id,
-                Instant,
-                Integer,
-                Markdown,
-                Oid,
-                PositiveInt,
-                String,
-                Time,
-                UnsignedInt,
-                Uri,
-                Url,
-                Uuid,
-                Address,
-                Age,
-                Annotation,
-                Attachment,
-                CodeableConcept,
-                Coding,
-                ContactPoint,
-                Count,
-                Distance,
-                Duration,
-                HumanName,
-                Identifier,
-                Money,
-                Period,
-                Quantity,
-                Range,
-                Ratio,
-                Reference,
-                SampledData,
-                Signature,
-                Timing,
-                ContactDetail,
-                Contributor,
-                DataRequirement,
-                Expression,
-                ParameterDefinition,
-                RelatedArtifact,
-                TriggerDefinition,
-                UsageContext,
-                Dosage,
-                Meta,
+                "Base64Binary",
+                "Boolean",
+                "Canonical",
+                "Code",
+                "Date",
+                "DateTime",
+                "Decimal",
+                "Id",
+                "Instant",
+                "Integer",
+                "Markdown",
+                "Oid",
+                "PositiveInt",
+                "String",
+                "Time",
+                "UnsignedInt",
+                "Uri",
+                "Url",
+                "Uuid",
+                "Address",
+                "Age",
+                "Annotation",
+                "Attachment",
+                "CodeableConcept",
+                "Coding",
+                "ContactPoint",
+                "Count",
+                "Distance",
+                "Duration",
+                "HumanName",
+                "Identifier",
+                "Money",
+                "Period",
+                "Quantity",
+                "Range",
+                "Ratio",
+                "Reference",
+                "SampledData",
+                "Signature",
+                "Timing",
+                "ContactDetail",
+                "Contributor",
+                "DataRequirement",
+                "Expression",
+                "ParameterDefinition",
+                "RelatedArtifact",
+                "TriggerDefinition",
+                "UsageContext",
+                "Dosage",
+                "Meta",
             ],
             field_name_base="value",
             required=False,
@@ -493,57 +460,10 @@ class Parameters(Resource):
     _type = "Parameters"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Parameters"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
     parameter: Optional[ListType[ParametersParameter]] = Field(
         description="Operation Parameter",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "parameter",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_inv_1_constraint_validator(self):

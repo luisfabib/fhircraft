@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,37 +50,16 @@ class InventoryItemName(BackboneElement):
         description="The language used to express the item name",
         default=None,
     )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
+
     name: Optional[String] = Field(
         description="The name or designation of the item",
         default=None,
     )
-    name_ext: Optional[List[Optional[Element]]] = Field(
+    name_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for name extensions",
         default=None,
         alias="_name",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "name",
-                "language",
-                "nameType",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class InventoryItemResponsibleOrganization(BackboneElement):
@@ -97,22 +76,6 @@ class InventoryItemResponsibleOrganization(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "organization",
-                "role",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class InventoryItemDescription(BackboneElement):
     """
@@ -123,11 +86,7 @@ class InventoryItemDescription(BackboneElement):
         description="The language that is used in the item description",
         default=None,
     )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
+
     description: Optional[String] = Field(
         description="Textual description of the item",
         default=None,
@@ -137,22 +96,6 @@ class InventoryItemDescription(BackboneElement):
         default=None,
         alias="_description",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "description",
-                "language",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class InventoryItemAssociation(BackboneElement):
@@ -172,23 +115,6 @@ class InventoryItemAssociation(BackboneElement):
         description="The quantity of the product in this product",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "quantity",
-                "relatedItem",
-                "associationType",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class InventoryItemCharacteristic(BackboneElement):
@@ -291,21 +217,6 @@ class InventoryItemCharacteristic(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "characteristicType",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -334,7 +245,7 @@ class InventoryItemInstance(BackboneElement):
     Instances or occurrences of the product.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="The identifier for the physical instance, typically a serial number",
         default=None,
     )
@@ -365,25 +276,6 @@ class InventoryItemInstance(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "location",
-                "subject",
-                "expiry",
-                "lotNumber",
-                "identifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class InventoryItem(DomainResource):
     """
@@ -394,54 +286,7 @@ class InventoryItem(DomainResource):
     _type = "InventoryItem"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/InventoryItem"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for the inventory item",
         default=None,
     )
@@ -454,29 +299,29 @@ class InventoryItem(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Category or class of the item",
         default=None,
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Code designating the specific type of item",
         default=None,
     )
-    name: Optional[List[InventoryItemName]] = Field(
+    name: Optional[ListType[InventoryItemName]] = Field(
         description="The item name(s) - the brand name, or common name, functional name, generic name or others",
         default=None,
     )
-    responsibleOrganization: Optional[List[InventoryItemResponsibleOrganization]] = (
-        Field(
-            description="Organization(s) responsible for the product",
-            default=None,
-        )
+    responsibleOrganization: Optional[
+        ListType[InventoryItemResponsibleOrganization]
+    ] = Field(
+        description="Organization(s) responsible for the product",
+        default=None,
     )
     description: Optional[InventoryItemDescription] = Field(
         description="Descriptive characteristics of the item",
         default=None,
     )
-    inventoryStatus: Optional[List[CodeableConcept]] = Field(
+    inventoryStatus: Optional[ListType[CodeableConcept]] = Field(
         description="The usage status like recalled, in use, discarded",
         default=None,
     )
@@ -488,11 +333,11 @@ class InventoryItem(DomainResource):
         description="Net content or amount present in the item",
         default=None,
     )
-    association: Optional[List[InventoryItemAssociation]] = Field(
+    association: Optional[ListType[InventoryItemAssociation]] = Field(
         description="Association with other items or products",
         default=None,
     )
-    characteristic: Optional[List[InventoryItemCharacteristic]] = Field(
+    characteristic: Optional[ListType[InventoryItemCharacteristic]] = Field(
         description="Characteristic of the item",
         default=None,
     )
@@ -504,99 +349,3 @@ class InventoryItem(DomainResource):
         description="Link to a product resource used in clinical workflows",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "productReference",
-                "instance",
-                "characteristic",
-                "association",
-                "netContent",
-                "baseUnit",
-                "inventoryStatus",
-                "description",
-                "responsibleOrganization",
-                "name",
-                "code",
-                "category",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

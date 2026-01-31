@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,7 +50,7 @@ class SubstanceDefinitionMoiety(BackboneElement):
         description="Textual name for this moiety substance",
         default=None,
     )
-    name_ext: Optional[List[Optional[Element]]] = Field(
+    name_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for name extensions",
         default=None,
         alias="_name",
@@ -98,27 +98,6 @@ class SubstanceDefinitionMoiety(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "measurementType",
-                "molecularFormula",
-                "opticalActivity",
-                "stereochemistry",
-                "name",
-                "identifier",
-                "role",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def amount_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -150,28 +129,10 @@ class SubstanceDefinitionCharacterization(BackboneElement):
         default=None,
         alias="_description",
     )
-    file: Optional[List[Attachment]] = Field(
+    file: Optional[ListType[Attachment]] = Field(
         description="The data produced by the analytical instrument or a pictorial representation of that data. Examples: a JCAMP, JDX, or ADX file, or a chromatogram or spectrum analysis",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "file",
-                "description",
-                "form",
-                "technique",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class SubstanceDefinitionProperty(BackboneElement):
@@ -222,21 +183,6 @@ class SubstanceDefinitionProperty(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -264,23 +210,6 @@ class SubstanceDefinitionMolecularWeight(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "amount",
-                "type",
-                "method",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class SubstanceDefinitionStructureMolecularWeight(BackboneElement):
     """
@@ -300,23 +229,6 @@ class SubstanceDefinitionStructureMolecularWeight(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "amount",
-                "type",
-                "method",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class SubstanceDefinitionStructureRepresentation(BackboneElement):
     """
@@ -331,7 +243,7 @@ class SubstanceDefinitionStructureRepresentation(BackboneElement):
         description="The structural representation as a text string in a standard format",
         default=None,
     )
-    representation_ext: Optional[List[Optional[Element]]] = Field(
+    representation_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for representation extensions",
         default=None,
         alias="_representation",
@@ -344,24 +256,6 @@ class SubstanceDefinitionStructureRepresentation(BackboneElement):
         description="An attachment with the structural representation e.g. a structure graphic or AnIML file",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "document",
-                "format",
-                "representation",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class SubstanceDefinitionStructure(BackboneElement):
@@ -399,40 +293,20 @@ class SubstanceDefinitionStructure(BackboneElement):
         description="The molecular weight or weight range",
         default=None,
     )
-    technique: Optional[List[CodeableConcept]] = Field(
+    technique: Optional[ListType[CodeableConcept]] = Field(
         description="The method used to find the structure e.g. X-ray, NMR",
         default=None,
     )
-    sourceDocument: Optional[List[Reference]] = Field(
+    sourceDocument: Optional[ListType[Reference]] = Field(
         description="Source of information for the structure",
         default=None,
     )
-    representation: Optional[List[SubstanceDefinitionStructureRepresentation]] = Field(
-        description="A depiction of the structure of the substance",
-        default=None,
-    )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "representation",
-                "sourceDocument",
-                "technique",
-                "molecularWeight",
-                "molecularFormulaByMoiety",
-                "molecularFormula",
-                "opticalActivity",
-                "stereochemistry",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
+    representation: Optional[ListType[SubstanceDefinitionStructureRepresentation]] = (
+        Field(
+            description="A depiction of the structure of the substance",
+            default=None,
         )
+    )
 
 
 class SubstanceDefinitionCode(BackboneElement):
@@ -457,33 +331,14 @@ class SubstanceDefinitionCode(BackboneElement):
         default=None,
         alias="_statusDate",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Any comment can be provided in this field",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "source",
-                "note",
-                "statusDate",
-                "status",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class SubstanceDefinitionNameOfficial(BackboneElement):
@@ -508,23 +363,6 @@ class SubstanceDefinitionNameOfficial(BackboneElement):
         default=None,
         alias="_date",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "date",
-                "status",
-                "authority",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class SubstanceDefinitionName(BackboneElement):
@@ -558,59 +396,34 @@ class SubstanceDefinitionName(BackboneElement):
         default=None,
         alias="_preferred",
     )
-    language: Optional[List[CodeableConcept]] = Field(
+    language: Optional[ListType[CodeableConcept]] = Field(
         description="Human language that the name is written in",
         default=None,
     )
-    domain: Optional[List[CodeableConcept]] = Field(
+    domain: Optional[ListType[CodeableConcept]] = Field(
         description="The use context of this name e.g. as an active ingredient or as a food colour additive",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="The jurisdiction where this name applies",
         default=None,
     )
-    synonym: Optional[List["SubstanceDefinitionName"]] = Field(
+    synonym: Optional[ListType["SubstanceDefinitionName"]] = Field(
         description="A synonym of this particular name, by which the substance is also known",
         default=None,
     )
-    translation: Optional[List["SubstanceDefinitionName"]] = Field(
+    translation: Optional[ListType["SubstanceDefinitionName"]] = Field(
         description="A translation for this name into another human language",
         default=None,
     )
-    official: Optional[List[SubstanceDefinitionNameOfficial]] = Field(
+    official: Optional[ListType[SubstanceDefinitionNameOfficial]] = Field(
         description="Details of the official nature of this name",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "source",
-                "official",
-                "translation",
-                "synonym",
-                "jurisdiction",
-                "domain",
-                "language",
-                "preferred",
-                "status",
-                "type",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class SubstanceDefinitionRelationship(BackboneElement):
@@ -664,7 +477,7 @@ class SubstanceDefinitionRelationship(BackboneElement):
         description='An operator for the amount, for example "average", "approximately", "less than"',
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
@@ -681,25 +494,6 @@ class SubstanceDefinitionRelationship(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="amount",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "source",
-                "comparator",
-                "ratioHighLimitAmount",
-                "isDefining",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -742,29 +536,10 @@ class SubstanceDefinitionSourceMaterial(BackboneElement):
         description="An anatomical origin of the source material within an organism",
         default=None,
     )
-    countryOfOrigin: Optional[List[CodeableConcept]] = Field(
+    countryOfOrigin: Optional[ListType[CodeableConcept]] = Field(
         description="The country or countries where the material is harvested",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "countryOfOrigin",
-                "part",
-                "species",
-                "genus",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class SubstanceDefinition(DomainResource):
@@ -776,54 +551,13 @@ class SubstanceDefinition(DomainResource):
     _type = "SubstanceDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubstanceDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[List[Optional[Element]]] = Field(
+    language_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for language extensions",
         default=None,
         alias="_language",
     )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier by which this substance is known",
         default=None,
     )
@@ -840,7 +574,7 @@ class SubstanceDefinition(DomainResource):
         description="Status of substance within the catalogue e.g. active, retired",
         default=None,
     )
-    classification: Optional[List[CodeableConcept]] = Field(
+    classification: Optional[ListType[CodeableConcept]] = Field(
         description="A categorization, high level e.g. polymer or nucleic acid, or food, chemical, biological, or lower e.g. polymer linear or branch chain, or type of impurity",
         default=None,
     )
@@ -848,7 +582,7 @@ class SubstanceDefinition(DomainResource):
         description="If the substance applies to human or veterinary use",
         default=None,
     )
-    grade: Optional[List[CodeableConcept]] = Field(
+    grade: Optional[ListType[CodeableConcept]] = Field(
         description="The quality standard, established benchmark, to which substance complies (e.g. USP/NF, BP)",
         default=None,
     )
@@ -861,31 +595,31 @@ class SubstanceDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    informationSource: Optional[List[Reference]] = Field(
+    informationSource: Optional[ListType[Reference]] = Field(
         description="Supporting literature",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Textual comment about the substance\u0027s catalogue or registry record",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="The entity that creates, makes, produces or fabricates the substance",
         default=None,
     )
-    supplier: Optional[List[Reference]] = Field(
+    supplier: Optional[ListType[Reference]] = Field(
         description="An entity that is the source for the substance. It may be different from the manufacturer",
         default=None,
     )
-    moiety: Optional[List[SubstanceDefinitionMoiety]] = Field(
+    moiety: Optional[ListType[SubstanceDefinitionMoiety]] = Field(
         description="Moiety, for structural modifications",
         default=None,
     )
-    characterization: Optional[List[SubstanceDefinitionCharacterization]] = Field(
+    characterization: Optional[ListType[SubstanceDefinitionCharacterization]] = Field(
         description="General specifications for this substance",
         default=None,
     )
-    property_: Optional[List[SubstanceDefinitionProperty]] = Field(
+    property_: Optional[ListType[SubstanceDefinitionProperty]] = Field(
         description="General specifications for this substance",
         default=None,
         alias="property",
@@ -894,7 +628,7 @@ class SubstanceDefinition(DomainResource):
         description="General information detailing this substance",
         default=None,
     )
-    molecularWeight: Optional[List[SubstanceDefinitionMolecularWeight]] = Field(
+    molecularWeight: Optional[ListType[SubstanceDefinitionMolecularWeight]] = Field(
         description="The average mass of a molecule of a compound",
         default=None,
     )
@@ -902,15 +636,15 @@ class SubstanceDefinition(DomainResource):
         description="Structural information",
         default=None,
     )
-    code: Optional[List[SubstanceDefinitionCode]] = Field(
+    code: Optional[ListType[SubstanceDefinitionCode]] = Field(
         description="Codes associated with the substance",
         default=None,
     )
-    name: Optional[List[SubstanceDefinitionName]] = Field(
+    name: Optional[ListType[SubstanceDefinitionName]] = Field(
         description="Names applicable to this substance",
         default=None,
     )
-    relationship: Optional[List[SubstanceDefinitionRelationship]] = Field(
+    relationship: Optional[ListType[SubstanceDefinitionRelationship]] = Field(
         description="A link between this substance and another",
         default=None,
     )
@@ -930,109 +664,3 @@ class SubstanceDefinition(DomainResource):
         description="Material or taxonomic/anatomical source",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "sourceMaterial",
-                "protein",
-                "polymer",
-                "nucleicAcid",
-                "relationship",
-                "name",
-                "code",
-                "structure",
-                "molecularWeight",
-                "referenceInformation",
-                "property_",
-                "characterization",
-                "moiety",
-                "supplier",
-                "manufacturer",
-                "note",
-                "informationSource",
-                "description",
-                "grade",
-                "domain",
-                "classification",
-                "status",
-                "version",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

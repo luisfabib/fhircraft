@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -90,23 +90,6 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "period",
-                "exclude",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -121,30 +104,14 @@ class EvidenceReportSubject(BackboneElement):
     Specifies the subject or focus of the report. Answers "What is this report about?".
     """
 
-    characteristic: Optional[List[EvidenceReportSubjectCharacteristic]] = Field(
+    characteristic: Optional[ListType[EvidenceReportSubjectCharacteristic]] = Field(
         description="Characteristic",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "note",
-                "characteristic",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EvidenceReportRelatesToTarget(BackboneElement):
@@ -179,24 +146,6 @@ class EvidenceReportRelatesToTarget(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "resource",
-                "display",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class EvidenceReportRelatesTo(BackboneElement):
     """
@@ -216,22 +165,6 @@ class EvidenceReportRelatesTo(BackboneElement):
         description="Target of the relationship",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "target",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EvidenceReportSection(BackboneElement):
@@ -256,7 +189,7 @@ class EvidenceReportSection(BackboneElement):
         description="Classification of section by Resource",
         default=None,
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the section",
         default=None,
     )
@@ -277,15 +210,15 @@ class EvidenceReportSection(BackboneElement):
         description="Order of section entries",
         default=None,
     )
-    entryClassifier: Optional[List[CodeableConcept]] = Field(
+    entryClassifier: Optional[ListType[CodeableConcept]] = Field(
         description="Extensible classifiers as content",
         default=None,
     )
-    entryReference: Optional[List[Reference]] = Field(
+    entryReference: Optional[ListType[Reference]] = Field(
         description="Reference to resources as content",
         default=None,
     )
-    entryQuantity: Optional[List[Quantity]] = Field(
+    entryQuantity: Optional[ListType[Quantity]] = Field(
         description="Quantity as content",
         default=None,
     )
@@ -293,36 +226,10 @@ class EvidenceReportSection(BackboneElement):
         description="Why the section is empty",
         default=None,
     )
-    section: Optional[List["EvidenceReportSection"]] = Field(
+    section: Optional[ListType["EvidenceReportSection"]] = Field(
         description="Nested Section",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "section",
-                "emptyReason",
-                "entryQuantity",
-                "entryReference",
-                "entryClassifier",
-                "orderedBy",
-                "mode",
-                "text",
-                "author",
-                "focusReference",
-                "focus",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EvidenceReport(DomainResource):
@@ -334,53 +241,6 @@ class EvidenceReport(DomainResource):
     _type = "EvidenceReport"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceReport"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this EvidenceReport, represented as a globally unique URI",
         default=None,
@@ -399,15 +259,15 @@ class EvidenceReport(DomainResource):
         default=None,
         alias="_status",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique identifier for the evidence report",
         default=None,
     )
-    relatedIdentifier: Optional[List[Identifier]] = Field(
+    relatedIdentifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers for articles that may relate to more than one evidence report",
         default=None,
     )
@@ -428,11 +288,11 @@ class EvidenceReport(DomainResource):
         description="Kind of report",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes and annotations",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Link, description or reference to artifact associated with the report",
         default=None,
     )
@@ -449,31 +309,31 @@ class EvidenceReport(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    relatesTo: Optional[List[EvidenceReportRelatesTo]] = Field(
+    relatesTo: Optional[ListType[EvidenceReportRelatesTo]] = Field(
         description="Relationships to other compositions/documents",
         default=None,
     )
-    section: Optional[List[EvidenceReportSection]] = Field(
+    section: Optional[ListType[EvidenceReportSection]] = Field(
         description="Composition is broken into sections",
         default=None,
     )
@@ -486,52 +346,12 @@ class EvidenceReport(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def citeAs_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
             self,
-            elements=(
-                "section",
-                "relatesTo",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "contact",
-                "publisher",
-                "subject",
-                "relatedArtifact",
-                "note",
-                "type",
-                "relatedIdentifier",
-                "identifier",
-                "useContext",
-                "status",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
+            field_types=[Reference, Markdown],
+            field_name_base="citeAs",
+            required=False,
         )
 
     @model_validator(mode="after")
@@ -543,13 +363,4 @@ class EvidenceReport(DomainResource):
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",
             severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def citeAs_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[Reference, Markdown],
-            field_name_base="citeAs",
-            required=False,
         )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -28,35 +28,19 @@ class EndpointPayload(BackboneElement):
     The set of payloads that are provided/available at this endpoint.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="The type of content that may be used at this endpoint (e.g. XDS Discharge summaries)",
         default=None,
     )
-    mimeType: Optional[List[Code]] = Field(
+    mimeType: Optional[ListType[Code]] = Field(
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,
     )
-    mimeType_ext: Optional[List[Optional[Element]]] = Field(
+    mimeType_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for mimeType extensions",
         default=None,
         alias="_mimeType",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "mimeType",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class Endpoint(DomainResource):
@@ -68,54 +52,7 @@ class Endpoint(DomainResource):
     _type = "Endpoint"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Endpoint"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifies this endpoint across multiple systems",
         default=None,
     )
@@ -128,7 +65,7 @@ class Endpoint(DomainResource):
         default=None,
         alias="_status",
     )
-    connectionType: Optional[List[CodeableConcept]] = Field(
+    connectionType: Optional[ListType[CodeableConcept]] = Field(
         description="Protocol/Profile/Standard to be used with this endpoint connection",
         default=None,
     )
@@ -150,7 +87,7 @@ class Endpoint(DomainResource):
         default=None,
         alias="_description",
     )
-    environmentType: Optional[List[CodeableConcept]] = Field(
+    environmentType: Optional[ListType[CodeableConcept]] = Field(
         description="The type of environment(s) exposed at this endpoint",
         default=None,
     )
@@ -158,7 +95,7 @@ class Endpoint(DomainResource):
         description="Organization that manages this endpoint (might not be the organization that exposes the endpoint)",
         default=None,
     )
-    contact: Optional[List[ContactPoint]] = Field(
+    contact: Optional[ListType[ContactPoint]] = Field(
         description="Contact details for source (e.g. troubleshooting)",
         default=None,
     )
@@ -166,7 +103,7 @@ class Endpoint(DomainResource):
         description="Interval the endpoint is expected to be operational",
         default=None,
     )
-    payload: Optional[List[EndpointPayload]] = Field(
+    payload: Optional[ListType[EndpointPayload]] = Field(
         description="Set of payloads that are provided by this endpoint",
         default=None,
     )
@@ -179,106 +116,12 @@ class Endpoint(DomainResource):
         default=None,
         alias="_address",
     )
-    header: Optional[List[String]] = Field(
+    header: Optional[ListType[String]] = Field(
         description="Usage depends on the channel type",
         default=None,
     )
-    header_ext: Optional[List[Optional[Element]]] = Field(
+    header_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for header extensions",
         default=None,
         alias="_header",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "header",
-                "address",
-                "payload",
-                "period",
-                "contact",
-                "managingOrganization",
-                "environmentType",
-                "description",
-                "name",
-                "connectionType",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

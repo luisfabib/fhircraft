@@ -75,22 +75,6 @@ class ElementDefinitionSlicingDiscriminator(Element):
         alias="_path",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "path",
-                "type",
-                "extension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ElementDefinitionSlicing(Element):
     """
@@ -131,26 +115,6 @@ class ElementDefinitionSlicing(Element):
         alias="_rules",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "rules",
-                "ordered",
-                "description",
-                "discriminator",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ElementDefinitionBase(Element):
     """
@@ -186,24 +150,6 @@ class ElementDefinitionBase(Element):
         default=None,
         alias="_max",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "max",
-                "min",
-                "path",
-                "extension",
-                "extension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ElementDefinitionType(Element):
@@ -258,28 +204,6 @@ class ElementDefinitionType(Element):
         default=None,
         alias="_versioning",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "versioning",
-                "aggregation",
-                "targetProfile",
-                "profile",
-                "code",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ElementDefinitionExample(Element):
@@ -623,20 +547,6 @@ class ElementDefinitionExample(Element):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "label",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return validate_type_choice_element(
             self,
@@ -773,32 +683,6 @@ class ElementDefinitionConstraint(Element):
         alias="_source",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "source",
-                "expression",
-                "human",
-                "suppress",
-                "severity",
-                "requirements",
-                "key",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ElementDefinitionBindingAdditional(Element):
     """
@@ -857,30 +741,6 @@ class ElementDefinitionBindingAdditional(Element):
         alias="_any",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "any",
-                "usage",
-                "shortDoco",
-                "documentation",
-                "valueSet",
-                "purpose",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ElementDefinitionBinding(Element):
     """
@@ -920,26 +780,6 @@ class ElementDefinitionBinding(Element):
         description="Additional Bindings - more rules about the binding",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "additional",
-                "valueSet",
-                "description",
-                "strength",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ElementDefinitionMapping(Element):
@@ -985,26 +825,6 @@ class ElementDefinitionMapping(Element):
         default=None,
         alias="_comment",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "comment",
-                "map",
-                "language",
-                "identity",
-                "extension",
-                "extension",
-                "extension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ElementDefinition(BackboneType):
@@ -2408,51 +2228,6 @@ class ElementDefinition(BackboneType):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return validate_element_constraint(
-            self,
-            elements=(
-                "mapping",
-                "binding",
-                "isSummary",
-                "isModifierReason",
-                "isModifier",
-                "mustSupport",
-                "valueAlternatives",
-                "mustHaveValue",
-                "constraint",
-                "condition",
-                "maxLength",
-                "example",
-                "orderMeaning",
-                "meaningWhenMissing",
-                "type",
-                "contentReference",
-                "base",
-                "max",
-                "min",
-                "alias",
-                "requirements",
-                "comment",
-                "definition",
-                "short",
-                "slicing",
-                "code",
-                "label",
-                "sliceIsConstraining",
-                "sliceName",
-                "representation",
-                "path",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_eld_3_constraint_validator(self):
         return validate_element_constraint(
             self,
@@ -2526,16 +2301,6 @@ class ElementDefinition(BackboneType):
             expression="description.exists() or valueSet.exists()",
             human="binding SHALL have either description or valueSet",
             key="eld-23",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return validate_model_constraint(
-            self,
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
             severity="error",
         )
 

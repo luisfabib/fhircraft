@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -43,22 +43,6 @@ class ClinicalImpressionFinding(BackboneElement):
         alias="_basis",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "basis",
-                "item",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ClinicalImpression(DomainResource):
     """
@@ -69,54 +53,7 @@ class ClinicalImpression(DomainResource):
     _type = "ClinicalImpression"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ClinicalImpression"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
@@ -180,7 +117,7 @@ class ClinicalImpression(DomainResource):
         description="Reference to last assessment",
         default=None,
     )
-    problem: Optional[List[Reference]] = Field(
+    problem: Optional[ListType[Reference]] = Field(
         description="Relevant impressions of patient state",
         default=None,
     )
@@ -188,11 +125,11 @@ class ClinicalImpression(DomainResource):
         description="Change in the status/pattern of a subject\u0027s condition since previously assessed, such as worsening, improving, or no change",
         default=None,
     )
-    protocol: Optional[List[Uri]] = Field(
+    protocol: Optional[ListType[Uri]] = Field(
         description="Clinical Protocol followed",
         default=None,
     )
-    protocol_ext: Optional[List[Optional[Element]]] = Field(
+    protocol_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for protocol extensions",
         default=None,
         alias="_protocol",
@@ -206,23 +143,23 @@ class ClinicalImpression(DomainResource):
         default=None,
         alias="_summary",
     )
-    finding: Optional[List[ClinicalImpressionFinding]] = Field(
+    finding: Optional[ListType[ClinicalImpressionFinding]] = Field(
         description="Possible or likely findings and diagnoses",
         default=None,
     )
-    prognosisCodeableConcept: Optional[List[CodeableConcept]] = Field(
+    prognosisCodeableConcept: Optional[ListType[CodeableConcept]] = Field(
         description="Estimate of likely outcome",
         default=None,
     )
-    prognosisReference: Optional[List[Reference]] = Field(
+    prognosisReference: Optional[ListType[Reference]] = Field(
         description="RiskAssessment expressing likely outcome",
         default=None,
     )
-    supportingInfo: Optional[List[Reference]] = Field(
+    supportingInfo: Optional[ListType[Reference]] = Field(
         description="Information supporting the clinical impression",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the ClinicalImpression",
         default=None,
     )
@@ -235,110 +172,10 @@ class ClinicalImpression(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "note",
-                "supportingInfo",
-                "prognosisReference",
-                "prognosisCodeableConcept",
-                "finding",
-                "summary",
-                "protocol",
-                "changePattern",
-                "problem",
-                "previous",
-                "performer",
-                "date",
-                "encounter",
-                "subject",
-                "description",
-                "statusReason",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def effective_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[DateTime, Period],
             field_name_base="effective",
             required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )

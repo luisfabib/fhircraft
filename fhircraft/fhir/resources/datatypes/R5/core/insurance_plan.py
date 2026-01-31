@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -39,22 +39,6 @@ class InsurancePlanCoverageBenefitLimit(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "code",
-                "value",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class InsurancePlanCoverageBenefit(BackboneElement):
     """
@@ -74,27 +58,10 @@ class InsurancePlanCoverageBenefit(BackboneElement):
         default=None,
         alias="_requirement",
     )
-    limit: Optional[List[InsurancePlanCoverageBenefitLimit]] = Field(
+    limit: Optional[ListType[InsurancePlanCoverageBenefitLimit]] = Field(
         description="Benefit limits",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "limit",
-                "requirement",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class InsurancePlanCoverage(BackboneElement):
@@ -106,31 +73,14 @@ class InsurancePlanCoverage(BackboneElement):
         description="Type of coverage",
         default=None,
     )
-    network: Optional[List[Reference]] = Field(
+    network: Optional[ListType[Reference]] = Field(
         description="What networks provide coverage",
         default=None,
     )
-    benefit: Optional[List[InsurancePlanCoverageBenefit]] = Field(
+    benefit: Optional[ListType[InsurancePlanCoverageBenefit]] = Field(
         description="List of benefits",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "benefit",
-                "network",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class InsurancePlanPlanGeneralCost(BackboneElement):
@@ -165,24 +115,6 @@ class InsurancePlanPlanGeneralCost(BackboneElement):
         alias="_comment",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "comment",
-                "cost",
-                "groupSize",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
     """
@@ -197,7 +129,7 @@ class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
         description="in-network | out-of-network | other",
         default=None,
     )
-    qualifiers: Optional[List[CodeableConcept]] = Field(
+    qualifiers: Optional[ListType[CodeableConcept]] = Field(
         description="Additional information about the cost",
         default=None,
     )
@@ -205,24 +137,6 @@ class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
         description="The actual cost value",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "qualifiers",
-                "applicability",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
@@ -234,26 +148,10 @@ class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
         description="Type of specific benefit",
         default=None,
     )
-    cost: Optional[List[InsurancePlanPlanSpecificCostBenefitCost]] = Field(
+    cost: Optional[ListType[InsurancePlanPlanSpecificCostBenefitCost]] = Field(
         description="List of the costs",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "cost",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class InsurancePlanPlanSpecificCost(BackboneElement):
@@ -265,26 +163,10 @@ class InsurancePlanPlanSpecificCost(BackboneElement):
         description="General category of benefit",
         default=None,
     )
-    benefit: Optional[List[InsurancePlanPlanSpecificCostBenefit]] = Field(
+    benefit: Optional[ListType[InsurancePlanPlanSpecificCostBenefit]] = Field(
         description="Benefits list",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "benefit",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class InsurancePlanPlan(BackboneElement):
@@ -292,7 +174,7 @@ class InsurancePlanPlan(BackboneElement):
     Details about an insurance plan.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for Product",
         default=None,
     )
@@ -300,42 +182,22 @@ class InsurancePlanPlan(BackboneElement):
         description="Type of plan",
         default=None,
     )
-    coverageArea: Optional[List[Reference]] = Field(
+    coverageArea: Optional[ListType[Reference]] = Field(
         description="Where product applies",
         default=None,
     )
-    network: Optional[List[Reference]] = Field(
+    network: Optional[ListType[Reference]] = Field(
         description="What networks provide coverage",
         default=None,
     )
-    generalCost: Optional[List[InsurancePlanPlanGeneralCost]] = Field(
+    generalCost: Optional[ListType[InsurancePlanPlanGeneralCost]] = Field(
         description="Overall costs",
         default=None,
     )
-    specificCost: Optional[List[InsurancePlanPlanSpecificCost]] = Field(
+    specificCost: Optional[ListType[InsurancePlanPlanSpecificCost]] = Field(
         description="Specific costs",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "specificCost",
-                "generalCost",
-                "network",
-                "coverageArea",
-                "type",
-                "identifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class InsurancePlan(DomainResource):
@@ -347,54 +209,7 @@ class InsurancePlan(DomainResource):
     _type = "InsurancePlan"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/InsurancePlan"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for Product",
         default=None,
     )
@@ -407,7 +222,7 @@ class InsurancePlan(DomainResource):
         default=None,
         alias="_status",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of product",
         default=None,
     )
@@ -420,11 +235,11 @@ class InsurancePlan(DomainResource):
         default=None,
         alias="_name",
     )
-    alias: Optional[List[String]] = Field(
+    alias: Optional[ListType[String]] = Field(
         description="Alternate names",
         default=None,
     )
-    alias_ext: Optional[List[Optional[Element]]] = Field(
+    alias_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",
@@ -441,126 +256,30 @@ class InsurancePlan(DomainResource):
         description="Product administrator",
         default=None,
     )
-    coverageArea: Optional[List[Reference]] = Field(
+    coverageArea: Optional[ListType[Reference]] = Field(
         description="Where product applies",
         default=None,
     )
-    contact: Optional[List[ExtendedContactDetail]] = Field(
+    contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details relevant to the health insurance plan/product",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoint",
         default=None,
     )
-    network: Optional[List[Reference]] = Field(
+    network: Optional[ListType[Reference]] = Field(
         description="What networks are Included",
         default=None,
     )
-    coverage: Optional[List[InsurancePlanCoverage]] = Field(
+    coverage: Optional[ListType[InsurancePlanCoverage]] = Field(
         description="Coverage details",
         default=None,
     )
-    plan: Optional[List[InsurancePlanPlan]] = Field(
+    plan: Optional[ListType[InsurancePlanPlan]] = Field(
         description="Plan details",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "plan",
-                "coverage",
-                "network",
-                "endpoint",
-                "contact",
-                "coverageArea",
-                "administeredBy",
-                "ownedBy",
-                "period",
-                "alias",
-                "name",
-                "type",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )
 
     @model_validator(mode="after")
     def FHIR_ipn_1_constraint_model_validator(self):

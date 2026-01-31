@@ -1,12 +1,11 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
-    Uri,
     Code,
     PositiveInt,
     Markdown,
@@ -16,9 +15,6 @@ from fhircraft.fhir.resources.datatypes.primitives import (
 )
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
-    Meta,
-    Narrative,
-    Extension,
     Identifier,
     CodeableConcept,
     Reference,
@@ -27,7 +23,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     CodeableReference,
     Money,
 )
-from .resource import Resource
 from .domain_resource import DomainResource
 
 
@@ -49,22 +44,6 @@ class AccountCoverage(BackboneElement):
         default=None,
         alias="_priority",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "priority",
-                "coverage",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AccountGuarantor(BackboneElement):
@@ -89,23 +68,6 @@ class AccountGuarantor(BackboneElement):
         description="Guarantee account during",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "period",
-                "onHold",
-                "party",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AccountDiagnosis(BackboneElement):
@@ -135,7 +97,7 @@ class AccountDiagnosis(BackboneElement):
         default=None,
         alias="_dateOfDiagnosis",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type that this diagnosis has relevant to the account (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
@@ -148,30 +110,10 @@ class AccountDiagnosis(BackboneElement):
         default=None,
         alias="_onAdmission",
     )
-    packageCode: Optional[List[CodeableConcept]] = Field(
+    packageCode: Optional[ListType[CodeableConcept]] = Field(
         description="Package Code specific for billing",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "packageCode",
-                "onAdmission",
-                "type",
-                "dateOfDiagnosis",
-                "condition",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AccountProcedure(BackboneElement):
@@ -201,38 +143,18 @@ class AccountProcedure(BackboneElement):
         default=None,
         alias="_dateOfService",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="How this procedure value should be used in charging the account",
         default=None,
     )
-    packageCode: Optional[List[CodeableConcept]] = Field(
+    packageCode: Optional[ListType[CodeableConcept]] = Field(
         description="Package Code specific for billing",
         default=None,
     )
-    device: Optional[List[Reference]] = Field(
+    device: Optional[ListType[Reference]] = Field(
         description="Any devices that were associated with the procedure",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "device",
-                "packageCode",
-                "type",
-                "dateOfService",
-                "code",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AccountRelatedAccount(BackboneElement):
@@ -248,22 +170,6 @@ class AccountRelatedAccount(BackboneElement):
         description="Reference to an associated Account",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "account",
-                "relationship",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AccountBalance(BackboneElement):
@@ -295,24 +201,6 @@ class AccountBalance(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "amount",
-                "estimate",
-                "term",
-                "aggregate",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class Account(DomainResource):
     """
@@ -323,54 +211,7 @@ class Account(DomainResource):
     _type = "Account"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Account"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default=None,
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Account number",
         default=None,
     )
@@ -400,7 +241,7 @@ class Account(DomainResource):
         default=None,
         alias="_name",
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="The entity that caused the expenses",
         default=None,
     )
@@ -408,7 +249,7 @@ class Account(DomainResource):
         description="Transaction window",
         default=None,
     )
-    coverage: Optional[List[AccountCoverage]] = Field(
+    coverage: Optional[ListType[AccountCoverage]] = Field(
         description="The party(s) that are responsible for covering the payment of this account, and what order should they be applied to the account",
         default=None,
     )
@@ -425,19 +266,19 @@ class Account(DomainResource):
         default=None,
         alias="_description",
     )
-    guarantor: Optional[List[AccountGuarantor]] = Field(
+    guarantor: Optional[ListType[AccountGuarantor]] = Field(
         description="The parties ultimately responsible for balancing the Account",
         default=None,
     )
-    diagnosis: Optional[List[AccountDiagnosis]] = Field(
-        description="The list of diagnoses relevant to this account",
+    diagnosis: Optional[ListType[AccountDiagnosis]] = Field(
+        description="The ListType of diagnoses relevant to this account",
         default=None,
     )
-    procedure: Optional[List[AccountProcedure]] = Field(
-        description="The list of procedures relevant to this account",
+    procedure: Optional[ListType[AccountProcedure]] = Field(
+        description="The ListType of procedures relevant to this account",
         default=None,
     )
-    relatedAccount: Optional[List[AccountRelatedAccount]] = Field(
+    relatedAccount: Optional[ListType[AccountRelatedAccount]] = Field(
         description="Other associated accounts related to this account",
         default=None,
     )
@@ -445,7 +286,7 @@ class Account(DomainResource):
         description="The base or default currency",
         default=None,
     )
-    balance: Optional[List[AccountBalance]] = Field(
+    balance: Optional[ListType[AccountBalance]] = Field(
         description="Calculated account balance(s)",
         default=None,
     )
@@ -458,55 +299,6 @@ class Account(DomainResource):
         default=None,
         alias="_calculatedAt",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "calculatedAt",
-                "balance",
-                "currency",
-                "relatedAccount",
-                "procedure",
-                "diagnosis",
-                "guarantor",
-                "description",
-                "owner",
-                "coverage",
-                "servicePeriod",
-                "subject",
-                "name",
-                "type",
-                "billingStatus",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_act_1_constraint_validator(self):
@@ -528,54 +320,4 @@ class Account(DomainResource):
             human="The dateOfService is not valid when using a reference to a procedure",
             key="act-2",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )
