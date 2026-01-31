@@ -188,6 +188,15 @@ class Provenance(DomainResource):
         )
 
     @model_validator(mode="after")
+    def occurred_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[Period, DateTime],
+            field_name_base="occurred",
+            required=False,
+        )
+
+    @model_validator(mode="after")
     def FHIR_prov_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -218,13 +227,4 @@ class Provenance(DomainResource):
             human="If who is an organization, onBehalfOf can't be a PractitionerRole within that organization",
             key="prov-3",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def occurred_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[Period, DateTime],
-            field_name_base="occurred",
-            required=False,
         )

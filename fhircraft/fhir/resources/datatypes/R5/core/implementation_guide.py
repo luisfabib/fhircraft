@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ImplementationGuideDependsOn(BackboneElement):
     """
     Another implementation guide that this implementation depends on. Typically, an implementation guide uses value sets, profiles etc.defined in other implementation guides.
@@ -75,6 +76,7 @@ class ImplementationGuideDependsOn(BackboneElement):
         alias="_reason",
     )
 
+
 class ImplementationGuideGlobal(BackboneElement):
     """
     A set of profiles that all resources covered by this implementation guide must conform to.
@@ -99,6 +101,7 @@ class ImplementationGuideGlobal(BackboneElement):
         alias="_profile",
     )
 
+
 class ImplementationGuideDefinitionGrouping(BackboneElement):
     """
     A logical group of resources. Logical groups can be used when building pages.
@@ -122,6 +125,7 @@ class ImplementationGuideDefinitionGrouping(BackboneElement):
         default=None,
         alias="_description",
     )
+
 
 class ImplementationGuideDefinitionResource(BackboneElement):
     """
@@ -186,6 +190,7 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         default=None,
         alias="_groupingId",
     )
+
 
 class ImplementationGuideDefinitionPage(BackboneElement):
     """
@@ -267,6 +272,7 @@ class ImplementationGuideDefinitionPage(BackboneElement):
             required=False,
         )
 
+
 class ImplementationGuideDefinitionParameter(BackboneElement):
     """
     A set of parameters that defines how the implementation guide is built. The parameters are defined by the relevant tools that build the implementation guides.
@@ -285,6 +291,7 @@ class ImplementationGuideDefinitionParameter(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class ImplementationGuideDefinitionTemplate(BackboneElement):
     """
@@ -319,6 +326,7 @@ class ImplementationGuideDefinitionTemplate(BackboneElement):
         alias="_scope",
     )
 
+
 class ImplementationGuideDefinition(BackboneElement):
     """
     The information needed by an IG publisher tool to publish the whole implementation guide.
@@ -345,16 +353,6 @@ class ImplementationGuideDefinition(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ig_3_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("page",),
-            expression="generation='generated' implies source.empty()",
-            human="Source must be absent if 'generated' is generated",
-            key="ig-3",
-            severity="error",
-        )
 
 class ImplementationGuideManifestResource(BackboneElement):
     """
@@ -393,6 +391,7 @@ class ImplementationGuideManifestResource(BackboneElement):
         alias="_relativePath",
     )
 
+
 class ImplementationGuideManifestPage(BackboneElement):
     """
     Information about a page within the IG.
@@ -425,6 +424,7 @@ class ImplementationGuideManifestPage(BackboneElement):
         default=None,
         alias="_anchor",
     )
+
 
 class ImplementationGuideManifest(BackboneElement):
     """
@@ -466,6 +466,7 @@ class ImplementationGuideManifest(BackboneElement):
         default=None,
         alias="_other",
     )
+
 
 class ImplementationGuide(DomainResource):
     """
@@ -666,6 +667,25 @@ class ImplementationGuide(DomainResource):
         )
 
     @model_validator(mode="after")
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_cnl_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -688,30 +708,22 @@ class ImplementationGuide(DomainResource):
         )
 
     @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def FHIR_ig_2_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="definition.resource.fhirVersion.all(%context.fhirVersion contains $this)",
             human="If a resource has a fhirVersion, it must be one of the versions defined for the Implementation Guide",
             key="ig-2",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_ig_3_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("definition.page",),
+            expression="generation='generated' implies source.empty()",
+            human="Source must be absent if 'generated' is generated",
+            key="ig-3",
             severity="error",
         )

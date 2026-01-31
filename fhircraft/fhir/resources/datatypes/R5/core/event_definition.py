@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EventDefinition(DomainResource):
     """
     The EventDefinition resource provides a reusable description of when a particular event can occur.
@@ -271,17 +272,6 @@ class EventDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -297,6 +287,17 @@ class EventDefinition(DomainResource):
             field_types=[CodeableConcept, Reference],
             field_name_base="subject",
             required=False,
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
+            severity="warning",
         )
 
     @model_validator(mode="after")

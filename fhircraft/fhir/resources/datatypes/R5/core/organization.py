@@ -125,6 +125,16 @@ class Organization(DomainResource):
     )
 
     @model_validator(mode="after")
+    def FHIR_org_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="(identifier.count() + name.count()) > 0",
+            human="The organization SHALL at least have a name or an identifier, and possibly more than one",
+            key="org-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_org_3_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -143,15 +153,5 @@ class Organization(DomainResource):
             expression="address.where(use = 'home').empty()",
             human="The address of an organization can never be of use 'home'",
             key="org-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_org_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="(identifier.count() + name.count()) > 0",
-            human="The organization SHALL at least have a name or an identifier, and possibly more than one",
-            key="org-1",
             severity="error",
         )

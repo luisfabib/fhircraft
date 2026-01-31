@@ -26,6 +26,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 )
 from .domain_resource import DomainResource
 
+
 class ActorDefinition(DomainResource):
     """
     The ActorDefinition resource is used to describe an actor - a human or an application that plays a role in data exchange, and that may have obligations associated with the role the actor plays.
@@ -226,17 +227,6 @@ class ActorDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -252,5 +242,16 @@ class ActorDefinition(DomainResource):
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
             severity="warning",
         )

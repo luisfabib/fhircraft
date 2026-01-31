@@ -533,28 +533,6 @@ class Observation(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_obs_9_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("specimen",),
-            expression="(reference.resolve().exists() and reference.resolve() is Group) implies reference.resolve().member.entity.resolve().all($this is Specimen)",
-            human="If Observation.specimen is a reference to Group, the group can only have specimens",
-            key="obs-9",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_obs_3_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("referenceRange",),
-            expression="low.exists() or high.exists() or text.exists()",
-            human="Must have at least a low or a high or text",
-            key="obs-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def instantiates_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -596,6 +574,17 @@ class Observation(DomainResource):
         )
 
     @model_validator(mode="after")
+    def FHIR_obs_3_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("referenceRange",),
+            expression="low.exists() or high.exists() or text.exists()",
+            human="Must have at least a low or a high or text",
+            key="obs-3",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_obs_6_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -622,5 +611,16 @@ class Observation(DomainResource):
             expression="bodySite.exists() implies bodyStructure.empty()",
             human="bodyStructure SHALL only be present if Observation.bodySite is not present",
             key="obs-8",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_obs_9_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("specimen",),
+            expression="(reference.resolve().exists() and reference.resolve() is Group) implies reference.resolve().member.entity.resolve().all($this is Specimen)",
+            human="If Observation.specimen is a reference to Group, the group can only have specimens",
+            key="obs-9",
             severity="error",
         )

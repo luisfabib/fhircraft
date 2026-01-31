@@ -218,6 +218,15 @@ class RiskAssessment(DomainResource):
         )
 
     @model_validator(mode="after")
+    def occurrence_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[DateTime, Period],
+            field_name_base="occurrence",
+            required=False,
+        )
+
+    @model_validator(mode="after")
     def FHIR_ras_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -226,13 +235,4 @@ class RiskAssessment(DomainResource):
             human="Probability as a deciml must be <= 100",
             key="ras-2",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def occurrence_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[DateTime, Period],
-            field_name_base="occurrence",
-            required=False,
         )

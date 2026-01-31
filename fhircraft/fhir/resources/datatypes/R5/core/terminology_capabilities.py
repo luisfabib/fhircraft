@@ -31,6 +31,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class TerminologyCapabilitiesSoftware(BackboneElement):
     """
     Software that is covered by this terminology capability statement.  It is used when the statement describes the capabilities of a particular software version, independent of an installation.
@@ -54,6 +55,7 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
         default=None,
         alias="_version",
     )
+
 
 class TerminologyCapabilitiesImplementation(BackboneElement):
     """
@@ -79,6 +81,7 @@ class TerminologyCapabilitiesImplementation(BackboneElement):
         alias="_url",
     )
 
+
 class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
     """
     Filter Properties supported.
@@ -102,6 +105,7 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
         default=None,
         alias="_op",
     )
+
 
 class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
     """
@@ -159,6 +163,7 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         alias="_property",
     )
 
+
 class TerminologyCapabilitiesCodeSystem(BackboneElement):
     """
     Identifies a code system that is supported by the server. If there is a no code system URL, then this declares the general assumptions a client can make about support for any CodeSystem resource.
@@ -196,6 +201,7 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         alias="_subsumption",
     )
 
+
 class TerminologyCapabilitiesExpansionParameter(BackboneElement):
     """
     Supported expansion parameter.
@@ -219,6 +225,7 @@ class TerminologyCapabilitiesExpansionParameter(BackboneElement):
         default=None,
         alias="_documentation",
     )
+
 
 class TerminologyCapabilitiesExpansion(BackboneElement):
     """
@@ -266,6 +273,7 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         alias="_textFilter",
     )
 
+
 class TerminologyCapabilitiesValidateCode(BackboneElement):
     """
     Information about the [ValueSet/$validate-code](https://hl7.org/fhir/R5/valueset-operation-validate-code.html) operation.
@@ -280,6 +288,7 @@ class TerminologyCapabilitiesValidateCode(BackboneElement):
         default=None,
         alias="_translations",
     )
+
 
 class TerminologyCapabilitiesTranslation(BackboneElement):
     """
@@ -296,6 +305,7 @@ class TerminologyCapabilitiesTranslation(BackboneElement):
         alias="_needsMap",
     )
 
+
 class TerminologyCapabilitiesClosure(BackboneElement):
     """
     Whether the $closure operation is supported.
@@ -310,6 +320,7 @@ class TerminologyCapabilitiesClosure(BackboneElement):
         default=None,
         alias="_translation",
     )
+
 
 class TerminologyCapabilities(DomainResource):
     """
@@ -521,6 +532,25 @@ class TerminologyCapabilities(DomainResource):
         )
 
     @model_validator(mode="after")
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_cnl_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -540,47 +570,6 @@ class TerminologyCapabilities(DomainResource):
             human="If there is more than one version, a version code must be defined",
             key="tcp-1",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tcp_7_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("codeSystem",),
-            expression="version.code.isDistinct()",
-            human="Each version.code element must be distinct for a particular code system.",
-            key="tcp-7",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_tcp_8_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("codeSystem",),
-            expression="version.where(isDefault = true).count() <= 1",
-            human="A codeSystem element instance may have at most one version.isDefault element with a value of 'true'.",
-            key="tcp-8",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -630,5 +619,27 @@ class TerminologyCapabilities(DomainResource):
             expression="codeSystem.uri.isDistinct()",
             human="Each instance of the codeSystem element must represent a distinct code system.",
             key="tcp-6",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tcp_7_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("codeSystem",),
+            expression="version.code.isDistinct()",
+            human="Each version.code element must be distinct for a particular code system.",
+            key="tcp-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_tcp_8_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("codeSystem",),
+            expression="version.where(isDefault = true).count() <= 1",
+            human="A codeSystem element instance may have at most one version.isDefault element with a value of 'true'.",
+            key="tcp-8",
             severity="error",
         )

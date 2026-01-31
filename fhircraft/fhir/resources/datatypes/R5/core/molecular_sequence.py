@@ -181,28 +181,6 @@ class MolecularSequenceRelative(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_msq_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("startingSequence",),
-            expression="chromosome.exists() = genomeAssembly.exists()",
-            human="Both genomeAssembly and chromosome must be both contained if either one of them is contained",
-            key="msq-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_msq_6_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("startingSequence",),
-            expression="genomeAssembly.exists() xor sequence.exists()",
-            human="Have and only have one of the following elements in startingSequence: 1. genomeAssembly; 2 sequence",
-            key="msq-6",
-            severity="error",
-        )
-
 
 class MolecularSequence(DomainResource):
     """
@@ -263,3 +241,25 @@ class MolecularSequence(DomainResource):
         description="A sequence defined relative to another sequence",
         default=None,
     )
+
+    @model_validator(mode="after")
+    def FHIR_msq_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("relative.startingSequence",),
+            expression="chromosome.exists() = genomeAssembly.exists()",
+            human="Both genomeAssembly and chromosome must be both contained if either one of them is contained",
+            key="msq-5",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_msq_6_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("relative.startingSequence",),
+            expression="genomeAssembly.exists() xor sequence.exists()",
+            human="Have and only have one of the following elements in startingSequence: 1. genomeAssembly; 2 sequence",
+            key="msq-6",
+            severity="error",
+        )

@@ -252,6 +252,15 @@ class Goal(DomainResource):
         )
 
     @model_validator(mode="after")
+    def start_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[Date, CodeableConcept],
+            field_name_base="start",
+            required=False,
+        )
+
+    @model_validator(mode="after")
     def FHIR_gol_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -260,13 +269,4 @@ class Goal(DomainResource):
             human="Goal.target.measure is required if Goal.target.detail is populated",
             key="gol-1",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def start_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[Date, CodeableConcept],
-            field_name_base="start",
-            required=False,
         )

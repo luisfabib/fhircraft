@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class StructureMapStructure(BackboneElement):
     """
     A structure definition used by this map. The structure definition may describe instances that are converted, or the instances that are produced.
@@ -77,6 +78,7 @@ class StructureMapStructure(BackboneElement):
         alias="_documentation",
     )
 
+
 class StructureMapConst(BackboneElement):
     """
     Definition of a constant value used in the map rules.
@@ -100,6 +102,7 @@ class StructureMapConst(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class StructureMapGroupInput(BackboneElement):
     """
@@ -142,6 +145,7 @@ class StructureMapGroupInput(BackboneElement):
         default=None,
         alias="_documentation",
     )
+
 
 class StructureMapGroupRuleSource(BackboneElement):
     """
@@ -248,6 +252,7 @@ class StructureMapGroupRuleSource(BackboneElement):
         alias="_logMessage",
     )
 
+
 class StructureMapGroupRuleTargetParameter(BackboneElement):
     """
     Parameters to the transform.
@@ -342,6 +347,7 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
             required=True,
         )
 
+
 class StructureMapGroupRuleTarget(BackboneElement):
     """
     Content to create because of this mapping rule.
@@ -405,6 +411,7 @@ class StructureMapGroupRuleTarget(BackboneElement):
         description="Parameters to the transform",
         default=None,
     )
+
 
 class StructureMapGroupRuleDependentParameter(BackboneElement):
     """
@@ -500,6 +507,7 @@ class StructureMapGroupRuleDependentParameter(BackboneElement):
             required=True,
         )
 
+
 class StructureMapGroupRuleDependent(BackboneElement):
     """
     Which other rules to apply in the context of this rule.
@@ -518,6 +526,7 @@ class StructureMapGroupRuleDependent(BackboneElement):
         description="Parameter to pass to the rule or group",
         default=None,
     )
+
 
 class StructureMapGroupRule(BackboneElement):
     """
@@ -559,16 +568,6 @@ class StructureMapGroupRule(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_smp_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("target",),
-            expression="element.exists() implies context.exists()",
-            human="Can only have an element if you have a context",
-            key="smp-1",
-            severity="error",
-        )
 
 class StructureMapGroup(BackboneElement):
     """
@@ -619,6 +618,7 @@ class StructureMapGroup(BackboneElement):
         description="Transform Rule from source to target",
         default=None,
     )
+
 
 class StructureMap(DomainResource):
     """
@@ -797,17 +797,6 @@ class StructureMap(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -824,4 +813,26 @@ class StructureMap(DomainResource):
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_smp_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.rule.target",),
+            expression="element.exists() implies context.exists()",
+            human="Can only have an element if you have a context",
+            key="smp-1",
+            severity="error",
         )

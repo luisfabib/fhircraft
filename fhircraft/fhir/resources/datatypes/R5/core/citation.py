@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CitationSummary(BackboneElement):
     """
     A human-readable display of key concepts to represent the citation.
@@ -56,6 +57,7 @@ class CitationSummary(BackboneElement):
         alias="_text",
     )
 
+
 class CitationClassification(BackboneElement):
     """
     The assignment to an organizing scheme.
@@ -69,6 +71,7 @@ class CitationClassification(BackboneElement):
         description="The specific classification value",
         default=None,
     )
+
 
 class CitationStatusDate(BackboneElement):
     """
@@ -93,6 +96,7 @@ class CitationStatusDate(BackboneElement):
         default=None,
     )
 
+
 class CitationCitedArtifactVersion(BackboneElement):
     """
     The defined version of the cited artifact.
@@ -111,6 +115,7 @@ class CitationCitedArtifactVersion(BackboneElement):
         description="Citation for the main version of the cited artifact",
         default=None,
     )
+
 
 class CitationCitedArtifactStatusDate(BackboneElement):
     """
@@ -135,6 +140,7 @@ class CitationCitedArtifactStatusDate(BackboneElement):
         default=None,
     )
 
+
 class CitationCitedArtifactTitle(BackboneElement):
     """
     The title details of the article or artifact.
@@ -157,6 +163,7 @@ class CitationCitedArtifactTitle(BackboneElement):
         default=None,
         alias="_text",
     )
+
 
 class CitationCitedArtifactAbstract(BackboneElement):
     """
@@ -190,6 +197,7 @@ class CitationCitedArtifactAbstract(BackboneElement):
         alias="_copyright",
     )
 
+
 class CitationCitedArtifactPart(BackboneElement):
     """
     The component of the article or artifact.
@@ -212,6 +220,7 @@ class CitationCitedArtifactPart(BackboneElement):
         description="The citation for the full article or artifact",
         default=None,
     )
+
 
 class CitationCitedArtifactRelatesTo(BackboneElement):
     """
@@ -276,6 +285,7 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         default=None,
     )
 
+
 class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
     """
     The collection the cited article or artifact is published in.
@@ -311,6 +321,7 @@ class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
         default=None,
         alias="_publisherLocation",
     )
+
 
 class CitationCitedArtifactPublicationForm(BackboneElement):
     """
@@ -438,6 +449,7 @@ class CitationCitedArtifactPublicationForm(BackboneElement):
         alias="_copyright",
     )
 
+
 class CitationCitedArtifactWebLocation(BackboneElement):
     """
     Used for any URL for the article or artifact cited.
@@ -457,6 +469,7 @@ class CitationCitedArtifactWebLocation(BackboneElement):
         alias="_url",
     )
 
+
 class CitationCitedArtifactClassification(BackboneElement):
     """
     The assignment to an organizing scheme.
@@ -474,6 +487,7 @@ class CitationCitedArtifactClassification(BackboneElement):
         description="Complex or externally created classification",
         default=None,
     )
+
 
 class CitationCitedArtifactContributorshipEntryContributionInstance(BackboneElement):
     """
@@ -493,6 +507,7 @@ class CitationCitedArtifactContributorshipEntryContributionInstance(BackboneElem
         default=None,
         alias="_time",
     )
+
 
 class CitationCitedArtifactContributorshipEntry(BackboneElement):
     """
@@ -549,6 +564,7 @@ class CitationCitedArtifactContributorshipEntry(BackboneElement):
         alias="_rankingOrder",
     )
 
+
 class CitationCitedArtifactContributorshipSummary(BackboneElement):
     """
     Used to record a display of the author/contributor list without separate data element for each list member.
@@ -576,6 +592,7 @@ class CitationCitedArtifactContributorshipSummary(BackboneElement):
         alias="_value",
     )
 
+
 class CitationCitedArtifactContributorship(BackboneElement):
     """
     This element is used to list authors and other contributors, their contact information, specific contributions, and summary statements.
@@ -598,6 +615,7 @@ class CitationCitedArtifactContributorship(BackboneElement):
         description="Used to record a display of the author/contributor list without separate data element for each list member",
         default=None,
     )
+
 
 class CitationCitedArtifact(BackboneElement):
     """
@@ -669,6 +687,7 @@ class CitationCitedArtifact(BackboneElement):
         description="Any additional information or content for the article or artifact",
         default=None,
     )
+
 
 class Citation(DomainResource):
     """
@@ -897,17 +916,6 @@ class Citation(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -923,5 +931,16 @@ class Citation(DomainResource):
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
             severity="warning",
         )

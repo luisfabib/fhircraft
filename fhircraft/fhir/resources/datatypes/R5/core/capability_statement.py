@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CapabilityStatementSoftware(BackboneElement):
     """
     Software that is covered by this capability statement.  It is used when the capability statement describes the capabilities of a particular software version, independent of an installation.
@@ -66,6 +67,7 @@ class CapabilityStatementSoftware(BackboneElement):
         alias="_releaseDate",
     )
 
+
 class CapabilityStatementImplementation(BackboneElement):
     """
     Identifies a specific implementation instance that is described by the capability statement - i.e. a particular installation, rather than the capabilities of a software program.
@@ -93,6 +95,7 @@ class CapabilityStatementImplementation(BackboneElement):
         description="Organization that manages the data",
         default=None,
     )
+
 
 class CapabilityStatementRestSecurity(BackboneElement):
     """
@@ -122,6 +125,7 @@ class CapabilityStatementRestSecurity(BackboneElement):
         alias="_description",
     )
 
+
 class CapabilityStatementRestResourceInteraction(BackboneElement):
     """
     Identifies a restful operation supported by the solution.
@@ -145,6 +149,7 @@ class CapabilityStatementRestResourceInteraction(BackboneElement):
         default=None,
         alias="_documentation",
     )
+
 
 class CapabilityStatementRestResourceSearchParam(BackboneElement):
     """
@@ -188,6 +193,7 @@ class CapabilityStatementRestResourceSearchParam(BackboneElement):
         alias="_documentation",
     )
 
+
 class CapabilityStatementRestResourceOperation(BackboneElement):
     """
     Definition of an operation or a named query together with its parameters and their meaning and type. Consult the definition of the operation for details about how to invoke the operation, and the parameters.
@@ -220,6 +226,7 @@ class CapabilityStatementRestResourceOperation(BackboneElement):
         default=None,
         alias="_documentation",
     )
+
 
 class CapabilityStatementRestResource(BackboneElement):
     """
@@ -374,6 +381,7 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
     )
 
+
 class CapabilityStatementRestInteraction(BackboneElement):
     """
     A specification of restful operations supported by the system.
@@ -397,6 +405,7 @@ class CapabilityStatementRestInteraction(BackboneElement):
         default=None,
         alias="_documentation",
     )
+
 
 class CapabilityStatementRestSearchParam(BackboneElement):
     """
@@ -440,6 +449,7 @@ class CapabilityStatementRestSearchParam(BackboneElement):
         alias="_documentation",
     )
 
+
 class CapabilityStatementRestOperation(BackboneElement):
     """
     Definition of an operation or a named query together with its parameters and their meaning and type.
@@ -472,6 +482,7 @@ class CapabilityStatementRestOperation(BackboneElement):
         default=None,
         alias="_documentation",
     )
+
 
 class CapabilityStatementRest(BackboneElement):
     """
@@ -526,16 +537,6 @@ class CapabilityStatementRest(BackboneElement):
         alias="_compartment",
     )
 
-    @model_validator(mode="after")
-    def FHIR_cpb_12_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("resource",),
-            expression="searchParam.select(name).isDistinct()",
-            human="Search parameter names must be unique in the context of a resource.",
-            key="cpb-12",
-            severity="error",
-        )
 
 class CapabilityStatementMessagingEndpoint(BackboneElement):
     """
@@ -555,6 +556,7 @@ class CapabilityStatementMessagingEndpoint(BackboneElement):
         default=None,
         alias="_address",
     )
+
 
 class CapabilityStatementMessagingSupportedMessage(BackboneElement):
     """
@@ -579,6 +581,7 @@ class CapabilityStatementMessagingSupportedMessage(BackboneElement):
         default=None,
         alias="_definition",
     )
+
 
 class CapabilityStatementMessaging(BackboneElement):
     """
@@ -614,6 +617,7 @@ class CapabilityStatementMessaging(BackboneElement):
         )
     )
 
+
 class CapabilityStatementDocument(BackboneElement):
     """
     A document definition.
@@ -646,6 +650,7 @@ class CapabilityStatementDocument(BackboneElement):
         default=None,
         alias="_profile",
     )
+
 
 class CapabilityStatement(DomainResource):
     """
@@ -894,6 +899,16 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_cnl_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -905,33 +920,12 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_9_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("rest",),
-            expression="resource.select(type).isDistinct()",
-            human="A given resource can only be described once per RESTful mode.",
-            key="cpb-9",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -981,6 +975,28 @@ class CapabilityStatement(DomainResource):
             expression="document.select(profile&mode).isDistinct()",
             human="The set of documents must be unique by the combination of profile and mode.",
             key="cpb-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cpb_9_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("rest",),
+            expression="resource.select(type).isDistinct()",
+            human="A given resource can only be described once per RESTful mode.",
+            key="cpb-9",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cpb_12_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("rest.resource",),
+            expression="searchParam.select(name).isDistinct()",
+            human="Search parameter names must be unique in the context of a resource.",
+            key="cpb-12",
             severity="error",
         )
 

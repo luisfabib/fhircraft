@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CodeSystemFilter(BackboneElement):
     """
     A filter that can be used in a value set compose statement when selecting concepts using a filter.
@@ -77,6 +78,7 @@ class CodeSystemFilter(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class CodeSystemProperty(BackboneElement):
     """
@@ -120,6 +122,7 @@ class CodeSystemProperty(BackboneElement):
         alias="_type",
     )
 
+
 class CodeSystemConceptDesignation(BackboneElement):
     """
     Additional representations for the concept - other languages, aliases, specialized purposes, used for particular purposes, etc.
@@ -147,6 +150,7 @@ class CodeSystemConceptDesignation(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class CodeSystemConceptProperty(BackboneElement):
     """
@@ -237,6 +241,7 @@ class CodeSystemConceptProperty(BackboneElement):
             required=True,
         )
 
+
 class CodeSystemConcept(BackboneElement):
     """
     Concepts that are in the code system. The concept definitions are inherently hierarchical, but the definitions must be consulted to determine what the meanings of the hierarchical relationships are.
@@ -283,16 +288,6 @@ class CodeSystemConcept(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_csd_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("designation",),
-            expression="additionalUse.exists() implies use.exists()",
-            human="Must have a value for concept.designation.use if concept.designation.additionalUse is present",
-            key="csd-5",
-            severity="error",
-        )
 
 class CodeSystem(DomainResource):
     """
@@ -646,5 +641,16 @@ class CodeSystem(DomainResource):
             expression="CodeSystem.content = 'supplement' implies CodeSystem.supplements.exists()",
             human="If the code system content = supplement, it must nominate what it's a supplement for",
             key="csd-4",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_csd_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("concept.designation",),
+            expression="additionalUse.exists() implies use.exists()",
+            human="Must have a value for concept.designation.use if concept.designation.additionalUse is present",
+            key="csd-5",
             severity="error",
         )

@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MeasureTerm(BackboneElement):
     """
     Provides a description of an individual term used within the measure.
@@ -53,6 +54,7 @@ class MeasureTerm(BackboneElement):
         default=None,
         alias="_definition",
     )
+
 
 class MeasureGroupPopulation(BackboneElement):
     """
@@ -103,16 +105,6 @@ class MeasureGroupPopulation(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_mea_3_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-3",
-            severity="warning",
-        )
 
 class MeasureGroupStratifierComponent(BackboneElement):
     """
@@ -150,16 +142,6 @@ class MeasureGroupStratifierComponent(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_mea_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-5",
-            severity="warning",
-        )
 
 class MeasureGroupStratifier(BackboneElement):
     """
@@ -201,16 +183,6 @@ class MeasureGroupStratifier(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_mea_4_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-4",
-            severity="warning",
-        )
 
 class MeasureGroup(BackboneElement):
     """
@@ -307,17 +279,6 @@ class MeasureGroup(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_mea_2_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-2",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def subject_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -325,6 +286,7 @@ class MeasureGroup(BackboneElement):
             field_name_base="subject",
             required=False,
         )
+
 
 class MeasureSupplementalData(BackboneElement):
     """
@@ -362,16 +324,6 @@ class MeasureSupplementalData(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_mea_6_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="mea-6",
-            severity="warning",
-        )
 
 class Measure(DomainResource):
     """
@@ -711,17 +663,6 @@ class Measure(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -750,6 +691,17 @@ class Measure(DomainResource):
         )
 
     @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_mea_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -757,4 +709,59 @@ class Measure(DomainResource):
             human="Stratifier SHALL be either a single criteria or a set of criteria components",
             key="mea-1",
             severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_2_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-2",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_3_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.population.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-3",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_4_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.stratifier.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-4",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.stratifier.component.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-5",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_mea_6_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("supplementalData.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="mea-6",
+            severity="warning",
         )

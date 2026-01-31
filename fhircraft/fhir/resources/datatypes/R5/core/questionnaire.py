@@ -38,6 +38,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class QuestionnaireItemEnableWhen(BackboneElement):
     """
     A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
@@ -164,6 +165,7 @@ class QuestionnaireItemEnableWhen(BackboneElement):
             required=True,
         )
 
+
 class QuestionnaireItemAnswerOption(BackboneElement):
     """
     One of the permitted answers for the question.
@@ -238,6 +240,7 @@ class QuestionnaireItemAnswerOption(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class QuestionnaireItemInitial(BackboneElement):
     """
@@ -361,6 +364,7 @@ class QuestionnaireItemInitial(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class QuestionnaireItem(BackboneElement):
     """
@@ -505,27 +509,6 @@ class QuestionnaireItem(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_que_15_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("linkId",),
-            expression="$this.length() <= 255",
-            human="Link ids should be 255 characters or less",
-            key="que-15",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_que_7_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("enableWhen",),
-            expression="operator = 'exists' implies (answer is boolean)",
-            human="If the operator is 'exists', the value must be a boolean",
-            key="que-7",
-            severity="error",
-        )
 
 class Questionnaire(DomainResource):
     """
@@ -730,6 +713,25 @@ class Questionnaire(DomainResource):
         )
 
     @model_validator(mode="after")
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_cnl_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -738,6 +740,16 @@ class Questionnaire(DomainResource):
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_que_2_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="descendants().linkId.isDistinct()",
+            human="The link ids for groups and questions must be unique within the questionnaire",
+            key="que-2",
+            severity="error",
         )
 
     @model_validator(mode="after")
@@ -814,6 +826,17 @@ class Questionnaire(DomainResource):
             expression="type!='display' or (required.empty() and repeats.empty())",
             human="Required and repeat aren't permitted for display items",
             key="que-6",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_que_7_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("item.enableWhen",),
+            expression="operator = 'exists' implies (answer is boolean)",
+            human="If the operator is 'exists', the value must be a boolean",
+            key="que-7",
             severity="error",
         )
 
@@ -895,30 +918,12 @@ class Questionnaire(DomainResource):
         )
 
     @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
+    def FHIR_que_15_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
             self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
+            elements=("item.linkId",),
+            expression="$this.length() <= 255",
+            human="Link ids should be 255 characters or less",
+            key="que-15",
             severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_que_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="descendants().linkId.isDistinct()",
-            human="The link ids for groups and questions must be unique within the questionnaire",
-            key="que-2",
-            severity="error",
         )

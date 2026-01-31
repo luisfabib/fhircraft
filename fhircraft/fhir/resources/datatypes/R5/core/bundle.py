@@ -299,28 +299,6 @@ class Bundle(Resource):
     )
 
     @model_validator(mode="after")
-    def FHIR_bdl_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("entry",),
-            expression="resource.exists() or request.exists() or response.exists()",
-            human="must be a resource unless there's a request or response",
-            key="bdl-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_8_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("entry",),
-            expression="fullUrl.exists() implies fullUrl.contains('/_history/').not()",
-            human="fullUrl cannot be a version specific reference",
-            key="bdl-8",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_bdl_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -341,12 +319,74 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
+    def FHIR_bdl_3a_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="type in ('document' | 'message' | 'searchset' | 'collection') implies entry.all(resource.exists() and request.empty() and response.empty())",
+            human="For collections of type document, message, searchset or collection, all entries must contain resources, and not have request or response elements",
+            key="bdl-3a",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_3b_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="type = 'history' implies entry.all(request.exists() and response.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
+            human="For collections of type history, all entries must contain request or response elements, and resources if the method is POST, PUT or PATCH",
+            key="bdl-3b",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_3c_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="type in ('transaction' | 'batch') implies entry.all(request.method.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
+            human="For collections of type transaction or batch, all entries must contain request elements, and resources if the method is POST, PUT or PATCH",
+            key="bdl-3c",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_3d_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="type in ('transaction-response' | 'batch-response') implies entry.all(response.exists())",
+            human="For collections of type transaction-response or batch-response, all entries must contain response elements",
+            key="bdl-3d",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("entry",),
+            expression="resource.exists() or request.exists() or response.exists()",
+            human="must be a resource unless there's a request or response",
+            key="bdl-5",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_bdl_7_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'history') or entry.where(fullUrl.exists()).select(fullUrl&iif(resource.meta.versionId.exists(), resource.meta.versionId, '')).isDistinct()",
             human="FullUrl must be unique in a bundle, or else entries with the same fullUrl must have different meta.versionId (except in history bundles)",
             key="bdl-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_8_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("entry",),
+            expression="fullUrl.exists() implies fullUrl.contains('/_history/').not()",
+            human="fullUrl cannot be a version specific reference",
+            key="bdl-8",
             severity="error",
         )
 
@@ -447,45 +487,5 @@ class Bundle(Resource):
             expression="type = 'searchset' implies link.where(relation = 'self' and url.exists()).exists()",
             human="Self link is required for searchsets.",
             key="bdl-18",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_3a_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="type in ('document' | 'message' | 'searchset' | 'collection') implies entry.all(resource.exists() and request.empty() and response.empty())",
-            human="For collections of type document, message, searchset or collection, all entries must contain resources, and not have request or response elements",
-            key="bdl-3a",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_3b_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="type = 'history' implies entry.all(request.exists() and response.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
-            human="For collections of type history, all entries must contain request or response elements, and resources if the method is POST, PUT or PATCH",
-            key="bdl-3b",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_3c_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="type in ('transaction' | 'batch') implies entry.all(request.method.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
-            human="For collections of type transaction or batch, all entries must contain request elements, and resources if the method is POST, PUT or PATCH",
-            key="bdl-3c",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_3d_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="type in ('transaction-response' | 'batch-response') implies entry.all(response.exists())",
-            human="For collections of type transaction-response or batch-response, all entries must contain response elements",
-            key="bdl-3d",
             severity="error",
         )

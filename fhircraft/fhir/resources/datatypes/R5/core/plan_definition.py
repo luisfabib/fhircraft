@@ -46,6 +46,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class PlanDefinitionGoalTarget(BackboneElement):
     """
     Indicates what should be done and within what timeframe.
@@ -127,6 +128,7 @@ class PlanDefinitionGoalTarget(BackboneElement):
             required=False,
         )
 
+
 class PlanDefinitionGoal(BackboneElement):
     """
     A goal describes an expected outcome that activities within the plan are intended to achieve. For example, weight loss, restoring an activity of daily living, obtaining herd immunity via immunization, meeting a process improvement objective, meeting the acceptance criteria for a test as specified by a quality specification, etc.
@@ -161,6 +163,7 @@ class PlanDefinitionGoal(BackboneElement):
         default=None,
     )
 
+
 class PlanDefinitionActorOption(BackboneElement):
     """
     The characteristics of the candidates that could serve as the actor.
@@ -193,6 +196,7 @@ class PlanDefinitionActorOption(BackboneElement):
         default=None,
     )
 
+
 class PlanDefinitionActor(BackboneElement):
     """
     Actors represent the individuals or groups involved in the execution of the defined set of activities.
@@ -221,6 +225,7 @@ class PlanDefinitionActor(BackboneElement):
         default=None,
     )
 
+
 class PlanDefinitionActionCondition(BackboneElement):
     """
     An expression that describes applicability criteria or start/stop conditions for the action.
@@ -239,6 +244,7 @@ class PlanDefinitionActionCondition(BackboneElement):
         description="Boolean-valued expression",
         default=None,
     )
+
 
 class PlanDefinitionActionInput(BackboneElement):
     """
@@ -268,6 +274,7 @@ class PlanDefinitionActionInput(BackboneElement):
         alias="_relatedData",
     )
 
+
 class PlanDefinitionActionOutput(BackboneElement):
     """
     Defines the outputs of the action, if any.
@@ -295,6 +302,7 @@ class PlanDefinitionActionOutput(BackboneElement):
         default=None,
         alias="_relatedData",
     )
+
 
 class PlanDefinitionActionRelatedAction(BackboneElement):
     """
@@ -353,6 +361,7 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
             required=False,
         )
 
+
 class PlanDefinitionActionParticipant(BackboneElement):
     """
     Indicates who should participate in performing the action described.
@@ -398,6 +407,7 @@ class PlanDefinitionActionParticipant(BackboneElement):
         default=None,
     )
 
+
 class PlanDefinitionActionDynamicValue(BackboneElement):
     """
     Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
@@ -416,6 +426,7 @@ class PlanDefinitionActionDynamicValue(BackboneElement):
         description="An expression that provides the dynamic value for the customization",
         default=None,
     )
+
 
 class PlanDefinitionAction(BackboneElement):
     """
@@ -665,28 +676,6 @@ class PlanDefinitionAction(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_pld_0_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("input",),
-            expression="requirement.exists() xor relatedData.exists()",
-            human="Input data elements must have a requirement or a relatedData, but not both",
-            key="pld-0",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_pld_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("output",),
-            expression="requirement.exists() xor relatedData.exists()",
-            human="Output data element must have a requirement or a relatedData, but not both",
-            key="pld-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def subject_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -712,6 +701,7 @@ class PlanDefinitionAction(BackboneElement):
             field_name_base="definition",
             required=False,
         )
+
 
 class PlanDefinition(DomainResource):
     """
@@ -1001,17 +991,6 @@ class PlanDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -1046,6 +1025,39 @@ class PlanDefinition(DomainResource):
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("action.url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_pld_0_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("action.input",),
+            expression="requirement.exists() xor relatedData.exists()",
+            human="Input data elements must have a requirement or a relatedData, but not both",
+            key="pld-0",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_pld_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("action.output",),
+            expression="requirement.exists() xor relatedData.exists()",
+            human="Output data element must have a requirement or a relatedData, but not both",
+            key="pld-1",
+            severity="error",
         )
 
     @model_validator(mode="after")

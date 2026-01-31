@@ -268,17 +268,6 @@ class Procedure(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_prc_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("performer",),
-            expression="onBehalfOf.exists() and actor.resolve().exists() implies actor.resolve().where($this is Practitioner or $this is PractitionerRole).empty()",
-            human="Procedure.performer.onBehalfOf can only be populated when performer.actor isn't Practitioner or PractitionerRole",
-            key="prc-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -294,4 +283,15 @@ class Procedure(DomainResource):
             field_types=[Boolean, Reference],
             field_name_base="reported",
             required=False,
+        )
+
+    @model_validator(mode="after")
+    def FHIR_prc_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("performer",),
+            expression="onBehalfOf.exists() and actor.resolve().exists() implies actor.resolve().where($this is Practitioner or $this is PractitionerRole).empty()",
+            human="Procedure.performer.onBehalfOf can only be populated when performer.actor isn't Practitioner or PractitionerRole",
+            key="prc-1",
+            severity="error",
         )

@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EvidenceVariableDefinition(BackboneElement):
     """
     Evidence variable such as population, exposure, or outcome.
@@ -71,6 +72,7 @@ class EvidenceVariableDefinition(BackboneElement):
         description="low | moderate | high | exact",
         default=None,
     )
+
 
 class EvidenceStatisticSampleSize(BackboneElement):
     """
@@ -118,6 +120,7 @@ class EvidenceStatisticSampleSize(BackboneElement):
         alias="_knownDataCount",
     )
 
+
 class EvidenceStatisticAttributeEstimate(BackboneElement):
     """
     A statistical attribute of the statistic such as a measure of heterogeneity.
@@ -162,6 +165,7 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
         default=None,
     )
 
+
 class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
     """
     A variable adjusted for in the adjusted analysis.
@@ -192,6 +196,7 @@ class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
         description="Range of values for grouping of ordinal or polychotomous variables",
         default=None,
     )
+
 
 class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
     """
@@ -237,6 +242,7 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
         default=None,
     )
 
+
 class EvidenceStatisticModelCharacteristic(BackboneElement):
     """
     A component of the method to generate the statistic.
@@ -260,6 +266,7 @@ class EvidenceStatisticModelCharacteristic(BackboneElement):
         description="An attribute of the statistic used as a model characteristic",
         default=None,
     )
+
 
 class EvidenceStatistic(BackboneElement):
     """
@@ -322,6 +329,7 @@ class EvidenceStatistic(BackboneElement):
         default=None,
     )
 
+
 class EvidenceCertainty(BackboneElement):
     """
     Assessment of certainty, confidence in the estimates, or quality of the evidence.
@@ -361,6 +369,7 @@ class EvidenceCertainty(BackboneElement):
         description="A domain or subdomain of certainty",
         default=None,
     )
+
 
 class Evidence(DomainResource):
     """
@@ -604,17 +613,6 @@ class Evidence(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -639,5 +637,16 @@ class Evidence(DomainResource):
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
             severity="warning",
         )

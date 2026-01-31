@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ObservationDefinitionQualifiedValue(BackboneElement):
     """
     A set of qualified values associated with a context and a set of conditions -  provides a range for quantitative and ordinal observations and a collection of value sets for qualitative observations.
@@ -122,6 +123,7 @@ class ObservationDefinitionQualifiedValue(BackboneElement):
         default=None,
         alias="_criticalCodedValueSet",
     )
+
 
 class ObservationDefinitionComponentQualifiedValue(BackboneElement):
     """
@@ -212,6 +214,7 @@ class ObservationDefinitionComponentQualifiedValue(BackboneElement):
         alias="_criticalCodedValueSet",
     )
 
+
 class ObservationDefinitionComponent(BackboneElement):
     """
     Some observations have multiple component observations, expressed as separate code value pairs.
@@ -240,6 +243,7 @@ class ObservationDefinitionComponent(BackboneElement):
             default=None,
         )
     )
+
 
 class ObservationDefinition(DomainResource):
     """
@@ -511,17 +515,6 @@ class ObservationDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_obd_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("component",),
-            expression="permittedUnit.exists() implies (permittedDataType = 'Quantity').exists()",
-            human="If permittedUnit exists, then permittedDataType=Quantity must exist.",
-            key="obd-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -547,5 +540,16 @@ class ObservationDefinition(DomainResource):
             expression="permittedUnit.exists() implies (permittedDataType = 'Quantity').exists()",
             human="If permittedUnit exists, then permittedDataType=Quantity must exist.",
             key="obd-0",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_obd_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("component",),
+            expression="permittedUnit.exists() implies (permittedDataType = 'Quantity').exists()",
+            human="If permittedUnit exists, then permittedDataType=Quantity must exist.",
+            key="obd-1",
             severity="error",
         )

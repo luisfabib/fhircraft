@@ -489,28 +489,6 @@ class RequestOrchestrationAction(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_pld_0_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("input",),
-            expression="requirement.exists() xor relatedData.exists()",
-            human="Input data elements must have a requirement or a relatedData, but not both",
-            key="pld-0",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_pld_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("output",),
-            expression="requirement.exists() xor relatedData.exists()",
-            human="Output data element must have a requirement or a relatedData, but not both",
-            key="pld-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -640,6 +618,28 @@ class RequestOrchestration(DomainResource):
         description="Proposed actions, if any",
         default=None,
     )
+
+    @model_validator(mode="after")
+    def FHIR_pld_0_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("action.input",),
+            expression="requirement.exists() xor relatedData.exists()",
+            human="Input data elements must have a requirement or a relatedData, but not both",
+            key="pld-0",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_pld_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("action.output",),
+            expression="requirement.exists() xor relatedData.exists()",
+            human="Output data element must have a requirement or a relatedData, but not both",
+            key="pld-1",
+            severity="error",
+        )
 
     @model_validator(mode="after")
     def FHIR_rqg_1_constraint_validator(self):

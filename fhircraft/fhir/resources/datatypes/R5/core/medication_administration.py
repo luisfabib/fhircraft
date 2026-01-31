@@ -234,6 +234,15 @@ class MedicationAdministration(DomainResource):
         )
 
     @model_validator(mode="after")
+    def occurence_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[DateTime, Period, Timing],
+            field_name_base="occurence",
+            required=True,
+        )
+
+    @model_validator(mode="after")
     def FHIR_mad_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -242,13 +251,4 @@ class MedicationAdministration(DomainResource):
             human="If dosage attribute is present then SHALL have at least one of dosage.text or dosage.dose or dosage.rate[x]",
             key="mad-1",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def occurence_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[DateTime, Period, Timing],
-            field_name_base="occurence",
-            required=True,
         )

@@ -32,6 +32,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class TestPlanDependency(BackboneElement):
     """
     The required criteria to execute the test plan - e.g. preconditions, previous tests...
@@ -51,6 +52,7 @@ class TestPlanDependency(BackboneElement):
         default=None,
     )
 
+
 class TestPlanTestCaseDependency(BackboneElement):
     """
     The required criteria to execute the test case - e.g. preconditions, previous tests.
@@ -69,6 +71,7 @@ class TestPlanTestCaseDependency(BackboneElement):
         description="Link to predecessor test plans",
         default=None,
     )
+
 
 class TestPlanTestCaseTestRunScript(BackboneElement):
     """
@@ -109,6 +112,7 @@ class TestPlanTestCaseTestRunScript(BackboneElement):
             required=False,
         )
 
+
 class TestPlanTestCaseTestRun(BackboneElement):
     """
     The actual test to be executed.
@@ -127,6 +131,7 @@ class TestPlanTestCaseTestRun(BackboneElement):
         description="The test cases in a structured language e.g. gherkin, Postman, or FHIR TestScript",
         default=None,
     )
+
 
 class TestPlanTestCaseTestData(BackboneElement):
     """
@@ -171,6 +176,7 @@ class TestPlanTestCaseTestData(BackboneElement):
             required=False,
         )
 
+
 class TestPlanTestCaseAssertion(BackboneElement):
     """
     The test assertions - the expectations of test results from the execution of the test case.
@@ -188,6 +194,7 @@ class TestPlanTestCaseAssertion(BackboneElement):
         description="The actual result assertion",
         default=None,
     )
+
 
 class TestPlanTestCase(BackboneElement):
     """
@@ -223,6 +230,7 @@ class TestPlanTestCase(BackboneElement):
         description="Test assertions or expectations",
         default=None,
     )
+
 
 class TestPlan(DomainResource):
     """
@@ -413,17 +421,6 @@ class TestPlan(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -439,5 +436,16 @@ class TestPlan(DomainResource):
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
             severity="warning",
         )

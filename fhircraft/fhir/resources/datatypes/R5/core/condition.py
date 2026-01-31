@@ -206,17 +206,6 @@ class Condition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_con_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("stage",),
-            expression="summary.exists() or assessment.exists()",
-            human="Stage SHALL have summary or assessment",
-            key="con-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def onset_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -232,6 +221,17 @@ class Condition(DomainResource):
             field_types=[DateTime, Age, Period, Range, String],
             field_name_base="abatement",
             required=False,
+        )
+
+    @model_validator(mode="after")
+    def FHIR_con_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("stage",),
+            expression="summary.exists() or assessment.exists()",
+            human="Stage SHALL have summary or assessment",
+            key="con-1",
+            severity="error",
         )
 
     @model_validator(mode="after")

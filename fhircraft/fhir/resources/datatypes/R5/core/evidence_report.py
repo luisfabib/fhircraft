@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EvidenceReportSubjectCharacteristic(BackboneElement):
     """
     Characteristic.
@@ -97,6 +98,7 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
             required=True,
         )
 
+
 class EvidenceReportSubject(BackboneElement):
     """
     Specifies the subject or focus of the report. Answers "What is this report about?".
@@ -110,6 +112,7 @@ class EvidenceReportSubject(BackboneElement):
         description="Footnotes and/or explanatory notes",
         default=None,
     )
+
 
 class EvidenceReportRelatesToTarget(BackboneElement):
     """
@@ -143,6 +146,7 @@ class EvidenceReportRelatesToTarget(BackboneElement):
         default=None,
     )
 
+
 class EvidenceReportRelatesTo(BackboneElement):
     """
     Relationships that this composition has with other compositions or documents that already exist.
@@ -161,6 +165,7 @@ class EvidenceReportRelatesTo(BackboneElement):
         description="Target of the relationship",
         default=None,
     )
+
 
 class EvidenceReportSection(BackboneElement):
     """
@@ -225,6 +230,7 @@ class EvidenceReportSection(BackboneElement):
         description="Nested Section",
         default=None,
     )
+
 
 class EvidenceReport(DomainResource):
     """
@@ -340,6 +346,15 @@ class EvidenceReport(DomainResource):
         )
 
     @model_validator(mode="after")
+    def citeAs_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[Reference, Markdown],
+            field_name_base="citeAs",
+            required=False,
+        )
+
+    @model_validator(mode="after")
     def FHIR_cnl_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -348,13 +363,4 @@ class EvidenceReport(DomainResource):
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",
             severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def citeAs_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[Reference, Markdown],
-            field_name_base="citeAs",
-            required=False,
         )
