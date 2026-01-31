@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -74,24 +74,6 @@ class ExampleScenarioActor(BackboneElement):
         alias="_description",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "description",
-                "title",
-                "type",
-                "key",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExampleScenarioInstanceVersion(BackboneElement):
     """
@@ -130,24 +112,6 @@ class ExampleScenarioInstanceVersion(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "content",
-                "description",
-                "title",
-                "key",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExampleScenarioInstanceContainedInstance(BackboneElement):
     """
@@ -172,22 +136,6 @@ class ExampleScenarioInstanceContainedInstance(BackboneElement):
         default=None,
         alias="_versionReference",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "versionReference",
-                "instanceReference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExampleScenarioInstance(BackboneElement):
@@ -257,11 +205,11 @@ class ExampleScenarioInstance(BackboneElement):
         description="Example instance data",
         default=None,
     )
-    version: Optional[List[ExampleScenarioInstanceVersion]] = Field(
+    version: Optional[ListType[ExampleScenarioInstanceVersion]] = Field(
         description="Snapshot of instance that changes",
         default=None,
     )
-    containedInstance: Optional[List[ExampleScenarioInstanceContainedInstance]] = Field(
+    containedInstance: Optional[ListType[ExampleScenarioInstanceContainedInstance]] = Field(
         description="Resources contained in the instance",
         default=None,
     )
@@ -271,61 +219,6 @@ class ExampleScenarioInstance(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="structureProfile",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "containedInstance",
-                "version",
-                "content",
-                "description",
-                "title",
-                "structureVersion",
-                "structureType",
-                "key",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_14_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("containedInstance",),
-            expression="%resource.instance.where(key=%context.instanceReference).exists()",
-            human="InstanceReference must be a key of an instance defined in the ExampleScenario",
-            key="exs-14",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_15_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("containedInstance",),
-            expression="versionReference.empty() implies %resource.instance.where(key=%context.instanceReference).version.empty()",
-            human="versionReference must be specified if the referenced instance defines versions",
-            key="exs-15",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_16_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("containedInstance",),
-            expression="versionReference.exists() implies %resource.instance.where(key=%context.instanceReference).version.where(key=%context.versionReference).exists()",
-            human="versionReference must be a key of a version within the instance pointed to by instanceReference",
-            key="exs-16",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -361,22 +254,6 @@ class ExampleScenarioProcessStepOperationRequest(BackboneElement):
         default=None,
         alias="_versionReference",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "versionReference",
-                "instanceReference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExampleScenarioProcessStepOperation(BackboneElement):
@@ -451,29 +328,6 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "response",
-                "request",
-                "receiverActive",
-                "initiatorActive",
-                "description",
-                "receiver",
-                "initiator",
-                "title",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExampleScenarioProcessStepAlternative(BackboneElement):
     """
@@ -498,27 +352,10 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
         default=None,
         alias="_description",
     )
-    step: Optional[List["ExampleScenarioProcessStep"]] = Field(
+    step: Optional[ListType["ExampleScenarioProcessStep"]] = Field(
         description="Alternative action(s)",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "step",
-                "description",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExampleScenarioProcessStep(BackboneElement):
@@ -552,7 +389,7 @@ class ExampleScenarioProcessStep(BackboneElement):
         description="Step is simple action",
         default=None,
     )
-    alternative: Optional[List[ExampleScenarioProcessStepAlternative]] = Field(
+    alternative: Optional[ListType[ExampleScenarioProcessStepAlternative]] = Field(
         description="Alternate non-typical step action",
         default=None,
     )
@@ -565,48 +402,6 @@ class ExampleScenarioProcessStep(BackboneElement):
         default=None,
         alias="_pause",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "pause",
-                "alternative",
-                "operation",
-                "workflow",
-                "process",
-                "number",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_17_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("operation",),
-            expression="initiator.exists() implies initiator = 'OTHER' or %resource.actor.where(key=%context.initiator).exists()",
-            human="If specified, initiator must be a key of an actor within the ExampleScenario",
-            key="exs-17",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_18_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("operation",),
-            expression="receiver.exists() implies receiver = 'OTHER' or %resource.actor.where(key=%context.receiver).exists()",
-            human="If specified, receiver must be a key of an actor within the ExampleScenario",
-            key="exs-18",
-            severity="error",
-        )
 
 
 class ExampleScenarioProcess(BackboneElement):
@@ -650,51 +445,10 @@ class ExampleScenarioProcess(BackboneElement):
         default=None,
         alias="_postConditions",
     )
-    step: Optional[List[ExampleScenarioProcessStep]] = Field(
+    step: Optional[ListType[ExampleScenarioProcessStep]] = Field(
         description="Event within of the process",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "step",
-                "postConditions",
-                "preConditions",
-                "description",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_13_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("step",),
-            expression="alternative.title.count() = alternative.title.distinct().count()",
-            human="Alternative titles must be unique within a step",
-            key="exs-13",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_22_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("step",),
-            expression="(process.exists() implies workflow.empty() and operation.empty()) and (workflow.exists() implies operation.empty())",
-            human="Can have a process, a workflow, one or more operations or none of these, but cannot have a combination",
-            key="exs-22",
-            severity="error",
-        )
 
 
 class ExampleScenario(DomainResource):
@@ -706,55 +460,6 @@ class ExampleScenario(DomainResource):
     _type = "ExampleScenario"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExampleScenario"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ExampleScenario"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this example scenario, represented as a URI (globally unique)",
         default=None,
@@ -764,7 +469,7 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the example scenario",
         default=None,
     )
@@ -772,7 +477,7 @@ class ExampleScenario(DomainResource):
         description="Business version of the example scenario",
         default=None,
     )
-    version_ext: Optional[List[Optional[Element]]] = Field(
+    version_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",
@@ -844,7 +549,7 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -857,11 +562,11 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for example scenario (if applicable)",
         default=None,
     )
@@ -892,15 +597,15 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    actor: Optional[List[ExampleScenarioActor]] = Field(
+    actor: Optional[ListType[ExampleScenarioActor]] = Field(
         description="Individual involved in exchange",
         default=None,
     )
-    instance: Optional[List[ExampleScenarioInstance]] = Field(
+    instance: Optional[ListType[ExampleScenarioInstance]] = Field(
         description="Data used in the scenario",
         default=None,
     )
-    process: Optional[List[ExampleScenarioProcess]] = Field(
+    process: Optional[ListType[ExampleScenarioProcess]] = Field(
         description="Major process within scenario",
         default=None,
     )
@@ -913,54 +618,22 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
             self,
-            elements=(
-                "process",
-                "instance",
-                "actor",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
         )
 
     @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
             self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -972,28 +645,6 @@ class ExampleScenario(DomainResource):
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",
             severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_19_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("actor",),
-            expression="%resource.process.descendants().select(operation).where(initiator=%context.key or receiver=%context.key).exists()",
-            human="Actor should be referenced in at least one operation",
-            key="exs-19",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_23_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("actor",),
-            expression="key != 'OTHER'",
-            human="actor.key canot be 'OTHER'",
-            key="exs-23",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -1019,80 +670,6 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_exs_10_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("instance",),
-            expression="version.key.count() = version.key.distinct().count()",
-            human="Version keys must be unique within an instance",
-            key="exs-10",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_11_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("instance",),
-            expression="version.title.count() = version.title.distinct().count()",
-            human="Version titles must be unique within an instance",
-            key="exs-11",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_20_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("instance",),
-            expression="%resource.process.descendants().select(instanceReference).where($this=%context.key).exists()",
-            human="Instance should be referenced in at least one location",
-            key="exs-20",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_21_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("instance",),
-            expression="version.exists() implies version.key.intersect(%resource.process.descendants().where(instanceReference = %context.key).versionReference).exists()",
-            human="Instance version should be referenced in at least one operation",
-            key="exs-21",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_exs_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("process",),
-            expression="%resource.status='active' or %resource.status='retired' implies step.exists()",
-            human="Processes must have steps if ExampleScenario status is active or required",
-            key="exs-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def FHIR_exs_3_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -1109,6 +686,17 @@ class ExampleScenario(DomainResource):
             expression="status='active' or status='retired' implies process.exists()",
             human="Must have processes if status is active or required",
             key="exs-4",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("process",),
+            expression="%resource.status='active' or %resource.status='retired' implies step.exists()",
+            human="Processes must have steps if ExampleScenario status is active or required",
+            key="exs-5",
             severity="error",
         )
 
@@ -1153,6 +741,28 @@ class ExampleScenario(DomainResource):
         )
 
     @model_validator(mode="after")
+    def FHIR_exs_10_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("instance",),
+            expression="version.key.count() = version.key.distinct().count()",
+            human="Version keys must be unique within an instance",
+            key="exs-10",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_11_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("instance",),
+            expression="version.title.count() = version.title.distinct().count()",
+            human="Version titles must be unique within an instance",
+            key="exs-11",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_exs_12_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -1162,8 +772,123 @@ class ExampleScenario(DomainResource):
             severity="error",
         )
 
+    @model_validator(mode="after")
+    def FHIR_exs_13_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("process.step",),
+            expression="alternative.title.count() = alternative.title.distinct().count()",
+            human="Alternative titles must be unique within a step",
+            key="exs-13",
+            severity="error",
+        )
 
-ExampleScenarioProcessStepAlternative.model_rebuild()
-ExampleScenarioProcessStep.model_rebuild()
-ExampleScenarioProcess.model_rebuild()
-ExampleScenario.model_rebuild()
+    @model_validator(mode="after")
+    def FHIR_exs_14_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("instance.containedInstance",),
+            expression="%resource.instance.where(key=%context.instanceReference).exists()",
+            human="InstanceReference must be a key of an instance defined in the ExampleScenario",
+            key="exs-14",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_15_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("instance.containedInstance",),
+            expression="versionReference.empty() implies %resource.instance.where(key=%context.instanceReference).version.empty()",
+            human="versionReference must be specified if the referenced instance defines versions",
+            key="exs-15",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_16_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("instance.containedInstance",),
+            expression="versionReference.exists() implies %resource.instance.where(key=%context.instanceReference).version.where(key=%context.versionReference).exists()",
+            human="versionReference must be a key of a version within the instance pointed to by instanceReference",
+            key="exs-16",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_17_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("process.step.operation",),
+            expression="initiator.exists() implies initiator = 'OTHER' or %resource.actor.where(key=%context.initiator).exists()",
+            human="If specified, initiator must be a key of an actor within the ExampleScenario",
+            key="exs-17",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_18_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("process.step.operation",),
+            expression="receiver.exists() implies receiver = 'OTHER' or %resource.actor.where(key=%context.receiver).exists()",
+            human="If specified, receiver must be a key of an actor within the ExampleScenario",
+            key="exs-18",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_19_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("actor",),
+            expression="%resource.process.descendants().select(operation).where(initiator=%context.key or receiver=%context.key).exists()",
+            human="Actor should be referenced in at least one operation",
+            key="exs-19",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_20_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("instance",),
+            expression="%resource.process.descendants().select(instanceReference).where($this=%context.key).exists()",
+            human="Instance should be referenced in at least one location",
+            key="exs-20",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_21_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("instance",),
+            expression="version.exists() implies version.key.intersect(%resource.process.descendants().where(instanceReference = %context.key).versionReference).exists()",
+            human="Instance version should be referenced in at least one operation",
+            key="exs-21",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_22_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("process.step",),
+            expression="(process.exists() implies workflow.empty() and operation.empty()) and (workflow.exists() implies operation.empty())",
+            human="Can have a process, a workflow, one or more operations or none of these, but cannot have a combination",
+            key="exs-22",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_exs_23_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("actor",),
+            expression="key != 'OTHER'",
+            human="actor.key canot be 'OTHER'",
+            key="exs-23",
+            severity="error",
+        )

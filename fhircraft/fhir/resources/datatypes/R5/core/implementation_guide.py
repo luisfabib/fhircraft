@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -76,24 +76,6 @@ class ImplementationGuideDependsOn(BackboneElement):
         alias="_reason",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reason",
-                "version",
-                "packageId",
-                "uri",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ImplementationGuideGlobal(BackboneElement):
     """
@@ -113,27 +95,11 @@ class ImplementationGuideGlobal(BackboneElement):
         description="Profile that all resources must conform to",
         default=None,
     )
-    profile_ext: Optional[List[Optional[Element]]] = Field(
+    profile_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for profile extensions",
         default=None,
         alias="_profile",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "profile",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ImplementationGuideDefinitionGrouping(BackboneElement):
@@ -160,22 +126,6 @@ class ImplementationGuideDefinitionGrouping(BackboneElement):
         alias="_description",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "description",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ImplementationGuideDefinitionResource(BackboneElement):
     """
@@ -186,11 +136,11 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         description="Location of the resource",
         default=None,
     )
-    fhirVersion: Optional[List[Code]] = Field(
+    fhirVersion: Optional[ListType[Code]] = Field(
         description="Versions this applies to (if different to IG)",
         default=None,
     )
-    fhirVersion_ext: Optional[List[Optional[Element]]] = Field(
+    fhirVersion_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for fhirVersion extensions",
         default=None,
         alias="_fhirVersion",
@@ -222,7 +172,7 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         default=None,
         alias="_isExample",
     )
-    profile: Optional[List[Canonical]] = Field(
+    profile: Optional[ListType[Canonical]] = Field(
         description="Profile(s) this is an example of",
         default=None,
     )
@@ -240,27 +190,6 @@ class ImplementationGuideDefinitionResource(BackboneElement):
         default=None,
         alias="_groupingId",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "groupingId",
-                "profile",
-                "isExample",
-                "description",
-                "name",
-                "fhirVersion",
-                "reference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ImplementationGuideDefinitionPage(BackboneElement):
@@ -322,7 +251,7 @@ class ImplementationGuideDefinitionPage(BackboneElement):
         default=None,
         alias="_generation",
     )
-    page: Optional[List["ImplementationGuideDefinitionPage"]] = Field(
+    page: Optional[ListType["ImplementationGuideDefinitionPage"]] = Field(
         description="Nested Pages / Sections",
         default=None,
     )
@@ -332,24 +261,6 @@ class ImplementationGuideDefinitionPage(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="source",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "page",
-                "generation",
-                "title",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -380,22 +291,6 @@ class ImplementationGuideDefinitionParameter(BackboneElement):
         default=None,
         alias="_value",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ImplementationGuideDefinitionTemplate(BackboneElement):
@@ -431,34 +326,17 @@ class ImplementationGuideDefinitionTemplate(BackboneElement):
         alias="_scope",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "scope",
-                "source",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ImplementationGuideDefinition(BackboneElement):
     """
     The information needed by an IG publisher tool to publish the whole implementation guide.
     """
 
-    grouping: Optional[List[ImplementationGuideDefinitionGrouping]] = Field(
+    grouping: Optional[ListType[ImplementationGuideDefinitionGrouping]] = Field(
         description="Grouping used to present related resources in the IG",
         default=None,
     )
-    resource: Optional[List[ImplementationGuideDefinitionResource]] = Field(
+    resource: Optional[ListType[ImplementationGuideDefinitionResource]] = Field(
         description="Resource in the implementation guide",
         default=None,
     )
@@ -466,44 +344,14 @@ class ImplementationGuideDefinition(BackboneElement):
         description="Page/Section in the Guide",
         default=None,
     )
-    parameter: Optional[List[ImplementationGuideDefinitionParameter]] = Field(
+    parameter: Optional[ListType[ImplementationGuideDefinitionParameter]] = Field(
         description="Defines how IG is built by tools",
         default=None,
     )
-    template: Optional[List[ImplementationGuideDefinitionTemplate]] = Field(
+    template: Optional[ListType[ImplementationGuideDefinitionTemplate]] = Field(
         description="A template for building resources",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "template",
-                "parameter",
-                "page",
-                "resource",
-                "grouping",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ig_3_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("page",),
-            expression="generation='generated' implies source.empty()",
-            human="Source must be absent if 'generated' is generated",
-            key="ig-3",
-            severity="error",
-        )
 
 
 class ImplementationGuideManifestResource(BackboneElement):
@@ -524,7 +372,7 @@ class ImplementationGuideManifestResource(BackboneElement):
         default=None,
         alias="_isExample",
     )
-    profile: Optional[List[Canonical]] = Field(
+    profile: Optional[ListType[Canonical]] = Field(
         description="Profile(s) this is an example of",
         default=None,
     )
@@ -542,24 +390,6 @@ class ImplementationGuideManifestResource(BackboneElement):
         default=None,
         alias="_relativePath",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "relativePath",
-                "profile",
-                "isExample",
-                "reference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ImplementationGuideManifestPage(BackboneElement):
@@ -585,32 +415,15 @@ class ImplementationGuideManifestPage(BackboneElement):
         default=None,
         alias="_title",
     )
-    anchor: Optional[List[String]] = Field(
+    anchor: Optional[ListType[String]] = Field(
         description="Anchor available on the page",
         default=None,
     )
-    anchor_ext: Optional[List[Optional[Element]]] = Field(
+    anchor_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for anchor extensions",
         default=None,
         alias="_anchor",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "anchor",
-                "title",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ImplementationGuideManifest(BackboneElement):
@@ -627,51 +440,32 @@ class ImplementationGuideManifest(BackboneElement):
         default=None,
         alias="_rendering",
     )
-    resource: Optional[List[ImplementationGuideManifestResource]] = Field(
+    resource: Optional[ListType[ImplementationGuideManifestResource]] = Field(
         description="Resource in the implementation guide",
         default=None,
     )
-    page: Optional[List[ImplementationGuideManifestPage]] = Field(
+    page: Optional[ListType[ImplementationGuideManifestPage]] = Field(
         description="HTML page within the parent IG",
         default=None,
     )
-    image: Optional[List[String]] = Field(
+    image: Optional[ListType[String]] = Field(
         description="Image within the IG",
         default=None,
     )
-    image_ext: Optional[List[Optional[Element]]] = Field(
+    image_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for image extensions",
         default=None,
         alias="_image",
     )
-    other: Optional[List[String]] = Field(
+    other: Optional[ListType[String]] = Field(
         description="Additional linkable file in IG",
         default=None,
     )
-    other_ext: Optional[List[Optional[Element]]] = Field(
+    other_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for other extensions",
         default=None,
         alias="_other",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "other",
-                "image",
-                "page",
-                "resource",
-                "rendering",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ImplementationGuide(DomainResource):
@@ -683,55 +477,6 @@ class ImplementationGuide(DomainResource):
     _type = "ImplementationGuide"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImplementationGuide"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ImplementationGuide"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this implementation guide, represented as a URI (globally unique)",
         default=None,
@@ -741,7 +486,7 @@ class ImplementationGuide(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the implementation guide (business identifier)",
         default=None,
     )
@@ -821,7 +566,7 @@ class ImplementationGuide(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -834,11 +579,11 @@ class ImplementationGuide(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for implementation guide (if applicable)",
         default=None,
     )
@@ -887,7 +632,7 @@ class ImplementationGuide(DomainResource):
         default=None,
         alias="_license",
     )
-    fhirVersion: Optional[List[Code]] = Field(
+    fhirVersion: Optional[ListType[Code]] = Field(
         description="FHIR Version(s) this Implementation Guide targets",
         default=None,
     )
@@ -896,11 +641,11 @@ class ImplementationGuide(DomainResource):
         default=None,
         alias="_fhirVersion",
     )
-    dependsOn: Optional[List[ImplementationGuideDependsOn]] = Field(
+    dependsOn: Optional[ListType[ImplementationGuideDependsOn]] = Field(
         description="Another Implementation guide this depends on",
         default=None,
     )
-    global_: Optional[List[ImplementationGuideGlobal]] = Field(
+    global_: Optional[ListType[ImplementationGuideGlobal]] = Field(
         description="Profiles that apply globally",
         default=None,
         alias="global",
@@ -922,58 +667,22 @@ class ImplementationGuide(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
             self,
-            elements=(
-                "manifest",
-                "definition",
-                "global_",
-                "dependsOn",
-                "fhirVersion",
-                "license",
-                "packageId",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
         )
 
     @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
             self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -999,30 +708,22 @@ class ImplementationGuide(DomainResource):
         )
 
     @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
     def FHIR_ig_2_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="definition.resource.fhirVersion.all(%context.fhirVersion contains $this)",
             human="If a resource has a fhirVersion, it must be one of the versions defined for the Implementation Guide",
             key="ig-2",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_ig_3_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("definition.page",),
+            expression="generation='generated' implies source.empty()",
+            human="Source must be absent if 'generated' is generated",
+            key="ig-3",
             severity="error",
         )

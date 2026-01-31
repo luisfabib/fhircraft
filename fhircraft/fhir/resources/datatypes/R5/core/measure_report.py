@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -64,7 +64,7 @@ class MeasureReportGroupPopulation(BackboneElement):
         description="For subject-list reports, the subject results in this population",
         default=None,
     )
-    subjectReport: Optional[List[Reference]] = Field(
+    subjectReport: Optional[ListType[Reference]] = Field(
         description="For subject-list reports, a subject result in this population",
         default=None,
     )
@@ -72,26 +72,6 @@ class MeasureReportGroupPopulation(BackboneElement):
         description="What individual(s) in the population",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subjects",
-                "subjectReport",
-                "subjectResults",
-                "count",
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class MeasureReportGroupStratifierStratumComponent(BackboneElement):
@@ -146,22 +126,6 @@ class MeasureReportGroupStratifierStratumComponent(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -202,7 +166,7 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         description="For subject-list reports, the subject results in this population",
         default=None,
     )
-    subjectReport: Optional[List[Reference]] = Field(
+    subjectReport: Optional[ListType[Reference]] = Field(
         description="For subject-list reports, a subject result in this population",
         default=None,
     )
@@ -210,26 +174,6 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         description="What individual(s) in the population",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subjects",
-                "subjectReport",
-                "subjectResults",
-                "count",
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class MeasureReportGroupStratifierStratum(BackboneElement):
@@ -262,11 +206,11 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         description="The stratum value, e.g. male",
         default=None,
     )
-    component: Optional[List[MeasureReportGroupStratifierStratumComponent]] = Field(
+    component: Optional[ListType[MeasureReportGroupStratifierStratumComponent]] = Field(
         description="Stratifier component values",
         default=None,
     )
-    population: Optional[List[MeasureReportGroupStratifierStratumPopulation]] = Field(
+    population: Optional[ListType[MeasureReportGroupStratifierStratumPopulation]] = Field(
         description="Population results in this stratum",
         default=None,
     )
@@ -315,22 +259,6 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "population",
-                "component",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -367,27 +295,10 @@ class MeasureReportGroupStratifier(BackboneElement):
         description="What stratifier of the group",
         default=None,
     )
-    stratum: Optional[List[MeasureReportGroupStratifierStratum]] = Field(
+    stratum: Optional[ListType[MeasureReportGroupStratifierStratum]] = Field(
         description="Stratum results, one for each unique value, or set of values, in the stratifier, or stratifier components",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "stratum",
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class MeasureReportGroup(BackboneElement):
@@ -412,7 +323,7 @@ class MeasureReportGroup(BackboneElement):
         description="What individual(s) the report is for",
         default=None,
     )
-    population: Optional[List[MeasureReportGroupPopulation]] = Field(
+    population: Optional[ListType[MeasureReportGroupPopulation]] = Field(
         description="The populations in the group",
         default=None,
     )
@@ -445,7 +356,7 @@ class MeasureReportGroup(BackboneElement):
         description="What score this group achieved",
         default=None,
     )
-    stratifier: Optional[List[MeasureReportGroupStratifier]] = Field(
+    stratifier: Optional[ListType[MeasureReportGroupStratifier]] = Field(
         description="Stratification results",
         default=None,
     )
@@ -455,25 +366,6 @@ class MeasureReportGroup(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="measureScore",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "stratifier",
-                "population",
-                "subject",
-                "code",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -495,56 +387,7 @@ class MeasureReport(DomainResource):
     _type = "MeasureReport"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MeasureReport"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/MeasureReport"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the MeasureReport",
         default=None,
     )
@@ -625,117 +468,18 @@ class MeasureReport(DomainResource):
         description="increase | decrease",
         default=None,
     )
-    group: Optional[List[MeasureReportGroup]] = Field(
+    group: Optional[ListType[MeasureReportGroup]] = Field(
         description="Measure results for each group",
         default=None,
     )
-    supplementalData: Optional[List[Reference]] = Field(
+    supplementalData: Optional[ListType[Reference]] = Field(
         description="Additional information collected for the report",
         default=None,
     )
-    evaluatedResource: Optional[List[Reference]] = Field(
+    evaluatedResource: Optional[ListType[Reference]] = Field(
         description="What data was used to calculate the measure score",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "evaluatedResource",
-                "supplementalData",
-                "group",
-                "improvementNotation",
-                "scoring",
-                "inputParameters",
-                "period",
-                "location",
-                "reportingVendor",
-                "reporter",
-                "date",
-                "subject",
-                "measure",
-                "dataUpdateType",
-                "type",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )
 
     @model_validator(mode="after")
     def FHIR_mrp_1_constraint_model_validator(self):

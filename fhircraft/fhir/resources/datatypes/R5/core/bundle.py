@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import List, Optional
+from typing import List as ListType, Optional
 
 NoneType = type(None)
 
@@ -46,22 +46,6 @@ class BundleLink(BackboneElement):
         alias="_url",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "url",
-                "relation",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class BundleEntryLink(BackboneElement):
     """
@@ -87,22 +71,6 @@ class BundleEntryLink(BackboneElement):
         alias="_url",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "url",
-                "relation",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class BundleEntrySearch(BackboneElement):
     """
@@ -127,22 +95,6 @@ class BundleEntrySearch(BackboneElement):
         default=None,
         alias="_score",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "score",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class BundleEntryRequest(BackboneElement):
@@ -205,26 +157,6 @@ class BundleEntryRequest(BackboneElement):
         alias="_ifNoneExist",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "ifNoneExist",
-                "ifMatch",
-                "ifModifiedSince",
-                "ifNoneMatch",
-                "url",
-                "method",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class BundleEntryResponse(BackboneElement):
     """
@@ -272,31 +204,13 @@ class BundleEntryResponse(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "lastModified",
-                "etag",
-                "location",
-                "status",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class BundleEntry(BackboneElement):
     """
     An entry in a bundle resource - will either contain a resource or information about a resource (transactions and history only).
     """
 
-    link: Optional[List[BundleEntryLink]] = Field(
+    link: Optional[ListType[BundleEntryLink]] = Field(
         description="Links related to this entry",
         default=None,
     )
@@ -326,25 +240,6 @@ class BundleEntry(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "response",
-                "request",
-                "search",
-                "fullUrl",
-                "link",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class Bundle(Resource):
     """
@@ -355,39 +250,6 @@ class Bundle(Resource):
     _type = "Bundle"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Bundle"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Bundle"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
     identifier: Optional[Identifier] = Field(
         description="Persistent identifier for the bundle",
         default=None,
@@ -419,11 +281,11 @@ class Bundle(Resource):
         default=None,
         alias="_total",
     )
-    link: Optional[List[BundleLink]] = Field(
+    link: Optional[ListType[BundleLink]] = Field(
         description="Links related to this Bundle",
         default=None,
     )
-    entry: Optional[List[BundleEntry]] = Field(
+    entry: Optional[ListType[BundleEntry]] = Field(
         description="Entry in the bundle - will have a resource or information",
         default=None,
     )
@@ -435,50 +297,6 @@ class Bundle(Resource):
         description="Issues with the Bundle",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "signature",
-                "entry",
-                "link",
-                "total",
-                "timestamp",
-                "type",
-                "identifier",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("entry",),
-            expression="resource.exists() or request.exists() or response.exists()",
-            human="must be a resource unless there's a request or response",
-            key="bdl-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_8_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("entry",),
-            expression="fullUrl.exists() implies fullUrl.contains('/_history/').not()",
-            human="fullUrl cannot be a version specific reference",
-            key="bdl-8",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_bdl_1_constraint_model_validator(self):
@@ -501,12 +319,74 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
+    def FHIR_bdl_3a_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="type in ('document' | 'message' | 'searchset' | 'collection') implies entry.all(resource.exists() and request.empty() and response.empty())",
+            human="For collections of type document, message, searchset or collection, all entries must contain resources, and not have request or response elements",
+            key="bdl-3a",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_3b_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="type = 'history' implies entry.all(request.exists() and response.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
+            human="For collections of type history, all entries must contain request or response elements, and resources if the method is POST, PUT or PATCH",
+            key="bdl-3b",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_3c_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="type in ('transaction' | 'batch') implies entry.all(request.method.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
+            human="For collections of type transaction or batch, all entries must contain request elements, and resources if the method is POST, PUT or PATCH",
+            key="bdl-3c",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_3d_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="type in ('transaction-response' | 'batch-response') implies entry.all(response.exists())",
+            human="For collections of type transaction-response or batch-response, all entries must contain response elements",
+            key="bdl-3d",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("entry",),
+            expression="resource.exists() or request.exists() or response.exists()",
+            human="must be a resource unless there's a request or response",
+            key="bdl-5",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_bdl_7_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'history') or entry.where(fullUrl.exists()).select(fullUrl&iif(resource.meta.versionId.exists(), resource.meta.versionId, '')).isDistinct()",
             human="FullUrl must be unique in a bundle, or else entries with the same fullUrl must have different meta.versionId (except in history bundles)",
             key="bdl-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_8_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("entry",),
+            expression="fullUrl.exists() implies fullUrl.contains('/_history/').not()",
+            human="fullUrl cannot be a version specific reference",
+            key="bdl-8",
             severity="error",
         )
 
@@ -607,45 +487,5 @@ class Bundle(Resource):
             expression="type = 'searchset' implies link.where(relation = 'self' and url.exists()).exists()",
             human="Self link is required for searchsets.",
             key="bdl-18",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_3a_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="type in ('document' | 'message' | 'searchset' | 'collection') implies entry.all(resource.exists() and request.empty() and response.empty())",
-            human="For collections of type document, message, searchset or collection, all entries must contain resources, and not have request or response elements",
-            key="bdl-3a",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_3b_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="type = 'history' implies entry.all(request.exists() and response.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
-            human="For collections of type history, all entries must contain request or response elements, and resources if the method is POST, PUT or PATCH",
-            key="bdl-3b",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_3c_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="type in ('transaction' | 'batch') implies entry.all(request.method.exists() and ((request.method in ('POST' | 'PATCH' | 'PUT')) = resource.exists()))",
-            human="For collections of type transaction or batch, all entries must contain request elements, and resources if the method is POST, PUT or PATCH",
-            key="bdl-3c",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_3d_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="type in ('transaction-response' | 'batch-response') implies entry.all(response.exists())",
-            human="For collections of type transaction-response or batch-response, all entries must contain response elements",
-            key="bdl-3d",
             severity="error",
         )

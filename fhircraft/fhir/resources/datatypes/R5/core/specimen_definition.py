@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -36,7 +36,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
     """
     Substance introduced in the kind of container to preserve, maintain or enhance the specimen. Examples: Formalin, Citrate, EDTA.
@@ -66,7 +65,6 @@ class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
             field_name_base="additive",
             required=True,
         )
-
 
 class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     """
@@ -111,7 +109,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         default=None,
         alias="_minimumVolumeString",
     )
-    additive: Optional[List[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
+    additive: Optional[ListType[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
         description="Additive associated with container",
         default=None,
     )
@@ -133,27 +131,6 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "preparation",
-                "additive",
-                "capacity",
-                "description",
-                "cap",
-                "type",
-                "material",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def minimumVolume_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -161,7 +138,6 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
             field_name_base="minimumVolume",
             required=False,
         )
-
 
 class SpecimenDefinitionTypeTestedHandling(BackboneElement):
     """
@@ -189,25 +165,6 @@ class SpecimenDefinitionTypeTestedHandling(BackboneElement):
         default=None,
         alias="_instruction",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "instruction",
-                "maxDuration",
-                "temperatureRange",
-                "temperatureQualifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class SpecimenDefinitionTypeTested(BackboneElement):
     """
@@ -262,43 +219,18 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         default=None,
         alias="_singleUse",
     )
-    rejectionCriterion: Optional[List[CodeableConcept]] = Field(
+    rejectionCriterion: Optional[ListType[CodeableConcept]] = Field(
         description="Criterion specified for specimen rejection",
         default=None,
     )
-    handling: Optional[List[SpecimenDefinitionTypeTestedHandling]] = Field(
+    handling: Optional[ListType[SpecimenDefinitionTypeTestedHandling]] = Field(
         description="Specimen handling before testing",
         default=None,
     )
-    testingDestination: Optional[List[CodeableConcept]] = Field(
+    testingDestination: Optional[ListType[CodeableConcept]] = Field(
         description="Where the specimen will be tested",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "testingDestination",
-                "handling",
-                "rejectionCriterion",
-                "singleUse",
-                "retentionTime",
-                "requirement",
-                "container",
-                "preference",
-                "type",
-                "isDerived",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class SpecimenDefinition(DomainResource):
     """
@@ -309,55 +241,6 @@ class SpecimenDefinition(DomainResource):
     _type = "SpecimenDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SpecimenDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/SpecimenDefinition"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Logical canonical URL to reference this SpecimenDefinition (globally unique)",
         default=None,
@@ -411,20 +294,20 @@ class SpecimenDefinition(DomainResource):
         default=None,
         alias="_title",
     )
-    derivedFromCanonical: Optional[List[Canonical]] = Field(
+    derivedFromCanonical: Optional[ListType[Canonical]] = Field(
         description="Based on FHIR definition of another SpecimenDefinition",
         default=None,
     )
-    derivedFromCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFromCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromCanonical extensions",
         default=None,
         alias="_derivedFromCanonical",
     )
-    derivedFromUri: Optional[List[Uri]] = Field(
+    derivedFromUri: Optional[ListType[Uri]] = Field(
         description="Based on external definition",
         default=None,
     )
-    derivedFromUri_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFromUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromUri extensions",
         default=None,
         alias="_derivedFromUri",
@@ -473,7 +356,7 @@ class SpecimenDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -486,11 +369,11 @@ class SpecimenDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="Content intends to support these contexts",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for this SpecimenDefinition (if applicable)",
         default=None,
     )
@@ -547,7 +430,7 @@ class SpecimenDefinition(DomainResource):
         description="Kind of material to collect",
         default=None,
     )
-    patientPreparation: Optional[List[CodeableConcept]] = Field(
+    patientPreparation: Optional[ListType[CodeableConcept]] = Field(
         description="Patient preparation for collection",
         default=None,
     )
@@ -560,11 +443,11 @@ class SpecimenDefinition(DomainResource):
         default=None,
         alias="_timeAspect",
     )
-    collection: Optional[List[CodeableConcept]] = Field(
+    collection: Optional[ListType[CodeableConcept]] = Field(
         description="Specimen collection procedure",
         default=None,
     )
-    typeTested: Optional[List[SpecimenDefinitionTypeTested]] = Field(
+    typeTested: Optional[ListType[SpecimenDefinitionTypeTested]] = Field(
         description="Specimen in container intended for testing by lab",
         default=None,
     )
@@ -581,64 +464,6 @@ class SpecimenDefinition(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="subject",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "typeTested",
-                "collection",
-                "timeAspect",
-                "patientPreparation",
-                "typeCollected",
-                "effectivePeriod",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "derivedFromUri",
-                "derivedFromCanonical",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

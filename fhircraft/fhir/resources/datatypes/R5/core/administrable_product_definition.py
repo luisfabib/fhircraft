@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -7,7 +7,6 @@ import fhircraft.fhir.resources.validators as fhir_validators
 
 from fhircraft.fhir.resources.datatypes.primitives import (
     String,
-    Uri,
     Code,
     Markdown,
     Date,
@@ -17,8 +16,6 @@ from fhircraft.fhir.resources.datatypes.primitives import (
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
     Meta,
-    Narrative,
-    Extension,
     Identifier,
     Reference,
     CodeableConcept,
@@ -28,7 +25,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Ratio,
     Duration,
 )
-from .resource import Resource
 from .domain_resource import DomainResource
 
 
@@ -97,22 +93,6 @@ class AdministrableProductDefinitionProperty(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "status",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -155,23 +135,6 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
         alias="_supportingInformation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "supportingInformation",
-                "value",
-                "tissue",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneElement):
     """
@@ -183,29 +146,13 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneE
         default=None,
     )
     withdrawalPeriod: Optional[
-        List[
+        ListType[
             AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawalPeriod
         ]
     ] = Field(
         description="A species specific time during which consumption of animal product is not appropriate",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "withdrawalPeriod",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
@@ -238,32 +185,11 @@ class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
         default=None,
     )
     targetSpecies: Optional[
-        List[AdministrableProductDefinitionRouteOfAdministrationTargetSpecies]
+        ListType[AdministrableProductDefinitionRouteOfAdministrationTargetSpecies]
     ] = Field(
         description="A species for which this route applies",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "targetSpecies",
-                "maxTreatmentPeriod",
-                "maxDosePerTreatmentPeriod",
-                "maxDosePerDay",
-                "maxSingleDose",
-                "firstDose",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AdministrableProductDefinition(DomainResource):
@@ -277,58 +203,7 @@ class AdministrableProductDefinition(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
     )
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
-            ]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier for the administrable product",
         default=None,
     )
@@ -341,7 +216,7 @@ class AdministrableProductDefinition(DomainResource):
         default=None,
         alias="_status",
     )
-    formOf: Optional[List[Reference]] = Field(
+    formOf: Optional[ListType[Reference]] = Field(
         description="References a product from which one or more of the constituent parts of that product can be prepared and used as described by this administrable product",
         default=None,
     )
@@ -353,11 +228,11 @@ class AdministrableProductDefinition(DomainResource):
         description="The presentation type in which this item is given to a patient. e.g. for a spray - \u0027puff\u0027",
         default=None,
     )
-    producedFrom: Optional[List[Reference]] = Field(
+    producedFrom: Optional[ListType[Reference]] = Field(
         description="Indicates the specific manufactured items that are part of the \u0027formOf\u0027 product that are used in the preparation of this specific administrable form",
         default=None,
     )
-    ingredient: Optional[List[CodeableConcept]] = Field(
+    ingredient: Optional[ListType[CodeableConcept]] = Field(
         description="The ingredients of this administrable medicinal product. This is only needed if the ingredients are not specified either using ManufacturedItemDefiniton, or using by incoming references from the Ingredient resource",
         default=None,
     )
@@ -374,60 +249,17 @@ class AdministrableProductDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    property_: Optional[List[AdministrableProductDefinitionProperty]] = Field(
+    property_: Optional[ListType[AdministrableProductDefinitionProperty]] = Field(
         description="Characteristics e.g. a product\u0027s onset of action",
         default=None,
         alias="property",
     )
     routeOfAdministration: Optional[
-        List[AdministrableProductDefinitionRouteOfAdministration]
+        ListType[AdministrableProductDefinitionRouteOfAdministration]
     ] = Field(
         description="The path by which the product is taken into or makes contact with the body",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "routeOfAdministration",
-                "property_",
-                "description",
-                "device",
-                "ingredient",
-                "producedFrom",
-                "unitOfPresentation",
-                "administrableDoseForm",
-                "formOf",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_apd_1_constraint_model_validator(self):
@@ -437,54 +269,4 @@ class AdministrableProductDefinition(DomainResource):
             human="RouteOfAdministration cannot be used when the 'formOf' product already uses MedicinalProductDefinition.route (and vice versa)",
             key="apd-1",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )

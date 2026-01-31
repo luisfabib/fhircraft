@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -56,23 +56,6 @@ class ExplanationOfBenefitRelated(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reference",
-                "relationship",
-                "claim",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExplanationOfBenefitEvent(BackboneElement):
     """
@@ -105,21 +88,6 @@ class ExplanationOfBenefitEvent(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def when_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -142,22 +110,6 @@ class ExplanationOfBenefitPayee(BackboneElement):
         description="Recipient reference",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "party",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitCareTeam(BackboneElement):
@@ -195,25 +147,6 @@ class ExplanationOfBenefitCareTeam(BackboneElement):
         description="Practitioner or provider specialization",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "specialty",
-                "role",
-                "responsible",
-                "provider",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitSupportingInfo(BackboneElement):
@@ -305,24 +238,6 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reason",
-                "code",
-                "category",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def timing_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -363,7 +278,7 @@ class ExplanationOfBenefitDiagnosis(BackboneElement):
         description="Nature of illness or problem",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Timing or nature of the diagnosis",
         default=None,
     )
@@ -377,23 +292,6 @@ class ExplanationOfBenefitDiagnosis(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="diagnosis",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "onAdmission",
-                "type",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -420,7 +318,7 @@ class ExplanationOfBenefitProcedure(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Category of Procedure",
         default=None,
     )
@@ -441,7 +339,7 @@ class ExplanationOfBenefitProcedure(BackboneElement):
         description="Specific clinical procedure",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
@@ -451,24 +349,6 @@ class ExplanationOfBenefitProcedure(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="procedure",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "udi",
-                "date",
-                "type",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -499,32 +379,15 @@ class ExplanationOfBenefitInsurance(BackboneElement):
         description="Insurance information",
         default=None,
     )
-    preAuthRef: Optional[List[String]] = Field(
+    preAuthRef: Optional[ListType[String]] = Field(
         description="Prior authorization reference number",
         default=None,
     )
-    preAuthRef_ext: Optional[List[Optional[Element]]] = Field(
+    preAuthRef_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for preAuthRef extensions",
         default=None,
         alias="_preAuthRef",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "preAuthRef",
-                "coverage",
-                "focal",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitAccident(BackboneElement):
@@ -562,22 +425,6 @@ class ExplanationOfBenefitAccident(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "date",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def location_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -592,30 +439,14 @@ class ExplanationOfBenefitItemBodySite(BackboneElement):
     Physical location where the service is performed or applies.
     """
 
-    site: Optional[List[CodeableReference]] = Field(
+    site: Optional[ListType[CodeableReference]] = Field(
         description="Location",
         default=None,
     )
-    subSite: Optional[List[CodeableConcept]] = Field(
+    subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Sub-location",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subSite",
-                "site",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitItemReviewOutcome(BackboneElement):
@@ -627,7 +458,7 @@ class ExplanationOfBenefitItemReviewOutcome(BackboneElement):
         description="Result of the adjudication",
         default=None,
     )
-    reason: Optional[List[CodeableConcept]] = Field(
+    reason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for result of the adjudication",
         default=None,
     )
@@ -644,24 +475,6 @@ class ExplanationOfBenefitItemReviewOutcome(BackboneElement):
         description="Preauthorization reference effective period",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "preAuthPeriod",
-                "preAuthRef",
-                "reason",
-                "decision",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitItemAdjudication(BackboneElement):
@@ -686,24 +499,6 @@ class ExplanationOfBenefitItemAdjudication(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "quantity",
-                "amount",
-                "reason",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExplanationOfBenefitItemDetailReviewOutcome(BackboneElement):
     """
@@ -714,7 +509,7 @@ class ExplanationOfBenefitItemDetailReviewOutcome(BackboneElement):
         description="Result of the adjudication",
         default=None,
     )
-    reason: Optional[List[CodeableConcept]] = Field(
+    reason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for result of the adjudication",
         default=None,
     )
@@ -731,24 +526,6 @@ class ExplanationOfBenefitItemDetailReviewOutcome(BackboneElement):
         description="Preauthorization reference effective period",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "preAuthPeriod",
-                "preAuthRef",
-                "reason",
-                "decision",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitItemDetailAdjudication(BackboneElement):
@@ -773,24 +550,6 @@ class ExplanationOfBenefitItemDetailAdjudication(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "quantity",
-                "amount",
-                "reason",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
     """
@@ -806,7 +565,7 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -826,11 +585,11 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -863,15 +622,15 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
-    noteNumber_ext: Optional[List[Optional[Element]]] = Field(
+    noteNumber_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for noteNumber extensions",
         default=None,
         alias="_noteNumber",
@@ -880,42 +639,10 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="Subdetail level adjudication results",
         default=None,
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Subdetail level adjudication details",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "udi",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "patientPaid",
-                "programCode",
-                "modifier",
-                "productOrServiceEnd",
-                "productOrService",
-                "category",
-                "revenue",
-                "traceNumber",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitItemDetail(BackboneElement):
@@ -932,7 +659,7 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -952,11 +679,11 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -989,11 +716,11 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -1006,47 +733,14 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="Detail level adjudication results",
         default=None,
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemDetailAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemDetailAdjudication]] = Field(
         description="Detail level adjudication details",
         default=None,
     )
-    subDetail: Optional[List[ExplanationOfBenefitItemDetailSubDetail]] = Field(
+    subDetail: Optional[ListType[ExplanationOfBenefitItemDetailSubDetail]] = Field(
         description="Additional items",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subDetail",
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "udi",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "patientPaid",
-                "programCode",
-                "modifier",
-                "productOrServiceEnd",
-                "productOrService",
-                "category",
-                "revenue",
-                "traceNumber",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitItem(BackboneElement):
@@ -1063,43 +757,43 @@ class ExplanationOfBenefitItem(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    careTeamSequence: Optional[List[PositiveInt]] = Field(
+    careTeamSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable care team members",
         default=None,
     )
-    careTeamSequence_ext: Optional[List[Optional[Element]]] = Field(
+    careTeamSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for careTeamSequence extensions",
         default=None,
         alias="_careTeamSequence",
     )
-    diagnosisSequence: Optional[List[PositiveInt]] = Field(
+    diagnosisSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable diagnoses",
         default=None,
     )
-    diagnosisSequence_ext: Optional[List[Optional[Element]]] = Field(
+    diagnosisSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for diagnosisSequence extensions",
         default=None,
         alias="_diagnosisSequence",
     )
-    procedureSequence: Optional[List[PositiveInt]] = Field(
+    procedureSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable procedures",
         default=None,
     )
-    procedureSequence_ext: Optional[List[Optional[Element]]] = Field(
+    procedureSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for procedureSequence extensions",
         default=None,
         alias="_procedureSequence",
     )
-    informationSequence: Optional[List[PositiveInt]] = Field(
+    informationSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable exception and supporting information",
         default=None,
     )
-    informationSequence_ext: Optional[List[Optional[Element]]] = Field(
+    informationSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for informationSequence extensions",
         default=None,
         alias="_informationSequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -1119,15 +813,15 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    request: Optional[List[Reference]] = Field(
+    request: Optional[ListType[Reference]] = Field(
         description="Request or Referral for Service",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Product or service billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -1185,19 +879,19 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-    bodySite: Optional[List[ExplanationOfBenefitItemBodySite]] = Field(
+    bodySite: Optional[ListType[ExplanationOfBenefitItemBodySite]] = Field(
         description="Anatomical location",
         default=None,
     )
-    encounter: Optional[List[Reference]] = Field(
+    encounter: Optional[ListType[Reference]] = Field(
         description="Encounters associated with the listed treatments",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -1210,11 +904,11 @@ class ExplanationOfBenefitItem(BackboneElement):
         description="Adjudication results",
         default=None,
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Adjudication details",
         default=None,
     )
-    detail: Optional[List[ExplanationOfBenefitItemDetail]] = Field(
+    detail: Optional[ListType[ExplanationOfBenefitItemDetail]] = Field(
         description="Additional items",
         default=None,
     )
@@ -1231,46 +925,6 @@ class ExplanationOfBenefitItem(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="location",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "detail",
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "encounter",
-                "bodySite",
-                "udi",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "patientPaid",
-                "programCode",
-                "modifier",
-                "request",
-                "productOrServiceEnd",
-                "productOrService",
-                "category",
-                "revenue",
-                "traceNumber",
-                "informationSequence",
-                "procedureSequence",
-                "diagnosisSequence",
-                "careTeamSequence",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -1297,30 +951,14 @@ class ExplanationOfBenefitAddItemBodySite(BackboneElement):
     Physical location where the service is performed or applies.
     """
 
-    site: Optional[List[CodeableReference]] = Field(
+    site: Optional[ListType[CodeableReference]] = Field(
         description="Location",
         default=None,
     )
-    subSite: Optional[List[CodeableConcept]] = Field(
+    subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Sub-location",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subSite",
-                "site",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
@@ -1328,7 +966,7 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
     The third-tier service adjudications for payor added services.
     """
 
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -1344,7 +982,7 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
@@ -1377,7 +1015,7 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -1390,38 +1028,10 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         description="Additem subdetail level adjudication results",
         default=None,
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Added items adjudication",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "patientPaid",
-                "modifier",
-                "productOrServiceEnd",
-                "productOrService",
-                "revenue",
-                "traceNumber",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitAddItemDetail(BackboneElement):
@@ -1429,7 +1039,7 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
     The second-tier service adjudications for payor added services.
     """
 
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -1445,7 +1055,7 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
@@ -1478,7 +1088,7 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -1491,43 +1101,14 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         description="Additem detail level adjudication results",
         default=None,
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Added items adjudication",
         default=None,
     )
-    subDetail: Optional[List[ExplanationOfBenefitAddItemDetailSubDetail]] = Field(
+    subDetail: Optional[ListType[ExplanationOfBenefitAddItemDetailSubDetail]] = Field(
         description="Insurer added line items",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subDetail",
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "patientPaid",
-                "modifier",
-                "productOrServiceEnd",
-                "productOrService",
-                "revenue",
-                "traceNumber",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitAddItem(BackboneElement):
@@ -1535,38 +1116,38 @@ class ExplanationOfBenefitAddItem(BackboneElement):
     The first-tier service adjudications for payor added product or service lines.
     """
 
-    itemSequence: Optional[List[PositiveInt]] = Field(
+    itemSequence: Optional[ListType[PositiveInt]] = Field(
         description="Item sequence number",
         default=None,
     )
-    itemSequence_ext: Optional[List[Optional[Element]]] = Field(
+    itemSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for itemSequence extensions",
         default=None,
         alias="_itemSequence",
     )
-    detailSequence: Optional[List[PositiveInt]] = Field(
+    detailSequence: Optional[ListType[PositiveInt]] = Field(
         description="Detail sequence number",
         default=None,
     )
-    detailSequence_ext: Optional[List[Optional[Element]]] = Field(
+    detailSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for detailSequence extensions",
         default=None,
         alias="_detailSequence",
     )
-    subDetailSequence: Optional[List[PositiveInt]] = Field(
+    subDetailSequence: Optional[ListType[PositiveInt]] = Field(
         description="Subdetail sequence number",
         default=None,
     )
-    subDetailSequence_ext: Optional[List[Optional[Element]]] = Field(
+    subDetailSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for subDetailSequence extensions",
         default=None,
         alias="_subDetailSequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
-    provider: Optional[List[Reference]] = Field(
+    provider: Optional[ListType[Reference]] = Field(
         description="Authorized providers",
         default=None,
     )
@@ -1582,15 +1163,15 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    request: Optional[List[Reference]] = Field(
+    request: Optional[ListType[Reference]] = Field(
         description="Request or Referral for Service",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -1648,11 +1229,11 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    bodySite: Optional[List[ExplanationOfBenefitAddItemBodySite]] = Field(
+    bodySite: Optional[ListType[ExplanationOfBenefitAddItemBodySite]] = Field(
         description="Anatomical location",
         default=None,
     )
-    noteNumber: Optional[List[PositiveInt]] = Field(
+    noteNumber: Optional[ListType[PositiveInt]] = Field(
         description="Applicable note numbers",
         default=None,
     )
@@ -1665,11 +1246,11 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         description="Additem level adjudication results",
         default=None,
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Added items adjudication",
         default=None,
     )
-    detail: Optional[List[ExplanationOfBenefitAddItemDetail]] = Field(
+    detail: Optional[ListType[ExplanationOfBenefitAddItemDetail]] = Field(
         description="Insurer added line items",
         default=None,
     )
@@ -1686,42 +1267,6 @@ class ExplanationOfBenefitAddItem(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="location",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "detail",
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "bodySite",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "patientPaid",
-                "programCode",
-                "modifier",
-                "request",
-                "productOrServiceEnd",
-                "productOrService",
-                "revenue",
-                "provider",
-                "traceNumber",
-                "subDetailSequence",
-                "detailSequence",
-                "itemSequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -1756,22 +1301,6 @@ class ExplanationOfBenefitTotal(BackboneElement):
         description="Financial total for the category",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "amount",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitPayment(BackboneElement):
@@ -1809,26 +1338,6 @@ class ExplanationOfBenefitPayment(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "identifier",
-                "amount",
-                "date",
-                "adjustmentReason",
-                "adjustment",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExplanationOfBenefitProcessNote(BackboneElement):
     """
@@ -1861,24 +1370,6 @@ class ExplanationOfBenefitProcessNote(BackboneElement):
         description="Language of the text",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "language",
-                "text",
-                "type",
-                "number",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
@@ -1938,21 +1429,6 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="used",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -2022,32 +1498,10 @@ class ExplanationOfBenefitBenefitBalance(BackboneElement):
         description="Annual or lifetime",
         default=None,
     )
-    financial: Optional[List[ExplanationOfBenefitBenefitBalanceFinancial]] = Field(
+    financial: Optional[ListType[ExplanationOfBenefitBenefitBalanceFinancial]] = Field(
         description="Benefit Summary",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "financial",
-                "term",
-                "unit",
-                "network",
-                "description",
-                "name",
-                "excluded",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExplanationOfBenefit(DomainResource):
@@ -2059,60 +1513,11 @@ class ExplanationOfBenefit(DomainResource):
     _type = "ExplanationOfBenefit"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExplanationOfBenefit"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ExplanationOfBenefit"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for the resource",
         default=None,
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -2183,7 +1588,7 @@ class ExplanationOfBenefit(DomainResource):
         description="Funds reserved status",
         default=None,
     )
-    related: Optional[List[ExplanationOfBenefitRelated]] = Field(
+    related: Optional[ListType[ExplanationOfBenefitRelated]] = Field(
         description="Prior or corollary claims",
         default=None,
     )
@@ -2195,7 +1600,7 @@ class ExplanationOfBenefit(DomainResource):
         description="Original prescription if superceded by fulfiller",
         default=None,
     )
-    event: Optional[List[ExplanationOfBenefitEvent]] = Field(
+    event: Optional[ListType[ExplanationOfBenefitEvent]] = Field(
         description="Event information",
         default=None,
     )
@@ -2207,7 +1612,7 @@ class ExplanationOfBenefit(DomainResource):
         description="Treatment Referral",
         default=None,
     )
-    encounter: Optional[List[Reference]] = Field(
+    encounter: Optional[ListType[Reference]] = Field(
         description="Encounters associated with the listed treatments",
         default=None,
     )
@@ -2245,7 +1650,7 @@ class ExplanationOfBenefit(DomainResource):
         default=None,
         alias="_disposition",
     )
-    preAuthRef: Optional[List[String]] = Field(
+    preAuthRef: Optional[ListType[String]] = Field(
         description="Preauthorization reference",
         default=None,
     )
@@ -2254,7 +1659,7 @@ class ExplanationOfBenefit(DomainResource):
         default=None,
         alias="_preAuthRef",
     )
-    preAuthRefPeriod: Optional[List[Period]] = Field(
+    preAuthRefPeriod: Optional[ListType[Period]] = Field(
         description="Preauthorization in-effect period",
         default=None,
     )
@@ -2262,19 +1667,19 @@ class ExplanationOfBenefit(DomainResource):
         description="Package billing code",
         default=None,
     )
-    careTeam: Optional[List[ExplanationOfBenefitCareTeam]] = Field(
+    careTeam: Optional[ListType[ExplanationOfBenefitCareTeam]] = Field(
         description="Care Team members",
         default=None,
     )
-    supportingInfo: Optional[List[ExplanationOfBenefitSupportingInfo]] = Field(
+    supportingInfo: Optional[ListType[ExplanationOfBenefitSupportingInfo]] = Field(
         description="Supporting information",
         default=None,
     )
-    diagnosis: Optional[List[ExplanationOfBenefitDiagnosis]] = Field(
+    diagnosis: Optional[ListType[ExplanationOfBenefitDiagnosis]] = Field(
         description="Pertinent diagnosis information",
         default=None,
     )
-    procedure: Optional[List[ExplanationOfBenefitProcedure]] = Field(
+    procedure: Optional[ListType[ExplanationOfBenefitProcedure]] = Field(
         description="Clinical procedures performed",
         default=None,
     )
@@ -2287,7 +1692,7 @@ class ExplanationOfBenefit(DomainResource):
         default=None,
         alias="_precedence",
     )
-    insurance: Optional[List[ExplanationOfBenefitInsurance]] = Field(
+    insurance: Optional[ListType[ExplanationOfBenefitInsurance]] = Field(
         description="Patient insurance information",
         default=None,
     )
@@ -2299,19 +1704,19 @@ class ExplanationOfBenefit(DomainResource):
         description="Paid by the patient",
         default=None,
     )
-    item: Optional[List[ExplanationOfBenefitItem]] = Field(
+    item: Optional[ListType[ExplanationOfBenefitItem]] = Field(
         description="Product or service provided",
         default=None,
     )
-    addItem: Optional[List[ExplanationOfBenefitAddItem]] = Field(
+    addItem: Optional[ListType[ExplanationOfBenefitAddItem]] = Field(
         description="Insurer added line items",
         default=None,
     )
-    adjudication: Optional[List[ExplanationOfBenefitItemAdjudication]] = Field(
+    adjudication: Optional[ListType[ExplanationOfBenefitItemAdjudication]] = Field(
         description="Header-level adjudication",
         default=None,
     )
-    total: Optional[List[ExplanationOfBenefitTotal]] = Field(
+    total: Optional[ListType[ExplanationOfBenefitTotal]] = Field(
         description="Adjudication totals",
         default=None,
     )
@@ -2327,7 +1732,7 @@ class ExplanationOfBenefit(DomainResource):
         description="Printed reference or actual form",
         default=None,
     )
-    processNote: Optional[List[ExplanationOfBenefitProcessNote]] = Field(
+    processNote: Optional[ListType[ExplanationOfBenefitProcessNote]] = Field(
         description="Note concerning adjudication",
         default=None,
     )
@@ -2335,138 +1740,7 @@ class ExplanationOfBenefit(DomainResource):
         description="When the benefits are applicable",
         default=None,
     )
-    benefitBalance: Optional[List[ExplanationOfBenefitBenefitBalance]] = Field(
+    benefitBalance: Optional[ListType[ExplanationOfBenefitBenefitBalance]] = Field(
         description="Balance by Benefit Category",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "benefitBalance",
-                "benefitPeriod",
-                "processNote",
-                "form",
-                "formCode",
-                "payment",
-                "total",
-                "adjudication",
-                "addItem",
-                "item",
-                "patientPaid",
-                "accident",
-                "insurance",
-                "precedence",
-                "procedure",
-                "diagnosis",
-                "supportingInfo",
-                "careTeam",
-                "diagnosisRelatedGroup",
-                "preAuthRefPeriod",
-                "preAuthRef",
-                "disposition",
-                "decision",
-                "outcome",
-                "claimResponse",
-                "claim",
-                "facility",
-                "encounter",
-                "referral",
-                "payee",
-                "event",
-                "originalPrescription",
-                "prescription",
-                "related",
-                "fundsReserve",
-                "fundsReserveRequested",
-                "priority",
-                "provider",
-                "insurer",
-                "enterer",
-                "created",
-                "billablePeriod",
-                "patient",
-                "use",
-                "subType",
-                "type",
-                "status",
-                "traceNumber",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

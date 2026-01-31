@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -60,22 +60,6 @@ class GenomicStudyAnalysisInput(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "file",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def generatedBy_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -99,22 +83,6 @@ class GenomicStudyAnalysisOutput(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "file",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class GenomicStudyAnalysisPerformer(BackboneElement):
     """
@@ -129,22 +97,6 @@ class GenomicStudyAnalysisPerformer(BackboneElement):
         description="Role of the actor for this analysis",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "role",
-                "actor",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class GenomicStudyAnalysisDevice(BackboneElement):
@@ -161,37 +113,21 @@ class GenomicStudyAnalysisDevice(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "function",
-                "device",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class GenomicStudyAnalysis(BackboneElement):
     """
     The details about a specific analysis that was performed in this GenomicStudy.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers for the analysis event",
         default=None,
     )
-    methodType: Optional[List[CodeableConcept]] = Field(
+    methodType: Optional[ListType[CodeableConcept]] = Field(
         description="Type of the methods used in the analysis (e.g., FISH, Karyotyping, MSI)",
         default=None,
     )
-    changeType: Optional[List[CodeableConcept]] = Field(
+    changeType: Optional[ListType[CodeableConcept]] = Field(
         description="Type of the genomic changes studied in the analysis (e.g., DNA, RNA, or AA change)",
         default=None,
     )
@@ -226,11 +162,11 @@ class GenomicStudyAnalysis(BackboneElement):
         default=None,
         alias="_title",
     )
-    focus: Optional[List[Reference]] = Field(
+    focus: Optional[ListType[Reference]] = Field(
         description="What the genomic analysis is about, when it is not about the subject of record",
         default=None,
     )
-    specimen: Optional[List[Reference]] = Field(
+    specimen: Optional[ListType[Reference]] = Field(
         description="The specimen used in the analysis event",
         default=None,
     )
@@ -243,7 +179,7 @@ class GenomicStudyAnalysis(BackboneElement):
         default=None,
         alias="_date",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Any notes capture with the analysis event",
         default=None,
     )
@@ -251,62 +187,30 @@ class GenomicStudyAnalysis(BackboneElement):
         description="The protocol that was performed for the analysis event",
         default=None,
     )
-    regionsStudied: Optional[List[Reference]] = Field(
+    regionsStudied: Optional[ListType[Reference]] = Field(
         description="The genomic regions to be studied in the analysis (BED file)",
         default=None,
     )
-    regionsCalled: Optional[List[Reference]] = Field(
+    regionsCalled: Optional[ListType[Reference]] = Field(
         description="Genomic regions actually called in the analysis event (BED file)",
         default=None,
     )
-    input: Optional[List[GenomicStudyAnalysisInput]] = Field(
+    input: Optional[ListType[GenomicStudyAnalysisInput]] = Field(
         description="Inputs for the analysis event",
         default=None,
     )
-    output: Optional[List[GenomicStudyAnalysisOutput]] = Field(
+    output: Optional[ListType[GenomicStudyAnalysisOutput]] = Field(
         description="Outputs for the analysis event",
         default=None,
     )
-    performer: Optional[List[GenomicStudyAnalysisPerformer]] = Field(
+    performer: Optional[ListType[GenomicStudyAnalysisPerformer]] = Field(
         description="Performer for the analysis event",
         default=None,
     )
-    device: Optional[List[GenomicStudyAnalysisDevice]] = Field(
+    device: Optional[ListType[GenomicStudyAnalysisDevice]] = Field(
         description="Devices used for the analysis (e.g., instruments, software), with settings and parameters",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "device",
-                "performer",
-                "output",
-                "input",
-                "regionsCalled",
-                "regionsStudied",
-                "protocolPerformed",
-                "note",
-                "date",
-                "specimen",
-                "focus",
-                "title",
-                "instantiatesUri",
-                "instantiatesCanonical",
-                "genomeBuild",
-                "changeType",
-                "methodType",
-                "identifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class GenomicStudy(DomainResource):
@@ -318,56 +222,7 @@ class GenomicStudy(DomainResource):
     _type = "GenomicStudy"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/GenomicStudy"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/GenomicStudy"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers for this genomic study",
         default=None,
     )
@@ -380,7 +235,7 @@ class GenomicStudy(DomainResource):
         default=None,
         alias="_status",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="The type of the study (e.g., Familial variant segregation, Functional variation detection, or Gene expression profiling)",
         default=None,
     )
@@ -401,7 +256,7 @@ class GenomicStudy(DomainResource):
         default=None,
         alias="_startDate",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Event resources that the genomic study is based on",
         default=None,
     )
@@ -409,11 +264,11 @@ class GenomicStudy(DomainResource):
         description="Healthcare professional who requested or referred the genomic study",
         default=None,
     )
-    interpreter: Optional[List[Reference]] = Field(
+    interpreter: Optional[ListType[Reference]] = Field(
         description="Healthcare professionals who interpreted the genomic study",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why the genomic study was performed",
         default=None,
     )
@@ -435,7 +290,7 @@ class GenomicStudy(DomainResource):
         default=None,
         alias="_instantiatesUri",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments related to the genomic study",
         default=None,
     )
@@ -448,104 +303,7 @@ class GenomicStudy(DomainResource):
         default=None,
         alias="_description",
     )
-    analysis: Optional[List[GenomicStudyAnalysis]] = Field(
+    analysis: Optional[ListType[GenomicStudyAnalysis]] = Field(
         description="Genomic Analysis Event",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "analysis",
-                "description",
-                "note",
-                "instantiatesUri",
-                "instantiatesCanonical",
-                "reason",
-                "interpreter",
-                "referrer",
-                "basedOn",
-                "startDate",
-                "encounter",
-                "subject",
-                "type",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

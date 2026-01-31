@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -49,22 +49,6 @@ class MedicationRequestDispenseRequestInitialFill(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "duration",
-                "quantity",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicationRequestDispenseRequest(BackboneElement):
     """
@@ -104,7 +88,7 @@ class MedicationRequestDispenseRequest(BackboneElement):
         description="Intended performer of dispense",
         default=None,
     )
-    dispenserInstruction: Optional[List[Annotation]] = Field(
+    dispenserInstruction: Optional[ListType[Annotation]] = Field(
         description="Additional information for the dispenser",
         default=None,
     )
@@ -112,29 +96,6 @@ class MedicationRequestDispenseRequest(BackboneElement):
         description="Type of adherence packaging to use for the dispense",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "doseAdministrationAid",
-                "dispenserInstruction",
-                "dispenser",
-                "expectedSupplyDuration",
-                "quantity",
-                "numberOfRepeatsAllowed",
-                "validityPeriod",
-                "dispenseInterval",
-                "initialFill",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class MedicationRequestSubstitution(BackboneElement):
@@ -168,21 +129,6 @@ class MedicationRequestSubstitution(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reason",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def allowed_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -201,60 +147,11 @@ class MedicationRequest(DomainResource):
     _type = "MedicationRequest"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/MedicationRequest"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External ids for this request",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="A plan or request that is fulfilled in whole or in part by this medication request",
         default=None,
     )
@@ -297,7 +194,7 @@ class MedicationRequest(DomainResource):
         default=None,
         alias="_intent",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Grouping or category of medication request",
         default=None,
     )
@@ -327,7 +224,7 @@ class MedicationRequest(DomainResource):
         description="Individual or group for whom the medication has been requested",
         default=None,
     )
-    informationSource: Optional[List[Reference]] = Field(
+    informationSource: Optional[ListType[Reference]] = Field(
         description="The person or organization who provided the information about this request, if the source is someone other than the requestor",
         default=None,
     )
@@ -335,7 +232,7 @@ class MedicationRequest(DomainResource):
         description="Encounter created as part of encounter/admission/stay",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Information to support fulfilling of the medication",
         default=None,
     )
@@ -365,11 +262,11 @@ class MedicationRequest(DomainResource):
         description="Desired kind of performer of the medication administration",
         default=None,
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Intended performer of administration",
         default=None,
     )
-    device: Optional[List[CodeableReference]] = Field(
+    device: Optional[ListType[CodeableReference]] = Field(
         description="Intended type of device for the administration",
         default=None,
     )
@@ -377,7 +274,7 @@ class MedicationRequest(DomainResource):
         description="Person who entered the request",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Reason or indication for ordering or not ordering the medication",
         default=None,
     )
@@ -385,11 +282,11 @@ class MedicationRequest(DomainResource):
         description="Overall pattern of medication administration",
         default=None,
     )
-    insurance: Optional[List[Reference]] = Field(
+    insurance: Optional[ListType[Reference]] = Field(
         description="Associated insurance coverage",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Information about the prescription",
         default=None,
     )
@@ -406,7 +303,7 @@ class MedicationRequest(DomainResource):
         description="Period over which the medication is to be taken",
         default=None,
     )
-    dosageInstruction: Optional[List[Dosage]] = Field(
+    dosageInstruction: Optional[ListType[Dosage]] = Field(
         description="Specific instructions for how the medication should be taken",
         default=None,
     )
@@ -418,122 +315,7 @@ class MedicationRequest(DomainResource):
         description="Any restrictions on medication substitution",
         default=None,
     )
-    eventHistory: Optional[List[Reference]] = Field(
+    eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of events of interest in the lifecycle",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "eventHistory",
-                "substitution",
-                "dispenseRequest",
-                "dosageInstruction",
-                "effectiveDosePeriod",
-                "renderedDosageInstruction",
-                "note",
-                "insurance",
-                "courseOfTherapyType",
-                "reason",
-                "recorder",
-                "device",
-                "performer",
-                "performerType",
-                "reported",
-                "requester",
-                "authoredOn",
-                "supportingInformation",
-                "encounter",
-                "informationSource",
-                "subject",
-                "medication",
-                "doNotPerform",
-                "priority",
-                "category",
-                "intent",
-                "statusChanged",
-                "statusReason",
-                "status",
-                "groupIdentifier",
-                "priorPrescription",
-                "basedOn",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

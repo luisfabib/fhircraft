@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -97,26 +97,6 @@ class DeviceUdiCarrier(BackboneElement):
         alias="_entryType",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "entryType",
-                "carrierHRF",
-                "carrierAIDC",
-                "jurisdiction",
-                "issuer",
-                "deviceIdentifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class DeviceName(BackboneElement):
     """
@@ -136,7 +116,7 @@ class DeviceName(BackboneElement):
         description="registered-name | user-friendly-name | patient-reported-name",
         default=None,
     )
-    type_ext: Optional[List[Optional[Element]]] = Field(
+    type_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for type extensions",
         default=None,
         alias="_type",
@@ -150,23 +130,6 @@ class DeviceName(BackboneElement):
         default=None,
         alias="_display",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "display",
-                "type",
-                "value",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class DeviceVersion(BackboneElement):
@@ -201,24 +164,6 @@ class DeviceVersion(BackboneElement):
         alias="_value",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "installDate",
-                "component",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class DeviceConformsTo(BackboneElement):
     """
@@ -237,28 +182,11 @@ class DeviceConformsTo(BackboneElement):
         description="Specific form or variant of the standard",
         default=None,
     )
-    version_ext: Optional[List[Optional[Element]]] = Field(
+    version_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "version",
-                "specification",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class DeviceProperty(BackboneElement):
@@ -322,21 +250,6 @@ class DeviceProperty(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -363,56 +276,7 @@ class Device(DomainResource):
     _type = "Device"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Device"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Device"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Instance identifier",
         default=None,
     )
@@ -429,7 +293,7 @@ class Device(DomainResource):
         description="The reference to the definition for the device",
         default=None,
     )
-    udiCarrier: Optional[List[DeviceUdiCarrier]] = Field(
+    udiCarrier: Optional[ListType[DeviceUdiCarrier]] = Field(
         description="Unique Device Identifier (UDI) Barcode string",
         default=None,
     )
@@ -495,7 +359,7 @@ class Device(DomainResource):
         default=None,
         alias="_serialNumber",
     )
-    name: Optional[List[DeviceName]] = Field(
+    name: Optional[ListType[DeviceName]] = Field(
         description="The name or names of the device as known to the manufacturer and/or patient",
         default=None,
     )
@@ -517,23 +381,23 @@ class Device(DomainResource):
         default=None,
         alias="_partNumber",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Indicates a high-level grouping of the device",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="The kind or type of device",
         default=None,
     )
-    version: Optional[List[DeviceVersion]] = Field(
+    version: Optional[ListType[DeviceVersion]] = Field(
         description="The actual design of the device or software version running on the device",
         default=None,
     )
-    conformsTo: Optional[List[DeviceConformsTo]] = Field(
+    conformsTo: Optional[ListType[DeviceConformsTo]] = Field(
         description="Identifies the standards, specifications, or formal guidances for the capabilities supported by the device",
         default=None,
     )
-    property_: Optional[List[DeviceProperty]] = Field(
+    property_: Optional[ListType[DeviceProperty]] = Field(
         description="Inherent, essentially fixed, characteristics of the device.  e.g., time properties, size, material, etc.",
         default=None,
         alias="property",
@@ -554,7 +418,7 @@ class Device(DomainResource):
         description="Organization responsible for device",
         default=None,
     )
-    contact: Optional[List[ContactPoint]] = Field(
+    contact: Optional[ListType[ContactPoint]] = Field(
         description="Details for human/organization for support",
         default=None,
     )
@@ -571,19 +435,19 @@ class Device(DomainResource):
         default=None,
         alias="_url",
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to electronic services provided by the device",
         default=None,
     )
-    gateway: Optional[List[CodeableReference]] = Field(
+    gateway: Optional[ListType[CodeableReference]] = Field(
         description="Linked device acting as a communication/data collector, translator or controller",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Device notes and comments",
         default=None,
     )
-    safety: Optional[List[CodeableConcept]] = Field(
+    safety: Optional[ListType[CodeableConcept]] = Field(
         description="Safety Characteristics of Device",
         default=None,
     )
@@ -593,70 +457,6 @@ class Device(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "parent",
-                "safety",
-                "note",
-                "gateway",
-                "endpoint",
-                "url",
-                "location",
-                "contact",
-                "owner",
-                "duration",
-                "cycle",
-                "mode",
-                "property_",
-                "conformsTo",
-                "version",
-                "type",
-                "category",
-                "partNumber",
-                "modelNumber",
-                "name",
-                "serialNumber",
-                "lotNumber",
-                "expirationDate",
-                "manufactureDate",
-                "manufacturer",
-                "biologicalSourceEvent",
-                "availabilityStatus",
-                "status",
-                "udiCarrier",
-                "definition",
-                "displayName",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_dev_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -664,54 +464,4 @@ class Device(DomainResource):
             human="only one Device.name.display SHALL be true when there is more than one Device.name",
             key="dev-1",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )

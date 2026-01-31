@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -75,24 +75,6 @@ class StructureDefinitionMapping(BackboneElement):
         alias="_comment",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "comment",
-                "name",
-                "uri",
-                "identity",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class StructureDefinitionContext(BackboneElement):
     """
@@ -118,69 +100,16 @@ class StructureDefinitionContext(BackboneElement):
         alias="_expression",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "expression",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class StructureDefinitionSnapshot(BackboneElement):
     """
     A snapshot view is expressed in a standalone form that can be used and interpreted without considering the base StructureDefinition.
     """
 
-    element: Optional[List[ElementDefinition]] = Field(
+    element: Optional[ListType[ElementDefinition]] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "element",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_10_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("element",),
-            expression="binding.empty() or binding.valueSet.exists() or binding.description.exists()",
-            human="provide either a binding reference or a description (or both)",
-            key="sdf-10",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_28_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("element",),
-            expression="slicing.exists().not() or (slicing.discriminator.exists() or slicing.description.exists())",
-            human="If there are no discriminators, there must be a definition",
-            key="sdf-28",
-            severity="error",
-        )
 
 
 class StructureDefinitionDifferential(BackboneElement):
@@ -188,25 +117,10 @@ class StructureDefinitionDifferential(BackboneElement):
     A differential view is expressed relative to the base StructureDefinition - a statement of differences that it applies.
     """
 
-    element: Optional[List[ElementDefinition]] = Field(
+    element: Optional[ListType[ElementDefinition]] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "element",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class StructureDefinition(DomainResource):
@@ -218,55 +132,6 @@ class StructureDefinition(DomainResource):
     _type = "StructureDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/StructureDefinition"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this structure definition, represented as a URI (globally unique)",
         default=None,
@@ -276,7 +141,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure definition",
         default=None,
     )
@@ -356,7 +221,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -369,11 +234,11 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for structure definition (if applicable)",
         default=None,
     )
@@ -404,7 +269,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    keyword: Optional[List[Coding]] = Field(
+    keyword: Optional[ListType[Coding]] = Field(
         description="Assist with indexing and finding",
         default=None,
     )
@@ -417,7 +282,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_fhirVersion",
     )
-    mapping: Optional[List[StructureDefinitionMapping]] = Field(
+    mapping: Optional[ListType[StructureDefinitionMapping]] = Field(
         description="External specification that the content is mapped to",
         default=None,
     )
@@ -439,15 +304,15 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_abstract",
     )
-    context: Optional[List[StructureDefinitionContext]] = Field(
+    context: Optional[ListType[StructureDefinitionContext]] = Field(
         description="If an extension, where it can be used in instances",
         default=None,
     )
-    contextInvariant: Optional[List[String]] = Field(
+    contextInvariant: Optional[ListType[String]] = Field(
         description="FHIRPath invariants - when the extension can be used",
         default=None,
     )
-    contextInvariant_ext: Optional[List[Optional[Element]]] = Field(
+    contextInvariant_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for contextInvariant extensions",
         default=None,
         alias="_contextInvariant",
@@ -496,63 +361,22 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
             self,
-            elements=(
-                "differential",
-                "snapshot",
-                "derivation",
-                "baseDefinition",
-                "type",
-                "contextInvariant",
-                "context",
-                "abstract",
-                "kind",
-                "mapping",
-                "fhirVersion",
-                "keyword",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
         )
 
     @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
             self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -564,6 +388,16 @@ class StructureDefinition(DomainResource):
             human="URL should not contain | or # - these characters make processing canonical references problematic",
             key="cnl-1",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_1_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="derivation = 'constraint' or snapshot.element.select(path).isDistinct()",
+            human="Element paths must be unique unless the structure is a constraint",
+            key="sdf-1",
+            severity="error",
         )
 
     @model_validator(mode="after")
@@ -585,112 +419,6 @@ class StructureDefinition(DomainResource):
             expression="%resource.kind = 'logical' or element.all(definition.exists() and min.exists() and max.exists())",
             human="Each element definition in a snapshot must have a formal definition and cardinalities, unless model is a logical model",
             key="sdf-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_8_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("snapshot",),
-            expression="(%resource.kind = 'logical' or element.first().path = %resource.type) and element.tail().all(path.startsWith(%resource.snapshot.element.first().path&'.'))",
-            human="All snapshot elements must start with the StructureDefinition's specified type for non-logical models, or with the same type name for logical models",
-            key="sdf-8",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_24_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("snapshot",),
-            expression="element.where(type.where(code='Reference').exists() and path.endsWith('.reference') and type.targetProfile.exists() and (path.substring(0,$this.path.length()-10) in %context.element.where(type.where(code='CodeableReference').exists()).path)).exists().not()",
-            human="For CodeableReference elements, target profiles must be listed on the CodeableReference, not the CodeableReference.reference",
-            key="sdf-24",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_25_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("snapshot",),
-            expression="element.where(type.where(code='CodeableConcept').exists() and path.endsWith('.concept') and binding.exists() and (path.substring(0,$this.path.length()-8) in %context.element.where(type.where(code='CodeableReference').exists()).path)).exists().not()",
-            human="For CodeableReference elements, bindings must be listed on the CodeableReference, not the CodeableReference.concept",
-            key="sdf-25",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_26_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("snapshot",),
-            expression="$this.where(element[0].mustSupport='true').exists().not()",
-            human="The root element of a profile should not have mustSupport = true",
-            key="sdf-26",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_8b_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("snapshot",),
-            expression="element.all(base.exists())",
-            human="All snapshot elements must have a base definition",
-            key="sdf-8b",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_20_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("differential",),
-            expression="element.where(path.contains('.').not()).slicing.empty()",
-            human="No slicing on the root element",
-            key="sdf-20",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_8a_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("differential",),
-            expression="(%resource.kind = 'logical' or element.first().path.startsWith(%resource.type)) and (element.tail().empty() or  element.tail().all(path.startsWith(%resource.differential.element.first().path.replaceMatches('\\..*','')&'.')))",
-            human="In any differential, all the elements must start with the StructureDefinition's specified type for non-logical models, or with the same type name for logical models",
-            key="sdf-8a",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_sdf_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="derivation = 'constraint' or snapshot.element.select(path).isDistinct()",
-            human="Element paths must be unique unless the structure is a constraint",
-            key="sdf-1",
             severity="error",
         )
 
@@ -721,6 +449,60 @@ class StructureDefinition(DomainResource):
             expression="snapshot.exists() or differential.exists()",
             human="A structure must have either a differential, or a snapshot (or both)",
             key="sdf-6",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_8_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("snapshot",),
+            expression="(%resource.kind = 'logical' or element.first().path = %resource.type) and element.tail().all(path.startsWith(%resource.snapshot.element.first().path&'.'))",
+            human="All snapshot elements must start with the StructureDefinition's specified type for non-logical models, or with the same type name for logical models",
+            key="sdf-8",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_8a_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("differential",),
+            expression="(%resource.kind = 'logical' or element.first().path.startsWith(%resource.type)) and (element.tail().empty() or  element.tail().all(path.startsWith(%resource.differential.element.first().path.replaceMatches('\\..*','')&'.')))",
+            human="In any differential, all the elements must start with the StructureDefinition's specified type for non-logical models, or with the same type name for logical models",
+            key="sdf-8a",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_8b_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("snapshot",),
+            expression="element.all(base.exists())",
+            human="All snapshot elements must have a base definition",
+            key="sdf-8b",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_9_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="children().element.where(path.contains('.').not()).label.empty() and children().element.where(path.contains('.').not()).code.empty() and children().element.where(path.contains('.').not()).requirements.empty()",
+            human='In any snapshot or differential, no label, code or requirements on an element without a "." in the path (e.g. the first element)',
+            key="sdf-9",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_10_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("snapshot.element",),
+            expression="binding.empty() or binding.valueSet.exists() or binding.description.exists()",
+            human="provide either a binding reference or a description (or both)",
+            key="sdf-10",
             severity="error",
         )
 
@@ -765,16 +547,6 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_sdf_9_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="children().element.where(path.contains('.').not()).label.empty() and children().element.where(path.contains('.').not()).code.empty() and children().element.where(path.contains('.').not()).requirements.empty()",
-            human='In any snapshot or differential, no label, code or requirements on an element without a "." in the path (e.g. the first element)',
-            key="sdf-9",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_sdf_16_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -815,6 +587,17 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
+    def FHIR_sdf_20_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("differential",),
+            expression="element.where(path.contains('.').not()).slicing.empty()",
+            human="No slicing on the root element",
+            key="sdf-20",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_sdf_21_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -845,12 +628,56 @@ class StructureDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
+    def FHIR_sdf_24_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("snapshot",),
+            expression="element.where(type.where(code='Reference').exists() and path.endsWith('.reference') and type.targetProfile.exists() and (path.substring(0,$this.path.length()-10) in %context.element.where(type.where(code='CodeableReference').exists()).path)).exists().not()",
+            human="For CodeableReference elements, target profiles must be listed on the CodeableReference, not the CodeableReference.reference",
+            key="sdf-24",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_25_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("snapshot",),
+            expression="element.where(type.where(code='CodeableConcept').exists() and path.endsWith('.concept') and binding.exists() and (path.substring(0,$this.path.length()-8) in %context.element.where(type.where(code='CodeableReference').exists()).path)).exists().not()",
+            human="For CodeableReference elements, bindings must be listed on the CodeableReference, not the CodeableReference.concept",
+            key="sdf-25",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_26_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("snapshot",),
+            expression="$this.where(element[0].mustSupport='true').exists().not()",
+            human="The root element of a profile should not have mustSupport = true",
+            key="sdf-26",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_sdf_27_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="baseDefinition.exists() implies derivation.exists()",
             human="If there's a base definition, there must be a derivation ",
             key="sdf-27",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_28_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("snapshot.element",),
+            expression="slicing.exists().not() or (slicing.discriminator.exists() or slicing.description.exists())",
+            human="If there are no discriminators, there must be a definition",
+            key="sdf-28",
             severity="error",
         )
 

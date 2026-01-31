@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -39,22 +39,6 @@ class SubstanceSourceMaterialFractionDescription(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "materialType",
-                "fraction",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class SubstanceSourceMaterialOrganismAuthor(BackboneElement):
     """
@@ -74,22 +58,6 @@ class SubstanceSourceMaterialOrganismAuthor(BackboneElement):
         default=None,
         alias="_authorDescription",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "authorDescription",
-                "authorType",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class SubstanceSourceMaterialOrganismHybrid(BackboneElement):
@@ -138,25 +106,6 @@ class SubstanceSourceMaterialOrganismHybrid(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "hybridType",
-                "paternalOrganismName",
-                "paternalOrganismId",
-                "maternalOrganismName",
-                "maternalOrganismId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class SubstanceSourceMaterialOrganismOrganismGeneral(BackboneElement):
     """
@@ -180,24 +129,6 @@ class SubstanceSourceMaterialOrganismOrganismGeneral(BackboneElement):
         description="The order of an organism shall be specified,",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "order",
-                "class_",
-                "phylum",
-                "kingdom",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class SubstanceSourceMaterialOrganism(BackboneElement):
@@ -230,7 +161,7 @@ class SubstanceSourceMaterialOrganism(BackboneElement):
         default=None,
         alias="_intraspecificDescription",
     )
-    author: Optional[List[SubstanceSourceMaterialOrganismAuthor]] = Field(
+    author: Optional[ListType[SubstanceSourceMaterialOrganismAuthor]] = Field(
         description="4.9.13.6.1 Author type (Conditional)",
         default=None,
     )
@@ -242,28 +173,6 @@ class SubstanceSourceMaterialOrganism(BackboneElement):
         description="4.9.13.7.1 Kingdom (Conditional)",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "organismGeneral",
-                "hybrid",
-                "author",
-                "intraspecificDescription",
-                "intraspecificType",
-                "species",
-                "genus",
-                "family",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class SubstanceSourceMaterialPartDescription(BackboneElement):
@@ -280,22 +189,6 @@ class SubstanceSourceMaterialPartDescription(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "partLocation",
-                "part",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class SubstanceSourceMaterial(DomainResource):
     """
@@ -306,55 +199,6 @@ class SubstanceSourceMaterial(DomainResource):
     _type = "SubstanceSourceMaterial"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SubstanceSourceMaterial"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/SubstanceSourceMaterial"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     sourceMaterialClass: Optional[CodeableConcept] = Field(
         description="General high level classification of the source material specific to the origin of the material",
         default=None,
@@ -380,28 +224,28 @@ class SubstanceSourceMaterial(DomainResource):
         default=None,
         alias="_organismName",
     )
-    parentSubstanceId: Optional[List[Identifier]] = Field(
+    parentSubstanceId: Optional[ListType[Identifier]] = Field(
         description="The parent of the herbal drug Ginkgo biloba, Leaf is the substance ID of the substance (fresh) of Ginkgo biloba L. or Ginkgo biloba L. (Whole plant)",
         default=None,
     )
-    parentSubstanceName: Optional[List[String]] = Field(
+    parentSubstanceName: Optional[ListType[String]] = Field(
         description="The parent substance of the Herbal Drug, or Herbal preparation",
         default=None,
     )
-    parentSubstanceName_ext: Optional[List[Optional[Element]]] = Field(
+    parentSubstanceName_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for parentSubstanceName extensions",
         default=None,
         alias="_parentSubstanceName",
     )
-    countryOfOrigin: Optional[List[CodeableConcept]] = Field(
+    countryOfOrigin: Optional[ListType[CodeableConcept]] = Field(
         description="The country where the plant material is harvested or the countries where the plasma is sourced from as laid down in accordance with the Plasma Master File. For \u201cPlasma-derived substances\u201d the attribute country of origin provides information about the countries used for the manufacturing of the Cryopoor plama or Crioprecipitate",
         default=None,
     )
-    geographicalLocation: Optional[List[String]] = Field(
+    geographicalLocation: Optional[ListType[String]] = Field(
         description="The place/region where the plant is harvested or the places/regions where the animal source material has its habitat",
         default=None,
     )
-    geographicalLocation_ext: Optional[List[Optional[Element]]] = Field(
+    geographicalLocation_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for geographicalLocation extensions",
         default=None,
         alias="_geographicalLocation",
@@ -410,7 +254,7 @@ class SubstanceSourceMaterial(DomainResource):
         description="Stage of life for animals, plants, insects and microorganisms. This information shall be provided only when the substance is significantly different in these stages (e.g. foetal bovine serum)",
         default=None,
     )
-    fractionDescription: Optional[List[SubstanceSourceMaterialFractionDescription]] = (
+    fractionDescription: Optional[ListType[SubstanceSourceMaterialFractionDescription]] = (
         Field(
             description="Many complex materials are fractions of parts of plants, animals, or minerals. Fraction elements are often necessary to define both Substances and Specified Group 1 Substances. For substances derived from Plants, fraction information will be captured at the Substance information level ( . Oils, Juices and Exudates). Additional information for Extracts, such as extraction solvent composition, will be captured at the Specified Substance Group 1 information level. For plasma-derived products fraction information will be captured at the Substance and the Specified Substance Group 1 levels",
             default=None,
@@ -420,102 +264,7 @@ class SubstanceSourceMaterial(DomainResource):
         description="This subclause describes the organism which the substance is derived from. For vaccines, the parent organism shall be specified based on these subclause elements. As an example, full taxonomy will be described for the Substance Name: ., Leaf",
         default=None,
     )
-    partDescription: Optional[List[SubstanceSourceMaterialPartDescription]] = Field(
+    partDescription: Optional[ListType[SubstanceSourceMaterialPartDescription]] = Field(
         description="To do",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "partDescription",
-                "organism",
-                "fractionDescription",
-                "developmentStage",
-                "geographicalLocation",
-                "countryOfOrigin",
-                "parentSubstanceName",
-                "parentSubstanceId",
-                "organismName",
-                "organismId",
-                "sourceMaterialState",
-                "sourceMaterialType",
-                "sourceMaterialClass",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

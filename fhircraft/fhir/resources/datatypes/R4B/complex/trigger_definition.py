@@ -64,52 +64,6 @@ class TriggerDefinition(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "condition",
-                "data",
-                "name",
-                "type",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("extension",),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def timing_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=["Timing", "Reference", Date, DateTime],
-            field_name_base="timing",
-        )
-
-    @model_validator(mode="after")
     def FHIR_trd_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -137,6 +91,14 @@ class TriggerDefinition(Element):
             human="A named event requires a name, a periodic event requires timing, and a data event requires data",
             key="trd-3",
             severity="error",
+        )
+
+    @model_validator(mode="after")
+    def timing_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=["Timing", "Reference", Date, DateTime],
+            field_name_base="timing",
         )
 
     @property

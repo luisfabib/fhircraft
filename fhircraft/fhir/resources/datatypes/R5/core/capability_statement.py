@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -67,23 +67,6 @@ class CapabilityStatementSoftware(BackboneElement):
         alias="_releaseDate",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "releaseDate",
-                "version",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementImplementation(BackboneElement):
     """
@@ -113,23 +96,6 @@ class CapabilityStatementImplementation(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "custodian",
-                "url",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRestSecurity(BackboneElement):
     """
@@ -145,7 +111,7 @@ class CapabilityStatementRestSecurity(BackboneElement):
         default=None,
         alias="_cors",
     )
-    service: Optional[List[CodeableConcept]] = Field(
+    service: Optional[ListType[CodeableConcept]] = Field(
         description="OAuth | SMART-on-FHIR | NTLM | Basic | Kerberos | Certificates",
         default=None,
     )
@@ -158,23 +124,6 @@ class CapabilityStatementRestSecurity(BackboneElement):
         default=None,
         alias="_description",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "description",
-                "service",
-                "cors",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class CapabilityStatementRestResourceInteraction(BackboneElement):
@@ -200,22 +149,6 @@ class CapabilityStatementRestResourceInteraction(BackboneElement):
         default=None,
         alias="_documentation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class CapabilityStatementRestResourceSearchParam(BackboneElement):
@@ -260,24 +193,6 @@ class CapabilityStatementRestResourceSearchParam(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "type",
-                "definition",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRestResourceOperation(BackboneElement):
     """
@@ -312,23 +227,6 @@ class CapabilityStatementRestResourceOperation(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "definition",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRestResource(BackboneElement):
     """
@@ -353,11 +251,11 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
         alias="_profile",
     )
-    supportedProfile: Optional[List[Canonical]] = Field(
+    supportedProfile: Optional[ListType[Canonical]] = Field(
         description="Use-case specific profiles",
         default=None,
     )
-    supportedProfile_ext: Optional[List[Optional[Element]]] = Field(
+    supportedProfile_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for supportedProfile extensions",
         default=None,
         alias="_supportedProfile",
@@ -371,7 +269,7 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    interaction: Optional[List[CapabilityStatementRestResourceInteraction]] = Field(
+    interaction: Optional[ListType[CapabilityStatementRestResourceInteraction]] = Field(
         description="What operations are supported?",
         default=None,
     )
@@ -447,73 +345,41 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
         alias="_conditionalDelete",
     )
-    referencePolicy: Optional[List[Code]] = Field(
+    referencePolicy: Optional[ListType[Code]] = Field(
         description="literal | logical | resolves | enforced | local",
         default=None,
     )
-    referencePolicy_ext: Optional[List[Optional[Element]]] = Field(
+    referencePolicy_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for referencePolicy extensions",
         default=None,
         alias="_referencePolicy",
     )
-    searchInclude: Optional[List[String]] = Field(
+    searchInclude: Optional[ListType[String]] = Field(
         description="_include values supported by the server",
         default=None,
     )
-    searchInclude_ext: Optional[List[Optional[Element]]] = Field(
+    searchInclude_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for searchInclude extensions",
         default=None,
         alias="_searchInclude",
     )
-    searchRevInclude: Optional[List[String]] = Field(
+    searchRevInclude: Optional[ListType[String]] = Field(
         description="_revinclude values supported by the server",
         default=None,
     )
-    searchRevInclude_ext: Optional[List[Optional[Element]]] = Field(
+    searchRevInclude_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for searchRevInclude extensions",
         default=None,
         alias="_searchRevInclude",
     )
-    searchParam: Optional[List[CapabilityStatementRestResourceSearchParam]] = Field(
+    searchParam: Optional[ListType[CapabilityStatementRestResourceSearchParam]] = Field(
         description="Search parameters supported by implementation",
         default=None,
     )
-    operation: Optional[List[CapabilityStatementRestResourceOperation]] = Field(
+    operation: Optional[ListType[CapabilityStatementRestResourceOperation]] = Field(
         description="Definition of a resource operation",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "operation",
-                "searchParam",
-                "searchRevInclude",
-                "searchInclude",
-                "referencePolicy",
-                "conditionalDelete",
-                "conditionalPatch",
-                "conditionalUpdate",
-                "conditionalRead",
-                "conditionalCreate",
-                "updateCreate",
-                "readHistory",
-                "versioning",
-                "interaction",
-                "documentation",
-                "supportedProfile",
-                "profile",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class CapabilityStatementRestInteraction(BackboneElement):
@@ -539,22 +405,6 @@ class CapabilityStatementRestInteraction(BackboneElement):
         default=None,
         alias="_documentation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class CapabilityStatementRestSearchParam(BackboneElement):
@@ -599,24 +449,6 @@ class CapabilityStatementRestSearchParam(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "type",
-                "definition",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRestOperation(BackboneElement):
     """
@@ -651,23 +483,6 @@ class CapabilityStatementRestOperation(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "definition",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRest(BackboneElement):
     """
@@ -696,64 +511,31 @@ class CapabilityStatementRest(BackboneElement):
         description="Information about security of implementation",
         default=None,
     )
-    resource: Optional[List[CapabilityStatementRestResource]] = Field(
+    resource: Optional[ListType[CapabilityStatementRestResource]] = Field(
         description="Resource served on the REST interface",
         default=None,
     )
-    interaction: Optional[List[CapabilityStatementRestInteraction]] = Field(
+    interaction: Optional[ListType[CapabilityStatementRestInteraction]] = Field(
         description="What operations are supported?",
         default=None,
     )
-    searchParam: Optional[List[CapabilityStatementRestSearchParam]] = Field(
+    searchParam: Optional[ListType[CapabilityStatementRestSearchParam]] = Field(
         description="Search parameters for searching all resources",
         default=None,
     )
-    operation: Optional[List[CapabilityStatementRestOperation]] = Field(
+    operation: Optional[ListType[CapabilityStatementRestOperation]] = Field(
         description="Definition of a system level operation",
         default=None,
     )
-    compartment: Optional[List[Canonical]] = Field(
+    compartment: Optional[ListType[Canonical]] = Field(
         description="Compartments served/used by system",
         default=None,
     )
-    compartment_ext: Optional[List[Optional[Element]]] = Field(
+    compartment_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for compartment extensions",
         default=None,
         alias="_compartment",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "compartment",
-                "operation",
-                "searchParam",
-                "interaction",
-                "resource",
-                "security",
-                "documentation",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cpb_12_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("resource",),
-            expression="searchParam.select(name).isDistinct()",
-            human="Search parameter names must be unique in the context of a resource.",
-            key="cpb-12",
-            severity="error",
-        )
 
 
 class CapabilityStatementMessagingEndpoint(BackboneElement):
@@ -774,22 +556,6 @@ class CapabilityStatementMessagingEndpoint(BackboneElement):
         default=None,
         alias="_address",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "address",
-                "protocol",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class CapabilityStatementMessagingSupportedMessage(BackboneElement):
@@ -816,29 +582,13 @@ class CapabilityStatementMessagingSupportedMessage(BackboneElement):
         alias="_definition",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "definition",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementMessaging(BackboneElement):
     """
     A description of the messaging capabilities of the solution.
     """
 
-    endpoint: Optional[List[CapabilityStatementMessagingEndpoint]] = Field(
+    endpoint: Optional[ListType[CapabilityStatementMessagingEndpoint]] = Field(
         description="Where messages should be sent",
         default=None,
     )
@@ -860,30 +610,12 @@ class CapabilityStatementMessaging(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    supportedMessage: Optional[List[CapabilityStatementMessagingSupportedMessage]] = (
+    supportedMessage: Optional[ListType[CapabilityStatementMessagingSupportedMessage]] = (
         Field(
             description="Messages supported by this system",
             default=None,
         )
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "supportedMessage",
-                "documentation",
-                "reliableCache",
-                "endpoint",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class CapabilityStatementDocument(BackboneElement):
@@ -919,23 +651,6 @@ class CapabilityStatementDocument(BackboneElement):
         alias="_profile",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "profile",
-                "documentation",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatement(DomainResource):
     """
@@ -946,55 +661,6 @@ class CapabilityStatement(DomainResource):
     _type = "CapabilityStatement"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CapabilityStatement"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/CapabilityStatement"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this capability statement, represented as a URI (globally unique)",
         default=None,
@@ -1004,7 +670,7 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the CapabilityStatement (business identifier)",
         default=None,
     )
@@ -1084,7 +750,7 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -1097,11 +763,11 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for capability statement (if applicable)",
         default=None,
     )
@@ -1141,20 +807,20 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_kind",
     )
-    instantiates: Optional[List[Canonical]] = Field(
+    instantiates: Optional[ListType[Canonical]] = Field(
         description="Canonical URL of another capability statement this implements",
         default=None,
     )
-    instantiates_ext: Optional[List[Optional[Element]]] = Field(
+    instantiates_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiates extensions",
         default=None,
         alias="_instantiates",
     )
-    imports: Optional[List[Canonical]] = Field(
+    imports: Optional[ListType[Canonical]] = Field(
         description="Canonical URL of another capability statement this adds to",
         default=None,
     )
-    imports_ext: Optional[List[Optional[Element]]] = Field(
+    imports_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for imports extensions",
         default=None,
         alias="_imports",
@@ -1176,51 +842,51 @@ class CapabilityStatement(DomainResource):
         default=None,
         alias="_fhirVersion",
     )
-    format: Optional[List[Code]] = Field(
+    format: Optional[ListType[Code]] = Field(
         description="formats supported (xml | json | ttl | mime type)",
         default=None,
     )
-    format_ext: Optional[List[Optional[Element]]] = Field(
+    format_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for format extensions",
         default=None,
         alias="_format",
     )
-    patchFormat: Optional[List[Code]] = Field(
+    patchFormat: Optional[ListType[Code]] = Field(
         description="Patch formats supported",
         default=None,
     )
-    patchFormat_ext: Optional[List[Optional[Element]]] = Field(
+    patchFormat_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for patchFormat extensions",
         default=None,
         alias="_patchFormat",
     )
-    acceptLanguage: Optional[List[Code]] = Field(
+    acceptLanguage: Optional[ListType[Code]] = Field(
         description="Languages supported",
         default=None,
     )
-    acceptLanguage_ext: Optional[List[Optional[Element]]] = Field(
+    acceptLanguage_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for acceptLanguage extensions",
         default=None,
         alias="_acceptLanguage",
     )
-    implementationGuide: Optional[List[Canonical]] = Field(
+    implementationGuide: Optional[ListType[Canonical]] = Field(
         description="Implementation guides supported",
         default=None,
     )
-    implementationGuide_ext: Optional[List[Optional[Element]]] = Field(
+    implementationGuide_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for implementationGuide extensions",
         default=None,
         alias="_implementationGuide",
     )
-    rest: Optional[List[CapabilityStatementRest]] = Field(
+    rest: Optional[ListType[CapabilityStatementRest]] = Field(
         description="If the endpoint is a RESTful one",
         default=None,
     )
-    messaging: Optional[List[CapabilityStatementMessaging]] = Field(
+    messaging: Optional[ListType[CapabilityStatementMessaging]] = Field(
         description="If messaging is supported",
         default=None,
     )
-    document: Optional[List[CapabilityStatementDocument]] = Field(
+    document: Optional[ListType[CapabilityStatementDocument]] = Field(
         description="Document definition",
         default=None,
     )
@@ -1233,64 +899,13 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
             self,
-            elements=(
-                "document",
-                "messaging",
-                "rest",
-                "implementationGuide",
-                "acceptLanguage",
-                "patchFormat",
-                "format",
-                "fhirVersion",
-                "implementation",
-                "software",
-                "imports",
-                "instantiates",
-                "kind",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -1305,33 +920,12 @@ class CapabilityStatement(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_cpb_9_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("rest",),
-            expression="resource.select(type).isDistinct()",
-            human="A given resource can only be described once per RESTful mode.",
-            key="cpb-9",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def versionAlgorithm_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[String, Coding],
             field_name_base="versionAlgorithm",
             required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -1381,6 +975,28 @@ class CapabilityStatement(DomainResource):
             expression="document.select(profile&mode).isDistinct()",
             human="The set of documents must be unique by the combination of profile and mode.",
             key="cpb-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cpb_9_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("rest",),
+            expression="resource.select(type).isDistinct()",
+            human="A given resource can only be described once per RESTful mode.",
+            key="cpb-9",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cpb_12_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("rest.resource",),
+            expression="searchParam.select(name).isDistinct()",
+            human="Search parameter names must be unique in the context of a resource.",
+            key="cpb-12",
             severity="error",
         )
 

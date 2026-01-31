@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -49,23 +49,6 @@ class CompositionAttester(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "party",
-                "time",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CompositionEvent(BackboneElement):
     """
@@ -76,26 +59,10 @@ class CompositionEvent(BackboneElement):
         description="The period covered by the documentation",
         default=None,
     )
-    detail: Optional[List[CodeableReference]] = Field(
+    detail: Optional[ListType[CodeableReference]] = Field(
         description="The event(s) being documented, as code(s), reference(s), or both",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "detail",
-                "period",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class CompositionSection(BackboneElement):
@@ -116,7 +83,7 @@ class CompositionSection(BackboneElement):
         description="Classification of section (recommended)",
         default=None,
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the section",
         default=None,
     )
@@ -132,7 +99,7 @@ class CompositionSection(BackboneElement):
         description="Order of section entries",
         default=None,
     )
-    entry: Optional[List[Reference]] = Field(
+    entry: Optional[ListType[Reference]] = Field(
         description="A reference to data that supports this section",
         default=None,
     )
@@ -140,33 +107,10 @@ class CompositionSection(BackboneElement):
         description="Why the section is empty",
         default=None,
     )
-    section: Optional[List["CompositionSection"]] = Field(
+    section: Optional[ListType["CompositionSection"]] = Field(
         description="Nested Section",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "section",
-                "emptyReason",
-                "entry",
-                "orderedBy",
-                "text",
-                "focus",
-                "author",
-                "code",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class Composition(DomainResource):
@@ -178,55 +122,6 @@ class Composition(DomainResource):
     _type = "Composition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Composition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Composition"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this Composition, represented as a URI (globally unique)",
         default=None,
@@ -236,7 +131,7 @@ class Composition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Version-independent identifier for the Composition",
         default=None,
     )
@@ -262,11 +157,11 @@ class Composition(DomainResource):
         description="Kind of composition (LOINC if possible)",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Categorization of Composition",
         default=None,
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="Who and/or what the composition is about",
         default=None,
     )
@@ -283,11 +178,11 @@ class Composition(DomainResource):
         default=None,
         alias="_date",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the composition",
         default=None,
     )
@@ -309,11 +204,11 @@ class Composition(DomainResource):
         default=None,
         alias="_title",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="For any additional notes",
         default=None,
     )
-    attester: Optional[List[CompositionAttester]] = Field(
+    attester: Optional[ListType[CompositionAttester]] = Field(
         description="Attests to accuracy of composition",
         default=None,
     )
@@ -321,69 +216,18 @@ class Composition(DomainResource):
         description="Organization which maintains the composition",
         default=None,
     )
-    relatesTo: Optional[List[RelatedArtifact]] = Field(
+    relatesTo: Optional[ListType[RelatedArtifact]] = Field(
         description="Relationships to other compositions/documents",
         default=None,
     )
-    event: Optional[List[CompositionEvent]] = Field(
+    event: Optional[ListType[CompositionEvent]] = Field(
         description="The clinical service(s) being documented",
         default=None,
     )
-    section: Optional[List[CompositionSection]] = Field(
+    section: Optional[ListType[CompositionSection]] = Field(
         description="Composition is broken into sections",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "section",
-                "event",
-                "relatesTo",
-                "custodian",
-                "attester",
-                "note",
-                "title",
-                "name",
-                "author",
-                "useContext",
-                "date",
-                "encounter",
-                "subject",
-                "category",
-                "type",
-                "status",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_cmp_1_constraint_validator(self):
@@ -405,54 +249,4 @@ class Composition(DomainResource):
             human="A section can only have an emptyReason if it is empty",
             key="cmp-2",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )

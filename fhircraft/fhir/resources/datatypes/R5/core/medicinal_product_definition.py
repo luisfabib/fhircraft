@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,22 +50,6 @@ class MedicinalProductDefinitionContact(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "contact",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicinalProductDefinitionNamePart(BackboneElement):
     """
@@ -76,7 +60,7 @@ class MedicinalProductDefinitionNamePart(BackboneElement):
         description="A fragment of a product name",
         default=None,
     )
-    part_ext: Optional[List[Optional[Element]]] = Field(
+    part_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for part extensions",
         default=None,
         alias="_part",
@@ -85,22 +69,6 @@ class MedicinalProductDefinitionNamePart(BackboneElement):
         description="Identifying type for this part of the name (e.g. strength part)",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "part",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class MedicinalProductDefinitionNameUsage(BackboneElement):
@@ -121,23 +89,6 @@ class MedicinalProductDefinitionNameUsage(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "language",
-                "jurisdiction",
-                "country",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicinalProductDefinitionName(BackboneElement):
     """
@@ -157,32 +108,14 @@ class MedicinalProductDefinitionName(BackboneElement):
         description="Type of product name, such as rINN, BAN, Proprietary, Non-Proprietary",
         default=None,
     )
-    part: Optional[List[MedicinalProductDefinitionNamePart]] = Field(
+    part: Optional[ListType[MedicinalProductDefinitionNamePart]] = Field(
         description="Coding words or phrases of the name",
         default=None,
     )
-    usage: Optional[List[MedicinalProductDefinitionNameUsage]] = Field(
+    usage: Optional[ListType[MedicinalProductDefinitionNameUsage]] = Field(
         description="Country and jurisdiction where the name applies",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "usage",
-                "part",
-                "type",
-                "productName",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class MedicinalProductDefinitionCrossReference(BackboneElement):
@@ -199,22 +132,6 @@ class MedicinalProductDefinitionCrossReference(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "product",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicinalProductDefinitionOperation(BackboneElement):
     """
@@ -229,7 +146,7 @@ class MedicinalProductDefinitionOperation(BackboneElement):
         description="Date range of applicability",
         default=None,
     )
-    organization: Optional[List[Reference]] = Field(
+    organization: Optional[ListType[Reference]] = Field(
         description="The organization responsible for the particular process, e.g. the manufacturer or importer",
         default=None,
     )
@@ -237,24 +154,6 @@ class MedicinalProductDefinitionOperation(BackboneElement):
         description="Specifies whether this process is considered proprietary or confidential",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "confidentialityIndicator",
-                "organization",
-                "effectiveDate",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class MedicinalProductDefinitionCharacteristic(BackboneElement):
@@ -323,21 +222,6 @@ class MedicinalProductDefinitionCharacteristic(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -366,58 +250,7 @@ class MedicinalProductDefinition(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition"
     )
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition"
-            ]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this product. Could be an MPID",
         default=None,
     )
@@ -464,7 +297,7 @@ class MedicinalProductDefinition(DomainResource):
         description="The dose form for a single part product, or combined form of a multiple part product",
         default=None,
     )
-    route: Optional[List[CodeableConcept]] = Field(
+    route: Optional[ListType[CodeableConcept]] = Field(
         description="The path by which the product is taken into or makes contact with the body",
         default=None,
     )
@@ -485,7 +318,7 @@ class MedicinalProductDefinition(DomainResource):
         description="Whether the Medicinal Product is subject to additional monitoring for regulatory reasons",
         default=None,
     )
-    specialMeasures: Optional[List[CodeableConcept]] = Field(
+    specialMeasures: Optional[ListType[CodeableConcept]] = Field(
         description="Whether the Medicinal Product is subject to special measures for regulatory reasons",
         default=None,
     )
@@ -493,174 +326,63 @@ class MedicinalProductDefinition(DomainResource):
         description="If authorised for use in children",
         default=None,
     )
-    classification: Optional[List[CodeableConcept]] = Field(
+    classification: Optional[ListType[CodeableConcept]] = Field(
         description="Allows the product to be classified by various systems",
         default=None,
     )
-    marketingStatus: Optional[List[MarketingStatus]] = Field(
+    marketingStatus: Optional[ListType[MarketingStatus]] = Field(
         description="Marketing status of the medicinal product, in contrast to marketing authorization",
         default=None,
     )
-    packagedMedicinalProduct: Optional[List[CodeableConcept]] = Field(
+    packagedMedicinalProduct: Optional[ListType[CodeableConcept]] = Field(
         description="Package type for the product",
         default=None,
     )
-    comprisedOf: Optional[List[Reference]] = Field(
+    comprisedOf: Optional[ListType[Reference]] = Field(
         description="Types of medicinal manufactured items and/or devices that this product consists of, such as tablets, capsule, or syringes",
         default=None,
     )
-    ingredient: Optional[List[CodeableConcept]] = Field(
+    ingredient: Optional[ListType[CodeableConcept]] = Field(
         description="The ingredients of this medicinal product - when not detailed in other resources",
         default=None,
     )
-    impurity: Optional[List[CodeableReference]] = Field(
+    impurity: Optional[ListType[CodeableReference]] = Field(
         description="Any component of the drug product which is not the chemical entity defined as the drug substance, or an excipient in the drug product",
         default=None,
     )
-    attachedDocument: Optional[List[Reference]] = Field(
+    attachedDocument: Optional[ListType[Reference]] = Field(
         description="Additional documentation about the medicinal product",
         default=None,
     )
-    masterFile: Optional[List[Reference]] = Field(
+    masterFile: Optional[ListType[Reference]] = Field(
         description="A master file for the medicinal product (e.g. Pharmacovigilance System Master File)",
         default=None,
     )
-    contact: Optional[List[MedicinalProductDefinitionContact]] = Field(
+    contact: Optional[ListType[MedicinalProductDefinitionContact]] = Field(
         description="A product specific contact, person (in a role), or an organization",
         default=None,
     )
-    clinicalTrial: Optional[List[Reference]] = Field(
+    clinicalTrial: Optional[ListType[Reference]] = Field(
         description="Clinical trials or studies that this product is involved in",
         default=None,
     )
-    code: Optional[List[Coding]] = Field(
+    code: Optional[ListType[Coding]] = Field(
         description="A code that this product is known by, within some formal terminology",
         default=None,
     )
-    name: Optional[List[MedicinalProductDefinitionName]] = Field(
+    name: Optional[ListType[MedicinalProductDefinitionName]] = Field(
         description="The product\u0027s name, including full name and possibly coded parts",
         default=None,
     )
-    crossReference: Optional[List[MedicinalProductDefinitionCrossReference]] = Field(
+    crossReference: Optional[ListType[MedicinalProductDefinitionCrossReference]] = Field(
         description="Reference to another product, e.g. for linking authorised to investigational product",
         default=None,
     )
-    operation: Optional[List[MedicinalProductDefinitionOperation]] = Field(
+    operation: Optional[ListType[MedicinalProductDefinitionOperation]] = Field(
         description="A manufacturing or administrative process for the medicinal product",
         default=None,
     )
-    characteristic: Optional[List[MedicinalProductDefinitionCharacteristic]] = Field(
+    characteristic: Optional[ListType[MedicinalProductDefinitionCharacteristic]] = Field(
         description='Key product features such as "sugar free", "modified release"',
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "characteristic",
-                "operation",
-                "crossReference",
-                "name",
-                "code",
-                "clinicalTrial",
-                "contact",
-                "masterFile",
-                "attachedDocument",
-                "impurity",
-                "ingredient",
-                "comprisedOf",
-                "packagedMedicinalProduct",
-                "marketingStatus",
-                "classification",
-                "pediatricUseIndicator",
-                "specialMeasures",
-                "additionalMonitoringIndicator",
-                "legalStatusOfSupply",
-                "indication",
-                "route",
-                "combinedPharmaceuticalDoseForm",
-                "description",
-                "statusDate",
-                "status",
-                "version",
-                "domain",
-                "type",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -52,7 +52,7 @@ class EvidenceVariableDefinition(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
@@ -73,26 +73,6 @@ class EvidenceVariableDefinition(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "directnessMatch",
-                "intended",
-                "observed",
-                "variableRole",
-                "note",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class EvidenceStatisticSampleSize(BackboneElement):
     """
@@ -108,7 +88,7 @@ class EvidenceStatisticSampleSize(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnote or explanatory note about the sample size",
         default=None,
     )
@@ -140,25 +120,6 @@ class EvidenceStatisticSampleSize(BackboneElement):
         alias="_knownDataCount",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "knownDataCount",
-                "numberOfParticipants",
-                "numberOfStudies",
-                "note",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class EvidenceStatisticAttributeEstimate(BackboneElement):
     """
@@ -174,7 +135,7 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnote or explanatory note about the estimate",
         default=None,
     )
@@ -199,31 +160,10 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
         description="Lower and upper bound values of the attribute estimate",
         default=None,
     )
-    attributeEstimate: Optional[List["EvidenceStatisticAttributeEstimate"]] = Field(
+    attributeEstimate: Optional[ListType["EvidenceStatisticAttributeEstimate"]] = Field(
         description="A nested attribute estimate; which is the attribute estimate of an attribute estimate",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "attributeEstimate",
-                "range",
-                "level",
-                "quantity",
-                "type",
-                "note",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
@@ -244,37 +184,18 @@ class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
         default=None,
         alias="_handling",
     )
-    valueCategory: Optional[List[CodeableConcept]] = Field(
+    valueCategory: Optional[ListType[CodeableConcept]] = Field(
         description="Description for grouping of ordinal or polychotomous variables",
         default=None,
     )
-    valueQuantity: Optional[List[Quantity]] = Field(
+    valueQuantity: Optional[ListType[Quantity]] = Field(
         description="Discrete value for grouping of ordinal or polychotomous variables",
         default=None,
     )
-    valueRange: Optional[List[Range]] = Field(
+    valueRange: Optional[ListType[Range]] = Field(
         description="Range of values for grouping of ordinal or polychotomous variables",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "valueRange",
-                "valueQuantity",
-                "valueCategory",
-                "handling",
-                "variableDefinition",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
@@ -291,7 +212,7 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnote or explanatory note about the estimate",
         default=None,
     )
@@ -316,31 +237,10 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
         description="Lower and upper bound values of the attribute estimate",
         default=None,
     )
-    attributeEstimate: Optional[List[EvidenceStatisticAttributeEstimate]] = Field(
+    attributeEstimate: Optional[ListType[EvidenceStatisticAttributeEstimate]] = Field(
         description="A nested attribute estimate; which is the attribute estimate of an attribute estimate",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "attributeEstimate",
-                "range",
-                "level",
-                "quantity",
-                "type",
-                "note",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EvidenceStatisticModelCharacteristic(BackboneElement):
@@ -356,34 +256,16 @@ class EvidenceStatisticModelCharacteristic(BackboneElement):
         description="Numerical value to complete model specification",
         default=None,
     )
-    variable: Optional[List[EvidenceStatisticModelCharacteristicVariable]] = Field(
+    variable: Optional[ListType[EvidenceStatisticModelCharacteristicVariable]] = Field(
         description="A variable adjusted for in the adjusted analysis",
         default=None,
     )
     attributeEstimate: Optional[
-        List[EvidenceStatisticModelCharacteristicAttributeEstimate]
+        ListType[EvidenceStatisticModelCharacteristicAttributeEstimate]
     ] = Field(
         description="An attribute of the statistic used as a model characteristic",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "attributeEstimate",
-                "variable",
-                "value",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EvidenceStatistic(BackboneElement):
@@ -400,7 +282,7 @@ class EvidenceStatistic(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
@@ -438,38 +320,14 @@ class EvidenceStatistic(BackboneElement):
         description="Number of samples in the statistic",
         default=None,
     )
-    attributeEstimate: Optional[List[EvidenceStatisticAttributeEstimate]] = Field(
+    attributeEstimate: Optional[ListType[EvidenceStatisticAttributeEstimate]] = Field(
         description="An attribute of the Statistic",
         default=None,
     )
-    modelCharacteristic: Optional[List[EvidenceStatisticModelCharacteristic]] = Field(
+    modelCharacteristic: Optional[ListType[EvidenceStatisticModelCharacteristic]] = Field(
         description="An aspect of the statistical model",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modelCharacteristic",
-                "attributeEstimate",
-                "sampleSize",
-                "numberAffected",
-                "numberOfEvents",
-                "quantity",
-                "category",
-                "statisticType",
-                "note",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EvidenceCertainty(BackboneElement):
@@ -486,7 +344,7 @@ class EvidenceCertainty(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
@@ -507,30 +365,10 @@ class EvidenceCertainty(BackboneElement):
         default=None,
         alias="_rater",
     )
-    subcomponent: Optional[List["EvidenceCertainty"]] = Field(
+    subcomponent: Optional[ListType["EvidenceCertainty"]] = Field(
         description="A domain or subdomain of certainty",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subcomponent",
-                "rater",
-                "rating",
-                "type",
-                "note",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class Evidence(DomainResource):
@@ -542,55 +380,6 @@ class Evidence(DomainResource):
     _type = "Evidence"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Evidence"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Evidence"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this evidence, represented as a globally unique URI",
         default=None,
@@ -600,7 +389,7 @@ class Evidence(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the summary",
         default=None,
     )
@@ -711,27 +500,27 @@ class Evidence(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
@@ -762,7 +551,7 @@ class Evidence(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Link or citation to artifact associated with the summary",
         default=None,
     )
@@ -784,11 +573,11 @@ class Evidence(DomainResource):
         default=None,
         alias="_assertion",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
-    variableDefinition: Optional[List[EvidenceVariableDefinition]] = Field(
+    variableDefinition: Optional[ListType[EvidenceVariableDefinition]] = Field(
         description="Evidence variable such as population, exposure, or outcome",
         default=None,
     )
@@ -796,15 +585,15 @@ class Evidence(DomainResource):
         description="The method to combine studies",
         default=None,
     )
-    studyDesign: Optional[List[CodeableConcept]] = Field(
+    studyDesign: Optional[ListType[CodeableConcept]] = Field(
         description="The design of the study that produced this evidence",
         default=None,
     )
-    statistic: Optional[List[EvidenceStatistic]] = Field(
+    statistic: Optional[ListType[EvidenceStatistic]] = Field(
         description="Values and parameters for a single statistic",
         default=None,
     )
-    certainty: Optional[List[EvidenceCertainty]] = Field(
+    certainty: Optional[ListType[EvidenceCertainty]] = Field(
         description="Certainty or quality of the evidence",
         default=None,
     )
@@ -821,78 +610,6 @@ class Evidence(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="citeAs",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "certainty",
-                "statistic",
-                "studyDesign",
-                "synthesisType",
-                "variableDefinition",
-                "note",
-                "assertion",
-                "description",
-                "relatedArtifact",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "useContext",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "contact",
-                "publisher",
-                "lastReviewDate",
-                "approvalDate",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -920,5 +637,16 @@ class Evidence(DomainResource):
             expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
             severity="warning",
         )

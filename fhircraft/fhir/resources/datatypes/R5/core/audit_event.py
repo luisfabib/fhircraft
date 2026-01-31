@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -44,26 +44,10 @@ class AuditEventOutcome(BackboneElement):
         description="Whether the event succeeded or failed",
         default=None,
     )
-    detail: Optional[List[CodeableConcept]] = Field(
+    detail: Optional[ListType[CodeableConcept]] = Field(
         description="Additional outcome detail",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "detail",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AuditEventAgent(BackboneElement):
@@ -75,7 +59,7 @@ class AuditEventAgent(BackboneElement):
         description="How agent participated",
         default=None,
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="Agent role in the event",
         default=None,
     )
@@ -96,11 +80,11 @@ class AuditEventAgent(BackboneElement):
         description="The agent location when the event occurred",
         default=None,
     )
-    policy: Optional[List[Uri]] = Field(
+    policy: Optional[ListType[Uri]] = Field(
         description="Policy that authorized the agent participation in the event",
         default=None,
     )
-    policy_ext: Optional[List[Optional[Element]]] = Field(
+    policy_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for policy extensions",
         default=None,
         alias="_policy",
@@ -127,7 +111,7 @@ class AuditEventAgent(BackboneElement):
         default=None,
         alias="_networkString",
     )
-    authorization: Optional[List[CodeableConcept]] = Field(
+    authorization: Optional[ListType[CodeableConcept]] = Field(
         description="Allowable authorization for this agent",
         default=None,
     )
@@ -137,27 +121,6 @@ class AuditEventAgent(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="network",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "authorization",
-                "policy",
-                "location",
-                "requestor",
-                "who",
-                "role",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -183,27 +146,10 @@ class AuditEventSource(BackboneElement):
         description="The identity of source detecting the event",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="The type of source where event originated",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "observer",
-                "site",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AuditEventEntityDetail(BackboneElement):
@@ -298,21 +244,6 @@ class AuditEventEntityDetail(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -343,7 +274,7 @@ class AuditEventEntityAgent(BackboneElement):
         description="How agent participated",
         default=None,
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="Agent role in the event",
         default=None,
     )
@@ -364,7 +295,7 @@ class AuditEventEntityAgent(BackboneElement):
         description="The agent location when the event occurred",
         default=None,
     )
-    policy: Optional[List[Uri]] = Field(
+    policy: Optional[ListType[Uri]] = Field(
         description="Policy that authorized the agent participation in the event",
         default=None,
     )
@@ -395,7 +326,7 @@ class AuditEventEntityAgent(BackboneElement):
         default=None,
         alias="_networkString",
     )
-    authorization: Optional[List[CodeableConcept]] = Field(
+    authorization: Optional[ListType[CodeableConcept]] = Field(
         description="Allowable authorization for this agent",
         default=None,
     )
@@ -405,27 +336,6 @@ class AuditEventEntityAgent(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="network",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "authorization",
-                "policy",
-                "location",
-                "requestor",
-                "who",
-                "role",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -451,7 +361,7 @@ class AuditEventEntity(BackboneElement):
         description="What role the entity played",
         default=None,
     )
-    securityLabel: Optional[List[CodeableConcept]] = Field(
+    securityLabel: Optional[ListType[CodeableConcept]] = Field(
         description="Security labels on the entity",
         default=None,
     )
@@ -464,34 +374,14 @@ class AuditEventEntity(BackboneElement):
         default=None,
         alias="_query",
     )
-    detail: Optional[List[AuditEventEntityDetail]] = Field(
+    detail: Optional[ListType[AuditEventEntityDetail]] = Field(
         description="Additional Information about the entity",
         default=None,
     )
-    agent: Optional[List[AuditEventEntityAgent]] = Field(
+    agent: Optional[ListType[AuditEventEntityAgent]] = Field(
         description="Entity is attributed to this agent",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "agent",
-                "detail",
-                "query",
-                "securityLabel",
-                "role",
-                "what",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class AuditEvent(DomainResource):
@@ -503,56 +393,7 @@ class AuditEvent(DomainResource):
     _type = "AuditEvent"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/AuditEvent"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/AuditEvent"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Type/identifier of event",
         default=None,
     )
@@ -604,11 +445,11 @@ class AuditEvent(DomainResource):
         description="Whether the event succeeded or failed",
         default=None,
     )
-    authorization: Optional[List[CodeableConcept]] = Field(
+    authorization: Optional[ListType[CodeableConcept]] = Field(
         description="Authorization related to the event",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Workflow authorization within which this event occurred",
         default=None,
     )
@@ -620,7 +461,7 @@ class AuditEvent(DomainResource):
         description="Encounter within which this event occurred or which the event is tightly associated",
         default=None,
     )
-    agent: Optional[List[AuditEventAgent]] = Field(
+    agent: Optional[ListType[AuditEventAgent]] = Field(
         description="Actor involved in the event",
         default=None,
     )
@@ -628,7 +469,7 @@ class AuditEvent(DomainResource):
         description="Audit Event Reporter",
         default=None,
     )
-    entity: Optional[List[AuditEventEntity]] = Field(
+    entity: Optional[ListType[AuditEventEntity]] = Field(
         description="Data or objects used",
         default=None,
     )
@@ -641,105 +482,10 @@ class AuditEvent(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "entity",
-                "source",
-                "agent",
-                "encounter",
-                "patient",
-                "basedOn",
-                "authorization",
-                "outcome",
-                "recorded",
-                "severity",
-                "action",
-                "code",
-                "category",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def occurred_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[Period, DateTime],
             field_name_base="occurred",
             required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -48,22 +48,6 @@ class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
         description="The place where the legal status of supply applies",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "jurisdiction",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class PackagedProductDefinitionPackagingProperty(BackboneElement):
@@ -114,21 +98,6 @@ class PackagedProductDefinitionPackagingProperty(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -152,29 +121,13 @@ class PackagedProductDefinitionPackagingContainedItem(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "amount",
-                "item",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class PackagedProductDefinitionPackaging(BackboneElement):
     """
     A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap (which is not a device or a medication manufactured item).
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier that is specific to this particular part of the packaging. Including possibly a Data Carrier Identifier",
         default=None,
     )
@@ -200,62 +153,37 @@ class PackagedProductDefinitionPackaging(BackboneElement):
         default=None,
         alias="_quantity",
     )
-    material: Optional[List[CodeableConcept]] = Field(
+    material: Optional[ListType[CodeableConcept]] = Field(
         description="Material type of the package item",
         default=None,
     )
-    alternateMaterial: Optional[List[CodeableConcept]] = Field(
+    alternateMaterial: Optional[ListType[CodeableConcept]] = Field(
         description="A possible alternate material for this part of the packaging, that is allowed to be used instead of the usual material",
         default=None,
     )
-    shelfLifeStorage: Optional[List[ProductShelfLife]] = Field(
+    shelfLifeStorage: Optional[ListType[ProductShelfLife]] = Field(
         description="Shelf Life and storage information",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this packaging item (multiple means these are all potential manufacturers)",
         default=None,
     )
-    property_: Optional[List[PackagedProductDefinitionPackagingProperty]] = Field(
+    property_: Optional[ListType[PackagedProductDefinitionPackagingProperty]] = Field(
         description="General characteristics of this item",
         default=None,
         alias="property",
     )
-    containedItem: Optional[List[PackagedProductDefinitionPackagingContainedItem]] = (
+    containedItem: Optional[ListType[PackagedProductDefinitionPackagingContainedItem]] = (
         Field(
             description="The item(s) within the packaging",
             default=None,
         )
     )
-    packaging: Optional[List["PackagedProductDefinitionPackaging"]] = Field(
+    packaging: Optional[ListType["PackagedProductDefinitionPackaging"]] = Field(
         description="Allows containers (and parts of containers) within containers, still as a part of single packaged product",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "packaging",
-                "containedItem",
-                "property_",
-                "manufacturer",
-                "shelfLifeStorage",
-                "alternateMaterial",
-                "material",
-                "quantity",
-                "componentPart",
-                "type",
-                "identifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class PackagedProductDefinitionCharacteristic(BackboneElement):
@@ -306,21 +234,6 @@ class PackagedProductDefinitionCharacteristic(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -339,58 +252,7 @@ class PackagedProductDefinition(DomainResource):
     _type = "PackagedProductDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition"
-            ]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="A unique identifier for this package as whole - not for the content of the package",
         default=None,
     )
@@ -407,7 +269,7 @@ class PackagedProductDefinition(DomainResource):
         description="A high level category e.g. medicinal product, raw material, shipping container etc",
         default=None,
     )
-    packageFor: Optional[List[Reference]] = Field(
+    packageFor: Optional[ListType[Reference]] = Field(
         description="The product that this is a pack for",
         default=None,
     )
@@ -424,7 +286,7 @@ class PackagedProductDefinition(DomainResource):
         default=None,
         alias="_statusDate",
     )
-    containedItemQuantity: Optional[List[Quantity]] = Field(
+    containedItemQuantity: Optional[ListType[Quantity]] = Field(
         description="A total of the complete count of contained items of a particular type/form, independent of sub-packaging or organization. This can be considered as the pack size. See also packaging.containedItem.amount (especially the long definition)",
         default=None,
     )
@@ -438,12 +300,12 @@ class PackagedProductDefinition(DomainResource):
         alias="_description",
     )
     legalStatusOfSupply: Optional[
-        List[PackagedProductDefinitionLegalStatusOfSupply]
+        ListType[PackagedProductDefinitionLegalStatusOfSupply]
     ] = Field(
         description="The legal status of supply of the packaged item as classified by the regulator",
         default=None,
     )
-    marketingStatus: Optional[List[MarketingStatus]] = Field(
+    marketingStatus: Optional[ListType[MarketingStatus]] = Field(
         description="Allows specifying that an item is on the market for sale, or that it is not available, and the dates and locations associated",
         default=None,
     )
@@ -456,11 +318,11 @@ class PackagedProductDefinition(DomainResource):
         default=None,
         alias="_copackagedIndicator",
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this package type (multiple means these are all possible manufacturers)",
         default=None,
     )
-    attachedDocument: Optional[List[Reference]] = Field(
+    attachedDocument: Optional[ListType[Reference]] = Field(
         description="Additional information or supporting documentation about the packaged product",
         default=None,
     )
@@ -468,104 +330,7 @@ class PackagedProductDefinition(DomainResource):
         description="A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap",
         default=None,
     )
-    characteristic: Optional[List[PackagedProductDefinitionCharacteristic]] = Field(
+    characteristic: Optional[ListType[PackagedProductDefinitionCharacteristic]] = Field(
         description='Allows the key features to be recorded, such as "hospital pack", "nurse prescribable"',
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "characteristic",
-                "packaging",
-                "attachedDocument",
-                "manufacturer",
-                "copackagedIndicator",
-                "marketingStatus",
-                "legalStatusOfSupply",
-                "description",
-                "containedItemQuantity",
-                "statusDate",
-                "status",
-                "packageFor",
-                "type",
-                "name",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

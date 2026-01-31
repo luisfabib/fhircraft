@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -78,24 +78,6 @@ class StructureMapStructure(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "alias",
-                "mode",
-                "url",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class StructureMapConst(BackboneElement):
     """
@@ -120,22 +102,6 @@ class StructureMapConst(BackboneElement):
         default=None,
         alias="_value",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class StructureMapGroupInput(BackboneElement):
@@ -179,24 +145,6 @@ class StructureMapGroupInput(BackboneElement):
         default=None,
         alias="_documentation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "mode",
-                "type",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class StructureMapGroupRuleSource(BackboneElement):
@@ -262,7 +210,7 @@ class StructureMapGroupRuleSource(BackboneElement):
         description="first | not_first | last | not_last | only_one",
         default=None,
     )
-    listMode_ext: Optional[List[Optional[Element]]] = Field(
+    listMode_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for listMode extensions",
         default=None,
         alias="_listMode",
@@ -303,31 +251,6 @@ class StructureMapGroupRuleSource(BackboneElement):
         default=None,
         alias="_logMessage",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "logMessage",
-                "check",
-                "condition",
-                "variable",
-                "listMode",
-                "element",
-                "defaultValue",
-                "type",
-                "max",
-                "min",
-                "context",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class StructureMapGroupRuleTargetParameter(BackboneElement):
@@ -457,7 +380,7 @@ class StructureMapGroupRuleTarget(BackboneElement):
         default=None,
         alias="_variable",
     )
-    listMode: Optional[List[Code]] = Field(
+    listMode: Optional[ListType[Code]] = Field(
         description="first | share | last | single",
         default=None,
     )
@@ -484,31 +407,10 @@ class StructureMapGroupRuleTarget(BackboneElement):
         default=None,
         alias="_transform",
     )
-    parameter: Optional[List[StructureMapGroupRuleTargetParameter]] = Field(
+    parameter: Optional[ListType[StructureMapGroupRuleTargetParameter]] = Field(
         description="Parameters to the transform",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "parameter",
-                "transform",
-                "listRuleId",
-                "listMode",
-                "variable",
-                "element",
-                "context",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class StructureMapGroupRuleDependentParameter(BackboneElement):
@@ -620,26 +522,10 @@ class StructureMapGroupRuleDependent(BackboneElement):
         default=None,
         alias="_name",
     )
-    parameter: Optional[List[StructureMapGroupRuleDependentParameter]] = Field(
+    parameter: Optional[ListType[StructureMapGroupRuleDependentParameter]] = Field(
         description="Parameter to pass to the rule or group",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "parameter",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class StructureMapGroupRule(BackboneElement):
@@ -656,19 +542,19 @@ class StructureMapGroupRule(BackboneElement):
         default=None,
         alias="_name",
     )
-    source: Optional[List[StructureMapGroupRuleSource]] = Field(
+    source: Optional[ListType[StructureMapGroupRuleSource]] = Field(
         description="Source inputs to the mapping",
         default=None,
     )
-    target: Optional[List[StructureMapGroupRuleTarget]] = Field(
+    target: Optional[ListType[StructureMapGroupRuleTarget]] = Field(
         description="Content to create because of this mapping rule",
         default=None,
     )
-    rule: Optional[List["StructureMapGroupRule"]] = Field(
+    rule: Optional[ListType["StructureMapGroupRule"]] = Field(
         description="Rules contained in this rule",
         default=None,
     )
-    dependent: Optional[List[StructureMapGroupRuleDependent]] = Field(
+    dependent: Optional[ListType[StructureMapGroupRuleDependent]] = Field(
         description="Which other rules to apply in the context of this rule",
         default=None,
     )
@@ -681,37 +567,6 @@ class StructureMapGroupRule(BackboneElement):
         default=None,
         alias="_documentation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "dependent",
-                "rule",
-                "target",
-                "source",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_smp_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("target",),
-            expression="element.exists() implies context.exists()",
-            human="Can only have an element if you have a context",
-            key="smp-1",
-            severity="error",
-        )
 
 
 class StructureMapGroup(BackboneElement):
@@ -755,34 +610,14 @@ class StructureMapGroup(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    input: Optional[List[StructureMapGroupInput]] = Field(
+    input: Optional[ListType[StructureMapGroupInput]] = Field(
         description="Named instance provided when invoking the map",
         default=None,
     )
-    rule: Optional[List[StructureMapGroupRule]] = Field(
+    rule: Optional[ListType[StructureMapGroupRule]] = Field(
         description="Transform Rule from source to target",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "rule",
-                "input",
-                "documentation",
-                "typeMode",
-                "extends",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class StructureMap(DomainResource):
@@ -794,55 +629,6 @@ class StructureMap(DomainResource):
     _type = "StructureMap"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/StructureMap"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/StructureMap"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this structure map, represented as a URI (globally unique)",
         default=None,
@@ -852,7 +638,7 @@ class StructureMap(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure map",
         default=None,
     )
@@ -932,7 +718,7 @@ class StructureMap(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -945,11 +731,11 @@ class StructureMap(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for structure map (if applicable)",
         default=None,
     )
@@ -980,11 +766,11 @@ class StructureMap(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    structure: Optional[List[StructureMapStructure]] = Field(
+    structure: Optional[ListType[StructureMapStructure]] = Field(
         description="Structure Definition used by this map",
         default=None,
     )
-    import_: Optional[List[Canonical]] = Field(
+    import_: Optional[ListType[Canonical]] = Field(
         description="Other maps used by this map (canonical URLs)",
         default=None,
         alias="import",
@@ -994,11 +780,11 @@ class StructureMap(DomainResource):
         default=None,
         alias="_import",
     )
-    const: Optional[List[StructureMapConst]] = Field(
+    const: Optional[ListType[StructureMapConst]] = Field(
         description="Definition of the constant value used in the map rules",
         default=None,
     )
-    group: Optional[List[StructureMapGroup]] = Field(
+    group: Optional[ListType[StructureMapGroup]] = Field(
         description="Named sections for reader convenience",
         default=None,
     )
@@ -1008,69 +794,6 @@ class StructureMap(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "group",
-                "const",
-                "import_",
-                "structure",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("url",),
-            expression="exists() implies matches('^[^|# ]+$')",
-            human="URL should not contain | or # - these characters make processing canonical references problematic",
-            key="cnl-1",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -1090,4 +813,26 @@ class StructureMap(DomainResource):
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="cnl-0",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_cnl_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("url",),
+            expression="exists() implies matches('^[^|# ]+$')",
+            human="URL should not contain | or # - these characters make processing canonical references problematic",
+            key="cnl-1",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_smp_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.rule.target",),
+            expression="element.exists() implies context.exists()",
+            human="Can only have an element if you have a context",
+            key="smp-1",
+            severity="error",
         )

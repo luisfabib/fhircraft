@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -87,37 +87,17 @@ class ContractContentDefinition(BackboneElement):
         alias="_copyright",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "copyright",
-                "publicationStatus",
-                "publicationDate",
-                "publisher",
-                "subType",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ContractTermSecurityLabel(BackboneElement):
     """
     Security labels that protect the handling of information about the term and its elements, which may be specifically identified.
     """
 
-    number: Optional[List[UnsignedInt]] = Field(
+    number: Optional[ListType[UnsignedInt]] = Field(
         description="Link to Security Labels",
         default=None,
     )
-    number_ext: Optional[List[Optional[Element]]] = Field(
+    number_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for number extensions",
         default=None,
         alias="_number",
@@ -126,32 +106,14 @@ class ContractTermSecurityLabel(BackboneElement):
         description="Confidentiality Protection",
         default=None,
     )
-    category: Optional[List[Coding]] = Field(
+    category: Optional[ListType[Coding]] = Field(
         description="Applicable Policy",
         default=None,
     )
-    control: Optional[List[Coding]] = Field(
+    control: Optional[ListType[Coding]] = Field(
         description="Handling Instructions",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "control",
-                "category",
-                "classification",
-                "number",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ContractTermOfferParty(BackboneElement):
@@ -159,7 +121,7 @@ class ContractTermOfferParty(BackboneElement):
     Offer Recipient.
     """
 
-    reference: Optional[List[Reference]] = Field(
+    reference: Optional[ListType[Reference]] = Field(
         description="Referenced entity",
         default=None,
     )
@@ -167,22 +129,6 @@ class ContractTermOfferParty(BackboneElement):
         description="Participant engagement type",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "role",
-                "reference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ContractTermOfferAnswer(BackboneElement):
@@ -314,11 +260,11 @@ class ContractTermOffer(BackboneElement):
     The matter of concern in the context of this provision of the agrement.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Offer business ID",
         default=None,
     )
-    party: Optional[List[ContractTermOfferParty]] = Field(
+    party: Optional[ListType[ContractTermOfferParty]] = Field(
         description="Offer Recipient",
         default=None,
     )
@@ -334,11 +280,11 @@ class ContractTermOffer(BackboneElement):
         description="Accepting party choice",
         default=None,
     )
-    decisionMode: Optional[List[CodeableConcept]] = Field(
+    decisionMode: Optional[ListType[CodeableConcept]] = Field(
         description="How decision is conveyed",
         default=None,
     )
-    answer: Optional[List[ContractTermOfferAnswer]] = Field(
+    answer: Optional[ListType[ContractTermOfferAnswer]] = Field(
         description="Response to offer text",
         default=None,
     )
@@ -351,48 +297,24 @@ class ContractTermOffer(BackboneElement):
         default=None,
         alias="_text",
     )
-    linkId: Optional[List[String]] = Field(
+    linkId: Optional[ListType[String]] = Field(
         description="Pointer to text",
         default=None,
     )
-    linkId_ext: Optional[List[Optional[Element]]] = Field(
+    linkId_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for linkId extensions",
         default=None,
         alias="_linkId",
     )
-    securityLabelNumber: Optional[List[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
         description="Offer restriction numbers",
         default=None,
     )
-    securityLabelNumber_ext: Optional[List[Optional[Element]]] = Field(
+    securityLabelNumber_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for securityLabelNumber extensions",
         default=None,
         alias="_securityLabelNumber",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "securityLabelNumber",
-                "linkId",
-                "text",
-                "answer",
-                "decisionMode",
-                "decision",
-                "type",
-                "topic",
-                "party",
-                "identifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ContractTermAssetContext(BackboneElement):
@@ -404,7 +326,7 @@ class ContractTermAssetContext(BackboneElement):
         description="Creator,custodian or owner",
         default=None,
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Codeable asset context",
         default=None,
     )
@@ -417,23 +339,6 @@ class ContractTermAssetContext(BackboneElement):
         default=None,
         alias="_text",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "text",
-                "code",
-                "reference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ContractTermAssetAnswer(BackboneElement):
@@ -642,7 +547,7 @@ class ContractTermAssetValuedItem(BackboneElement):
         description="Who will receive payment",
         default=None,
     )
-    linkId: Optional[List[String]] = Field(
+    linkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -651,7 +556,7 @@ class ContractTermAssetValuedItem(BackboneElement):
         default=None,
         alias="_linkId",
     )
-    securityLabelNumber: Optional[List[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
         description="Security Labels that define affected terms",
         default=None,
     )
@@ -666,33 +571,6 @@ class ContractTermAssetValuedItem(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="entity",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "securityLabelNumber",
-                "linkId",
-                "recipient",
-                "responsible",
-                "paymentDate",
-                "payment",
-                "net",
-                "points",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "effectiveTime",
-                "identifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -714,15 +592,15 @@ class ContractTermAsset(BackboneElement):
         description="Range of asset",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Asset category",
         default=None,
     )
-    typeReference: Optional[List[Reference]] = Field(
+    typeReference: Optional[ListType[Reference]] = Field(
         description="Associated entities",
         default=None,
     )
-    subtype: Optional[List[CodeableConcept]] = Field(
+    subtype: Optional[ListType[CodeableConcept]] = Field(
         description="Asset sub-category",
         default=None,
     )
@@ -730,7 +608,7 @@ class ContractTermAsset(BackboneElement):
         description="Kinship of the asset",
         default=None,
     )
-    context: Optional[List[ContractTermAssetContext]] = Field(
+    context: Optional[ListType[ContractTermAssetContext]] = Field(
         description="Circumstance of the asset",
         default=None,
     )
@@ -743,15 +621,15 @@ class ContractTermAsset(BackboneElement):
         default=None,
         alias="_condition",
     )
-    periodType: Optional[List[CodeableConcept]] = Field(
+    periodType: Optional[ListType[CodeableConcept]] = Field(
         description="Asset availability types",
         default=None,
     )
-    period: Optional[List[Period]] = Field(
+    period: Optional[ListType[Period]] = Field(
         description="Time period of the asset",
         default=None,
     )
-    usePeriod: Optional[List[Period]] = Field(
+    usePeriod: Optional[ListType[Period]] = Field(
         description="Time period",
         default=None,
     )
@@ -764,7 +642,7 @@ class ContractTermAsset(BackboneElement):
         default=None,
         alias="_text",
     )
-    linkId: Optional[List[String]] = Field(
+    linkId: Optional[ListType[String]] = Field(
         description="Pointer to asset text",
         default=None,
     )
@@ -773,11 +651,11 @@ class ContractTermAsset(BackboneElement):
         default=None,
         alias="_linkId",
     )
-    answer: Optional[List[ContractTermAssetAnswer]] = Field(
+    answer: Optional[ListType[ContractTermAssetAnswer]] = Field(
         description="Response to assets",
         default=None,
     )
-    securityLabelNumber: Optional[List[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
         description="Asset restriction numbers",
         default=None,
     )
@@ -786,39 +664,10 @@ class ContractTermAsset(BackboneElement):
         default=None,
         alias="_securityLabelNumber",
     )
-    valuedItem: Optional[List[ContractTermAssetValuedItem]] = Field(
+    valuedItem: Optional[ListType[ContractTermAssetValuedItem]] = Field(
         description="Contract Valued Item List",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "valuedItem",
-                "securityLabelNumber",
-                "answer",
-                "linkId",
-                "text",
-                "usePeriod",
-                "period",
-                "periodType",
-                "condition",
-                "context",
-                "relationship",
-                "subtype",
-                "typeReference",
-                "type",
-                "scope",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ContractTermActionSubject(BackboneElement):
@@ -826,7 +675,7 @@ class ContractTermActionSubject(BackboneElement):
     Entity of the action.
     """
 
-    reference: Optional[List[Reference]] = Field(
+    reference: Optional[ListType[Reference]] = Field(
         description="Entity of the action",
         default=None,
     )
@@ -834,22 +683,6 @@ class ContractTermActionSubject(BackboneElement):
         description="Role type of the agent",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "role",
-                "reference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ContractTermAction(BackboneElement):
@@ -870,7 +703,7 @@ class ContractTermAction(BackboneElement):
         description="Type or form of the action",
         default=None,
     )
-    subject: Optional[List[ContractTermActionSubject]] = Field(
+    subject: Optional[ListType[ContractTermActionSubject]] = Field(
         description="Entity of the action",
         default=None,
     )
@@ -878,7 +711,7 @@ class ContractTermAction(BackboneElement):
         description="Purpose for the Contract Term Action",
         default=None,
     )
-    linkId: Optional[List[String]] = Field(
+    linkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
@@ -895,11 +728,11 @@ class ContractTermAction(BackboneElement):
         description="Episode associated with action",
         default=None,
     )
-    contextLinkId: Optional[List[String]] = Field(
+    contextLinkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
-    contextLinkId_ext: Optional[List[Optional[Element]]] = Field(
+    contextLinkId_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for contextLinkId extensions",
         default=None,
         alias="_contextLinkId",
@@ -921,20 +754,20 @@ class ContractTermAction(BackboneElement):
         description="When action happens",
         default=None,
     )
-    requester: Optional[List[Reference]] = Field(
+    requester: Optional[ListType[Reference]] = Field(
         description="Who asked for action",
         default=None,
     )
-    requesterLinkId: Optional[List[String]] = Field(
+    requesterLinkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
-    requesterLinkId_ext: Optional[List[Optional[Element]]] = Field(
+    requesterLinkId_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for requesterLinkId extensions",
         default=None,
         alias="_requesterLinkId",
     )
-    performerType: Optional[List[CodeableConcept]] = Field(
+    performerType: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of service performer",
         default=None,
     )
@@ -946,33 +779,33 @@ class ContractTermAction(BackboneElement):
         description="Actor that wil execute (or not) the action",
         default=None,
     )
-    performerLinkId: Optional[List[String]] = Field(
+    performerLinkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
-    performerLinkId_ext: Optional[List[Optional[Element]]] = Field(
+    performerLinkId_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for performerLinkId extensions",
         default=None,
         alias="_performerLinkId",
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why is action (not) needed?",
         default=None,
     )
-    reasonLinkId: Optional[List[String]] = Field(
+    reasonLinkId: Optional[ListType[String]] = Field(
         description="Pointer to specific item",
         default=None,
     )
-    reasonLinkId_ext: Optional[List[Optional[Element]]] = Field(
+    reasonLinkId_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for reasonLinkId extensions",
         default=None,
         alias="_reasonLinkId",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments about the action",
         default=None,
     )
-    securityLabelNumber: Optional[List[UnsignedInt]] = Field(
+    securityLabelNumber: Optional[ListType[UnsignedInt]] = Field(
         description="Action restriction numbers",
         default=None,
     )
@@ -987,38 +820,6 @@ class ContractTermAction(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="occurrence",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "securityLabelNumber",
-                "note",
-                "reasonLinkId",
-                "reason",
-                "performerLinkId",
-                "performer",
-                "performerRole",
-                "performerType",
-                "requesterLinkId",
-                "requester",
-                "contextLinkId",
-                "context",
-                "status",
-                "linkId",
-                "intent",
-                "subject",
-                "type",
-                "doNotPerform",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -1078,7 +879,7 @@ class ContractTerm(BackboneElement):
         default=None,
         alias="_text",
     )
-    securityLabel: Optional[List[ContractTermSecurityLabel]] = Field(
+    securityLabel: Optional[ListType[ContractTermSecurityLabel]] = Field(
         description="Protection for the Term",
         default=None,
     )
@@ -1086,15 +887,15 @@ class ContractTerm(BackboneElement):
         description="Context of the Contract term",
         default=None,
     )
-    asset: Optional[List[ContractTermAsset]] = Field(
+    asset: Optional[ListType[ContractTermAsset]] = Field(
         description="Contract Term Asset List",
         default=None,
     )
-    action: Optional[List[ContractTermAction]] = Field(
+    action: Optional[ListType[ContractTermAction]] = Field(
         description="Entity being ascribed responsibility",
         default=None,
     )
-    group: Optional[List["ContractTerm"]] = Field(
+    group: Optional[ListType["ContractTerm"]] = Field(
         description="Nested Contract Term Group",
         default=None,
     )
@@ -1104,31 +905,6 @@ class ContractTerm(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="topic",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "group",
-                "action",
-                "asset",
-                "offer",
-                "securityLabel",
-                "text",
-                "subType",
-                "type",
-                "applies",
-                "issued",
-                "identifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -1154,27 +930,10 @@ class ContractSigner(BackboneElement):
         description="Contract Signatory Party",
         default=None,
     )
-    signature: Optional[List[Signature]] = Field(
+    signature: Optional[ListType[Signature]] = Field(
         description="Contract Documentation Signature",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "signature",
-                "party",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ContractFriendly(BackboneElement):
@@ -1279,56 +1038,7 @@ class Contract(DomainResource):
     _type = "Contract"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Contract"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Contract"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Contract number",
         default=None,
     )
@@ -1397,19 +1107,19 @@ class Contract(DomainResource):
         description="Contract cessation cause",
         default=None,
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="Contract Target Entity",
         default=None,
     )
-    authority: Optional[List[Reference]] = Field(
+    authority: Optional[ListType[Reference]] = Field(
         description="Authority under which this Contract has standing",
         default=None,
     )
-    domain: Optional[List[Reference]] = Field(
+    domain: Optional[ListType[Reference]] = Field(
         description="A sphere of control governed by an authoritative jurisdiction, organization, or person",
         default=None,
     )
-    site: Optional[List[Reference]] = Field(
+    site: Optional[ListType[Reference]] = Field(
         description="Specific Location",
         default=None,
     )
@@ -1440,11 +1150,11 @@ class Contract(DomainResource):
         default=None,
         alias="_subtitle",
     )
-    alias: Optional[List[String]] = Field(
+    alias: Optional[ListType[String]] = Field(
         description="Acronym or short name",
         default=None,
     )
-    alias_ext: Optional[List[Optional[Element]]] = Field(
+    alias_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",
@@ -1469,7 +1179,7 @@ class Contract(DomainResource):
         description="Legal instrument category",
         default=None,
     )
-    subType: Optional[List[CodeableConcept]] = Field(
+    subType: Optional[ListType[CodeableConcept]] = Field(
         description="Subtype within the context of type",
         default=None,
     )
@@ -1477,31 +1187,31 @@ class Contract(DomainResource):
         description="Contract precursor content",
         default=None,
     )
-    term: Optional[List[ContractTerm]] = Field(
+    term: Optional[ListType[ContractTerm]] = Field(
         description="Contract Term List",
         default=None,
     )
-    supportingInfo: Optional[List[Reference]] = Field(
+    supportingInfo: Optional[ListType[Reference]] = Field(
         description="Extra Information",
         default=None,
     )
-    relevantHistory: Optional[List[Reference]] = Field(
+    relevantHistory: Optional[ListType[Reference]] = Field(
         description="Key event in Contract History",
         default=None,
     )
-    signer: Optional[List[ContractSigner]] = Field(
+    signer: Optional[ListType[ContractSigner]] = Field(
         description="Contract Signatory",
         default=None,
     )
-    friendly: Optional[List[ContractFriendly]] = Field(
+    friendly: Optional[ListType[ContractFriendly]] = Field(
         description="Contract Friendly Language",
         default=None,
     )
-    legal: Optional[List[ContractLegal]] = Field(
+    legal: Optional[ListType[ContractLegal]] = Field(
         description="Contract Legal Language",
         default=None,
     )
-    rule: Optional[List[ContractRule]] = Field(
+    rule: Optional[ListType[ContractRule]] = Field(
         description="Computable Contract Language",
         default=None,
     )
@@ -1529,69 +1239,6 @@ class Contract(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "rule",
-                "legal",
-                "friendly",
-                "signer",
-                "relevantHistory",
-                "supportingInfo",
-                "term",
-                "contentDefinition",
-                "subType",
-                "type",
-                "scope",
-                "author",
-                "alias",
-                "subtitle",
-                "title",
-                "name",
-                "site",
-                "domain",
-                "authority",
-                "subject",
-                "expirationType",
-                "applies",
-                "issued",
-                "contentDerivative",
-                "instantiatesUri",
-                "instantiatesCanonical",
-                "legalState",
-                "status",
-                "version",
-                "url",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def topic_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -1607,54 +1254,4 @@ class Contract(DomainResource):
             field_types=[Attachment, Reference],
             field_name_base="legallyBinding",
             required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )

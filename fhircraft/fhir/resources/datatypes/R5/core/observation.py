@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -68,23 +68,6 @@ class ObservationTriggeredBy(BackboneElement):
         alias="_reason",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reason",
-                "type",
-                "observation",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ObservationReferenceRange(BackboneElement):
     """
@@ -107,7 +90,7 @@ class ObservationReferenceRange(BackboneElement):
         description="Reference range qualifier",
         default=None,
     )
-    appliesTo: Optional[List[CodeableConcept]] = Field(
+    appliesTo: Optional[ListType[CodeableConcept]] = Field(
         description="Reference range population",
         default=None,
     )
@@ -124,27 +107,6 @@ class ObservationReferenceRange(BackboneElement):
         default=None,
         alias="_text",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "text",
-                "age",
-                "appliesTo",
-                "type",
-                "normalValue",
-                "high",
-                "low",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ObservationComponentReferenceRange(BackboneElement):
@@ -168,7 +130,7 @@ class ObservationComponentReferenceRange(BackboneElement):
         description="Reference range qualifier",
         default=None,
     )
-    appliesTo: Optional[List[CodeableConcept]] = Field(
+    appliesTo: Optional[ListType[CodeableConcept]] = Field(
         description="Reference range population",
         default=None,
     )
@@ -185,27 +147,6 @@ class ObservationComponentReferenceRange(BackboneElement):
         default=None,
         alias="_text",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "text",
-                "age",
-                "appliesTo",
-                "type",
-                "normalValue",
-                "high",
-                "low",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ObservationComponent(BackboneElement):
@@ -298,11 +239,11 @@ class ObservationComponent(BackboneElement):
         description="Why the component result is missing",
         default=None,
     )
-    interpretation: Optional[List[CodeableConcept]] = Field(
+    interpretation: Optional[ListType[CodeableConcept]] = Field(
         description="High, low, normal, etc",
         default=None,
     )
-    referenceRange: Optional[List[ObservationComponentReferenceRange]] = Field(
+    referenceRange: Optional[ListType[ObservationComponentReferenceRange]] = Field(
         description="Provides guide for interpretation of component result",
         default=None,
     )
@@ -312,24 +253,6 @@ class ObservationComponent(BackboneElement):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="value",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "referenceRange",
-                "interpretation",
-                "dataAbsentReason",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -365,56 +288,7 @@ class Observation(DomainResource):
     _type = "Observation"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Observation"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Observation"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for observation",
         default=None,
     )
@@ -431,15 +305,15 @@ class Observation(DomainResource):
         description="Instantiates FHIR ObservationDefinition",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal or order",
         default=None,
     )
-    triggeredBy: Optional[List[ObservationTriggeredBy]] = Field(
+    triggeredBy: Optional[ListType[ObservationTriggeredBy]] = Field(
         description="Triggering observation(s)",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -452,7 +326,7 @@ class Observation(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of  type of observation",
         default=None,
     )
@@ -464,7 +338,7 @@ class Observation(DomainResource):
         description="Who and/or what the observation is about",
         default=None,
     )
-    focus: Optional[List[Reference]] = Field(
+    focus: Optional[ListType[Reference]] = Field(
         description="What the observation is about, when it is not about the subject of record",
         default=None,
     )
@@ -507,7 +381,7 @@ class Observation(DomainResource):
         default=None,
         alias="_issued",
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Who is responsible for the observation",
         default=None,
     )
@@ -592,11 +466,11 @@ class Observation(DomainResource):
         description="Why the result is missing",
         default=None,
     )
-    interpretation: Optional[List[CodeableConcept]] = Field(
+    interpretation: Optional[ListType[CodeableConcept]] = Field(
         description="High, low, normal, etc",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments about the observation",
         default=None,
     )
@@ -620,19 +494,19 @@ class Observation(DomainResource):
         description="A reference to the device that generates the measurements or the device settings for the device",
         default=None,
     )
-    referenceRange: Optional[List[ObservationReferenceRange]] = Field(
+    referenceRange: Optional[ListType[ObservationReferenceRange]] = Field(
         description="Provides guide for interpretation",
         default=None,
     )
-    hasMember: Optional[List[Reference]] = Field(
+    hasMember: Optional[ListType[Reference]] = Field(
         description="Related resource that belongs to the Observation group",
         default=None,
     )
-    derivedFrom: Optional[List[Reference]] = Field(
+    derivedFrom: Optional[ListType[Reference]] = Field(
         description="Related resource from which the observation is made",
         default=None,
     )
-    component: Optional[List[ObservationComponent]] = Field(
+    component: Optional[ListType[ObservationComponent]] = Field(
         description="Component results",
         default=None,
     )
@@ -656,84 +530,6 @@ class Observation(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="value",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "component",
-                "derivedFrom",
-                "hasMember",
-                "referenceRange",
-                "device",
-                "specimen",
-                "method",
-                "bodyStructure",
-                "bodySite",
-                "note",
-                "interpretation",
-                "dataAbsentReason",
-                "performer",
-                "issued",
-                "encounter",
-                "focus",
-                "subject",
-                "code",
-                "category",
-                "status",
-                "partOf",
-                "triggeredBy",
-                "basedOn",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_obs_9_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("specimen",),
-            expression="(reference.resolve().exists() and reference.resolve() is Group) implies reference.resolve().member.entity.resolve().all($this is Specimen)",
-            human="If Observation.specimen is a reference to Group, the group can only have specimens",
-            key="obs-9",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_obs_3_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("referenceRange",),
-            expression="low.exists() or high.exists() or text.exists()",
-            human="Must have at least a low or a high or text",
-            key="obs-3",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -778,53 +574,14 @@ class Observation(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
+    def FHIR_obs_3_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
             self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
+            elements=("referenceRange",),
+            expression="low.exists() or high.exists() or text.exists()",
+            human="Must have at least a low or a high or text",
+            key="obs-3",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -854,5 +611,16 @@ class Observation(DomainResource):
             expression="bodySite.exists() implies bodyStructure.empty()",
             human="bodyStructure SHALL only be present if Observation.bodySite is not present",
             key="obs-8",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_obs_9_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("specimen",),
+            expression="(reference.resolve().exists() and reference.resolve() is Group) implies reference.resolve().member.entity.resolve().all($this is Specimen)",
+            human="If Observation.specimen is a reference to Group, the group can only have specimens",
+            key="obs-9",
             severity="error",
         )

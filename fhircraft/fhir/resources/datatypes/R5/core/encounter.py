@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -30,7 +30,7 @@ class EncounterParticipant(BackboneElement):
     The list of people responsible for providing the service.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in encounter",
         default=None,
     )
@@ -43,53 +43,20 @@ class EncounterParticipant(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "actor",
-                "period",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class EncounterReason(BackboneElement):
     """
     The list of medical reasons that are expected to be addressed during the episode of care.
     """
 
-    use: Optional[List[CodeableConcept]] = Field(
+    use: Optional[ListType[CodeableConcept]] = Field(
         description="What the reason value should be used for/as",
         default=None,
     )
-    value: Optional[List[CodeableReference]] = Field(
+    value: Optional[ListType[CodeableReference]] = Field(
         description="Reason the encounter takes place (core or reference)",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "use",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EncounterDiagnosis(BackboneElement):
@@ -97,30 +64,14 @@ class EncounterDiagnosis(BackboneElement):
     The list of diagnosis relevant to this encounter.
     """
 
-    condition: Optional[List[CodeableReference]] = Field(
+    condition: Optional[ListType[CodeableReference]] = Field(
         description="The diagnosis relevant to the encounter",
         default=None,
     )
-    use: Optional[List[CodeableConcept]] = Field(
+    use: Optional[ListType[CodeableConcept]] = Field(
         description="Role that this diagnosis has within the encounter (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "use",
-                "condition",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class EncounterAdmission(BackboneElement):
@@ -155,26 +106,6 @@ class EncounterAdmission(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "dischargeDisposition",
-                "destination",
-                "reAdmission",
-                "admitSource",
-                "origin",
-                "preAdmissionIdentifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class EncounterLocation(BackboneElement):
     """
@@ -203,24 +134,6 @@ class EncounterLocation(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "period",
-                "form",
-                "status",
-                "location",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class Encounter(DomainResource):
     """
@@ -231,56 +144,7 @@ class Encounter(DomainResource):
     _type = "Encounter"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Encounter"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Encounter"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
@@ -293,7 +157,7 @@ class Encounter(DomainResource):
         default=None,
         alias="_status",
     )
-    class_: Optional[List[CodeableConcept]] = Field(
+    class_: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of patient encounter context - e.g. Inpatient, outpatient",
         default=None,
         alias="class",
@@ -302,11 +166,11 @@ class Encounter(DomainResource):
         description="Indicates the urgency of the encounter",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Specific type of encounter (e.g. e-mail consultation, surgical day-care, ...)",
         default=None,
     )
-    serviceType: Optional[List[CodeableReference]] = Field(
+    serviceType: Optional[ListType[CodeableReference]] = Field(
         description="Specific type of service",
         default=None,
     )
@@ -318,15 +182,15 @@ class Encounter(DomainResource):
         description="The current status of the subject in relation to the Encounter",
         default=None,
     )
-    episodeOfCare: Optional[List[Reference]] = Field(
+    episodeOfCare: Optional[ListType[Reference]] = Field(
         description="Episode(s) of care that this encounter should be recorded against",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="The request that initiated this encounter",
         default=None,
     )
-    careTeam: Optional[List[Reference]] = Field(
+    careTeam: Optional[ListType[Reference]] = Field(
         description="The group(s) that are allocated to participate in this encounter",
         default=None,
     )
@@ -338,15 +202,15 @@ class Encounter(DomainResource):
         description="The organization (facility) responsible for this encounter",
         default=None,
     )
-    participant: Optional[List[EncounterParticipant]] = Field(
+    participant: Optional[ListType[EncounterParticipant]] = Field(
         description="List of participants involved in the encounter",
         default=None,
     )
-    appointment: Optional[List[Reference]] = Field(
+    appointment: Optional[ListType[Reference]] = Field(
         description="The appointment that scheduled this encounter",
         default=None,
     )
-    virtualService: Optional[List[VirtualServiceDetail]] = Field(
+    virtualService: Optional[ListType[VirtualServiceDetail]] = Field(
         description="Connection details of a virtual service (e.g. conference call)",
         default=None,
     )
@@ -376,27 +240,27 @@ class Encounter(DomainResource):
         description="Actual quantity of time the encounter lasted (less time absent)",
         default=None,
     )
-    reason: Optional[List[EncounterReason]] = Field(
+    reason: Optional[ListType[EncounterReason]] = Field(
         description="The list of medical reasons that are expected to be addressed during the episode of care",
         default=None,
     )
-    diagnosis: Optional[List[EncounterDiagnosis]] = Field(
+    diagnosis: Optional[ListType[EncounterDiagnosis]] = Field(
         description="The list of diagnosis relevant to this encounter",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="The set of accounts that may be used for billing for this Encounter",
         default=None,
     )
-    dietPreference: Optional[List[CodeableConcept]] = Field(
+    dietPreference: Optional[ListType[CodeableConcept]] = Field(
         description="Diet preferences reported by the patient",
         default=None,
     )
-    specialArrangement: Optional[List[CodeableConcept]] = Field(
+    specialArrangement: Optional[ListType[CodeableConcept]] = Field(
         description="Wheelchair, translator, stretcher, etc",
         default=None,
     )
-    specialCourtesy: Optional[List[CodeableConcept]] = Field(
+    specialCourtesy: Optional[ListType[CodeableConcept]] = Field(
         description="Special courtesies (VIP, board member)",
         default=None,
     )
@@ -404,70 +268,10 @@ class Encounter(DomainResource):
         description="Details about the admission to a healthcare service",
         default=None,
     )
-    location: Optional[List[EncounterLocation]] = Field(
+    location: Optional[ListType[EncounterLocation]] = Field(
         description="List of locations where the patient has been",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "location",
-                "admission",
-                "specialCourtesy",
-                "specialArrangement",
-                "dietPreference",
-                "account",
-                "diagnosis",
-                "reason",
-                "length",
-                "plannedEndDate",
-                "plannedStartDate",
-                "actualPeriod",
-                "virtualService",
-                "appointment",
-                "participant",
-                "serviceProvider",
-                "partOf",
-                "careTeam",
-                "basedOn",
-                "episodeOfCare",
-                "subjectStatus",
-                "subject",
-                "serviceType",
-                "type",
-                "priority",
-                "class_",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_enc_1_constraint_validator(self):
@@ -489,54 +293,4 @@ class Encounter(DomainResource):
             human="A type cannot be provided for a patient or group participant",
             key="enc-2",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )

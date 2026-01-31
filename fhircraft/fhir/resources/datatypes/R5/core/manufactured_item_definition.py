@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -93,21 +93,6 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -130,40 +115,22 @@ class ManufacturedItemDefinitionComponentConstituent(BackboneElement):
     A reference to a constituent of the manufactured item as a whole, linked here so that its component location within the item can be indicated. This not where the item's ingredient are primarily stated (for which see Ingredient.for or ManufacturedItemDefinition.ingredient).
     """
 
-    amount: Optional[List[Quantity]] = Field(
+    amount: Optional[ListType[Quantity]] = Field(
         description="The measurable amount of the substance, expressable in different ways (e.g. by mass or volume)",
         default=None,
     )
-    location: Optional[List[CodeableConcept]] = Field(
+    location: Optional[ListType[CodeableConcept]] = Field(
         description="The physical location of the constituent/ingredient within the component",
         default=None,
     )
-    function: Optional[List[CodeableConcept]] = Field(
+    function: Optional[ListType[CodeableConcept]] = Field(
         description="The function of this constituent within the component e.g. binder",
         default=None,
     )
-    hasIngredient: Optional[List[CodeableReference]] = Field(
+    hasIngredient: Optional[ListType[CodeableReference]] = Field(
         description="The ingredient that is the constituent of the given component",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "hasIngredient",
-                "function",
-                "location",
-                "amount",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ManufacturedItemDefinitionComponentProperty(BackboneElement):
@@ -227,21 +194,6 @@ class ManufacturedItemDefinitionComponentProperty(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -268,47 +220,27 @@ class ManufacturedItemDefinitionComponent(BackboneElement):
         description="Defining type of the component e.g. shell, layer, ink",
         default=None,
     )
-    function: Optional[List[CodeableConcept]] = Field(
+    function: Optional[ListType[CodeableConcept]] = Field(
         description="The function of this component within the item e.g. delivers active ingredient, masks taste",
         default=None,
     )
-    amount: Optional[List[Quantity]] = Field(
+    amount: Optional[ListType[Quantity]] = Field(
         description="The measurable amount of total quantity of all substances in the component, expressable in different ways (e.g. by mass or volume)",
         default=None,
     )
-    constituent: Optional[List[ManufacturedItemDefinitionComponentConstituent]] = Field(
+    constituent: Optional[ListType[ManufacturedItemDefinitionComponentConstituent]] = Field(
         description="A reference to a constituent of the manufactured item as a whole, linked here so that its component location within the item can be indicated. This not where the item\u0027s ingredient are primarily stated (for which see Ingredient.for or ManufacturedItemDefinition.ingredient)",
         default=None,
     )
-    property_: Optional[List[ManufacturedItemDefinitionComponentProperty]] = Field(
+    property_: Optional[ListType[ManufacturedItemDefinitionComponentProperty]] = Field(
         description="General characteristics of this component",
         default=None,
         alias="property",
     )
-    component: Optional[List["ManufacturedItemDefinitionComponent"]] = Field(
+    component: Optional[ListType["ManufacturedItemDefinitionComponent"]] = Field(
         description="A component that this component contains or is made from",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "component",
-                "property_",
-                "constituent",
-                "amount",
-                "function",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ManufacturedItemDefinition(DomainResource):
@@ -322,58 +254,7 @@ class ManufacturedItemDefinition(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition"
     )
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition"
-            ]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique identifier",
         default=None,
     )
@@ -403,116 +284,24 @@ class ManufacturedItemDefinition(DomainResource):
         description="The \u201creal-world\u201d units in which the quantity of the item is described",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of the item, one of several possible",
         default=None,
     )
-    marketingStatus: Optional[List[MarketingStatus]] = Field(
+    marketingStatus: Optional[ListType[MarketingStatus]] = Field(
         description="Allows specifying that an item is on the market for sale, or that it is not available, and the dates and locations associated",
         default=None,
     )
-    ingredient: Optional[List[CodeableConcept]] = Field(
+    ingredient: Optional[ListType[CodeableConcept]] = Field(
         description="The ingredients of this manufactured item. Only needed if these are not specified by incoming references from the Ingredient resource",
         default=None,
     )
-    property_: Optional[List[ManufacturedItemDefinitionProperty]] = Field(
+    property_: Optional[ListType[ManufacturedItemDefinitionProperty]] = Field(
         description="General characteristics of this item",
         default=None,
         alias="property",
     )
-    component: Optional[List[ManufacturedItemDefinitionComponent]] = Field(
+    component: Optional[ListType[ManufacturedItemDefinitionComponent]] = Field(
         description="Physical parts of the manufactured item, that it is intrisically made from. This is distinct from the ingredients that are part of its chemical makeup",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "component",
-                "property_",
-                "ingredient",
-                "marketingStatus",
-                "manufacturer",
-                "unitOfPresentation",
-                "manufacturedDoseForm",
-                "name",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

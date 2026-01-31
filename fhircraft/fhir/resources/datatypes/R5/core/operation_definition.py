@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -56,22 +56,6 @@ class OperationDefinitionParameterBinding(BackboneElement):
         alias="_valueSet",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "valueSet",
-                "strength",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class OperationDefinitionParameterReferencedFrom(BackboneElement):
     """
@@ -97,22 +81,6 @@ class OperationDefinitionParameterReferencedFrom(BackboneElement):
         alias="_sourceId",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "sourceId",
-                "source",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class OperationDefinitionParameter(BackboneElement):
     """
@@ -137,11 +105,11 @@ class OperationDefinitionParameter(BackboneElement):
         default=None,
         alias="_use",
     )
-    scope: Optional[List[Code]] = Field(
+    scope: Optional[ListType[Code]] = Field(
         description="instance | type | system",
         default=None,
     )
-    scope_ext: Optional[List[Optional[Element]]] = Field(
+    scope_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for scope extensions",
         default=None,
         alias="_scope",
@@ -182,20 +150,20 @@ class OperationDefinitionParameter(BackboneElement):
         default=None,
         alias="_type",
     )
-    allowedType: Optional[List[Code]] = Field(
+    allowedType: Optional[ListType[Code]] = Field(
         description="Allowed sub-type this parameter can have (if type is abstract)",
         default=None,
     )
-    allowedType_ext: Optional[List[Optional[Element]]] = Field(
+    allowedType_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for allowedType extensions",
         default=None,
         alias="_allowedType",
     )
-    targetProfile: Optional[List[Canonical]] = Field(
+    targetProfile: Optional[ListType[Canonical]] = Field(
         description="If type is Reference | canonical, allowed targets. If type is \u0027Resource\u0027, then this constrains the allowed resource types",
         default=None,
     )
-    targetProfile_ext: Optional[List[Optional[Element]]] = Field(
+    targetProfile_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for targetProfile extensions",
         default=None,
         alias="_targetProfile",
@@ -213,41 +181,14 @@ class OperationDefinitionParameter(BackboneElement):
         description="ValueSet details if this is coded",
         default=None,
     )
-    referencedFrom: Optional[List[OperationDefinitionParameterReferencedFrom]] = Field(
+    referencedFrom: Optional[ListType[OperationDefinitionParameterReferencedFrom]] = Field(
         description="References to this parameter",
         default=None,
     )
-    part: Optional[List["OperationDefinitionParameter"]] = Field(
+    part: Optional[ListType["OperationDefinitionParameter"]] = Field(
         description="Parts of a nested Parameter",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "part",
-                "referencedFrom",
-                "binding",
-                "searchType",
-                "targetProfile",
-                "allowedType",
-                "type",
-                "documentation",
-                "max",
-                "min",
-                "scope",
-                "use",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class OperationDefinitionOverload(BackboneElement):
@@ -255,11 +196,11 @@ class OperationDefinitionOverload(BackboneElement):
     Defines an appropriate combination of parameters to use when invoking this operation, to help code generators when generating overloaded parameter sets for this operation.
     """
 
-    parameterName: Optional[List[String]] = Field(
+    parameterName: Optional[ListType[String]] = Field(
         description="Name of parameter to include in overload",
         default=None,
     )
-    parameterName_ext: Optional[List[Optional[Element]]] = Field(
+    parameterName_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for parameterName extensions",
         default=None,
         alias="_parameterName",
@@ -274,22 +215,6 @@ class OperationDefinitionOverload(BackboneElement):
         alias="_comment",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "comment",
-                "parameterName",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class OperationDefinition(DomainResource):
     """
@@ -300,55 +225,6 @@ class OperationDefinition(DomainResource):
     _type = "OperationDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/OperationDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/OperationDefinition"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this operation definition, represented as an absolute URI (globally unique)",
         default=None,
@@ -358,7 +234,7 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the implementation guide (business identifier)",
         default=None,
     )
@@ -447,7 +323,7 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -460,11 +336,11 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for operation definition (if applicable)",
         default=None,
     )
@@ -531,11 +407,11 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_base",
     )
-    resource: Optional[List[Code]] = Field(
+    resource: Optional[ListType[Code]] = Field(
         description="Types this operation applies to",
         default=None,
     )
-    resource_ext: Optional[List[Optional[Element]]] = Field(
+    resource_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for resource extensions",
         default=None,
         alias="_resource",
@@ -585,11 +461,11 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_outputProfile",
     )
-    parameter: Optional[List[OperationDefinitionParameter]] = Field(
+    parameter: Optional[ListType[OperationDefinitionParameter]] = Field(
         description="Parameters for the operation/query",
         default=None,
     )
-    overload: Optional[List[OperationDefinitionOverload]] = Field(
+    overload: Optional[ListType[OperationDefinitionOverload]] = Field(
         description="Define overloaded variants for when  generating code",
         default=None,
     )
@@ -602,64 +478,22 @@ class OperationDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def versionAlgorithm_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
             self,
-            elements=(
-                "overload",
-                "parameter",
-                "outputProfile",
-                "inputProfile",
-                "instance",
-                "type",
-                "system",
-                "resource",
-                "base",
-                "comment",
-                "code",
-                "affectsState",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "kind",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
+            field_types=[String, Coding],
+            field_name_base="versionAlgorithm",
+            required=False,
         )
 
     @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
+    def FHIR_cnl_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
             self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
+            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="cnl-0",
+            severity="warning",
         )
 
     @model_validator(mode="after")
@@ -715,25 +549,6 @@ class OperationDefinition(DomainResource):
             human="SearchParamType can only be specified on in parameters",
             key="opd-4",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def versionAlgorithm_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[String, Coding],
-            field_name_base="versionAlgorithm",
-            required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_cnl_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('^[A-Z]([A-Za-z0-9_]){1,254}$')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="cnl-0",
-            severity="warning",
         )
 
     @model_validator(mode="after")

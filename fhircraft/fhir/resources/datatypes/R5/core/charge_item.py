@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -47,22 +47,6 @@ class ChargeItemPerformer(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "actor",
-                "function",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ChargeItem(DomainResource):
     """
@@ -73,73 +57,24 @@ class ChargeItem(DomainResource):
     _type = "ChargeItem"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ChargeItem"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ChargeItem"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for item",
         default=None,
     )
-    definitionUri: Optional[List[Uri]] = Field(
+    definitionUri: Optional[ListType[Uri]] = Field(
         description="Defining information about the code of this charge item",
         default=None,
     )
-    definitionUri_ext: Optional[List[Optional[Element]]] = Field(
+    definitionUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for definitionUri extensions",
         default=None,
         alias="_definitionUri",
     )
-    definitionCanonical: Optional[List[Canonical]] = Field(
+    definitionCanonical: Optional[ListType[Canonical]] = Field(
         description="Resource defining the code of this ChargeItem",
         default=None,
     )
-    definitionCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    definitionCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for definitionCanonical extensions",
         default=None,
         alias="_definitionCanonical",
@@ -153,7 +88,7 @@ class ChargeItem(DomainResource):
         default=None,
         alias="_status",
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced ChargeItem",
         default=None,
     )
@@ -186,7 +121,7 @@ class ChargeItem(DomainResource):
         description="When the charged service was applied",
         default=None,
     )
-    performer: Optional[List[ChargeItemPerformer]] = Field(
+    performer: Optional[ListType[ChargeItemPerformer]] = Field(
         description="Who performed charged service",
         default=None,
     )
@@ -206,7 +141,7 @@ class ChargeItem(DomainResource):
         description="Quantity of which the charge item has been serviced",
         default=None,
     )
-    bodysite: Optional[List[CodeableConcept]] = Field(
+    bodysite: Optional[ListType[CodeableConcept]] = Field(
         description="Anatomical location, if relevant",
         default=None,
     )
@@ -235,27 +170,27 @@ class ChargeItem(DomainResource):
         default=None,
         alias="_enteredDate",
     )
-    reason: Optional[List[CodeableConcept]] = Field(
+    reason: Optional[ListType[CodeableConcept]] = Field(
         description="Why was the charged  service rendered?",
         default=None,
     )
-    service: Optional[List[CodeableReference]] = Field(
+    service: Optional[ListType[CodeableReference]] = Field(
         description="Which rendered service is being charged?",
         default=None,
     )
-    product: Optional[List[CodeableReference]] = Field(
+    product: Optional[ListType[CodeableReference]] = Field(
         description="Product charged",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="Account to place this charge",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the ChargeItem",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Further information supporting this charge",
         default=None,
     )
@@ -268,117 +203,10 @@ class ChargeItem(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "supportingInformation",
-                "note",
-                "account",
-                "product",
-                "service",
-                "reason",
-                "enteredDate",
-                "enterer",
-                "overrideReason",
-                "totalPriceComponent",
-                "unitPriceComponent",
-                "bodysite",
-                "quantity",
-                "costCenter",
-                "requestingOrganization",
-                "performingOrganization",
-                "performer",
-                "encounter",
-                "subject",
-                "code",
-                "partOf",
-                "status",
-                "definitionCanonical",
-                "definitionUri",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def occurrence_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
             field_types=[DateTime, Period, Timing],
             field_name_base="occurrence",
             required=False,
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )

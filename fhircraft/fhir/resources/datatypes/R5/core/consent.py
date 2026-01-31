@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -52,22 +52,6 @@ class ConsentPolicyBasis(BackboneElement):
         alias="_url",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "url",
-                "reference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ConsentVerification(BackboneElement):
     """
@@ -95,34 +79,15 @@ class ConsentVerification(BackboneElement):
         description="Person who verified",
         default=None,
     )
-    verificationDate: Optional[List[DateTime]] = Field(
+    verificationDate: Optional[ListType[DateTime]] = Field(
         description="When consent verified",
         default=None,
     )
-    verificationDate_ext: Optional[List[Optional[Element]]] = Field(
+    verificationDate_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for verificationDate extensions",
         default=None,
         alias="_verificationDate",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "verificationDate",
-                "verifiedWith",
-                "verifiedBy",
-                "verificationType",
-                "verified",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ConsentProvisionActor(BackboneElement):
@@ -138,22 +103,6 @@ class ConsentProvisionActor(BackboneElement):
         description="Resource for the actor (or group, by role)",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reference",
-                "role",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ConsentProvisionData(BackboneElement):
@@ -175,22 +124,6 @@ class ConsentProvisionData(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reference",
-                "meaning",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ConsentProvision(BackboneElement):
     """
@@ -201,27 +134,27 @@ class ConsentProvision(BackboneElement):
         description="Timeframe for this provision",
         default=None,
     )
-    actor: Optional[List[ConsentProvisionActor]] = Field(
+    actor: Optional[ListType[ConsentProvisionActor]] = Field(
         description="Who|what controlled by this provision (or group, by role)",
         default=None,
     )
-    action: Optional[List[CodeableConcept]] = Field(
+    action: Optional[ListType[CodeableConcept]] = Field(
         description="Actions controlled by this provision",
         default=None,
     )
-    securityLabel: Optional[List[Coding]] = Field(
+    securityLabel: Optional[ListType[Coding]] = Field(
         description="Security Labels that define affected resources",
         default=None,
     )
-    purpose: Optional[List[Coding]] = Field(
+    purpose: Optional[ListType[Coding]] = Field(
         description="Context of activities covered by this provision",
         default=None,
     )
-    documentType: Optional[List[Coding]] = Field(
+    documentType: Optional[ListType[Coding]] = Field(
         description="e.g. Resource Type, Profile, CDA, etc",
         default=None,
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="e.g. LOINC or SNOMED CT code, etc. in the content",
         default=None,
     )
@@ -229,7 +162,7 @@ class ConsentProvision(BackboneElement):
         description="Timeframe for data controlled by this provision",
         default=None,
     )
-    data: Optional[List[ConsentProvisionData]] = Field(
+    data: Optional[ListType[ConsentProvisionData]] = Field(
         description="Data controlled by this provision",
         default=None,
     )
@@ -237,35 +170,10 @@ class ConsentProvision(BackboneElement):
         description="A computable expression of the consent",
         default=None,
     )
-    provision: Optional[List["ConsentProvision"]] = Field(
+    provision: Optional[ListType["ConsentProvision"]] = Field(
         description="Nested Exception Provisions",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "provision",
-                "expression",
-                "data",
-                "dataPeriod",
-                "code",
-                "documentType",
-                "purpose",
-                "securityLabel",
-                "action",
-                "actor",
-                "period",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class Consent(DomainResource):
@@ -277,56 +185,7 @@ class Consent(DomainResource):
     _type = "Consent"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Consent"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Consent"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier for this record (external references)",
         default=None,
     )
@@ -339,7 +198,7 @@ class Consent(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of the consent statement - for indexing/retrieval",
         default=None,
     )
@@ -360,31 +219,31 @@ class Consent(DomainResource):
         description="Effective period for this Consent",
         default=None,
     )
-    grantor: Optional[List[Reference]] = Field(
+    grantor: Optional[ListType[Reference]] = Field(
         description="Who is granting rights according to the policy and rules",
         default=None,
     )
-    grantee: Optional[List[Reference]] = Field(
+    grantee: Optional[ListType[Reference]] = Field(
         description="Who is agreeing to the policy and rules",
         default=None,
     )
-    manager: Optional[List[Reference]] = Field(
+    manager: Optional[ListType[Reference]] = Field(
         description="Consent workflow management",
         default=None,
     )
-    controller: Optional[List[Reference]] = Field(
+    controller: Optional[ListType[Reference]] = Field(
         description="Consent Enforcer",
         default=None,
     )
-    sourceAttachment: Optional[List[Attachment]] = Field(
+    sourceAttachment: Optional[ListType[Attachment]] = Field(
         description="Source from which this consent is taken",
         default=None,
     )
-    sourceReference: Optional[List[Reference]] = Field(
+    sourceReference: Optional[ListType[Reference]] = Field(
         description="Source from which this consent is taken",
         default=None,
     )
-    regulatoryBasis: Optional[List[CodeableConcept]] = Field(
+    regulatoryBasis: Optional[ListType[CodeableConcept]] = Field(
         description="Regulations establishing base Consent",
         default=None,
     )
@@ -392,11 +251,11 @@ class Consent(DomainResource):
         description="Computable version of the backing policy",
         default=None,
     )
-    policyText: Optional[List[Reference]] = Field(
+    policyText: Optional[ListType[Reference]] = Field(
         description="Human Readable Policy",
         default=None,
     )
-    verification: Optional[List[ConsentVerification]] = Field(
+    verification: Optional[ListType[ConsentVerification]] = Field(
         description="Consent Verified by patient or family",
         default=None,
     )
@@ -409,107 +268,7 @@ class Consent(DomainResource):
         default=None,
         alias="_decision",
     )
-    provision: Optional[List[ConsentProvision]] = Field(
+    provision: Optional[ListType[ConsentProvision]] = Field(
         description="Constraints to the base Consent.policyRule/Consent.policy",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "provision",
-                "decision",
-                "verification",
-                "policyText",
-                "policyBasis",
-                "regulatoryBasis",
-                "sourceReference",
-                "sourceAttachment",
-                "controller",
-                "manager",
-                "grantee",
-                "grantor",
-                "period",
-                "date",
-                "subject",
-                "category",
-                "status",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )
