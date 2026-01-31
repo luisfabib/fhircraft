@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -166,11 +166,11 @@ class CoverageEligibilityRequestItem(BackboneElement):
     Service categories or billable services for which benefit details and/or an authorization prior to service delivery may be required by the payor.
     """
 
-    supportingInfoSequence: Optional[List[PositiveInt]] = Field(
+    supportingInfoSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable exception or supporting information",
         default=None,
     )
-    supportingInfoSequence_ext: Optional[List[Optional[Element]]] = Field(
+    supportingInfoSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for supportingInfoSequence extensions",
         default=None,
         alias="_supportingInfoSequence",
@@ -183,7 +183,7 @@ class CoverageEligibilityRequestItem(BackboneElement):
         description="Billing, service, product, or drug code",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Product or service billing modifiers",
         default=None,
     )
@@ -203,11 +203,11 @@ class CoverageEligibilityRequestItem(BackboneElement):
         description="Servicing facility",
         default=None,
     )
-    diagnosis: Optional[List[CoverageEligibilityRequestItemDiagnosis]] = Field(
+    diagnosis: Optional[ListType[CoverageEligibilityRequestItemDiagnosis]] = Field(
         description="Applicable diagnosis",
         default=None,
     )
-    detail: Optional[List[Reference]] = Field(
+    detail: Optional[ListType[Reference]] = Field(
         description="Product or service details",
         default=None,
     )
@@ -224,7 +224,7 @@ class CoverageEligibilityRequest(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityRequest"
     )
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for coverage eligiblity request",
         default=None,
     )
@@ -241,11 +241,11 @@ class CoverageEligibilityRequest(DomainResource):
         description="Desired processing priority",
         default=None,
     )
-    purpose: Optional[List[Code]] = Field(
+    purpose: Optional[ListType[Code]] = Field(
         description="auth-requirements | benefits | discovery | validation",
         default=None,
     )
-    purpose_ext: Optional[List[Optional[Element]]] = Field(
+    purpose_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for purpose extensions",
         default=None,
         alias="_purpose",
@@ -254,7 +254,7 @@ class CoverageEligibilityRequest(DomainResource):
         description="Intended recipient of products and services",
         default=None,
     )
-    event: Optional[List[CoverageEligibilityRequestEvent]] = Field(
+    event: Optional[ListType[CoverageEligibilityRequestEvent]] = Field(
         description="Event information",
         default=None,
     )
@@ -296,15 +296,15 @@ class CoverageEligibilityRequest(DomainResource):
         description="Servicing facility",
         default=None,
     )
-    supportingInfo: Optional[List[CoverageEligibilityRequestSupportingInfo]] = Field(
+    supportingInfo: Optional[ListType[CoverageEligibilityRequestSupportingInfo]] = Field(
         description="Supporting information",
         default=None,
     )
-    insurance: Optional[List[CoverageEligibilityRequestInsurance]] = Field(
+    insurance: Optional[ListType[CoverageEligibilityRequestInsurance]] = Field(
         description="Patient insurance information",
         default=None,
     )
-    item: Optional[List[CoverageEligibilityRequestItem]] = Field(
+    item: Optional[ListType[CoverageEligibilityRequestItem]] = Field(
         description="Item to be evaluated for eligibiity",
         default=None,
     )

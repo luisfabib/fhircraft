@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -276,7 +276,7 @@ class ClaimDiagnosis(BackboneElement):
         description="Nature of illness or problem",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Timing or nature of the diagnosis",
         default=None,
     )
@@ -316,7 +316,7 @@ class ClaimProcedure(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Category of Procedure",
         default=None,
     )
@@ -337,7 +337,7 @@ class ClaimProcedure(BackboneElement):
         description="Specific clinical procedure",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
@@ -399,11 +399,11 @@ class ClaimInsurance(BackboneElement):
         default=None,
         alias="_businessArrangement",
     )
-    preAuthRef: Optional[List[String]] = Field(
+    preAuthRef: Optional[ListType[String]] = Field(
         description="Prior authorization reference number",
         default=None,
     )
-    preAuthRef_ext: Optional[List[Optional[Element]]] = Field(
+    preAuthRef_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for preAuthRef extensions",
         default=None,
         alias="_preAuthRef",
@@ -463,11 +463,11 @@ class ClaimItemBodySite(BackboneElement):
     Physical location where the service is performed or applies.
     """
 
-    site: Optional[List[CodeableReference]] = Field(
+    site: Optional[ListType[CodeableReference]] = Field(
         description="Location",
         default=None,
     )
-    subSite: Optional[List[CodeableConcept]] = Field(
+    subSite: Optional[ListType[CodeableConcept]] = Field(
         description="Sub-location",
         default=None,
     )
@@ -487,7 +487,7 @@ class ClaimItemDetailSubDetail(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -507,11 +507,11 @@ class ClaimItemDetailSubDetail(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -544,7 +544,7 @@ class ClaimItemDetailSubDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
@@ -564,7 +564,7 @@ class ClaimItemDetail(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -584,11 +584,11 @@ class ClaimItemDetail(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Service/Product billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -621,11 +621,11 @@ class ClaimItemDetail(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-    subDetail: Optional[List[ClaimItemDetailSubDetail]] = Field(
+    subDetail: Optional[ListType[ClaimItemDetailSubDetail]] = Field(
         description="Product or service provided",
         default=None,
     )
@@ -645,42 +645,42 @@ class ClaimItem(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
-    careTeamSequence: Optional[List[PositiveInt]] = Field(
+    careTeamSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable careTeam members",
         default=None,
     )
-    careTeamSequence_ext: Optional[List[Optional[Element]]] = Field(
+    careTeamSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for careTeamSequence extensions",
         default=None,
         alias="_careTeamSequence",
     )
-    diagnosisSequence: Optional[List[PositiveInt]] = Field(
+    diagnosisSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable diagnoses",
         default=None,
     )
-    diagnosisSequence_ext: Optional[List[Optional[Element]]] = Field(
+    diagnosisSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for diagnosisSequence extensions",
         default=None,
         alias="_diagnosisSequence",
     )
-    procedureSequence: Optional[List[PositiveInt]] = Field(
+    procedureSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable procedures",
         default=None,
     )
-    procedureSequence_ext: Optional[List[Optional[Element]]] = Field(
+    procedureSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for procedureSequence extensions",
         default=None,
         alias="_procedureSequence",
     )
-    informationSequence: Optional[List[PositiveInt]] = Field(
+    informationSequence: Optional[ListType[PositiveInt]] = Field(
         description="Applicable exception and supporting information",
         default=None,
     )
-    informationSequence_ext: Optional[List[Optional[Element]]] = Field(
+    informationSequence_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for informationSequence extensions",
         default=None,
         alias="_informationSequence",
@@ -701,15 +701,15 @@ class ClaimItem(BackboneElement):
         description="End of a range of codes",
         default=None,
     )
-    request: Optional[List[Reference]] = Field(
+    request: Optional[ListType[Reference]] = Field(
         description="Request or Referral for Service",
         default=None,
     )
-    modifier: Optional[List[CodeableConcept]] = Field(
+    modifier: Optional[ListType[CodeableConcept]] = Field(
         description="Product or service billing modifiers",
         default=None,
     )
-    programCode: Optional[List[CodeableConcept]] = Field(
+    programCode: Optional[ListType[CodeableConcept]] = Field(
         description="Program the product or service is provided under",
         default=None,
     )
@@ -767,19 +767,19 @@ class ClaimItem(BackboneElement):
         description="Total item cost",
         default=None,
     )
-    udi: Optional[List[Reference]] = Field(
+    udi: Optional[ListType[Reference]] = Field(
         description="Unique device identifier",
         default=None,
     )
-    bodySite: Optional[List[ClaimItemBodySite]] = Field(
+    bodySite: Optional[ListType[ClaimItemBodySite]] = Field(
         description="Anatomical location",
         default=None,
     )
-    encounter: Optional[List[Reference]] = Field(
+    encounter: Optional[ListType[Reference]] = Field(
         description="Encounters associated with the listed treatments",
         default=None,
     )
-    detail: Optional[List[ClaimItemDetail]] = Field(
+    detail: Optional[ListType[ClaimItemDetail]] = Field(
         description="Product or service provided",
         default=None,
     )
@@ -826,11 +826,11 @@ class Claim(DomainResource):
     _type = "Claim"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Claim"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for claim",
         default=None,
     )
-    traceNumber: Optional[List[Identifier]] = Field(
+    traceNumber: Optional[ListType[Identifier]] = Field(
         description="Number for tracking",
         default=None,
     )
@@ -897,7 +897,7 @@ class Claim(DomainResource):
         description="For whom to reserve funds",
         default=None,
     )
-    related: Optional[List[ClaimRelated]] = Field(
+    related: Optional[ListType[ClaimRelated]] = Field(
         description="Prior or corollary claims",
         default=None,
     )
@@ -917,7 +917,7 @@ class Claim(DomainResource):
         description="Treatment referral",
         default=None,
     )
-    encounter: Optional[List[Reference]] = Field(
+    encounter: Optional[ListType[Reference]] = Field(
         description="Encounters associated with the listed treatments",
         default=None,
     )
@@ -929,27 +929,27 @@ class Claim(DomainResource):
         description="Package billing code",
         default=None,
     )
-    event: Optional[List[ClaimEvent]] = Field(
+    event: Optional[ListType[ClaimEvent]] = Field(
         description="Event information",
         default=None,
     )
-    careTeam: Optional[List[ClaimCareTeam]] = Field(
+    careTeam: Optional[ListType[ClaimCareTeam]] = Field(
         description="Members of the care team",
         default=None,
     )
-    supportingInfo: Optional[List[ClaimSupportingInfo]] = Field(
+    supportingInfo: Optional[ListType[ClaimSupportingInfo]] = Field(
         description="Supporting information",
         default=None,
     )
-    diagnosis: Optional[List[ClaimDiagnosis]] = Field(
+    diagnosis: Optional[ListType[ClaimDiagnosis]] = Field(
         description="Pertinent diagnosis information",
         default=None,
     )
-    procedure: Optional[List[ClaimProcedure]] = Field(
+    procedure: Optional[ListType[ClaimProcedure]] = Field(
         description="Clinical procedures performed",
         default=None,
     )
-    insurance: Optional[List[ClaimInsurance]] = Field(
+    insurance: Optional[ListType[ClaimInsurance]] = Field(
         description="Patient insurance information",
         default=None,
     )
@@ -961,7 +961,7 @@ class Claim(DomainResource):
         description="Paid by the patient",
         default=None,
     )
-    item: Optional[List[ClaimItem]] = Field(
+    item: Optional[ListType[ClaimItem]] = Field(
         description="Product or service provided",
         default=None,
     )

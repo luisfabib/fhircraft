@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -105,11 +105,11 @@ class OperationDefinitionParameter(BackboneElement):
         default=None,
         alias="_use",
     )
-    scope: Optional[List[Code]] = Field(
+    scope: Optional[ListType[Code]] = Field(
         description="instance | type | system",
         default=None,
     )
-    scope_ext: Optional[List[Optional[Element]]] = Field(
+    scope_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for scope extensions",
         default=None,
         alias="_scope",
@@ -150,20 +150,20 @@ class OperationDefinitionParameter(BackboneElement):
         default=None,
         alias="_type",
     )
-    allowedType: Optional[List[Code]] = Field(
+    allowedType: Optional[ListType[Code]] = Field(
         description="Allowed sub-type this parameter can have (if type is abstract)",
         default=None,
     )
-    allowedType_ext: Optional[List[Optional[Element]]] = Field(
+    allowedType_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for allowedType extensions",
         default=None,
         alias="_allowedType",
     )
-    targetProfile: Optional[List[Canonical]] = Field(
+    targetProfile: Optional[ListType[Canonical]] = Field(
         description="If type is Reference | canonical, allowed targets. If type is \u0027Resource\u0027, then this constrains the allowed resource types",
         default=None,
     )
-    targetProfile_ext: Optional[List[Optional[Element]]] = Field(
+    targetProfile_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for targetProfile extensions",
         default=None,
         alias="_targetProfile",
@@ -181,11 +181,11 @@ class OperationDefinitionParameter(BackboneElement):
         description="ValueSet details if this is coded",
         default=None,
     )
-    referencedFrom: Optional[List[OperationDefinitionParameterReferencedFrom]] = Field(
+    referencedFrom: Optional[ListType[OperationDefinitionParameterReferencedFrom]] = Field(
         description="References to this parameter",
         default=None,
     )
-    part: Optional[List["OperationDefinitionParameter"]] = Field(
+    part: Optional[ListType["OperationDefinitionParameter"]] = Field(
         description="Parts of a nested Parameter",
         default=None,
     )
@@ -196,11 +196,11 @@ class OperationDefinitionOverload(BackboneElement):
     Defines an appropriate combination of parameters to use when invoking this operation, to help code generators when generating overloaded parameter sets for this operation.
     """
 
-    parameterName: Optional[List[String]] = Field(
+    parameterName: Optional[ListType[String]] = Field(
         description="Name of parameter to include in overload",
         default=None,
     )
-    parameterName_ext: Optional[List[Optional[Element]]] = Field(
+    parameterName_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for parameterName extensions",
         default=None,
         alias="_parameterName",
@@ -234,7 +234,7 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the implementation guide (business identifier)",
         default=None,
     )
@@ -323,7 +323,7 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -336,11 +336,11 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for operation definition (if applicable)",
         default=None,
     )
@@ -407,11 +407,11 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_base",
     )
-    resource: Optional[List[Code]] = Field(
+    resource: Optional[ListType[Code]] = Field(
         description="Types this operation applies to",
         default=None,
     )
-    resource_ext: Optional[List[Optional[Element]]] = Field(
+    resource_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for resource extensions",
         default=None,
         alias="_resource",
@@ -461,11 +461,11 @@ class OperationDefinition(DomainResource):
         default=None,
         alias="_outputProfile",
     )
-    parameter: Optional[List[OperationDefinitionParameter]] = Field(
+    parameter: Optional[ListType[OperationDefinitionParameter]] = Field(
         description="Parameters for the operation/query",
         default=None,
     )
-    overload: Optional[List[OperationDefinitionOverload]] = Field(
+    overload: Optional[ListType[OperationDefinitionOverload]] = Field(
         description="Define overloaded variants for when  generating code",
         default=None,
     )

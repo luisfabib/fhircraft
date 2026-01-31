@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -57,11 +57,11 @@ class RequirementsStatement(BackboneElement):
         default=None,
         alias="_label",
     )
-    conformance: Optional[List[Code]] = Field(
+    conformance: Optional[ListType[Code]] = Field(
         description="SHALL | SHOULD | MAY | SHOULD-NOT",
         default=None,
     )
-    conformance_ext: Optional[List[Optional[Element]]] = Field(
+    conformance_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for conformance extensions",
         default=None,
         alias="_conformance",
@@ -88,7 +88,7 @@ class RequirementsStatement(BackboneElement):
         description="Another statement this clarifies/restricts ([url#]key)",
         default=None,
     )
-    derivedFrom_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFrom_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",
@@ -102,25 +102,25 @@ class RequirementsStatement(BackboneElement):
         default=None,
         alias="_parent",
     )
-    satisfiedBy: Optional[List[Url]] = Field(
+    satisfiedBy: Optional[ListType[Url]] = Field(
         description="Design artifact that satisfies this requirement",
         default=None,
     )
-    satisfiedBy_ext: Optional[List[Optional[Element]]] = Field(
+    satisfiedBy_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for satisfiedBy extensions",
         default=None,
         alias="_satisfiedBy",
     )
-    reference: Optional[List[Url]] = Field(
+    reference: Optional[ListType[Url]] = Field(
         description="External artifact (rule/document etc. that) created this requirement",
         default=None,
     )
-    reference_ext: Optional[List[Optional[Element]]] = Field(
+    reference_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for reference extensions",
         default=None,
         alias="_reference",
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Who asked for this statement",
         default=None,
     )
@@ -144,7 +144,7 @@ class Requirements(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the Requirements (business identifier)",
         default=None,
     )
@@ -224,7 +224,7 @@ class Requirements(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -237,11 +237,11 @@ class Requirements(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for Requirements (if applicable)",
         default=None,
     )
@@ -272,7 +272,7 @@ class Requirements(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    derivedFrom: Optional[List[Canonical]] = Field(
+    derivedFrom: Optional[ListType[Canonical]] = Field(
         description="Other set of Requirements this builds on",
         default=None,
     )
@@ -281,7 +281,7 @@ class Requirements(DomainResource):
         default=None,
         alias="_derivedFrom",
     )
-    reference: Optional[List[Url]] = Field(
+    reference: Optional[ListType[Url]] = Field(
         description="External artifact (rule/document etc. that) created this set of requirements",
         default=None,
     )
@@ -290,16 +290,16 @@ class Requirements(DomainResource):
         default=None,
         alias="_reference",
     )
-    actor: Optional[List[Canonical]] = Field(
+    actor: Optional[ListType[Canonical]] = Field(
         description="Actor for these requirements",
         default=None,
     )
-    actor_ext: Optional[List[Optional[Element]]] = Field(
+    actor_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for actor extensions",
         default=None,
         alias="_actor",
     )
-    statement: Optional[List[RequirementsStatement]] = Field(
+    statement: Optional[ListType[RequirementsStatement]] = Field(
         description="Actual statement as markdown",
         default=None,
     )

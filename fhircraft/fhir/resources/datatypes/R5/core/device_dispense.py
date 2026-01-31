@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -54,15 +54,15 @@ class DeviceDispense(DomainResource):
     _type = "DeviceDispense"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceDispense"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this dispensation",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="The order or request that this dispense is fulfilling",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="The bigger event that this dispense is a part of",
         default=None,
     )
@@ -79,7 +79,7 @@ class DeviceDispense(DomainResource):
         description="Why a dispense was or was not performed",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of device dispense",
         default=None,
     )
@@ -99,11 +99,11 @@ class DeviceDispense(DomainResource):
         description="Encounter associated with event",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Information that supports the dispensing of the device",
         default=None,
     )
-    performer: Optional[List[DeviceDispensePerformer]] = Field(
+    performer: Optional[ListType[DeviceDispensePerformer]] = Field(
         description="Who performed event",
         default=None,
     )
@@ -141,7 +141,7 @@ class DeviceDispense(DomainResource):
         description="Where the device was sent or should be sent",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Information about the dispense",
         default=None,
     )
@@ -154,7 +154,7 @@ class DeviceDispense(DomainResource):
         default=None,
         alias="_usageInstruction",
     )
-    eventHistory: Optional[List[Reference]] = Field(
+    eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of relevant lifecycle events",
         default=None,
     )

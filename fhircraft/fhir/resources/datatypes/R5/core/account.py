@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -97,7 +97,7 @@ class AccountDiagnosis(BackboneElement):
         default=None,
         alias="_dateOfDiagnosis",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type that this diagnosis has relevant to the account (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
@@ -110,7 +110,7 @@ class AccountDiagnosis(BackboneElement):
         default=None,
         alias="_onAdmission",
     )
-    packageCode: Optional[List[CodeableConcept]] = Field(
+    packageCode: Optional[ListType[CodeableConcept]] = Field(
         description="Package Code specific for billing",
         default=None,
     )
@@ -143,15 +143,15 @@ class AccountProcedure(BackboneElement):
         default=None,
         alias="_dateOfService",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="How this procedure value should be used in charging the account",
         default=None,
     )
-    packageCode: Optional[List[CodeableConcept]] = Field(
+    packageCode: Optional[ListType[CodeableConcept]] = Field(
         description="Package Code specific for billing",
         default=None,
     )
-    device: Optional[List[Reference]] = Field(
+    device: Optional[ListType[Reference]] = Field(
         description="Any devices that were associated with the procedure",
         default=None,
     )
@@ -211,7 +211,7 @@ class Account(DomainResource):
     _type = "Account"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Account"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Account number",
         default=None,
     )
@@ -241,7 +241,7 @@ class Account(DomainResource):
         default=None,
         alias="_name",
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="The entity that caused the expenses",
         default=None,
     )
@@ -249,7 +249,7 @@ class Account(DomainResource):
         description="Transaction window",
         default=None,
     )
-    coverage: Optional[List[AccountCoverage]] = Field(
+    coverage: Optional[ListType[AccountCoverage]] = Field(
         description="The party(s) that are responsible for covering the payment of this account, and what order should they be applied to the account",
         default=None,
     )
@@ -266,19 +266,19 @@ class Account(DomainResource):
         default=None,
         alias="_description",
     )
-    guarantor: Optional[List[AccountGuarantor]] = Field(
+    guarantor: Optional[ListType[AccountGuarantor]] = Field(
         description="The parties ultimately responsible for balancing the Account",
         default=None,
     )
-    diagnosis: Optional[List[AccountDiagnosis]] = Field(
-        description="The list of diagnoses relevant to this account",
+    diagnosis: Optional[ListType[AccountDiagnosis]] = Field(
+        description="The ListType of diagnoses relevant to this account",
         default=None,
     )
-    procedure: Optional[List[AccountProcedure]] = Field(
-        description="The list of procedures relevant to this account",
+    procedure: Optional[ListType[AccountProcedure]] = Field(
+        description="The ListType of procedures relevant to this account",
         default=None,
     )
-    relatedAccount: Optional[List[AccountRelatedAccount]] = Field(
+    relatedAccount: Optional[ListType[AccountRelatedAccount]] = Field(
         description="Other associated accounts related to this account",
         default=None,
     )
@@ -286,7 +286,7 @@ class Account(DomainResource):
         description="The base or default currency",
         default=None,
     )
-    balance: Optional[List[AccountBalance]] = Field(
+    balance: Optional[ListType[AccountBalance]] = Field(
         description="Calculated account balance(s)",
         default=None,
     )

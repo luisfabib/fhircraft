@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -52,7 +52,7 @@ class EventDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the event definition",
         default=None,
     )
@@ -149,7 +149,7 @@ class EventDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -162,11 +162,11 @@ class EventDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for event definition (if applicable)",
         default=None,
     )
@@ -228,31 +228,31 @@ class EventDefinition(DomainResource):
         description="When the event definition is expected to be used",
         default=None,
     )
-    topic: Optional[List[CodeableConcept]] = Field(
+    topic: Optional[ListType[CodeableConcept]] = Field(
         description="E.g. Education, Treatment, Assessment, etc",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc",
         default=None,
     )
-    trigger: Optional[List[TriggerDefinition]] = Field(
+    trigger: Optional[ListType[TriggerDefinition]] = Field(
         description='"when" the event occurs (multiple = \u0027or\u0027)',
         default=None,
     )

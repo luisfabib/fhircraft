@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -36,7 +36,7 @@ class SubstanceReferenceInformationGene(BackboneElement):
         description="Todo",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Todo",
         default=None,
     )
@@ -55,7 +55,7 @@ class SubstanceReferenceInformationGeneElement(BackboneElement):
         description="Todo",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Todo",
         default=None,
     )
@@ -107,7 +107,7 @@ class SubstanceReferenceInformationTarget(BackboneElement):
         description="Todo",
         default=None,
     )
-    source: Optional[List[Reference]] = Field(
+    source: Optional[ListType[Reference]] = Field(
         description="Todo",
         default=None,
     )
@@ -158,15 +158,15 @@ class SubstanceReferenceInformation(DomainResource):
         default=None,
         alias="_comment",
     )
-    gene: Optional[List[SubstanceReferenceInformationGene]] = Field(
+    gene: Optional[ListType[SubstanceReferenceInformationGene]] = Field(
         description="Todo",
         default=None,
     )
-    geneElement: Optional[List[SubstanceReferenceInformationGeneElement]] = Field(
+    geneElement: Optional[ListType[SubstanceReferenceInformationGeneElement]] = Field(
         description="Todo",
         default=None,
     )
-    target: Optional[List[SubstanceReferenceInformationTarget]] = Field(
+    target: Optional[ListType[SubstanceReferenceInformationTarget]] = Field(
         description="Todo",
         default=None,
     )

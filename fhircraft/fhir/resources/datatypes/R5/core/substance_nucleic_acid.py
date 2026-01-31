@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -97,7 +97,7 @@ class SubstanceNucleicAcidSubunit(BackboneElement):
         description="Index of linear sequences of nucleic acids in order of decreasing length. Sequences of the same length will be ordered by molecular weight. Subunits that have identical sequences will be repeated and have sequential subscripts",
         default=None,
     )
-    subunit_ext: Optional[List[Optional[Element]]] = Field(
+    subunit_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for subunit extensions",
         default=None,
         alias="_subunit",
@@ -132,11 +132,11 @@ class SubstanceNucleicAcidSubunit(BackboneElement):
         description="The nucleotide present at the 3\u2019 terminal shall be specified based on a controlled vocabulary. Since the sequence is represented from the 5\u0027 to the 3\u0027 end, the 5\u2019 prime nucleotide is the letter at the last position in the sequence. A separate representation would be redundant",
         default=None,
     )
-    linkage: Optional[List[SubstanceNucleicAcidSubunitLinkage]] = Field(
+    linkage: Optional[ListType[SubstanceNucleicAcidSubunitLinkage]] = Field(
         description="The linkages between sugar residues will also be captured",
         default=None,
     )
-    sugar: Optional[List[SubstanceNucleicAcidSubunitSugar]] = Field(
+    sugar: Optional[ListType[SubstanceNucleicAcidSubunitSugar]] = Field(
         description="5.3.6.8.1 Sugar ID (Mandatory)",
         default=None,
     )
@@ -177,7 +177,7 @@ class SubstanceNucleicAcid(DomainResource):
         description="(TBC)",
         default=None,
     )
-    subunit: Optional[List[SubstanceNucleicAcidSubunit]] = Field(
+    subunit: Optional[ListType[SubstanceNucleicAcidSubunit]] = Field(
         description="Subunits are listed in order of decreasing length; sequences of the same length will be ordered by molecular weight; subunits that have identical sequences will be repeated multiple times",
         default=None,
     )

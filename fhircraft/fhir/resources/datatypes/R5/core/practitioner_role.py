@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -32,7 +32,7 @@ class PractitionerRole(DomainResource):
     _type = "PractitionerRole"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/PractitionerRole"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers for a role/location",
         default=None,
     )
@@ -57,39 +57,39 @@ class PractitionerRole(DomainResource):
         description="Organization where the roles are available",
         default=None,
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Roles which this practitioner may perform",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="Specific specialty of the practitioner",
         default=None,
     )
-    location: Optional[List[Reference]] = Field(
+    location: Optional[ListType[Reference]] = Field(
         description="Location(s) where the practitioner provides care",
         default=None,
     )
-    healthcareService: Optional[List[Reference]] = Field(
+    healthcareService: Optional[ListType[Reference]] = Field(
         description="Healthcare services provided for this role\u0027s Organization/Location(s)",
         default=None,
     )
-    contact: Optional[List[ExtendedContactDetail]] = Field(
+    contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details relating to this PractitionerRole",
         default=None,
     )
-    characteristic: Optional[List[CodeableConcept]] = Field(
+    characteristic: Optional[ListType[CodeableConcept]] = Field(
         description="Collection of characteristics (attributes)",
         default=None,
     )
-    communication: Optional[List[CodeableConcept]] = Field(
+    communication: Optional[ListType[CodeableConcept]] = Field(
         description="A language the practitioner (in this role) can use in patient communication",
         default=None,
     )
-    availability: Optional[List[Availability]] = Field(
+    availability: Optional[ListType[Availability]] = Field(
         description="Times the Practitioner is available at this location and/or healthcare service (including exceptions)",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Endpoints for interacting with the practitioner in this role",
         default=None,
     )

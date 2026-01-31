@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -114,7 +114,7 @@ class ActivityDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the activity definition",
         default=None,
     )
@@ -220,7 +220,7 @@ class ActivityDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -233,11 +233,11 @@ class ActivityDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for activity definition (if applicable)",
         default=None,
     )
@@ -299,35 +299,35 @@ class ActivityDefinition(DomainResource):
         description="When the activity definition is expected to be used",
         default=None,
     )
-    topic: Optional[List[CodeableConcept]] = Field(
+    topic: Optional[ListType[CodeableConcept]] = Field(
         description="E.g. Education, Treatment, Assessment, etc",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc",
         default=None,
     )
-    library: Optional[List[Canonical]] = Field(
+    library: Optional[ListType[Canonical]] = Field(
         description="Logic used by the activity definition",
         default=None,
     )
-    library_ext: Optional[List[Optional[Element]]] = Field(
+    library_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for library extensions",
         default=None,
         alias="_library",
@@ -414,7 +414,7 @@ class ActivityDefinition(DomainResource):
         description="Where it should happen",
         default=None,
     )
-    participant: Optional[List[ActivityDefinitionParticipant]] = Field(
+    participant: Optional[ListType[ActivityDefinitionParticipant]] = Field(
         description="Who should participate in the action",
         default=None,
     )
@@ -430,37 +430,37 @@ class ActivityDefinition(DomainResource):
         description="How much is administered/consumed/supplied",
         default=None,
     )
-    dosage: Optional[List[Dosage]] = Field(
+    dosage: Optional[ListType[Dosage]] = Field(
         description="Detailed dosage instructions",
         default=None,
     )
-    bodySite: Optional[List[CodeableConcept]] = Field(
+    bodySite: Optional[ListType[CodeableConcept]] = Field(
         description="What part of body to perform on",
         default=None,
     )
-    specimenRequirement: Optional[List[Canonical]] = Field(
+    specimenRequirement: Optional[ListType[Canonical]] = Field(
         description="What specimens are required to perform this action",
         default=None,
     )
-    specimenRequirement_ext: Optional[List[Optional[Element]]] = Field(
+    specimenRequirement_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for specimenRequirement extensions",
         default=None,
         alias="_specimenRequirement",
     )
-    observationRequirement: Optional[List[Canonical]] = Field(
+    observationRequirement: Optional[ListType[Canonical]] = Field(
         description="What observations are required to perform this action",
         default=None,
     )
-    observationRequirement_ext: Optional[List[Optional[Element]]] = Field(
+    observationRequirement_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for observationRequirement extensions",
         default=None,
         alias="_observationRequirement",
     )
-    observationResultRequirement: Optional[List[Canonical]] = Field(
+    observationResultRequirement: Optional[ListType[Canonical]] = Field(
         description="What observations must be produced by this action",
         default=None,
     )
-    observationResultRequirement_ext: Optional[List[Optional[Element]]] = Field(
+    observationResultRequirement_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for observationResultRequirement extensions",
         default=None,
         alias="_observationResultRequirement",
@@ -474,7 +474,7 @@ class ActivityDefinition(DomainResource):
         default=None,
         alias="_transform",
     )
-    dynamicValue: Optional[List[ActivityDefinitionDynamicValue]] = Field(
+    dynamicValue: Optional[ListType[ActivityDefinitionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
         default=None,
     )

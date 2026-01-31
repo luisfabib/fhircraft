@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -118,7 +118,7 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for a given MessageDefinition",
         default=None,
     )
@@ -162,11 +162,11 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_title",
     )
-    replaces: Optional[List[Canonical]] = Field(
+    replaces: Optional[ListType[Canonical]] = Field(
         description="Takes the place of",
         default=None,
     )
-    replaces_ext: Optional[List[Optional[Element]]] = Field(
+    replaces_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for replaces extensions",
         default=None,
         alias="_replaces",
@@ -207,7 +207,7 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -220,11 +220,11 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for message definition (if applicable)",
         default=None,
     )
@@ -264,11 +264,11 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_base",
     )
-    parent: Optional[List[Canonical]] = Field(
+    parent: Optional[ListType[Canonical]] = Field(
         description="Protocol/workflow this is part of",
         default=None,
     )
-    parent_ext: Optional[List[Optional[Element]]] = Field(
+    parent_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for parent extensions",
         default=None,
         alias="_parent",
@@ -295,7 +295,7 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_category",
     )
-    focus: Optional[List[MessageDefinitionFocus]] = Field(
+    focus: Optional[ListType[MessageDefinitionFocus]] = Field(
         description="Resource(s) that are the subject of the event",
         default=None,
     )
@@ -308,7 +308,7 @@ class MessageDefinition(DomainResource):
         default=None,
         alias="_responseRequired",
     )
-    allowedResponse: Optional[List[MessageDefinitionAllowedResponse]] = Field(
+    allowedResponse: Optional[ListType[MessageDefinitionAllowedResponse]] = Field(
         description="Responses to this message",
         default=None,
     )

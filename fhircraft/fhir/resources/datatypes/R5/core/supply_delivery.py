@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -68,15 +68,15 @@ class SupplyDelivery(DomainResource):
     _type = "SupplyDelivery"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SupplyDelivery"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifier",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal or order",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -97,7 +97,7 @@ class SupplyDelivery(DomainResource):
         description="Category of supply event",
         default=None,
     )
-    suppliedItem: Optional[List[SupplyDeliverySuppliedItem]] = Field(
+    suppliedItem: Optional[ListType[SupplyDeliverySuppliedItem]] = Field(
         description="The item that is delivered or supplied",
         default=None,
     )
@@ -126,7 +126,7 @@ class SupplyDelivery(DomainResource):
         description="Where the delivery was sent",
         default=None,
     )
-    receiver: Optional[List[Reference]] = Field(
+    receiver: Optional[ListType[Reference]] = Field(
         description="Who received the delivery",
         default=None,
     )

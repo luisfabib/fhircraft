@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -64,7 +64,7 @@ class MeasureReportGroupPopulation(BackboneElement):
         description="For subject-list reports, the subject results in this population",
         default=None,
     )
-    subjectReport: Optional[List[Reference]] = Field(
+    subjectReport: Optional[ListType[Reference]] = Field(
         description="For subject-list reports, a subject result in this population",
         default=None,
     )
@@ -166,7 +166,7 @@ class MeasureReportGroupStratifierStratumPopulation(BackboneElement):
         description="For subject-list reports, the subject results in this population",
         default=None,
     )
-    subjectReport: Optional[List[Reference]] = Field(
+    subjectReport: Optional[ListType[Reference]] = Field(
         description="For subject-list reports, a subject result in this population",
         default=None,
     )
@@ -206,11 +206,11 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         description="The stratum value, e.g. male",
         default=None,
     )
-    component: Optional[List[MeasureReportGroupStratifierStratumComponent]] = Field(
+    component: Optional[ListType[MeasureReportGroupStratifierStratumComponent]] = Field(
         description="Stratifier component values",
         default=None,
     )
-    population: Optional[List[MeasureReportGroupStratifierStratumPopulation]] = Field(
+    population: Optional[ListType[MeasureReportGroupStratifierStratumPopulation]] = Field(
         description="Population results in this stratum",
         default=None,
     )
@@ -295,7 +295,7 @@ class MeasureReportGroupStratifier(BackboneElement):
         description="What stratifier of the group",
         default=None,
     )
-    stratum: Optional[List[MeasureReportGroupStratifierStratum]] = Field(
+    stratum: Optional[ListType[MeasureReportGroupStratifierStratum]] = Field(
         description="Stratum results, one for each unique value, or set of values, in the stratifier, or stratifier components",
         default=None,
     )
@@ -323,7 +323,7 @@ class MeasureReportGroup(BackboneElement):
         description="What individual(s) the report is for",
         default=None,
     )
-    population: Optional[List[MeasureReportGroupPopulation]] = Field(
+    population: Optional[ListType[MeasureReportGroupPopulation]] = Field(
         description="The populations in the group",
         default=None,
     )
@@ -356,7 +356,7 @@ class MeasureReportGroup(BackboneElement):
         description="What score this group achieved",
         default=None,
     )
-    stratifier: Optional[List[MeasureReportGroupStratifier]] = Field(
+    stratifier: Optional[ListType[MeasureReportGroupStratifier]] = Field(
         description="Stratification results",
         default=None,
     )
@@ -387,7 +387,7 @@ class MeasureReport(DomainResource):
     _type = "MeasureReport"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MeasureReport"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the MeasureReport",
         default=None,
     )
@@ -468,15 +468,15 @@ class MeasureReport(DomainResource):
         description="increase | decrease",
         default=None,
     )
-    group: Optional[List[MeasureReportGroup]] = Field(
+    group: Optional[ListType[MeasureReportGroup]] = Field(
         description="Measure results for each group",
         default=None,
     )
-    supplementalData: Optional[List[Reference]] = Field(
+    supplementalData: Optional[ListType[Reference]] = Field(
         description="Additional information collected for the report",
         default=None,
     )
-    evaluatedResource: Optional[List[Reference]] = Field(
+    evaluatedResource: Optional[ListType[Reference]] = Field(
         description="What data was used to calculate the measure score",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -28,11 +28,11 @@ class PermissionJustification(BackboneElement):
     The asserted justification for using the data.
     """
 
-    basis: Optional[List[CodeableConcept]] = Field(
+    basis: Optional[ListType[CodeableConcept]] = Field(
         description="The regulatory grounds upon which this Permission builds",
         default=None,
     )
-    evidence: Optional[List[Reference]] = Field(
+    evidence: Optional[ListType[Reference]] = Field(
         description="Justifing rational",
         default=None,
     )
@@ -63,15 +63,15 @@ class PermissionRuleData(BackboneElement):
     A description or definition of which activities are allowed to be done on the data.
     """
 
-    resource: Optional[List[PermissionRuleDataResource]] = Field(
+    resource: Optional[ListType[PermissionRuleDataResource]] = Field(
         description="Explicit FHIR Resource references",
         default=None,
     )
-    security: Optional[List[Coding]] = Field(
+    security: Optional[ListType[Coding]] = Field(
         description="Security tag code on .meta.security",
         default=None,
     )
-    period: Optional[List[Period]] = Field(
+    period: Optional[ListType[Period]] = Field(
         description="Timeframe encompasing data create/update",
         default=None,
     )
@@ -86,15 +86,15 @@ class PermissionRuleActivity(BackboneElement):
     A description or definition of which activities are allowed to be done on the data.
     """
 
-    actor: Optional[List[Reference]] = Field(
+    actor: Optional[ListType[Reference]] = Field(
         description="Authorized actor(s)",
         default=None,
     )
-    action: Optional[List[CodeableConcept]] = Field(
+    action: Optional[ListType[CodeableConcept]] = Field(
         description="Actions controlled by this rule",
         default=None,
     )
-    purpose: Optional[List[CodeableConcept]] = Field(
+    purpose: Optional[ListType[CodeableConcept]] = Field(
         description="The purpose for which the permission is given",
         default=None,
     )
@@ -114,15 +114,15 @@ class PermissionRule(BackboneElement):
         default=None,
         alias="_type",
     )
-    data: Optional[List[PermissionRuleData]] = Field(
+    data: Optional[ListType[PermissionRuleData]] = Field(
         description="The selection criteria to identify data that is within scope of this provision",
         default=None,
     )
-    activity: Optional[List[PermissionRuleActivity]] = Field(
+    activity: Optional[ListType[PermissionRuleActivity]] = Field(
         description="A description or definition of which activities are allowed to be done on the data",
         default=None,
     )
-    limit: Optional[List[CodeableConcept]] = Field(
+    limit: Optional[ListType[CodeableConcept]] = Field(
         description="What limits apply to the use of the data",
         default=None,
     )
@@ -150,11 +150,11 @@ class Permission(DomainResource):
         description="The person or entity that asserts the permission",
         default=None,
     )
-    date: Optional[List[DateTime]] = Field(
+    date: Optional[ListType[DateTime]] = Field(
         description="The date that permission was asserted",
         default=None,
     )
-    date_ext: Optional[List[Optional[Element]]] = Field(
+    date_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for date extensions",
         default=None,
         alias="_date",
@@ -176,7 +176,7 @@ class Permission(DomainResource):
         default=None,
         alias="_combining",
     )
-    rule: Optional[List[PermissionRule]] = Field(
+    rule: Optional[ListType[PermissionRule]] = Field(
         description="Constraints to the Permission",
         default=None,
     )

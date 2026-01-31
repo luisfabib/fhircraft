@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -74,7 +74,7 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the search parameter (business identifier)",
         default=None,
     )
@@ -163,7 +163,7 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -176,11 +176,11 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for search parameter (if applicable)",
         default=None,
     )
@@ -220,11 +220,11 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_code",
     )
-    base: Optional[List[Code]] = Field(
+    base: Optional[ListType[Code]] = Field(
         description="The resource type(s) this search parameter applies to",
         default=None,
     )
-    base_ext: Optional[List[Optional[Element]]] = Field(
+    base_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for base extensions",
         default=None,
         alias="_base",
@@ -265,11 +265,11 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_constraint",
     )
-    target: Optional[List[Code]] = Field(
+    target: Optional[ListType[Code]] = Field(
         description="Types of resource (if a resource reference)",
         default=None,
     )
-    target_ext: Optional[List[Optional[Element]]] = Field(
+    target_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for target extensions",
         default=None,
         alias="_target",
@@ -292,34 +292,34 @@ class SearchParameter(DomainResource):
         default=None,
         alias="_multipleAnd",
     )
-    comparator: Optional[List[Code]] = Field(
+    comparator: Optional[ListType[Code]] = Field(
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
-    comparator_ext: Optional[List[Optional[Element]]] = Field(
+    comparator_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for comparator extensions",
         default=None,
         alias="_comparator",
     )
-    modifier: Optional[List[Code]] = Field(
+    modifier: Optional[ListType[Code]] = Field(
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
     )
-    modifier_ext: Optional[List[Optional[Element]]] = Field(
+    modifier_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for modifier extensions",
         default=None,
         alias="_modifier",
     )
-    chain: Optional[List[String]] = Field(
+    chain: Optional[ListType[String]] = Field(
         description="Chained names supported",
         default=None,
     )
-    chain_ext: Optional[List[Optional[Element]]] = Field(
+    chain_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for chain extensions",
         default=None,
         alias="_chain",
     )
-    component: Optional[List[SearchParameterComponent]] = Field(
+    component: Optional[ListType[SearchParameterComponent]] = Field(
         description="For Composite resources to define the parts",
         default=None,
     )

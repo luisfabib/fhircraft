@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -60,11 +60,11 @@ class CodeSystemFilter(BackboneElement):
         default=None,
         alias="_description",
     )
-    operator: Optional[List[Code]] = Field(
+    operator: Optional[ListType[Code]] = Field(
         description="= | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | child-of | descendent-leaf | exists",
         default=None,
     )
-    operator_ext: Optional[List[Optional[Element]]] = Field(
+    operator_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for operator extensions",
         default=None,
         alias="_operator",
@@ -137,7 +137,7 @@ class CodeSystemConceptDesignation(BackboneElement):
         description="Details how this designation would be used",
         default=None,
     )
-    additionalUse: Optional[List[Coding]] = Field(
+    additionalUse: Optional[ListType[Coding]] = Field(
         description="Additional ways how this designation would be used",
         default=None,
     )
@@ -274,16 +274,16 @@ class CodeSystemConcept(BackboneElement):
         default=None,
         alias="_definition",
     )
-    designation: Optional[List[CodeSystemConceptDesignation]] = Field(
+    designation: Optional[ListType[CodeSystemConceptDesignation]] = Field(
         description="Additional representations for the concept",
         default=None,
     )
-    property_: Optional[List[CodeSystemConceptProperty]] = Field(
+    property_: Optional[ListType[CodeSystemConceptProperty]] = Field(
         description="Property value for the concept",
         default=None,
         alias="property",
     )
-    concept: Optional[List["CodeSystemConcept"]] = Field(
+    concept: Optional[ListType["CodeSystemConcept"]] = Field(
         description="Child Concepts (is-a/contains/categorizes)",
         default=None,
     )
@@ -307,7 +307,7 @@ class CodeSystem(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the code system (business identifier)",
         default=None,
     )
@@ -387,7 +387,7 @@ class CodeSystem(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -400,11 +400,11 @@ class CodeSystem(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for code system (if applicable)",
         default=None,
     )
@@ -457,27 +457,27 @@ class CodeSystem(DomainResource):
         description="When the CodeSystem is expected to be used",
         default=None,
     )
-    topic: Optional[List[CodeableConcept]] = Field(
+    topic: Optional[ListType[CodeableConcept]] = Field(
         description="E.g. Education, Treatment, Assessment, etc",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the CodeSystem",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the CodeSystem",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the CodeSystem",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the CodeSystem",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc",
         default=None,
     )
@@ -553,16 +553,16 @@ class CodeSystem(DomainResource):
         default=None,
         alias="_count",
     )
-    filter: Optional[List[CodeSystemFilter]] = Field(
+    filter: Optional[ListType[CodeSystemFilter]] = Field(
         description="Filter that can be used in a value set",
         default=None,
     )
-    property_: Optional[List[CodeSystemProperty]] = Field(
+    property_: Optional[ListType[CodeSystemProperty]] = Field(
         description="Additional information supplied about each concept",
         default=None,
         alias="property",
     )
-    concept: Optional[List[CodeSystemConcept]] = Field(
+    concept: Optional[ListType[CodeSystemConcept]] = Field(
         description="Concepts in the code system",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -205,7 +205,7 @@ class GraphDefinitionLink(BackboneElement):
         default=None,
         alias="_params",
     )
-    compartment: Optional[List[GraphDefinitionLinkCompartment]] = Field(
+    compartment: Optional[ListType[GraphDefinitionLinkCompartment]] = Field(
         description="Compartment Consistency Rules",
         default=None,
     )
@@ -229,7 +229,7 @@ class GraphDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the GraphDefinition (business identifier)",
         default=None,
     )
@@ -309,7 +309,7 @@ class GraphDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -322,11 +322,11 @@ class GraphDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for graph definition (if applicable)",
         default=None,
     )
@@ -366,11 +366,11 @@ class GraphDefinition(DomainResource):
         default=None,
         alias="_start",
     )
-    node: Optional[List[GraphDefinitionNode]] = Field(
+    node: Optional[ListType[GraphDefinitionNode]] = Field(
         description="Potential target for the link",
         default=None,
     )
-    link: Optional[List[GraphDefinitionLink]] = Field(
+    link: Optional[ListType[GraphDefinitionLink]] = Field(
         description="Links this graph makes rules about",
         default=None,
     )

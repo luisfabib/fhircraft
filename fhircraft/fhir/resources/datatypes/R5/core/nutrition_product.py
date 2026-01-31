@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -42,7 +42,7 @@ class NutritionProductNutrient(BackboneElement):
         description="The (relevant) nutrients in the product",
         default=None,
     )
-    amount: Optional[List[Ratio]] = Field(
+    amount: Optional[ListType[Ratio]] = Field(
         description="The amount of nutrient expressed in one or more units: X per pack / per serving / per dose",
         default=None,
     )
@@ -57,7 +57,7 @@ class NutritionProductIngredient(BackboneElement):
         description="The ingredient contained in the product",
         default=None,
     )
-    amount: Optional[List[Ratio]] = Field(
+    amount: Optional[ListType[Ratio]] = Field(
         description="The amount of ingredient that is in the product",
         default=None,
     )
@@ -145,7 +145,7 @@ class NutritionProductInstance(BackboneElement):
         description="The amount of items or instances",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="The identifier for the physical instance, typically a serial number or manufacturer number",
         default=None,
     )
@@ -213,35 +213,35 @@ class NutritionProduct(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Broad product groups or categories used to classify the product, such as Legume and Legume Products, Beverages, or Beef Products",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer, representative or officially responsible for the product",
         default=None,
     )
-    nutrient: Optional[List[NutritionProductNutrient]] = Field(
+    nutrient: Optional[ListType[NutritionProductNutrient]] = Field(
         description="The product\u0027s nutritional information expressed by the nutrients",
         default=None,
     )
-    ingredient: Optional[List[NutritionProductIngredient]] = Field(
+    ingredient: Optional[ListType[NutritionProductIngredient]] = Field(
         description="Ingredients contained in this product",
         default=None,
     )
-    knownAllergen: Optional[List[CodeableReference]] = Field(
+    knownAllergen: Optional[ListType[CodeableReference]] = Field(
         description="Known or suspected allergens that are a part of this product",
         default=None,
     )
-    characteristic: Optional[List[NutritionProductCharacteristic]] = Field(
+    characteristic: Optional[ListType[NutritionProductCharacteristic]] = Field(
         description="Specifies descriptive properties of the nutrition product",
         default=None,
     )
-    instance: Optional[List[NutritionProductInstance]] = Field(
+    instance: Optional[ListType[NutritionProductInstance]] = Field(
         description="One or several physical instances or occurrences of the nutrition product",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the product",
         default=None,
     )

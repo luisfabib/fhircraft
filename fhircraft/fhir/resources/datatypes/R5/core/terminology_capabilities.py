@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,7 +50,7 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
         description="Version covered by this statement",
         default=None,
     )
-    version_ext: Optional[List[Optional[Element]]] = Field(
+    version_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",
@@ -96,11 +96,11 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
         default=None,
         alias="_code",
     )
-    op: Optional[List[Code]] = Field(
+    op: Optional[ListType[Code]] = Field(
         description="Operations supported for the property",
         default=None,
     )
-    op_ext: Optional[List[Optional[Element]]] = Field(
+    op_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for op extensions",
         default=None,
         alias="_op",
@@ -139,20 +139,20 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         default=None,
         alias="_compositional",
     )
-    language: Optional[List[Code]] = Field(
+    language: Optional[ListType[Code]] = Field(
         description="Language Displays supported",
         default=None,
     )
-    language_ext: Optional[List[Optional[Element]]] = Field(
+    language_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for language extensions",
         default=None,
         alias="_language",
     )
-    filter: Optional[List[TerminologyCapabilitiesCodeSystemVersionFilter]] = Field(
+    filter: Optional[ListType[TerminologyCapabilitiesCodeSystemVersionFilter]] = Field(
         description="Filter Properties supported",
         default=None,
     )
-    property_: Optional[List[Code]] = Field(
+    property_: Optional[ListType[Code]] = Field(
         description="Properties supported for $lookup",
         default=None,
         alias="property",
@@ -178,7 +178,7 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         default=None,
         alias="_uri",
     )
-    version: Optional[List[TerminologyCapabilitiesCodeSystemVersion]] = Field(
+    version: Optional[ListType[TerminologyCapabilitiesCodeSystemVersion]] = Field(
         description="Version of Code System supported",
         default=None,
     )
@@ -259,7 +259,7 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         default=None,
         alias="_incomplete",
     )
-    parameter: Optional[List[TerminologyCapabilitiesExpansionParameter]] = Field(
+    parameter: Optional[ListType[TerminologyCapabilitiesExpansionParameter]] = Field(
         description="Supported expansion parameter",
         default=None,
     )
@@ -340,7 +340,7 @@ class TerminologyCapabilities(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the terminology capabilities",
         default=None,
     )
@@ -420,7 +420,7 @@ class TerminologyCapabilities(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -433,11 +433,11 @@ class TerminologyCapabilities(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for terminology capabilities (if applicable)",
         default=None,
     )
@@ -494,7 +494,7 @@ class TerminologyCapabilities(DomainResource):
         default=None,
         alias="_lockedDate",
     )
-    codeSystem: Optional[List[TerminologyCapabilitiesCodeSystem]] = Field(
+    codeSystem: Optional[ListType[TerminologyCapabilitiesCodeSystem]] = Field(
         description="A code system supported by the server",
         default=None,
     )

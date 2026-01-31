@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -72,11 +72,11 @@ class ResearchStudyAssociatedParty(BackboneElement):
         description="sponsor | lead-sponsor | sponsor-investigator | primary-investigator | collaborator | funding-source | general-contact | recruitment-contact | sub-investigator | study-director | study-chair",
         default=None,
     )
-    period: Optional[List[Period]] = Field(
+    period: Optional[ListType[Period]] = Field(
         description="When active in the role",
         default=None,
     )
-    classifier: Optional[List[CodeableConcept]] = Field(
+    classifier: Optional[ListType[CodeableConcept]] = Field(
         description="nih | fda | government | nonprofit | academic | industry",
         default=None,
     )
@@ -179,7 +179,7 @@ class ResearchStudyComparisonGroup(BackboneElement):
         default=None,
         alias="_description",
     )
-    intendedExposure: Optional[List[Reference]] = Field(
+    intendedExposure: Optional[ListType[Reference]] = Field(
         description="Interventions or exposures in this comparisonGroup or cohort",
         default=None,
     )
@@ -232,7 +232,7 @@ class ResearchStudyOutcomeMeasure(BackboneElement):
         default=None,
         alias="_name",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="primary | secondary | exploratory",
         default=None,
     )
@@ -269,7 +269,7 @@ class ResearchStudy(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for study",
         default=None,
     )
@@ -300,19 +300,19 @@ class ResearchStudy(DomainResource):
         default=None,
         alias="_title",
     )
-    label: Optional[List[ResearchStudyLabel]] = Field(
+    label: Optional[ListType[ResearchStudyLabel]] = Field(
         description="Additional names for the study",
         default=None,
     )
-    protocol: Optional[List[Reference]] = Field(
+    protocol: Optional[ListType[Reference]] = Field(
         description="Steps followed in executing study",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of larger study",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="References, URLs, and attachments",
         default=None,
     )
@@ -342,23 +342,23 @@ class ResearchStudy(DomainResource):
         description="n-a | early-phase-1 | phase-1 | phase-1-phase-2 | phase-2 | phase-2-phase-3 | phase-3 | phase-4",
         default=None,
     )
-    studyDesign: Optional[List[CodeableConcept]] = Field(
+    studyDesign: Optional[ListType[CodeableConcept]] = Field(
         description="Classifications of the study design characteristics",
         default=None,
     )
-    focus: Optional[List[CodeableReference]] = Field(
+    focus: Optional[ListType[CodeableReference]] = Field(
         description="Drugs, devices, etc. under study",
         default=None,
     )
-    condition: Optional[List[CodeableConcept]] = Field(
+    condition: Optional[ListType[CodeableConcept]] = Field(
         description="Condition being studied",
         default=None,
     )
-    keyword: Optional[List[CodeableConcept]] = Field(
+    keyword: Optional[ListType[CodeableConcept]] = Field(
         description="Used to search for the study",
         default=None,
     )
-    region: Optional[List[CodeableConcept]] = Field(
+    region: Optional[ListType[CodeableConcept]] = Field(
         description="Geographic area for the study",
         default=None,
     )
@@ -384,23 +384,23 @@ class ResearchStudy(DomainResource):
         description="When the study began and ended",
         default=None,
     )
-    site: Optional[List[Reference]] = Field(
+    site: Optional[ListType[Reference]] = Field(
         description="Facility where study activities are conducted",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the study",
         default=None,
     )
-    classifier: Optional[List[CodeableConcept]] = Field(
+    classifier: Optional[ListType[CodeableConcept]] = Field(
         description="Classification for the study",
         default=None,
     )
-    associatedParty: Optional[List[ResearchStudyAssociatedParty]] = Field(
+    associatedParty: Optional[ListType[ResearchStudyAssociatedParty]] = Field(
         description="Sponsors, collaborators, and other parties",
         default=None,
     )
-    progressStatus: Optional[List[ResearchStudyProgressStatus]] = Field(
+    progressStatus: Optional[ListType[ResearchStudyProgressStatus]] = Field(
         description="Status of study with time for that status",
         default=None,
     )
@@ -412,19 +412,19 @@ class ResearchStudy(DomainResource):
         description="Target or actual group of participants enrolled in study",
         default=None,
     )
-    comparisonGroup: Optional[List[ResearchStudyComparisonGroup]] = Field(
+    comparisonGroup: Optional[ListType[ResearchStudyComparisonGroup]] = Field(
         description="Defined path through the study for a subject",
         default=None,
     )
-    objective: Optional[List[ResearchStudyObjective]] = Field(
+    objective: Optional[ListType[ResearchStudyObjective]] = Field(
         description="A goal for the study",
         default=None,
     )
-    outcomeMeasure: Optional[List[ResearchStudyOutcomeMeasure]] = Field(
+    outcomeMeasure: Optional[ListType[ResearchStudyOutcomeMeasure]] = Field(
         description="A variable measured during the study",
         default=None,
     )
-    result: Optional[List[Reference]] = Field(
+    result: Optional[ListType[Reference]] = Field(
         description="Link to results generated during the study",
         default=None,
     )

@@ -1,6 +1,6 @@
 from pydantic import Field, model_validator
 
-from typing import List, Optional
+from typing import List as ListType, Optional
 
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.datatypes.primitives import (
@@ -396,7 +396,7 @@ class ParametersParameter(BackboneElement):
         description="If parameter is a whole resource",
         default=None,
     )
-    part: Optional[List["ParametersParameter"]] = Field(
+    part: Optional[ListType["ParametersParameter"]] = Field(
         description="Named part of a multi-part parameter",
         default=None,
     )
@@ -480,7 +480,7 @@ class Parameters(Resource):
 
     _type = "Parameters"
 
-    parameter: Optional[List[ParametersParameter]] = Field(
+    parameter: Optional[ListType[ParametersParameter]] = Field(
         description="Operation Parameter",
         default=None,
     )

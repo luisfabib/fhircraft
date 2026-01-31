@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -59,7 +59,7 @@ class RegulatedAuthorizationCase(BackboneElement):
         default=None,
         alias="_dateDateTime",
     )
-    application: Optional[List["RegulatedAuthorizationCase"]] = Field(
+    application: Optional[ListType["RegulatedAuthorizationCase"]] = Field(
         description="Applications submitted to obtain a regulated authorization. Steps within the longer running case or procedure",
         default=None,
     )
@@ -90,11 +90,11 @@ class RegulatedAuthorization(DomainResource):
     _type = "RegulatedAuthorization"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/RegulatedAuthorization"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for the authorization, typically assigned by the authorizing body",
         default=None,
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="The product type, treatment, facility or activity that is being authorized",
         default=None,
     )
@@ -111,7 +111,7 @@ class RegulatedAuthorization(DomainResource):
         default=None,
         alias="_description",
     )
-    region: Optional[List[CodeableConcept]] = Field(
+    region: Optional[ListType[CodeableConcept]] = Field(
         description="The territory in which the authorization has been granted",
         default=None,
     )
@@ -132,7 +132,7 @@ class RegulatedAuthorization(DomainResource):
         description="The time period in which the regulatory approval etc. is in effect, e.g. a Marketing Authorization includes the date of authorization and/or expiration date",
         default=None,
     )
-    indication: Optional[List[CodeableReference]] = Field(
+    indication: Optional[ListType[CodeableReference]] = Field(
         description="Condition for which the use of the regulated product applies",
         default=None,
     )
@@ -140,7 +140,7 @@ class RegulatedAuthorization(DomainResource):
         description="The intended use of the product, e.g. prevention, treatment",
         default=None,
     )
-    basis: Optional[List[CodeableConcept]] = Field(
+    basis: Optional[ListType[CodeableConcept]] = Field(
         description="The legal/regulatory framework or reasons under which this authorization is granted",
         default=None,
     )
@@ -152,7 +152,7 @@ class RegulatedAuthorization(DomainResource):
         description="The regulatory authority or authorizing body granting the authorization",
         default=None,
     )
-    attachedDocument: Optional[List[Reference]] = Field(
+    attachedDocument: Optional[ListType[Reference]] = Field(
         description="Additional information or supporting documentation about the authorization",
         default=None,
     )

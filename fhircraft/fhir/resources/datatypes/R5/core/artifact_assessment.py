@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -59,7 +59,7 @@ class ArtifactAssessmentContent(BackboneElement):
         description="What type of content",
         default=None,
     )
-    classifier: Optional[List[CodeableConcept]] = Field(
+    classifier: Optional[ListType[CodeableConcept]] = Field(
         description="Rating, classifier, or assessment",
         default=None,
     )
@@ -71,16 +71,16 @@ class ArtifactAssessmentContent(BackboneElement):
         description="Who authored the content",
         default=None,
     )
-    path: Optional[List[Uri]] = Field(
+    path: Optional[ListType[Uri]] = Field(
         description="What the comment is directed to",
         default=None,
     )
-    path_ext: Optional[List[Optional[Element]]] = Field(
+    path_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for path extensions",
         default=None,
         alias="_path",
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional information",
         default=None,
     )
@@ -93,7 +93,7 @@ class ArtifactAssessmentContent(BackboneElement):
         default=None,
         alias="_freeToShare",
     )
-    component: Optional[List["ArtifactAssessmentContent"]] = Field(
+    component: Optional[ListType["ArtifactAssessmentContent"]] = Field(
         description="Contained content",
         default=None,
     )
@@ -108,7 +108,7 @@ class ArtifactAssessment(DomainResource):
     _type = "ArtifactAssessment"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ArtifactAssessment"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the artifact assessment",
         default=None,
     )
@@ -192,7 +192,7 @@ class ArtifactAssessment(DomainResource):
         default=None,
         alias="_artifactUri",
     )
-    content: Optional[List[ArtifactAssessmentContent]] = Field(
+    content: Optional[ListType[ArtifactAssessmentContent]] = Field(
         description="Comment, classifier, or rating content",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -127,7 +127,7 @@ class QuestionnaireResponseItemAnswer(BackboneElement):
         description="Single-valued answer to the question",
         default=None,
     )
-    item: Optional[List["QuestionnaireResponseItem"]] = Field(
+    item: Optional[ListType["QuestionnaireResponseItem"]] = Field(
         description="Child items of question",
         default=None,
     )
@@ -194,11 +194,11 @@ class QuestionnaireResponseItem(BackboneElement):
         default=None,
         alias="_text",
     )
-    answer: Optional[List[QuestionnaireResponseItemAnswer]] = Field(
+    answer: Optional[ListType[QuestionnaireResponseItemAnswer]] = Field(
         description="The response(s) to the question",
         default=None,
     )
-    item: Optional[List["QuestionnaireResponseItem"]] = Field(
+    item: Optional[ListType["QuestionnaireResponseItem"]] = Field(
         description="Child items of group item",
         default=None,
     )
@@ -213,15 +213,15 @@ class QuestionnaireResponse(DomainResource):
     _type = "QuestionnaireResponse"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this set of answers",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled by this QuestionnaireResponse",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -268,7 +268,7 @@ class QuestionnaireResponse(DomainResource):
         description="The individual or device that answered the questions",
         default=None,
     )
-    item: Optional[List[QuestionnaireResponseItem]] = Field(
+    item: Optional[ListType[QuestionnaireResponseItem]] = Field(
         description="Groups and questions",
         default=None,
     )

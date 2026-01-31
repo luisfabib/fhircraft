@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -205,11 +205,11 @@ class ExampleScenarioInstance(BackboneElement):
         description="Example instance data",
         default=None,
     )
-    version: Optional[List[ExampleScenarioInstanceVersion]] = Field(
+    version: Optional[ListType[ExampleScenarioInstanceVersion]] = Field(
         description="Snapshot of instance that changes",
         default=None,
     )
-    containedInstance: Optional[List[ExampleScenarioInstanceContainedInstance]] = Field(
+    containedInstance: Optional[ListType[ExampleScenarioInstanceContainedInstance]] = Field(
         description="Resources contained in the instance",
         default=None,
     )
@@ -352,7 +352,7 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
         default=None,
         alias="_description",
     )
-    step: Optional[List["ExampleScenarioProcessStep"]] = Field(
+    step: Optional[ListType["ExampleScenarioProcessStep"]] = Field(
         description="Alternative action(s)",
         default=None,
     )
@@ -389,7 +389,7 @@ class ExampleScenarioProcessStep(BackboneElement):
         description="Step is simple action",
         default=None,
     )
-    alternative: Optional[List[ExampleScenarioProcessStepAlternative]] = Field(
+    alternative: Optional[ListType[ExampleScenarioProcessStepAlternative]] = Field(
         description="Alternate non-typical step action",
         default=None,
     )
@@ -445,7 +445,7 @@ class ExampleScenarioProcess(BackboneElement):
         default=None,
         alias="_postConditions",
     )
-    step: Optional[List[ExampleScenarioProcessStep]] = Field(
+    step: Optional[ListType[ExampleScenarioProcessStep]] = Field(
         description="Event within of the process",
         default=None,
     )
@@ -469,7 +469,7 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the example scenario",
         default=None,
     )
@@ -477,7 +477,7 @@ class ExampleScenario(DomainResource):
         description="Business version of the example scenario",
         default=None,
     )
-    version_ext: Optional[List[Optional[Element]]] = Field(
+    version_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",
@@ -549,7 +549,7 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -562,11 +562,11 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for example scenario (if applicable)",
         default=None,
     )
@@ -597,15 +597,15 @@ class ExampleScenario(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    actor: Optional[List[ExampleScenarioActor]] = Field(
+    actor: Optional[ListType[ExampleScenarioActor]] = Field(
         description="Individual involved in exchange",
         default=None,
     )
-    instance: Optional[List[ExampleScenarioInstance]] = Field(
+    instance: Optional[ListType[ExampleScenarioInstance]] = Field(
         description="Data used in the scenario",
         default=None,
     )
-    process: Optional[List[ExampleScenarioProcess]] = Field(
+    process: Optional[ListType[ExampleScenarioProcess]] = Field(
         description="Major process within scenario",
         default=None,
     )

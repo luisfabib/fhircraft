@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -42,7 +42,7 @@ class GuidanceResponse(DomainResource):
         description="The identifier of the request associated with this response, if any",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
@@ -98,11 +98,11 @@ class GuidanceResponse(DomainResource):
         description="Device returning the guidance",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why guidance is needed",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional notes about the response",
         default=None,
     )
@@ -114,11 +114,11 @@ class GuidanceResponse(DomainResource):
         description="The output parameters of the evaluation, if any",
         default=None,
     )
-    result: Optional[List[Reference]] = Field(
+    result: Optional[ListType[Reference]] = Field(
         description="Proposed actions, if any",
         default=None,
     )
-    dataRequirement: Optional[List[DataRequirement]] = Field(
+    dataRequirement: Optional[ListType[DataRequirement]] = Field(
         description="Additional required data",
         default=None,
     )

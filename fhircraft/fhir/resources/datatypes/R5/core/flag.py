@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -30,7 +30,7 @@ class Flag(DomainResource):
     _type = "Flag"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Flag"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
@@ -43,7 +43,7 @@ class Flag(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Clinical, administrative, etc",
         default=None,
     )

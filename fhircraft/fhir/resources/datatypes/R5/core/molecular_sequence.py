@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -176,7 +176,7 @@ class MolecularSequenceRelative(BackboneElement):
         description="A sequence used as starting sequence",
         default=None,
     )
-    edit: Optional[List[MolecularSequenceRelativeEdit]] = Field(
+    edit: Optional[ListType[MolecularSequenceRelativeEdit]] = Field(
         description="Changes in sequence from the starting sequence",
         default=None,
     )
@@ -191,7 +191,7 @@ class MolecularSequence(DomainResource):
     _type = "MolecularSequence"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MolecularSequence"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique ID for this particular sequence",
         default=None,
     )
@@ -208,7 +208,7 @@ class MolecularSequence(DomainResource):
         description="Subject this sequence is associated too",
         default=None,
     )
-    focus: Optional[List[Reference]] = Field(
+    focus: Optional[ListType[Reference]] = Field(
         description="What the molecular sequence is about, when it is not about the subject of record",
         default=None,
     )
@@ -233,11 +233,11 @@ class MolecularSequence(DomainResource):
         default=None,
         alias="_literal",
     )
-    formatted: Optional[List[Attachment]] = Field(
+    formatted: Optional[ListType[Attachment]] = Field(
         description="Embedded file or a link (URL) which contains content to represent the sequence",
         default=None,
     )
-    relative: Optional[List[MolecularSequenceRelative]] = Field(
+    relative: Optional[ListType[MolecularSequenceRelative]] = Field(
         description="A sequence defined relative to another sequence",
         default=None,
     )

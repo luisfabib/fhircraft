@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -119,15 +119,15 @@ class GenomicStudyAnalysis(BackboneElement):
     The details about a specific analysis that was performed in this GenomicStudy.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers for the analysis event",
         default=None,
     )
-    methodType: Optional[List[CodeableConcept]] = Field(
+    methodType: Optional[ListType[CodeableConcept]] = Field(
         description="Type of the methods used in the analysis (e.g., FISH, Karyotyping, MSI)",
         default=None,
     )
-    changeType: Optional[List[CodeableConcept]] = Field(
+    changeType: Optional[ListType[CodeableConcept]] = Field(
         description="Type of the genomic changes studied in the analysis (e.g., DNA, RNA, or AA change)",
         default=None,
     )
@@ -162,11 +162,11 @@ class GenomicStudyAnalysis(BackboneElement):
         default=None,
         alias="_title",
     )
-    focus: Optional[List[Reference]] = Field(
+    focus: Optional[ListType[Reference]] = Field(
         description="What the genomic analysis is about, when it is not about the subject of record",
         default=None,
     )
-    specimen: Optional[List[Reference]] = Field(
+    specimen: Optional[ListType[Reference]] = Field(
         description="The specimen used in the analysis event",
         default=None,
     )
@@ -179,7 +179,7 @@ class GenomicStudyAnalysis(BackboneElement):
         default=None,
         alias="_date",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Any notes capture with the analysis event",
         default=None,
     )
@@ -187,27 +187,27 @@ class GenomicStudyAnalysis(BackboneElement):
         description="The protocol that was performed for the analysis event",
         default=None,
     )
-    regionsStudied: Optional[List[Reference]] = Field(
+    regionsStudied: Optional[ListType[Reference]] = Field(
         description="The genomic regions to be studied in the analysis (BED file)",
         default=None,
     )
-    regionsCalled: Optional[List[Reference]] = Field(
+    regionsCalled: Optional[ListType[Reference]] = Field(
         description="Genomic regions actually called in the analysis event (BED file)",
         default=None,
     )
-    input: Optional[List[GenomicStudyAnalysisInput]] = Field(
+    input: Optional[ListType[GenomicStudyAnalysisInput]] = Field(
         description="Inputs for the analysis event",
         default=None,
     )
-    output: Optional[List[GenomicStudyAnalysisOutput]] = Field(
+    output: Optional[ListType[GenomicStudyAnalysisOutput]] = Field(
         description="Outputs for the analysis event",
         default=None,
     )
-    performer: Optional[List[GenomicStudyAnalysisPerformer]] = Field(
+    performer: Optional[ListType[GenomicStudyAnalysisPerformer]] = Field(
         description="Performer for the analysis event",
         default=None,
     )
-    device: Optional[List[GenomicStudyAnalysisDevice]] = Field(
+    device: Optional[ListType[GenomicStudyAnalysisDevice]] = Field(
         description="Devices used for the analysis (e.g., instruments, software), with settings and parameters",
         default=None,
     )
@@ -222,7 +222,7 @@ class GenomicStudy(DomainResource):
     _type = "GenomicStudy"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/GenomicStudy"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers for this genomic study",
         default=None,
     )
@@ -235,7 +235,7 @@ class GenomicStudy(DomainResource):
         default=None,
         alias="_status",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="The type of the study (e.g., Familial variant segregation, Functional variation detection, or Gene expression profiling)",
         default=None,
     )
@@ -256,7 +256,7 @@ class GenomicStudy(DomainResource):
         default=None,
         alias="_startDate",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Event resources that the genomic study is based on",
         default=None,
     )
@@ -264,11 +264,11 @@ class GenomicStudy(DomainResource):
         description="Healthcare professional who requested or referred the genomic study",
         default=None,
     )
-    interpreter: Optional[List[Reference]] = Field(
+    interpreter: Optional[ListType[Reference]] = Field(
         description="Healthcare professionals who interpreted the genomic study",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why the genomic study was performed",
         default=None,
     )
@@ -290,7 +290,7 @@ class GenomicStudy(DomainResource):
         default=None,
         alias="_instantiatesUri",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments related to the genomic study",
         default=None,
     )
@@ -303,7 +303,7 @@ class GenomicStudy(DomainResource):
         default=None,
         alias="_description",
     )
-    analysis: Optional[List[GenomicStudyAnalysis]] = Field(
+    analysis: Optional[ListType[GenomicStudyAnalysis]] = Field(
         description="Genomic Analysis Event",
         default=None,
     )

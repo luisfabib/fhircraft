@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -106,11 +106,11 @@ class SubscriptionTopicResourceTrigger(BackboneElement):
         default=None,
         alias="_resource",
     )
-    supportedInteraction: Optional[List[Code]] = Field(
+    supportedInteraction: Optional[ListType[Code]] = Field(
         description="create | update | delete",
         default=None,
     )
-    supportedInteraction_ext: Optional[List[Optional[Element]]] = Field(
+    supportedInteraction_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for supportedInteraction extensions",
         default=None,
         alias="_supportedInteraction",
@@ -198,20 +198,20 @@ class SubscriptionTopicCanFilterBy(BackboneElement):
         default=None,
         alias="_filterDefinition",
     )
-    comparator: Optional[List[Code]] = Field(
+    comparator: Optional[ListType[Code]] = Field(
         description="eq | ne | gt | lt | ge | le | sa | eb | ap",
         default=None,
     )
-    comparator_ext: Optional[List[Optional[Element]]] = Field(
+    comparator_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for comparator extensions",
         default=None,
         alias="_comparator",
     )
-    modifier: Optional[List[Code]] = Field(
+    modifier: Optional[ListType[Code]] = Field(
         description="missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate",
         default=None,
     )
-    modifier_ext: Optional[List[Optional[Element]]] = Field(
+    modifier_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for modifier extensions",
         default=None,
         alias="_modifier",
@@ -231,20 +231,20 @@ class SubscriptionTopicNotificationShape(BackboneElement):
         default=None,
         alias="_resource",
     )
-    include: Optional[List[String]] = Field(
+    include: Optional[ListType[String]] = Field(
         description="Include directives, rooted in the resource for this shape",
         default=None,
     )
-    include_ext: Optional[List[Optional[Element]]] = Field(
+    include_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for include extensions",
         default=None,
         alias="_include",
     )
-    revInclude: Optional[List[String]] = Field(
+    revInclude: Optional[ListType[String]] = Field(
         description="Reverse include directives, rooted in the resource for this shape",
         default=None,
     )
-    revInclude_ext: Optional[List[Optional[Element]]] = Field(
+    revInclude_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for revInclude extensions",
         default=None,
         alias="_revInclude",
@@ -268,7 +268,7 @@ class SubscriptionTopic(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for subscription topic",
         default=None,
     )
@@ -312,11 +312,11 @@ class SubscriptionTopic(DomainResource):
         default=None,
         alias="_title",
     )
-    derivedFrom: Optional[List[Canonical]] = Field(
+    derivedFrom: Optional[ListType[Canonical]] = Field(
         description="Based on FHIR protocol or definition",
         default=None,
     )
-    derivedFrom_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFrom_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",
@@ -357,7 +357,7 @@ class SubscriptionTopic(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -370,11 +370,11 @@ class SubscriptionTopic(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="Content intends to support these contexts",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction of the SubscriptionTopic (if applicable)",
         default=None,
     )
@@ -427,19 +427,19 @@ class SubscriptionTopic(DomainResource):
         description="The effective date range for the SubscriptionTopic",
         default=None,
     )
-    resourceTrigger: Optional[List[SubscriptionTopicResourceTrigger]] = Field(
+    resourceTrigger: Optional[ListType[SubscriptionTopicResourceTrigger]] = Field(
         description="Definition of a resource-based trigger for the subscription topic",
         default=None,
     )
-    eventTrigger: Optional[List[SubscriptionTopicEventTrigger]] = Field(
+    eventTrigger: Optional[ListType[SubscriptionTopicEventTrigger]] = Field(
         description="Event definitions the SubscriptionTopic",
         default=None,
     )
-    canFilterBy: Optional[List[SubscriptionTopicCanFilterBy]] = Field(
+    canFilterBy: Optional[ListType[SubscriptionTopicCanFilterBy]] = Field(
         description="Properties by which a Subscription can filter notifications from the SubscriptionTopic",
         default=None,
     )
-    notificationShape: Optional[List[SubscriptionTopicNotificationShape]] = Field(
+    notificationShape: Optional[ListType[SubscriptionTopicNotificationShape]] = Field(
         description="Properties for describing the shape of notifications generated by this topic",
         default=None,
     )

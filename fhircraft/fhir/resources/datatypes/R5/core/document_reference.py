@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -126,7 +126,7 @@ class DocumentReferenceContent(BackboneElement):
         description="Where to access the document",
         default=None,
     )
-    profile: Optional[List[DocumentReferenceContentProfile]] = Field(
+    profile: Optional[ListType[DocumentReferenceContentProfile]] = Field(
         description="Content profile rules for the document",
         default=None,
     )
@@ -141,7 +141,7 @@ class DocumentReference(DomainResource):
     _type = "DocumentReference"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DocumentReference"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifiers for the document",
         default=None,
     )
@@ -154,7 +154,7 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_version",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Procedure that caused this media to be created",
         default=None,
     )
@@ -176,7 +176,7 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_docStatus",
     )
-    modality: Optional[List[CodeableConcept]] = Field(
+    modality: Optional[ListType[CodeableConcept]] = Field(
         description="Imaging modality used",
         default=None,
     )
@@ -184,7 +184,7 @@ class DocumentReference(DomainResource):
         description="Kind of document (LOINC if possible)",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Categorization of document",
         default=None,
     )
@@ -192,15 +192,15 @@ class DocumentReference(DomainResource):
         description="Who/what is the subject of the document",
         default=None,
     )
-    context: Optional[List[Reference]] = Field(
+    context: Optional[ListType[Reference]] = Field(
         description="Context of the document content",
         default=None,
     )
-    event: Optional[List[CodeableReference]] = Field(
+    event: Optional[ListType[CodeableReference]] = Field(
         description="Main clinical acts documented",
         default=None,
     )
-    bodySite: Optional[List[CodeableReference]] = Field(
+    bodySite: Optional[ListType[CodeableReference]] = Field(
         description="Body part included",
         default=None,
     )
@@ -225,11 +225,11 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_date",
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the document",
         default=None,
     )
-    attester: Optional[List[DocumentReferenceAttester]] = Field(
+    attester: Optional[ListType[DocumentReferenceAttester]] = Field(
         description="Attests to accuracy of the document",
         default=None,
     )
@@ -237,7 +237,7 @@ class DocumentReference(DomainResource):
         description="Organization which maintains the document",
         default=None,
     )
-    relatesTo: Optional[List[DocumentReferenceRelatesTo]] = Field(
+    relatesTo: Optional[ListType[DocumentReferenceRelatesTo]] = Field(
         description="Relationships to other documents",
         default=None,
     )
@@ -250,11 +250,11 @@ class DocumentReference(DomainResource):
         default=None,
         alias="_description",
     )
-    securityLabel: Optional[List[CodeableConcept]] = Field(
+    securityLabel: Optional[ListType[CodeableConcept]] = Field(
         description="Document security-tags",
         default=None,
     )
-    content: Optional[List[DocumentReferenceContent]] = Field(
+    content: Optional[ListType[DocumentReferenceContent]] = Field(
         description="Document referenced",
         default=None,
     )

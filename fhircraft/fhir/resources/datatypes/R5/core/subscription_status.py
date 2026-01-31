@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -54,7 +54,7 @@ class SubscriptionStatusNotificationEvent(BackboneElement):
         description="Reference to the primary resource or information of this event",
         default=None,
     )
-    additionalContext: Optional[List[Reference]] = Field(
+    additionalContext: Optional[ListType[Reference]] = Field(
         description="References related to the focus resource and/or context of this event",
         default=None,
     )
@@ -96,7 +96,7 @@ class SubscriptionStatus(DomainResource):
         default=None,
         alias="_eventsSinceSubscriptionStart",
     )
-    notificationEvent: Optional[List[SubscriptionStatusNotificationEvent]] = Field(
+    notificationEvent: Optional[ListType[SubscriptionStatusNotificationEvent]] = Field(
         description="Detailed information about any events relevant to this notification",
         default=None,
     )
@@ -113,7 +113,7 @@ class SubscriptionStatus(DomainResource):
         default=None,
         alias="_topic",
     )
-    error: Optional[List[CodeableConcept]] = Field(
+    error: Optional[ListType[CodeableConcept]] = Field(
         description="List of errors on the subscription",
         default=None,
     )

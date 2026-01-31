@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -61,7 +61,7 @@ class Linkage(DomainResource):
         description="Who is responsible for linkages",
         default=None,
     )
-    item: Optional[List[LinkageItem]] = Field(
+    item: Optional[ListType[LinkageItem]] = Field(
         description="Item to be linked",
         default=None,
     )

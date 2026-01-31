@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -61,7 +61,7 @@ class RelatedPerson(DomainResource):
     _type = "RelatedPerson"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/RelatedPerson"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="A human identifier for this person",
         default=None,
     )
@@ -78,15 +78,15 @@ class RelatedPerson(DomainResource):
         description="The patient this person is related to",
         default=None,
     )
-    relationship: Optional[List[CodeableConcept]] = Field(
+    relationship: Optional[ListType[CodeableConcept]] = Field(
         description="The relationship of the related person to the patient",
         default=None,
     )
-    name: Optional[List[HumanName]] = Field(
+    name: Optional[ListType[HumanName]] = Field(
         description="A name associated with the person",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="A contact detail for the person",
         default=None,
     )
@@ -108,11 +108,11 @@ class RelatedPerson(DomainResource):
         default=None,
         alias="_birthDate",
     )
-    address: Optional[List[Address]] = Field(
+    address: Optional[ListType[Address]] = Field(
         description="Address where the related person can be contacted or visited",
         default=None,
     )
-    photo: Optional[List[Attachment]] = Field(
+    photo: Optional[ListType[Attachment]] = Field(
         description="Image of the person",
         default=None,
     )
@@ -120,7 +120,7 @@ class RelatedPerson(DomainResource):
         description="Period of time that this relationship is considered valid",
         default=None,
     )
-    communication: Optional[List[RelatedPersonCommunication]] = Field(
+    communication: Optional[ListType[RelatedPersonCommunication]] = Field(
         description="A language which may be used to communicate with the related person about the patient\u0027s health",
         default=None,
     )

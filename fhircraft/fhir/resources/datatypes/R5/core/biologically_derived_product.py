@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -185,15 +185,15 @@ class BiologicallyDerivedProduct(DomainResource):
         description="A code that identifies the kind of this biologically derived product",
         default=None,
     )
-    parent: Optional[List[Reference]] = Field(
+    parent: Optional[ListType[Reference]] = Field(
         description="The parent biologically-derived product",
         default=None,
     )
-    request: Optional[List[Reference]] = Field(
+    request: Optional[ListType[Reference]] = Field(
         description="Request to obtain and/or infuse this product",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Instance identifier",
         default=None,
     )
@@ -201,7 +201,7 @@ class BiologicallyDerivedProduct(DomainResource):
         description="An identifier that supports traceability to the event during which material in this product from one or more biological entities was obtained or pooled",
         default=None,
     )
-    processingFacility: Optional[List[Reference]] = Field(
+    processingFacility: Optional[ListType[Reference]] = Field(
         description="Processing facilities responsible for the labeling and distribution of this biologically derived product",
         default=None,
     )
@@ -235,7 +235,7 @@ class BiologicallyDerivedProduct(DomainResource):
         description="Product storage temperature requirements",
         default=None,
     )
-    property_: Optional[List[BiologicallyDerivedProductProperty]] = Field(
+    property_: Optional[ListType[BiologicallyDerivedProductProperty]] = Field(
         description="A property that is specific to this BiologicallyDerviedProduct instance",
         default=None,
         alias="property",

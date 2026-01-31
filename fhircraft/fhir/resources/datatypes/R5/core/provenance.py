@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -38,7 +38,7 @@ class ProvenanceAgent(BackboneElement):
         description="How the agent participated",
         default=None,
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="What the agents role was",
         default=None,
     )
@@ -61,7 +61,7 @@ class ProvenanceEntityAgent(BackboneElement):
         description="How the agent participated",
         default=None,
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="What the agents role was",
         default=None,
     )
@@ -84,7 +84,7 @@ class ProvenanceEntity(BackboneElement):
         description="revision | quotation | source | instantiates | removal",
         default=None,
     )
-    role_ext: Optional[List[Optional[Element]]] = Field(
+    role_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for role extensions",
         default=None,
         alias="_role",
@@ -93,7 +93,7 @@ class ProvenanceEntity(BackboneElement):
         description="Identity of entity",
         default=None,
     )
-    agent: Optional[List[ProvenanceEntityAgent]] = Field(
+    agent: Optional[ListType[ProvenanceEntityAgent]] = Field(
         description="Entity is attributed to this agent",
         default=None,
     )
@@ -108,7 +108,7 @@ class Provenance(DomainResource):
     _type = "Provenance"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Provenance"
 
-    target: Optional[List[Reference]] = Field(
+    target: Optional[ListType[Reference]] = Field(
         description="Target Reference(s) (usually version specific)",
         default=None,
     )
@@ -134,11 +134,11 @@ class Provenance(DomainResource):
         default=None,
         alias="_recorded",
     )
-    policy: Optional[List[Uri]] = Field(
+    policy: Optional[ListType[Uri]] = Field(
         description="Policy or plan the activity was defined by",
         default=None,
     )
-    policy_ext: Optional[List[Optional[Element]]] = Field(
+    policy_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for policy extensions",
         default=None,
         alias="_policy",
@@ -147,7 +147,7 @@ class Provenance(DomainResource):
         description="Where the activity occurred, if relevant",
         default=None,
     )
-    authorization: Optional[List[CodeableReference]] = Field(
+    authorization: Optional[ListType[CodeableReference]] = Field(
         description="Authorization (purposeOfUse) related to the event",
         default=None,
     )
@@ -155,7 +155,7 @@ class Provenance(DomainResource):
         description="Activity that occurred",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Workflow authorization within which this event occurred",
         default=None,
     )
@@ -167,15 +167,15 @@ class Provenance(DomainResource):
         description="Encounter within which this event occurred or which the event is tightly associated",
         default=None,
     )
-    agent: Optional[List[ProvenanceAgent]] = Field(
+    agent: Optional[ListType[ProvenanceAgent]] = Field(
         description="Actor involved",
         default=None,
     )
-    entity: Optional[List[ProvenanceEntity]] = Field(
+    entity: Optional[ListType[ProvenanceEntity]] = Field(
         description="An entity used in this activity",
         default=None,
     )
-    signature: Optional[List[Signature]] = Field(
+    signature: Optional[ListType[Signature]] = Field(
         description="Signature on target",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -195,7 +195,7 @@ class MessageHeader(DomainResource):
         default=None,
         alias="_eventCanonical",
     )
-    destination: Optional[List[MessageHeaderDestination]] = Field(
+    destination: Optional[ListType[MessageHeaderDestination]] = Field(
         description="Message destination application(s)",
         default=None,
     )
@@ -223,7 +223,7 @@ class MessageHeader(DomainResource):
         description="If this is a reply to prior message",
         default=None,
     )
-    focus: Optional[List[Reference]] = Field(
+    focus: Optional[ListType[Reference]] = Field(
         description="The actual content of the message",
         default=None,
     )

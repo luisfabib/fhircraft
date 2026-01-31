@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,7 +50,7 @@ class ValueSetComposeIncludeConceptDesignation(BackboneElement):
         description="Types of uses of designations",
         default=None,
     )
-    additionalUse: Optional[List[Coding]] = Field(
+    additionalUse: Optional[ListType[Coding]] = Field(
         description="Additional ways how this designation would be used",
         default=None,
     )
@@ -88,7 +88,7 @@ class ValueSetComposeIncludeConcept(BackboneElement):
         default=None,
         alias="_display",
     )
-    designation: Optional[List[ValueSetComposeIncludeConceptDesignation]] = Field(
+    designation: Optional[ListType[ValueSetComposeIncludeConceptDesignation]] = Field(
         description="Additional representations for this concept",
         default=None,
     )
@@ -152,19 +152,19 @@ class ValueSetComposeInclude(BackboneElement):
         default=None,
         alias="_version",
     )
-    concept: Optional[List[ValueSetComposeIncludeConcept]] = Field(
+    concept: Optional[ListType[ValueSetComposeIncludeConcept]] = Field(
         description="A concept defined in the system",
         default=None,
     )
-    filter: Optional[List[ValueSetComposeIncludeFilter]] = Field(
+    filter: Optional[ListType[ValueSetComposeIncludeFilter]] = Field(
         description="Select codes/concepts by their properties (including relationships)",
         default=None,
     )
-    valueSet: Optional[List[Canonical]] = Field(
+    valueSet: Optional[ListType[Canonical]] = Field(
         description="Select the contents included in this value set",
         default=None,
     )
-    valueSet_ext: Optional[List[Optional[Element]]] = Field(
+    valueSet_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for valueSet extensions",
         default=None,
         alias="_valueSet",
@@ -203,15 +203,15 @@ class ValueSetComposeExclude(BackboneElement):
         default=None,
         alias="_version",
     )
-    concept: Optional[List[ValueSetComposeIncludeConcept]] = Field(
+    concept: Optional[ListType[ValueSetComposeIncludeConcept]] = Field(
         description="A concept defined in the system",
         default=None,
     )
-    filter: Optional[List[ValueSetComposeIncludeFilter]] = Field(
+    filter: Optional[ListType[ValueSetComposeIncludeFilter]] = Field(
         description="Select codes/concepts by their properties (including relationships)",
         default=None,
     )
-    valueSet: Optional[List[Canonical]] = Field(
+    valueSet: Optional[ListType[Canonical]] = Field(
         description="Select the contents included in this value set",
         default=None,
     )
@@ -254,15 +254,15 @@ class ValueSetCompose(BackboneElement):
         default=None,
         alias="_inactive",
     )
-    include: Optional[List[ValueSetComposeInclude]] = Field(
+    include: Optional[ListType[ValueSetComposeInclude]] = Field(
         description="Include one or more codes from a code system or other value set(s)",
         default=None,
     )
-    exclude: Optional[List[ValueSetComposeExclude]] = Field(
+    exclude: Optional[ListType[ValueSetComposeExclude]] = Field(
         description="Explicitly exclude codes from a code system or other value sets",
         default=None,
     )
-    property_: Optional[List[String]] = Field(
+    property_: Optional[ListType[String]] = Field(
         description="Property to return if client doesn\u0027t override",
         default=None,
         alias="property",
@@ -408,7 +408,7 @@ class ValueSetExpansionContainsDesignation(BackboneElement):
         description="Types of uses of designations",
         default=None,
     )
-    additionalUse: Optional[List[Coding]] = Field(
+    additionalUse: Optional[ListType[Coding]] = Field(
         description="Additional ways how this designation would be used",
         default=None,
     )
@@ -585,7 +585,7 @@ class ValueSetExpansionContainsProperty(BackboneElement):
         default=None,
         alias="_valueDecimal",
     )
-    subProperty: Optional[List[ValueSetExpansionContainsPropertySubProperty]] = Field(
+    subProperty: Optional[ListType[ValueSetExpansionContainsPropertySubProperty]] = Field(
         description="SubProperty value for the concept",
         default=None,
     )
@@ -666,16 +666,16 @@ class ValueSetExpansionContains(BackboneElement):
         default=None,
         alias="_display",
     )
-    designation: Optional[List[ValueSetExpansionContainsDesignation]] = Field(
+    designation: Optional[ListType[ValueSetExpansionContainsDesignation]] = Field(
         description="Additional representations for this item",
         default=None,
     )
-    property_: Optional[List[ValueSetExpansionContainsProperty]] = Field(
+    property_: Optional[ListType[ValueSetExpansionContainsProperty]] = Field(
         description="Property value for the concept",
         default=None,
         alias="property",
     )
-    contains: Optional[List["ValueSetExpansionContains"]] = Field(
+    contains: Optional[ListType["ValueSetExpansionContains"]] = Field(
         description="Codes contained under this entry",
         default=None,
     )
@@ -690,7 +690,7 @@ class ValueSetExpansion(BackboneElement):
         description="Identifies the value set expansion (business identifier)",
         default=None,
     )
-    identifier_ext: Optional[List[Optional[Element]]] = Field(
+    identifier_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for identifier extensions",
         default=None,
         alias="_identifier",
@@ -731,16 +731,16 @@ class ValueSetExpansion(BackboneElement):
         default=None,
         alias="_offset",
     )
-    parameter: Optional[List[ValueSetExpansionParameter]] = Field(
+    parameter: Optional[ListType[ValueSetExpansionParameter]] = Field(
         description="Parameter that controlled the expansion process",
         default=None,
     )
-    property_: Optional[List[ValueSetExpansionProperty]] = Field(
+    property_: Optional[ListType[ValueSetExpansionProperty]] = Field(
         description="Additional information supplied about each concept",
         default=None,
         alias="property",
     )
-    contains: Optional[List[ValueSetExpansionContains]] = Field(
+    contains: Optional[ListType[ValueSetExpansionContains]] = Field(
         description="Codes in the value set",
         default=None,
     )
@@ -789,7 +789,7 @@ class ValueSet(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the value set (business identifier)",
         default=None,
     )
@@ -869,7 +869,7 @@ class ValueSet(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -882,11 +882,11 @@ class ValueSet(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for value set (if applicable)",
         default=None,
     )
@@ -948,27 +948,27 @@ class ValueSet(DomainResource):
         description="When the ValueSet is expected to be used",
         default=None,
     )
-    topic: Optional[List[CodeableConcept]] = Field(
+    topic: Optional[ListType[CodeableConcept]] = Field(
         description="E.g. Education, Treatment, Assessment, etc",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the ValueSet",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the ValueSet",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the ValueSet",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the ValueSet",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc",
         default=None,
     )

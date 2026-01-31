@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -31,7 +31,7 @@ class OrganizationAffiliation(DomainResource):
     _type = "OrganizationAffiliation"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/OrganizationAffiliation"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifiers that are specific to this role",
         default=None,
     )
@@ -56,31 +56,31 @@ class OrganizationAffiliation(DomainResource):
         description="Organization that provides/performs the role (e.g. providing services or is a member of)",
         default=None,
     )
-    network: Optional[List[Reference]] = Field(
+    network: Optional[ListType[Reference]] = Field(
         description="The network in which the participatingOrganization provides the role\u0027s services (if defined) at the indicated locations (if defined)",
         default=None,
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Definition of the role the participatingOrganization plays",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="Specific specialty of the participatingOrganization in the context of the role",
         default=None,
     )
-    location: Optional[List[Reference]] = Field(
+    location: Optional[ListType[Reference]] = Field(
         description="The location(s) at which the role occurs",
         default=None,
     )
-    healthcareService: Optional[List[Reference]] = Field(
+    healthcareService: Optional[ListType[Reference]] = Field(
         description="Healthcare services provided through the role",
         default=None,
     )
-    contact: Optional[List[ExtendedContactDetail]] = Field(
+    contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details at the participatingOrganization relevant to this Affiliation",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for this role",
         default=None,
     )

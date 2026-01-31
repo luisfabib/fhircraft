@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -31,7 +31,7 @@ class DeviceAssociationOperation(BackboneElement):
         description="Device operational condition",
         default=None,
     )
-    operator: Optional[List[Reference]] = Field(
+    operator: Optional[ListType[Reference]] = Field(
         description="The individual performing the action enabled by the device",
         default=None,
     )
@@ -50,7 +50,7 @@ class DeviceAssociation(DomainResource):
     _type = "DeviceAssociation"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceAssociation"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Instance identifier",
         default=None,
     )
@@ -58,7 +58,7 @@ class DeviceAssociation(DomainResource):
         description="Reference to the devices associated with the patient or group",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Describes the relationship between the device and subject",
         default=None,
     )
@@ -66,7 +66,7 @@ class DeviceAssociation(DomainResource):
         description="implanted | explanted | attached | entered-in-error | unknown",
         default=None,
     )
-    statusReason: Optional[List[CodeableConcept]] = Field(
+    statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="The reasons given for the current association status",
         default=None,
     )
@@ -82,7 +82,7 @@ class DeviceAssociation(DomainResource):
         description="Begin and end dates and times for the device association",
         default=None,
     )
-    operation: Optional[List[DeviceAssociationOperation]] = Field(
+    operation: Optional[ListType[DeviceAssociationOperation]] = Field(
         description="The details about the device when it is in use to describe its operation",
         default=None,
     )

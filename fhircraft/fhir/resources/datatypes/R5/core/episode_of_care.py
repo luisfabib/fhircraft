@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -52,7 +52,7 @@ class EpisodeOfCareReason(BackboneElement):
         description="What the reason value should be used for/as",
         default=None,
     )
-    value: Optional[List[CodeableReference]] = Field(
+    value: Optional[ListType[CodeableReference]] = Field(
         description="Medical reason to be addressed",
         default=None,
     )
@@ -63,7 +63,7 @@ class EpisodeOfCareDiagnosis(BackboneElement):
     The list of medical conditions that were addressed during the episode of care.
     """
 
-    condition: Optional[List[CodeableReference]] = Field(
+    condition: Optional[ListType[CodeableReference]] = Field(
         description="The medical condition that was addressed during the episode of care",
         default=None,
     )
@@ -82,7 +82,7 @@ class EpisodeOfCare(DomainResource):
     _type = "EpisodeOfCare"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/EpisodeOfCare"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier(s) relevant for this EpisodeOfCare",
         default=None,
     )
@@ -95,19 +95,19 @@ class EpisodeOfCare(DomainResource):
         default=None,
         alias="_status",
     )
-    statusHistory: Optional[List[EpisodeOfCareStatusHistory]] = Field(
+    statusHistory: Optional[ListType[EpisodeOfCareStatusHistory]] = Field(
         description="Past list of status codes (the current status may be included to cover the start date of the status)",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type/class  - e.g. specialist referral, disease management",
         default=None,
     )
-    reason: Optional[List[EpisodeOfCareReason]] = Field(
+    reason: Optional[ListType[EpisodeOfCareReason]] = Field(
         description="The list of medical reasons that are expected to be addressed during the episode of care",
         default=None,
     )
-    diagnosis: Optional[List[EpisodeOfCareDiagnosis]] = Field(
+    diagnosis: Optional[ListType[EpisodeOfCareDiagnosis]] = Field(
         description="The list of medical conditions that were addressed during the episode of care",
         default=None,
     )
@@ -123,7 +123,7 @@ class EpisodeOfCare(DomainResource):
         description="Interval during responsibility is assumed",
         default=None,
     )
-    referralRequest: Optional[List[Reference]] = Field(
+    referralRequest: Optional[ListType[Reference]] = Field(
         description="Originating Referral Request(s)",
         default=None,
     )
@@ -131,11 +131,11 @@ class EpisodeOfCare(DomainResource):
         description="Care manager/care coordinator for the patient",
         default=None,
     )
-    careTeam: Optional[List[Reference]] = Field(
+    careTeam: Optional[ListType[Reference]] = Field(
         description="Other practitioners facilitating this episode of care",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="The set of accounts that may be used for billing for this EpisodeOfCare",
         default=None,
     )

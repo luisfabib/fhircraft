@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -210,7 +210,7 @@ class StructureMapGroupRuleSource(BackboneElement):
         description="first | not_first | last | not_last | only_one",
         default=None,
     )
-    listMode_ext: Optional[List[Optional[Element]]] = Field(
+    listMode_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for listMode extensions",
         default=None,
         alias="_listMode",
@@ -380,7 +380,7 @@ class StructureMapGroupRuleTarget(BackboneElement):
         default=None,
         alias="_variable",
     )
-    listMode: Optional[List[Code]] = Field(
+    listMode: Optional[ListType[Code]] = Field(
         description="first | share | last | single",
         default=None,
     )
@@ -407,7 +407,7 @@ class StructureMapGroupRuleTarget(BackboneElement):
         default=None,
         alias="_transform",
     )
-    parameter: Optional[List[StructureMapGroupRuleTargetParameter]] = Field(
+    parameter: Optional[ListType[StructureMapGroupRuleTargetParameter]] = Field(
         description="Parameters to the transform",
         default=None,
     )
@@ -522,7 +522,7 @@ class StructureMapGroupRuleDependent(BackboneElement):
         default=None,
         alias="_name",
     )
-    parameter: Optional[List[StructureMapGroupRuleDependentParameter]] = Field(
+    parameter: Optional[ListType[StructureMapGroupRuleDependentParameter]] = Field(
         description="Parameter to pass to the rule or group",
         default=None,
     )
@@ -542,19 +542,19 @@ class StructureMapGroupRule(BackboneElement):
         default=None,
         alias="_name",
     )
-    source: Optional[List[StructureMapGroupRuleSource]] = Field(
+    source: Optional[ListType[StructureMapGroupRuleSource]] = Field(
         description="Source inputs to the mapping",
         default=None,
     )
-    target: Optional[List[StructureMapGroupRuleTarget]] = Field(
+    target: Optional[ListType[StructureMapGroupRuleTarget]] = Field(
         description="Content to create because of this mapping rule",
         default=None,
     )
-    rule: Optional[List["StructureMapGroupRule"]] = Field(
+    rule: Optional[ListType["StructureMapGroupRule"]] = Field(
         description="Rules contained in this rule",
         default=None,
     )
-    dependent: Optional[List[StructureMapGroupRuleDependent]] = Field(
+    dependent: Optional[ListType[StructureMapGroupRuleDependent]] = Field(
         description="Which other rules to apply in the context of this rule",
         default=None,
     )
@@ -610,11 +610,11 @@ class StructureMapGroup(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    input: Optional[List[StructureMapGroupInput]] = Field(
+    input: Optional[ListType[StructureMapGroupInput]] = Field(
         description="Named instance provided when invoking the map",
         default=None,
     )
-    rule: Optional[List[StructureMapGroupRule]] = Field(
+    rule: Optional[ListType[StructureMapGroupRule]] = Field(
         description="Transform Rule from source to target",
         default=None,
     )
@@ -638,7 +638,7 @@ class StructureMap(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure map",
         default=None,
     )
@@ -718,7 +718,7 @@ class StructureMap(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -731,11 +731,11 @@ class StructureMap(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for structure map (if applicable)",
         default=None,
     )
@@ -766,11 +766,11 @@ class StructureMap(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    structure: Optional[List[StructureMapStructure]] = Field(
+    structure: Optional[ListType[StructureMapStructure]] = Field(
         description="Structure Definition used by this map",
         default=None,
     )
-    import_: Optional[List[Canonical]] = Field(
+    import_: Optional[ListType[Canonical]] = Field(
         description="Other maps used by this map (canonical URLs)",
         default=None,
         alias="import",
@@ -780,11 +780,11 @@ class StructureMap(DomainResource):
         default=None,
         alias="_import",
     )
-    const: Optional[List[StructureMapConst]] = Field(
+    const: Optional[ListType[StructureMapConst]] = Field(
         description="Definition of the constant value used in the map rules",
         default=None,
     )
-    group: Optional[List[StructureMapGroup]] = Field(
+    group: Optional[ListType[StructureMapGroup]] = Field(
         description="Named sections for reader convenience",
         default=None,
     )

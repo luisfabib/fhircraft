@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -46,7 +46,7 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
         description="Category of medicationKnowledge",
         default=None,
     )
-    reference: Optional[List[Reference]] = Field(
+    reference: Optional[ListType[Reference]] = Field(
         description="Associated documentation about the associated medication knowledge",
         default=None,
     )
@@ -70,7 +70,7 @@ class MedicationKnowledgeCost(BackboneElement):
     The price of the medication.
     """
 
-    effectiveDate: Optional[List[Period]] = Field(
+    effectiveDate: Optional[ListType[Period]] = Field(
         description="The date range for which the cost is effective",
         default=None,
     )
@@ -125,7 +125,7 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         description="Name of the reviewing program",
         default=None,
     )
-    name_ext: Optional[List[Optional[Element]]] = Field(
+    name_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for name extensions",
         default=None,
         alias="_name",
@@ -140,7 +140,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage(BackboneElemen
         description="Category of dosage for a medication",
         default=None,
     )
-    dosage: Optional[List[Dosage]] = Field(
+    dosage: Optional[ListType[Dosage]] = Field(
         description="Dosage for the medication for the specific guidelines",
         default=None,
     )
@@ -195,7 +195,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline(BackboneElement):
         default=None,
     )
     dosage: Optional[
-        List[MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage]
+        ListType[MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage]
     ] = Field(
         description="Dosage for the medication for the specific guidelines",
         default=None,
@@ -205,7 +205,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline(BackboneElement):
         default=None,
     )
     patientCharacteristic: Optional[
-        List[MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic]
+        ListType[MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic]
     ] = Field(
         description="Characteristics of the patient that are relevant to the administration guidelines",
         default=None,
@@ -216,12 +216,12 @@ class MedicationKnowledgeIndicationGuideline(BackboneElement):
     Guidelines or protocols that are applicable for the administration of the medication based on indication.
     """
 
-    indication: Optional[List[CodeableReference]] = Field(
+    indication: Optional[ListType[CodeableReference]] = Field(
         description="Indication for use that applies to the specific administration guideline",
         default=None,
     )
     dosingGuideline: Optional[
-        List[MedicationKnowledgeIndicationGuidelineDosingGuideline]
+        ListType[MedicationKnowledgeIndicationGuidelineDosingGuideline]
     ] = Field(
         description="Guidelines for dosage of the medication",
         default=None,
@@ -254,7 +254,7 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
         default=None,
         alias="_sourceUri",
     )
-    classification: Optional[List[CodeableConcept]] = Field(
+    classification: Optional[ListType[CodeableConcept]] = Field(
         description="Specific category assigned to the medication",
         default=None,
     )
@@ -280,7 +280,7 @@ class MedicationKnowledgePackagingCost(BackboneElement):
     The cost of the packaged medication.
     """
 
-    effectiveDate: Optional[List[Period]] = Field(
+    effectiveDate: Optional[ListType[Period]] = Field(
         description="The date range for which the cost is effective",
         default=None,
     )
@@ -327,7 +327,7 @@ class MedicationKnowledgePackaging(BackboneElement):
     Information that only applies to packages (not products).
     """
 
-    cost: Optional[List[MedicationKnowledgePackagingCost]] = Field(
+    cost: Optional[ListType[MedicationKnowledgePackagingCost]] = Field(
         description="Cost of the packaged medication",
         default=None,
     )
@@ -383,12 +383,12 @@ class MedicationKnowledgeStorageGuideline(BackboneElement):
         description="Reference to additional information",
         default=None,
     )
-    reference_ext: Optional[List[Optional[Element]]] = Field(
+    reference_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for reference extensions",
         default=None,
         alias="_reference",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional storage notes",
         default=None,
     )
@@ -397,7 +397,7 @@ class MedicationKnowledgeStorageGuideline(BackboneElement):
         default=None,
     )
     environmentalSetting: Optional[
-        List[MedicationKnowledgeStorageGuidelineEnvironmentalSetting]
+        ListType[MedicationKnowledgeStorageGuidelineEnvironmentalSetting]
     ] = Field(
         description="Setting or value of environment for adequate storage",
         default=None,
@@ -445,11 +445,11 @@ class MedicationKnowledgeRegulatory(BackboneElement):
         description="Specifies the authority of the regulation",
         default=None,
     )
-    substitution: Optional[List[MedicationKnowledgeRegulatorySubstitution]] = Field(
+    substitution: Optional[ListType[MedicationKnowledgeRegulatorySubstitution]] = Field(
         description="Specifies if changes are allowed when dispensing a medication from a regulatory perspective",
         default=None,
     )
-    schedule: Optional[List[CodeableConcept]] = Field(
+    schedule: Optional[ListType[CodeableConcept]] = Field(
         description="Specifies the schedule of a medication in jurisdiction",
         default=None,
     )
@@ -561,7 +561,7 @@ class MedicationKnowledgeDefinitional(BackboneElement):
     Along with the link to a Medicinal Product Definition resource, this information provides common definitional elements that are needed to understand the specific medication that is being described.
     """
 
-    definition: Optional[List[Reference]] = Field(
+    definition: Optional[ListType[Reference]] = Field(
         description="Definitional resources that provide more information about this medication",
         default=None,
     )
@@ -569,16 +569,16 @@ class MedicationKnowledgeDefinitional(BackboneElement):
         description="powder | tablets | capsule +",
         default=None,
     )
-    intendedRoute: Optional[List[CodeableConcept]] = Field(
+    intendedRoute: Optional[ListType[CodeableConcept]] = Field(
         description="The intended or approved route of administration",
         default=None,
     )
-    ingredient: Optional[List[MedicationKnowledgeDefinitionalIngredient]] = Field(
+    ingredient: Optional[ListType[MedicationKnowledgeDefinitionalIngredient]] = Field(
         description="Active or inactive ingredient",
         default=None,
     )
     drugCharacteristic: Optional[
-        List[MedicationKnowledgeDefinitionalDrugCharacteristic]
+        ListType[MedicationKnowledgeDefinitionalDrugCharacteristic]
     ] = Field(
         description="Specifies descriptive properties of the medicine",
         default=None,
@@ -593,7 +593,7 @@ class MedicationKnowledge(DomainResource):
     _type = "MedicationKnowledge"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationKnowledge"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this medication",
         default=None,
     )
@@ -614,11 +614,11 @@ class MedicationKnowledge(DomainResource):
         description="Creator or owner of the knowledge or information about the medication",
         default=None,
     )
-    intendedJurisdiction: Optional[List[CodeableConcept]] = Field(
+    intendedJurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Codes that identify the different jurisdictions for which the information of this resource was created",
         default=None,
     )
-    name: Optional[List[String]] = Field(
+    name: Optional[ListType[String]] = Field(
         description="A name associated with the medication being described",
         default=None,
     )
@@ -628,20 +628,20 @@ class MedicationKnowledge(DomainResource):
         alias="_name",
     )
     relatedMedicationKnowledge: Optional[
-        List[MedicationKnowledgeRelatedMedicationKnowledge]
+        ListType[MedicationKnowledgeRelatedMedicationKnowledge]
     ] = Field(
         description="Associated or related medication information",
         default=None,
     )
-    associatedMedication: Optional[List[Reference]] = Field(
+    associatedMedication: Optional[ListType[Reference]] = Field(
         description="The set of medication resources that are associated with this medication",
         default=None,
     )
-    productType: Optional[List[CodeableConcept]] = Field(
+    productType: Optional[ListType[CodeableConcept]] = Field(
         description="Category of the medication or product",
         default=None,
     )
-    monograph: Optional[List[MedicationKnowledgeMonograph]] = Field(
+    monograph: Optional[ListType[MedicationKnowledgeMonograph]] = Field(
         description="Associated documentation about the medication",
         default=None,
     )
@@ -654,37 +654,37 @@ class MedicationKnowledge(DomainResource):
         default=None,
         alias="_preparationInstruction",
     )
-    cost: Optional[List[MedicationKnowledgeCost]] = Field(
+    cost: Optional[ListType[MedicationKnowledgeCost]] = Field(
         description="The pricing of the medication",
         default=None,
     )
-    monitoringProgram: Optional[List[MedicationKnowledgeMonitoringProgram]] = Field(
+    monitoringProgram: Optional[ListType[MedicationKnowledgeMonitoringProgram]] = Field(
         description="Program under which a medication is reviewed",
         default=None,
     )
-    indicationGuideline: Optional[List[MedicationKnowledgeIndicationGuideline]] = Field(
+    indicationGuideline: Optional[ListType[MedicationKnowledgeIndicationGuideline]] = Field(
         description="Guidelines or protocols for administration of the medication for an indication",
         default=None,
     )
     medicineClassification: Optional[
-        List[MedicationKnowledgeMedicineClassification]
+        ListType[MedicationKnowledgeMedicineClassification]
     ] = Field(
         description="Categorization of the medication within a formulary or classification system",
         default=None,
     )
-    packaging: Optional[List[MedicationKnowledgePackaging]] = Field(
+    packaging: Optional[ListType[MedicationKnowledgePackaging]] = Field(
         description="Details about packaged medications",
         default=None,
     )
-    clinicalUseIssue: Optional[List[Reference]] = Field(
+    clinicalUseIssue: Optional[ListType[Reference]] = Field(
         description="Potential clinical issue with or between medication(s)",
         default=None,
     )
-    storageGuideline: Optional[List[MedicationKnowledgeStorageGuideline]] = Field(
+    storageGuideline: Optional[ListType[MedicationKnowledgeStorageGuideline]] = Field(
         description="How the medication should be stored",
         default=None,
     )
-    regulatory: Optional[List[MedicationKnowledgeRegulatory]] = Field(
+    regulatory: Optional[ListType[MedicationKnowledgeRegulatory]] = Field(
         description="Regulatory information about a medication",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -28,7 +28,7 @@ class EnrollmentResponse(DomainResource):
     _type = "EnrollmentResponse"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/EnrollmentResponse"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier",
         default=None,
     )

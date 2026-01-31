@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -159,7 +159,7 @@ class ConditionDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the condition definition",
         default=None,
     )
@@ -248,7 +248,7 @@ class ConditionDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -261,11 +261,11 @@ class ConditionDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for condition definition (if applicable)",
         default=None,
     )
@@ -312,36 +312,36 @@ class ConditionDefinition(DomainResource):
         default=None,
         alias="_hasStage",
     )
-    definition: Optional[List[Uri]] = Field(
+    definition: Optional[ListType[Uri]] = Field(
         description="Formal Definition for the condition",
         default=None,
     )
-    definition_ext: Optional[List[Optional[Element]]] = Field(
+    definition_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for definition extensions",
         default=None,
         alias="_definition",
     )
-    observation: Optional[List[ConditionDefinitionObservation]] = Field(
+    observation: Optional[ListType[ConditionDefinitionObservation]] = Field(
         description="Observations particularly relevant to this condition",
         default=None,
     )
-    medication: Optional[List[ConditionDefinitionMedication]] = Field(
+    medication: Optional[ListType[ConditionDefinitionMedication]] = Field(
         description="Medications particularly relevant for this condition",
         default=None,
     )
-    precondition: Optional[List[ConditionDefinitionPrecondition]] = Field(
+    precondition: Optional[ListType[ConditionDefinitionPrecondition]] = Field(
         description="Observation that suggets this condition",
         default=None,
     )
-    team: Optional[List[Reference]] = Field(
+    team: Optional[ListType[Reference]] = Field(
         description="Appropriate team for this condition",
         default=None,
     )
-    questionnaire: Optional[List[ConditionDefinitionQuestionnaire]] = Field(
+    questionnaire: Optional[ListType[ConditionDefinitionQuestionnaire]] = Field(
         description="Questionnaire for this condition",
         default=None,
     )
-    plan: Optional[List[ConditionDefinitionPlan]] = Field(
+    plan: Optional[ListType[ConditionDefinitionPlan]] = Field(
         description="Plan that is appropriate",
         default=None,
     )

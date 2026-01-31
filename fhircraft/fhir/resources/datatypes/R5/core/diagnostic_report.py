@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -75,11 +75,11 @@ class DiagnosticReport(DomainResource):
     _type = "DiagnosticReport"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DiagnosticReport"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for report",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="What was requested",
         default=None,
     )
@@ -92,7 +92,7 @@ class DiagnosticReport(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Service category",
         default=None,
     )
@@ -130,35 +130,35 @@ class DiagnosticReport(DomainResource):
         default=None,
         alias="_issued",
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Responsible Diagnostic Service",
         default=None,
     )
-    resultsInterpreter: Optional[List[Reference]] = Field(
+    resultsInterpreter: Optional[ListType[Reference]] = Field(
         description="Primary result interpreter",
         default=None,
     )
-    specimen: Optional[List[Reference]] = Field(
+    specimen: Optional[ListType[Reference]] = Field(
         description="Specimens this report is based on",
         default=None,
     )
-    result: Optional[List[Reference]] = Field(
+    result: Optional[ListType[Reference]] = Field(
         description="Observations",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments about the diagnostic report",
         default=None,
     )
-    study: Optional[List[Reference]] = Field(
+    study: Optional[ListType[Reference]] = Field(
         description="Reference to full details of an analysis associated with the diagnostic report",
         default=None,
     )
-    supportingInfo: Optional[List[DiagnosticReportSupportingInfo]] = Field(
+    supportingInfo: Optional[ListType[DiagnosticReportSupportingInfo]] = Field(
         description="Additional information supporting the diagnostic report",
         default=None,
     )
-    media: Optional[List[DiagnosticReportMedia]] = Field(
+    media: Optional[ListType[DiagnosticReportMedia]] = Field(
         description="Key images or data associated with this report",
         default=None,
     )
@@ -175,11 +175,11 @@ class DiagnosticReport(DomainResource):
         default=None,
         alias="_conclusion",
     )
-    conclusionCode: Optional[List[CodeableConcept]] = Field(
+    conclusionCode: Optional[ListType[CodeableConcept]] = Field(
         description="Codes for the clinical conclusion of test results",
         default=None,
     )
-    presentedForm: Optional[List[Attachment]] = Field(
+    presentedForm: Optional[ListType[Attachment]] = Field(
         description="Entire report as issued",
         default=None,
     )

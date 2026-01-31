@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -112,33 +112,33 @@ class NutritionIntake(DomainResource):
     _type = "NutritionIntake"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/NutritionIntake"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesCanonical extensions",
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesUri extensions",
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfils plan, proposal or order",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -151,7 +151,7 @@ class NutritionIntake(DomainResource):
         default=None,
         alias="_status",
     )
-    statusReason: Optional[List[CodeableConcept]] = Field(
+    statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for current status",
         default=None,
     )
@@ -202,15 +202,15 @@ class NutritionIntake(DomainResource):
         description="Person or organization that provided the information about the consumption of this food or fluid",
         default=None,
     )
-    consumedItem: Optional[List[NutritionIntakeConsumedItem]] = Field(
+    consumedItem: Optional[ListType[NutritionIntakeConsumedItem]] = Field(
         description="What food or fluid product or item was consumed",
         default=None,
     )
-    ingredientLabel: Optional[List[NutritionIntakeIngredientLabel]] = Field(
+    ingredientLabel: Optional[ListType[NutritionIntakeIngredientLabel]] = Field(
         description="Total nutrient for the whole meal, product, serving",
         default=None,
     )
-    performer: Optional[List[NutritionIntakePerformer]] = Field(
+    performer: Optional[ListType[NutritionIntakePerformer]] = Field(
         description="Who was performed in the intake",
         default=None,
     )
@@ -218,15 +218,15 @@ class NutritionIntake(DomainResource):
         description="Where the intake occurred",
         default=None,
     )
-    derivedFrom: Optional[List[Reference]] = Field(
+    derivedFrom: Optional[ListType[Reference]] = Field(
         description="Additional supporting information",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Reason for why the food or fluid is /was consumed",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Further information about the consumption",
         default=None,
     )

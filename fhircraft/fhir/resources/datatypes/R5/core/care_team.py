@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -76,7 +76,7 @@ class CareTeam(DomainResource):
     _type = "CareTeam"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CareTeam"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this team",
         default=None,
     )
@@ -89,7 +89,7 @@ class CareTeam(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of team",
         default=None,
     )
@@ -110,23 +110,23 @@ class CareTeam(DomainResource):
         description="Time period team covers",
         default=None,
     )
-    participant: Optional[List[CareTeamParticipant]] = Field(
+    participant: Optional[ListType[CareTeamParticipant]] = Field(
         description="Members of the team",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why the care team exists",
         default=None,
     )
-    managingOrganization: Optional[List[Reference]] = Field(
+    managingOrganization: Optional[ListType[Reference]] = Field(
         description="Organization responsible for the care team",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="A contact detail for the care team (that applies to all members)",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the CareTeam",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,7 +50,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue(BackboneElement):
         description="Expresses the type of characteristic",
         default=None,
     )
-    method: Optional[List[CodeableConcept]] = Field(
+    method: Optional[ListType[CodeableConcept]] = Field(
         description="Method for how the characteristic value was determined",
         default=None,
     )
@@ -137,7 +137,7 @@ class EvidenceVariableCharacteristicDefinitionByCombination(BackboneElement):
         default=None,
         alias="_threshold",
     )
-    characteristic: Optional[List["EvidenceVariableCharacteristic"]] = Field(
+    characteristic: Optional[ListType["EvidenceVariableCharacteristic"]] = Field(
         description="A defining factor of the characteristic",
         default=None,
     )
@@ -157,7 +157,7 @@ class EvidenceVariableCharacteristicTimeFromEvent(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
@@ -236,7 +236,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
@@ -307,7 +307,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Length of time in which the characteristic is met",
         default=None,
     )
-    timeFromEvent: Optional[List[EvidenceVariableCharacteristicTimeFromEvent]] = Field(
+    timeFromEvent: Optional[ListType[EvidenceVariableCharacteristicTimeFromEvent]] = Field(
         description="Timing in which the characteristic is determined",
         default=None,
     )
@@ -407,7 +407,7 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the evidence variable",
         default=None,
     )
@@ -496,7 +496,7 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -509,11 +509,11 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes or explanatory notes",
         default=None,
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
@@ -566,23 +566,23 @@ class EvidenceVariable(DomainResource):
         description="When the resource is expected to be used",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc",
         default=None,
     )
@@ -595,7 +595,7 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_actual",
     )
-    characteristic: Optional[List[EvidenceVariableCharacteristic]] = Field(
+    characteristic: Optional[ListType[EvidenceVariableCharacteristic]] = Field(
         description="A defining factor of the EvidenceVariable",
         default=None,
     )
@@ -608,7 +608,7 @@ class EvidenceVariable(DomainResource):
         default=None,
         alias="_handling",
     )
-    category: Optional[List[EvidenceVariableCategory]] = Field(
+    category: Optional[ListType[EvidenceVariableCategory]] = Field(
         description="A grouping for ordinal or polychotomous variables",
         default=None,
     )

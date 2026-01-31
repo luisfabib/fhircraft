@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -55,20 +55,20 @@ class OperationOutcomeIssue(BackboneElement):
         default=None,
         alias="_diagnostics",
     )
-    location: Optional[List[String]] = Field(
+    location: Optional[ListType[String]] = Field(
         description="Deprecated: Path of element(s) related to issue",
         default=None,
     )
-    location_ext: Optional[List[Optional[Element]]] = Field(
+    location_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for location extensions",
         default=None,
         alias="_location",
     )
-    expression: Optional[List[String]] = Field(
+    expression: Optional[ListType[String]] = Field(
         description="FHIRPath of element(s) related to issue",
         default=None,
     )
-    expression_ext: Optional[List[Optional[Element]]] = Field(
+    expression_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for expression extensions",
         default=None,
         alias="_expression",
@@ -84,7 +84,7 @@ class OperationOutcome(DomainResource):
     _type = "OperationOutcome"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/OperationOutcome"
 
-    issue: Optional[List[OperationOutcomeIssue]] = Field(
+    issue: Optional[ListType[OperationOutcomeIssue]] = Field(
         description="A single issue associated with the action",
         default=None,
     )

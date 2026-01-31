@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -36,7 +36,7 @@ class OrganizationQualification(BackboneElement):
     For example, an approval to provide a type of services issued by a certifying body (such as the US Joint Commission) to an organization.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier for this qualification for the organization",
         default=None,
     )
@@ -63,7 +63,7 @@ class Organization(DomainResource):
     _type = "Organization"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Organization"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifies this organization  across multiple systems",
         default=None,
     )
@@ -76,7 +76,7 @@ class Organization(DomainResource):
         default=None,
         alias="_active",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of organization",
         default=None,
     )
@@ -89,11 +89,11 @@ class Organization(DomainResource):
         default=None,
         alias="_name",
     )
-    alias: Optional[List[String]] = Field(
+    alias: Optional[ListType[String]] = Field(
         description="A list of alternate names that the organization is known as, or was known as in the past",
         default=None,
     )
-    alias_ext: Optional[List[Optional[Element]]] = Field(
+    alias_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",
@@ -107,7 +107,7 @@ class Organization(DomainResource):
         default=None,
         alias="_description",
     )
-    contact: Optional[List[ExtendedContactDetail]] = Field(
+    contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details for the Organization",
         default=None,
     )
@@ -115,11 +115,11 @@ class Organization(DomainResource):
         description="The organization of which this organization forms a part",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the organization",
         default=None,
     )
-    qualification: Optional[List[OrganizationQualification]] = Field(
+    qualification: Optional[ListType[OrganizationQualification]] = Field(
         description="Qualifications, certifications, accreditations, licenses, training, etc. pertaining to the provision of care",
         default=None,
     )

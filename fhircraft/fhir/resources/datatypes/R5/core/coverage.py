@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -122,7 +122,7 @@ class CoverageCostToBeneficiary(BackboneElement):
         description="The amount or percentage due from the beneficiary",
         default=None,
     )
-    exception: Optional[List[CoverageCostToBeneficiaryException]] = Field(
+    exception: Optional[ListType[CoverageCostToBeneficiaryException]] = Field(
         description="Exceptions for patient payments",
         default=None,
     )
@@ -153,7 +153,7 @@ class Coverage(DomainResource):
     _type = "Coverage"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Coverage"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier(s) for this coverage",
         default=None,
     )
@@ -175,7 +175,7 @@ class Coverage(DomainResource):
         default=None,
         alias="_kind",
     )
-    paymentBy: Optional[List[CoveragePaymentBy]] = Field(
+    paymentBy: Optional[ListType[CoveragePaymentBy]] = Field(
         description="Self-pay parties and responsibility",
         default=None,
     )
@@ -191,7 +191,7 @@ class Coverage(DomainResource):
         description="Subscriber to the policy",
         default=None,
     )
-    subscriberId: Optional[List[Identifier]] = Field(
+    subscriberId: Optional[ListType[Identifier]] = Field(
         description="ID assigned to the subscriber",
         default=None,
     )
@@ -220,7 +220,7 @@ class Coverage(DomainResource):
         description="Issuer of the policy",
         default=None,
     )
-    class_: Optional[List[CoverageClass]] = Field(
+    class_: Optional[ListType[CoverageClass]] = Field(
         description="Additional coverage classifications",
         default=None,
         alias="class",
@@ -243,7 +243,7 @@ class Coverage(DomainResource):
         default=None,
         alias="_network",
     )
-    costToBeneficiary: Optional[List[CoverageCostToBeneficiary]] = Field(
+    costToBeneficiary: Optional[ListType[CoverageCostToBeneficiary]] = Field(
         description="Patient payments for services/products",
         default=None,
     )
@@ -256,7 +256,7 @@ class Coverage(DomainResource):
         default=None,
         alias="_subrogation",
     )
-    contract: Optional[List[Reference]] = Field(
+    contract: Optional[ListType[Reference]] = Field(
         description="Contract details",
         default=None,
     )

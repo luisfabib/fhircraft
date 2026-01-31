@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -57,24 +57,24 @@ class ChargeItem(DomainResource):
     _type = "ChargeItem"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ChargeItem"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for item",
         default=None,
     )
-    definitionUri: Optional[List[Uri]] = Field(
+    definitionUri: Optional[ListType[Uri]] = Field(
         description="Defining information about the code of this charge item",
         default=None,
     )
-    definitionUri_ext: Optional[List[Optional[Element]]] = Field(
+    definitionUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for definitionUri extensions",
         default=None,
         alias="_definitionUri",
     )
-    definitionCanonical: Optional[List[Canonical]] = Field(
+    definitionCanonical: Optional[ListType[Canonical]] = Field(
         description="Resource defining the code of this ChargeItem",
         default=None,
     )
-    definitionCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    definitionCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for definitionCanonical extensions",
         default=None,
         alias="_definitionCanonical",
@@ -88,7 +88,7 @@ class ChargeItem(DomainResource):
         default=None,
         alias="_status",
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced ChargeItem",
         default=None,
     )
@@ -121,7 +121,7 @@ class ChargeItem(DomainResource):
         description="When the charged service was applied",
         default=None,
     )
-    performer: Optional[List[ChargeItemPerformer]] = Field(
+    performer: Optional[ListType[ChargeItemPerformer]] = Field(
         description="Who performed charged service",
         default=None,
     )
@@ -141,7 +141,7 @@ class ChargeItem(DomainResource):
         description="Quantity of which the charge item has been serviced",
         default=None,
     )
-    bodysite: Optional[List[CodeableConcept]] = Field(
+    bodysite: Optional[ListType[CodeableConcept]] = Field(
         description="Anatomical location, if relevant",
         default=None,
     )
@@ -170,27 +170,27 @@ class ChargeItem(DomainResource):
         default=None,
         alias="_enteredDate",
     )
-    reason: Optional[List[CodeableConcept]] = Field(
+    reason: Optional[ListType[CodeableConcept]] = Field(
         description="Why was the charged  service rendered?",
         default=None,
     )
-    service: Optional[List[CodeableReference]] = Field(
+    service: Optional[ListType[CodeableReference]] = Field(
         description="Which rendered service is being charged?",
         default=None,
     )
-    product: Optional[List[CodeableReference]] = Field(
+    product: Optional[ListType[CodeableReference]] = Field(
         description="Product charged",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="Account to place this charge",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the ChargeItem",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Further information supporting this charge",
         default=None,
     )

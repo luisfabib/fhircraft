@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -150,7 +150,7 @@ class Goal(DomainResource):
     _type = "Goal"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Goal"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this goal",
         default=None,
     )
@@ -167,7 +167,7 @@ class Goal(DomainResource):
         description="in-progress | improving | worsening | no-change | achieved | sustaining | not-achieved | no-progress | not-attainable",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="E.g. Treatment, dietary, behavioral, etc",
         default=None,
     )
@@ -205,7 +205,7 @@ class Goal(DomainResource):
         description="When goal pursuit begins",
         default=None,
     )
-    target: Optional[List[GoalTarget]] = Field(
+    target: Optional[ListType[GoalTarget]] = Field(
         description="Target outcome for the goal",
         default=None,
     )
@@ -231,15 +231,15 @@ class Goal(DomainResource):
         description="Who\u0027s responsible for creating Goal?",
         default=None,
     )
-    addresses: Optional[List[Reference]] = Field(
+    addresses: Optional[ListType[Reference]] = Field(
         description="Issues addressed by this goal",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments about the goal",
         default=None,
     )
-    outcome: Optional[List[CodeableReference]] = Field(
+    outcome: Optional[ListType[CodeableReference]] = Field(
         description="What result was achieved regarding the goal?",
         default=None,
     )

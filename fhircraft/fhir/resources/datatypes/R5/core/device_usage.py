@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -34,7 +34,7 @@ class DeviceUsageAdherence(BackboneElement):
         description="always | never | sometimes",
         default=None,
     )
-    reason: Optional[List[CodeableConcept]] = Field(
+    reason: Optional[ListType[CodeableConcept]] = Field(
         description="lost | stolen | prescribed | broken | burned | forgot",
         default=None,
     )
@@ -49,11 +49,11 @@ class DeviceUsage(DomainResource):
     _type = "DeviceUsage"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceUsage"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifier for this record",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal or order",
         default=None,
     )
@@ -66,7 +66,7 @@ class DeviceUsage(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the statement - classifying how the statement is made",
         default=None,
     )
@@ -74,7 +74,7 @@ class DeviceUsage(DomainResource):
         description="Patient using device",
         default=None,
     )
-    derivedFrom: Optional[List[Reference]] = Field(
+    derivedFrom: Optional[ListType[Reference]] = Field(
         description="Supporting information",
         default=None,
     )
@@ -112,7 +112,7 @@ class DeviceUsage(DomainResource):
         description="The status of the device usage, for example always, sometimes, never. This is not the same as the status of the statement",
         default=None,
     )
-    usageReason: Optional[List[CodeableConcept]] = Field(
+    usageReason: Optional[ListType[CodeableConcept]] = Field(
         description="The reason for asserting the usage status - for example forgot, lost, stolen, broken",
         default=None,
     )
@@ -128,7 +128,7 @@ class DeviceUsage(DomainResource):
         description="Code or Reference to device used",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why device was used",
         default=None,
     )
@@ -136,7 +136,7 @@ class DeviceUsage(DomainResource):
         description="Target body site",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Addition details (comments, instructions)",
         default=None,
     )

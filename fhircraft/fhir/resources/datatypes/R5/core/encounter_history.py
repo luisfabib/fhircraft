@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -52,7 +52,7 @@ class EncounterHistory(DomainResource):
         description="The Encounter associated with this set of historic values",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
@@ -70,11 +70,11 @@ class EncounterHistory(DomainResource):
         default=None,
         alias="class",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Specific type of encounter",
         default=None,
     )
-    serviceType: Optional[List[CodeableReference]] = Field(
+    serviceType: Optional[ListType[CodeableReference]] = Field(
         description="Specific type of service",
         default=None,
     )
@@ -112,7 +112,7 @@ class EncounterHistory(DomainResource):
         description="Actual quantity of time the encounter lasted (less time absent)",
         default=None,
     )
-    location: Optional[List[EncounterHistoryLocation]] = Field(
+    location: Optional[ListType[EncounterHistoryLocation]] = Field(
         description="Location of the patient at this point in the encounter",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -146,7 +146,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneE
         default=None,
     )
     withdrawalPeriod: Optional[
-        List[
+        ListType[
             AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawalPeriod
         ]
     ] = Field(
@@ -185,7 +185,7 @@ class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
         default=None,
     )
     targetSpecies: Optional[
-        List[AdministrableProductDefinitionRouteOfAdministrationTargetSpecies]
+        ListType[AdministrableProductDefinitionRouteOfAdministrationTargetSpecies]
     ] = Field(
         description="A species for which this route applies",
         default=None,
@@ -203,7 +203,7 @@ class AdministrableProductDefinition(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
     )
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier for the administrable product",
         default=None,
     )
@@ -216,7 +216,7 @@ class AdministrableProductDefinition(DomainResource):
         default=None,
         alias="_status",
     )
-    formOf: Optional[List[Reference]] = Field(
+    formOf: Optional[ListType[Reference]] = Field(
         description="References a product from which one or more of the constituent parts of that product can be prepared and used as described by this administrable product",
         default=None,
     )
@@ -228,11 +228,11 @@ class AdministrableProductDefinition(DomainResource):
         description="The presentation type in which this item is given to a patient. e.g. for a spray - \u0027puff\u0027",
         default=None,
     )
-    producedFrom: Optional[List[Reference]] = Field(
+    producedFrom: Optional[ListType[Reference]] = Field(
         description="Indicates the specific manufactured items that are part of the \u0027formOf\u0027 product that are used in the preparation of this specific administrable form",
         default=None,
     )
-    ingredient: Optional[List[CodeableConcept]] = Field(
+    ingredient: Optional[ListType[CodeableConcept]] = Field(
         description="The ingredients of this administrable medicinal product. This is only needed if the ingredients are not specified either using ManufacturedItemDefiniton, or using by incoming references from the Ingredient resource",
         default=None,
     )
@@ -249,13 +249,13 @@ class AdministrableProductDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    property_: Optional[List[AdministrableProductDefinitionProperty]] = Field(
+    property_: Optional[ListType[AdministrableProductDefinitionProperty]] = Field(
         description="Characteristics e.g. a product\u0027s onset of action",
         default=None,
         alias="property",
     )
     routeOfAdministration: Optional[
-        List[AdministrableProductDefinitionRouteOfAdministration]
+        ListType[AdministrableProductDefinitionRouteOfAdministration]
     ] = Field(
         description="The path by which the product is taken into or makes contact with the body",
         default=None,

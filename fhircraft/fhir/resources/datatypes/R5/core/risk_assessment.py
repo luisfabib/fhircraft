@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -126,7 +126,7 @@ class RiskAssessment(DomainResource):
     _type = "RiskAssessment"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/RiskAssessment"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique identifier for the assessment",
         default=None,
     )
@@ -184,15 +184,15 @@ class RiskAssessment(DomainResource):
         description="Who did assessment?",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why the assessment was necessary?",
         default=None,
     )
-    basis: Optional[List[Reference]] = Field(
+    basis: Optional[ListType[Reference]] = Field(
         description="Information used in assessment",
         default=None,
     )
-    prediction: Optional[List[RiskAssessmentPrediction]] = Field(
+    prediction: Optional[ListType[RiskAssessmentPrediction]] = Field(
         description="Outcome predicted",
         default=None,
     )
@@ -205,7 +205,7 @@ class RiskAssessment(DomainResource):
         default=None,
         alias="_mitigation",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments on the risk assessment",
         default=None,
     )

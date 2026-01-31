@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -108,7 +108,7 @@ class ImmunizationProtocolApplied(BackboneElement):
         description="Who is responsible for publishing the recommendations",
         default=None,
     )
-    targetDisease: Optional[List[CodeableConcept]] = Field(
+    targetDisease: Optional[ListType[CodeableConcept]] = Field(
         description="Vaccine preventatable disease being targeted",
         default=None,
     )
@@ -141,11 +141,11 @@ class Immunization(DomainResource):
     _type = "Immunization"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Immunization"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Authority that the immunization event is based on",
         default=None,
     )
@@ -200,7 +200,7 @@ class Immunization(DomainResource):
         description="Encounter immunization was part of",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Additional information in support of the immunization",
         default=None,
     )
@@ -251,15 +251,15 @@ class Immunization(DomainResource):
         description="Amount of vaccine administered",
         default=None,
     )
-    performer: Optional[List[ImmunizationPerformer]] = Field(
+    performer: Optional[ListType[ImmunizationPerformer]] = Field(
         description="Who performed event",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional immunization notes",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why immunization occurred",
         default=None,
     )
@@ -272,11 +272,11 @@ class Immunization(DomainResource):
         default=None,
         alias="_isSubpotent",
     )
-    subpotentReason: Optional[List[CodeableConcept]] = Field(
+    subpotentReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason for being subpotent",
         default=None,
     )
-    programEligibility: Optional[List[ImmunizationProgramEligibility]] = Field(
+    programEligibility: Optional[ListType[ImmunizationProgramEligibility]] = Field(
         description="Patient eligibility for a specific vaccination program",
         default=None,
     )
@@ -284,11 +284,11 @@ class Immunization(DomainResource):
         description="Funding source for the vaccine",
         default=None,
     )
-    reaction: Optional[List[ImmunizationReaction]] = Field(
+    reaction: Optional[ListType[ImmunizationReaction]] = Field(
         description="Details of a reaction that follows immunization",
         default=None,
     )
-    protocolApplied: Optional[List[ImmunizationProtocolApplied]] = Field(
+    protocolApplied: Optional[ListType[ImmunizationProtocolApplied]] = Field(
         description="Protocol followed by the provider",
         default=None,
     )

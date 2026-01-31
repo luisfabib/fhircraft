@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -150,11 +150,11 @@ class TestScriptMetadataCapability(BackboneElement):
         default=None,
         alias="_description",
     )
-    origin: Optional[List[Integer]] = Field(
+    origin: Optional[ListType[Integer]] = Field(
         description="Which origin server these requirements apply to",
         default=None,
     )
-    origin_ext: Optional[List[Optional[Element]]] = Field(
+    origin_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for origin extensions",
         default=None,
         alias="_origin",
@@ -163,16 +163,16 @@ class TestScriptMetadataCapability(BackboneElement):
         description="Which server these requirements apply to",
         default=None,
     )
-    destination_ext: Optional[List[Optional[Element]]] = Field(
+    destination_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for destination extensions",
         default=None,
         alias="_destination",
     )
-    link: Optional[List[Uri]] = Field(
+    link: Optional[ListType[Uri]] = Field(
         description="Links to the FHIR specification",
         default=None,
     )
-    link_ext: Optional[List[Optional[Element]]] = Field(
+    link_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for link extensions",
         default=None,
         alias="_link",
@@ -193,11 +193,11 @@ class TestScriptMetadata(BackboneElement):
     The required capability must exist and are assumed to function correctly on the FHIR server being tested.
     """
 
-    link: Optional[List[TestScriptMetadataLink]] = Field(
+    link: Optional[ListType[TestScriptMetadataLink]] = Field(
         description="Links to the FHIR specification",
         default=None,
     )
-    capability: Optional[List[TestScriptMetadataCapability]] = Field(
+    capability: Optional[ListType[TestScriptMetadataCapability]] = Field(
         description="Capabilities  that are assumed to function correctly on the FHIR server being tested",
         default=None,
     )
@@ -434,7 +434,7 @@ class TestScriptSetupActionOperation(BackboneElement):
         default=None,
         alias="_params",
     )
-    requestHeader: Optional[List["TestScriptSetupActionOperationRequestHeader"]] = (
+    requestHeader: Optional[ListType["TestScriptSetupActionOperationRequestHeader"]] = (
         Field(
             description="Each operation can have one or more header elements",
             default=None,
@@ -708,7 +708,7 @@ class TestScriptSetupActionAssert(BackboneElement):
         default=None,
         alias="_warningOnly",
     )
-    requirement: Optional[List["TestScriptSetupActionAssertRequirement"]] = Field(
+    requirement: Optional[ListType["TestScriptSetupActionAssertRequirement"]] = Field(
         description="Links or references to the testing requirements",
         default=None,
     )
@@ -735,7 +735,7 @@ class TestScriptSetup(BackboneElement):
     A series of required setup operations before tests are executed.
     """
 
-    action: Optional[List[TestScriptSetupAction]] = Field(
+    action: Optional[ListType[TestScriptSetupAction]] = Field(
         description="A setup operation or assert to perform",
         default=None,
     )
@@ -865,7 +865,7 @@ class TestScriptTestActionOperation(BackboneElement):
         default=None,
         alias="_params",
     )
-    requestHeader: Optional[List[TestScriptSetupActionOperationRequestHeader]] = Field(
+    requestHeader: Optional[ListType[TestScriptSetupActionOperationRequestHeader]] = Field(
         description="Each operation can have one or more header elements",
         default=None,
     )
@@ -1178,7 +1178,7 @@ class TestScriptTestActionAssert(BackboneElement):
         default=None,
         alias="_warningOnly",
     )
-    requirement: Optional[List[TestScriptSetupActionAssertRequirement]] = Field(
+    requirement: Optional[ListType[TestScriptSetupActionAssertRequirement]] = Field(
         description="Links or references to the testing requirements",
         default=None,
     )
@@ -1223,7 +1223,7 @@ class TestScriptTest(BackboneElement):
         default=None,
         alias="_description",
     )
-    action: Optional[List[TestScriptTestAction]] = Field(
+    action: Optional[ListType[TestScriptTestAction]] = Field(
         description="A test operation or assert to perform",
         default=None,
     )
@@ -1245,7 +1245,7 @@ class TestScriptTeardown(BackboneElement):
     A series of operations required to clean up after all the tests are executed (successfully or otherwise).
     """
 
-    action: Optional[List[TestScriptTeardownAction]] = Field(
+    action: Optional[ListType[TestScriptTeardownAction]] = Field(
         description="One or more teardown operations to perform",
         default=None,
     )
@@ -1269,7 +1269,7 @@ class TestScript(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the test script",
         default=None,
     )
@@ -1349,7 +1349,7 @@ class TestScript(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -1362,11 +1362,11 @@ class TestScript(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for test script (if applicable)",
         default=None,
     )
@@ -1397,11 +1397,11 @@ class TestScript(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    origin: Optional[List[TestScriptOrigin]] = Field(
+    origin: Optional[ListType[TestScriptOrigin]] = Field(
         description="An abstract server representing a client or sender in a message exchange",
         default=None,
     )
-    destination: Optional[List[TestScriptDestination]] = Field(
+    destination: Optional[ListType[TestScriptDestination]] = Field(
         description="An abstract server representing a destination or receiver in a message exchange",
         default=None,
     )
@@ -1409,24 +1409,24 @@ class TestScript(DomainResource):
         description="Required capability that is assumed to function correctly on the FHIR server being tested",
         default=None,
     )
-    scope: Optional[List[TestScriptScope]] = Field(
+    scope: Optional[ListType[TestScriptScope]] = Field(
         description="Indication of the artifact(s) that are tested by this test case",
         default=None,
     )
-    fixture: Optional[List[TestScriptFixture]] = Field(
+    fixture: Optional[ListType[TestScriptFixture]] = Field(
         description="Fixture in the test script - by reference (uri)",
         default=None,
     )
-    profile: Optional[List[Canonical]] = Field(
+    profile: Optional[ListType[Canonical]] = Field(
         description="Reference of the validation profile",
         default=None,
     )
-    profile_ext: Optional[List[Optional[Element]]] = Field(
+    profile_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for profile extensions",
         default=None,
         alias="_profile",
     )
-    variable: Optional[List[TestScriptVariable]] = Field(
+    variable: Optional[ListType[TestScriptVariable]] = Field(
         description="Placeholder for evaluated elements",
         default=None,
     )
@@ -1434,7 +1434,7 @@ class TestScript(DomainResource):
         description="A series of required setup operations before tests are executed",
         default=None,
     )
-    test: Optional[List[TestScriptTest]] = Field(
+    test: Optional[ListType[TestScriptTest]] = Field(
         description="A test in this script",
         default=None,
     )

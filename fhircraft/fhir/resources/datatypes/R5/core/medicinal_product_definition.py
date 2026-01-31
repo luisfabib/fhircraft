@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -60,7 +60,7 @@ class MedicinalProductDefinitionNamePart(BackboneElement):
         description="A fragment of a product name",
         default=None,
     )
-    part_ext: Optional[List[Optional[Element]]] = Field(
+    part_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for part extensions",
         default=None,
         alias="_part",
@@ -108,11 +108,11 @@ class MedicinalProductDefinitionName(BackboneElement):
         description="Type of product name, such as rINN, BAN, Proprietary, Non-Proprietary",
         default=None,
     )
-    part: Optional[List[MedicinalProductDefinitionNamePart]] = Field(
+    part: Optional[ListType[MedicinalProductDefinitionNamePart]] = Field(
         description="Coding words or phrases of the name",
         default=None,
     )
-    usage: Optional[List[MedicinalProductDefinitionNameUsage]] = Field(
+    usage: Optional[ListType[MedicinalProductDefinitionNameUsage]] = Field(
         description="Country and jurisdiction where the name applies",
         default=None,
     )
@@ -146,7 +146,7 @@ class MedicinalProductDefinitionOperation(BackboneElement):
         description="Date range of applicability",
         default=None,
     )
-    organization: Optional[List[Reference]] = Field(
+    organization: Optional[ListType[Reference]] = Field(
         description="The organization responsible for the particular process, e.g. the manufacturer or importer",
         default=None,
     )
@@ -250,7 +250,7 @@ class MedicinalProductDefinition(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition"
     )
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this product. Could be an MPID",
         default=None,
     )
@@ -297,7 +297,7 @@ class MedicinalProductDefinition(DomainResource):
         description="The dose form for a single part product, or combined form of a multiple part product",
         default=None,
     )
-    route: Optional[List[CodeableConcept]] = Field(
+    route: Optional[ListType[CodeableConcept]] = Field(
         description="The path by which the product is taken into or makes contact with the body",
         default=None,
     )
@@ -318,7 +318,7 @@ class MedicinalProductDefinition(DomainResource):
         description="Whether the Medicinal Product is subject to additional monitoring for regulatory reasons",
         default=None,
     )
-    specialMeasures: Optional[List[CodeableConcept]] = Field(
+    specialMeasures: Optional[ListType[CodeableConcept]] = Field(
         description="Whether the Medicinal Product is subject to special measures for regulatory reasons",
         default=None,
     )
@@ -326,63 +326,63 @@ class MedicinalProductDefinition(DomainResource):
         description="If authorised for use in children",
         default=None,
     )
-    classification: Optional[List[CodeableConcept]] = Field(
+    classification: Optional[ListType[CodeableConcept]] = Field(
         description="Allows the product to be classified by various systems",
         default=None,
     )
-    marketingStatus: Optional[List[MarketingStatus]] = Field(
+    marketingStatus: Optional[ListType[MarketingStatus]] = Field(
         description="Marketing status of the medicinal product, in contrast to marketing authorization",
         default=None,
     )
-    packagedMedicinalProduct: Optional[List[CodeableConcept]] = Field(
+    packagedMedicinalProduct: Optional[ListType[CodeableConcept]] = Field(
         description="Package type for the product",
         default=None,
     )
-    comprisedOf: Optional[List[Reference]] = Field(
+    comprisedOf: Optional[ListType[Reference]] = Field(
         description="Types of medicinal manufactured items and/or devices that this product consists of, such as tablets, capsule, or syringes",
         default=None,
     )
-    ingredient: Optional[List[CodeableConcept]] = Field(
+    ingredient: Optional[ListType[CodeableConcept]] = Field(
         description="The ingredients of this medicinal product - when not detailed in other resources",
         default=None,
     )
-    impurity: Optional[List[CodeableReference]] = Field(
+    impurity: Optional[ListType[CodeableReference]] = Field(
         description="Any component of the drug product which is not the chemical entity defined as the drug substance, or an excipient in the drug product",
         default=None,
     )
-    attachedDocument: Optional[List[Reference]] = Field(
+    attachedDocument: Optional[ListType[Reference]] = Field(
         description="Additional documentation about the medicinal product",
         default=None,
     )
-    masterFile: Optional[List[Reference]] = Field(
+    masterFile: Optional[ListType[Reference]] = Field(
         description="A master file for the medicinal product (e.g. Pharmacovigilance System Master File)",
         default=None,
     )
-    contact: Optional[List[MedicinalProductDefinitionContact]] = Field(
+    contact: Optional[ListType[MedicinalProductDefinitionContact]] = Field(
         description="A product specific contact, person (in a role), or an organization",
         default=None,
     )
-    clinicalTrial: Optional[List[Reference]] = Field(
+    clinicalTrial: Optional[ListType[Reference]] = Field(
         description="Clinical trials or studies that this product is involved in",
         default=None,
     )
-    code: Optional[List[Coding]] = Field(
+    code: Optional[ListType[Coding]] = Field(
         description="A code that this product is known by, within some formal terminology",
         default=None,
     )
-    name: Optional[List[MedicinalProductDefinitionName]] = Field(
+    name: Optional[ListType[MedicinalProductDefinitionName]] = Field(
         description="The product\u0027s name, including full name and possibly coded parts",
         default=None,
     )
-    crossReference: Optional[List[MedicinalProductDefinitionCrossReference]] = Field(
+    crossReference: Optional[ListType[MedicinalProductDefinitionCrossReference]] = Field(
         description="Reference to another product, e.g. for linking authorised to investigational product",
         default=None,
     )
-    operation: Optional[List[MedicinalProductDefinitionOperation]] = Field(
+    operation: Optional[ListType[MedicinalProductDefinitionOperation]] = Field(
         description="A manufacturing or administrative process for the medicinal product",
         default=None,
     )
-    characteristic: Optional[List[MedicinalProductDefinitionCharacteristic]] = Field(
+    characteristic: Optional[ListType[MedicinalProductDefinitionCharacteristic]] = Field(
         description='Key product features such as "sugar free", "modified release"',
         default=None,
     )

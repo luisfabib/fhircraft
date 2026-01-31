@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -78,7 +78,7 @@ class ResearchSubject(DomainResource):
     _type = "ResearchSubject"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchSubject"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for research subject in a study",
         default=None,
     )
@@ -91,7 +91,7 @@ class ResearchSubject(DomainResource):
         default=None,
         alias="_status",
     )
-    progress: Optional[List[ResearchSubjectProgress]] = Field(
+    progress: Optional[ListType[ResearchSubjectProgress]] = Field(
         description="Subject status",
         default=None,
     )
@@ -125,7 +125,7 @@ class ResearchSubject(DomainResource):
         default=None,
         alias="_actualComparisonGroup",
     )
-    consent: Optional[List[Reference]] = Field(
+    consent: Optional[ListType[Reference]] = Field(
         description="Agreement to participate in study",
         default=None,
     )

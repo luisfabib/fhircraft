@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -45,7 +45,7 @@ class ActorDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the actor definition (business identifier)",
         default=None,
     )
@@ -125,7 +125,7 @@ class ActorDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -138,11 +138,11 @@ class ActorDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for actor definition (if applicable)",
         default=None,
     )
@@ -191,11 +191,11 @@ class ActorDefinition(DomainResource):
         default=None,
         alias="_documentation",
     )
-    reference: Optional[List[Url]] = Field(
+    reference: Optional[ListType[Url]] = Field(
         description="Reference to more information about the actor",
         default=None,
     )
-    reference_ext: Optional[List[Optional[Element]]] = Field(
+    reference_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for reference extensions",
         default=None,
         alias="_reference",
@@ -209,11 +209,11 @@ class ActorDefinition(DomainResource):
         default=None,
         alias="_capabilities",
     )
-    derivedFrom: Optional[List[Canonical]] = Field(
+    derivedFrom: Optional[ListType[Canonical]] = Field(
         description="Definition of this actor in another context / IG",
         default=None,
     )
-    derivedFrom_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFrom_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",

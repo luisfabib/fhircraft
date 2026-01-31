@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -226,7 +226,7 @@ class AdverseEvent(DomainResource):
     _type = "AdverseEvent"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/AdverseEvent"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for the event",
         default=None,
     )
@@ -248,7 +248,7 @@ class AdverseEvent(DomainResource):
         default=None,
         alias="_actuality",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="wrong-patient | procedure-mishap | medication-mishap | device | unsafe-physical-environment | hospital-aquired-infection | wrong-body-site",
         default=None,
     )
@@ -299,7 +299,7 @@ class AdverseEvent(DomainResource):
         default=None,
         alias="_recordedDate",
     )
-    resultingEffect: Optional[List[Reference]] = Field(
+    resultingEffect: Optional[ListType[Reference]] = Field(
         description="Effect on the subject due to this event",
         default=None,
     )
@@ -311,7 +311,7 @@ class AdverseEvent(DomainResource):
         description="Seriousness or gravity of the event",
         default=None,
     )
-    outcome: Optional[List[CodeableConcept]] = Field(
+    outcome: Optional[ListType[CodeableConcept]] = Field(
         description="Type of outcome from the adverse event",
         default=None,
     )
@@ -319,11 +319,11 @@ class AdverseEvent(DomainResource):
         description="Who recorded the adverse event",
         default=None,
     )
-    participant: Optional[List[AdverseEventParticipant]] = Field(
+    participant: Optional[ListType[AdverseEventParticipant]] = Field(
         description="Who was involved in the adverse event or the potential adverse event and what they did",
         default=None,
     )
-    study: Optional[List[Reference]] = Field(
+    study: Optional[ListType[Reference]] = Field(
         description="Research study that the subject is enrolled in",
         default=None,
     )
@@ -336,27 +336,27 @@ class AdverseEvent(DomainResource):
         default=None,
         alias="_expectedInResearchStudy",
     )
-    suspectEntity: Optional[List[AdverseEventSuspectEntity]] = Field(
+    suspectEntity: Optional[ListType[AdverseEventSuspectEntity]] = Field(
         description="The suspected agent causing the adverse event",
         default=None,
     )
-    contributingFactor: Optional[List[AdverseEventContributingFactor]] = Field(
+    contributingFactor: Optional[ListType[AdverseEventContributingFactor]] = Field(
         description="Contributing factors suspected to have increased the probability or severity of the adverse event",
         default=None,
     )
-    preventiveAction: Optional[List[AdverseEventPreventiveAction]] = Field(
+    preventiveAction: Optional[ListType[AdverseEventPreventiveAction]] = Field(
         description="Preventive actions that contributed to avoiding the adverse event",
         default=None,
     )
-    mitigatingAction: Optional[List[AdverseEventMitigatingAction]] = Field(
+    mitigatingAction: Optional[ListType[AdverseEventMitigatingAction]] = Field(
         description="Ameliorating actions taken after the adverse event occured in order to reduce the extent of harm",
         default=None,
     )
-    supportingInfo: Optional[List[AdverseEventSupportingInfo]] = Field(
+    supportingInfo: Optional[ListType[AdverseEventSupportingInfo]] = Field(
         description="Supporting information relevant to the event",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comment on adverse event",
         default=None,
     )

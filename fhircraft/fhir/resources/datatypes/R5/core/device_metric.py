@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -65,7 +65,7 @@ class DeviceMetric(DomainResource):
     _type = "DeviceMetric"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceMetric"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Instance identifier",
         default=None,
     )
@@ -112,7 +112,7 @@ class DeviceMetric(DomainResource):
         description="Indicates how often the metric is taken or recorded",
         default=None,
     )
-    calibration: Optional[List[DeviceMetricCalibration]] = Field(
+    calibration: Optional[ListType[DeviceMetricCalibration]] = Field(
         description="Describes the calibrations that have been performed or that are required to be performed",
         default=None,
     )

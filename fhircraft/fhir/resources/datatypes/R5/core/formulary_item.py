@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -28,7 +28,7 @@ class FormularyItem(DomainResource):
     _type = "FormularyItem"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/FormularyItem"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this formulary item",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -55,7 +55,7 @@ class InventoryItemName(BackboneElement):
         description="The name or designation of the item",
         default=None,
     )
-    name_ext: Optional[List[Optional[Element]]] = Field(
+    name_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for name extensions",
         default=None,
         alias="_name",
@@ -245,7 +245,7 @@ class InventoryItemInstance(BackboneElement):
     Instances or occurrences of the product.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="The identifier for the physical instance, typically a serial number",
         default=None,
     )
@@ -286,7 +286,7 @@ class InventoryItem(DomainResource):
     _type = "InventoryItem"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/InventoryItem"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for the inventory item",
         default=None,
     )
@@ -299,19 +299,19 @@ class InventoryItem(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Category or class of the item",
         default=None,
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Code designating the specific type of item",
         default=None,
     )
-    name: Optional[List[InventoryItemName]] = Field(
+    name: Optional[ListType[InventoryItemName]] = Field(
         description="The item name(s) - the brand name, or common name, functional name, generic name or others",
         default=None,
     )
-    responsibleOrganization: Optional[List[InventoryItemResponsibleOrganization]] = (
+    responsibleOrganization: Optional[ListType[InventoryItemResponsibleOrganization]] = (
         Field(
             description="Organization(s) responsible for the product",
             default=None,
@@ -321,7 +321,7 @@ class InventoryItem(DomainResource):
         description="Descriptive characteristics of the item",
         default=None,
     )
-    inventoryStatus: Optional[List[CodeableConcept]] = Field(
+    inventoryStatus: Optional[ListType[CodeableConcept]] = Field(
         description="The usage status like recalled, in use, discarded",
         default=None,
     )
@@ -333,11 +333,11 @@ class InventoryItem(DomainResource):
         description="Net content or amount present in the item",
         default=None,
     )
-    association: Optional[List[InventoryItemAssociation]] = Field(
+    association: Optional[ListType[InventoryItemAssociation]] = Field(
         description="Association with other items or products",
         default=None,
     )
-    characteristic: Optional[List[InventoryItemCharacteristic]] = Field(
+    characteristic: Optional[ListType[InventoryItemCharacteristic]] = Field(
         description="Characteristic of the item",
         default=None,
     )

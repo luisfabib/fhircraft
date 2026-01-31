@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -61,11 +61,11 @@ class ImagingSelectionInstanceImageRegion2D(BackboneElement):
         default=None,
         alias="_regionType",
     )
-    coordinate: Optional[List[Decimal]] = Field(
+    coordinate: Optional[ListType[Decimal]] = Field(
         description="Specifies the coordinates that define the image region",
         default=None,
     )
-    coordinate_ext: Optional[List[Optional[Element]]] = Field(
+    coordinate_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for coordinate extensions",
         default=None,
         alias="_coordinate",
@@ -86,7 +86,7 @@ class ImagingSelectionInstanceImageRegion3D(BackboneElement):
         default=None,
         alias="_regionType",
     )
-    coordinate: Optional[List[Decimal]] = Field(
+    coordinate: Optional[ListType[Decimal]] = Field(
         description="Specifies the coordinates that define the image region",
         default=None,
     )
@@ -124,20 +124,20 @@ class ImagingSelectionInstance(BackboneElement):
         description="DICOM SOP Class UID",
         default=None,
     )
-    subset: Optional[List[String]] = Field(
+    subset: Optional[ListType[String]] = Field(
         description="The selected subset of the SOP Instance",
         default=None,
     )
-    subset_ext: Optional[List[Optional[Element]]] = Field(
+    subset_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for subset extensions",
         default=None,
         alias="_subset",
     )
-    imageRegion2D: Optional[List[ImagingSelectionInstanceImageRegion2D]] = Field(
+    imageRegion2D: Optional[ListType[ImagingSelectionInstanceImageRegion2D]] = Field(
         description="A specific 2D region in a DICOM image / frame",
         default=None,
     )
-    imageRegion3D: Optional[List[ImagingSelectionInstanceImageRegion3D]] = Field(
+    imageRegion3D: Optional[ListType[ImagingSelectionInstanceImageRegion3D]] = Field(
         description="A specific 3D region in a DICOM frame of reference",
         default=None,
     )
@@ -152,7 +152,7 @@ class ImagingSelection(DomainResource):
     _type = "ImagingSelection"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImagingSelection"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for Imaging Selection",
         default=None,
     )
@@ -178,15 +178,15 @@ class ImagingSelection(DomainResource):
         default=None,
         alias="_issued",
     )
-    performer: Optional[List[ImagingSelectionPerformer]] = Field(
+    performer: Optional[ListType[ImagingSelectionPerformer]] = Field(
         description="Selector of the instances (human or machine)",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Associated request",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classifies the imaging selection",
         default=None,
     )
@@ -203,11 +203,11 @@ class ImagingSelection(DomainResource):
         default=None,
         alias="_studyUid",
     )
-    derivedFrom: Optional[List[Reference]] = Field(
+    derivedFrom: Optional[ListType[Reference]] = Field(
         description="The imaging study from which the imaging selection is derived",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="The network service providing retrieval for the images referenced in the imaging selection",
         default=None,
     )
@@ -242,11 +242,11 @@ class ImagingSelection(DomainResource):
         description="Body part examined",
         default=None,
     )
-    focus: Optional[List[Reference]] = Field(
+    focus: Optional[ListType[Reference]] = Field(
         description="Related resource that is the focus for the imaging selection",
         default=None,
     )
-    instance: Optional[List[ImagingSelectionInstance]] = Field(
+    instance: Optional[ListType[ImagingSelectionInstance]] = Field(
         description="The selected instances",
         default=None,
     )

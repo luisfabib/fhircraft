@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -182,15 +182,15 @@ class TestPlanTestCaseAssertion(BackboneElement):
     The test assertions - the expectations of test results from the execution of the test case.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Assertion type - for example \u0027informative\u0027 or \u0027required\u0027 ",
         default=None,
     )
-    object: Optional[List[CodeableReference]] = Field(
+    object: Optional[ListType[CodeableReference]] = Field(
         description="The focus or object of the assertion",
         default=None,
     )
-    result: Optional[List[CodeableReference]] = Field(
+    result: Optional[ListType[CodeableReference]] = Field(
         description="The actual result assertion",
         default=None,
     )
@@ -210,23 +210,23 @@ class TestPlanTestCase(BackboneElement):
         default=None,
         alias="_sequence",
     )
-    scope: Optional[List[Reference]] = Field(
+    scope: Optional[ListType[Reference]] = Field(
         description="The scope or artifact covered by the case",
         default=None,
     )
-    dependency: Optional[List[TestPlanTestCaseDependency]] = Field(
+    dependency: Optional[ListType[TestPlanTestCaseDependency]] = Field(
         description="Required criteria to execute the test case",
         default=None,
     )
-    testRun: Optional[List[TestPlanTestCaseTestRun]] = Field(
+    testRun: Optional[ListType[TestPlanTestCaseTestRun]] = Field(
         description="The actual test to be executed",
         default=None,
     )
-    testData: Optional[List[TestPlanTestCaseTestData]] = Field(
+    testData: Optional[ListType[TestPlanTestCaseTestData]] = Field(
         description="The test data used in the test case",
         default=None,
     )
-    assertion: Optional[List[TestPlanTestCaseAssertion]] = Field(
+    assertion: Optional[ListType[TestPlanTestCaseAssertion]] = Field(
         description="Test assertions or expectations",
         default=None,
     )
@@ -250,7 +250,7 @@ class TestPlan(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier identifier for the test plan",
         default=None,
     )
@@ -330,7 +330,7 @@ class TestPlan(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -343,11 +343,11 @@ class TestPlan(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction where the test plan applies (if applicable)",
         default=None,
     )
@@ -378,11 +378,11 @@ class TestPlan(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="The category of the Test Plan - can be acceptance, unit, performance",
         default=None,
     )
-    scope: Optional[List[Reference]] = Field(
+    scope: Optional[ListType[Reference]] = Field(
         description="What is being tested with this Test Plan - a conformance resource, or narrative criteria, or an external reference",
         default=None,
     )
@@ -395,7 +395,7 @@ class TestPlan(DomainResource):
         default=None,
         alias="_testTools",
     )
-    dependency: Optional[List[TestPlanDependency]] = Field(
+    dependency: Optional[ListType[TestPlanDependency]] = Field(
         description="The required criteria to execute the test plan - e.g. preconditions, previous tests",
         default=None,
     )
@@ -408,7 +408,7 @@ class TestPlan(DomainResource):
         default=None,
         alias="_exitCriteria",
     )
-    testCase: Optional[List[TestPlanTestCase]] = Field(
+    testCase: Optional[ListType[TestPlanTestCase]] = Field(
         description="The test cases that constitute this plan",
         default=None,
     )

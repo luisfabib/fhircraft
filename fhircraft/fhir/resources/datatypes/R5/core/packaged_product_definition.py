@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -127,7 +127,7 @@ class PackagedProductDefinitionPackaging(BackboneElement):
     A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap (which is not a device or a medication manufactured item).
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier that is specific to this particular part of the packaging. Including possibly a Data Carrier Identifier",
         default=None,
     )
@@ -153,34 +153,34 @@ class PackagedProductDefinitionPackaging(BackboneElement):
         default=None,
         alias="_quantity",
     )
-    material: Optional[List[CodeableConcept]] = Field(
+    material: Optional[ListType[CodeableConcept]] = Field(
         description="Material type of the package item",
         default=None,
     )
-    alternateMaterial: Optional[List[CodeableConcept]] = Field(
+    alternateMaterial: Optional[ListType[CodeableConcept]] = Field(
         description="A possible alternate material for this part of the packaging, that is allowed to be used instead of the usual material",
         default=None,
     )
-    shelfLifeStorage: Optional[List[ProductShelfLife]] = Field(
+    shelfLifeStorage: Optional[ListType[ProductShelfLife]] = Field(
         description="Shelf Life and storage information",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this packaging item (multiple means these are all potential manufacturers)",
         default=None,
     )
-    property_: Optional[List[PackagedProductDefinitionPackagingProperty]] = Field(
+    property_: Optional[ListType[PackagedProductDefinitionPackagingProperty]] = Field(
         description="General characteristics of this item",
         default=None,
         alias="property",
     )
-    containedItem: Optional[List[PackagedProductDefinitionPackagingContainedItem]] = (
+    containedItem: Optional[ListType[PackagedProductDefinitionPackagingContainedItem]] = (
         Field(
             description="The item(s) within the packaging",
             default=None,
         )
     )
-    packaging: Optional[List["PackagedProductDefinitionPackaging"]] = Field(
+    packaging: Optional[ListType["PackagedProductDefinitionPackaging"]] = Field(
         description="Allows containers (and parts of containers) within containers, still as a part of single packaged product",
         default=None,
     )
@@ -252,7 +252,7 @@ class PackagedProductDefinition(DomainResource):
     _type = "PackagedProductDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="A unique identifier for this package as whole - not for the content of the package",
         default=None,
     )
@@ -269,7 +269,7 @@ class PackagedProductDefinition(DomainResource):
         description="A high level category e.g. medicinal product, raw material, shipping container etc",
         default=None,
     )
-    packageFor: Optional[List[Reference]] = Field(
+    packageFor: Optional[ListType[Reference]] = Field(
         description="The product that this is a pack for",
         default=None,
     )
@@ -286,7 +286,7 @@ class PackagedProductDefinition(DomainResource):
         default=None,
         alias="_statusDate",
     )
-    containedItemQuantity: Optional[List[Quantity]] = Field(
+    containedItemQuantity: Optional[ListType[Quantity]] = Field(
         description="A total of the complete count of contained items of a particular type/form, independent of sub-packaging or organization. This can be considered as the pack size. See also packaging.containedItem.amount (especially the long definition)",
         default=None,
     )
@@ -300,12 +300,12 @@ class PackagedProductDefinition(DomainResource):
         alias="_description",
     )
     legalStatusOfSupply: Optional[
-        List[PackagedProductDefinitionLegalStatusOfSupply]
+        ListType[PackagedProductDefinitionLegalStatusOfSupply]
     ] = Field(
         description="The legal status of supply of the packaged item as classified by the regulator",
         default=None,
     )
-    marketingStatus: Optional[List[MarketingStatus]] = Field(
+    marketingStatus: Optional[ListType[MarketingStatus]] = Field(
         description="Allows specifying that an item is on the market for sale, or that it is not available, and the dates and locations associated",
         default=None,
     )
@@ -318,11 +318,11 @@ class PackagedProductDefinition(DomainResource):
         default=None,
         alias="_copackagedIndicator",
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of this package type (multiple means these are all possible manufacturers)",
         default=None,
     )
-    attachedDocument: Optional[List[Reference]] = Field(
+    attachedDocument: Optional[ListType[Reference]] = Field(
         description="Additional information or supporting documentation about the packaged product",
         default=None,
     )
@@ -330,7 +330,7 @@ class PackagedProductDefinition(DomainResource):
         description="A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap",
         default=None,
     )
-    characteristic: Optional[List[PackagedProductDefinitionCharacteristic]] = Field(
+    characteristic: Optional[ListType[PackagedProductDefinitionCharacteristic]] = Field(
         description='Allows the key features to be recorded, such as "hospital pack", "nurse prescribable"',
         default=None,
     )

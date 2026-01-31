@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -44,7 +44,7 @@ class AuditEventOutcome(BackboneElement):
         description="Whether the event succeeded or failed",
         default=None,
     )
-    detail: Optional[List[CodeableConcept]] = Field(
+    detail: Optional[ListType[CodeableConcept]] = Field(
         description="Additional outcome detail",
         default=None,
     )
@@ -59,7 +59,7 @@ class AuditEventAgent(BackboneElement):
         description="How agent participated",
         default=None,
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="Agent role in the event",
         default=None,
     )
@@ -80,11 +80,11 @@ class AuditEventAgent(BackboneElement):
         description="The agent location when the event occurred",
         default=None,
     )
-    policy: Optional[List[Uri]] = Field(
+    policy: Optional[ListType[Uri]] = Field(
         description="Policy that authorized the agent participation in the event",
         default=None,
     )
-    policy_ext: Optional[List[Optional[Element]]] = Field(
+    policy_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for policy extensions",
         default=None,
         alias="_policy",
@@ -111,7 +111,7 @@ class AuditEventAgent(BackboneElement):
         default=None,
         alias="_networkString",
     )
-    authorization: Optional[List[CodeableConcept]] = Field(
+    authorization: Optional[ListType[CodeableConcept]] = Field(
         description="Allowable authorization for this agent",
         default=None,
     )
@@ -146,7 +146,7 @@ class AuditEventSource(BackboneElement):
         description="The identity of source detecting the event",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="The type of source where event originated",
         default=None,
     )
@@ -274,7 +274,7 @@ class AuditEventEntityAgent(BackboneElement):
         description="How agent participated",
         default=None,
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="Agent role in the event",
         default=None,
     )
@@ -295,7 +295,7 @@ class AuditEventEntityAgent(BackboneElement):
         description="The agent location when the event occurred",
         default=None,
     )
-    policy: Optional[List[Uri]] = Field(
+    policy: Optional[ListType[Uri]] = Field(
         description="Policy that authorized the agent participation in the event",
         default=None,
     )
@@ -326,7 +326,7 @@ class AuditEventEntityAgent(BackboneElement):
         default=None,
         alias="_networkString",
     )
-    authorization: Optional[List[CodeableConcept]] = Field(
+    authorization: Optional[ListType[CodeableConcept]] = Field(
         description="Allowable authorization for this agent",
         default=None,
     )
@@ -361,7 +361,7 @@ class AuditEventEntity(BackboneElement):
         description="What role the entity played",
         default=None,
     )
-    securityLabel: Optional[List[CodeableConcept]] = Field(
+    securityLabel: Optional[ListType[CodeableConcept]] = Field(
         description="Security labels on the entity",
         default=None,
     )
@@ -374,11 +374,11 @@ class AuditEventEntity(BackboneElement):
         default=None,
         alias="_query",
     )
-    detail: Optional[List[AuditEventEntityDetail]] = Field(
+    detail: Optional[ListType[AuditEventEntityDetail]] = Field(
         description="Additional Information about the entity",
         default=None,
     )
-    agent: Optional[List[AuditEventEntityAgent]] = Field(
+    agent: Optional[ListType[AuditEventEntityAgent]] = Field(
         description="Entity is attributed to this agent",
         default=None,
     )
@@ -393,7 +393,7 @@ class AuditEvent(DomainResource):
     _type = "AuditEvent"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/AuditEvent"
 
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Type/identifier of event",
         default=None,
     )
@@ -445,11 +445,11 @@ class AuditEvent(DomainResource):
         description="Whether the event succeeded or failed",
         default=None,
     )
-    authorization: Optional[List[CodeableConcept]] = Field(
+    authorization: Optional[ListType[CodeableConcept]] = Field(
         description="Authorization related to the event",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Workflow authorization within which this event occurred",
         default=None,
     )
@@ -461,7 +461,7 @@ class AuditEvent(DomainResource):
         description="Encounter within which this event occurred or which the event is tightly associated",
         default=None,
     )
-    agent: Optional[List[AuditEventAgent]] = Field(
+    agent: Optional[ListType[AuditEventAgent]] = Field(
         description="Actor involved in the event",
         default=None,
     )
@@ -469,7 +469,7 @@ class AuditEvent(DomainResource):
         description="Audit Event Reporter",
         default=None,
     )
-    entity: Optional[List[AuditEventEntity]] = Field(
+    entity: Optional[ListType[AuditEventEntity]] = Field(
         description="Data or objects used",
         default=None,
     )

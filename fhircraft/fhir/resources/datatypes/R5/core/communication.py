@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -74,37 +74,37 @@ class Communication(DomainResource):
     _type = "Communication"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Communication"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesCanonical extensions",
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesUri extensions",
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled by this communication",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event (e.g. Communication, Procedure)",
         default=None,
     )
-    inResponseTo: Optional[List[Reference]] = Field(
+    inResponseTo: Optional[ListType[Reference]] = Field(
         description="Reply to",
         default=None,
     )
@@ -121,7 +121,7 @@ class Communication(DomainResource):
         description="Reason for current status",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Message category",
         default=None,
     )
@@ -134,7 +134,7 @@ class Communication(DomainResource):
         default=None,
         alias="_priority",
     )
-    medium: Optional[List[CodeableConcept]] = Field(
+    medium: Optional[ListType[CodeableConcept]] = Field(
         description="A channel of communication",
         default=None,
     )
@@ -146,7 +146,7 @@ class Communication(DomainResource):
         description="Description of the purpose/content",
         default=None,
     )
-    about: Optional[List[Reference]] = Field(
+    about: Optional[ListType[Reference]] = Field(
         description="Resources that pertain to this communication",
         default=None,
     )
@@ -172,7 +172,7 @@ class Communication(DomainResource):
         default=None,
         alias="_received",
     )
-    recipient: Optional[List[Reference]] = Field(
+    recipient: Optional[ListType[Reference]] = Field(
         description="Who the information is shared with",
         default=None,
     )
@@ -180,15 +180,15 @@ class Communication(DomainResource):
         description="Who shares the information",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Indication for message",
         default=None,
     )
-    payload: Optional[List[CommunicationPayload]] = Field(
+    payload: Optional[ListType[CommunicationPayload]] = Field(
         description="Message payload",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the communication",
         default=None,
     )

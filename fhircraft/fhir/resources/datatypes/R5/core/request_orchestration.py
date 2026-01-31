@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -320,31 +320,31 @@ class RequestOrchestrationAction(BackboneElement):
         default=None,
         alias="_priority",
     )
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Code representing the meaning of the action or sub-actions",
         default=None,
     )
-    documentation: Optional[List[RelatedArtifact]] = Field(
+    documentation: Optional[ListType[RelatedArtifact]] = Field(
         description="Supporting documentation for the intended performer of the action",
         default=None,
     )
-    goal: Optional[List[Reference]] = Field(
+    goal: Optional[ListType[Reference]] = Field(
         description="What goals",
         default=None,
     )
-    condition: Optional[List[RequestOrchestrationActionCondition]] = Field(
+    condition: Optional[ListType[RequestOrchestrationActionCondition]] = Field(
         description="Whether or not the action is applicable",
         default=None,
     )
-    input: Optional[List[RequestOrchestrationActionInput]] = Field(
+    input: Optional[ListType[RequestOrchestrationActionInput]] = Field(
         description="Input data requirements",
         default=None,
     )
-    output: Optional[List[RequestOrchestrationActionOutput]] = Field(
+    output: Optional[ListType[RequestOrchestrationActionOutput]] = Field(
         description="Output data definition",
         default=None,
     )
-    relatedAction: Optional[List[RequestOrchestrationActionRelatedAction]] = Field(
+    relatedAction: Optional[ListType[RequestOrchestrationActionRelatedAction]] = Field(
         description="Relationship to another action",
         default=None,
     )
@@ -381,7 +381,7 @@ class RequestOrchestrationAction(BackboneElement):
         description="Where it should happen",
         default=None,
     )
-    participant: Optional[List[RequestOrchestrationActionParticipant]] = Field(
+    participant: Optional[ListType[RequestOrchestrationActionParticipant]] = Field(
         description="Who should perform the action",
         default=None,
     )
@@ -465,11 +465,11 @@ class RequestOrchestrationAction(BackboneElement):
         default=None,
         alias="_transform",
     )
-    dynamicValue: Optional[List[RequestOrchestrationActionDynamicValue]] = Field(
+    dynamicValue: Optional[ListType[RequestOrchestrationActionDynamicValue]] = Field(
         description="Dynamic aspects of the definition",
         default=None,
     )
-    action: Optional[List["RequestOrchestrationAction"]] = Field(
+    action: Optional[ListType["RequestOrchestrationAction"]] = Field(
         description="Sub action",
         default=None,
     )
@@ -516,33 +516,33 @@ class RequestOrchestration(DomainResource):
     _type = "RequestOrchestration"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/RequestOrchestration"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesCanonical extensions",
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesUri extensions",
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan, proposal, or order",
         default=None,
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="Request(s) replaced by this request",
         default=None,
     )
@@ -602,19 +602,19 @@ class RequestOrchestration(DomainResource):
         description="Device or practitioner that authored the request orchestration",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why the request orchestration is needed",
         default=None,
     )
-    goal: Optional[List[Reference]] = Field(
+    goal: Optional[ListType[Reference]] = Field(
         description="What goals",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional notes about the response",
         default=None,
     )
-    action: Optional[List[RequestOrchestrationAction]] = Field(
+    action: Optional[ListType[RequestOrchestrationAction]] = Field(
         description="Proposed actions, if any",
         default=None,
     )

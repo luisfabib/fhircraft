@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -104,11 +104,11 @@ class EvidenceReportSubject(BackboneElement):
     Specifies the subject or focus of the report. Answers "What is this report about?".
     """
 
-    characteristic: Optional[List[EvidenceReportSubjectCharacteristic]] = Field(
+    characteristic: Optional[ListType[EvidenceReportSubjectCharacteristic]] = Field(
         description="Characteristic",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
@@ -189,7 +189,7 @@ class EvidenceReportSection(BackboneElement):
         description="Classification of section by Resource",
         default=None,
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the section",
         default=None,
     )
@@ -210,15 +210,15 @@ class EvidenceReportSection(BackboneElement):
         description="Order of section entries",
         default=None,
     )
-    entryClassifier: Optional[List[CodeableConcept]] = Field(
+    entryClassifier: Optional[ListType[CodeableConcept]] = Field(
         description="Extensible classifiers as content",
         default=None,
     )
-    entryReference: Optional[List[Reference]] = Field(
+    entryReference: Optional[ListType[Reference]] = Field(
         description="Reference to resources as content",
         default=None,
     )
-    entryQuantity: Optional[List[Quantity]] = Field(
+    entryQuantity: Optional[ListType[Quantity]] = Field(
         description="Quantity as content",
         default=None,
     )
@@ -226,7 +226,7 @@ class EvidenceReportSection(BackboneElement):
         description="Why the section is empty",
         default=None,
     )
-    section: Optional[List["EvidenceReportSection"]] = Field(
+    section: Optional[ListType["EvidenceReportSection"]] = Field(
         description="Nested Section",
         default=None,
     )
@@ -259,15 +259,15 @@ class EvidenceReport(DomainResource):
         default=None,
         alias="_status",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique identifier for the evidence report",
         default=None,
     )
-    relatedIdentifier: Optional[List[Identifier]] = Field(
+    relatedIdentifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers for articles that may relate to more than one evidence report",
         default=None,
     )
@@ -288,11 +288,11 @@ class EvidenceReport(DomainResource):
         description="Kind of report",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Used for footnotes and annotations",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Link, description or reference to artifact associated with the report",
         default=None,
     )
@@ -309,31 +309,31 @@ class EvidenceReport(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    relatesTo: Optional[List[EvidenceReportRelatesTo]] = Field(
+    relatesTo: Optional[ListType[EvidenceReportRelatesTo]] = Field(
         description="Relationships to other compositions/documents",
         default=None,
     )
-    section: Optional[List[EvidenceReportSection]] = Field(
+    section: Optional[ListType[EvidenceReportSection]] = Field(
         description="Composition is broken into sections",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -52,7 +52,7 @@ class EvidenceVariableDefinition(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
@@ -88,7 +88,7 @@ class EvidenceStatisticSampleSize(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnote or explanatory note about the sample size",
         default=None,
     )
@@ -135,7 +135,7 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnote or explanatory note about the estimate",
         default=None,
     )
@@ -160,7 +160,7 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
         description="Lower and upper bound values of the attribute estimate",
         default=None,
     )
-    attributeEstimate: Optional[List["EvidenceStatisticAttributeEstimate"]] = Field(
+    attributeEstimate: Optional[ListType["EvidenceStatisticAttributeEstimate"]] = Field(
         description="A nested attribute estimate; which is the attribute estimate of an attribute estimate",
         default=None,
     )
@@ -184,15 +184,15 @@ class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
         default=None,
         alias="_handling",
     )
-    valueCategory: Optional[List[CodeableConcept]] = Field(
+    valueCategory: Optional[ListType[CodeableConcept]] = Field(
         description="Description for grouping of ordinal or polychotomous variables",
         default=None,
     )
-    valueQuantity: Optional[List[Quantity]] = Field(
+    valueQuantity: Optional[ListType[Quantity]] = Field(
         description="Discrete value for grouping of ordinal or polychotomous variables",
         default=None,
     )
-    valueRange: Optional[List[Range]] = Field(
+    valueRange: Optional[ListType[Range]] = Field(
         description="Range of values for grouping of ordinal or polychotomous variables",
         default=None,
     )
@@ -212,7 +212,7 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnote or explanatory note about the estimate",
         default=None,
     )
@@ -237,7 +237,7 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
         description="Lower and upper bound values of the attribute estimate",
         default=None,
     )
-    attributeEstimate: Optional[List[EvidenceStatisticAttributeEstimate]] = Field(
+    attributeEstimate: Optional[ListType[EvidenceStatisticAttributeEstimate]] = Field(
         description="A nested attribute estimate; which is the attribute estimate of an attribute estimate",
         default=None,
     )
@@ -256,12 +256,12 @@ class EvidenceStatisticModelCharacteristic(BackboneElement):
         description="Numerical value to complete model specification",
         default=None,
     )
-    variable: Optional[List[EvidenceStatisticModelCharacteristicVariable]] = Field(
+    variable: Optional[ListType[EvidenceStatisticModelCharacteristicVariable]] = Field(
         description="A variable adjusted for in the adjusted analysis",
         default=None,
     )
     attributeEstimate: Optional[
-        List[EvidenceStatisticModelCharacteristicAttributeEstimate]
+        ListType[EvidenceStatisticModelCharacteristicAttributeEstimate]
     ] = Field(
         description="An attribute of the statistic used as a model characteristic",
         default=None,
@@ -282,7 +282,7 @@ class EvidenceStatistic(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
@@ -320,11 +320,11 @@ class EvidenceStatistic(BackboneElement):
         description="Number of samples in the statistic",
         default=None,
     )
-    attributeEstimate: Optional[List[EvidenceStatisticAttributeEstimate]] = Field(
+    attributeEstimate: Optional[ListType[EvidenceStatisticAttributeEstimate]] = Field(
         description="An attribute of the Statistic",
         default=None,
     )
-    modelCharacteristic: Optional[List[EvidenceStatisticModelCharacteristic]] = Field(
+    modelCharacteristic: Optional[ListType[EvidenceStatisticModelCharacteristic]] = Field(
         description="An aspect of the statistical model",
         default=None,
     )
@@ -344,7 +344,7 @@ class EvidenceCertainty(BackboneElement):
         default=None,
         alias="_description",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
@@ -365,7 +365,7 @@ class EvidenceCertainty(BackboneElement):
         default=None,
         alias="_rater",
     )
-    subcomponent: Optional[List["EvidenceCertainty"]] = Field(
+    subcomponent: Optional[ListType["EvidenceCertainty"]] = Field(
         description="A domain or subdomain of certainty",
         default=None,
     )
@@ -389,7 +389,7 @@ class Evidence(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the summary",
         default=None,
     )
@@ -500,27 +500,27 @@ class Evidence(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the content",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the content",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the content",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the content",
         default=None,
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
@@ -551,7 +551,7 @@ class Evidence(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Link or citation to artifact associated with the summary",
         default=None,
     )
@@ -573,11 +573,11 @@ class Evidence(DomainResource):
         default=None,
         alias="_assertion",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Footnotes and/or explanatory notes",
         default=None,
     )
-    variableDefinition: Optional[List[EvidenceVariableDefinition]] = Field(
+    variableDefinition: Optional[ListType[EvidenceVariableDefinition]] = Field(
         description="Evidence variable such as population, exposure, or outcome",
         default=None,
     )
@@ -585,15 +585,15 @@ class Evidence(DomainResource):
         description="The method to combine studies",
         default=None,
     )
-    studyDesign: Optional[List[CodeableConcept]] = Field(
+    studyDesign: Optional[ListType[CodeableConcept]] = Field(
         description="The design of the study that produced this evidence",
         default=None,
     )
-    statistic: Optional[List[EvidenceStatistic]] = Field(
+    statistic: Optional[ListType[EvidenceStatistic]] = Field(
         description="Values and parameters for a single statistic",
         default=None,
     )
-    certainty: Optional[List[EvidenceCertainty]] = Field(
+    certainty: Optional[ListType[EvidenceCertainty]] = Field(
         description="Certainty or quality of the evidence",
         default=None,
     )

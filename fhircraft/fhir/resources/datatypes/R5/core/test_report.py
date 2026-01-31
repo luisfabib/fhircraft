@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -127,7 +127,7 @@ class TestReportSetupActionAssert(BackboneElement):
         default=None,
         alias="_detail",
     )
-    requirement: Optional[List["TestReportSetupActionAssertRequirement"]] = Field(
+    requirement: Optional[ListType["TestReportSetupActionAssertRequirement"]] = Field(
         description="Links or references to the testing requirements",
         default=None,
     )
@@ -154,7 +154,7 @@ class TestReportSetup(BackboneElement):
     The results of the series of required setup operations before the tests were executed.
     """
 
-    action: Optional[List[TestReportSetupAction]] = Field(
+    action: Optional[ListType[TestReportSetupAction]] = Field(
         description="A setup operation or assert that was executed",
         default=None,
     )
@@ -267,7 +267,7 @@ class TestReportTestActionAssert(BackboneElement):
         default=None,
         alias="_detail",
     )
-    requirement: Optional[List[TestReportSetupActionAssertRequirement]] = Field(
+    requirement: Optional[ListType[TestReportSetupActionAssertRequirement]] = Field(
         description="Links or references to the testing requirements",
         default=None,
     )
@@ -312,7 +312,7 @@ class TestReportTest(BackboneElement):
         default=None,
         alias="_description",
     )
-    action: Optional[List[TestReportTestAction]] = Field(
+    action: Optional[ListType[TestReportTestAction]] = Field(
         description="A test operation or assert that was performed",
         default=None,
     )
@@ -334,7 +334,7 @@ class TestReportTeardown(BackboneElement):
     The results of the series of operations required to clean up after all the tests were executed (successfully or otherwise).
     """
 
-    action: Optional[List[TestReportTeardownAction]] = Field(
+    action: Optional[ListType[TestReportTeardownAction]] = Field(
         description="One or more teardown operations performed",
         default=None,
     )
@@ -416,7 +416,7 @@ class TestReport(DomainResource):
         default=None,
         alias="_issued",
     )
-    participant: Optional[List[TestReportParticipant]] = Field(
+    participant: Optional[ListType[TestReportParticipant]] = Field(
         description="A participant in the test execution, either the execution engine, a client, or a server",
         default=None,
     )
@@ -424,7 +424,7 @@ class TestReport(DomainResource):
         description="The results of the series of required setup operations before the tests were executed",
         default=None,
     )
-    test: Optional[List[TestReportTest]] = Field(
+    test: Optional[ListType[TestReportTest]] = Field(
         description="A test executed from the test script",
         default=None,
     )

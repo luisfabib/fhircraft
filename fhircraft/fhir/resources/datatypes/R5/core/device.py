@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -116,7 +116,7 @@ class DeviceName(BackboneElement):
         description="registered-name | user-friendly-name | patient-reported-name",
         default=None,
     )
-    type_ext: Optional[List[Optional[Element]]] = Field(
+    type_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for type extensions",
         default=None,
         alias="_type",
@@ -182,7 +182,7 @@ class DeviceConformsTo(BackboneElement):
         description="Specific form or variant of the standard",
         default=None,
     )
-    version_ext: Optional[List[Optional[Element]]] = Field(
+    version_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",
@@ -276,7 +276,7 @@ class Device(DomainResource):
     _type = "Device"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Device"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Instance identifier",
         default=None,
     )
@@ -293,7 +293,7 @@ class Device(DomainResource):
         description="The reference to the definition for the device",
         default=None,
     )
-    udiCarrier: Optional[List[DeviceUdiCarrier]] = Field(
+    udiCarrier: Optional[ListType[DeviceUdiCarrier]] = Field(
         description="Unique Device Identifier (UDI) Barcode string",
         default=None,
     )
@@ -359,7 +359,7 @@ class Device(DomainResource):
         default=None,
         alias="_serialNumber",
     )
-    name: Optional[List[DeviceName]] = Field(
+    name: Optional[ListType[DeviceName]] = Field(
         description="The name or names of the device as known to the manufacturer and/or patient",
         default=None,
     )
@@ -381,23 +381,23 @@ class Device(DomainResource):
         default=None,
         alias="_partNumber",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Indicates a high-level grouping of the device",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="The kind or type of device",
         default=None,
     )
-    version: Optional[List[DeviceVersion]] = Field(
+    version: Optional[ListType[DeviceVersion]] = Field(
         description="The actual design of the device or software version running on the device",
         default=None,
     )
-    conformsTo: Optional[List[DeviceConformsTo]] = Field(
+    conformsTo: Optional[ListType[DeviceConformsTo]] = Field(
         description="Identifies the standards, specifications, or formal guidances for the capabilities supported by the device",
         default=None,
     )
-    property_: Optional[List[DeviceProperty]] = Field(
+    property_: Optional[ListType[DeviceProperty]] = Field(
         description="Inherent, essentially fixed, characteristics of the device.  e.g., time properties, size, material, etc.",
         default=None,
         alias="property",
@@ -418,7 +418,7 @@ class Device(DomainResource):
         description="Organization responsible for device",
         default=None,
     )
-    contact: Optional[List[ContactPoint]] = Field(
+    contact: Optional[ListType[ContactPoint]] = Field(
         description="Details for human/organization for support",
         default=None,
     )
@@ -435,19 +435,19 @@ class Device(DomainResource):
         default=None,
         alias="_url",
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to electronic services provided by the device",
         default=None,
     )
-    gateway: Optional[List[CodeableReference]] = Field(
+    gateway: Optional[ListType[CodeableReference]] = Field(
         description="Linked device acting as a communication/data collector, translator or controller",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Device notes and comments",
         default=None,
     )
-    safety: Optional[List[CodeableConcept]] = Field(
+    safety: Optional[ListType[CodeableConcept]] = Field(
         description="Safety Characteristics of Device",
         default=None,
     )

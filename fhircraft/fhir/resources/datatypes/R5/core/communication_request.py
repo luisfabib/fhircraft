@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -75,15 +75,15 @@ class CommunicationRequest(DomainResource):
     _type = "CommunicationRequest"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CommunicationRequest"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique identifier",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Fulfills plan or proposal",
         default=None,
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="Request(s) replaced by this request",
         default=None,
     )
@@ -113,7 +113,7 @@ class CommunicationRequest(DomainResource):
         default=None,
         alias="_intent",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Message category",
         default=None,
     )
@@ -135,7 +135,7 @@ class CommunicationRequest(DomainResource):
         default=None,
         alias="_doNotPerform",
     )
-    medium: Optional[List[CodeableConcept]] = Field(
+    medium: Optional[ListType[CodeableConcept]] = Field(
         description="A channel of communication",
         default=None,
     )
@@ -143,7 +143,7 @@ class CommunicationRequest(DomainResource):
         description="Focus of message",
         default=None,
     )
-    about: Optional[List[Reference]] = Field(
+    about: Optional[ListType[Reference]] = Field(
         description="Resources that pertain to this communication request",
         default=None,
     )
@@ -151,7 +151,7 @@ class CommunicationRequest(DomainResource):
         description="The Encounter during which this CommunicationRequest was created",
         default=None,
     )
-    payload: Optional[List[CommunicationRequestPayload]] = Field(
+    payload: Optional[ListType[CommunicationRequestPayload]] = Field(
         description="Message payload",
         default=None,
     )
@@ -181,19 +181,19 @@ class CommunicationRequest(DomainResource):
         description="Who asks for the information to be shared",
         default=None,
     )
-    recipient: Optional[List[Reference]] = Field(
+    recipient: Optional[ListType[Reference]] = Field(
         description="Who to share the information with",
         default=None,
     )
-    informationProvider: Optional[List[Reference]] = Field(
+    informationProvider: Optional[ListType[Reference]] = Field(
         description="Who should share the information",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why is communication needed?",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about communication request",
         default=None,
     )

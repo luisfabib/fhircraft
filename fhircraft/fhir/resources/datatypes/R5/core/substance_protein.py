@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -30,7 +30,7 @@ class SubstanceProteinSubunit(BackboneElement):
         description="Index of primary sequences of amino acids linked through peptide bonds in order of decreasing length. Sequences of the same length will be ordered by molecular weight. Subunits that have identical sequences will be repeated and have sequential subscripts",
         default=None,
     )
-    subunit_ext: Optional[List[Optional[Element]]] = Field(
+    subunit_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for subunit extensions",
         default=None,
         alias="_subunit",
@@ -107,16 +107,16 @@ class SubstanceProtein(DomainResource):
         default=None,
         alias="_numberOfSubunits",
     )
-    disulfideLinkage: Optional[List[String]] = Field(
+    disulfideLinkage: Optional[ListType[String]] = Field(
         description="The disulphide bond between two cysteine residues either on the same subunit or on two different subunits shall be described. The position of the disulfide bonds in the SubstanceProtein shall be listed in increasing order of subunit number and position within subunit followed by the abbreviation of the amino acids involved. The disulfide linkage positions shall actually contain the amino acid Cysteine at the respective positions",
         default=None,
     )
-    disulfideLinkage_ext: Optional[List[Optional[Element]]] = Field(
+    disulfideLinkage_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for disulfideLinkage extensions",
         default=None,
         alias="_disulfideLinkage",
     )
-    subunit: Optional[List[SubstanceProteinSubunit]] = Field(
+    subunit: Optional[ListType[SubstanceProteinSubunit]] = Field(
         description="This subclause refers to the description of each subunit constituting the SubstanceProtein. A subunit is a linear sequence of amino acids linked through peptide bonds. The Subunit information shall be provided when the finished SubstanceProtein is a complex of multiple sequences; subunits are not used to delineate domains within a single sequence. Subunits are listed in order of decreasing length; sequences of the same length will be ordered by decreasing molecular weight; subunits that have identical sequences will be repeated multiple times",
         default=None,
     )

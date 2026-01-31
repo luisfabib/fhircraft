@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -90,7 +90,7 @@ class TransportRestriction(BackboneElement):
         description="When fulfillment sought",
         default=None,
     )
-    recipient: Optional[List[Reference]] = Field(
+    recipient: Optional[ListType[Reference]] = Field(
         description="For whom is fulfillment sought?",
         default=None,
     )
@@ -891,7 +891,7 @@ class Transport(DomainResource):
     _type = "Transport"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Transport"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifier",
         default=None,
     )
@@ -913,7 +913,7 @@ class Transport(DomainResource):
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled by this transport",
         default=None,
     )
@@ -921,7 +921,7 @@ class Transport(DomainResource):
         description="Requisition or grouper id",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -1013,7 +1013,7 @@ class Transport(DomainResource):
         description="Who is asking for transport to be done",
         default=None,
     )
-    performerType: Optional[List[CodeableConcept]] = Field(
+    performerType: Optional[ListType[CodeableConcept]] = Field(
         description="Requested performer",
         default=None,
     )
@@ -1025,15 +1025,15 @@ class Transport(DomainResource):
         description="Where transport occurs",
         default=None,
     )
-    insurance: Optional[List[Reference]] = Field(
+    insurance: Optional[ListType[Reference]] = Field(
         description="Associated insurance coverage",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the transport",
         default=None,
     )
-    relevantHistory: Optional[List[Reference]] = Field(
+    relevantHistory: Optional[ListType[Reference]] = Field(
         description="Key events in history of the Transport",
         default=None,
     )
@@ -1041,11 +1041,11 @@ class Transport(DomainResource):
         description="Constraints on fulfillment transports",
         default=None,
     )
-    input: Optional[List[TransportInput]] = Field(
+    input: Optional[ListType[TransportInput]] = Field(
         description="Information used to perform transport",
         default=None,
     )
-    output: Optional[List[TransportOutput]] = Field(
+    output: Optional[ListType[TransportOutput]] = Field(
         description="Information produced as part of transport",
         default=None,
     )

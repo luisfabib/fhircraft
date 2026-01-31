@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -118,7 +118,7 @@ class ServiceRequestOrderDetail(BackboneElement):
         description="The context of the order details by reference",
         default=None,
     )
-    parameter: Optional[List[ServiceRequestOrderDetailParameter]] = Field(
+    parameter: Optional[ListType[ServiceRequestOrderDetailParameter]] = Field(
         description="The parameter details for the service being requested",
         default=None,
     )
@@ -169,33 +169,33 @@ class ServiceRequest(DomainResource):
     _type = "ServiceRequest"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ServiceRequest"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers assigned to this order",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesCanonical extensions",
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesUri extensions",
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="What request fulfills",
         default=None,
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="What request replaces",
         default=None,
     )
@@ -221,7 +221,7 @@ class ServiceRequest(DomainResource):
         default=None,
         alias="_intent",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of service",
         default=None,
     )
@@ -247,7 +247,7 @@ class ServiceRequest(DomainResource):
         description="What is being requested/ordered",
         default=None,
     )
-    orderDetail: Optional[List[ServiceRequestOrderDetail]] = Field(
+    orderDetail: Optional[ListType[ServiceRequestOrderDetail]] = Field(
         description="Additional order information",
         default=None,
     )
@@ -267,7 +267,7 @@ class ServiceRequest(DomainResource):
         description="Individual or Entity the service is ordered for",
         default=None,
     )
-    focus: Optional[List[Reference]] = Field(
+    focus: Optional[ListType[Reference]] = Field(
         description="What the service request is about, when it is not about the subject of record",
         default=None,
     )
@@ -322,31 +322,31 @@ class ServiceRequest(DomainResource):
         description="Performer role",
         default=None,
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Requested performer",
         default=None,
     )
-    location: Optional[List[CodeableReference]] = Field(
+    location: Optional[ListType[CodeableReference]] = Field(
         description="Requested location",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Explanation/Justification for procedure or service",
         default=None,
     )
-    insurance: Optional[List[Reference]] = Field(
+    insurance: Optional[ListType[Reference]] = Field(
         description="Associated insurance coverage",
         default=None,
     )
-    supportingInfo: Optional[List[CodeableReference]] = Field(
+    supportingInfo: Optional[ListType[CodeableReference]] = Field(
         description="Additional clinical information",
         default=None,
     )
-    specimen: Optional[List[Reference]] = Field(
+    specimen: Optional[ListType[Reference]] = Field(
         description="Procedure Samples",
         default=None,
     )
-    bodySite: Optional[List[CodeableConcept]] = Field(
+    bodySite: Optional[ListType[CodeableConcept]] = Field(
         description="Coded location on Body",
         default=None,
     )
@@ -354,15 +354,15 @@ class ServiceRequest(DomainResource):
         description="BodyStructure-based location on the body",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments",
         default=None,
     )
-    patientInstruction: Optional[List[ServiceRequestPatientInstruction]] = Field(
+    patientInstruction: Optional[ListType[ServiceRequestPatientInstruction]] = Field(
         description="Patient or consumer-oriented instructions",
         default=None,
     )
-    relevantHistory: Optional[List[Reference]] = Field(
+    relevantHistory: Optional[ListType[Reference]] = Field(
         description="Request provenance",
         default=None,
     )

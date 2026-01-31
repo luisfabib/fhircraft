@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -115,19 +115,19 @@ class ManufacturedItemDefinitionComponentConstituent(BackboneElement):
     A reference to a constituent of the manufactured item as a whole, linked here so that its component location within the item can be indicated. This not where the item's ingredient are primarily stated (for which see Ingredient.for or ManufacturedItemDefinition.ingredient).
     """
 
-    amount: Optional[List[Quantity]] = Field(
+    amount: Optional[ListType[Quantity]] = Field(
         description="The measurable amount of the substance, expressable in different ways (e.g. by mass or volume)",
         default=None,
     )
-    location: Optional[List[CodeableConcept]] = Field(
+    location: Optional[ListType[CodeableConcept]] = Field(
         description="The physical location of the constituent/ingredient within the component",
         default=None,
     )
-    function: Optional[List[CodeableConcept]] = Field(
+    function: Optional[ListType[CodeableConcept]] = Field(
         description="The function of this constituent within the component e.g. binder",
         default=None,
     )
-    hasIngredient: Optional[List[CodeableReference]] = Field(
+    hasIngredient: Optional[ListType[CodeableReference]] = Field(
         description="The ingredient that is the constituent of the given component",
         default=None,
     )
@@ -220,24 +220,24 @@ class ManufacturedItemDefinitionComponent(BackboneElement):
         description="Defining type of the component e.g. shell, layer, ink",
         default=None,
     )
-    function: Optional[List[CodeableConcept]] = Field(
+    function: Optional[ListType[CodeableConcept]] = Field(
         description="The function of this component within the item e.g. delivers active ingredient, masks taste",
         default=None,
     )
-    amount: Optional[List[Quantity]] = Field(
+    amount: Optional[ListType[Quantity]] = Field(
         description="The measurable amount of total quantity of all substances in the component, expressable in different ways (e.g. by mass or volume)",
         default=None,
     )
-    constituent: Optional[List[ManufacturedItemDefinitionComponentConstituent]] = Field(
+    constituent: Optional[ListType[ManufacturedItemDefinitionComponentConstituent]] = Field(
         description="A reference to a constituent of the manufactured item as a whole, linked here so that its component location within the item can be indicated. This not where the item\u0027s ingredient are primarily stated (for which see Ingredient.for or ManufacturedItemDefinition.ingredient)",
         default=None,
     )
-    property_: Optional[List[ManufacturedItemDefinitionComponentProperty]] = Field(
+    property_: Optional[ListType[ManufacturedItemDefinitionComponentProperty]] = Field(
         description="General characteristics of this component",
         default=None,
         alias="property",
     )
-    component: Optional[List["ManufacturedItemDefinitionComponent"]] = Field(
+    component: Optional[ListType["ManufacturedItemDefinitionComponent"]] = Field(
         description="A component that this component contains or is made from",
         default=None,
     )
@@ -254,7 +254,7 @@ class ManufacturedItemDefinition(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition"
     )
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique identifier",
         default=None,
     )
@@ -284,24 +284,24 @@ class ManufacturedItemDefinition(DomainResource):
         description="The \u201creal-world\u201d units in which the quantity of the item is described",
         default=None,
     )
-    manufacturer: Optional[List[Reference]] = Field(
+    manufacturer: Optional[ListType[Reference]] = Field(
         description="Manufacturer of the item, one of several possible",
         default=None,
     )
-    marketingStatus: Optional[List[MarketingStatus]] = Field(
+    marketingStatus: Optional[ListType[MarketingStatus]] = Field(
         description="Allows specifying that an item is on the market for sale, or that it is not available, and the dates and locations associated",
         default=None,
     )
-    ingredient: Optional[List[CodeableConcept]] = Field(
+    ingredient: Optional[ListType[CodeableConcept]] = Field(
         description="The ingredients of this manufactured item. Only needed if these are not specified by incoming references from the Ingredient resource",
         default=None,
     )
-    property_: Optional[List[ManufacturedItemDefinitionProperty]] = Field(
+    property_: Optional[ListType[ManufacturedItemDefinitionProperty]] = Field(
         description="General characteristics of this item",
         default=None,
         alias="property",
     )
-    component: Optional[List[ManufacturedItemDefinitionComponent]] = Field(
+    component: Optional[ListType[ManufacturedItemDefinitionComponent]] = Field(
         description="Physical parts of the manufactured item, that it is intrisically made from. This is distinct from the ingredients that are part of its chemical makeup",
         default=None,
     )

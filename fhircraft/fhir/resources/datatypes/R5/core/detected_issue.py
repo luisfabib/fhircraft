@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -34,11 +34,11 @@ class DetectedIssueEvidence(BackboneElement):
     Supporting evidence or manifestations that provide the basis for identifying the detected issue such as a GuidanceResponse or MeasureReport.
     """
 
-    code: Optional[List[CodeableConcept]] = Field(
+    code: Optional[ListType[CodeableConcept]] = Field(
         description="Manifestation",
         default=None,
     )
-    detail: Optional[List[Reference]] = Field(
+    detail: Optional[ListType[Reference]] = Field(
         description="Supporting information",
         default=None,
     )
@@ -66,7 +66,7 @@ class DetectedIssueMitigation(BackboneElement):
         description="Who is committing?",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional notes about the mitigation",
         default=None,
     )
@@ -81,7 +81,7 @@ class DetectedIssue(DomainResource):
     _type = "DetectedIssue"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DetectedIssue"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique id for the detected issue",
         default=None,
     )
@@ -94,7 +94,7 @@ class DetectedIssue(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of detected issue, e.g. drug-drug, duplicate therapy, etc",
         default=None,
     )
@@ -136,11 +136,11 @@ class DetectedIssue(DomainResource):
         description="The provider or device that identified the issue",
         default=None,
     )
-    implicated: Optional[List[Reference]] = Field(
+    implicated: Optional[ListType[Reference]] = Field(
         description="Problem resource",
         default=None,
     )
-    evidence: Optional[List[DetectedIssueEvidence]] = Field(
+    evidence: Optional[ListType[DetectedIssueEvidence]] = Field(
         description="Supporting evidence",
         default=None,
     )
@@ -148,7 +148,7 @@ class DetectedIssue(DomainResource):
         description="Description and context",
         default=None,
     )
-    detail_ext: Optional[List[Optional[Element]]] = Field(
+    detail_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for detail extensions",
         default=None,
         alias="_detail",
@@ -162,7 +162,7 @@ class DetectedIssue(DomainResource):
         default=None,
         alias="_reference",
     )
-    mitigation: Optional[List[DetectedIssueMitigation]] = Field(
+    mitigation: Optional[ListType[DetectedIssueMitigation]] = Field(
         description="Step taken to address",
         default=None,
     )

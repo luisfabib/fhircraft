@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -88,7 +88,7 @@ class MedicationRequestDispenseRequest(BackboneElement):
         description="Intended performer of dispense",
         default=None,
     )
-    dispenserInstruction: Optional[List[Annotation]] = Field(
+    dispenserInstruction: Optional[ListType[Annotation]] = Field(
         description="Additional information for the dispenser",
         default=None,
     )
@@ -147,11 +147,11 @@ class MedicationRequest(DomainResource):
     _type = "MedicationRequest"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationRequest"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External ids for this request",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="A plan or request that is fulfilled in whole or in part by this medication request",
         default=None,
     )
@@ -194,7 +194,7 @@ class MedicationRequest(DomainResource):
         default=None,
         alias="_intent",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Grouping or category of medication request",
         default=None,
     )
@@ -224,7 +224,7 @@ class MedicationRequest(DomainResource):
         description="Individual or group for whom the medication has been requested",
         default=None,
     )
-    informationSource: Optional[List[Reference]] = Field(
+    informationSource: Optional[ListType[Reference]] = Field(
         description="The person or organization who provided the information about this request, if the source is someone other than the requestor",
         default=None,
     )
@@ -232,7 +232,7 @@ class MedicationRequest(DomainResource):
         description="Encounter created as part of encounter/admission/stay",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Information to support fulfilling of the medication",
         default=None,
     )
@@ -262,11 +262,11 @@ class MedicationRequest(DomainResource):
         description="Desired kind of performer of the medication administration",
         default=None,
     )
-    performer: Optional[List[Reference]] = Field(
+    performer: Optional[ListType[Reference]] = Field(
         description="Intended performer of administration",
         default=None,
     )
-    device: Optional[List[CodeableReference]] = Field(
+    device: Optional[ListType[CodeableReference]] = Field(
         description="Intended type of device for the administration",
         default=None,
     )
@@ -274,7 +274,7 @@ class MedicationRequest(DomainResource):
         description="Person who entered the request",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Reason or indication for ordering or not ordering the medication",
         default=None,
     )
@@ -282,11 +282,11 @@ class MedicationRequest(DomainResource):
         description="Overall pattern of medication administration",
         default=None,
     )
-    insurance: Optional[List[Reference]] = Field(
+    insurance: Optional[ListType[Reference]] = Field(
         description="Associated insurance coverage",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Information about the prescription",
         default=None,
     )
@@ -303,7 +303,7 @@ class MedicationRequest(DomainResource):
         description="Period over which the medication is to be taken",
         default=None,
     )
-    dosageInstruction: Optional[List[Dosage]] = Field(
+    dosageInstruction: Optional[ListType[Dosage]] = Field(
         description="Specific instructions for how the medication should be taken",
         default=None,
     )
@@ -315,7 +315,7 @@ class MedicationRequest(DomainResource):
         description="Any restrictions on medication substitution",
         default=None,
     )
-    eventHistory: Optional[List[Reference]] = Field(
+    eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of events of interest in the lifecycle",
         default=None,
     )

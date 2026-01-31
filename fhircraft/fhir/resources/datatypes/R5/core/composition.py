@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -59,7 +59,7 @@ class CompositionEvent(BackboneElement):
         description="The period covered by the documentation",
         default=None,
     )
-    detail: Optional[List[CodeableReference]] = Field(
+    detail: Optional[ListType[CodeableReference]] = Field(
         description="The event(s) being documented, as code(s), reference(s), or both",
         default=None,
     )
@@ -83,7 +83,7 @@ class CompositionSection(BackboneElement):
         description="Classification of section (recommended)",
         default=None,
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the section",
         default=None,
     )
@@ -99,7 +99,7 @@ class CompositionSection(BackboneElement):
         description="Order of section entries",
         default=None,
     )
-    entry: Optional[List[Reference]] = Field(
+    entry: Optional[ListType[Reference]] = Field(
         description="A reference to data that supports this section",
         default=None,
     )
@@ -107,7 +107,7 @@ class CompositionSection(BackboneElement):
         description="Why the section is empty",
         default=None,
     )
-    section: Optional[List["CompositionSection"]] = Field(
+    section: Optional[ListType["CompositionSection"]] = Field(
         description="Nested Section",
         default=None,
     )
@@ -131,7 +131,7 @@ class Composition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Version-independent identifier for the Composition",
         default=None,
     )
@@ -157,11 +157,11 @@ class Composition(DomainResource):
         description="Kind of composition (LOINC if possible)",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Categorization of Composition",
         default=None,
     )
-    subject: Optional[List[Reference]] = Field(
+    subject: Optional[ListType[Reference]] = Field(
         description="Who and/or what the composition is about",
         default=None,
     )
@@ -178,11 +178,11 @@ class Composition(DomainResource):
         default=None,
         alias="_date",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    author: Optional[List[Reference]] = Field(
+    author: Optional[ListType[Reference]] = Field(
         description="Who and/or what authored the composition",
         default=None,
     )
@@ -204,11 +204,11 @@ class Composition(DomainResource):
         default=None,
         alias="_title",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="For any additional notes",
         default=None,
     )
-    attester: Optional[List[CompositionAttester]] = Field(
+    attester: Optional[ListType[CompositionAttester]] = Field(
         description="Attests to accuracy of composition",
         default=None,
     )
@@ -216,15 +216,15 @@ class Composition(DomainResource):
         description="Organization which maintains the composition",
         default=None,
     )
-    relatesTo: Optional[List[RelatedArtifact]] = Field(
+    relatesTo: Optional[ListType[RelatedArtifact]] = Field(
         description="Relationships to other compositions/documents",
         default=None,
     )
-    event: Optional[List[CompositionEvent]] = Field(
+    event: Optional[ListType[CompositionEvent]] = Field(
         description="The clinical service(s) being documented",
         default=None,
     )
-    section: Optional[List[CompositionSection]] = Field(
+    section: Optional[ListType[CompositionSection]] = Field(
         description="Composition is broken into sections",
         default=None,
     )

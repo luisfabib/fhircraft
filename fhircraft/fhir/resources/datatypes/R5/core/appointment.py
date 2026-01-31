@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -40,7 +40,7 @@ class AppointmentParticipant(BackboneElement):
     List of participants involved in the appointment.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in the appointment",
         default=None,
     )
@@ -231,11 +231,11 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         default=None,
         alias="_occurrenceCount",
     )
-    occurrenceDate: Optional[List[Date]] = Field(
+    occurrenceDate: Optional[ListType[Date]] = Field(
         description="Specific dates for a recurring set of appointments (no template)",
         default=None,
     )
-    occurrenceDate_ext: Optional[List[Optional[Element]]] = Field(
+    occurrenceDate_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for occurrenceDate extensions",
         default=None,
         alias="_occurrenceDate",
@@ -252,20 +252,20 @@ class AppointmentRecurrenceTemplate(BackboneElement):
         description="Information about yearly recurring appointments",
         default=None,
     )
-    excludingDate: Optional[List[Date]] = Field(
+    excludingDate: Optional[ListType[Date]] = Field(
         description="Any dates that should be excluded from the series",
         default=None,
     )
-    excludingDate_ext: Optional[List[Optional[Element]]] = Field(
+    excludingDate_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for excludingDate extensions",
         default=None,
         alias="_excludingDate",
     )
-    excludingRecurrenceId: Optional[List[PositiveInt]] = Field(
+    excludingRecurrenceId: Optional[ListType[PositiveInt]] = Field(
         description="Any recurrence IDs that should be excluded from the recurrence",
         default=None,
     )
-    excludingRecurrenceId_ext: Optional[List[Optional[Element]]] = Field(
+    excludingRecurrenceId_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for excludingRecurrenceId extensions",
         default=None,
         alias="_excludingRecurrenceId",
@@ -281,7 +281,7 @@ class Appointment(DomainResource):
     _type = "Appointment"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Appointment"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this item",
         default=None,
     )
@@ -298,20 +298,20 @@ class Appointment(DomainResource):
         description="The coded reason for the appointment being cancelled",
         default=None,
     )
-    class_: Optional[List[CodeableConcept]] = Field(
+    class_: Optional[ListType[CodeableConcept]] = Field(
         description="Classification when becoming an encounter",
         default=None,
         alias="class",
     )
-    serviceCategory: Optional[List[CodeableConcept]] = Field(
+    serviceCategory: Optional[ListType[CodeableConcept]] = Field(
         description="A broad categorization of the service that is to be performed during this appointment",
         default=None,
     )
-    serviceType: Optional[List[CodeableReference]] = Field(
+    serviceType: Optional[ListType[CodeableReference]] = Field(
         description="The specific service that is to be performed during this appointment",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="The specialty of a practitioner that would be required to perform the service requested in this appointment",
         default=None,
     )
@@ -319,7 +319,7 @@ class Appointment(DomainResource):
         description="The style of appointment or patient that has been booked in the slot (not service type)",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Reason this appointment is scheduled",
         default=None,
     )
@@ -336,15 +336,15 @@ class Appointment(DomainResource):
         default=None,
         alias="_description",
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="Appointment replaced by this Appointment",
         default=None,
     )
-    virtualService: Optional[List[VirtualServiceDetail]] = Field(
+    virtualService: Optional[ListType[VirtualServiceDetail]] = Field(
         description="Connection details of a virtual service (e.g. conference call)",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Additional information to support the appointment",
         default=None,
     )
@@ -383,15 +383,15 @@ class Appointment(DomainResource):
         default=None,
         alias="_minutesDuration",
     )
-    requestedPeriod: Optional[List[Period]] = Field(
+    requestedPeriod: Optional[ListType[Period]] = Field(
         description="Potential date/time interval(s) requested to allocate the appointment within",
         default=None,
     )
-    slot: Optional[List[Reference]] = Field(
+    slot: Optional[ListType[Reference]] = Field(
         description="The slots that this appointment is filling",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="The set of accounts that may be used for billing for this Appointment",
         default=None,
     )
@@ -413,15 +413,15 @@ class Appointment(DomainResource):
         default=None,
         alias="_cancellationDate",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional comments",
         default=None,
     )
-    patientInstruction: Optional[List[CodeableReference]] = Field(
+    patientInstruction: Optional[ListType[CodeableReference]] = Field(
         description="Detailed information and instructions for the patient",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="The request this appointment is allocated to assess",
         default=None,
     )
@@ -429,7 +429,7 @@ class Appointment(DomainResource):
         description="The patient or group associated with the appointment",
         default=None,
     )
-    participant: Optional[List[AppointmentParticipant]] = Field(
+    participant: Optional[ListType[AppointmentParticipant]] = Field(
         description="Participants involved in appointment",
         default=None,
     )
@@ -451,7 +451,7 @@ class Appointment(DomainResource):
         default=None,
         alias="_occurrenceChanged",
     )
-    recurrenceTemplate: Optional[List[AppointmentRecurrenceTemplate]] = Field(
+    recurrenceTemplate: Optional[ListType[AppointmentRecurrenceTemplate]] = Field(
         description="Details of the recurrence pattern/template used to generate occurrences",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -113,15 +113,15 @@ class MedicationAdministration(DomainResource):
     _type = "MedicationAdministration"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationAdministration"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifier",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Plan this is fulfilled by this administration",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -134,11 +134,11 @@ class MedicationAdministration(DomainResource):
         default=None,
         alias="_status",
     )
-    statusReason: Optional[List[CodeableConcept]] = Field(
+    statusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason administration not performed",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of medication administration",
         default=None,
     )
@@ -154,7 +154,7 @@ class MedicationAdministration(DomainResource):
         description="Encounter administered as part of",
         default=None,
     )
-    supportingInformation: Optional[List[Reference]] = Field(
+    supportingInformation: Optional[ListType[Reference]] = Field(
         description="Additional information to support administration",
         default=None,
     )
@@ -193,15 +193,15 @@ class MedicationAdministration(DomainResource):
         default=None,
         alias="_isSubPotent",
     )
-    subPotentReason: Optional[List[CodeableConcept]] = Field(
+    subPotentReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason full dose was not administered",
         default=None,
     )
-    performer: Optional[List[MedicationAdministrationPerformer]] = Field(
+    performer: Optional[ListType[MedicationAdministrationPerformer]] = Field(
         description="Who or what performed the medication administration and what type of performance they did",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Concept, condition or observation that supports why the medication was administered",
         default=None,
     )
@@ -209,11 +209,11 @@ class MedicationAdministration(DomainResource):
         description="Request administration performed against",
         default=None,
     )
-    device: Optional[List[CodeableReference]] = Field(
+    device: Optional[ListType[CodeableReference]] = Field(
         description="Device used to administer",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Information about the administration",
         default=None,
     )
@@ -221,7 +221,7 @@ class MedicationAdministration(DomainResource):
         description="Details of how medication was taken",
         default=None,
     )
-    eventHistory: Optional[List[Reference]] = Field(
+    eventHistory: Optional[ListType[Reference]] = Field(
         description="A list of events of interest in the lifecycle",
         default=None,
     )

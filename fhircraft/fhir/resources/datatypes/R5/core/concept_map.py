@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -424,16 +424,16 @@ class ConceptMapGroupElementTarget(BackboneElement):
         default=None,
         alias="_comment",
     )
-    property_: Optional[List[ConceptMapGroupElementTargetProperty]] = Field(
+    property_: Optional[ListType[ConceptMapGroupElementTargetProperty]] = Field(
         description="Property value for the source -\u003e target mapping",
         default=None,
         alias="property",
     )
-    dependsOn: Optional[List[ConceptMapGroupElementTargetDependsOn]] = Field(
+    dependsOn: Optional[ListType[ConceptMapGroupElementTargetDependsOn]] = Field(
         description="Other properties required for this mapping",
         default=None,
     )
-    product: Optional[List[ConceptMapGroupElementTargetProduct]] = Field(
+    product: Optional[ListType[ConceptMapGroupElementTargetProduct]] = Field(
         description="Other data elements that this mapping also produces",
         default=None,
     )
@@ -480,7 +480,7 @@ class ConceptMapGroupElement(BackboneElement):
         default=None,
         alias="_noMap",
     )
-    target: Optional[List[ConceptMapGroupElementTarget]] = Field(
+    target: Optional[ListType[ConceptMapGroupElementTarget]] = Field(
         description="Concept in target system for element",
         default=None,
     )
@@ -565,12 +565,12 @@ class ConceptMapGroup(BackboneElement):
         description="Target system that the concepts are to be mapped to",
         default=None,
     )
-    target_ext: Optional[List[Optional[Element]]] = Field(
+    target_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for target extensions",
         default=None,
         alias="_target",
     )
-    element: Optional[List[ConceptMapGroupElement]] = Field(
+    element: Optional[ListType[ConceptMapGroupElement]] = Field(
         description="Mappings for a concept from the source set",
         default=None,
     )
@@ -598,7 +598,7 @@ class ConceptMap(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the concept map",
         default=None,
     )
@@ -678,7 +678,7 @@ class ConceptMap(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -691,11 +691,11 @@ class ConceptMap(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for concept map (if applicable)",
         default=None,
     )
@@ -748,36 +748,36 @@ class ConceptMap(DomainResource):
         description="When the ConceptMap is expected to be used",
         default=None,
     )
-    topic: Optional[List[CodeableConcept]] = Field(
+    topic: Optional[ListType[CodeableConcept]] = Field(
         description="E.g. Education, Treatment, Assessment, etc",
         default=None,
     )
-    author: Optional[List[ContactDetail]] = Field(
+    author: Optional[ListType[ContactDetail]] = Field(
         description="Who authored the ConceptMap",
         default=None,
     )
-    editor: Optional[List[ContactDetail]] = Field(
+    editor: Optional[ListType[ContactDetail]] = Field(
         description="Who edited the ConceptMap",
         default=None,
     )
-    reviewer: Optional[List[ContactDetail]] = Field(
+    reviewer: Optional[ListType[ContactDetail]] = Field(
         description="Who reviewed the ConceptMap",
         default=None,
     )
-    endorser: Optional[List[ContactDetail]] = Field(
+    endorser: Optional[ListType[ContactDetail]] = Field(
         description="Who endorsed the ConceptMap",
         default=None,
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="Additional documentation, citations, etc",
         default=None,
     )
-    property_: Optional[List[ConceptMapProperty]] = Field(
+    property_: Optional[ListType[ConceptMapProperty]] = Field(
         description="Additional properties of the mapping",
         default=None,
         alias="property",
     )
-    additionalAttribute: Optional[List[ConceptMapAdditionalAttribute]] = Field(
+    additionalAttribute: Optional[ListType[ConceptMapAdditionalAttribute]] = Field(
         description="Definition of an additional attribute to act as a data source or target",
         default=None,
     )
@@ -817,7 +817,7 @@ class ConceptMap(DomainResource):
         default=None,
         alias="_targetScopeCanonical",
     )
-    group: Optional[List[ConceptMapGroup]] = Field(
+    group: Optional[ListType[ConceptMapGroup]] = Field(
         description="Same source and target systems",
         default=None,
     )

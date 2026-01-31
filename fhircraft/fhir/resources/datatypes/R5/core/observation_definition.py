@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -44,7 +44,7 @@ class ObservationDefinitionQualifiedValue(BackboneElement):
         description="Context qualifier for the set of qualified values",
         default=None,
     )
-    appliesTo: Optional[List[CodeableConcept]] = Field(
+    appliesTo: Optional[ListType[CodeableConcept]] = Field(
         description="Targetted population for the set of qualified values",
         default=None,
     )
@@ -134,7 +134,7 @@ class ObservationDefinitionComponentQualifiedValue(BackboneElement):
         description="Context qualifier for the set of qualified values",
         default=None,
     )
-    appliesTo: Optional[List[CodeableConcept]] = Field(
+    appliesTo: Optional[ListType[CodeableConcept]] = Field(
         description="Targetted population for the set of qualified values",
         default=None,
     )
@@ -224,20 +224,20 @@ class ObservationDefinitionComponent(BackboneElement):
         description="Type of observation",
         default=None,
     )
-    permittedDataType: Optional[List[Code]] = Field(
+    permittedDataType: Optional[ListType[Code]] = Field(
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",
         default=None,
     )
-    permittedDataType_ext: Optional[List[Optional[Element]]] = Field(
+    permittedDataType_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for permittedDataType extensions",
         default=None,
         alias="_permittedDataType",
     )
-    permittedUnit: Optional[List[Coding]] = Field(
+    permittedUnit: Optional[ListType[Coding]] = Field(
         description="Unit for quantitative results",
         default=None,
     )
-    qualifiedValue: Optional[List[ObservationDefinitionComponentQualifiedValue]] = (
+    qualifiedValue: Optional[ListType[ObservationDefinitionComponentQualifiedValue]] = (
         Field(
             description="Set of qualified values for observation results",
             default=None,
@@ -343,7 +343,7 @@ class ObservationDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -356,11 +356,11 @@ class ObservationDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="Content intends to support these contexts",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for this ObservationDefinition (if applicable)",
         default=None,
     )
@@ -413,25 +413,25 @@ class ObservationDefinition(DomainResource):
         description="The effective date range for the ObservationDefinition",
         default=None,
     )
-    derivedFromCanonical: Optional[List[Canonical]] = Field(
+    derivedFromCanonical: Optional[ListType[Canonical]] = Field(
         description="Based on FHIR definition of another observation",
         default=None,
     )
-    derivedFromCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFromCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromCanonical extensions",
         default=None,
         alias="_derivedFromCanonical",
     )
-    derivedFromUri: Optional[List[Uri]] = Field(
+    derivedFromUri: Optional[ListType[Uri]] = Field(
         description="Based on external definition",
         default=None,
     )
-    derivedFromUri_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFromUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromUri extensions",
         default=None,
         alias="_derivedFromUri",
     )
-    subject: Optional[List[CodeableConcept]] = Field(
+    subject: Optional[ListType[CodeableConcept]] = Field(
         description="Type of subject for the defined observation",
         default=None,
     )
@@ -439,7 +439,7 @@ class ObservationDefinition(DomainResource):
         description="Desired kind of performer for such kind of observation",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="General type of observation",
         default=None,
     )
@@ -447,7 +447,7 @@ class ObservationDefinition(DomainResource):
         description="Type of observation",
         default=None,
     )
-    permittedDataType: Optional[List[Code]] = Field(
+    permittedDataType: Optional[ListType[Code]] = Field(
         description="Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period",
         default=None,
     )
@@ -473,11 +473,11 @@ class ObservationDefinition(DomainResource):
         description="Method used to produce the observation",
         default=None,
     )
-    specimen: Optional[List[Reference]] = Field(
+    specimen: Optional[ListType[Reference]] = Field(
         description="Kind of specimen used by this type of observation",
         default=None,
     )
-    device: Optional[List[Reference]] = Field(
+    device: Optional[ListType[Reference]] = Field(
         description="Measurement device or model of device",
         default=None,
     )
@@ -490,19 +490,19 @@ class ObservationDefinition(DomainResource):
         default=None,
         alias="_preferredReportName",
     )
-    permittedUnit: Optional[List[Coding]] = Field(
+    permittedUnit: Optional[ListType[Coding]] = Field(
         description="Unit for quantitative results",
         default=None,
     )
-    qualifiedValue: Optional[List[ObservationDefinitionQualifiedValue]] = Field(
+    qualifiedValue: Optional[ListType[ObservationDefinitionQualifiedValue]] = Field(
         description="Set of qualified values for observation results",
         default=None,
     )
-    hasMember: Optional[List[Reference]] = Field(
+    hasMember: Optional[ListType[Reference]] = Field(
         description="Definitions of related resources belonging to this kind of observation group",
         default=None,
     )
-    component: Optional[List[ObservationDefinitionComponent]] = Field(
+    component: Optional[ListType[ObservationDefinitionComponent]] = Field(
         description="Component results",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -117,7 +117,7 @@ class Subscription(DomainResource):
     _type = "Subscription"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Subscription"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifiers (business identifier)",
         default=None,
     )
@@ -148,7 +148,7 @@ class Subscription(DomainResource):
         default=None,
         alias="_topic",
     )
-    contact: Optional[List[ContactPoint]] = Field(
+    contact: Optional[ListType[ContactPoint]] = Field(
         description="Contact details for source (e.g. troubleshooting)",
         default=None,
     )
@@ -174,7 +174,7 @@ class Subscription(DomainResource):
         default=None,
         alias="_reason",
     )
-    filterBy: Optional[List[SubscriptionFilterBy]] = Field(
+    filterBy: Optional[ListType[SubscriptionFilterBy]] = Field(
         description="Criteria for narrowing the subscription topic stream",
         default=None,
     )
@@ -191,7 +191,7 @@ class Subscription(DomainResource):
         default=None,
         alias="_endpoint",
     )
-    parameter: Optional[List[SubscriptionParameter]] = Field(
+    parameter: Optional[ListType[SubscriptionParameter]] = Field(
         description="Channel type",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -28,15 +28,15 @@ class EndpointPayload(BackboneElement):
     The set of payloads that are provided/available at this endpoint.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="The type of content that may be used at this endpoint (e.g. XDS Discharge summaries)",
         default=None,
     )
-    mimeType: Optional[List[Code]] = Field(
+    mimeType: Optional[ListType[Code]] = Field(
         description="Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this)",
         default=None,
     )
-    mimeType_ext: Optional[List[Optional[Element]]] = Field(
+    mimeType_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for mimeType extensions",
         default=None,
         alias="_mimeType",
@@ -52,7 +52,7 @@ class Endpoint(DomainResource):
     _type = "Endpoint"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Endpoint"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifies this endpoint across multiple systems",
         default=None,
     )
@@ -65,7 +65,7 @@ class Endpoint(DomainResource):
         default=None,
         alias="_status",
     )
-    connectionType: Optional[List[CodeableConcept]] = Field(
+    connectionType: Optional[ListType[CodeableConcept]] = Field(
         description="Protocol/Profile/Standard to be used with this endpoint connection",
         default=None,
     )
@@ -87,7 +87,7 @@ class Endpoint(DomainResource):
         default=None,
         alias="_description",
     )
-    environmentType: Optional[List[CodeableConcept]] = Field(
+    environmentType: Optional[ListType[CodeableConcept]] = Field(
         description="The type of environment(s) exposed at this endpoint",
         default=None,
     )
@@ -95,7 +95,7 @@ class Endpoint(DomainResource):
         description="Organization that manages this endpoint (might not be the organization that exposes the endpoint)",
         default=None,
     )
-    contact: Optional[List[ContactPoint]] = Field(
+    contact: Optional[ListType[ContactPoint]] = Field(
         description="Contact details for source (e.g. troubleshooting)",
         default=None,
     )
@@ -103,7 +103,7 @@ class Endpoint(DomainResource):
         description="Interval the endpoint is expected to be operational",
         default=None,
     )
-    payload: Optional[List[EndpointPayload]] = Field(
+    payload: Optional[ListType[EndpointPayload]] = Field(
         description="Set of payloads that are provided by this endpoint",
         default=None,
     )
@@ -116,11 +116,11 @@ class Endpoint(DomainResource):
         default=None,
         alias="_address",
     )
-    header: Optional[List[String]] = Field(
+    header: Optional[ListType[String]] = Field(
         description="Usage depends on the channel type",
         default=None,
     )
-    header_ext: Optional[List[Optional[Element]]] = Field(
+    header_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for header extensions",
         default=None,
         alias="_header",

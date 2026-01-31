@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -112,7 +112,7 @@ class Medication(DomainResource):
     _type = "Medication"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Medication"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this medication",
         default=None,
     )
@@ -141,7 +141,7 @@ class Medication(DomainResource):
         description="When the specified product code does not infer a package size, this is the specific amount of drug in the product",
         default=None,
     )
-    ingredient: Optional[List[MedicationIngredient]] = Field(
+    ingredient: Optional[ListType[MedicationIngredient]] = Field(
         description="Active or inactive ingredient",
         default=None,
     )

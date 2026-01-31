@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -38,7 +38,7 @@ class AppointmentResponse(DomainResource):
     _type = "AppointmentResponse"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/AppointmentResponse"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this item",
         default=None,
     )
@@ -73,7 +73,7 @@ class AppointmentResponse(DomainResource):
         default=None,
         alias="_end",
     )
-    participantType: Optional[List[CodeableConcept]] = Field(
+    participantType: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in the appointment",
         default=None,
     )

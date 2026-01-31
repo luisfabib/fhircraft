@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,7 +50,7 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Specific substance or pharmaceutical product considered to be responsible for event",
         default=None,
     )
-    manifestation: Optional[List[CodeableReference]] = Field(
+    manifestation: Optional[ListType[CodeableReference]] = Field(
         description="Clinical symptoms/signs associated with the Event",
         default=None,
     )
@@ -85,7 +85,7 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="How the subject was exposed to the substance",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Text about event not captured in other fields",
         default=None,
     )
@@ -100,7 +100,7 @@ class AllergyIntolerance(DomainResource):
     _type = "AllergyIntolerance"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/AllergyIntolerance"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External ids for this item",
         default=None,
     )
@@ -116,11 +116,11 @@ class AllergyIntolerance(DomainResource):
         description="allergy | intolerance - Underlying mechanism (if known)",
         default=None,
     )
-    category: Optional[List[Code]] = Field(
+    category: Optional[ListType[Code]] = Field(
         description="food | medication | environment | biologic",
         default=None,
     )
-    category_ext: Optional[List[Optional[Element]]] = Field(
+    category_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for category extensions",
         default=None,
         alias="_category",
@@ -185,7 +185,7 @@ class AllergyIntolerance(DomainResource):
         default=None,
         alias="_recordedDate",
     )
-    participant: Optional[List[AllergyIntoleranceParticipant]] = Field(
+    participant: Optional[ListType[AllergyIntoleranceParticipant]] = Field(
         description="Who or what participated in the activities related to the allergy or intolerance and how they were involved",
         default=None,
     )
@@ -198,11 +198,11 @@ class AllergyIntolerance(DomainResource):
         default=None,
         alias="_lastOccurrence",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional text not captured in other fields",
         default=None,
     )
-    reaction: Optional[List[AllergyIntoleranceReaction]] = Field(
+    reaction: Optional[ListType[AllergyIntoleranceReaction]] = Field(
         description="Adverse Reaction Events linked to exposure to substance",
         default=None,
     )

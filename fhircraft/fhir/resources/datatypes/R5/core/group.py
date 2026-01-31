@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -129,7 +129,7 @@ class Group(DomainResource):
     _type = "Group"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Group"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for this Group",
         default=None,
     )
@@ -195,11 +195,11 @@ class Group(DomainResource):
         description="Entity that is the custodian of the Group\u0027s definition",
         default=None,
     )
-    characteristic: Optional[List[GroupCharacteristic]] = Field(
+    characteristic: Optional[ListType[GroupCharacteristic]] = Field(
         description="Include / Exclude group members by Trait",
         default=None,
     )
-    member: Optional[List[GroupMember]] = Field(
+    member: Optional[ListType[GroupMember]] = Field(
         description="Who or what is in group",
         default=None,
     )

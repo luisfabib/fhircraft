@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -152,7 +152,7 @@ class SpecimenProcessing(BackboneElement):
         description="Indicates the treatment step  applied to the specimen",
         default=None,
     )
-    additive: Optional[List[Reference]] = Field(
+    additive: Optional[ListType[Reference]] = Field(
         description="Material used in the processing step",
         default=None,
     )
@@ -215,7 +215,7 @@ class Specimen(DomainResource):
     _type = "Specimen"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Specimen"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Identifier",
         default=None,
     )
@@ -249,11 +249,11 @@ class Specimen(DomainResource):
         default=None,
         alias="_receivedTime",
     )
-    parent: Optional[List[Reference]] = Field(
+    parent: Optional[ListType[Reference]] = Field(
         description="Specimen from which this specimen originated",
         default=None,
     )
-    request: Optional[List[Reference]] = Field(
+    request: Optional[ListType[Reference]] = Field(
         description="Why the specimen was collected",
         default=None,
     )
@@ -266,11 +266,11 @@ class Specimen(DomainResource):
         default=None,
         alias="_combined",
     )
-    role: Optional[List[CodeableConcept]] = Field(
+    role: Optional[ListType[CodeableConcept]] = Field(
         description="The role the specimen serves",
         default=None,
     )
-    feature: Optional[List[SpecimenFeature]] = Field(
+    feature: Optional[ListType[SpecimenFeature]] = Field(
         description="The physical feature of a specimen",
         default=None,
     )
@@ -278,19 +278,19 @@ class Specimen(DomainResource):
         description="Collection details",
         default=None,
     )
-    processing: Optional[List[SpecimenProcessing]] = Field(
+    processing: Optional[ListType[SpecimenProcessing]] = Field(
         description="Processing and processing step details",
         default=None,
     )
-    container: Optional[List[SpecimenContainer]] = Field(
+    container: Optional[ListType[SpecimenContainer]] = Field(
         description="Direct container of specimen (tube/slide, etc.)",
         default=None,
     )
-    condition: Optional[List[CodeableConcept]] = Field(
+    condition: Optional[ListType[CodeableConcept]] = Field(
         description="State of the specimen",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments",
         default=None,
     )

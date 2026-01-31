@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -100,7 +100,7 @@ class VisionPrescriptionLensSpecification(BackboneElement):
         default=None,
         alias="_axis",
     )
-    prism: Optional[List[VisionPrescriptionLensSpecificationPrism]] = Field(
+    prism: Optional[ListType[VisionPrescriptionLensSpecificationPrism]] = Field(
         description="Eye alignment compensation",
         default=None,
     )
@@ -162,7 +162,7 @@ class VisionPrescriptionLensSpecification(BackboneElement):
         default=None,
         alias="_brand",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Notes for coatings",
         default=None,
     )
@@ -177,7 +177,7 @@ class VisionPrescription(DomainResource):
     _type = "VisionPrescription"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/VisionPrescription"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for vision prescription",
         default=None,
     )
@@ -220,7 +220,7 @@ class VisionPrescription(DomainResource):
         description="Who authorized the vision prescription",
         default=None,
     )
-    lensSpecification: Optional[List[VisionPrescriptionLensSpecification]] = Field(
+    lensSpecification: Optional[ListType[VisionPrescriptionLensSpecification]] = Field(
         description="Vision lens authorization",
         default=None,
     )

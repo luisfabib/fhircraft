@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -65,7 +65,7 @@ class SubstancePolymerMonomerSet(BackboneElement):
         description="Captures the type of ratio to the entire polymer, e.g. Monomer/Polymer ratio, SRU/Polymer Ratio",
         default=None,
     )
-    startingMaterial: Optional[List[SubstancePolymerMonomerSetStartingMaterial]] = (
+    startingMaterial: Optional[ListType[SubstancePolymerMonomerSetStartingMaterial]] = (
         Field(
             description="The starting materials - monomer(s) used in the synthesis of the polymer",
             default=None,
@@ -167,13 +167,13 @@ class SubstancePolymerRepeatRepeatUnit(BackboneElement):
         alias="_amount",
     )
     degreeOfPolymerisation: Optional[
-        List[SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation]
+        ListType[SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation]
     ] = Field(
         description="Applies to homopolymer and block co-polymers where the degree of polymerisation within a block can be described",
         default=None,
     )
     structuralRepresentation: Optional[
-        List[SubstancePolymerRepeatRepeatUnitStructuralRepresentation]
+        ListType[SubstancePolymerRepeatRepeatUnitStructuralRepresentation]
     ] = Field(
         description="A graphical structure for this SRU",
         default=None,
@@ -198,7 +198,7 @@ class SubstancePolymerRepeat(BackboneElement):
         description="How the quantitative amount of Structural Repeat Units is captured (e.g. Exact, Numeric, Average)",
         default=None,
     )
-    repeatUnit: Optional[List[SubstancePolymerRepeatRepeatUnit]] = Field(
+    repeatUnit: Optional[ListType[SubstancePolymerRepeatRepeatUnit]] = Field(
         description="An SRU - Structural Repeat Unit",
         default=None,
     )
@@ -226,7 +226,7 @@ class SubstancePolymer(DomainResource):
         description="Polymer geometry, e.g. linear, branched, cross-linked, network or dendritic",
         default=None,
     )
-    copolymerConnectivity: Optional[List[CodeableConcept]] = Field(
+    copolymerConnectivity: Optional[ListType[CodeableConcept]] = Field(
         description="Descrtibes the copolymer sequence type (polymer connectivity)",
         default=None,
     )
@@ -239,11 +239,11 @@ class SubstancePolymer(DomainResource):
         default=None,
         alias="_modification",
     )
-    monomerSet: Optional[List[SubstancePolymerMonomerSet]] = Field(
+    monomerSet: Optional[ListType[SubstancePolymerMonomerSet]] = Field(
         description="Todo",
         default=None,
     )
-    repeat: Optional[List[SubstancePolymerRepeat]] = Field(
+    repeat: Optional[ListType[SubstancePolymerRepeat]] = Field(
         description="Specifies and quantifies the repeated units and their configuration",
         default=None,
     )

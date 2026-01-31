@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import List, Optional
+from typing import List as ListType, Optional
 
 NoneType = type(None)
 
@@ -210,7 +210,7 @@ class BundleEntry(BackboneElement):
     An entry in a bundle resource - will either contain a resource or information about a resource (transactions and history only).
     """
 
-    link: Optional[List[BundleEntryLink]] = Field(
+    link: Optional[ListType[BundleEntryLink]] = Field(
         description="Links related to this entry",
         default=None,
     )
@@ -281,11 +281,11 @@ class Bundle(Resource):
         default=None,
         alias="_total",
     )
-    link: Optional[List[BundleLink]] = Field(
+    link: Optional[ListType[BundleLink]] = Field(
         description="Links related to this Bundle",
         default=None,
     )
-    entry: Optional[List[BundleEntry]] = Field(
+    entry: Optional[ListType[BundleEntry]] = Field(
         description="Entry in the bundle - will have a resource or information",
         default=None,
     )

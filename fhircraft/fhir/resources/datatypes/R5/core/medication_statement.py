@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -58,11 +58,11 @@ class MedicationStatement(DomainResource):
     _type = "MedicationStatement"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationStatement"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifier",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -75,7 +75,7 @@ class MedicationStatement(DomainResource):
         default=None,
         alias="_status",
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Type of medication statement",
         default=None,
     )
@@ -117,23 +117,23 @@ class MedicationStatement(DomainResource):
         default=None,
         alias="_dateAsserted",
     )
-    informationSource: Optional[List[Reference]] = Field(
+    informationSource: Optional[ListType[Reference]] = Field(
         description="Person or organization that provided the information about the taking of this medication",
         default=None,
     )
-    derivedFrom: Optional[List[Reference]] = Field(
+    derivedFrom: Optional[ListType[Reference]] = Field(
         description="Link to information used to derive the MedicationStatement",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Reason for why the medication is being/was taken",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Further information about the usage",
         default=None,
     )
-    relatedClinicalInformation: Optional[List[Reference]] = Field(
+    relatedClinicalInformation: Optional[ListType[Reference]] = Field(
         description="Link to information relevant to the usage of a medication",
         default=None,
     )
@@ -146,7 +146,7 @@ class MedicationStatement(DomainResource):
         default=None,
         alias="_renderedDosageInstruction",
     )
-    dosage: Optional[List[Dosage]] = Field(
+    dosage: Optional[ListType[Dosage]] = Field(
         description="Details of how medication is/was taken or should be taken",
         default=None,
     )

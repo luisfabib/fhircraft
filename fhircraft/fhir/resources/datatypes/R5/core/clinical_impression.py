@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -53,7 +53,7 @@ class ClinicalImpression(DomainResource):
     _type = "ClinicalImpression"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ClinicalImpression"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
@@ -117,7 +117,7 @@ class ClinicalImpression(DomainResource):
         description="Reference to last assessment",
         default=None,
     )
-    problem: Optional[List[Reference]] = Field(
+    problem: Optional[ListType[Reference]] = Field(
         description="Relevant impressions of patient state",
         default=None,
     )
@@ -125,11 +125,11 @@ class ClinicalImpression(DomainResource):
         description="Change in the status/pattern of a subject\u0027s condition since previously assessed, such as worsening, improving, or no change",
         default=None,
     )
-    protocol: Optional[List[Uri]] = Field(
+    protocol: Optional[ListType[Uri]] = Field(
         description="Clinical Protocol followed",
         default=None,
     )
-    protocol_ext: Optional[List[Optional[Element]]] = Field(
+    protocol_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for protocol extensions",
         default=None,
         alias="_protocol",
@@ -143,23 +143,23 @@ class ClinicalImpression(DomainResource):
         default=None,
         alias="_summary",
     )
-    finding: Optional[List[ClinicalImpressionFinding]] = Field(
+    finding: Optional[ListType[ClinicalImpressionFinding]] = Field(
         description="Possible or likely findings and diagnoses",
         default=None,
     )
-    prognosisCodeableConcept: Optional[List[CodeableConcept]] = Field(
+    prognosisCodeableConcept: Optional[ListType[CodeableConcept]] = Field(
         description="Estimate of likely outcome",
         default=None,
     )
-    prognosisReference: Optional[List[Reference]] = Field(
+    prognosisReference: Optional[ListType[Reference]] = Field(
         description="RiskAssessment expressing likely outcome",
         default=None,
     )
-    supportingInfo: Optional[List[Reference]] = Field(
+    supportingInfo: Optional[ListType[Reference]] = Field(
         description="Information supporting the clinical impression",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the ClinicalImpression",
         default=None,
     )

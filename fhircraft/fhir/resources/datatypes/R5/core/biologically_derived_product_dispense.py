@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -49,15 +49,15 @@ class BiologicallyDerivedProductDispense(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProductDispense"
     )
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for this dispense",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="The order or request that this dispense is fulfilling",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Short description",
         default=None,
     )
@@ -86,7 +86,7 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="Indicates the type of matching associated with the dispense",
         default=None,
     )
-    performer: Optional[List[BiologicallyDerivedProductDispensePerformer]] = Field(
+    performer: Optional[ListType[BiologicallyDerivedProductDispensePerformer]] = Field(
         description="Indicates who or what performed an action",
         default=None,
     )
@@ -120,7 +120,7 @@ class BiologicallyDerivedProductDispense(DomainResource):
         description="Where the product was dispatched to",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional notes",
         default=None,
     )

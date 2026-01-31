@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -50,7 +50,7 @@ class ConditionStage(BackboneElement):
         description="Simple summary (disease specific)",
         default=None,
     )
-    assessment: Optional[List[Reference]] = Field(
+    assessment: Optional[ListType[Reference]] = Field(
         description="Formal record of assessment",
         default=None,
     )
@@ -69,7 +69,7 @@ class Condition(DomainResource):
     _type = "Condition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Condition"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this condition",
         default=None,
     )
@@ -81,7 +81,7 @@ class Condition(DomainResource):
         description="unconfirmed | provisional | differential | confirmed | refuted | entered-in-error",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="problem-list-item | encounter-diagnosis",
         default=None,
     )
@@ -93,7 +93,7 @@ class Condition(DomainResource):
         description="Identification of the condition, problem or diagnosis",
         default=None,
     )
-    bodySite: Optional[List[CodeableConcept]] = Field(
+    bodySite: Optional[ListType[CodeableConcept]] = Field(
         description="Anatomical location, if relevant",
         default=None,
     )
@@ -174,19 +174,19 @@ class Condition(DomainResource):
         default=None,
         alias="_recordedDate",
     )
-    participant: Optional[List[ConditionParticipant]] = Field(
+    participant: Optional[ListType[ConditionParticipant]] = Field(
         description="Who or what participated in the activities related to the condition and how they were involved",
         default=None,
     )
-    stage: Optional[List[ConditionStage]] = Field(
+    stage: Optional[ListType[ConditionStage]] = Field(
         description="Stage/grade, usually assessed formally",
         default=None,
     )
-    evidence: Optional[List[CodeableReference]] = Field(
+    evidence: Optional[ListType[CodeableReference]] = Field(
         description="Supporting evidence for the verification status",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional information about the Condition",
         default=None,
     )

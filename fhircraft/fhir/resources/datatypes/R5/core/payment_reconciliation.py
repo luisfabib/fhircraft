@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -162,7 +162,7 @@ class PaymentReconciliation(DomainResource):
     _type = "PaymentReconciliation"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/PaymentReconciliation"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for a payment reconciliation",
         default=None,
     )
@@ -321,7 +321,7 @@ class PaymentReconciliation(DomainResource):
         description="Business identifier for the payment",
         default=None,
     )
-    allocation: Optional[List[PaymentReconciliationAllocation]] = Field(
+    allocation: Optional[ListType[PaymentReconciliationAllocation]] = Field(
         description="Settlement particulars",
         default=None,
     )
@@ -329,7 +329,7 @@ class PaymentReconciliation(DomainResource):
         description="Printed form identifier",
         default=None,
     )
-    processNote: Optional[List[PaymentReconciliationProcessNote]] = Field(
+    processNote: Optional[ListType[PaymentReconciliationProcessNote]] = Field(
         description="Note concerning processing",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -35,7 +35,7 @@ class ImmunizationEvaluation(DomainResource):
     _type = "ImmunizationEvaluation"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImmunizationEvaluation"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
@@ -77,7 +77,7 @@ class ImmunizationEvaluation(DomainResource):
         description="Status of the dose relative to published recommendations",
         default=None,
     )
-    doseStatusReason: Optional[List[CodeableConcept]] = Field(
+    doseStatusReason: Optional[ListType[CodeableConcept]] = Field(
         description="Reason why the doese is considered valid, invalid or some other status",
         default=None,
     )

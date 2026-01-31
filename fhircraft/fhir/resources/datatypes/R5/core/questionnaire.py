@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -389,7 +389,7 @@ class QuestionnaireItem(BackboneElement):
         default=None,
         alias="_definition",
     )
-    code: Optional[List[Coding]] = Field(
+    code: Optional[ListType[Coding]] = Field(
         description="Corresponding concept for this item in a terminology",
         default=None,
     )
@@ -420,7 +420,7 @@ class QuestionnaireItem(BackboneElement):
         default=None,
         alias="_type",
     )
-    enableWhen: Optional[List[QuestionnaireItemEnableWhen]] = Field(
+    enableWhen: Optional[ListType[QuestionnaireItemEnableWhen]] = Field(
         description="Only allow data when",
         default=None,
     )
@@ -496,15 +496,15 @@ class QuestionnaireItem(BackboneElement):
         default=None,
         alias="_answerValueSet",
     )
-    answerOption: Optional[List[QuestionnaireItemAnswerOption]] = Field(
+    answerOption: Optional[ListType[QuestionnaireItemAnswerOption]] = Field(
         description="Permitted answer",
         default=None,
     )
-    initial: Optional[List[QuestionnaireItemInitial]] = Field(
+    initial: Optional[ListType[QuestionnaireItemInitial]] = Field(
         description="Initial value(s) when item is first rendered",
         default=None,
     )
-    item: Optional[List["QuestionnaireItem"]] = Field(
+    item: Optional[ListType["QuestionnaireItem"]] = Field(
         description="Nested questionnaire items",
         default=None,
     )
@@ -528,7 +528,7 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for questionnaire",
         default=None,
     )
@@ -572,11 +572,11 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_title",
     )
-    derivedFrom: Optional[List[Canonical]] = Field(
+    derivedFrom: Optional[ListType[Canonical]] = Field(
         description="Based on Questionnaire",
         default=None,
     )
-    derivedFrom_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFrom_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFrom extensions",
         default=None,
         alias="_derivedFrom",
@@ -599,11 +599,11 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_experimental",
     )
-    subjectType: Optional[List[Code]] = Field(
+    subjectType: Optional[ListType[Code]] = Field(
         description="Resource that can be subject of QuestionnaireResponse",
         default=None,
     )
-    subjectType_ext: Optional[List[Optional[Element]]] = Field(
+    subjectType_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for subjectType extensions",
         default=None,
         alias="_subjectType",
@@ -626,7 +626,7 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -639,11 +639,11 @@ class Questionnaire(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for questionnaire (if applicable)",
         default=None,
     )
@@ -696,11 +696,11 @@ class Questionnaire(DomainResource):
         description="When the questionnaire is expected to be used",
         default=None,
     )
-    code: Optional[List[Coding]] = Field(
+    code: Optional[ListType[Coding]] = Field(
         description="Concept that represents the overall questionnaire",
         default=None,
     )
-    item: Optional[List[QuestionnaireItem]] = Field(
+    item: Optional[ListType[QuestionnaireItem]] = Field(
         description="Questions and sections within the Questionnaire",
         default=None,
     )

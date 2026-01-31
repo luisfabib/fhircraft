@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -106,7 +106,7 @@ class StructureDefinitionSnapshot(BackboneElement):
     A snapshot view is expressed in a standalone form that can be used and interpreted without considering the base StructureDefinition.
     """
 
-    element: Optional[List[ElementDefinition]] = Field(
+    element: Optional[ListType[ElementDefinition]] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
         default=None,
     )
@@ -117,7 +117,7 @@ class StructureDefinitionDifferential(BackboneElement):
     A differential view is expressed relative to the base StructureDefinition - a statement of differences that it applies.
     """
 
-    element: Optional[List[ElementDefinition]] = Field(
+    element: Optional[ListType[ElementDefinition]] = Field(
         description="Definition of elements in the resource (if no StructureDefinition)",
         default=None,
     )
@@ -141,7 +141,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the structure definition",
         default=None,
     )
@@ -221,7 +221,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -234,11 +234,11 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for structure definition (if applicable)",
         default=None,
     )
@@ -269,7 +269,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_copyrightLabel",
     )
-    keyword: Optional[List[Coding]] = Field(
+    keyword: Optional[ListType[Coding]] = Field(
         description="Assist with indexing and finding",
         default=None,
     )
@@ -282,7 +282,7 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_fhirVersion",
     )
-    mapping: Optional[List[StructureDefinitionMapping]] = Field(
+    mapping: Optional[ListType[StructureDefinitionMapping]] = Field(
         description="External specification that the content is mapped to",
         default=None,
     )
@@ -304,15 +304,15 @@ class StructureDefinition(DomainResource):
         default=None,
         alias="_abstract",
     )
-    context: Optional[List[StructureDefinitionContext]] = Field(
+    context: Optional[ListType[StructureDefinitionContext]] = Field(
         description="If an extension, where it can be used in instances",
         default=None,
     )
-    contextInvariant: Optional[List[String]] = Field(
+    contextInvariant: Optional[ListType[String]] = Field(
         description="FHIRPath invariants - when the extension can be used",
         default=None,
     )
-    contextInvariant_ext: Optional[List[Optional[Element]]] = Field(
+    contextInvariant_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for contextInvariant extensions",
         default=None,
         alias="_contextInvariant",

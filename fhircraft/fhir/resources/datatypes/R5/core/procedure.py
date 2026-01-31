@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -81,33 +81,33 @@ class Procedure(DomainResource):
     _type = "Procedure"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Procedure"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Identifiers for this procedure",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesCanonical extensions",
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesUri extensions",
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="A request for this procedure",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -124,7 +124,7 @@ class Procedure(DomainResource):
         description="Reason for current status",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of the procedure",
         default=None,
     )
@@ -204,7 +204,7 @@ class Procedure(DomainResource):
         description="Reported rather than primary record",
         default=None,
     )
-    performer: Optional[List[ProcedurePerformer]] = Field(
+    performer: Optional[ListType[ProcedurePerformer]] = Field(
         description="Who performed the procedure and what they did",
         default=None,
     )
@@ -212,11 +212,11 @@ class Procedure(DomainResource):
         description="Where the procedure happened",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="The justification that the procedure was performed",
         default=None,
     )
-    bodySite: Optional[List[CodeableConcept]] = Field(
+    bodySite: Optional[ListType[CodeableConcept]] = Field(
         description="Target body sites",
         default=None,
     )
@@ -224,31 +224,31 @@ class Procedure(DomainResource):
         description="The result of procedure",
         default=None,
     )
-    report: Optional[List[Reference]] = Field(
+    report: Optional[ListType[Reference]] = Field(
         description="Any report resulting from the procedure",
         default=None,
     )
-    complication: Optional[List[CodeableReference]] = Field(
+    complication: Optional[ListType[CodeableReference]] = Field(
         description="Complication following the procedure",
         default=None,
     )
-    followUp: Optional[List[CodeableConcept]] = Field(
+    followUp: Optional[ListType[CodeableConcept]] = Field(
         description="Instructions for follow up",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Additional information about the procedure",
         default=None,
     )
-    focalDevice: Optional[List[ProcedureFocalDevice]] = Field(
+    focalDevice: Optional[ListType[ProcedureFocalDevice]] = Field(
         description="Manipulated, implanted, or removed device",
         default=None,
     )
-    used: Optional[List[CodeableReference]] = Field(
+    used: Optional[ListType[CodeableReference]] = Field(
         description="Items used during procedure",
         default=None,
     )
-    supportingInfo: Optional[List[Reference]] = Field(
+    supportingInfo: Optional[ListType[Reference]] = Field(
         description="Extra information relevant to the procedure",
         default=None,
     )

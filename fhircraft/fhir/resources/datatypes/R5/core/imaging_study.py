@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -129,7 +129,7 @@ class ImagingStudySeries(BackboneElement):
         default=None,
         alias="_numberOfInstances",
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Series access endpoint",
         default=None,
     )
@@ -141,7 +141,7 @@ class ImagingStudySeries(BackboneElement):
         description="Body part laterality",
         default=None,
     )
-    specimen: Optional[List[Reference]] = Field(
+    specimen: Optional[ListType[Reference]] = Field(
         description="Specimen imaged",
         default=None,
     )
@@ -154,11 +154,11 @@ class ImagingStudySeries(BackboneElement):
         default=None,
         alias="_started",
     )
-    performer: Optional[List[ImagingStudySeriesPerformer]] = Field(
+    performer: Optional[ListType[ImagingStudySeriesPerformer]] = Field(
         description="Who performed the series",
         default=None,
     )
-    instance: Optional[List[ImagingStudySeriesInstance]] = Field(
+    instance: Optional[ListType[ImagingStudySeriesInstance]] = Field(
         description="A single SOP instance from the series",
         default=None,
     )
@@ -173,7 +173,7 @@ class ImagingStudy(DomainResource):
     _type = "ImagingStudy"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ImagingStudy"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifiers for the whole study",
         default=None,
     )
@@ -186,7 +186,7 @@ class ImagingStudy(DomainResource):
         default=None,
         alias="_status",
     )
-    modality: Optional[List[CodeableConcept]] = Field(
+    modality: Optional[ListType[CodeableConcept]] = Field(
         description="All of the distinct values for series\u0027 modalities",
         default=None,
     )
@@ -207,11 +207,11 @@ class ImagingStudy(DomainResource):
         default=None,
         alias="_started",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Part of referenced event",
         default=None,
     )
@@ -219,7 +219,7 @@ class ImagingStudy(DomainResource):
         description="Referring physician",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Study access endpoint",
         default=None,
     )
@@ -241,7 +241,7 @@ class ImagingStudy(DomainResource):
         default=None,
         alias="_numberOfInstances",
     )
-    procedure: Optional[List[CodeableReference]] = Field(
+    procedure: Optional[ListType[CodeableReference]] = Field(
         description="The performed procedure or code",
         default=None,
     )
@@ -249,11 +249,11 @@ class ImagingStudy(DomainResource):
         description="Where ImagingStudy occurred",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why the study was requested / performed",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="User-defined comments",
         default=None,
     )
@@ -266,7 +266,7 @@ class ImagingStudy(DomainResource):
         default=None,
         alias="_description",
     )
-    series: Optional[List[ImagingStudySeries]] = Field(
+    series: Optional[ListType[ImagingStudySeries]] = Field(
         description="Each study has one or more series of instances",
         default=None,
     )

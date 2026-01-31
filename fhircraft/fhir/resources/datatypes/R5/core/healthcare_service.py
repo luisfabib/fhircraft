@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -59,7 +59,7 @@ class HealthcareService(DomainResource):
     _type = "HealthcareService"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/HealthcareService"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External identifiers for this item",
         default=None,
     )
@@ -76,23 +76,23 @@ class HealthcareService(DomainResource):
         description="Organization that provides this service",
         default=None,
     )
-    offeredIn: Optional[List[Reference]] = Field(
+    offeredIn: Optional[ListType[Reference]] = Field(
         description="The service within which this service is offered",
         default=None,
     )
-    category: Optional[List[CodeableConcept]] = Field(
+    category: Optional[ListType[CodeableConcept]] = Field(
         description="Broad category of service being performed or delivered",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type of service that may be delivered or performed",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="Specialties handled by the HealthcareService",
         default=None,
     )
-    location: Optional[List[Reference]] = Field(
+    location: Optional[ListType[Reference]] = Field(
         description="Location(s) where service may be provided",
         default=None,
     )
@@ -127,35 +127,35 @@ class HealthcareService(DomainResource):
         description="Facilitates quick identification of the service",
         default=None,
     )
-    contact: Optional[List[ExtendedContactDetail]] = Field(
+    contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details for the HealthcareService",
         default=None,
     )
-    coverageArea: Optional[List[Reference]] = Field(
+    coverageArea: Optional[ListType[Reference]] = Field(
         description="Location(s) service is intended for/available to",
         default=None,
     )
-    serviceProvisionCode: Optional[List[CodeableConcept]] = Field(
+    serviceProvisionCode: Optional[ListType[CodeableConcept]] = Field(
         description="Conditions under which service is available/offered",
         default=None,
     )
-    eligibility: Optional[List[HealthcareServiceEligibility]] = Field(
+    eligibility: Optional[ListType[HealthcareServiceEligibility]] = Field(
         description="Specific eligibility requirements required to use the service",
         default=None,
     )
-    program: Optional[List[CodeableConcept]] = Field(
+    program: Optional[ListType[CodeableConcept]] = Field(
         description="Programs that this service is applicable to",
         default=None,
     )
-    characteristic: Optional[List[CodeableConcept]] = Field(
+    characteristic: Optional[ListType[CodeableConcept]] = Field(
         description="Collection of characteristics (attributes)",
         default=None,
     )
-    communication: Optional[List[CodeableConcept]] = Field(
+    communication: Optional[ListType[CodeableConcept]] = Field(
         description="The language that this service is offered in",
         default=None,
     )
-    referralMethod: Optional[List[CodeableConcept]] = Field(
+    referralMethod: Optional[ListType[CodeableConcept]] = Field(
         description="Ways that the service accepts referrals",
         default=None,
     )
@@ -168,11 +168,11 @@ class HealthcareService(DomainResource):
         default=None,
         alias="_appointmentRequired",
     )
-    availability: Optional[List[Availability]] = Field(
+    availability: Optional[ListType[Availability]] = Field(
         description="Times the healthcare service is available (including exceptions)",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to electronic services operated for the healthcare service",
         default=None,
     )

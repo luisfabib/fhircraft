@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -66,7 +66,7 @@ class InventoryReportInventoryListing(BackboneElement):
         default=None,
         alias="_countingDateTime",
     )
-    item: Optional[List[InventoryReportInventoryListingItem]] = Field(
+    item: Optional[ListType[InventoryReportInventoryListingItem]] = Field(
         description="The item or items in this listing",
         default=None,
     )
@@ -81,7 +81,7 @@ class InventoryReport(DomainResource):
     _type = "InventoryReport"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/InventoryReport"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier for the report",
         default=None,
     )
@@ -128,11 +128,11 @@ class InventoryReport(DomainResource):
         description="The period the report refers to",
         default=None,
     )
-    inventoryListing: Optional[List[InventoryReportInventoryListing]] = Field(
+    inventoryListing: Optional[ListType[InventoryReportInventoryListing]] = Field(
         description="An inventory listing section (grouped by any of the attributes)",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="A note associated with the InventoryReport",
         default=None,
     )

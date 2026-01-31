@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -37,7 +37,7 @@ class Schedule(DomainResource):
     _type = "Schedule"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Schedule"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this item",
         default=None,
     )
@@ -50,15 +50,15 @@ class Schedule(DomainResource):
         default=None,
         alias="_active",
     )
-    serviceCategory: Optional[List[CodeableConcept]] = Field(
+    serviceCategory: Optional[ListType[CodeableConcept]] = Field(
         description="High-level category",
         default=None,
     )
-    serviceType: Optional[List[CodeableReference]] = Field(
+    serviceType: Optional[ListType[CodeableReference]] = Field(
         description="Specific service",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="Type of specialty needed",
         default=None,
     )
@@ -71,7 +71,7 @@ class Schedule(DomainResource):
         default=None,
         alias="_name",
     )
-    actor: Optional[List[Reference]] = Field(
+    actor: Optional[ListType[Reference]] = Field(
         description="Resource(s) that availability information is being provided for",
         default=None,
     )

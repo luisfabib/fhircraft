@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -36,23 +36,23 @@ class Slot(DomainResource):
     _type = "Slot"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Slot"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Ids for this item",
         default=None,
     )
-    serviceCategory: Optional[List[CodeableConcept]] = Field(
+    serviceCategory: Optional[ListType[CodeableConcept]] = Field(
         description="A broad categorization of the service that is to be performed during this appointment",
         default=None,
     )
-    serviceType: Optional[List[CodeableReference]] = Field(
+    serviceType: Optional[ListType[CodeableReference]] = Field(
         description="The type of appointments that can be booked into this slot (ideally this would be an identifiable service - which is at a location, rather than the location itself). If provided then this overrides the value provided on the Schedule resource",
         default=None,
     )
-    specialty: Optional[List[CodeableConcept]] = Field(
+    specialty: Optional[ListType[CodeableConcept]] = Field(
         description="The specialty of a practitioner that would be required to perform the service requested in this appointment",
         default=None,
     )
-    appointmentType: Optional[List[CodeableConcept]] = Field(
+    appointmentType: Optional[ListType[CodeableConcept]] = Field(
         description="The style of appointment or patient that may be booked in the slot (not service type)",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -30,7 +30,7 @@ class EncounterParticipant(BackboneElement):
     The list of people responsible for providing the service.
     """
 
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Role of participant in encounter",
         default=None,
     )
@@ -49,11 +49,11 @@ class EncounterReason(BackboneElement):
     The list of medical reasons that are expected to be addressed during the episode of care.
     """
 
-    use: Optional[List[CodeableConcept]] = Field(
+    use: Optional[ListType[CodeableConcept]] = Field(
         description="What the reason value should be used for/as",
         default=None,
     )
-    value: Optional[List[CodeableReference]] = Field(
+    value: Optional[ListType[CodeableReference]] = Field(
         description="Reason the encounter takes place (core or reference)",
         default=None,
     )
@@ -64,11 +64,11 @@ class EncounterDiagnosis(BackboneElement):
     The list of diagnosis relevant to this encounter.
     """
 
-    condition: Optional[List[CodeableReference]] = Field(
+    condition: Optional[ListType[CodeableReference]] = Field(
         description="The diagnosis relevant to the encounter",
         default=None,
     )
-    use: Optional[List[CodeableConcept]] = Field(
+    use: Optional[ListType[CodeableConcept]] = Field(
         description="Role that this diagnosis has within the encounter (e.g. admission, billing, discharge \u2026)",
         default=None,
     )
@@ -144,7 +144,7 @@ class Encounter(DomainResource):
     _type = "Encounter"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Encounter"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Identifier(s) by which this encounter is known",
         default=None,
     )
@@ -157,7 +157,7 @@ class Encounter(DomainResource):
         default=None,
         alias="_status",
     )
-    class_: Optional[List[CodeableConcept]] = Field(
+    class_: Optional[ListType[CodeableConcept]] = Field(
         description="Classification of patient encounter context - e.g. Inpatient, outpatient",
         default=None,
         alias="class",
@@ -166,11 +166,11 @@ class Encounter(DomainResource):
         description="Indicates the urgency of the encounter",
         default=None,
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Specific type of encounter (e.g. e-mail consultation, surgical day-care, ...)",
         default=None,
     )
-    serviceType: Optional[List[CodeableReference]] = Field(
+    serviceType: Optional[ListType[CodeableReference]] = Field(
         description="Specific type of service",
         default=None,
     )
@@ -182,15 +182,15 @@ class Encounter(DomainResource):
         description="The current status of the subject in relation to the Encounter",
         default=None,
     )
-    episodeOfCare: Optional[List[Reference]] = Field(
+    episodeOfCare: Optional[ListType[Reference]] = Field(
         description="Episode(s) of care that this encounter should be recorded against",
         default=None,
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="The request that initiated this encounter",
         default=None,
     )
-    careTeam: Optional[List[Reference]] = Field(
+    careTeam: Optional[ListType[Reference]] = Field(
         description="The group(s) that are allocated to participate in this encounter",
         default=None,
     )
@@ -202,15 +202,15 @@ class Encounter(DomainResource):
         description="The organization (facility) responsible for this encounter",
         default=None,
     )
-    participant: Optional[List[EncounterParticipant]] = Field(
+    participant: Optional[ListType[EncounterParticipant]] = Field(
         description="List of participants involved in the encounter",
         default=None,
     )
-    appointment: Optional[List[Reference]] = Field(
+    appointment: Optional[ListType[Reference]] = Field(
         description="The appointment that scheduled this encounter",
         default=None,
     )
-    virtualService: Optional[List[VirtualServiceDetail]] = Field(
+    virtualService: Optional[ListType[VirtualServiceDetail]] = Field(
         description="Connection details of a virtual service (e.g. conference call)",
         default=None,
     )
@@ -240,27 +240,27 @@ class Encounter(DomainResource):
         description="Actual quantity of time the encounter lasted (less time absent)",
         default=None,
     )
-    reason: Optional[List[EncounterReason]] = Field(
+    reason: Optional[ListType[EncounterReason]] = Field(
         description="The list of medical reasons that are expected to be addressed during the episode of care",
         default=None,
     )
-    diagnosis: Optional[List[EncounterDiagnosis]] = Field(
+    diagnosis: Optional[ListType[EncounterDiagnosis]] = Field(
         description="The list of diagnosis relevant to this encounter",
         default=None,
     )
-    account: Optional[List[Reference]] = Field(
+    account: Optional[ListType[Reference]] = Field(
         description="The set of accounts that may be used for billing for this Encounter",
         default=None,
     )
-    dietPreference: Optional[List[CodeableConcept]] = Field(
+    dietPreference: Optional[ListType[CodeableConcept]] = Field(
         description="Diet preferences reported by the patient",
         default=None,
     )
-    specialArrangement: Optional[List[CodeableConcept]] = Field(
+    specialArrangement: Optional[ListType[CodeableConcept]] = Field(
         description="Wheelchair, translator, stretcher, etc",
         default=None,
     )
-    specialCourtesy: Optional[List[CodeableConcept]] = Field(
+    specialCourtesy: Optional[ListType[CodeableConcept]] = Field(
         description="Special courtesies (VIP, board member)",
         default=None,
     )
@@ -268,7 +268,7 @@ class Encounter(DomainResource):
         description="Details about the admission to a healthcare service",
         default=None,
     )
-    location: Optional[List[EncounterLocation]] = Field(
+    location: Optional[ListType[EncounterLocation]] = Field(
         description="List of locations where the patient has been",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -109,7 +109,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
         default=None,
         alias="_minimumVolumeString",
     )
-    additive: Optional[List[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
+    additive: Optional[ListType[SpecimenDefinitionTypeTestedContainerAdditive]] = Field(
         description="Additive associated with container",
         default=None,
     )
@@ -219,15 +219,15 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         default=None,
         alias="_singleUse",
     )
-    rejectionCriterion: Optional[List[CodeableConcept]] = Field(
+    rejectionCriterion: Optional[ListType[CodeableConcept]] = Field(
         description="Criterion specified for specimen rejection",
         default=None,
     )
-    handling: Optional[List[SpecimenDefinitionTypeTestedHandling]] = Field(
+    handling: Optional[ListType[SpecimenDefinitionTypeTestedHandling]] = Field(
         description="Specimen handling before testing",
         default=None,
     )
-    testingDestination: Optional[List[CodeableConcept]] = Field(
+    testingDestination: Optional[ListType[CodeableConcept]] = Field(
         description="Where the specimen will be tested",
         default=None,
     )
@@ -294,20 +294,20 @@ class SpecimenDefinition(DomainResource):
         default=None,
         alias="_title",
     )
-    derivedFromCanonical: Optional[List[Canonical]] = Field(
+    derivedFromCanonical: Optional[ListType[Canonical]] = Field(
         description="Based on FHIR definition of another SpecimenDefinition",
         default=None,
     )
-    derivedFromCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFromCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromCanonical extensions",
         default=None,
         alias="_derivedFromCanonical",
     )
-    derivedFromUri: Optional[List[Uri]] = Field(
+    derivedFromUri: Optional[ListType[Uri]] = Field(
         description="Based on external definition",
         default=None,
     )
-    derivedFromUri_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFromUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromUri extensions",
         default=None,
         alias="_derivedFromUri",
@@ -356,7 +356,7 @@ class SpecimenDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -369,11 +369,11 @@ class SpecimenDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="Content intends to support these contexts",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for this SpecimenDefinition (if applicable)",
         default=None,
     )
@@ -430,7 +430,7 @@ class SpecimenDefinition(DomainResource):
         description="Kind of material to collect",
         default=None,
     )
-    patientPreparation: Optional[List[CodeableConcept]] = Field(
+    patientPreparation: Optional[ListType[CodeableConcept]] = Field(
         description="Patient preparation for collection",
         default=None,
     )
@@ -443,11 +443,11 @@ class SpecimenDefinition(DomainResource):
         default=None,
         alias="_timeAspect",
     )
-    collection: Optional[List[CodeableConcept]] = Field(
+    collection: Optional[ListType[CodeableConcept]] = Field(
         description="Specimen collection procedure",
         default=None,
     )
-    typeTested: Optional[List[SpecimenDefinitionTypeTested]] = Field(
+    typeTested: Optional[ListType[SpecimenDefinitionTypeTested]] = Field(
         description="Specimen in container intended for testing by lab",
         default=None,
     )

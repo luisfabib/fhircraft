@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -58,7 +58,7 @@ class InsurancePlanCoverageBenefit(BackboneElement):
         default=None,
         alias="_requirement",
     )
-    limit: Optional[List[InsurancePlanCoverageBenefitLimit]] = Field(
+    limit: Optional[ListType[InsurancePlanCoverageBenefitLimit]] = Field(
         description="Benefit limits",
         default=None,
     )
@@ -73,11 +73,11 @@ class InsurancePlanCoverage(BackboneElement):
         description="Type of coverage",
         default=None,
     )
-    network: Optional[List[Reference]] = Field(
+    network: Optional[ListType[Reference]] = Field(
         description="What networks provide coverage",
         default=None,
     )
-    benefit: Optional[List[InsurancePlanCoverageBenefit]] = Field(
+    benefit: Optional[ListType[InsurancePlanCoverageBenefit]] = Field(
         description="List of benefits",
         default=None,
     )
@@ -129,7 +129,7 @@ class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
         description="in-network | out-of-network | other",
         default=None,
     )
-    qualifiers: Optional[List[CodeableConcept]] = Field(
+    qualifiers: Optional[ListType[CodeableConcept]] = Field(
         description="Additional information about the cost",
         default=None,
     )
@@ -148,7 +148,7 @@ class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
         description="Type of specific benefit",
         default=None,
     )
-    cost: Optional[List[InsurancePlanPlanSpecificCostBenefitCost]] = Field(
+    cost: Optional[ListType[InsurancePlanPlanSpecificCostBenefitCost]] = Field(
         description="List of the costs",
         default=None,
     )
@@ -163,7 +163,7 @@ class InsurancePlanPlanSpecificCost(BackboneElement):
         description="General category of benefit",
         default=None,
     )
-    benefit: Optional[List[InsurancePlanPlanSpecificCostBenefit]] = Field(
+    benefit: Optional[ListType[InsurancePlanPlanSpecificCostBenefit]] = Field(
         description="Benefits list",
         default=None,
     )
@@ -174,7 +174,7 @@ class InsurancePlanPlan(BackboneElement):
     Details about an insurance plan.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for Product",
         default=None,
     )
@@ -182,19 +182,19 @@ class InsurancePlanPlan(BackboneElement):
         description="Type of plan",
         default=None,
     )
-    coverageArea: Optional[List[Reference]] = Field(
+    coverageArea: Optional[ListType[Reference]] = Field(
         description="Where product applies",
         default=None,
     )
-    network: Optional[List[Reference]] = Field(
+    network: Optional[ListType[Reference]] = Field(
         description="What networks provide coverage",
         default=None,
     )
-    generalCost: Optional[List[InsurancePlanPlanGeneralCost]] = Field(
+    generalCost: Optional[ListType[InsurancePlanPlanGeneralCost]] = Field(
         description="Overall costs",
         default=None,
     )
-    specificCost: Optional[List[InsurancePlanPlanSpecificCost]] = Field(
+    specificCost: Optional[ListType[InsurancePlanPlanSpecificCost]] = Field(
         description="Specific costs",
         default=None,
     )
@@ -209,7 +209,7 @@ class InsurancePlan(DomainResource):
     _type = "InsurancePlan"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/InsurancePlan"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for Product",
         default=None,
     )
@@ -222,7 +222,7 @@ class InsurancePlan(DomainResource):
         default=None,
         alias="_status",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Kind of product",
         default=None,
     )
@@ -235,11 +235,11 @@ class InsurancePlan(DomainResource):
         default=None,
         alias="_name",
     )
-    alias: Optional[List[String]] = Field(
+    alias: Optional[ListType[String]] = Field(
         description="Alternate names",
         default=None,
     )
-    alias_ext: Optional[List[Optional[Element]]] = Field(
+    alias_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",
@@ -256,27 +256,27 @@ class InsurancePlan(DomainResource):
         description="Product administrator",
         default=None,
     )
-    coverageArea: Optional[List[Reference]] = Field(
+    coverageArea: Optional[ListType[Reference]] = Field(
         description="Where product applies",
         default=None,
     )
-    contact: Optional[List[ExtendedContactDetail]] = Field(
+    contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details relevant to the health insurance plan/product",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoint",
         default=None,
     )
-    network: Optional[List[Reference]] = Field(
+    network: Optional[ListType[Reference]] = Field(
         description="What networks are Included",
         default=None,
     )
-    coverage: Optional[List[InsurancePlanCoverage]] = Field(
+    coverage: Optional[ListType[InsurancePlanCoverage]] = Field(
         description="Coverage details",
         default=None,
     )
-    plan: Optional[List[InsurancePlanPlan]] = Field(
+    plan: Optional[ListType[InsurancePlanPlan]] = Field(
         description="Plan details",
         default=None,
     )

@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -92,33 +92,33 @@ class DeviceRequest(DomainResource):
     _type = "DeviceRequest"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/DeviceRequest"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Request identifier",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesCanonical extensions",
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesUri extensions",
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="What request fulfills",
         default=None,
     )
-    replaces: Optional[List[Reference]] = Field(
+    replaces: Optional[ListType[Reference]] = Field(
         description="What request replaces",
         default=None,
     )
@@ -175,7 +175,7 @@ class DeviceRequest(DomainResource):
         default=None,
         alias="_quantity",
     )
-    parameter: Optional[List[DeviceRequestParameter]] = Field(
+    parameter: Optional[ListType[DeviceRequestParameter]] = Field(
         description="Device details",
         default=None,
     )
@@ -221,7 +221,7 @@ class DeviceRequest(DomainResource):
         description="Requested Filler",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Coded/Linked Reason for request",
         default=None,
     )
@@ -238,19 +238,19 @@ class DeviceRequest(DomainResource):
         description="Device usage reason",
         default=None,
     )
-    insurance: Optional[List[Reference]] = Field(
+    insurance: Optional[ListType[Reference]] = Field(
         description="Associated insurance coverage",
         default=None,
     )
-    supportingInfo: Optional[List[Reference]] = Field(
+    supportingInfo: Optional[ListType[Reference]] = Field(
         description="Additional clinical information",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Notes or comments",
         default=None,
     )
-    relevantHistory: Optional[List[Reference]] = Field(
+    relevantHistory: Optional[ListType[Reference]] = Field(
         description="Request provenance",
         default=None,
     )

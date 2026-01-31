@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -75,7 +75,7 @@ class Location(DomainResource):
     _type = "Location"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Location"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Unique code or number identifying the location to its users",
         default=None,
     )
@@ -101,11 +101,11 @@ class Location(DomainResource):
         default=None,
         alias="_name",
     )
-    alias: Optional[List[String]] = Field(
+    alias: Optional[ListType[String]] = Field(
         description="A list of alternate names that the location is known as, or was known as, in the past",
         default=None,
     )
-    alias_ext: Optional[List[Optional[Element]]] = Field(
+    alias_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for alias extensions",
         default=None,
         alias="_alias",
@@ -128,11 +128,11 @@ class Location(DomainResource):
         default=None,
         alias="_mode",
     )
-    type: Optional[List[CodeableConcept]] = Field(
+    type: Optional[ListType[CodeableConcept]] = Field(
         description="Type of function performed",
         default=None,
     )
-    contact: Optional[List[ExtendedContactDetail]] = Field(
+    contact: Optional[ListType[ExtendedContactDetail]] = Field(
         description="Official contact details for the location",
         default=None,
     )
@@ -156,19 +156,19 @@ class Location(DomainResource):
         description="Another Location this one is physically a part of",
         default=None,
     )
-    characteristic: Optional[List[CodeableConcept]] = Field(
+    characteristic: Optional[ListType[CodeableConcept]] = Field(
         description="Collection of characteristics (attributes)",
         default=None,
     )
-    hoursOfOperation: Optional[List[Availability]] = Field(
+    hoursOfOperation: Optional[ListType[Availability]] = Field(
         description="What days/times during a week is this location usually open (including exceptions)",
         default=None,
     )
-    virtualService: Optional[List[VirtualServiceDetail]] = Field(
+    virtualService: Optional[ListType[VirtualServiceDetail]] = Field(
         description="Connection details of a virtual service (e.g. conference call)",
         default=None,
     )
-    endpoint: Optional[List[Reference]] = Field(
+    endpoint: Optional[ListType[Reference]] = Field(
         description="Technical endpoints providing access to services operated for the location",
         default=None,
     )

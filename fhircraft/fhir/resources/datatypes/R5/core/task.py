@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -105,7 +105,7 @@ class TaskRestriction(BackboneElement):
         description="When fulfillment is sought",
         default=None,
     )
-    recipient: Optional[List[Reference]] = Field(
+    recipient: Optional[ListType[Reference]] = Field(
         description="For whom is fulfillment sought?",
         default=None,
     )
@@ -906,7 +906,7 @@ class Task(DomainResource):
     _type = "Task"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Task"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Task Instance Identifier",
         default=None,
     )
@@ -928,7 +928,7 @@ class Task(DomainResource):
         default=None,
         alias="_instantiatesUri",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="Request fulfilled by this task",
         default=None,
     )
@@ -936,7 +936,7 @@ class Task(DomainResource):
         description="Requisition or grouper id",
         default=None,
     )
-    partOf: Optional[List[Reference]] = Field(
+    partOf: Optional[ListType[Reference]] = Field(
         description="Composite task",
         default=None,
     )
@@ -1040,7 +1040,7 @@ class Task(DomainResource):
         description="Who is asking for task to be done",
         default=None,
     )
-    requestedPerformer: Optional[List[CodeableReference]] = Field(
+    requestedPerformer: Optional[ListType[CodeableReference]] = Field(
         description="Who should perform Task",
         default=None,
     )
@@ -1048,7 +1048,7 @@ class Task(DomainResource):
         description="Responsible individual",
         default=None,
     )
-    performer: Optional[List[TaskPerformer]] = Field(
+    performer: Optional[ListType[TaskPerformer]] = Field(
         description="Who or what performed the task",
         default=None,
     )
@@ -1056,19 +1056,19 @@ class Task(DomainResource):
         description="Where task occurs",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why task is needed",
         default=None,
     )
-    insurance: Optional[List[Reference]] = Field(
+    insurance: Optional[ListType[Reference]] = Field(
         description="Associated insurance coverage",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the task",
         default=None,
     )
-    relevantHistory: Optional[List[Reference]] = Field(
+    relevantHistory: Optional[ListType[Reference]] = Field(
         description="Key events in history of the Task",
         default=None,
     )
@@ -1076,11 +1076,11 @@ class Task(DomainResource):
         description="Constraints on fulfillment tasks",
         default=None,
     )
-    input: Optional[List[TaskInput]] = Field(
+    input: Optional[ListType[TaskInput]] = Field(
         description="Information used to perform task",
         default=None,
     )
-    output: Optional[List[TaskOutput]] = Field(
+    output: Optional[ListType[TaskOutput]] = Field(
         description="Information produced as part of task",
         default=None,
     )

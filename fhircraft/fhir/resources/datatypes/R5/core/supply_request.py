@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -89,7 +89,7 @@ class SupplyRequest(DomainResource):
     _type = "SupplyRequest"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/SupplyRequest"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for SupplyRequest",
         default=None,
     )
@@ -102,7 +102,7 @@ class SupplyRequest(DomainResource):
         default=None,
         alias="_status",
     )
-    basedOn: Optional[List[Reference]] = Field(
+    basedOn: Optional[ListType[Reference]] = Field(
         description="What other request is fulfilled by this supply request",
         default=None,
     )
@@ -131,7 +131,7 @@ class SupplyRequest(DomainResource):
         description="The requested amount of the item indicated",
         default=None,
     )
-    parameter: Optional[List[SupplyRequestParameter]] = Field(
+    parameter: Optional[ListType[SupplyRequestParameter]] = Field(
         description="Ordered item details",
         default=None,
     )
@@ -165,11 +165,11 @@ class SupplyRequest(DomainResource):
         description="Individual making the request",
         default=None,
     )
-    supplier: Optional[List[Reference]] = Field(
+    supplier: Optional[ListType[Reference]] = Field(
         description="Who is intended to fulfill the request",
         default=None,
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="The reason why the supply item was requested",
         default=None,
     )

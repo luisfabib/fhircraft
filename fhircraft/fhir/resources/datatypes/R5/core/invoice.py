@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -83,7 +83,7 @@ class InvoiceLineItem(BackboneElement):
         description="Reference to ChargeItem containing details of this line item or an inline billing code",
         default=None,
     )
-    priceComponent: Optional[List[MonetaryComponent]] = Field(
+    priceComponent: Optional[ListType[MonetaryComponent]] = Field(
         description="Components of total line item price",
         default=None,
     )
@@ -130,7 +130,7 @@ class Invoice(DomainResource):
     _type = "Invoice"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Invoice"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business Identifier for item",
         default=None,
     )
@@ -195,7 +195,7 @@ class Invoice(DomainResource):
         description="Billing date or period",
         default=None,
     )
-    participant: Optional[List[InvoiceParticipant]] = Field(
+    participant: Optional[ListType[InvoiceParticipant]] = Field(
         description="Participant in creation of this Invoice",
         default=None,
     )
@@ -207,11 +207,11 @@ class Invoice(DomainResource):
         description="Account that is being balanced",
         default=None,
     )
-    lineItem: Optional[List[InvoiceLineItem]] = Field(
+    lineItem: Optional[ListType[InvoiceLineItem]] = Field(
         description="Line items of this Invoice",
         default=None,
     )
-    totalPriceComponent: Optional[List[MonetaryComponent]] = Field(
+    totalPriceComponent: Optional[ListType[MonetaryComponent]] = Field(
         description="Components of Invoice total",
         default=None,
     )
@@ -232,7 +232,7 @@ class Invoice(DomainResource):
         default=None,
         alias="_paymentTerms",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Comments made about the invoice",
         default=None,
     )

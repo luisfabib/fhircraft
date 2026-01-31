@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -42,11 +42,11 @@ class CompartmentDefinitionResource(BackboneElement):
         default=None,
         alias="_code",
     )
-    param: Optional[List[String]] = Field(
+    param: Optional[ListType[String]] = Field(
         description="Search Parameter Name, or chained parameters",
         default=None,
     )
-    param_ext: Optional[List[Optional[Element]]] = Field(
+    param_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for param extensions",
         default=None,
         alias="_param",
@@ -174,7 +174,7 @@ class CompartmentDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -187,7 +187,7 @@ class CompartmentDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
@@ -218,7 +218,7 @@ class CompartmentDefinition(DomainResource):
         default=None,
         alias="_search",
     )
-    resource: Optional[List[CompartmentDefinitionResource]] = Field(
+    resource: Optional[ListType[CompartmentDefinitionResource]] = Field(
         description="How a resource is related to the compartment",
         default=None,
     )

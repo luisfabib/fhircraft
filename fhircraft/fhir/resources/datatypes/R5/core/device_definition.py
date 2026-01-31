@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -72,7 +72,7 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
         alias="_jurisdiction",
     )
     marketDistribution: Optional[
-        List["DeviceDefinitionUdiDeviceIdentifierMarketDistribution"]
+        ListType["DeviceDefinitionUdiDeviceIdentifierMarketDistribution"]
     ] = Field(
         description="Indicates whether and when the device is available on the market",
         default=None,
@@ -156,7 +156,7 @@ class DeviceDefinitionClassification(BackboneElement):
         description="A classification or risk class of the device model",
         default=None,
     )
-    justification: Optional[List[RelatedArtifact]] = Field(
+    justification: Optional[ListType[RelatedArtifact]] = Field(
         description="Further information qualifying this classification of the device model",
         default=None,
     )
@@ -175,16 +175,16 @@ class DeviceDefinitionConformsTo(BackboneElement):
         description="Identifies the standard, specification, or formal guidance that the device adheres to the Device Specification type",
         default=None,
     )
-    version: Optional[List[String]] = Field(
+    version: Optional[ListType[String]] = Field(
         description="The specific form or variant of the standard, specification or formal guidance",
         default=None,
     )
-    version_ext: Optional[List[Optional[Element]]] = Field(
+    version_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for version extensions",
         default=None,
         alias="_version",
     )
-    source: Optional[List[RelatedArtifact]] = Field(
+    source: Optional[ListType[RelatedArtifact]] = Field(
         description="Standard, regulation, certification, or guidance website, document, or other publication, or similar, supporting the conformance",
         default=None,
     )
@@ -224,7 +224,7 @@ class DeviceDefinitionPackagingDistributor(BackboneElement):
         default=None,
         alias="_name",
     )
-    organizationReference: Optional[List[Reference]] = Field(
+    organizationReference: Optional[ListType[Reference]] = Field(
         description="Distributor as an Organization resource",
         default=None,
     )
@@ -283,7 +283,7 @@ class DeviceDefinitionPackagingUdiDeviceIdentifier(BackboneElement):
         alias="_jurisdiction",
     )
     marketDistribution: Optional[
-        List[DeviceDefinitionUdiDeviceIdentifierMarketDistribution]
+        ListType[DeviceDefinitionUdiDeviceIdentifierMarketDistribution]
     ] = Field(
         description="Indicates whether and when the device is available on the market",
         default=None,
@@ -312,17 +312,17 @@ class DeviceDefinitionPackaging(BackboneElement):
         default=None,
         alias="_count",
     )
-    distributor: Optional[List[DeviceDefinitionPackagingDistributor]] = Field(
+    distributor: Optional[ListType[DeviceDefinitionPackagingDistributor]] = Field(
         description="An organization that distributes the packaged device",
         default=None,
     )
     udiDeviceIdentifier: Optional[
-        List[DeviceDefinitionPackagingUdiDeviceIdentifier]
+        ListType[DeviceDefinitionPackagingUdiDeviceIdentifier]
     ] = Field(
         description="Unique Device Identifier (UDI) Barcode string on the packaging",
         default=None,
     )
-    packaging: Optional[List["DeviceDefinitionPackaging"]] = Field(
+    packaging: Optional[ListType["DeviceDefinitionPackaging"]] = Field(
         description="Allows packages within packages",
         default=None,
     )
@@ -479,7 +479,7 @@ class DeviceDefinitionGuideline(BackboneElement):
     Information aimed at providing directions for the usage of this model of device.
     """
 
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The circumstances that form the setting for using the device",
         default=None,
     )
@@ -492,19 +492,19 @@ class DeviceDefinitionGuideline(BackboneElement):
         default=None,
         alias="_usageInstruction",
     )
-    relatedArtifact: Optional[List[RelatedArtifact]] = Field(
+    relatedArtifact: Optional[ListType[RelatedArtifact]] = Field(
         description="A source of information or reference for this guideline",
         default=None,
     )
-    indication: Optional[List[CodeableConcept]] = Field(
+    indication: Optional[ListType[CodeableConcept]] = Field(
         description="A clinical condition for which the device was designed to be used",
         default=None,
     )
-    contraindication: Optional[List[CodeableConcept]] = Field(
+    contraindication: Optional[ListType[CodeableConcept]] = Field(
         description="A specific situation when a device should not be used because it may cause harm",
         default=None,
     )
-    warning: Optional[List[CodeableConcept]] = Field(
+    warning: Optional[ListType[CodeableConcept]] = Field(
         description="Specific hazard alert information that a user needs to know before using the device",
         default=None,
     )
@@ -565,7 +565,7 @@ class DeviceDefinitionChargeItem(BackboneElement):
         description="A specific time period in which this charge item applies",
         default=None,
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context to which this charge item applies",
         default=None,
     )
@@ -589,15 +589,15 @@ class DeviceDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Instance identifier",
         default=None,
     )
-    udiDeviceIdentifier: Optional[List[DeviceDefinitionUdiDeviceIdentifier]] = Field(
+    udiDeviceIdentifier: Optional[ListType[DeviceDefinitionUdiDeviceIdentifier]] = Field(
         description="Unique Device Identifier (UDI) Barcode string",
         default=None,
     )
-    regulatoryIdentifier: Optional[List[DeviceDefinitionRegulatoryIdentifier]] = Field(
+    regulatoryIdentifier: Optional[ListType[DeviceDefinitionRegulatoryIdentifier]] = Field(
         description="Regulatory identifier(s) associated with this device",
         default=None,
     )
@@ -614,7 +614,7 @@ class DeviceDefinition(DomainResource):
         description="Name of device manufacturer",
         default=None,
     )
-    deviceName: Optional[List[DeviceDefinitionDeviceName]] = Field(
+    deviceName: Optional[ListType[DeviceDefinitionDeviceName]] = Field(
         description="The name or names of the device as given by the manufacturer",
         default=None,
     )
@@ -627,39 +627,39 @@ class DeviceDefinition(DomainResource):
         default=None,
         alias="_modelNumber",
     )
-    classification: Optional[List[DeviceDefinitionClassification]] = Field(
+    classification: Optional[ListType[DeviceDefinitionClassification]] = Field(
         description="What kind of device or device system this is",
         default=None,
     )
-    conformsTo: Optional[List[DeviceDefinitionConformsTo]] = Field(
+    conformsTo: Optional[ListType[DeviceDefinitionConformsTo]] = Field(
         description="Identifies the standards, specifications, or formal guidances for the capabilities supported by the device",
         default=None,
     )
-    hasPart: Optional[List[DeviceDefinitionHasPart]] = Field(
+    hasPart: Optional[ListType[DeviceDefinitionHasPart]] = Field(
         description="A device, part of the current one",
         default=None,
     )
-    packaging: Optional[List[DeviceDefinitionPackaging]] = Field(
+    packaging: Optional[ListType[DeviceDefinitionPackaging]] = Field(
         description="Information about the packaging of the device, i.e. how the device is packaged",
         default=None,
     )
-    version: Optional[List[DeviceDefinitionVersion]] = Field(
+    version: Optional[ListType[DeviceDefinitionVersion]] = Field(
         description="The version of the device or software",
         default=None,
     )
-    safety: Optional[List[CodeableConcept]] = Field(
+    safety: Optional[ListType[CodeableConcept]] = Field(
         description="Safety characteristics of the device",
         default=None,
     )
-    shelfLifeStorage: Optional[List[ProductShelfLife]] = Field(
+    shelfLifeStorage: Optional[ListType[ProductShelfLife]] = Field(
         description="Shelf Life and storage information",
         default=None,
     )
-    languageCode: Optional[List[CodeableConcept]] = Field(
+    languageCode: Optional[ListType[CodeableConcept]] = Field(
         description="Language code for the human-readable text strings produced by the device (all supported)",
         default=None,
     )
-    property_: Optional[List[DeviceDefinitionProperty]] = Field(
+    property_: Optional[ListType[DeviceDefinitionProperty]] = Field(
         description="Inherent, essentially fixed, characteristics of this kind of device, e.g., time properties, size, etc",
         default=None,
         alias="property",
@@ -668,27 +668,27 @@ class DeviceDefinition(DomainResource):
         description="Organization responsible for device",
         default=None,
     )
-    contact: Optional[List[ContactPoint]] = Field(
+    contact: Optional[ListType[ContactPoint]] = Field(
         description="Details for human/organization for support",
         default=None,
     )
-    link: Optional[List[DeviceDefinitionLink]] = Field(
+    link: Optional[ListType[DeviceDefinitionLink]] = Field(
         description="An associated device, attached to, used with, communicating with or linking a previous or new device model to the focal device",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Device notes and comments",
         default=None,
     )
-    material: Optional[List[DeviceDefinitionMaterial]] = Field(
+    material: Optional[ListType[DeviceDefinitionMaterial]] = Field(
         description="A substance used to create the material(s) of which the device is made",
         default=None,
     )
-    productionIdentifierInUDI: Optional[List[Code]] = Field(
+    productionIdentifierInUDI: Optional[ListType[Code]] = Field(
         description="lot-number | manufactured-date | serial-number | expiration-date | biological-source | software-version",
         default=None,
     )
-    productionIdentifierInUDI_ext: Optional[List[Optional[Element]]] = Field(
+    productionIdentifierInUDI_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for productionIdentifierInUDI extensions",
         default=None,
         alias="_productionIdentifierInUDI",
@@ -701,7 +701,7 @@ class DeviceDefinition(DomainResource):
         description="Tracking of latest field safety corrective action",
         default=None,
     )
-    chargeItem: Optional[List[DeviceDefinitionChargeItem]] = Field(
+    chargeItem: Optional[ListType[DeviceDefinitionChargeItem]] = Field(
         description="Billing code or reference associated with the device",
         default=None,
     )

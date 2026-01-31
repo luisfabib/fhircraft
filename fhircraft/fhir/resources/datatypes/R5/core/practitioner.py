@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -40,7 +40,7 @@ class PractitionerQualification(BackboneElement):
     For example, a medical license issued by a medical board of licensure authorizing the practitioner to practice medicine within a certain locality.
     """
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier for this qualification for the practitioner",
         default=None,
     )
@@ -89,7 +89,7 @@ class Practitioner(DomainResource):
     _type = "Practitioner"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Practitioner"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="An identifier for the person as this agent",
         default=None,
     )
@@ -102,11 +102,11 @@ class Practitioner(DomainResource):
         default=None,
         alias="_active",
     )
-    name: Optional[List[HumanName]] = Field(
+    name: Optional[ListType[HumanName]] = Field(
         description="The name(s) associated with the practitioner",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="A contact detail for the practitioner (that apply to all roles)",
         default=None,
     )
@@ -146,19 +146,19 @@ class Practitioner(DomainResource):
         default=None,
         alias="_deceasedDateTime",
     )
-    address: Optional[List[Address]] = Field(
+    address: Optional[ListType[Address]] = Field(
         description="Address(es) of the practitioner that are not role specific (typically home address)",
         default=None,
     )
-    photo: Optional[List[Attachment]] = Field(
+    photo: Optional[ListType[Attachment]] = Field(
         description="Image of the person",
         default=None,
     )
-    qualification: Optional[List[PractitionerQualification]] = Field(
+    qualification: Optional[ListType[PractitionerQualification]] = Field(
         description="Qualifications, certifications, accreditations, licenses, training, etc. pertaining to the provision of care",
         default=None,
     )
-    communication: Optional[List[PractitionerCommunication]] = Field(
+    communication: Optional[ListType[PractitionerCommunication]] = Field(
         description="A language which may be used to communicate with the practitioner",
         default=None,
     )

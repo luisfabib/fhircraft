@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -44,16 +44,16 @@ class BodyStructureIncludedStructure(BackboneElement):
         default=None,
     )
     bodyLandmarkOrientation: Optional[
-        List["BodyStructureIncludedStructureBodyLandmarkOrientation"]
+        ListType["BodyStructureIncludedStructureBodyLandmarkOrientation"]
     ] = Field(
         description="Landmark relative location",
         default=None,
     )
-    spatialReference: Optional[List[Reference]] = Field(
+    spatialReference: Optional[ListType[Reference]] = Field(
         description="Cartesian reference for structure",
         default=None,
     )
-    qualifier: Optional[List[CodeableConcept]] = Field(
+    qualifier: Optional[ListType[CodeableConcept]] = Field(
         description="Code that represents the included structure qualifier",
         default=None,
     )
@@ -66,11 +66,11 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark(
     The distance in centimeters a certain observation is made from a body landmark.
     """
 
-    device: Optional[List[CodeableReference]] = Field(
+    device: Optional[ListType[CodeableReference]] = Field(
         description="Measurement device",
         default=None,
     )
-    value: Optional[List[Quantity]] = Field(
+    value: Optional[ListType[Quantity]] = Field(
         description="Measured distance from body landmark",
         default=None,
     )
@@ -81,21 +81,21 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
     Body locations in relation to a specific body landmark (tatoo, scar, other body structure).
     """
 
-    landmarkDescription: Optional[List[CodeableConcept]] = Field(
+    landmarkDescription: Optional[ListType[CodeableConcept]] = Field(
         description="Body ]andmark description",
         default=None,
     )
-    clockFacePosition: Optional[List[CodeableConcept]] = Field(
+    clockFacePosition: Optional[ListType[CodeableConcept]] = Field(
         description="Clockface orientation",
         default=None,
     )
     distanceFromLandmark: Optional[
-        List[BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark]
+        ListType[BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark]
     ] = Field(
         description="Landmark relative location",
         default=None,
     )
-    surfaceOrientation: Optional[List[CodeableConcept]] = Field(
+    surfaceOrientation: Optional[ListType[CodeableConcept]] = Field(
         description="Relative landmark surface orientation",
         default=None,
     )
@@ -115,16 +115,16 @@ class BodyStructureExcludedStructure(BackboneElement):
         default=None,
     )
     bodyLandmarkOrientation: Optional[
-        List[BodyStructureIncludedStructureBodyLandmarkOrientation]
+        ListType[BodyStructureIncludedStructureBodyLandmarkOrientation]
     ] = Field(
         description="Landmark relative location",
         default=None,
     )
-    spatialReference: Optional[List[Reference]] = Field(
+    spatialReference: Optional[ListType[Reference]] = Field(
         description="Cartesian reference for structure",
         default=None,
     )
-    qualifier: Optional[List[CodeableConcept]] = Field(
+    qualifier: Optional[ListType[CodeableConcept]] = Field(
         description="Code that represents the included structure qualifier",
         default=None,
     )
@@ -139,7 +139,7 @@ class BodyStructure(DomainResource):
     _type = "BodyStructure"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/BodyStructure"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Bodystructure identifier",
         default=None,
     )
@@ -156,11 +156,11 @@ class BodyStructure(DomainResource):
         description="Kind of Structure",
         default=None,
     )
-    includedStructure: Optional[List[BodyStructureIncludedStructure]] = Field(
+    includedStructure: Optional[ListType[BodyStructureIncludedStructure]] = Field(
         description="Included anatomic location(s)",
         default=None,
     )
-    excludedStructure: Optional[List[BodyStructureExcludedStructure]] = Field(
+    excludedStructure: Optional[ListType[BodyStructureExcludedStructure]] = Field(
         description="Excluded anatomic locations(s)",
         default=None,
     )
@@ -173,7 +173,7 @@ class BodyStructure(DomainResource):
         default=None,
         alias="_description",
     )
-    image: Optional[List[Attachment]] = Field(
+    image: Optional[ListType[Attachment]] = Field(
         description="Attached images",
         default=None,
     )

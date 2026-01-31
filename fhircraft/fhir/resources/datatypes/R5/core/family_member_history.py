@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -92,7 +92,7 @@ class FamilyMemberHistoryCondition(BackboneElement):
         default=None,
         alias="_onsetString",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Extra information about condition",
         default=None,
     )
@@ -166,7 +166,7 @@ class FamilyMemberHistoryProcedure(BackboneElement):
         default=None,
         alias="_performedDateTime",
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="Extra information about the procedure",
         default=None,
     )
@@ -197,24 +197,24 @@ class FamilyMemberHistory(DomainResource):
     _type = "FamilyMemberHistory"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/FamilyMemberHistory"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="External Id(s) for this record",
         default=None,
     )
-    instantiatesCanonical: Optional[List[Canonical]] = Field(
+    instantiatesCanonical: Optional[ListType[Canonical]] = Field(
         description="Instantiates FHIR protocol or definition",
         default=None,
     )
-    instantiatesCanonical_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesCanonical_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesCanonical extensions",
         default=None,
         alias="_instantiatesCanonical",
     )
-    instantiatesUri: Optional[List[Uri]] = Field(
+    instantiatesUri: Optional[ListType[Uri]] = Field(
         description="Instantiates external protocol or definition",
         default=None,
     )
-    instantiatesUri_ext: Optional[List[Optional[Element]]] = Field(
+    instantiatesUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for instantiatesUri extensions",
         default=None,
         alias="_instantiatesUri",
@@ -245,7 +245,7 @@ class FamilyMemberHistory(DomainResource):
         default=None,
         alias="_date",
     )
-    participant: Optional[List[FamilyMemberHistoryParticipant]] = Field(
+    participant: Optional[ListType[FamilyMemberHistoryParticipant]] = Field(
         description="Who or what participated in the activities related to the family member history and how they were involved",
         default=None,
     )
@@ -349,19 +349,19 @@ class FamilyMemberHistory(DomainResource):
         default=None,
         alias="_deceasedString",
     )
-    reason: Optional[List[CodeableReference]] = Field(
+    reason: Optional[ListType[CodeableReference]] = Field(
         description="Why was family member history performed?",
         default=None,
     )
-    note: Optional[List[Annotation]] = Field(
+    note: Optional[ListType[Annotation]] = Field(
         description="General note about related person",
         default=None,
     )
-    condition: Optional[List[FamilyMemberHistoryCondition]] = Field(
+    condition: Optional[ListType[FamilyMemberHistoryCondition]] = Field(
         description="Condition that the related person had",
         default=None,
     )
-    procedure: Optional[List[FamilyMemberHistoryProcedure]] = Field(
+    procedure: Optional[ListType[FamilyMemberHistoryProcedure]] = Field(
         description="Procedures that the related person had",
         default=None,
     )

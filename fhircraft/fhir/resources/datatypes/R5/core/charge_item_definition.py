@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -80,13 +80,13 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
     Group of properties which are applicable under the same conditions. If no applicability rules are established for the group, then all properties always apply.
     """
 
-    applicability: Optional[List[ChargeItemDefinitionPropertyGroupApplicability]] = (
+    applicability: Optional[ListType[ChargeItemDefinitionPropertyGroupApplicability]] = (
         Field(
             description="Conditions under which the priceComponent is applicable",
             default=None,
         )
     )
-    priceComponent: Optional[List[MonetaryComponent]] = Field(
+    priceComponent: Optional[ListType[MonetaryComponent]] = Field(
         description="Components of total line item price",
         default=None,
     )
@@ -110,7 +110,7 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_url",
     )
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Additional identifier for the charge item definition",
         default=None,
     )
@@ -154,29 +154,29 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_title",
     )
-    derivedFromUri: Optional[List[Uri]] = Field(
+    derivedFromUri: Optional[ListType[Uri]] = Field(
         description="Underlying externally-defined charge item definition",
         default=None,
     )
-    derivedFromUri_ext: Optional[List[Optional[Element]]] = Field(
+    derivedFromUri_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for derivedFromUri extensions",
         default=None,
         alias="_derivedFromUri",
     )
-    partOf: Optional[List[Canonical]] = Field(
+    partOf: Optional[ListType[Canonical]] = Field(
         description="A larger definition of which this particular definition is a component or step",
         default=None,
     )
-    partOf_ext: Optional[List[Optional[Element]]] = Field(
+    partOf_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for partOf extensions",
         default=None,
         alias="_partOf",
     )
-    replaces: Optional[List[Canonical]] = Field(
+    replaces: Optional[ListType[Canonical]] = Field(
         description="Completed or terminated request(s) whose function is taken by this new request",
         default=None,
     )
-    replaces_ext: Optional[List[Optional[Element]]] = Field(
+    replaces_ext: Optional[ListType[Optional[Element]]] = Field(
         description="Placeholder element for replaces extensions",
         default=None,
         alias="_replaces",
@@ -217,7 +217,7 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_publisher",
     )
-    contact: Optional[List[ContactDetail]] = Field(
+    contact: Optional[ListType[ContactDetail]] = Field(
         description="Contact details for the publisher",
         default=None,
     )
@@ -230,11 +230,11 @@ class ChargeItemDefinition(DomainResource):
         default=None,
         alias="_description",
     )
-    useContext: Optional[List[UsageContext]] = Field(
+    useContext: Optional[ListType[UsageContext]] = Field(
         description="The context that the content is intended to support",
         default=None,
     )
-    jurisdiction: Optional[List[CodeableConcept]] = Field(
+    jurisdiction: Optional[ListType[CodeableConcept]] = Field(
         description="Intended jurisdiction for charge item definition (if applicable)",
         default=None,
     )
@@ -287,15 +287,15 @@ class ChargeItemDefinition(DomainResource):
         description="Billing code or product type this definition applies to",
         default=None,
     )
-    instance: Optional[List[Reference]] = Field(
+    instance: Optional[ListType[Reference]] = Field(
         description="Instances this definition applies to",
         default=None,
     )
-    applicability: Optional[List[ChargeItemDefinitionApplicability]] = Field(
+    applicability: Optional[ListType[ChargeItemDefinitionApplicability]] = Field(
         description="Whether or not the billing code is applicable",
         default=None,
     )
-    propertyGroup: Optional[List[ChargeItemDefinitionPropertyGroup]] = Field(
+    propertyGroup: Optional[ListType[ChargeItemDefinitionPropertyGroup]] = Field(
         description="Group of properties which are applicable under the same conditions",
         default=None,
     )

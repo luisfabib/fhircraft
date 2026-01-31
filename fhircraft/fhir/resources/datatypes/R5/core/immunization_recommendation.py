@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -52,15 +52,15 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
     Vaccine administration recommendations.
     """
 
-    vaccineCode: Optional[List[CodeableConcept]] = Field(
+    vaccineCode: Optional[ListType[CodeableConcept]] = Field(
         description="Vaccine  or vaccine group recommendation applies to",
         default=None,
     )
-    targetDisease: Optional[List[CodeableConcept]] = Field(
+    targetDisease: Optional[ListType[CodeableConcept]] = Field(
         description="Disease to be immunized against",
         default=None,
     )
-    contraindicatedVaccineCode: Optional[List[CodeableConcept]] = Field(
+    contraindicatedVaccineCode: Optional[ListType[CodeableConcept]] = Field(
         description="Vaccine which is contraindicated to fulfill the recommendation",
         default=None,
     )
@@ -68,12 +68,12 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         description="Vaccine recommendation status",
         default=None,
     )
-    forecastReason: Optional[List[CodeableConcept]] = Field(
+    forecastReason: Optional[ListType[CodeableConcept]] = Field(
         description="Vaccine administration status reason",
         default=None,
     )
     dateCriterion: Optional[
-        List[ImmunizationRecommendationRecommendationDateCriterion]
+        ListType[ImmunizationRecommendationRecommendationDateCriterion]
     ] = Field(
         description="Dates governing proposed immunization",
         default=None,
@@ -114,11 +114,11 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
         default=None,
         alias="_seriesDoses",
     )
-    supportingImmunization: Optional[List[Reference]] = Field(
+    supportingImmunization: Optional[ListType[Reference]] = Field(
         description="Past immunizations supporting recommendation",
         default=None,
     )
-    supportingPatientInformation: Optional[List[Reference]] = Field(
+    supportingPatientInformation: Optional[ListType[Reference]] = Field(
         description="Patient observations supporting recommendation",
         default=None,
     )
@@ -135,7 +135,7 @@ class ImmunizationRecommendation(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation"
     )
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="Business identifier",
         default=None,
     )
@@ -156,7 +156,7 @@ class ImmunizationRecommendation(DomainResource):
         description="Who is responsible for protocol",
         default=None,
     )
-    recommendation: Optional[List[ImmunizationRecommendationRecommendation]] = Field(
+    recommendation: Optional[ListType[ImmunizationRecommendationRecommendation]] = Field(
         description="Vaccine administration recommendations",
         default=None,
     )

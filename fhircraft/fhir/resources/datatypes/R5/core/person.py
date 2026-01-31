@@ -1,5 +1,5 @@
 from pydantic import Field, model_validator
-from typing import Optional, List
+from typing import Optional, List as ListType
 
 NoneType = type(None)
 
@@ -81,7 +81,7 @@ class Person(DomainResource):
     _type = "Person"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Person"
 
-    identifier: Optional[List[Identifier]] = Field(
+    identifier: Optional[ListType[Identifier]] = Field(
         description="A human identifier for this person",
         default=None,
     )
@@ -94,11 +94,11 @@ class Person(DomainResource):
         default=None,
         alias="_active",
     )
-    name: Optional[List[HumanName]] = Field(
+    name: Optional[ListType[HumanName]] = Field(
         description="A name associated with the person",
         default=None,
     )
-    telecom: Optional[List[ContactPoint]] = Field(
+    telecom: Optional[ListType[ContactPoint]] = Field(
         description="A contact detail for the person",
         default=None,
     )
@@ -138,7 +138,7 @@ class Person(DomainResource):
         default=None,
         alias="_deceasedDateTime",
     )
-    address: Optional[List[Address]] = Field(
+    address: Optional[ListType[Address]] = Field(
         description="One or more addresses for the person",
         default=None,
     )
@@ -146,11 +146,11 @@ class Person(DomainResource):
         description="Marital (civil) status of a person",
         default=None,
     )
-    photo: Optional[List[Attachment]] = Field(
+    photo: Optional[ListType[Attachment]] = Field(
         description="Image of the person",
         default=None,
     )
-    communication: Optional[List[PersonCommunication]] = Field(
+    communication: Optional[ListType[PersonCommunication]] = Field(
         description="A language which may be used to communicate with the person about his or her health",
         default=None,
     )
@@ -158,7 +158,7 @@ class Person(DomainResource):
         description="The organization that is the custodian of the person record",
         default=None,
     )
-    link: Optional[List[PersonLink]] = Field(
+    link: Optional[ListType[PersonLink]] = Field(
         description="Link to a resource that concerns the same actual person",
         default=None,
     )
