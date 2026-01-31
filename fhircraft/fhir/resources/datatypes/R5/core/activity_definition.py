@@ -18,9 +18,6 @@ from fhircraft.fhir.resources.datatypes.primitives import (
 
 from fhircraft.fhir.resources.datatypes.R5.complex import (
     Element,
-    Meta,
-    Narrative,
-    Extension,
     Identifier,
     Coding,
     CodeableConcept,
@@ -39,9 +36,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     Dosage,
     Expression,
 )
-from .resource import Resource
 from .domain_resource import DomainResource
-
 
 class ActivityDefinitionParticipant(BackboneElement):
     """
@@ -79,26 +74,6 @@ class ActivityDefinitionParticipant(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "function",
-                "role",
-                "typeReference",
-                "typeCanonical",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ActivityDefinitionDynamicValue(BackboneElement):
     """
     Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the request resource that would contain the result.
@@ -118,23 +93,6 @@ class ActivityDefinitionDynamicValue(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "expression",
-                "path",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ActivityDefinition(DomainResource):
     """
     This resource allows for the definition of some activity to be performed, independent of a particular patient, practitioner, or other performance context.
@@ -144,55 +102,6 @@ class ActivityDefinition(DomainResource):
     _type = "ActivityDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ActivityDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ActivityDefinition"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this activity definition, represented as a URI (globally unique)",
         default=None,
@@ -600,82 +509,6 @@ class ActivityDefinition(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="product",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "dynamicValue",
-                "transform",
-                "observationResultRequirement",
-                "observationRequirement",
-                "specimenRequirement",
-                "bodySite",
-                "dosage",
-                "quantity",
-                "participant",
-                "location",
-                "doNotPerform",
-                "priority",
-                "intent",
-                "code",
-                "profile",
-                "kind",
-                "library",
-                "relatedArtifact",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "topic",
-                "effectivePeriod",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "usage",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "subtitle",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

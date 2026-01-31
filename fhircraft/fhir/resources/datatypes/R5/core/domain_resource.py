@@ -7,7 +7,6 @@ from fhircraft.fhir.resources.datatypes.primitives import *
 from fhircraft.fhir.resources.datatypes.R5.complex import Extension, Narrative
 from .resource import Resource
 
-
 class DomainResource(Resource):
     """
     A resource with narrative, extensions, and contained resources
@@ -33,38 +32,6 @@ class DomainResource(Resource):
         description="Extensions that cannot be ignored",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_dom_2_constraint_model_validator(self):

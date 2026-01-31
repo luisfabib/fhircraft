@@ -36,7 +36,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ChargeItemDefinitionApplicability(BackboneElement):
     """
     Expressions that describe applicability criteria for the billing code.
@@ -54,24 +53,6 @@ class ChargeItemDefinitionApplicability(BackboneElement):
         description="Reference to / quotation of the external source of the group of properties",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "relatedArtifact",
-                "effectivePeriod",
-                "condition",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
     """
@@ -91,24 +72,6 @@ class ChargeItemDefinitionPropertyGroupApplicability(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "relatedArtifact",
-                "effectivePeriod",
-                "condition",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ChargeItemDefinitionPropertyGroup(BackboneElement):
     """
     Group of properties which are applicable under the same conditions. If no applicability rules are established for the group, then all properties always apply.
@@ -125,23 +88,6 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "priceComponent",
-                "applicability",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ChargeItemDefinition(DomainResource):
     """
     The ChargeItemDefinition resource provides the properties that apply to the (billing) codes necessary to calculate costs and prices. The properties may differ largely depending on type and realm, therefore this resource gives only a rough structure and requires profiling for each type of billing code system.
@@ -151,55 +97,6 @@ class ChargeItemDefinition(DomainResource):
     _type = "ChargeItemDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this charge item definition, represented as a URI (globally unique)",
         default=None,
@@ -404,63 +301,6 @@ class ChargeItemDefinition(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "propertyGroup",
-                "applicability",
-                "instance",
-                "code",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "replaces",
-                "partOf",
-                "derivedFromUri",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

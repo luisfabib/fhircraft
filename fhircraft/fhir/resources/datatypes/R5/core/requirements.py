@@ -33,7 +33,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class RequirementsStatement(BackboneElement):
     """
     The actual statement of requirement, in markdown format.
@@ -125,31 +124,6 @@ class RequirementsStatement(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "source",
-                "reference",
-                "satisfiedBy",
-                "parent",
-                "derivedFrom",
-                "requirement",
-                "conditionality",
-                "conformance",
-                "label",
-                "key",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class Requirements(DomainResource):
     """
     The Requirements resource is used to describe an actor - a human or an application that plays a role in data exchange, and that may have obligations associated with the role the actor plays.
@@ -159,55 +133,6 @@ class Requirements(DomainResource):
     _type = "Requirements"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Requirements"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Requirements"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this Requirements, represented as a URI (globally unique)",
         default=None,
@@ -382,58 +307,6 @@ class Requirements(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "statement",
-                "actor",
-                "reference",
-                "derivedFrom",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

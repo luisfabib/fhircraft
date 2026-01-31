@@ -33,7 +33,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class EvidenceReportSubjectCharacteristic(BackboneElement):
     """
     Characteristic.
@@ -90,23 +89,6 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "period",
-                "exclude",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -114,7 +96,6 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class EvidenceReportSubject(BackboneElement):
     """
@@ -129,23 +110,6 @@ class EvidenceReportSubject(BackboneElement):
         description="Footnotes and/or explanatory notes",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "note",
-                "characteristic",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class EvidenceReportRelatesToTarget(BackboneElement):
     """
@@ -179,25 +143,6 @@ class EvidenceReportRelatesToTarget(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "resource",
-                "display",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class EvidenceReportRelatesTo(BackboneElement):
     """
     Relationships that this composition has with other compositions or documents that already exist.
@@ -216,23 +161,6 @@ class EvidenceReportRelatesTo(BackboneElement):
         description="Target of the relationship",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "target",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class EvidenceReportSection(BackboneElement):
     """
@@ -298,33 +226,6 @@ class EvidenceReportSection(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "section",
-                "emptyReason",
-                "entryQuantity",
-                "entryReference",
-                "entryClassifier",
-                "orderedBy",
-                "mode",
-                "text",
-                "author",
-                "focusReference",
-                "focus",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class EvidenceReport(DomainResource):
     """
     The EvidenceReport Resource is a specialized container for a collection of resources and codeable concepts, adapted to support compositions of Evidence, EvidenceVariable, and Citation resources and related concepts.
@@ -334,55 +235,6 @@ class EvidenceReport(DomainResource):
     _type = "EvidenceReport"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/EvidenceReport"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/EvidenceReport"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this EvidenceReport, represented as a globally unique URI",
         default=None,
@@ -485,55 +337,6 @@ class EvidenceReport(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="citeAs",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "section",
-                "relatesTo",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "contact",
-                "publisher",
-                "subject",
-                "relatedArtifact",
-                "note",
-                "type",
-                "relatedIdentifier",
-                "identifier",
-                "useContext",
-                "status",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

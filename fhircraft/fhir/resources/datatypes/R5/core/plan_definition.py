@@ -46,7 +46,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class PlanDefinitionGoalTarget(BackboneElement):
     """
     Indicates what should be done and within what timeframe.
@@ -112,22 +111,6 @@ class PlanDefinitionGoalTarget(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "due",
-                "measure",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def detail_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -143,7 +126,6 @@ class PlanDefinitionGoalTarget(BackboneElement):
             field_name_base="detail",
             required=False,
         )
-
 
 class PlanDefinitionGoal(BackboneElement):
     """
@@ -179,28 +161,6 @@ class PlanDefinitionGoal(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "target",
-                "documentation",
-                "addresses",
-                "start",
-                "priority",
-                "description",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class PlanDefinitionActorOption(BackboneElement):
     """
     The characteristics of the candidates that could serve as the actor.
@@ -233,25 +193,6 @@ class PlanDefinitionActorOption(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "role",
-                "typeReference",
-                "typeCanonical",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class PlanDefinitionActor(BackboneElement):
     """
     Actors represent the individuals or groups involved in the execution of the defined set of activities.
@@ -280,24 +221,6 @@ class PlanDefinitionActor(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "option",
-                "description",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class PlanDefinitionActionCondition(BackboneElement):
     """
     An expression that describes applicability criteria or start/stop conditions for the action.
@@ -316,23 +239,6 @@ class PlanDefinitionActionCondition(BackboneElement):
         description="Boolean-valued expression",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "expression",
-                "kind",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class PlanDefinitionActionInput(BackboneElement):
     """
@@ -362,24 +268,6 @@ class PlanDefinitionActionInput(BackboneElement):
         alias="_relatedData",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "relatedData",
-                "requirement",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class PlanDefinitionActionOutput(BackboneElement):
     """
     Defines the outputs of the action, if any.
@@ -407,24 +295,6 @@ class PlanDefinitionActionOutput(BackboneElement):
         default=None,
         alias="_relatedData",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "relatedData",
-                "requirement",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class PlanDefinitionActionRelatedAction(BackboneElement):
     """
@@ -475,23 +345,6 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "endRelationship",
-                "relationship",
-                "targetId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def offset_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -499,7 +352,6 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
             field_name_base="offset",
             required=False,
         )
-
 
 class PlanDefinitionActionParticipant(BackboneElement):
     """
@@ -546,27 +398,6 @@ class PlanDefinitionActionParticipant(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "function",
-                "role",
-                "typeReference",
-                "typeCanonical",
-                "type",
-                "actorId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class PlanDefinitionActionDynamicValue(BackboneElement):
     """
     Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
@@ -585,23 +416,6 @@ class PlanDefinitionActionDynamicValue(BackboneElement):
         description="An expression that provides the dynamic value for the customization",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "expression",
-                "path",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class PlanDefinitionAction(BackboneElement):
     """
@@ -851,46 +665,6 @@ class PlanDefinitionAction(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "action",
-                "dynamicValue",
-                "transform",
-                "cardinalityBehavior",
-                "precheckBehavior",
-                "requiredBehavior",
-                "selectionBehavior",
-                "groupingBehavior",
-                "type",
-                "participant",
-                "location",
-                "relatedAction",
-                "output",
-                "input",
-                "condition",
-                "trigger",
-                "goalId",
-                "documentation",
-                "reason",
-                "code",
-                "priority",
-                "textEquivalent",
-                "description",
-                "title",
-                "prefix",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_pld_0_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -939,7 +713,6 @@ class PlanDefinitionAction(BackboneElement):
             required=False,
         )
 
-
 class PlanDefinition(DomainResource):
     """
     This resource allows for the definition of various types of plans as a sharable, consumable, and executable artifact. The resource is general enough to support the description of a broad range of clinical and non-clinical artifacts such as clinical decision support rules, order sets, protocols, and drug quality specifications.
@@ -949,55 +722,6 @@ class PlanDefinition(DomainResource):
     _type = "PlanDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/PlanDefinition"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/PlanDefinition"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this plan definition, represented as a URI (globally unique)",
         default=None,
@@ -1274,70 +998,6 @@ class PlanDefinition(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="asNeeded",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "action",
-                "actor",
-                "goal",
-                "library",
-                "relatedArtifact",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "topic",
-                "effectivePeriod",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "usage",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "type",
-                "subtitle",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

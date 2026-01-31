@@ -37,7 +37,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
     """
     Associated or related medications. For example, if the medication is a branded product (e.g. Crestor), this is the Therapeutic Moeity (e.g. Rosuvastatin) or if this is a generic medication (e.g. Rosuvastatin), this would link to a branded product (e.g. Crestor.
@@ -52,23 +51,6 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "reference",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class MedicationKnowledgeMonograph(BackboneElement):
     """
     Associated documentation about the medication.
@@ -82,23 +64,6 @@ class MedicationKnowledgeMonograph(BackboneElement):
         description="Associated documentation about the medication",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "source",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicationKnowledgeCost(BackboneElement):
     """
@@ -139,23 +104,6 @@ class MedicationKnowledgeCost(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "source",
-                "type",
-                "effectiveDate",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def cost_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -163,7 +111,6 @@ class MedicationKnowledgeCost(BackboneElement):
             field_name_base="cost",
             required=True,
         )
-
 
 class MedicationKnowledgeMonitoringProgram(BackboneElement):
     """
@@ -184,23 +131,6 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         alias="_name",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "name",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage(BackboneElement):
     """
     Dosage for the medication for the specific guidelines.
@@ -214,23 +144,6 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage(BackboneElemen
         description="Dosage for the medication for the specific guidelines",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "dosage",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic(
     BackboneElement
@@ -264,21 +177,6 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -286,7 +184,6 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
             field_name_base="value",
             required=False,
         )
-
 
 class MedicationKnowledgeIndicationGuidelineDosingGuideline(BackboneElement):
     """
@@ -314,25 +211,6 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "patientCharacteristic",
-                "administrationTreatment",
-                "dosage",
-                "treatmentIntent",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class MedicationKnowledgeIndicationGuideline(BackboneElement):
     """
     Guidelines or protocols that are applicable for the administration of the medication based on indication.
@@ -348,23 +226,6 @@ class MedicationKnowledgeIndicationGuideline(BackboneElement):
         description="Guidelines for dosage of the medication",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "dosingGuideline",
-                "indication",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicationKnowledgeMedicineClassification(BackboneElement):
     """
@@ -406,22 +267,6 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "classification",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def source_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -429,7 +274,6 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
             field_name_base="source",
             required=False,
         )
-
 
 class MedicationKnowledgePackagingCost(BackboneElement):
     """
@@ -470,23 +314,6 @@ class MedicationKnowledgePackagingCost(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "source",
-                "type",
-                "effectiveDate",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def cost_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -494,7 +321,6 @@ class MedicationKnowledgePackagingCost(BackboneElement):
             field_name_base="cost",
             required=True,
         )
-
 
 class MedicationKnowledgePackaging(BackboneElement):
     """
@@ -509,23 +335,6 @@ class MedicationKnowledgePackaging(BackboneElement):
         description="The packaged medication that is being priced",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "packagedProduct",
-                "cost",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicationKnowledgeStorageGuidelineEnvironmentalSetting(BackboneElement):
     """
@@ -557,21 +366,6 @@ class MedicationKnowledgeStorageGuidelineEnvironmentalSetting(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -579,7 +373,6 @@ class MedicationKnowledgeStorageGuidelineEnvironmentalSetting(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class MedicationKnowledgeStorageGuideline(BackboneElement):
     """
@@ -610,25 +403,6 @@ class MedicationKnowledgeStorageGuideline(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "environmentalSetting",
-                "stabilityDuration",
-                "note",
-                "reference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
     """
     Specifies if changes are allowed when dispensing a medication from a regulatory perspective.
@@ -648,23 +422,6 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
         alias="_allowed",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "allowed",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
     """
     The maximum number of units of the medication that can be dispensed in a period.
@@ -678,23 +435,6 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
         description="The period that applies to the maximum number of units",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "period",
-                "quantity",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicationKnowledgeRegulatory(BackboneElement):
     """
@@ -717,25 +457,6 @@ class MedicationKnowledgeRegulatory(BackboneElement):
         description="The maximum number of units of the medication that can be dispensed in a period",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "maxDispense",
-                "schedule",
-                "substitution",
-                "regulatoryAuthority",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class MedicationKnowledgeDefinitionalIngredient(BackboneElement):
     """
@@ -771,22 +492,6 @@ class MedicationKnowledgeDefinitionalIngredient(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "item",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def strength_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -794,7 +499,6 @@ class MedicationKnowledgeDefinitionalIngredient(BackboneElement):
             field_name_base="strength",
             required=False,
         )
-
 
 class MedicationKnowledgeDefinitionalDrugCharacteristic(BackboneElement):
     """
@@ -844,21 +548,6 @@ class MedicationKnowledgeDefinitionalDrugCharacteristic(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -866,7 +555,6 @@ class MedicationKnowledgeDefinitionalDrugCharacteristic(BackboneElement):
             field_name_base="value",
             required=False,
         )
-
 
 class MedicationKnowledgeDefinitional(BackboneElement):
     """
@@ -896,26 +584,6 @@ class MedicationKnowledgeDefinitional(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "drugCharacteristic",
-                "ingredient",
-                "intendedRoute",
-                "doseForm",
-                "definition",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class MedicationKnowledge(DomainResource):
     """
     Information about a medication that is used to support knowledge.
@@ -925,55 +593,6 @@ class MedicationKnowledge(DomainResource):
     _type = "MedicationKnowledge"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/MedicationKnowledge"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/MedicationKnowledge"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     identifier: Optional[List[Identifier]] = Field(
         description="Business identifier for this medication",
         default=None,
@@ -1074,54 +693,3 @@ class MedicationKnowledge(DomainResource):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "definitional",
-                "regulatory",
-                "storageGuideline",
-                "clinicalUseIssue",
-                "packaging",
-                "medicineClassification",
-                "indicationGuideline",
-                "monitoringProgram",
-                "cost",
-                "preparationInstruction",
-                "monograph",
-                "productType",
-                "associatedMedication",
-                "relatedMedicationKnowledge",
-                "name",
-                "intendedJurisdiction",
-                "author",
-                "status",
-                "code",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )

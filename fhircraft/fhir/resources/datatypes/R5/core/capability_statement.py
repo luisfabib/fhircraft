@@ -33,7 +33,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CapabilityStatementSoftware(BackboneElement):
     """
     Software that is covered by this capability statement.  It is used when the capability statement describes the capabilities of a particular software version, independent of an installation.
@@ -67,24 +66,6 @@ class CapabilityStatementSoftware(BackboneElement):
         alias="_releaseDate",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "releaseDate",
-                "version",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CapabilityStatementImplementation(BackboneElement):
     """
     Identifies a specific implementation instance that is described by the capability statement - i.e. a particular installation, rather than the capabilities of a software program.
@@ -112,24 +93,6 @@ class CapabilityStatementImplementation(BackboneElement):
         description="Organization that manages the data",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "custodian",
-                "url",
-                "description",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRestSecurity(BackboneElement):
     """
@@ -159,24 +122,6 @@ class CapabilityStatementRestSecurity(BackboneElement):
         alias="_description",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "description",
-                "service",
-                "cors",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CapabilityStatementRestResourceInteraction(BackboneElement):
     """
     Identifies a restful operation supported by the solution.
@@ -200,23 +145,6 @@ class CapabilityStatementRestResourceInteraction(BackboneElement):
         default=None,
         alias="_documentation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRestResourceSearchParam(BackboneElement):
     """
@@ -260,25 +188,6 @@ class CapabilityStatementRestResourceSearchParam(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "type",
-                "definition",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CapabilityStatementRestResourceOperation(BackboneElement):
     """
     Definition of an operation or a named query together with its parameters and their meaning and type. Consult the definition of the operation for details about how to invoke the operation, and the parameters.
@@ -311,24 +220,6 @@ class CapabilityStatementRestResourceOperation(BackboneElement):
         default=None,
         alias="_documentation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "definition",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRestResource(BackboneElement):
     """
@@ -483,39 +374,6 @@ class CapabilityStatementRestResource(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "operation",
-                "searchParam",
-                "searchRevInclude",
-                "searchInclude",
-                "referencePolicy",
-                "conditionalDelete",
-                "conditionalPatch",
-                "conditionalUpdate",
-                "conditionalRead",
-                "conditionalCreate",
-                "updateCreate",
-                "readHistory",
-                "versioning",
-                "interaction",
-                "documentation",
-                "supportedProfile",
-                "profile",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CapabilityStatementRestInteraction(BackboneElement):
     """
     A specification of restful operations supported by the system.
@@ -539,23 +397,6 @@ class CapabilityStatementRestInteraction(BackboneElement):
         default=None,
         alias="_documentation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRestSearchParam(BackboneElement):
     """
@@ -599,25 +440,6 @@ class CapabilityStatementRestSearchParam(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "type",
-                "definition",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CapabilityStatementRestOperation(BackboneElement):
     """
     Definition of an operation or a named query together with its parameters and their meaning and type.
@@ -650,24 +472,6 @@ class CapabilityStatementRestOperation(BackboneElement):
         default=None,
         alias="_documentation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "documentation",
-                "definition",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementRest(BackboneElement):
     """
@@ -723,28 +527,6 @@ class CapabilityStatementRest(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "compartment",
-                "operation",
-                "searchParam",
-                "interaction",
-                "resource",
-                "security",
-                "documentation",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_cpb_12_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -754,7 +536,6 @@ class CapabilityStatementRest(BackboneElement):
             key="cpb-12",
             severity="error",
         )
-
 
 class CapabilityStatementMessagingEndpoint(BackboneElement):
     """
@@ -774,23 +555,6 @@ class CapabilityStatementMessagingEndpoint(BackboneElement):
         default=None,
         alias="_address",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "address",
-                "protocol",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementMessagingSupportedMessage(BackboneElement):
     """
@@ -815,23 +579,6 @@ class CapabilityStatementMessagingSupportedMessage(BackboneElement):
         default=None,
         alias="_definition",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "definition",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CapabilityStatementMessaging(BackboneElement):
     """
@@ -867,25 +614,6 @@ class CapabilityStatementMessaging(BackboneElement):
         )
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "supportedMessage",
-                "documentation",
-                "reliableCache",
-                "endpoint",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CapabilityStatementDocument(BackboneElement):
     """
     A document definition.
@@ -919,24 +647,6 @@ class CapabilityStatementDocument(BackboneElement):
         alias="_profile",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "profile",
-                "documentation",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CapabilityStatement(DomainResource):
     """
     A Capability Statement documents a set of capabilities (behaviors) of a FHIR Server or Client for a particular version of FHIR that may be used as a statement of actual server functionality or a statement of required or desired server implementation.
@@ -946,55 +656,6 @@ class CapabilityStatement(DomainResource):
     _type = "CapabilityStatement"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/CapabilityStatement"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/CapabilityStatement"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this capability statement, represented as a URI (globally unique)",
         default=None,
@@ -1230,67 +891,6 @@ class CapabilityStatement(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "document",
-                "messaging",
-                "rest",
-                "implementationGuide",
-                "acceptLanguage",
-                "patchFormat",
-                "format",
-                "fhirVersion",
-                "implementation",
-                "software",
-                "imports",
-                "instantiates",
-                "kind",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

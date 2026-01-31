@@ -35,7 +35,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ValueSetComposeIncludeConceptDesignation(BackboneElement):
     """
     Additional representations for this concept when used in this value set - other languages, aliases, specialized purposes, used for particular purposes, etc.
@@ -45,11 +44,7 @@ class ValueSetComposeIncludeConceptDesignation(BackboneElement):
         description="Human language of the designation",
         default=None,
     )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
+
     use: Optional[Coding] = Field(
         description="Types of uses of designations",
         default=None,
@@ -67,25 +62,6 @@ class ValueSetComposeIncludeConceptDesignation(BackboneElement):
         default=None,
         alias="_value",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "additionalUse",
-                "use",
-                "language",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ValueSetComposeIncludeConcept(BackboneElement):
     """
@@ -116,23 +92,6 @@ class ValueSetComposeIncludeConcept(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "designation",
-                "display",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_vsd_11_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -142,7 +101,6 @@ class ValueSetComposeIncludeConcept(BackboneElement):
             key="vsd-11",
             severity="error",
         )
-
 
 class ValueSetComposeIncludeFilter(BackboneElement):
     """
@@ -177,24 +135,6 @@ class ValueSetComposeIncludeFilter(BackboneElement):
         default=None,
         alias="_value",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "op",
-                "property_",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ValueSetComposeInclude(BackboneElement):
     """
@@ -246,27 +186,6 @@ class ValueSetComposeInclude(BackboneElement):
         alias="_copyright",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "copyright",
-                "valueSet",
-                "filter",
-                "concept",
-                "version",
-                "system",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ValueSetComposeExclude(BackboneElement):
     """
     Exclude one or more codes from the value set based on code system filters and/or other value sets.
@@ -317,27 +236,6 @@ class ValueSetComposeExclude(BackboneElement):
         alias="_copyright",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "copyright",
-                "valueSet",
-                "filter",
-                "concept",
-                "version",
-                "system",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ValueSetCompose(BackboneElement):
     """
     A set of criteria that define the contents of the value set by including or excluding codes selected from the specified code system(s) that the value set draws from. This is also known as the Content Logical Definition (CLD).
@@ -381,25 +279,6 @@ class ValueSetCompose(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "property_",
-                "exclude",
-                "include",
-                "inactive",
-                "lockedDate",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_vsd_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -431,7 +310,6 @@ class ValueSetCompose(BackboneElement):
             key="vsd-3",
             severity="error",
         )
-
 
 class ValueSetExpansionParameter(BackboneElement):
     """
@@ -519,21 +397,6 @@ class ValueSetExpansionParameter(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -541,7 +404,6 @@ class ValueSetExpansionParameter(BackboneElement):
             field_name_base="value",
             required=False,
         )
-
 
 class ValueSetExpansionProperty(BackboneElement):
     """
@@ -567,23 +429,6 @@ class ValueSetExpansionProperty(BackboneElement):
         alias="_uri",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "uri",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ValueSetExpansionContainsDesignation(BackboneElement):
     """
     Additional representations for this item - other languages, aliases, specialized purposes, used for particular purposes, etc. These are relevant when the conditions of the expansion do not fix to a single correct representation.
@@ -593,11 +438,7 @@ class ValueSetExpansionContainsDesignation(BackboneElement):
         description="Human language of the designation",
         default=None,
     )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
+
     use: Optional[Coding] = Field(
         description="Types of uses of designations",
         default=None,
@@ -615,25 +456,6 @@ class ValueSetExpansionContainsDesignation(BackboneElement):
         default=None,
         alias="_value",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "additionalUse",
-                "use",
-                "language",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
     """
@@ -716,21 +538,6 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -738,7 +545,6 @@ class ValueSetExpansionContainsPropertySubProperty(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class ValueSetExpansionContainsProperty(BackboneElement):
     """
@@ -825,22 +631,6 @@ class ValueSetExpansionContainsProperty(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subProperty",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -848,7 +638,6 @@ class ValueSetExpansionContainsProperty(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class ValueSetExpansionContains(BackboneElement):
     """
@@ -923,30 +712,6 @@ class ValueSetExpansionContains(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "contains",
-                "property_",
-                "designation",
-                "display",
-                "code",
-                "version",
-                "inactive",
-                "abstract",
-                "system",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ValueSetExpansion(BackboneElement):
     """
     A value set can also be "expanded", where the value set is turned into a simple collection of enumerated codes. This element holds the expansion, if it has been performed.
@@ -1012,28 +777,6 @@ class ValueSetExpansion(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "contains",
-                "property_",
-                "parameter",
-                "offset",
-                "total",
-                "timestamp",
-                "next",
-                "identifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_vsd_6_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -1066,7 +809,6 @@ class ValueSetExpansion(BackboneElement):
             severity="error",
         )
 
-
 class ValueSetScope(BackboneElement):
     """
     Description of the semantic space the Value Set Expansion is intended to cover and should further clarify the text in ValueSet.description.
@@ -1091,23 +833,6 @@ class ValueSetScope(BackboneElement):
         alias="_exclusionCriteria",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "exclusionCriteria",
-                "inclusionCriteria",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ValueSet(DomainResource):
     """
     A ValueSet resource instance specifies a set of codes drawn from one or more code systems, intended for use in a particular context. Value sets link between `CodeSystem` definitions and their use in [coded elements](https://hl7.org/fhir/R5/terminologies.html).
@@ -1117,55 +842,6 @@ class ValueSet(DomainResource):
     _type = "ValueSet"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ValueSet"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ValueSet"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this value set, represented as a URI (globally unique)",
         default=None,
@@ -1376,67 +1052,6 @@ class ValueSet(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "scope",
-                "expansion",
-                "compose",
-                "relatedArtifact",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "topic",
-                "effectivePeriod",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "immutable",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

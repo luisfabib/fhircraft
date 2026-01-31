@@ -37,7 +37,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class CitationSummary(BackboneElement):
     """
     A human-readable display of key concepts to represent the citation.
@@ -57,23 +56,6 @@ class CitationSummary(BackboneElement):
         alias="_text",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "text",
-                "style",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CitationClassification(BackboneElement):
     """
     The assignment to an organizing scheme.
@@ -87,23 +69,6 @@ class CitationClassification(BackboneElement):
         description="The specific classification value",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "classifier",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CitationStatusDate(BackboneElement):
     """
@@ -128,24 +93,6 @@ class CitationStatusDate(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "period",
-                "actual",
-                "activity",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CitationCitedArtifactVersion(BackboneElement):
     """
     The defined version of the cited artifact.
@@ -164,23 +111,6 @@ class CitationCitedArtifactVersion(BackboneElement):
         description="Citation for the main version of the cited artifact",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "baseCitation",
-                "value",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CitationCitedArtifactStatusDate(BackboneElement):
     """
@@ -205,24 +135,6 @@ class CitationCitedArtifactStatusDate(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "period",
-                "actual",
-                "activity",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CitationCitedArtifactTitle(BackboneElement):
     """
     The title details of the article or artifact.
@@ -245,24 +157,6 @@ class CitationCitedArtifactTitle(BackboneElement):
         default=None,
         alias="_text",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "text",
-                "language",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CitationCitedArtifactAbstract(BackboneElement):
     """
@@ -296,25 +190,6 @@ class CitationCitedArtifactAbstract(BackboneElement):
         alias="_copyright",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "copyright",
-                "text",
-                "language",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CitationCitedArtifactPart(BackboneElement):
     """
     The component of the article or artifact.
@@ -337,24 +212,6 @@ class CitationCitedArtifactPart(BackboneElement):
         description="The citation for the full article or artifact",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "baseCitation",
-                "value",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CitationCitedArtifactRelatesTo(BackboneElement):
     """
@@ -419,29 +276,6 @@ class CitationCitedArtifactRelatesTo(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "resourceReference",
-                "resource",
-                "document",
-                "citation",
-                "display",
-                "label",
-                "classifier",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
     """
     The collection the cited article or artifact is published in.
@@ -477,26 +311,6 @@ class CitationCitedArtifactPublicationFormPublishedIn(BackboneElement):
         default=None,
         alias="_publisherLocation",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "publisherLocation",
-                "publisher",
-                "title",
-                "identifier",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CitationCitedArtifactPublicationForm(BackboneElement):
     """
@@ -624,36 +438,6 @@ class CitationCitedArtifactPublicationForm(BackboneElement):
         alias="_copyright",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "copyright",
-                "pageCount",
-                "lastPage",
-                "firstPage",
-                "pageString",
-                "accessionNumber",
-                "language",
-                "lastRevisionDate",
-                "publicationDateSeason",
-                "publicationDateText",
-                "articleDate",
-                "issue",
-                "volume",
-                "citedMedium",
-                "publishedIn",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CitationCitedArtifactWebLocation(BackboneElement):
     """
     Used for any URL for the article or artifact cited.
@@ -673,23 +457,6 @@ class CitationCitedArtifactWebLocation(BackboneElement):
         alias="_url",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "url",
-                "classifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CitationCitedArtifactClassification(BackboneElement):
     """
     The assignment to an organizing scheme.
@@ -707,24 +474,6 @@ class CitationCitedArtifactClassification(BackboneElement):
         description="Complex or externally created classification",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "artifactAssessment",
-                "classifier",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CitationCitedArtifactContributorshipEntryContributionInstance(BackboneElement):
     """
@@ -744,23 +493,6 @@ class CitationCitedArtifactContributorshipEntryContributionInstance(BackboneElem
         default=None,
         alias="_time",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "time",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CitationCitedArtifactContributorshipEntry(BackboneElement):
     """
@@ -817,29 +549,6 @@ class CitationCitedArtifactContributorshipEntry(BackboneElement):
         alias="_rankingOrder",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "rankingOrder",
-                "correspondingContact",
-                "contributionInstance",
-                "role",
-                "contributionType",
-                "affiliation",
-                "forenameInitials",
-                "contributor",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CitationCitedArtifactContributorshipSummary(BackboneElement):
     """
     Used to record a display of the author/contributor list without separate data element for each list member.
@@ -867,25 +576,6 @@ class CitationCitedArtifactContributorshipSummary(BackboneElement):
         alias="_value",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "source",
-                "style",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class CitationCitedArtifactContributorship(BackboneElement):
     """
     This element is used to list authors and other contributors, their contact information, specific contributions, and summary statements.
@@ -908,24 +598,6 @@ class CitationCitedArtifactContributorship(BackboneElement):
         description="Used to record a display of the author/contributor list without separate data element for each list member",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "summary",
-                "entry",
-                "complete",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class CitationCitedArtifact(BackboneElement):
     """
@@ -998,36 +670,6 @@ class CitationCitedArtifact(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "note",
-                "contributorship",
-                "classification",
-                "webLocation",
-                "publicationForm",
-                "relatesTo",
-                "part",
-                "abstract",
-                "title",
-                "statusDate",
-                "currentState",
-                "version",
-                "dateAccessed",
-                "relatedIdentifier",
-                "identifier",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class Citation(DomainResource):
     """
     The Citation Resource enables reference to any knowledge artifact for purposes of identification and attribution. The Citation Resource supports existing reference structures and developing publication practices such as versioning, expressing complex contributorship roles, and referencing computable resources.
@@ -1037,55 +679,12 @@ class Citation(DomainResource):
     _type = "Citation"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Citation"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Citation"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
     language_ext: Optional[List[Optional[Element]]] = Field(
         description="Placeholder element for language extensions",
         default=None,
         alias="_language",
     )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
+
     url: Optional[Uri] = Field(
         description="Canonical identifier for this citation record, represented as a globally unique URI",
         default=None,
@@ -1295,68 +894,6 @@ class Citation(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "citedArtifact",
-                "relatedArtifact",
-                "statusDate",
-                "currentState",
-                "note",
-                "classification",
-                "summary",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "effectivePeriod",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

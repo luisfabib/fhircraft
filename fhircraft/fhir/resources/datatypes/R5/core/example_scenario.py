@@ -74,24 +74,6 @@ class ExampleScenarioActor(BackboneElement):
         alias="_description",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "description",
-                "title",
-                "type",
-                "key",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExampleScenarioInstanceVersion(BackboneElement):
     """
@@ -130,24 +112,6 @@ class ExampleScenarioInstanceVersion(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "content",
-                "description",
-                "title",
-                "key",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExampleScenarioInstanceContainedInstance(BackboneElement):
     """
@@ -172,22 +136,6 @@ class ExampleScenarioInstanceContainedInstance(BackboneElement):
         default=None,
         alias="_versionReference",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "versionReference",
-                "instanceReference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExampleScenarioInstance(BackboneElement):
@@ -274,28 +222,6 @@ class ExampleScenarioInstance(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "containedInstance",
-                "version",
-                "content",
-                "description",
-                "title",
-                "structureVersion",
-                "structureType",
-                "key",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_exs_14_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -361,22 +287,6 @@ class ExampleScenarioProcessStepOperationRequest(BackboneElement):
         default=None,
         alias="_versionReference",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "versionReference",
-                "instanceReference",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExampleScenarioProcessStepOperation(BackboneElement):
@@ -451,29 +361,6 @@ class ExampleScenarioProcessStepOperation(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "response",
-                "request",
-                "receiverActive",
-                "initiatorActive",
-                "description",
-                "receiver",
-                "initiator",
-                "title",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ExampleScenarioProcessStepAlternative(BackboneElement):
     """
@@ -502,23 +389,6 @@ class ExampleScenarioProcessStepAlternative(BackboneElement):
         description="Alternative action(s)",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "step",
-                "description",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ExampleScenarioProcessStep(BackboneElement):
@@ -565,26 +435,6 @@ class ExampleScenarioProcessStep(BackboneElement):
         default=None,
         alias="_pause",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "pause",
-                "alternative",
-                "operation",
-                "workflow",
-                "process",
-                "number",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_exs_17_constraint_validator(self):
@@ -656,25 +506,6 @@ class ExampleScenarioProcess(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "step",
-                "postConditions",
-                "preConditions",
-                "description",
-                "title",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_exs_13_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -706,55 +537,6 @@ class ExampleScenario(DomainResource):
     _type = "ExampleScenario"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ExampleScenario"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ExampleScenario"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this example scenario, represented as a URI (globally unique)",
         default=None,
@@ -910,57 +692,6 @@ class ExampleScenario(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "process",
-                "instance",
-                "actor",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
@@ -1161,9 +892,3 @@ class ExampleScenario(DomainResource):
             key="exs-12",
             severity="error",
         )
-
-
-ExampleScenarioProcessStepAlternative.model_rebuild()
-ExampleScenarioProcessStep.model_rebuild()
-ExampleScenarioProcess.model_rebuild()
-ExampleScenario.model_rebuild()

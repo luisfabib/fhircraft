@@ -269,27 +269,6 @@ class DataRequirement(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "sort",
-                "limit",
-                "valueFilter",
-                "dateFilter",
-                "codeFilter",
-                "mustSupport",
-                "profile",
-                "type",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_drq_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -317,16 +296,6 @@ class DataRequirement(Element):
             self,
             field_types=[CodeableConcept, Reference],
             field_name_base="subject",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
         )
 
     @property

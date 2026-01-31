@@ -36,7 +36,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class ConceptMapProperty(BackboneElement):
     """
     A property defines a slot through which additional information can be provided about a map from source -> target.
@@ -88,26 +87,6 @@ class ConceptMapProperty(BackboneElement):
         alias="_system",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "system",
-                "type",
-                "description",
-                "uri",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ConceptMapAdditionalAttribute(BackboneElement):
     """
     An additionalAttribute defines an additional data element found in the source or target data model where the data will come from or be mapped to. Some mappings are based on data in addition to the source data element, where codes in multiple fields are combined to a single field (or vice versa).
@@ -149,25 +128,6 @@ class ConceptMapAdditionalAttribute(BackboneElement):
         default=None,
         alias="_type",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "description",
-                "uri",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ConceptMapGroupElementTargetProperty(BackboneElement):
     """
@@ -250,21 +210,6 @@ class ConceptMapGroupElementTargetProperty(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -272,7 +217,6 @@ class ConceptMapGroupElementTargetProperty(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class ConceptMapGroupElementTargetDependsOn(BackboneElement):
     """
@@ -341,22 +285,6 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "valueSet",
-                "attribute",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -364,7 +292,6 @@ class ConceptMapGroupElementTargetDependsOn(BackboneElement):
             field_name_base="value",
             required=False,
         )
-
 
 class ConceptMapGroupElementTargetProduct(BackboneElement):
     """
@@ -433,22 +360,6 @@ class ConceptMapGroupElementTargetProduct(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "valueSet",
-                "attribute",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -456,7 +367,6 @@ class ConceptMapGroupElementTargetProduct(BackboneElement):
             field_name_base="value",
             required=False,
         )
-
 
 class ConceptMapGroupElementTarget(BackboneElement):
     """
@@ -523,28 +433,6 @@ class ConceptMapGroupElementTarget(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "product",
-                "dependsOn",
-                "property_",
-                "comment",
-                "relationship",
-                "valueSet",
-                "display",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_cmd_6_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -554,7 +442,6 @@ class ConceptMapGroupElementTarget(BackboneElement):
             key="cmd-6",
             severity="error",
         )
-
 
 class ConceptMapGroupElement(BackboneElement):
     """
@@ -603,25 +490,6 @@ class ConceptMapGroupElement(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "target",
-                "noMap",
-                "valueSet",
-                "display",
-                "code",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_cmd_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -642,7 +510,6 @@ class ConceptMapGroupElement(BackboneElement):
             key="cmd-7",
             severity="error",
         )
-
 
 class ConceptMapGroupUnmapped(BackboneElement):
     """
@@ -704,27 +571,6 @@ class ConceptMapGroupUnmapped(BackboneElement):
         alias="_otherMap",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "otherMap",
-                "relationship",
-                "valueSet",
-                "display",
-                "code",
-                "mode",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class ConceptMapGroup(BackboneElement):
     """
     A group of mappings that all have the same source and target system.
@@ -756,24 +602,6 @@ class ConceptMapGroup(BackboneElement):
         description="What to do when there is no mapping target for the source concept and ConceptMap.group.element.noMap is not true",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "unmapped",
-                "element",
-                "target",
-                "source",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_cmd_4_constraint_validator(self):
@@ -852,7 +680,6 @@ class ConceptMapGroup(BackboneElement):
             severity="error",
         )
 
-
 class ConceptMap(DomainResource):
     """
     A statement of relationships from one set of concepts to one or more other concepts - either concepts in code systems, or data element/data element concepts, or classes in class models.
@@ -862,55 +689,6 @@ class ConceptMap(DomainResource):
     _type = "ConceptMap"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ConceptMap"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ConceptMap"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this concept map, represented as a URI (globally unique)",
         default=None,
@@ -1163,66 +941,6 @@ class ConceptMap(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="targetScope",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "group",
-                "additionalAttribute",
-                "property_",
-                "relatedArtifact",
-                "endorser",
-                "reviewer",
-                "editor",
-                "author",
-                "topic",
-                "effectivePeriod",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")

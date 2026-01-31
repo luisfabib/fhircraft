@@ -67,21 +67,6 @@ class ClaimResponseEvent(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def when_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -118,24 +103,6 @@ class ClaimResponseItemReviewOutcome(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "preAuthPeriod",
-                "preAuthRef",
-                "reason",
-                "decision",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ClaimResponseItemAdjudication(BackboneElement):
     """
@@ -158,24 +125,6 @@ class ClaimResponseItemAdjudication(BackboneElement):
         description="Non-monetary value",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "quantity",
-                "amount",
-                "reason",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimResponseItemDetailReviewOutcome(BackboneElement):
@@ -205,24 +154,6 @@ class ClaimResponseItemDetailReviewOutcome(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "preAuthPeriod",
-                "preAuthRef",
-                "reason",
-                "decision",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ClaimResponseItemDetailAdjudication(BackboneElement):
     """
@@ -245,24 +176,6 @@ class ClaimResponseItemDetailAdjudication(BackboneElement):
         description="Non-monetary value",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "quantity",
-                "amount",
-                "reason",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimResponseItemDetailSubDetail(BackboneElement):
@@ -300,25 +213,6 @@ class ClaimResponseItemDetailSubDetail(BackboneElement):
         description="Subdetail level adjudication details",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "traceNumber",
-                "subDetailSequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimResponseItemDetail(BackboneElement):
@@ -361,26 +255,6 @@ class ClaimResponseItemDetail(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subDetail",
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "traceNumber",
-                "detailSequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ClaimResponseItem(BackboneElement):
     """
@@ -422,26 +296,6 @@ class ClaimResponseItem(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "detail",
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "traceNumber",
-                "itemSequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ClaimResponseAddItemBodySite(BackboneElement):
     """
@@ -456,22 +310,6 @@ class ClaimResponseAddItemBodySite(BackboneElement):
         description="Sub-location",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subSite",
-                "site",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimResponseAddItemDetailSubDetail(BackboneElement):
@@ -541,33 +379,6 @@ class ClaimResponseAddItemDetailSubDetail(BackboneElement):
         description="Added items subdetail adjudication",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "modifier",
-                "productOrServiceEnd",
-                "productOrService",
-                "revenue",
-                "traceNumber",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimResponseAddItemDetail(BackboneElement):
@@ -641,34 +452,6 @@ class ClaimResponseAddItemDetail(BackboneElement):
         description="Insurer added line items",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "subDetail",
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "modifier",
-                "productOrServiceEnd",
-                "productOrService",
-                "revenue",
-                "traceNumber",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimResponseAddItem(BackboneElement):
@@ -826,41 +609,6 @@ class ClaimResponseAddItem(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "detail",
-                "adjudication",
-                "reviewOutcome",
-                "noteNumber",
-                "bodySite",
-                "net",
-                "tax",
-                "factor",
-                "unitPrice",
-                "quantity",
-                "programCode",
-                "modifier",
-                "request",
-                "productOrServiceEnd",
-                "productOrService",
-                "revenue",
-                "provider",
-                "traceNumber",
-                "subdetailSequence",
-                "detailSequence",
-                "itemSequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def serviced_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -892,22 +640,6 @@ class ClaimResponseTotal(BackboneElement):
         description="Financial total for the category",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "amount",
-                "category",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimResponsePayment(BackboneElement):
@@ -945,26 +677,6 @@ class ClaimResponsePayment(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "identifier",
-                "amount",
-                "date",
-                "adjustmentReason",
-                "adjustment",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ClaimResponseProcessNote(BackboneElement):
     """
@@ -997,24 +709,6 @@ class ClaimResponseProcessNote(BackboneElement):
         description="Language of the text",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "language",
-                "text",
-                "type",
-                "number",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimResponseInsurance(BackboneElement):
@@ -1057,25 +751,6 @@ class ClaimResponseInsurance(BackboneElement):
         description="Adjudication results",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "claimResponse",
-                "businessArrangement",
-                "coverage",
-                "focal",
-                "sequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
 
 class ClaimResponseError(BackboneElement):
@@ -1124,25 +799,6 @@ class ClaimResponseError(BackboneElement):
         alias="_expression",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "expression",
-                "code",
-                "subDetailSequence",
-                "detailSequence",
-                "itemSequence",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class ClaimResponse(DomainResource):
     """
@@ -1153,55 +809,6 @@ class ClaimResponse(DomainResource):
     _type = "ClaimResponse"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ClaimResponse"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/ClaimResponse"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     identifier: Optional[List[Identifier]] = Field(
         description="Business Identifier for a claim response",
         default=None,
@@ -1360,117 +967,3 @@ class ClaimResponse(DomainResource):
         description="Processing errors",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "error",
-                "insurance",
-                "communicationRequest",
-                "processNote",
-                "form",
-                "formCode",
-                "fundsReserve",
-                "payment",
-                "total",
-                "adjudication",
-                "addItem",
-                "item",
-                "diagnosisRelatedGroup",
-                "encounter",
-                "payeeType",
-                "event",
-                "preAuthPeriod",
-                "preAuthRef",
-                "disposition",
-                "decision",
-                "outcome",
-                "request",
-                "requestor",
-                "insurer",
-                "created",
-                "patient",
-                "use",
-                "subType",
-                "type",
-                "status",
-                "traceNumber",
-                "identifier",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where((('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = '#').exists() or descendants().where(ofType(canonical) = '#').exists() or descendants().where(ofType(canonical) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
-        )

@@ -38,7 +38,6 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class QuestionnaireItemEnableWhen(BackboneElement):
     """
     A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
@@ -146,22 +145,6 @@ class QuestionnaireItemEnableWhen(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "operator",
-                "question",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def answer_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -180,7 +163,6 @@ class QuestionnaireItemEnableWhen(BackboneElement):
             field_name_base="answer",
             required=True,
         )
-
 
 class QuestionnaireItemAnswerOption(BackboneElement):
     """
@@ -249,21 +231,6 @@ class QuestionnaireItemAnswerOption(BackboneElement):
         )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "initialSelected",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def value_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -271,7 +238,6 @@ class QuestionnaireItemAnswerOption(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class QuestionnaireItemInitial(BackboneElement):
     """
@@ -395,7 +361,6 @@ class QuestionnaireItemInitial(BackboneElement):
             field_name_base="value",
             required=True,
         )
-
 
 class QuestionnaireItem(BackboneElement):
     """
@@ -541,38 +506,6 @@ class QuestionnaireItem(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "item",
-                "initial",
-                "answerOption",
-                "answerValueSet",
-                "answerConstraint",
-                "maxLength",
-                "readOnly",
-                "repeats",
-                "required",
-                "disabledDisplay",
-                "enableBehavior",
-                "enableWhen",
-                "type",
-                "text",
-                "prefix",
-                "code",
-                "definition",
-                "linkId",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_que_15_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -594,7 +527,6 @@ class QuestionnaireItem(BackboneElement):
             severity="error",
         )
 
-
 class Questionnaire(DomainResource):
     """
     A structured set of questions intended to guide the collection of answers from end-users. Questionnaires provide detailed control over order, presentation, phraseology and grouping to allow coherent, consistent data collection.
@@ -604,55 +536,6 @@ class Questionnaire(DomainResource):
     _type = "Questionnaire"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Questionnaire"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/Questionnaire"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
-    contained: Optional[List[Resource]] = Field(
-        description="Contained, inline Resources",
-        default=None,
-    )
-    extension: Optional[List[Extension]] = Field(
-        description="Additional content defined by implementations",
-        default=None,
-    )
-    modifierExtension: Optional[List[Extension]] = Field(
-        description="Extensions that cannot be ignored",
-        default=None,
-    )
     url: Optional[Uri] = Field(
         description="Canonical identifier for this questionnaire, represented as an absolute URI (globally unique)",
         default=None,
@@ -844,61 +727,6 @@ class Questionnaire(DomainResource):
         return fhir_validators.get_type_choice_value_by_base(
             self,
             base="versionAlgorithm",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "item",
-                "code",
-                "effectivePeriod",
-                "lastReviewDate",
-                "approvalDate",
-                "copyrightLabel",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "subjectType",
-                "experimental",
-                "status",
-                "derivedFrom",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
         )
 
     @model_validator(mode="after")
