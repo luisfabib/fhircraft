@@ -30,6 +30,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CoverageEligibilityRequestSupportingInfo(BackboneElement):
     """
     Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
@@ -58,6 +59,7 @@ class CoverageEligibilityRequestSupportingInfo(BackboneElement):
         alias="_appliesToAll",
     )
 
+
 class CoverageEligibilityRequestInsurance(BackboneElement):
     """
     Financial instruments for reimbursement for the health care products and services.
@@ -85,6 +87,7 @@ class CoverageEligibilityRequestInsurance(BackboneElement):
         default=None,
         alias="_businessArrangement",
     )
+
 
 class CoverageEligibilityRequestItemDiagnosis(BackboneElement):
     """
@@ -115,6 +118,7 @@ class CoverageEligibilityRequestItemDiagnosis(BackboneElement):
             field_name_base="diagnosis",
             required=False,
         )
+
 
 class CoverageEligibilityRequestItem(BackboneElement):
     """
@@ -167,6 +171,7 @@ class CoverageEligibilityRequestItem(BackboneElement):
         default=None,
     )
 
+
 class CoverageEligibilityRequest(DomainResource):
     """
     The CoverageEligibilityRequest provides patient and insurance coverage information to an insurer for them to respond, in the form of an CoverageEligibilityResponse, with information regarding whether the stated coverage is valid and in-force and optionally to provide the insurance details of the policy.
@@ -176,15 +181,6 @@ class CoverageEligibilityRequest(DomainResource):
     _type = "CoverageEligibilityRequest"
     _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityRequest"
-    )
-
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityRequest"
-            ]
-        ),
     )
 
     contained: Optional[ListType[Resource]] = Field(

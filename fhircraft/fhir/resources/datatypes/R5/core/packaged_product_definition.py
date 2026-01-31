@@ -252,15 +252,6 @@ class PackagedProductDefinition(DomainResource):
     _type = "PackagedProductDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition"
 
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition"
-            ]
-        ),
-    )
-
     identifier: Optional[List[Identifier]] = Field(
         description="A unique identifier for this package as whole - not for the content of the package",
         default=None,

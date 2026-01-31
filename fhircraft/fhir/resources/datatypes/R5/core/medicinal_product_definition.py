@@ -250,15 +250,6 @@ class MedicinalProductDefinition(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition"
     )
 
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition"
-            ]
-        ),
-    )
-
     identifier: Optional[List[Identifier]] = Field(
         description="Business identifier for this product. Could be an MPID",
         default=None,

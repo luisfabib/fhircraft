@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ManufacturedItemDefinitionProperty(BackboneElement):
     """
     General characteristics of this item.
@@ -83,6 +84,7 @@ class ManufacturedItemDefinitionProperty(BackboneElement):
             required=False,
         )
 
+
 class ManufacturedItemDefinition(DomainResource):
     """
     The definition and characteristics of a medicinal manufactured item, such as a tablet or capsule, as contained in a packaged medicinal product.
@@ -92,15 +94,6 @@ class ManufacturedItemDefinition(DomainResource):
     _type = "ManufacturedItemDefinition"
     _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition"
-    )
-
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition"
-            ]
-        ),
     )
 
     contained: Optional[ListType[Resource]] = Field(
@@ -149,4 +142,3 @@ class ManufacturedItemDefinition(DomainResource):
         default=None,
         alias="property",
     )
-

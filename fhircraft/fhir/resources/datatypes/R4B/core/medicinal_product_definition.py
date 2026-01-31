@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MedicinalProductDefinitionContact(BackboneElement):
     """
     A product specific contact, person (in a role), or an organization.
@@ -46,6 +47,7 @@ class MedicinalProductDefinitionContact(BackboneElement):
         description="A product specific contact, person (in a role), or an organization",
         default=None,
     )
+
 
 class MedicinalProductDefinitionNameNamePart(BackboneElement):
     """
@@ -66,6 +68,7 @@ class MedicinalProductDefinitionNameNamePart(BackboneElement):
         default=None,
     )
 
+
 class MedicinalProductDefinitionNameCountryLanguage(BackboneElement):
     """
     Country and jurisdiction where the name applies, and associated language.
@@ -83,6 +86,7 @@ class MedicinalProductDefinitionNameCountryLanguage(BackboneElement):
         description="Language code for this name",
         default=None,
     )
+
 
 class MedicinalProductDefinitionName(BackboneElement):
     """
@@ -113,6 +117,7 @@ class MedicinalProductDefinitionName(BackboneElement):
         default=None,
     )
 
+
 class MedicinalProductDefinitionCrossReference(BackboneElement):
     """
     Reference to another product, e.g. for linking authorised to investigational product, or a virtual product.
@@ -126,6 +131,7 @@ class MedicinalProductDefinitionCrossReference(BackboneElement):
         description="The type of relationship, for instance branded to generic or virtual to actual product",
         default=None,
     )
+
 
 class MedicinalProductDefinitionOperation(BackboneElement):
     """
@@ -148,6 +154,7 @@ class MedicinalProductDefinitionOperation(BackboneElement):
         description="Specifies whether this process is considered proprietary or confidential",
         default=None,
     )
+
 
 class MedicinalProductDefinitionCharacteristic(BackboneElement):
     """
@@ -205,6 +212,7 @@ class MedicinalProductDefinitionCharacteristic(BackboneElement):
             required=False,
         )
 
+
 class MedicinalProductDefinition(DomainResource):
     """
     Detailed definition of a medicinal product, typically for uses other than direct patient care (e.g. regulatory use, drug catalogs, to support prescribing, adverse events management etc.).
@@ -214,15 +222,6 @@ class MedicinalProductDefinition(DomainResource):
     _type = "MedicinalProductDefinition"
     _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition"
-    )
-
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition"
-            ]
-        ),
     )
 
     contained: Optional[ListType[Resource]] = Field(
@@ -373,4 +372,3 @@ class MedicinalProductDefinition(DomainResource):
             default=None,
         )
     )
-

@@ -220,15 +220,6 @@ class BiologicallyDerivedProduct(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProduct"
     )
 
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProduct"
-            ]
-        ),
-    )
-
     contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,

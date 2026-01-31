@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
     """
     The legal status of supply of the packaged item as classified by the regulator.
@@ -46,6 +47,7 @@ class PackagedProductDefinitionLegalStatusOfSupply(BackboneElement):
         description="The place where the legal status of supply applies",
         default=None,
     )
+
 
 class PackagedProductDefinitionPackageShelfLifeStorage(BackboneElement):
     """
@@ -89,6 +91,7 @@ class PackagedProductDefinitionPackageShelfLifeStorage(BackboneElement):
             field_name_base="period",
             required=False,
         )
+
 
 class PackagedProductDefinitionPackageProperty(BackboneElement):
     """
@@ -146,6 +149,7 @@ class PackagedProductDefinitionPackageProperty(BackboneElement):
             required=False,
         )
 
+
 class PackagedProductDefinitionPackageContainedItem(BackboneElement):
     """
     The item(s) within the packaging.
@@ -159,6 +163,7 @@ class PackagedProductDefinitionPackageContainedItem(BackboneElement):
         description="The number of this type of item within this packaging",
         default=None,
     )
+
 
 class PackagedProductDefinitionPackage(BackboneElement):
     """
@@ -216,6 +221,7 @@ class PackagedProductDefinitionPackage(BackboneElement):
         default=None,
     )
 
+
 class PackagedProductDefinition(DomainResource):
     """
     A medically related item or items, in a container or package.
@@ -224,15 +230,6 @@ class PackagedProductDefinition(DomainResource):
     _abstract = False
     _type = "PackagedProductDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition"
-
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition"
-            ]
-        ),
-    )
 
     contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
@@ -324,4 +321,3 @@ class PackagedProductDefinition(DomainResource):
         description="A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap",
         default=None,
     )
-

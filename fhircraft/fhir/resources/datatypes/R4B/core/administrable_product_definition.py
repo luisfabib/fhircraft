@@ -29,6 +29,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class AdministrableProductDefinitionProperty(BackboneElement):
     """
     Characteristics e.g. a product's onset of action.
@@ -89,6 +90,7 @@ class AdministrableProductDefinitionProperty(BackboneElement):
             required=False,
         )
 
+
 class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawalPeriod(
     BackboneElement
 ):
@@ -114,6 +116,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
         alias="_supportingInformation",
     )
 
+
 class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneElement):
     """
     A species for which this route applies.
@@ -131,6 +134,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies(BackboneE
         description="A species specific time during which consumption of animal product is not appropriate",
         default=None,
     )
+
 
 class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
     """
@@ -168,6 +172,7 @@ class AdministrableProductDefinitionRouteOfAdministration(BackboneElement):
         default=None,
     )
 
+
 class AdministrableProductDefinition(DomainResource):
     """
     A medicinal product in the final form which is suitable for administering to a patient (after any mixing of multiple components, dissolution etc. has been performed).
@@ -177,15 +182,6 @@ class AdministrableProductDefinition(DomainResource):
     _type = "AdministrableProductDefinition"
     _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
-    )
-
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
-            ]
-        ),
     )
 
     contained: Optional[ListType[Resource]] = Field(

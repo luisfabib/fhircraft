@@ -29,6 +29,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
     """
     Benefits used to date.
@@ -114,6 +115,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit(BackboneElement):
             field_name_base="used",
             required=False,
         )
+
 
 class CoverageEligibilityResponseInsuranceItem(BackboneElement):
     """
@@ -204,6 +206,7 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         alias="_authorizationUrl",
     )
 
+
 class CoverageEligibilityResponseInsurance(BackboneElement):
     """
     Financial instruments for reimbursement for the health care products and services.
@@ -242,6 +245,7 @@ class CoverageEligibilityResponseInsurance(BackboneElement):
             severity="error",
         )
 
+
 class CoverageEligibilityResponseError(BackboneElement):
     """
     Errors encountered during the processing of the request.
@@ -252,6 +256,7 @@ class CoverageEligibilityResponseError(BackboneElement):
         default=None,
     )
 
+
 class CoverageEligibilityResponse(DomainResource):
     """
     This resource provides eligibility and plan details from the processing of an CoverageEligibilityRequest resource.
@@ -261,15 +266,6 @@ class CoverageEligibilityResponse(DomainResource):
     _type = "CoverageEligibilityResponse"
     _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityResponse"
-    )
-
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/CoverageEligibilityResponse"
-            ]
-        ),
     )
 
     contained: Optional[ListType[Resource]] = Field(

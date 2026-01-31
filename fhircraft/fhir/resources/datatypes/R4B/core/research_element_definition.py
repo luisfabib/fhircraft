@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ResearchElementDefinitionCharacteristic(BackboneElement):
     """
     A characteristic that defines the members of the research element. Multiple characteristics are applied with "and" semantics.
@@ -214,6 +215,7 @@ class ResearchElementDefinitionCharacteristic(BackboneElement):
             required=False,
         )
 
+
 class ResearchElementDefinition(DomainResource):
     """
     The ResearchElementDefinition resource describes a "PICO" element that knowledge (evidence, assertion, recommendation) is about.
@@ -222,15 +224,6 @@ class ResearchElementDefinition(DomainResource):
     _abstract = False
     _type = "ResearchElementDefinition"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/ResearchElementDefinition"
-
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/ResearchElementDefinition"
-            ]
-        ),
-    )
 
     contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",

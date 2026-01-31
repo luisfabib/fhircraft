@@ -49,15 +49,6 @@ class BiologicallyDerivedProductDispense(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProductDispense"
     )
 
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProductDispense"
-            ]
-        ),
-    )
-
     identifier: Optional[List[Identifier]] = Field(
         description="Business identifier for this dispense",
         default=None,

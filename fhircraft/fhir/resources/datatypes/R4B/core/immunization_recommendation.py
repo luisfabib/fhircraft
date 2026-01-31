@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
     """
     Vaccine date recommendations.  For example, earliest date to administer, latest date to administer, etc.
@@ -43,6 +44,7 @@ class ImmunizationRecommendationRecommendationDateCriterion(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class ImmunizationRecommendationRecommendation(BackboneElement):
     """
@@ -170,6 +172,7 @@ class ImmunizationRecommendationRecommendation(BackboneElement):
             required=False,
         )
 
+
 class ImmunizationRecommendation(DomainResource):
     """
     A patient's point-in-time set of recommendations (i.e. forecasting) according to a published schedule with optional supporting justification.
@@ -179,15 +182,6 @@ class ImmunizationRecommendation(DomainResource):
     _type = "ImmunizationRecommendation"
     _canonical_url = (
         "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation"
-    )
-
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation"
-            ]
-        ),
     )
 
     contained: Optional[ListType[Resource]] = Field(

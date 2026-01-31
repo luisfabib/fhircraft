@@ -135,15 +135,6 @@ class ImmunizationRecommendation(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation"
     )
 
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation"
-            ]
-        ),
-    )
-
     identifier: Optional[List[Identifier]] = Field(
         description="Business identifier",
         default=None,

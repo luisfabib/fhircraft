@@ -203,15 +203,6 @@ class AdministrableProductDefinition(DomainResource):
         "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
     )
 
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=[
-                "http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition"
-            ]
-        ),
-    )
-
     identifier: Optional[List[Identifier]] = Field(
         description="An identifier for the administrable product",
         default=None,
