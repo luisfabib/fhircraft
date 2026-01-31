@@ -137,12 +137,30 @@ def validate_element_constraint(
         AssertionError: If the validation fails and severity is not `warning`.
         Warning: If the validation fails and severity is `warning`.
     """
-    for element in elements:
-        value = getattr(instance, element)
-        if not value:
-            continue
+    values = {}
+
+    def _get_path_value(obj: Any, element: str, path="") -> Any:
+        parts = element.split(".")
+        current = obj
+        for part in parts:
+            path += f".{part}" if path else part
+            if isinstance(current, list):
+                for idx, item in enumerate(current):
+                    path = f"{path}[{idx}]"
+                    _get_path_value(item, ".".join(parts[parts.index(part) :]), path)
+            else:
+                current = getattr(current, part, None)
+            if current is None:
+                break
+        else:
+            values[path] = current
+        return current
+
+    for element_path in elements:
+        _get_path_value(instance, element_path)
+    for path, value in values.items():
         _validate_FHIR_element_constraint(
-            value, instance, expression, human, key, severity
+            value, instance, expression, human, key, severity, element=path
         )
     return instance
 
