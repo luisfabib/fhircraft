@@ -13,7 +13,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
     Duration,
 )
 
-
 class TimingRepeat(BackboneElement):
     """
     When the event is to occur
@@ -175,7 +174,6 @@ class TimingRepeat(BackboneElement):
             base="bounds",
         )
 
-
 class Timing(BackboneElement):
     """
     A timing schedule that specifies an event that may occur multiple times
@@ -200,23 +198,6 @@ class Timing(BackboneElement):
         description="BID | TID | QID | AM | PM | QD | QOD | +",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "code",
-                "repeat",
-                "event",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_ext_1_constraint_validator(self):

@@ -206,37 +206,6 @@ class DataRequirement(Element):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "sort",
-                "limit",
-                "dateFilter",
-                "codeFilter",
-                "mustSupport",
-                "profile",
-                "type",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("extension",),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_drq_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -255,16 +224,6 @@ class DataRequirement(Element):
             expression="path.exists() xor searchParam.exists()",
             human="Either a path or a searchParam must be provided, but not both",
             key="drq-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
             severity="error",
         )
 

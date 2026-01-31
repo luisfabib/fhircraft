@@ -32,7 +32,6 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
-
 class TestScriptOrigin(BackboneElement):
     """
     An abstract server used in operations within this test script in the origin element.
@@ -52,23 +51,6 @@ class TestScriptOrigin(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "profile",
-                "index",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class TestScriptDestination(BackboneElement):
     """
     An abstract server used in operations within this test script in the destination element.
@@ -87,23 +69,6 @@ class TestScriptDestination(BackboneElement):
         description="FHIR-Server | FHIR-SDC-FormManager | FHIR-SDC-FormReceiver | FHIR-SDC-FormProcessor",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "profile",
-                "index",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TestScriptMetadataLink(BackboneElement):
     """
@@ -128,23 +93,6 @@ class TestScriptMetadataLink(BackboneElement):
         default=None,
         alias="_description",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "description",
-                "url",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TestScriptMetadataCapability(BackboneElement):
     """
@@ -215,28 +163,6 @@ class TestScriptMetadataCapability(BackboneElement):
         alias="_capabilities",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "capabilities",
-                "link",
-                "destination",
-                "origin",
-                "description",
-                "validated",
-                "required",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class TestScriptMetadata(BackboneElement):
     """
     The required capability must exist and are assumed to function correctly on the FHIR server being tested.
@@ -250,23 +176,6 @@ class TestScriptMetadata(BackboneElement):
         description="Capabilities  that are assumed to function correctly on the FHIR server being tested",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "capability",
-                "link",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TestScriptFixture(BackboneElement):
     """
@@ -295,24 +204,6 @@ class TestScriptFixture(BackboneElement):
         description="Reference of the resource",
         default=None,
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "resource",
-                "autodelete",
-                "autocreate",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TestScriptVariable(BackboneElement):
     """
@@ -391,29 +282,6 @@ class TestScriptVariable(BackboneElement):
         default=None,
         alias="_sourceId",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "sourceId",
-                "path",
-                "hint",
-                "headerField",
-                "expression",
-                "description",
-                "defaultValue",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TestScriptSetupActionOperation(BackboneElement):
     """
@@ -565,38 +433,6 @@ class TestScriptSetupActionOperation(BackboneElement):
         default=None,
         alias="_url",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "url",
-                "targetId",
-                "sourceId",
-                "responseId",
-                "requestId",
-                "requestHeader",
-                "params",
-                "origin",
-                "method",
-                "encodeRequestUrl",
-                "destination",
-                "contentType",
-                "accept",
-                "description",
-                "label",
-                "resource",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TestScriptSetupActionAssert(BackboneElement):
     """
@@ -802,43 +638,6 @@ class TestScriptSetupActionAssert(BackboneElement):
         alias="_warningOnly",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "warningOnly",
-                "value",
-                "validateProfileId",
-                "sourceId",
-                "responseCode",
-                "response",
-                "resource",
-                "requestURL",
-                "requestMethod",
-                "path",
-                "operator",
-                "navigationLinks",
-                "minimumId",
-                "headerField",
-                "expression",
-                "contentType",
-                "compareToSourcePath",
-                "compareToSourceExpression",
-                "compareToSourceId",
-                "direction",
-                "description",
-                "label",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class TestScriptSetupAction(BackboneElement):
     """
     Action would contain either an operation or an assertion.
@@ -853,22 +652,6 @@ class TestScriptSetupAction(BackboneElement):
         default=None,
         alias="assert",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "assert_",
-                "operation",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_tst_7_constraint_validator(self):
@@ -914,7 +697,6 @@ class TestScriptSetupAction(BackboneElement):
             severity="error",
         )
 
-
 class TestScriptSetup(BackboneElement):
     """
     A series of required setup operations before tests are executed.
@@ -926,21 +708,6 @@ class TestScriptSetup(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "action",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_tst_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -950,7 +717,6 @@ class TestScriptSetup(BackboneElement):
             key="tst-1",
             severity="error",
         )
-
 
 class TestScriptSetupActionOperationRequestHeader(BackboneElement):
     """
@@ -975,23 +741,6 @@ class TestScriptSetupActionOperationRequestHeader(BackboneElement):
         default=None,
         alias="_value",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "value",
-                "field",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TestScriptTestActionOperation(BackboneElement):
     """
@@ -1143,38 +892,6 @@ class TestScriptTestActionOperation(BackboneElement):
         default=None,
         alias="_url",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "url",
-                "targetId",
-                "sourceId",
-                "responseId",
-                "requestId",
-                "requestHeader",
-                "params",
-                "origin",
-                "method",
-                "encodeRequestUrl",
-                "destination",
-                "contentType",
-                "accept",
-                "description",
-                "label",
-                "resource",
-                "type",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
 
 class TestScriptTestActionAssert(BackboneElement):
     """
@@ -1380,43 +1097,6 @@ class TestScriptTestActionAssert(BackboneElement):
         alias="_warningOnly",
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "warningOnly",
-                "value",
-                "validateProfileId",
-                "sourceId",
-                "responseCode",
-                "response",
-                "resource",
-                "requestURL",
-                "requestMethod",
-                "path",
-                "operator",
-                "navigationLinks",
-                "minimumId",
-                "headerField",
-                "expression",
-                "contentType",
-                "compareToSourcePath",
-                "compareToSourceExpression",
-                "compareToSourceId",
-                "direction",
-                "description",
-                "label",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class TestScriptTestAction(BackboneElement):
     """
     Action would contain either an operation or an assertion.
@@ -1431,22 +1111,6 @@ class TestScriptTestAction(BackboneElement):
         default=None,
         alias="assert",
     )
-
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "assert_",
-                "operation",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
 
     @model_validator(mode="after")
     def FHIR_tst_8_constraint_validator(self):
@@ -1492,7 +1156,6 @@ class TestScriptTestAction(BackboneElement):
             severity="error",
         )
 
-
 class TestScriptTest(BackboneElement):
     """
     A test in this script.
@@ -1522,23 +1185,6 @@ class TestScriptTest(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "action",
-                "description",
-                "name",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_tst_2_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -1548,7 +1194,6 @@ class TestScriptTest(BackboneElement):
             key="tst-2",
             severity="error",
         )
-
 
 class TestScriptTeardownAction(BackboneElement):
     """
@@ -1561,21 +1206,6 @@ class TestScriptTeardownAction(BackboneElement):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "operation",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count())",
-            human="All FHIR elements must have a @value or children",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_tst_9_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -1585,7 +1215,6 @@ class TestScriptTeardownAction(BackboneElement):
             key="tst-9",
             severity="error",
         )
-
 
 class TestScriptTeardown(BackboneElement):
     """
@@ -1597,22 +1226,6 @@ class TestScriptTeardown(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "action",
-                "modifierExtension",
-                "extension",
-            ),
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
-            severity="error",
-        )
-
-
 class TestScript(DomainResource):
     """
     A structured set of tests against a FHIR server or client implementation to determine compliance against the FHIR specification.
@@ -1622,43 +1235,6 @@ class TestScript(DomainResource):
     _type = "TestScript"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/TestScript"
 
-    id: Optional[String] = Field(
-        description="Logical id of this artifact",
-        default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
-    meta: Optional[Meta] = Field(
-        description="Metadata about the resource.",
-        default_factory=lambda: Meta(
-            profile=["http://hl7.org/fhir/StructureDefinition/TestScript"]
-        ),
-    )
-    implicitRules: Optional[Uri] = Field(
-        description="A set of rules under which this content was created",
-        default=None,
-    )
-    implicitRules_ext: Optional[Element] = Field(
-        description="Placeholder element for implicitRules extensions",
-        default=None,
-        alias="_implicitRules",
-    )
-    language: Optional[Code] = Field(
-        description="Language of the resource content",
-        default=None,
-    )
-    language_ext: Optional[Element] = Field(
-        description="Placeholder element for language extensions",
-        default=None,
-        alias="_language",
-    )
-    text: Optional[Narrative] = Field(
-        description="Text summary of the resource, for human interpretation",
-        default=None,
-    )
     contained: Optional[ListType[Resource]] = Field(
         description="Contained, inline Resources",
         default=None,
@@ -1824,73 +1400,6 @@ class TestScript(DomainResource):
     )
 
     @model_validator(mode="after")
-    def FHIR_ele_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "teardown",
-                "test",
-                "setup",
-                "variable",
-                "profile",
-                "fixture",
-                "metadata",
-                "destination",
-                "origin",
-                "copyright",
-                "purpose",
-                "jurisdiction",
-                "useContext",
-                "description",
-                "contact",
-                "publisher",
-                "date",
-                "experimental",
-                "status",
-                "title",
-                "name",
-                "version",
-                "identifier",
-                "url",
-                "modifierExtension",
-                "extension",
-                "text",
-                "language",
-                "implicitRules",
-                "meta",
-            ),
-            expression="hasValue() or (children().count() > id.count()) or $this is Parameters",
-            human="All FHIR elements must have a @value or children unless an empty Parameters resource",
-            key="ele-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_r4b_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("contained",),
-            expression="($this is Citation or $this is Evidence or $this is EvidenceReport or $this is EvidenceVariable or $this is MedicinalProductDefinition or $this is PackagedProductDefinition or $this is AdministrableProductDefinition or $this is Ingredient or $this is ClinicalUseDefinition or $this is RegulatedAuthorization or $this is SubstanceDefinition or $this is SubscriptionStatus or $this is SubscriptionTopic) implies (%resource is Citation or %resource is Evidence or %resource is EvidenceReport or %resource is EvidenceVariable or %resource is MedicinalProductDefinition or %resource is PackagedProductDefinition or %resource is AdministrableProductDefinition or %resource is Ingredient or %resource is ClinicalUseDefinition or %resource is RegulatedAuthorization or %resource is SubstanceDefinition or %resource is SubscriptionStatus or %resource is SubscriptionTopic)",
-            human="Containing new R4B resources within R4 resources may cause interoperability issues if instances are shared with R4 systems",
-            key="dom-r4b",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_ext_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=(
-                "modifierExtension",
-                "extension",
-            ),
-            expression="extension.exists() != value.exists()",
-            human="Must have either extensions or value[x], not both",
-            key="ext-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_tst_4_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -1910,56 +1419,6 @@ class TestScript(DomainResource):
             human="Variable can only contain one of expression, headerField or path.",
             key="tst-3",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.contained.empty()",
-            human="If the resource is contained in another resource, it SHALL NOT contain nested Resources",
-            key="dom-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.where(((id.exists() and ('#'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url)))) or descendants().where(reference = '#').exists() or descendants().where(as(canonical) = '#').exists() or descendants().where(as(uri) = '#').exists()).not()).trace('unmatched', id).empty()",
-            human="If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource",
-            key="dom-3",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_4_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated",
-            key="dom-4",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_5_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="contained.meta.security.empty()",
-            human="If a resource is contained in another resource, it SHALL NOT have a security label",
-            key="dom-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_dom_6_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="text.`div`.exists()",
-            human="A resource should have narrative for robust management",
-            key="dom-6",
-            severity="warning",
         )
 
     @model_validator(mode="after")
