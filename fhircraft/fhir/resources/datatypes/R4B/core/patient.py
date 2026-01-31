@@ -32,6 +32,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class PatientContact(BackboneElement):
     """
     A contact party (e.g. guardian, partner, friend) for the patient.
@@ -71,6 +72,7 @@ class PatientContact(BackboneElement):
         default=None,
     )
 
+
 class PatientCommunication(BackboneElement):
     """
     A language which may be used to communicate with the patient about his or her health.
@@ -90,6 +92,7 @@ class PatientCommunication(BackboneElement):
         alias="_preferred",
     )
 
+
 class PatientLink(BackboneElement):
     """
     Link to another patient resource that concerns the same actual patient.
@@ -108,6 +111,7 @@ class PatientLink(BackboneElement):
         default=None,
         alias="_type",
     )
+
 
 class Patient(DomainResource):
     """
@@ -253,17 +257,6 @@ class Patient(DomainResource):
         )
 
     @model_validator(mode="after")
-    def FHIR_pat_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("contact",),
-            expression="name.exists() or telecom.exists() or address.exists() or organization.exists()",
-            human="SHALL at least contain a contact's details or a reference to an organization",
-            key="pat-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def deceased_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
@@ -279,4 +272,15 @@ class Patient(DomainResource):
             field_types=[Boolean, Integer],
             field_name_base="multipleBirth",
             required=False,
+        )
+
+    @model_validator(mode="after")
+    def FHIR_pat_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("contact",),
+            expression="name.exists() or telecom.exists() or address.exists() or organization.exists()",
+            human="SHALL at least contain a contact's details or a reference to an organization",
+            key="pat-1",
+            severity="error",
         )

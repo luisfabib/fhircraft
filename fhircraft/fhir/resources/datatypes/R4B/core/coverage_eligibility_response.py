@@ -234,17 +234,6 @@ class CoverageEligibilityResponseInsurance(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_ces_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("item",),
-            expression="category.exists() xor productOrService.exists()",
-            human="SHALL contain a category or a billcode but not both.",
-            key="ces-1",
-            severity="error",
-        )
-
 
 class CoverageEligibilityResponseError(BackboneElement):
     """
@@ -394,4 +383,15 @@ class CoverageEligibilityResponse(DomainResource):
             field_types=[Date, Period],
             field_name_base="serviced",
             required=False,
+        )
+
+    @model_validator(mode="after")
+    def FHIR_ces_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("response.insurance.item",),
+            expression="category.exists() xor productOrService.exists()",
+            human="SHALL contain a category or a billcode but not both.",
+            key="ces-1",
+            severity="error",
         )

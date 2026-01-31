@@ -319,6 +319,15 @@ class MessageDefinition(DomainResource):
         )
 
     @model_validator(mode="after")
+    def event_type_choice_validator(self):
+        return fhir_validators.validate_type_choice_element(
+            self,
+            field_types=[Coding, Uri],
+            field_name_base="event",
+            required=True,
+        )
+
+    @model_validator(mode="after")
     def FHIR_md_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -327,15 +336,6 @@ class MessageDefinition(DomainResource):
             human="Max must be postive int or *",
             key="md-1",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def event_type_choice_validator(self):
-        return fhir_validators.validate_type_choice_element(
-            self,
-            field_types=[Coding, Uri],
-            field_name_base="event",
-            required=True,
         )
 
     @model_validator(mode="after")

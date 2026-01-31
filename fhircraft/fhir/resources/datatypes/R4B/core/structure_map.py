@@ -66,6 +66,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class StructureMapStructure(BackboneElement):
     """
     A structure definition used by this map. The structure definition may describe instances that are converted, or the instances that are produced.
@@ -108,6 +109,7 @@ class StructureMapStructure(BackboneElement):
         alias="_documentation",
     )
 
+
 class StructureMapGroupInput(BackboneElement):
     """
     A name assigned to an instance of data. The instance must be provided when the mapping is invoked.
@@ -149,6 +151,7 @@ class StructureMapGroupInput(BackboneElement):
         default=None,
         alias="_documentation",
     )
+
 
 class StructureMapGroupRuleSource(BackboneElement):
     """
@@ -608,6 +611,7 @@ class StructureMapGroupRuleSource(BackboneElement):
             required=False,
         )
 
+
 class StructureMapGroupRuleTargetParameter(BackboneElement):
     """
     Parameters to the transform.
@@ -674,6 +678,7 @@ class StructureMapGroupRuleTargetParameter(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class StructureMapGroupRuleTarget(BackboneElement):
     """
@@ -748,6 +753,7 @@ class StructureMapGroupRuleTarget(BackboneElement):
         default=None,
     )
 
+
 class StructureMapGroupRuleDependent(BackboneElement):
     """
     Which other rules to apply in the context of this rule.
@@ -771,6 +777,7 @@ class StructureMapGroupRuleDependent(BackboneElement):
         default=None,
         alias="_variable",
     )
+
 
 class StructureMapGroupRule(BackboneElement):
     """
@@ -812,27 +819,6 @@ class StructureMapGroupRule(BackboneElement):
         alias="_documentation",
     )
 
-    @model_validator(mode="after")
-    def FHIR_smp_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("target",),
-            expression="element.exists() implies context.exists()",
-            human="Can only have an element if you have a context",
-            key="smp-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_smp_2_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("target",),
-            expression="context.exists() implies contextType.exists()",
-            human="Must have a contextType if you have a context",
-            key="smp-2",
-            severity="error",
-        )
 
 class StructureMapGroup(BackboneElement):
     """
@@ -883,6 +869,7 @@ class StructureMapGroup(BackboneElement):
         description="Transform Rule from source to target",
         default=None,
     )
+
 
 class StructureMap(DomainResource):
     """
@@ -1047,4 +1034,26 @@ class StructureMap(DomainResource):
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="smp-0",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_smp_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.rule.target",),
+            expression="element.exists() implies context.exists()",
+            human="Can only have an element if you have a context",
+            key="smp-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_smp_2_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("group.rule.target",),
+            expression="context.exists() implies contextType.exists()",
+            human="Must have a contextType if you have a context",
+            key="smp-2",
+            severity="error",
         )

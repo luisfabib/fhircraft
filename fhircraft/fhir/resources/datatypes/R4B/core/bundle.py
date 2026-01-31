@@ -296,28 +296,6 @@ class Bundle(Resource):
     )
 
     @model_validator(mode="after")
-    def FHIR_bdl_5_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("entry",),
-            expression="resource.exists() or request.exists() or response.exists()",
-            human="must be a resource unless there's a request or response",
-            key="bdl-5",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_bdl_8_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("entry",),
-            expression="fullUrl.exists() implies fullUrl.contains('/_history/').not()",
-            human="fullUrl cannot be a version specific reference",
-            key="bdl-8",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
     def FHIR_bdl_1_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
@@ -358,12 +336,34 @@ class Bundle(Resource):
         )
 
     @model_validator(mode="after")
+    def FHIR_bdl_5_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("entry",),
+            expression="resource.exists() or request.exists() or response.exists()",
+            human="must be a resource unless there's a request or response",
+            key="bdl-5",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_bdl_7_constraint_model_validator(self):
         return fhir_validators.validate_model_constraint(
             self,
             expression="(type = 'history') or entry.where(fullUrl.exists()).select(fullUrl&resource.meta.versionId).isDistinct()",
             human="FullUrl must be unique in a bundle, or else entries with the same fullUrl must have different meta.versionId (except in history bundles)",
             key="bdl-7",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_bdl_8_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("entry",),
+            expression="fullUrl.exists() implies fullUrl.contains('/_history/').not()",
+            human="fullUrl cannot be a version specific reference",
+            key="bdl-8",
             severity="error",
         )
 

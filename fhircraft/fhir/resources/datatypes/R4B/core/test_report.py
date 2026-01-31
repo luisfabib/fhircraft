@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class TestReportParticipant(BackboneElement):
     """
     A participant in the test execution, either the execution engine, a client, or a server.
@@ -57,6 +58,7 @@ class TestReportParticipant(BackboneElement):
         default=None,
         alias="_display",
     )
+
 
 class TestReportSetupActionOperation(BackboneElement):
     """
@@ -91,6 +93,7 @@ class TestReportSetupActionOperation(BackboneElement):
         alias="_detail",
     )
 
+
 class TestReportSetupActionAssert(BackboneElement):
     """
     The results of the assertion performed on the previous operations.
@@ -124,6 +127,7 @@ class TestReportSetupActionAssert(BackboneElement):
         alias="_detail",
     )
 
+
 class TestReportSetupAction(BackboneElement):
     """
     Action would contain either an operation or an assertion.
@@ -139,6 +143,7 @@ class TestReportSetupAction(BackboneElement):
         alias="assert",
     )
 
+
 class TestReportSetup(BackboneElement):
     """
     The results of the series of required setup operations before the tests were executed.
@@ -149,16 +154,6 @@ class TestReportSetup(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_inv_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("action",),
-            expression="operation.exists() xor assert.exists()",
-            human="Setup action SHALL contain either an operation or assert but not both.",
-            key="inv-1",
-            severity="error",
-        )
 
 class TestReportTestActionOperation(BackboneElement):
     """
@@ -193,6 +188,7 @@ class TestReportTestActionOperation(BackboneElement):
         alias="_detail",
     )
 
+
 class TestReportTestActionAssert(BackboneElement):
     """
     The results of the assertion performed on the previous operations.
@@ -226,6 +222,7 @@ class TestReportTestActionAssert(BackboneElement):
         alias="_detail",
     )
 
+
 class TestReportTestAction(BackboneElement):
     """
     Action would contain either an operation or an assertion.
@@ -240,6 +237,7 @@ class TestReportTestAction(BackboneElement):
         default=None,
         alias="assert",
     )
+
 
 class TestReportTest(BackboneElement):
     """
@@ -269,16 +267,6 @@ class TestReportTest(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_inv_2_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("action",),
-            expression="operation.exists() xor assert.exists()",
-            human="Test action SHALL contain either an operation or assert but not both.",
-            key="inv-2",
-            severity="error",
-        )
 
 class TestReportTeardownAction(BackboneElement):
     """
@@ -290,6 +278,7 @@ class TestReportTeardownAction(BackboneElement):
         default=None,
     )
 
+
 class TestReportTeardown(BackboneElement):
     """
     The results of the series of operations required to clean up after all the tests were executed (successfully or otherwise).
@@ -299,6 +288,7 @@ class TestReportTeardown(BackboneElement):
         description="One or more teardown operations performed",
         default=None,
     )
+
 
 class TestReport(DomainResource):
     """
@@ -400,3 +390,24 @@ class TestReport(DomainResource):
         default=None,
     )
 
+    @model_validator(mode="after")
+    def FHIR_inv_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("setup.action",),
+            expression="operation.exists() xor assert.exists()",
+            human="Setup action SHALL contain either an operation or assert but not both.",
+            key="inv-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_inv_2_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("test.action",),
+            expression="operation.exists() xor assert.exists()",
+            human="Test action SHALL contain either an operation or assert but not both.",
+            key="inv-2",
+            severity="error",
+        )

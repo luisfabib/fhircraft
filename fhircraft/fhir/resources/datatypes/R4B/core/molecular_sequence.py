@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MolecularSequenceReferenceSeq(BackboneElement):
     """
     A sequence that is used as a reference to describe variants that are present in a sequence analyzed.
@@ -99,6 +100,7 @@ class MolecularSequenceReferenceSeq(BackboneElement):
         alias="_windowEnd",
     )
 
+
 class MolecularSequenceVariant(BackboneElement):
     """
     The definition of variant here originates from Sequence ontology ([variant_of](http://www.sequenceontology.org/browser/current_svn/term/variant_of)). This element can represent amino acid or nucleic sequence change(including insertion,deletion,SNP,etc.)  It can represent some complex mutation or segment variation with the assist of CIGAR string.
@@ -153,6 +155,7 @@ class MolecularSequenceVariant(BackboneElement):
         description="Pointer to observed variant information",
         default=None,
     )
+
 
 class MolecularSequenceQualityRoc(BackboneElement):
     """
@@ -222,6 +225,7 @@ class MolecularSequenceQualityRoc(BackboneElement):
         default=None,
         alias="_fMeasure",
     )
+
 
 class MolecularSequenceQuality(BackboneElement):
     """
@@ -344,6 +348,7 @@ class MolecularSequenceQuality(BackboneElement):
         default=None,
     )
 
+
 class MolecularSequenceRepository(BackboneElement):
     """
     Configurations of the external repository. The repository shall store target's observedSeq or records related with target's observedSeq.
@@ -404,6 +409,7 @@ class MolecularSequenceRepository(BackboneElement):
         alias="_readsetId",
     )
 
+
 class MolecularSequenceStructureVariantOuter(BackboneElement):
     """
     Structural variant outer.
@@ -428,6 +434,7 @@ class MolecularSequenceStructureVariantOuter(BackboneElement):
         alias="_end",
     )
 
+
 class MolecularSequenceStructureVariantInner(BackboneElement):
     """
     Structural variant inner.
@@ -451,6 +458,7 @@ class MolecularSequenceStructureVariantInner(BackboneElement):
         default=None,
         alias="_end",
     )
+
 
 class MolecularSequenceStructureVariant(BackboneElement):
     """
@@ -487,6 +495,7 @@ class MolecularSequenceStructureVariant(BackboneElement):
         description="Structural variant inner",
         default=None,
     )
+
 
 class MolecularSequence(DomainResource):
     """
@@ -595,6 +604,16 @@ class MolecularSequence(DomainResource):
     )
 
     @model_validator(mode="after")
+    def FHIR_msq_3_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="coordinateSystem = 1 or coordinateSystem = 0",
+            human="Only 0 and 1 are valid for coordinateSystem",
+            key="msq-3",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
     def FHIR_msq_5_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -613,15 +632,5 @@ class MolecularSequence(DomainResource):
             expression="(genomeBuild.count()+referenceSeqId.count()+ referenceSeqPointer.count()+ referenceSeqString.count()) = 1",
             human="Have and only have one of the following elements in referenceSeq : 1. genomeBuild ; 2 referenceSeqId; 3. referenceSeqPointer;  4. referenceSeqString;",
             key="msq-6",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_msq_3_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="coordinateSystem = 1 or coordinateSystem = 0",
-            human="Only 0 and 1 are valid for coordinateSystem",
-            key="msq-3",
             severity="error",
         )

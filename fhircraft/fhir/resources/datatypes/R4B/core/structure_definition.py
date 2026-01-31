@@ -31,6 +31,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class StructureDefinitionMapping(BackboneElement):
     """
     An external specification that the content is mapped to.
@@ -73,6 +74,7 @@ class StructureDefinitionMapping(BackboneElement):
         alias="_comment",
     )
 
+
 class StructureDefinitionContext(BackboneElement):
     """
     Identifies the types of resource or data type elements to which the extension can be applied.
@@ -97,6 +99,7 @@ class StructureDefinitionContext(BackboneElement):
         alias="_expression",
     )
 
+
 class StructureDefinitionSnapshot(BackboneElement):
     """
     A snapshot view is expressed in a standalone form that can be used and interpreted without considering the base StructureDefinition.
@@ -107,16 +110,6 @@ class StructureDefinitionSnapshot(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_sdf_10_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("element",),
-            expression="binding.empty() or binding.valueSet.exists() or binding.description.exists()",
-            human="provide either a binding reference or a description (or both)",
-            key="sdf-10",
-            severity="error",
-        )
 
 class StructureDefinitionDifferential(BackboneElement):
     """
@@ -127,6 +120,7 @@ class StructureDefinitionDifferential(BackboneElement):
         description="Definition of elements in the resource (if no StructureDefinition)",
         default=None,
     )
+
 
 class StructureDefinition(DomainResource):
     """
@@ -503,6 +497,17 @@ class StructureDefinition(DomainResource):
             expression="children().element.where(path.contains('.').not()).label.empty() and children().element.where(path.contains('.').not()).code.empty() and children().element.where(path.contains('.').not()).requirements.empty()",
             human='In any snapshot or differential, no label, code or requirements on an element without a "." in the path (e.g. the first element)',
             key="sdf-9",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_sdf_10_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("snapshot.element",),
+            expression="binding.empty() or binding.valueSet.exists() or binding.description.exists()",
+            human="provide either a binding reference or a description (or both)",
+            key="sdf-10",
             severity="error",
         )
 

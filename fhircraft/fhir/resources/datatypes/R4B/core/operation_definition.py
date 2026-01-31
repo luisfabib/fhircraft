@@ -28,6 +28,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class OperationDefinitionParameterBinding(BackboneElement):
     """
     Binds to a value set if this parameter is coded (code, Coding, CodeableConcept).
@@ -52,6 +53,7 @@ class OperationDefinitionParameterBinding(BackboneElement):
         alias="_valueSet",
     )
 
+
 class OperationDefinitionParameterReferencedFrom(BackboneElement):
     """
     Identifies other resource parameters within the operation invocation that are expected to resolve to this resource.
@@ -75,6 +77,7 @@ class OperationDefinitionParameterReferencedFrom(BackboneElement):
         default=None,
         alias="_sourceId",
     )
+
 
 class OperationDefinitionParameter(BackboneElement):
     """
@@ -168,6 +171,7 @@ class OperationDefinitionParameter(BackboneElement):
         default=None,
     )
 
+
 class OperationDefinitionOverload(BackboneElement):
     """
     Defines an appropriate combination of parameters to use when invoking this operation, to help code generators when generating overloaded parameter sets for this operation.
@@ -191,6 +195,7 @@ class OperationDefinitionOverload(BackboneElement):
         default=None,
         alias="_comment",
     )
+
 
 class OperationDefinition(DomainResource):
     """
@@ -424,6 +429,16 @@ class OperationDefinition(DomainResource):
     )
 
     @model_validator(mode="after")
+    def FHIR_opd_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="name.exists() implies name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="opd-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_opd_1_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -454,14 +469,4 @@ class OperationDefinition(DomainResource):
             human="A targetProfile can only be specified for parameters of type Reference or Canonical",
             key="opd-3",
             severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_opd_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="opd-0",
-            severity="warning",
         )

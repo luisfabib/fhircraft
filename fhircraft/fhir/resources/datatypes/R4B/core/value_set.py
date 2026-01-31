@@ -32,6 +32,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ValueSetComposeIncludeConceptDesignation(BackboneElement):
     """
     Additional representations for this concept when used in this value set - other languages, aliases, specialized purposes, used for particular purposes, etc.
@@ -55,6 +56,7 @@ class ValueSetComposeIncludeConceptDesignation(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class ValueSetComposeIncludeConcept(BackboneElement):
     """
@@ -83,6 +85,7 @@ class ValueSetComposeIncludeConcept(BackboneElement):
         description="Additional representations for this concept",
         default=None,
     )
+
 
 class ValueSetComposeIncludeFilter(BackboneElement):
     """
@@ -117,6 +120,7 @@ class ValueSetComposeIncludeFilter(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class ValueSetComposeInclude(BackboneElement):
     """
@@ -159,6 +163,7 @@ class ValueSetComposeInclude(BackboneElement):
         alias="_valueSet",
     )
 
+
 class ValueSetComposeExclude(BackboneElement):
     """
     Exclude one or more codes from the value set based on code system filters and/or other value sets.
@@ -200,6 +205,7 @@ class ValueSetComposeExclude(BackboneElement):
         alias="_valueSet",
     )
 
+
 class ValueSetCompose(BackboneElement):
     """
     A set of criteria that define the contents of the value set by including or excluding codes selected from the specified code system(s) that the value set draws from. This is also known as the Content Logical Definition (CLD).
@@ -232,38 +238,6 @@ class ValueSetCompose(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_vsd_1_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("include",),
-            expression="valueSet.exists() or system.exists()",
-            human="A value set include/exclude SHALL have a value set or a system",
-            key="vsd-1",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_vsd_2_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("include",),
-            expression="(concept.exists() or filter.exists()) implies system.exists()",
-            human="A value set with concepts or filters SHALL include a system",
-            key="vsd-2",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_vsd_3_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("include",),
-            expression="concept.empty() or filter.empty()",
-            human="Cannot have both concept and filter",
-            key="vsd-3",
-            severity="error",
-        )
 
 class ValueSetExpansionParameter(BackboneElement):
     """
@@ -359,6 +333,7 @@ class ValueSetExpansionParameter(BackboneElement):
             required=False,
         )
 
+
 class ValueSetExpansionContainsDesignation(BackboneElement):
     """
     Additional representations for this item - other languages, aliases, specialized purposes, used for particular purposes, etc. These are relevant when the conditions of the expansion do not fix to a single correct representation.
@@ -382,6 +357,7 @@ class ValueSetExpansionContainsDesignation(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class ValueSetExpansionContains(BackboneElement):
     """
@@ -451,6 +427,7 @@ class ValueSetExpansionContains(BackboneElement):
         default=None,
     )
 
+
 class ValueSetExpansion(BackboneElement):
     """
     A value set can also be "expanded", where the value set is turned into a simple collection of enumerated codes. This element holds the expansion, if it has been performed.
@@ -501,38 +478,6 @@ class ValueSetExpansion(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_vsd_6_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("contains",),
-            expression="code.exists() or display.exists()",
-            human="SHALL have a code or a display",
-            key="vsd-6",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_vsd_9_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("contains",),
-            expression="code.exists() or abstract = true",
-            human="Must have a code if not abstract",
-            key="vsd-9",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_vsd_10_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("contains",),
-            expression="code.empty() or system.exists()",
-            human="Must have a system if a code is present",
-            key="vsd-10",
-            severity="error",
-        )
 
 class ValueSet(DomainResource):
     """
@@ -696,4 +641,70 @@ class ValueSet(DomainResource):
             human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
             key="vsd-0",
             severity="warning",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_vsd_1_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("compose.include",),
+            expression="valueSet.exists() or system.exists()",
+            human="A value set include/exclude SHALL have a value set or a system",
+            key="vsd-1",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_vsd_2_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("compose.include",),
+            expression="(concept.exists() or filter.exists()) implies system.exists()",
+            human="A value set with concepts or filters SHALL include a system",
+            key="vsd-2",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_vsd_3_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("compose.include",),
+            expression="concept.empty() or filter.empty()",
+            human="Cannot have both concept and filter",
+            key="vsd-3",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_vsd_6_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("expansion.contains",),
+            expression="code.exists() or display.exists()",
+            human="SHALL have a code or a display",
+            key="vsd-6",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_vsd_9_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("expansion.contains",),
+            expression="code.exists() or abstract = true",
+            human="Must have a code if not abstract",
+            key="vsd-9",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_vsd_10_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("expansion.contains",),
+            expression="code.empty() or system.exists()",
+            human="Must have a system if a code is present",
+            key="vsd-10",
+            severity="error",
         )

@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class QuestionnaireItemEnableWhen(BackboneElement):
     """
     A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
@@ -163,6 +164,7 @@ class QuestionnaireItemEnableWhen(BackboneElement):
             required=True,
         )
 
+
 class QuestionnaireItemAnswerOption(BackboneElement):
     """
     One of the permitted answers for a "choice" or "open-choice" question.
@@ -237,6 +239,7 @@ class QuestionnaireItemAnswerOption(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class QuestionnaireItemInitial(BackboneElement):
     """
@@ -360,6 +363,7 @@ class QuestionnaireItemInitial(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class QuestionnaireItem(BackboneElement):
     """
@@ -486,16 +490,6 @@ class QuestionnaireItem(BackboneElement):
         default=None,
     )
 
-    @model_validator(mode="after")
-    def FHIR_que_7_constraint_validator(self):
-        return fhir_validators.validate_element_constraint(
-            self,
-            elements=("enableWhen",),
-            expression="operator = 'exists' implies (answer is boolean)",
-            human="If the operator is 'exists', the value must be a boolean",
-            key="que-7",
-            severity="error",
-        )
 
 class Questionnaire(DomainResource):
     """
@@ -683,6 +677,16 @@ class Questionnaire(DomainResource):
     )
 
     @model_validator(mode="after")
+    def FHIR_que_0_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="name.exists() implies name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
+            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
+            key="que-0",
+            severity="warning",
+        )
+
+    @model_validator(mode="after")
     def FHIR_que_1a_constraint_validator(self):
         return fhir_validators.validate_element_constraint(
             self,
@@ -712,6 +716,16 @@ class Questionnaire(DomainResource):
             expression="type='display' implies item.empty()",
             human="Display items cannot have child items",
             key="que-1c",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_que_2_constraint_model_validator(self):
+        return fhir_validators.validate_model_constraint(
+            self,
+            expression="descendants().linkId.isDistinct()",
+            human="The link ids for groups and questions must be unique within the questionnaire",
+            key="que-2",
             severity="error",
         )
 
@@ -756,6 +770,17 @@ class Questionnaire(DomainResource):
             expression="type!='display' or (required.empty() and repeats.empty())",
             human="Required and repeat aren't permitted for display items",
             key="que-6",
+            severity="error",
+        )
+
+    @model_validator(mode="after")
+    def FHIR_que_7_constraint_validator(self):
+        return fhir_validators.validate_element_constraint(
+            self,
+            elements=("item.enableWhen",),
+            expression="operator = 'exists' implies (answer is boolean)",
+            human="If the operator is 'exists', the value must be a boolean",
+            key="que-7",
             severity="error",
         )
 
@@ -822,25 +847,5 @@ class Questionnaire(DomainResource):
             expression="repeats=true or initial.count() <= 1",
             human="Can only have multiple initial values for repeating items",
             key="que-13",
-            severity="error",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_que_0_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="name.exists() implies name.matches('[A-Z]([A-Za-z0-9_]){0,254}')",
-            human="Name should be usable as an identifier for the module by machine processing applications such as code generation",
-            key="que-0",
-            severity="warning",
-        )
-
-    @model_validator(mode="after")
-    def FHIR_que_2_constraint_model_validator(self):
-        return fhir_validators.validate_model_constraint(
-            self,
-            expression="descendants().linkId.isDistinct()",
-            human="The link ids for groups and questions must be unique within the questionnaire",
-            key="que-2",
             severity="error",
         )
