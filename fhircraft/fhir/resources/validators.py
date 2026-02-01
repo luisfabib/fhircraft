@@ -139,25 +139,63 @@ def validate_element_constraint(
     """
     values = {}
 
-    def _get_path_value(obj: Any, element: str, path="") -> Any:
-        parts = element.split(".")
-        current = obj
-        for part in parts:
-            path += f".{part}" if path else part
-            if isinstance(current, list):
-                for idx, item in enumerate(current):
-                    path = f"{path}[{idx}]"
-                    _get_path_value(item, ".".join(parts[parts.index(part) :]), path)
+    def _get_path_value(obj: Any, element_path: str, current_path: str = "") -> None:
+        """
+        Recursively extract values from nested object paths, handling lists correctly.
+
+        Args:
+            obj: Current object to traverse
+            element_path: Remaining path to traverse (dot-separated)
+            current_path: Path traversed so far (for error reporting)
+        """
+        if not element_path:
+            # We've reached the end of the path
+            values[current_path] = obj
+            return
+
+        parts = element_path.split(".", 1)
+        current_attr = parts[0]
+        remaining_path = parts[1] if len(parts) > 1 else ""
+
+        # Build the new current path
+        new_current_path = (
+            f"{current_path}.{current_attr}" if current_path else current_attr
+        )
+
+        # Get the attribute value
+        current_value = getattr(obj, current_attr, None) if obj is not None else None
+
+        if current_value is None:
+            # Attribute doesn't exist or is None
+            values[
+                (
+                    new_current_path
+                    if not remaining_path
+                    else f"{new_current_path}.{remaining_path}"
+                )
+            ] = None
+            return
+
+        if isinstance(current_value, list):
+            if not remaining_path:
+                # We want the list itself
+                values[new_current_path] = current_value
             else:
-                current = getattr(current, part, None)
-            if current is None:
-                break
+                # We need to traverse into each item in the list
+                for idx, item in enumerate(current_value):
+                    item_path = f"{new_current_path}[{idx}]"
+                    _get_path_value(item, remaining_path, item_path)
         else:
-            values[path] = current
-        return current
+            if not remaining_path:
+                # We want this value
+                values[new_current_path] = current_value
+            else:
+                # Continue traversing
+                _get_path_value(current_value, remaining_path, new_current_path)
 
     for element_path in elements:
         _get_path_value(instance, element_path)
+
     for path, value in values.items():
         _validate_FHIR_element_constraint(
             value, instance, expression, human, key, severity, element=path
