@@ -78,11 +78,6 @@
   "profile": [
     "http://hl7.org/fhir/StructureDefinition/Bundle"
   ],
-  "_profile": [
-    {
-      "id": "bundle-profile"
-    }
-  ],
   "variable": [
     {
       "name": "PatientCreateLocation",

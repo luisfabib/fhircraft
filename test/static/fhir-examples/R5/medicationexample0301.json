@@ -12,11 +12,6 @@
       "name": "Medication Manufacturer"
     }
   ],
-  "identifier": [
-    {
-      "id": "123456789"
-    }
-  ],
   "code": {
     "coding": [
       {
