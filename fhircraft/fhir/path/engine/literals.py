@@ -22,20 +22,33 @@ class Quantity(FHIRPathLiteralType):
     value: Union[int, float]
     unit: Optional[str]
 
+
+    @property
+    def registry_unit(self) -> PintQuantity:
+        return ureg(self.unit or "")
+
+    def is_compatible_with(self, unit: "Quantity") -> bool:
+        print(self.registry_unit)
+        return self.registry_unit.is_compatible_with(unit.registry_unit)
+
     def __comparison__(self, other, op) -> bool:
         if isinstance(other, Quantity):
+            if not self.is_compatible_with(other):
+                raise ValueError(
+                    f"Cannot perform logical comparisons between incompatible units: {self.unit} and {other.unit}"
+                )
             return op(
-                self.value * ureg(self.unit or ""), other.value * ureg(other.unit or "")
+                self.value * self.registry_unit, other.value * other.registry_unit
             )
         elif isinstance(other, (int, float)) and self.unit in (None, ""):
             return op(self.value, other)
         else:
             return False
-
+    
     def __math__(self, other, op) -> PintQuantity:
         if isinstance(other, Quantity):
             return op(
-                self.value * ureg(self.unit or ""), other.value * ureg(other.unit or "")
+                self.value * self.registry_unit, other.value * other.registry_unit
             )
         elif isinstance(other, (int, float)):
             return op(self.value, other)
@@ -62,6 +75,10 @@ class Quantity(FHIRPathLiteralType):
 
     def __add__(self, other):
         result = self.__math__(other, operator.add)
+        if not self.is_compatible_with(other):
+            raise ValueError(
+                f"Cannot perform additions between incompatible units: {self.unit} and {other.unit}"
+            )
         return Quantity(
             value=result.to(self.unit).magnitude,
             unit=self.unit,
@@ -69,6 +86,10 @@ class Quantity(FHIRPathLiteralType):
 
     def __sub__(self, other):
         result = self.__math__(other, operator.sub)
+        if not self.is_compatible_with(other):
+            raise ValueError(
+                f"Cannot perform subtractions between incompatible units: {self.unit} and {other.unit}"
+            )
         return Quantity(
             value=result.to(self.unit).magnitude,
             unit=self.unit,

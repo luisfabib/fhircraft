@@ -6,6 +6,11 @@ def test_fhirpath_type_quantity_init():
     assert isinstance(value, Quantity)
 
 
+
+def test_fhirpath_type_quantity_is_compatible_with():
+    assert Quantity(value=1, unit="m").is_compatible_with(Quantity(value=1, unit="m"))
+    assert not Quantity(value=1, unit="m").is_compatible_with(Quantity(value=1, unit="s"))
+
 def test_fhirpath_type_quantity_eq():
     assert Quantity(value=1, unit="m") == Quantity(value=1, unit="m")
     assert Quantity(value=1, unit="m") == Quantity(value=100, unit="cm")
