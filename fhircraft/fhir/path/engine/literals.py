@@ -48,6 +48,13 @@ class Quantity(FHIRPathLiteralType):
 
     @property
     def registry_unit(self) -> PintQuantity:
+        _unit = self.unit or ""
+        # UCUM square brackets not supported by Pint; replace with nothing
+        _unit = _unit.replace("[", "").replace("]", "")
+        # UCUM single-quotes not supported by Pint; replace with underscores
+        _unit = _unit.replace("'", "_")
+        # UCUM curly braces not supported by Pint; replace with nothing
+        _unit = re.sub(r"\{.*?\}", "_1", _unit)
         return ureg(self.unit or "")
 
     def is_compatible_with(self, unit: "Quantity") -> bool:
@@ -102,7 +109,7 @@ class Quantity(FHIRPathLiteralType):
                 f"Cannot perform additions between incompatible units: {self.unit} and {other.unit}"
             )
         return Quantity(
-            value=result.to(self.unit).magnitude,
+            value=result.to(self.registry_unit).magnitude,
             unit=self.unit,
         )
 
@@ -113,7 +120,7 @@ class Quantity(FHIRPathLiteralType):
                 f"Cannot perform subtractions between incompatible units: {self.unit} and {other.unit}"
             )
         return Quantity(
-            value=result.to(self.unit).magnitude,
+            value=result.to(self.registry_unit).magnitude,
             unit=self.unit,
         )
 

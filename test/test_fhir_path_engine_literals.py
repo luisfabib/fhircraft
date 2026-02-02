@@ -32,6 +32,9 @@ def test_fhirpath_type_quantity_eq():
     assert Quantity(value=1, unit="m") == Quantity(value=1, unit="m")
     assert Quantity(value=1, unit="m") == Quantity(value=100, unit="cm")
     assert Quantity(value=1, unit="km") == Quantity(value=100000, unit="cm")
+    assert Quantity(value=10, unit="{mutations}") == Quantity(value=1, unit="da{mutations}")
+    assert Quantity(value=10, unit="mm[Hg]") == Quantity(value=10, unit="mm[Hg]")
+    assert Quantity(value=10, unit="[arb'U]") == Quantity(value=10, unit="[arb'U]")
 
 
 def test_fhirpath_type_quantity_gt():
@@ -67,7 +70,9 @@ def test_fhirpath_type_quantity_add():
     assert Quantity(value=1, unit="g") + Quantity(value=1, unit="kg") == Quantity(
         value=1001, unit="g"
     )
-
+    assert Quantity(value=1, unit="{mutations}") + Quantity(value=1, unit="k{mutations}") == Quantity(
+        value=1001, unit="{mutations}"
+    )
 
 def test_fhirpath_type_quantity_sub():
     assert Quantity(value=2, unit="m") - Quantity(value=2, unit="m") == Quantity(
@@ -79,6 +84,9 @@ def test_fhirpath_type_quantity_sub():
     assert Quantity(value=1, unit="kg") - Quantity(value=500, unit="g") == Quantity(
         value=0.5, unit="kg"
     )
+    assert Quantity(value=10, unit="k{mutations}") - Quantity(value=100, unit="da{mutations}") == Quantity(
+        value=9, unit="k{mutations}"
+    )
 
 
 def test_fhirpath_type_quantity_prod():
@@ -88,11 +96,17 @@ def test_fhirpath_type_quantity_prod():
     assert Quantity(value=3, unit="m") * Quantity(value=2, unit="m") == Quantity(
         value=6, unit="m*m"
     )
+    assert Quantity(value=2, unit="{mutations}") * Quantity(value=10, unit="{mutations}") == Quantity(
+        value=20, unit="{mutations}"
+    )
 
 
 def test_fhirpath_type_quantity_div():
     assert Quantity(value=6, unit="m") / Quantity(value=2, unit="s") == Quantity(
         value=3, unit="m/s"
+    )
+    assert Quantity(value=2, unit="{mutations}") / Quantity(value=10, unit="k{mutations}") == Quantity(
+        value=0.2, unit="{mutations}/k{mutations}"
     )
 
 
