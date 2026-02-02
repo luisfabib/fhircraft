@@ -7,9 +7,9 @@ from fhircraft.fhir.path.engine.core import (
     FHIRPathCollectionItem,
 )
 from fhircraft.fhir.path.engine.existence import Empty, Exists
-from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
+from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.fhir.resources.datatypes.R4.complex import Quantity as R4_Quantity, Age as R4_Age
 
-Quantity = get_complex_FHIR_type("Quantity")
 
 env = dict()
 
@@ -103,6 +103,10 @@ toBoolean_cases = (
     ("t", True),
     ("yes", True),
     ("y", True),
+    ("True", True),
+    ("T", True),
+    ("Yes", True),
+    ("Y", True),
     ("1", True),
     ("1.0", True),
     (1, True),
@@ -111,6 +115,10 @@ toBoolean_cases = (
     ("f", False),
     ("no", False),
     ("n", False),
+    ("False", False),
+    ("F", False),
+    ("No", False),
+    ("N", False),
     ("0", False),
     ("0.0", False),
     (0, False),
@@ -156,8 +164,12 @@ def test_convertstoboolean_returns_empty_for_invalid_type():
 convertsToBoolean_cases = (
     ("true"),
     ("t"),
+    ("True"),
+    ("T"),
     ("yes"),
     ("y"),
+    ("Yes"),
+    ("Y"),
     ("1"),
     ("1.0"),
     (1),
@@ -166,6 +178,10 @@ convertsToBoolean_cases = (
     ("f"),
     ("no"),
     ("n"),
+    ("False"),
+    ("F"),
+    ("No"),
+    ("N"),
     ("0"),
     ("0.0"),
     (0),
@@ -254,10 +270,10 @@ def test_convertstointeger_returns_empty_for_invalid_type():
 
 
 convertstointeger_cases = (
-    ("4"),
-    (4),
-    ("-4"),
-    (-4),
+    ("14"),
+    (14),
+    ("-14"),
+    (-14),
     (True),
     (False),
 )
@@ -299,8 +315,9 @@ def test_todecimal_returns_empty_for_invalid_type():
 
 
 todecimal_cases = (
-    ("14.0", 14.0),
+    ("14.5", 14.5),
     ("14", 14.0),
+    (14.5, 14.5),
     (14, 14.0),
     (True, 1.0),
     (False, 0.0),
@@ -343,8 +360,9 @@ def test_convertstodecimal_returns_empty_for_invalid_type():
 
 
 convertstodecimal_cases = (
-    ("14.0"),
+    ("14.5"),
     ("14"),
+    (14.5),
     (14),
     (True),
     (False),
@@ -563,11 +581,16 @@ def test_toquantity_returns_empty_for_invalid_type():
 
 
 toquantity_cases = (
+    ("12.5 mg[Hg]", Quantity(value=12.5, unit="mg[Hg]")),
     ("12.5 mg", Quantity(value=12.5, unit="mg")),
-    (12.5, Quantity(value=12.5, unit="1")),
-    (5, Quantity(value=5, unit="1")),
-    (True, Quantity(value=1.0, unit="1")),
-    (False, Quantity(value=0.0, unit="1")),
+    ("12.5", Quantity(value=12.5, unit="")),
+    (12.5, Quantity(value=12.5, unit="")),
+    (5, Quantity(value=5, unit="")),
+    (True, Quantity(value=1.0, unit="")),
+    (False, Quantity(value=0.0, unit="")),
+    (Quantity(value=12.5, unit="mg"), Quantity(value=12.5, unit="mg")),
+    (R4_Quantity(value=12.5, unit="mg"), Quantity(value=12.5, unit="mg")),
+    (R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org"), Quantity(value=12.5, unit="a")),
 )
 
 
@@ -575,7 +598,7 @@ toquantity_cases = (
 def test_toquantity_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToQuantity().evaluate(collection, env)
-    assert result == [FHIRPathCollectionItem.wrap(expected)]
+    assert result[0].value == expected
 
 
 def test_toQuantity_raises_error_for_multiple_items():
@@ -607,12 +630,16 @@ def test_convertstoquantity_returns_empty_for_invalid_type():
 
 
 convertstoquantity_cases = (
+    ("12.5 mg[Hg]"),
     ("12.5 mg"),
     (12.5),
     (5),
     (True),
     (False),
-    (Quantity(value=0.0, unit="1")),
+    (Quantity(value=0.0, unit="")),
+    (Quantity(value=12.5, unit="mg")),
+    (R4_Quantity(value=12.5, unit="mg")),
+    (R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org")),
 )
 
 
@@ -660,6 +687,8 @@ toString_cases = (
     (True, "true"),
     (False, "false"),
     (Quantity(value=12.5, unit="mg"), "12.5 mg"),
+    (R4_Quantity(value=12.5, unit="mg"), "12.5 mg"),
+    (R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org"), "12.5 a"),
     ("2014-02-01T00:00:00.000Z", "2014-02-01T00:00:00.000Z"),
 )
 
@@ -708,6 +737,9 @@ convertstostring_cases = (
     (True),
     (False),
     (Quantity(value=12.5, unit="mg")),
+    (Quantity(value=12.5, unit="mg")),
+    (R4_Quantity(value=12.5, unit="mg")),
+    (R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org")),
 )
 
 

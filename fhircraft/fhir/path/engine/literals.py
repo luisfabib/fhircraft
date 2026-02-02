@@ -137,6 +137,9 @@ class Quantity(FHIRPathLiteralType):
             value=result.magnitude,
             unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "",
         )
+    
+    def __repr__(self):
+        return f"Quantity({self.value}, '{self.unit}')"
 
 
 @dataclass

@@ -6,6 +6,7 @@ that require a function in this section to be called explicitly.
 import re
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
+from fhircraft.fhir.path.engine.literals import Quantity
 from fhircraft.fhir.path.engine.core import (
     FHIRPath,
     FHIRPathCollection,
@@ -559,31 +560,29 @@ class ToQuantity(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
-        from fhircraft.fhir.resources.datatypes.utils import get_complex_FHIR_type
 
         self.validate_collection(collection)
-        Quantity = get_complex_FHIR_type("Quantity")
         if not collection:
             return []
         value = collection[0].value
         if isinstance(value, (bool, int, float)):
-            return [FHIRPathCollectionItem.wrap(Quantity(value=float(value), unit="1"))]
+            return [FHIRPathCollectionItem.wrap(Quantity(value=float(value), unit=""))]
         elif isinstance(value, str):
             quantity_match = re.match(
-                r"((\+|-)?\d+(\.\d+)?)\s*(('([^']+)'|([a-zA-Z]+))?)", value
+                r"((\+|-)?\d+(\.\d+)?)\s*(('([^']+)'|([a-zA-Z\[\]]+))?)", value
             )
             if quantity_match:
                 return [
                     FHIRPathCollectionItem.wrap(
                         Quantity(
-                            value=quantity_match.group(1), unit=quantity_match.group(4)
+                            value=float(quantity_match.group(1)), unit=quantity_match.group(4)
                         )
                     )
                 ]
             else:
                 return []
-        elif isinstance(value, Quantity):
-            return [FHIRPathCollectionItem.wrap(value)]
+        elif Quantity.is_quantity(value):
+            return [FHIRPathCollectionItem.wrap(Quantity.parse_quantity(value))]
         else:
             return []
 
@@ -663,7 +662,8 @@ class ToString(FHIRTypeConversionFunction):
             return [FHIRPathCollectionItem.wrap("true" if value else "false")]
         elif isinstance(value, (str, int, float)):
             return [FHIRPathCollectionItem.wrap(str(value))]
-        elif isinstance(value, get_complex_FHIR_type("Quantity")):
+        elif Quantity.is_quantity(value):
+            value = Quantity.parse_quantity(value)
             return [FHIRPathCollectionItem.wrap(f"{value.value} {value.unit}")]
         else:
             return []
