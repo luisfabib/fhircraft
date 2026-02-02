@@ -7,6 +7,9 @@ from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
+from fhircraft.fhir.resources.datatypes.R4.complex import Quantity as R4_Quantity, Age as R4_Age 
+from fhircraft.fhir.resources.datatypes.R4B.complex import Quantity as R4B_Quantity
+from fhircraft.fhir.resources.datatypes.R5.complex import Quantity as R5_Quantity
 
 env = dict()
 
@@ -404,3 +407,35 @@ def test_comparable_same_units_with_fhirpath():
         collection, {"%quantity": Quantity(value=12, unit="mg")}
     )
     assert result[0].value == True
+
+def test_comparable_r4_fhir_quantity():
+    collection = [FHIRPathCollectionItem(value=R4_Quantity(value=10, unit="mg"))]
+    quantity = Quantity(
+        value=12,
+        unit="mg",
+    )
+    assert Comparable(quantity).single(collection, env) == True
+
+def test_comparable_r4_fhir_quantity_subclass():
+    collection = [FHIRPathCollectionItem(value=R4_Age(value=10, system="http://unitsofmeasure.org", code="a"))]
+    quantity = Quantity(
+        value=12,
+        unit="s",
+    )
+    assert Comparable(quantity).single(collection, env) == True
+
+def test_comparable_r4b_fhir_quantity():
+    collection = [FHIRPathCollectionItem(value=R4B_Quantity(value=10, system="http://unitsofmeasure.org", code="mg"))]
+    quantity = Quantity(
+        value=12,
+        unit="mg",
+    )
+    assert Comparable(quantity).single(collection, env) == True
+
+def test_comparable_r5_fhir_quantity():
+    collection = [FHIRPathCollectionItem(value=R5_Quantity(value=10, system="http://unitsofmeasure.org", code="mg"))]
+    quantity = Quantity(
+        value=12,
+        unit="mg",
+    )
+    assert Comparable(quantity).single(collection, env) == True
