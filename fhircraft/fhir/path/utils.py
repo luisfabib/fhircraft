@@ -143,13 +143,11 @@ def evaluate_and_prepare_collection_values(
     from fhircraft.fhir.path.engine.core import Literal
 
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
-        from fhircraft.fhir.path.engine.literals import Quantity as FHIRPathQuantity, R4_Quantity, R4B_Quantity, R5_Quantity
+        from fhircraft.fhir.path.engine.literals import Quantity
         return [
             (
-                FHIRPathQuantity.parse_quantity(data)
-                if isinstance(
-                    (data := item.value), (FHIRPathQuantity, R4_Quantity, R4B_Quantity, R5_Quantity)
-                )
+                Quantity.parse_quantity(data)
+                if Quantity.is_quantity(data := item.value)
                 and data.value is not None
                 else data
             )
@@ -164,11 +162,11 @@ def evaluate_and_prepare_collection_values(
 
     if len(left_collection) > 1:
         raise FHIRPathRuntimeError(
-            f"FHIRPath operator {operator.__str__()} expected a single-item collection for the left expression, instead got a {len(collection)}-items collection."
+            f"FHIRPath operator {operator.__str__()} expected a single-item collection for the left expression, instead got a {len(left_collection)}-items collection."
         )
     if len(right_collection) > 1:
         raise FHIRPathRuntimeError(
-            f"FHIRPath operator {operator.__str__()} expected a single-item collection for the right expression, instead got a {len(collection)}-items collection."
+            f"FHIRPath operator {operator.__str__()} expected a single-item collection for the right expression, instead got a {len(right_collection)}-items collection."
         )
     if prevent_all_empty and (len(left_collection) == 0 or len(right_collection) == 0):
         return None, None

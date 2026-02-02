@@ -950,7 +950,7 @@ class Comparable(FHIRPathFunction):
             quantity = Literal(quantity)
         if not isinstance(quantity, FHIRPath):
             raise FHIRPathError(
-                "comparable() argument must be a Quantity or valid FHIRPath."
+                "comparable() argument must be a FHIRPath Quantity or valid FHIRPath."
             )
         self.quantity = quantity
 
@@ -972,7 +972,6 @@ class Comparable(FHIRPathFunction):
             return []
         elif len(collection) != 1:
             raise FHIRPathError("comparable() requires a singleton collection.")
-
         input_quantity: Quantity = Quantity.parse_quantity(collection[0].value)
         if not isinstance(
             quantity := self.quantity.single(collection, environment=environment),

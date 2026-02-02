@@ -5,7 +5,7 @@ import warnings
 from abc import ABC
 from dataclasses import dataclass
 from datetime import date, datetime, time
-from typing import Optional, Union
+from typing import Optional, Union, Any
 from pint import UnitRegistry, Quantity as PintQuantity
 from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
 from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
@@ -24,6 +24,12 @@ class FHIRPathLiteralType(ABC):
 class Quantity(FHIRPathLiteralType):
     value: Union[int, float]
     unit: Optional[str]
+
+    @classmethod
+    def is_quantity(cls, instance: Any) -> bool:
+        return isinstance(
+            instance, (cls, R4_Quantity, R4B_Quantity, R5_Quantity)
+        )
 
     @classmethod
     def parse_quantity(cls, instance: Union["Quantity", R4_Quantity, R4B_Quantity, R5_Quantity, int, float]) -> "Quantity":
