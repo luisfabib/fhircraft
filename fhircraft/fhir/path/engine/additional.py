@@ -534,11 +534,12 @@ class LowBoundary(FHIRPathFunction):
                 # Handle numeric values - determine precision and calculate boundary
                 low_boundary = self._get_numeric_low_boundary(value)
                 result.append(FHIRPathCollectionItem.wrap(low_boundary))
-            elif isinstance(value, Quantity):
+            elif Quantity.is_quantity(value):
+                value = Quantity.parse_quantity(value)
                 # Handle Quantity type
                 new_quantity = Quantity(
                     value=self._get_numeric_low_boundary(value.value),
-                    unit=value.unit if hasattr(value, "unit") else None,
+                    unit=value.unit or "",
                 )
                 result.append(FHIRPathCollectionItem.wrap(new_quantity))
             else:
@@ -626,11 +627,12 @@ class HighBoundary(FHIRPathFunction):
                 # Handle numeric values - determine precision and calculate boundary
                 high_boundary = self._get_numeric_high_boundary(value)
                 result.append(FHIRPathCollectionItem.wrap(high_boundary))
-            elif isinstance(value, Quantity):
+            elif Quantity.is_quantity(value):
+                value = Quantity.parse_quantity(value)
                 # Handle Quantity type
                 new_quantity = Quantity(
                     value=self._get_numeric_high_boundary(value.value),
-                    unit=value.unit if hasattr(value, "unit") else None,
+                    unit=value.unit or "",
                 )
                 result.append(FHIRPathCollectionItem.wrap(new_quantity))
             else:
