@@ -980,13 +980,14 @@ class Comparable(FHIRPathFunction):
             raise FHIRPathError("comparable() requires a singleton collection.")
         query_quantity = self.quantity.single(collection, environment=environment)
         collection_value = collection[0].value
-        if not collection_value or not query_quantity is None:
+        if (collection_value is None) or (query_quantity is None):
             return [FHIRPathCollectionItem.wrap(False)]
         if collection_value and not Quantity.is_quantity(collection_value):
             raise FHIRPathError(
                 f"Comparable() can only be called on Quantity types, got: {type(collection_value)}"
             )
         input_quantity: Quantity = Quantity.parse_quantity(collection_value)
+        query_quantity: Quantity = Quantity.parse_quantity(query_quantity)
 
         if query_quantity and not Quantity.is_quantity(query_quantity):
             raise FHIRPathError(
