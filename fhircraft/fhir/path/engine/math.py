@@ -79,15 +79,13 @@ class Addition(FHIRMathOperator):
             return []
         elif isinstance(left_value, str) and isinstance(right_value, str):
             return [FHIRPathCollectionItem.wrap(left_value + right_value)]
-        elif isinstance(left_value, (int, float)) and isinstance(
-            right_value, (int, float)
+        elif (
+            isinstance(left_value, (int, float)) 
+            and isinstance(right_value, (int, float))
+        ) or (
+            Quantity.is_quantity(left_value) 
+            and Quantity.is_quantity(right_value)
         ):
-            return [FHIRPathCollectionItem.wrap(left_value + right_value)]
-        elif isinstance(left_value, (Quantity)) and isinstance(right_value, (Quantity)):
-            if left_value.unit != right_value.unit:
-                raise FHIRPathRuntimeError(
-                    f"FHIRPath operator {self.__str__()} cannot add quantities with different units: {left_value.unit} and {right_value.unit}."
-                )
             return [FHIRPathCollectionItem.wrap(left_value + right_value)]
         else:
             raise FHIRPathRuntimeError(
@@ -130,15 +128,13 @@ class Subtraction(FHIRMathOperator):
         )
         if left_value is None or right_value is None:
             return []
-        elif isinstance(left_value, (int, float)) and isinstance(
-            right_value, (int, float)
+        elif (
+            isinstance(left_value, (int, float)) 
+            and isinstance(right_value, (int, float))
+        ) or (
+            Quantity.is_quantity(left_value) 
+            and Quantity.is_quantity(right_value)
         ):
-            return [FHIRPathCollectionItem.wrap(left_value - right_value)]
-        elif isinstance(left_value, (Quantity)) and isinstance(right_value, (Quantity)):
-            if left_value.unit != right_value.unit:
-                raise FHIRPathRuntimeError(
-                    f"FHIRPath operator {self.__str__()} cannot subtract quantities with different units: {left_value.unit} and {right_value.unit}."
-                )
             return [FHIRPathCollectionItem.wrap(left_value - right_value)]
         else:
             raise FHIRPathRuntimeError(
@@ -183,11 +179,13 @@ class Multiplication(FHIRMathOperator):
         )
         if left_value is None or right_value is None:
             return []
-        elif isinstance(left_value, (int, float)) and isinstance(
-            right_value, (int, float)
+        elif (
+            isinstance(left_value, (int, float)) 
+            and isinstance(right_value, (int, float))
+        ) or (
+            Quantity.is_quantity(left_value) 
+            and Quantity.is_quantity(right_value)
         ):
-            return [FHIRPathCollectionItem.wrap(left_value * right_value)]
-        elif isinstance(left_value, (Quantity)) and isinstance(right_value, (Quantity)):
             return [FHIRPathCollectionItem.wrap(left_value * right_value)]
         else:
             raise FHIRPathRuntimeError(
@@ -233,14 +231,18 @@ class Division(FHIRMathOperator):
         )
         if left_value is None or right_value is None:
             return []
-        if (isinstance(right_value, Quantity) and right_value.value == 0) or (
+        if (Quantity.is_quantity(right_value) and right_value.value == 0) or (
             isinstance(right_value, (int, float)) and right_value == 0
         ):
             return []
-        elif isinstance(left_value, (int, float, Quantity)) and isinstance(
-            right_value, (int, float, Quantity)
+        elif (
+            isinstance(left_value, (int, float)) 
+            and isinstance(right_value, (int, float))
+        ) or (
+            Quantity.is_quantity(left_value) 
+            and Quantity.is_quantity(right_value)
         ):
-            return [FHIRPathCollectionItem.wrap(left_value / right_value)]  # type: ignore
+            return [FHIRPathCollectionItem.wrap(left_value / right_value)]
         else:
             raise FHIRPathRuntimeError(
                 f"FHIRPath operator {self.__str__()} cannot divide {type(left_value).__name__} and {type(right_value).__name__}."
@@ -375,7 +377,7 @@ class FHIRPathMathFunction(FHIRPathFunction):
         value = collection[0].value
         if isinstance(value, (int, float)):
             value = self.math_operation(value)
-        elif isinstance(value, (Quantity)):
+        elif Quantity.is_quantity(value):
             value = Quantity(self.math_operation(value.value), value.unit)
         else:
             raise FHIRPathRuntimeError(

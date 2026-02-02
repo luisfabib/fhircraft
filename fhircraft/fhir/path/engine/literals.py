@@ -5,8 +5,13 @@ import warnings
 from abc import ABC
 from dataclasses import dataclass
 from datetime import date, datetime, time
-from typing import Optional, Union
+from typing import Optional, Union, Any, TYPE_CHECKING
 from pint import UnitRegistry, Quantity as PintQuantity
+
+if TYPE_CHECKING:
+    from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
+    from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
+    from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
 
 # Load the Pint unit registry with UCUM definitions
 ureg = UnitRegistry()
@@ -22,22 +27,68 @@ class Quantity(FHIRPathLiteralType):
     value: Union[int, float]
     unit: Optional[str]
 
+    @classmethod
+    def is_quantity(cls, instance: Any) -> bool:
+        from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
+        from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
+        from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
+        return isinstance(
+            instance, (cls, R4_Quantity, R4B_Quantity, R5_Quantity)
+        )
+
+    @classmethod
+    def parse_quantity(cls, instance: Union["Quantity", "R4_Quantity", "R4B_Quantity", "R5_Quantity", int, float]) -> "Quantity":
+        from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
+        from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
+        from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
+
+        if isinstance(instance, Quantity):
+            return instance
+        elif isinstance(instance, (R4_Quantity, R4B_Quantity, R5_Quantity)):
+            if instance.system not in (None, "http://unitsofmeasure.org"):
+                warnings.warn(
+                    f"Quantity with non-UCUM system '{instance.system}' may not be parsed correctly."
+                )
+            return cls(value=instance.value, unit=instance.code or instance.unit)
+        elif isinstance(instance, (int, float)):
+            return cls(value=instance, unit="")
+        else:
+            raise TypeError("Input must be a FHIRPath Quantity or FHIR Quantity type.")
+
+    @property
+    def registry_unit(self) -> PintQuantity:
+        _unit = self.unit or ""
+        # UCUM square brackets not supported by Pint; replace with nothing
+        _unit = _unit.replace("[", "").replace("]", "")
+        # UCUM single-quotes not supported by Pint; replace with underscores
+        _unit = _unit.replace("'", "_")
+        # UCUM curly braces not supported by Pint; replace with nothing
+        _unit = re.sub(r"\{.*?\}", "_1", _unit)
+        return ureg(_unit)
+
+    def is_compatible_with(self, unit: "Quantity") -> bool:
+        return self.registry_unit.is_compatible_with(unit.registry_unit)
+
     def __comparison__(self, other, op) -> bool:
         if isinstance(other, Quantity):
+            if not self.is_compatible_with(other):
+                raise ValueError(
+                    f"Cannot perform logical comparisons between incompatible units: {self.unit} and {other.unit}"
+                )
             return op(
-                self.value * ureg(self.unit or ""), other.value * ureg(other.unit or "")
+                self.value * self.registry_unit, other.value * other.registry_unit
             )
-        elif isinstance(other, (int, float)) and self.unit in (None, "1"):
+        elif isinstance(other, (int, float)) and not self.unit:
             return op(self.value, other)
         else:
             return False
-
+    
     def __math__(self, other, op) -> PintQuantity:
         if isinstance(other, Quantity):
             return op(
-                self.value * ureg(self.unit or ""), other.value * ureg(other.unit or "")
+                self.value * self.registry_unit, other.value * other.registry_unit
             )
-        elif isinstance(other, (int, float)):
+        elif isinstance(other, (int, float)) and not self.unit:
             return op(self.value, other)
         else:
             raise TypeError(f"Operations with {type(other)} not supported")
@@ -62,15 +113,23 @@ class Quantity(FHIRPathLiteralType):
 
     def __add__(self, other):
         result = self.__math__(other, operator.add)
+        if not self.is_compatible_with(other):
+            raise ValueError(
+                f"Cannot perform additions between incompatible units: {self.unit} and {other.unit}"
+            )
         return Quantity(
-            value=result.to(self.unit).magnitude,
+            value=result.to(self.registry_unit).magnitude,
             unit=self.unit,
         )
 
     def __sub__(self, other):
         result = self.__math__(other, operator.sub)
+        if not self.is_compatible_with(other):
+            raise ValueError(
+                f"Cannot perform subtractions between incompatible units: {self.unit} and {other.unit}"
+            )
         return Quantity(
-            value=result.to(self.unit).magnitude,
+            value=result.to(self.registry_unit).magnitude,
             unit=self.unit,
         )
 
@@ -85,15 +144,18 @@ class Quantity(FHIRPathLiteralType):
         result = self.__math__(other, operator.floordiv)
         return Quantity(
             value=result.magnitude,
-            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "1",
+            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "",
         )
 
     def __truediv__(self, other):
         result = self.__math__(other, operator.truediv)
         return Quantity(
             value=result.magnitude,
-            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "1",
+            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "",
         )
+    
+    def __repr__(self):
+        return f"Quantity({self.value}, '{self.unit}')"
 
 
 @dataclass

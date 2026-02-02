@@ -54,6 +54,9 @@ pptr = 1e-12
 
 _10 = 10
 
+_1 = 1 = _
+
+
 carat_of_gold_alloys = 1 / 24 = _ = car_Au
 Hounsfield_unit = 1 = _ = hnsf_U
 
