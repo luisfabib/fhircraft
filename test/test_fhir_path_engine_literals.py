@@ -1,10 +1,27 @@
 from fhircraft.fhir.path.engine.literals import *
 
+from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
+from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
+from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
 
 def test_fhirpath_type_quantity_init():
     value = Quantity(value=1, unit="m")
     assert isinstance(value, Quantity)
 
+
+def test_fhirpath_type_quantity_parse_quantity():
+    value = Quantity.parse_quantity(Quantity(value=1, unit="m"))
+    assert isinstance(value, Quantity)
+    value_r4 = Quantity.parse_quantity(R4_Quantity(value=1, unit="m"))
+    assert isinstance(value_r4, Quantity)
+    value_r4b = Quantity.parse_quantity(R4B_Quantity(value=1, unit="m"))
+    assert isinstance(value_r4b, Quantity)
+    value_r5 = Quantity.parse_quantity(R5_Quantity(value=1, unit="m"))
+    assert isinstance(value_r5, Quantity)
+    value_int = Quantity.parse_quantity(1)
+    assert isinstance(value_int, Quantity)
+    value_float = Quantity.parse_quantity(1.0)
+    assert isinstance(value_float, Quantity)
 
 
 def test_fhirpath_type_quantity_is_compatible_with():
