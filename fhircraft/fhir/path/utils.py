@@ -143,22 +143,12 @@ def evaluate_and_prepare_collection_values(
     from fhircraft.fhir.path.engine.core import Literal
 
     def _get_collection_values(collection: "FHIRPathCollection") -> list[Any]:
-        from fhircraft.fhir.path.engine.literals import Quantity as FHIRPathQuantity
-        from fhircraft.fhir.resources.datatypes.R4.complex import (
-            Quantity as R4_Quantity,
-        )
-        from fhircraft.fhir.resources.datatypes.R4B.complex import (
-            Quantity as R4B_Quantity,
-        )
-        from fhircraft.fhir.resources.datatypes.R5.complex import (
-            Quantity as R5_Quantity,
-        )
-
+        from fhircraft.fhir.path.engine.literals import Quantity as FHIRPathQuantity, R4_Quantity, R4B_Quantity, R5_Quantity
         return [
             (
-                FHIRPathQuantity(float(data.value), data.code or data.unit)
+                FHIRPathQuantity.parse_quantity(data)
                 if isinstance(
-                    (data := item.value), (R4_Quantity, R4B_Quantity, R5_Quantity)
+                    (data := item.value), (FHIRPathQuantity, R4_Quantity, R4B_Quantity, R5_Quantity)
                 )
                 and data.value is not None
                 else data
