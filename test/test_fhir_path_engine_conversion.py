@@ -581,7 +581,7 @@ def test_toquantity_returns_empty_for_invalid_type():
 
 
 toquantity_cases = (
-    ("12.5 mg[Hg]", Quantity(value=12.5, unit="mg[Hg]")),
+    ("12.5 mm[Hg]", Quantity(value=12.5, unit="mm[Hg]")),
     ("12.5 mg", Quantity(value=12.5, unit="mg")),
     ("12.5", Quantity(value=12.5, unit="")),
     (12.5, Quantity(value=12.5, unit="")),
@@ -630,7 +630,7 @@ def test_convertstoquantity_returns_empty_for_invalid_type():
 
 
 convertstoquantity_cases = (
-    ("12.5 mg[Hg]"),
+    ("12.5 mm[Hg]"),
     ("12.5 mg"),
     (12.5),
     (5),

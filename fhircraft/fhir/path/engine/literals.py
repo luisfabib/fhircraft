@@ -5,11 +5,13 @@ import warnings
 from abc import ABC
 from dataclasses import dataclass
 from datetime import date, datetime, time
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, TYPE_CHECKING
 from pint import UnitRegistry, Quantity as PintQuantity
-from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
-from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
-from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
+
+if TYPE_CHECKING:
+    from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
+    from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
+    from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
 
 # Load the Pint unit registry with UCUM definitions
 ureg = UnitRegistry()
@@ -27,12 +29,19 @@ class Quantity(FHIRPathLiteralType):
 
     @classmethod
     def is_quantity(cls, instance: Any) -> bool:
+        from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
+        from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
+        from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
         return isinstance(
             instance, (cls, R4_Quantity, R4B_Quantity, R5_Quantity)
         )
 
     @classmethod
-    def parse_quantity(cls, instance: Union["Quantity", R4_Quantity, R4B_Quantity, R5_Quantity, int, float]) -> "Quantity":
+    def parse_quantity(cls, instance: Union["Quantity", "R4_Quantity", "R4B_Quantity", "R5_Quantity", int, float]) -> "Quantity":
+        from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
+        from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
+        from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
+
         if isinstance(instance, Quantity):
             return instance
         elif isinstance(instance, (R4_Quantity, R4B_Quantity, R5_Quantity)):
@@ -55,7 +64,7 @@ class Quantity(FHIRPathLiteralType):
         _unit = _unit.replace("'", "_")
         # UCUM curly braces not supported by Pint; replace with nothing
         _unit = re.sub(r"\{.*?\}", "_1", _unit)
-        return ureg(self.unit or "")
+        return ureg(_unit)
 
     def is_compatible_with(self, unit: "Quantity") -> bool:
         return self.registry_unit.is_compatible_with(unit.registry_unit)
