@@ -1,15 +1,40 @@
 from fhircraft.fhir.path.engine.literals import *
 
+from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
+from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
+from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
 
 def test_fhirpath_type_quantity_init():
     value = Quantity(value=1, unit="m")
     assert isinstance(value, Quantity)
 
 
+def test_fhirpath_type_quantity_parse_quantity():
+    value = Quantity.parse_quantity(Quantity(value=1, unit="m"))
+    assert isinstance(value, Quantity)
+    value_r4 = Quantity.parse_quantity(R4_Quantity(value=1, unit="m"))
+    assert isinstance(value_r4, Quantity)
+    value_r4b = Quantity.parse_quantity(R4B_Quantity(value=1, unit="m"))
+    assert isinstance(value_r4b, Quantity)
+    value_r5 = Quantity.parse_quantity(R5_Quantity(value=1, unit="m"))
+    assert isinstance(value_r5, Quantity)
+    value_int = Quantity.parse_quantity(1)
+    assert isinstance(value_int, Quantity)
+    value_float = Quantity.parse_quantity(1.0)
+    assert isinstance(value_float, Quantity)
+
+
+def test_fhirpath_type_quantity_is_compatible_with():
+    assert Quantity(value=1, unit="m").is_compatible_with(Quantity(value=1, unit="m"))
+    assert not Quantity(value=1, unit="m").is_compatible_with(Quantity(value=1, unit="s"))
+
 def test_fhirpath_type_quantity_eq():
     assert Quantity(value=1, unit="m") == Quantity(value=1, unit="m")
     assert Quantity(value=1, unit="m") == Quantity(value=100, unit="cm")
     assert Quantity(value=1, unit="km") == Quantity(value=100000, unit="cm")
+    assert Quantity(value=10, unit="{mutations}") == Quantity(value=1, unit="da{mutations}")
+    assert Quantity(value=10, unit="mm[Hg]") == Quantity(value=10, unit="mm[Hg]")
+    assert Quantity(value=10, unit="[arb'U]") == Quantity(value=10, unit="[arb'U]")
 
 
 def test_fhirpath_type_quantity_gt():
@@ -45,7 +70,9 @@ def test_fhirpath_type_quantity_add():
     assert Quantity(value=1, unit="g") + Quantity(value=1, unit="kg") == Quantity(
         value=1001, unit="g"
     )
-
+    assert Quantity(value=1, unit="{mutations}") + Quantity(value=1, unit="k{mutations}") == Quantity(
+        value=1001, unit="{mutations}"
+    )
 
 def test_fhirpath_type_quantity_sub():
     assert Quantity(value=2, unit="m") - Quantity(value=2, unit="m") == Quantity(
@@ -57,6 +84,9 @@ def test_fhirpath_type_quantity_sub():
     assert Quantity(value=1, unit="kg") - Quantity(value=500, unit="g") == Quantity(
         value=0.5, unit="kg"
     )
+    assert Quantity(value=10, unit="k{mutations}") - Quantity(value=100, unit="da{mutations}") == Quantity(
+        value=9, unit="k{mutations}"
+    )
 
 
 def test_fhirpath_type_quantity_prod():
@@ -66,11 +96,17 @@ def test_fhirpath_type_quantity_prod():
     assert Quantity(value=3, unit="m") * Quantity(value=2, unit="m") == Quantity(
         value=6, unit="m*m"
     )
+    assert Quantity(value=2, unit="{mutations}") * Quantity(value=10, unit="{mutations}") == Quantity(
+        value=20, unit="{mutations}"
+    )
 
 
 def test_fhirpath_type_quantity_div():
     assert Quantity(value=6, unit="m") / Quantity(value=2, unit="s") == Quantity(
         value=3, unit="m/s"
+    )
+    assert Quantity(value=2, unit="{mutations}") / Quantity(value=10, unit="k{mutations}") == Quantity(
+        value=0.2, unit="{mutations}/k{mutations}"
     )
 
 

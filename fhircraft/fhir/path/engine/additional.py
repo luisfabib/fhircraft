@@ -534,11 +534,12 @@ class LowBoundary(FHIRPathFunction):
                 # Handle numeric values - determine precision and calculate boundary
                 low_boundary = self._get_numeric_low_boundary(value)
                 result.append(FHIRPathCollectionItem.wrap(low_boundary))
-            elif isinstance(value, Quantity):
+            elif Quantity.is_quantity(value):
+                value = Quantity.parse_quantity(value)
                 # Handle Quantity type
                 new_quantity = Quantity(
                     value=self._get_numeric_low_boundary(value.value),
-                    unit=value.unit if hasattr(value, "unit") else None,
+                    unit=value.unit or "",
                 )
                 result.append(FHIRPathCollectionItem.wrap(new_quantity))
             else:
@@ -626,11 +627,12 @@ class HighBoundary(FHIRPathFunction):
                 # Handle numeric values - determine precision and calculate boundary
                 high_boundary = self._get_numeric_high_boundary(value)
                 result.append(FHIRPathCollectionItem.wrap(high_boundary))
-            elif isinstance(value, Quantity):
+            elif Quantity.is_quantity(value):
+                value = Quantity.parse_quantity(value)
                 # Handle Quantity type
                 new_quantity = Quantity(
                     value=self._get_numeric_high_boundary(value.value),
-                    unit=value.unit if hasattr(value, "unit") else None,
+                    unit=value.unit or "",
                 )
                 result.append(FHIRPathCollectionItem.wrap(new_quantity))
             else:
@@ -950,7 +952,7 @@ class Comparable(FHIRPathFunction):
             quantity = Literal(quantity)
         if not isinstance(quantity, FHIRPath):
             raise FHIRPathError(
-                "comparable() argument must be a Quantity or valid FHIRPath."
+                "comparable() argument must be a FHIRPath Quantity or valid FHIRPath."
             )
         self.quantity = quantity
 
@@ -972,14 +974,10 @@ class Comparable(FHIRPathFunction):
             return []
         elif len(collection) != 1:
             raise FHIRPathError("comparable() requires a singleton collection.")
-        item = collection[0]
-        if not isinstance(item.value, Quantity):
-            raise FHIRPathError("comparable() requires a Quantity input.")
-        input_quantity: Quantity = item.value
+        input_quantity: Quantity = Quantity.parse_quantity(collection[0].value)
         if not isinstance(
             quantity := self.quantity.single(collection, environment=environment),
             Quantity,
         ):
             raise FHIRPathError("Comparable() input did not evaluate to a Quantity.")
-        # TODO: Implement proper unit comparison logic once unit systems are supported
-        return [FHIRPathCollectionItem.wrap(input_quantity.unit == quantity.unit)]
+        return [FHIRPathCollectionItem.wrap(input_quantity.is_compatible_with(quantity))]

@@ -7,6 +7,7 @@ from fhircraft.fhir.path.engine.additional import GetValue
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.fhir.resources.datatypes.R4.complex import Quantity as R4_Quantity, Age as R4_Age
 from fhircraft.fhir.path.engine.math import *
 
 env = dict()
@@ -20,6 +21,8 @@ addition_cases = (
     (2.2, 2.2, 4.4),
     ("AB", "C", "ABC"),
     (Quantity(2, "mg"), Quantity(2, "mg"), Quantity(4, "mg")),
+    (R4_Quantity(value=2, unit="g"), R4_Quantity(value=500, unit="mg"), Quantity(value=2.5, unit="g")),
+    (R4_Age(value=4, code="a", system="http://unitsofmeasure.org"), R4_Age(value=2, code="a", system="http://unitsofmeasure.org"), Quantity(value=6, unit="a")),
 )
 
 
@@ -47,6 +50,8 @@ subtraction_cases = (
     (5, 2, 3),
     (3.2, 2.2, 1),
     (Quantity(5, "mg"), Quantity(2, "mg"), Quantity(3, "mg")),
+    (R4_Quantity(value=2, unit="g"), R4_Quantity(value=500, unit="mg"), Quantity(value=1.5, unit="g")),
+    (R4_Age(value=4, code="a", system="http://unitsofmeasure.org"), R4_Age(value=2, code="a", system="http://unitsofmeasure.org"), Quantity(value=2, unit="a")),
 )
 
 
@@ -75,6 +80,8 @@ multiplication_cases = (
     (2.2, 2, 4.4),
     (Quantity(2, "mg"), Quantity(2, "mg"), Quantity(4, "mg*mg")),
     (Quantity(2, "mg"), Quantity(2, "L"), Quantity(4, "mg*L")),
+    (R4_Quantity(value=2, unit="g"), R4_Quantity(value=500, unit="mg"), Quantity(value=1000, unit="g*mg")),
+    (R4_Age(value=4, code="a", system="http://unitsofmeasure.org"), R4_Age(value=2, code="a", system="http://unitsofmeasure.org"), Quantity(value=8, unit="a*a")),
 )
 
 
@@ -103,8 +110,10 @@ division_cases = (
     (4, 2, 2),
     (5.5, 2, 2.75),
     (5.5, 0, []),
-    (Quantity(4, "mg"), Quantity(2, "mg"), Quantity(2, "1")),
+    (Quantity(4, "mg"), Quantity(2, "mg"), Quantity(2, "")),
     (Quantity(4, "mg"), Quantity(2, "L"), Quantity(2, "mg/L")),
+    (R4_Quantity(value=8, unit="g"), R4_Quantity(value=2, unit="g"), Quantity(value=4, unit="")),
+    (R4_Age(value=4, code="a", system="http://unitsofmeasure.org"), R4_Age(value=2, code="a", system="http://unitsofmeasure.org"), Quantity(value=2, unit="")),
 )
 
 
