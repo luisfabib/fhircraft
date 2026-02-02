@@ -960,7 +960,11 @@ class Comparable(FHIRPathFunction):
         self, collection: FHIRPathCollection, environment: dict, create: bool = False
     ) -> FHIRPathCollection:
         """
-        This function returns `true` if the engine executing the FHIRPath statement can compare the singleton Quantity with the singleton other Quantity and determine their relationship to each other. Comparable means that both have values and that the code and system for the units are the same (irrespective of system) or both have code + system, system is recognized by the FHIRPath implementation and the codes are comparable within that code system. E.g. days and hours or inches and cm.
+        This function returns `true` if the engine executing the FHIRPath statement can compare
+        the singleton Quantity with the singleton other Quantity and determine their relationship
+        to each other. Comparable means that both have values and that the code and system for
+        the units are the same (irrespective of system) or both have code + system, system is
+        recognized by the FHIRPath implementation and the codes are comparable within that code system. E.g. days and hours or inches and cm.
 
         Args:
             collection (FHIRPathCollection): The input collection.
@@ -974,10 +978,23 @@ class Comparable(FHIRPathFunction):
             return []
         elif len(collection) != 1:
             raise FHIRPathError("comparable() requires a singleton collection.")
-        input_quantity: Quantity = Quantity.parse_quantity(collection[0].value)
-        if not isinstance(
-            quantity := self.quantity.single(collection, environment=environment),
-            Quantity,
-        ):
-            raise FHIRPathError("Comparable() input did not evaluate to a Quantity.")
-        return [FHIRPathCollectionItem.wrap(input_quantity.is_compatible_with(quantity))]
+        query_quantity = self.quantity.single(collection, environment=environment)
+        collection_value = collection[0].value
+        if not collection_value or not query_quantity is None:
+            return [FHIRPathCollectionItem.wrap(False)]
+        if collection_value and not Quantity.is_quantity(collection_value):
+            raise FHIRPathError(
+                f"Comparable() can only be called on Quantity types, got: {type(collection_value)}"
+            )
+        input_quantity: Quantity = Quantity.parse_quantity(collection_value)
+
+        if query_quantity and not Quantity.is_quantity(query_quantity):
+            raise FHIRPathError(
+                f"Comparable() input did not evaluate to a Quantity, it was: {type(query_quantity)}"
+            )
+
+        return [
+            FHIRPathCollectionItem.wrap(
+                input_quantity.is_compatible_with(query_quantity)
+            )
+        ]
