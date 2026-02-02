@@ -27,7 +27,7 @@ class Quantity(FHIRPathLiteralType):
             return op(
                 self.value * ureg(self.unit or ""), other.value * ureg(other.unit or "")
             )
-        elif isinstance(other, (int, float)) and self.unit in (None, "1"):
+        elif isinstance(other, (int, float)) and self.unit in (None, ""):
             return op(self.value, other)
         else:
             return False
@@ -85,14 +85,14 @@ class Quantity(FHIRPathLiteralType):
         result = self.__math__(other, operator.floordiv)
         return Quantity(
             value=result.magnitude,
-            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "1",
+            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "",
         )
 
     def __truediv__(self, other):
         result = self.__math__(other, operator.truediv)
         return Quantity(
             value=result.magnitude,
-            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "1",
+            unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "",
         )
 
 
