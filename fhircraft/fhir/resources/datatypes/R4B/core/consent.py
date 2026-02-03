@@ -28,6 +28,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ConsentPolicy(BackboneElement):
     """
     The references to the policies that are included in this consent scope. Policies may be organizational, but are often defined jurisdictionally, or in law.
@@ -51,6 +52,7 @@ class ConsentPolicy(BackboneElement):
         default=None,
         alias="_uri",
     )
+
 
 class ConsentVerification(BackboneElement):
     """
@@ -80,6 +82,7 @@ class ConsentVerification(BackboneElement):
         alias="_verificationDate",
     )
 
+
 class ConsentProvisionActor(BackboneElement):
     """
     Who or what is controlled by this rule. Use group to identify a set of actors by some property they share (e.g. 'admitting officers').
@@ -93,6 +96,7 @@ class ConsentProvisionActor(BackboneElement):
         description="Resource for the actor (or group, by role)",
         default=None,
     )
+
 
 class ConsentProvisionData(BackboneElement):
     """
@@ -112,6 +116,7 @@ class ConsentProvisionData(BackboneElement):
         description="The actual data reference",
         default=None,
     )
+
 
 class ConsentProvision(BackboneElement):
     """
@@ -168,6 +173,7 @@ class ConsentProvision(BackboneElement):
         description="Nested Exception Rules",
         default=None,
     )
+
 
 class Consent(DomainResource):
     """

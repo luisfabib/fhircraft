@@ -28,6 +28,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ImagingStudySeriesPerformer(BackboneElement):
     """
     Indicates who or what performed the series and how they were involved.
@@ -41,6 +42,7 @@ class ImagingStudySeriesPerformer(BackboneElement):
         description="Who performed the series",
         default=None,
     )
+
 
 class ImagingStudySeriesInstance(BackboneElement):
     """
@@ -78,6 +80,7 @@ class ImagingStudySeriesInstance(BackboneElement):
         default=None,
         alias="_title",
     )
+
 
 class ImagingStudySeries(BackboneElement):
     """
@@ -157,6 +160,7 @@ class ImagingStudySeries(BackboneElement):
         description="A single SOP instance from the series",
         default=None,
     )
+
 
 class ImagingStudy(DomainResource):
     """
@@ -284,4 +288,3 @@ class ImagingStudy(DomainResource):
         description="Each study has one or more series of instances",
         default=None,
     )
-

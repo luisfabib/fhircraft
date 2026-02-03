@@ -29,6 +29,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ImmunizationPerformer(BackboneElement):
     """
     Indicates who performed the immunization event.
@@ -42,6 +43,7 @@ class ImmunizationPerformer(BackboneElement):
         description="Individual or organization who was performing",
         default=None,
     )
+
 
 class ImmunizationEducation(BackboneElement):
     """
@@ -85,6 +87,7 @@ class ImmunizationEducation(BackboneElement):
         alias="_presentationDate",
     )
 
+
 class ImmunizationReaction(BackboneElement):
     """
     Categorical data indicating that an adverse event is associated in time to an immunization.
@@ -112,6 +115,7 @@ class ImmunizationReaction(BackboneElement):
         default=None,
         alias="_reported",
     )
+
 
 class ImmunizationProtocolApplied(BackboneElement):
     """
@@ -203,6 +207,7 @@ class ImmunizationProtocolApplied(BackboneElement):
             field_name_base="seriesDoses",
             required=False,
         )
+
 
 class Immunization(DomainResource):
     """

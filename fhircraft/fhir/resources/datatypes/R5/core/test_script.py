@@ -865,9 +865,11 @@ class TestScriptTestActionOperation(BackboneElement):
         default=None,
         alias="_params",
     )
-    requestHeader: Optional[ListType[TestScriptSetupActionOperationRequestHeader]] = Field(
-        description="Each operation can have one or more header elements",
-        default=None,
+    requestHeader: Optional[ListType[TestScriptSetupActionOperationRequestHeader]] = (
+        Field(
+            description="Each operation can have one or more header elements",
+            default=None,
+        )
     )
     requestId: Optional[Id] = Field(
         description="Fixture Id of mapped request",

@@ -37,6 +37,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
     """
     Associated or related medications. For example, if the medication is a branded product (e.g. Crestor), this is the Therapeutic Moeity (e.g. Rosuvastatin) or if this is a generic medication (e.g. Rosuvastatin), this would link to a branded product (e.g. Crestor.
@@ -51,6 +52,7 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
         default=None,
     )
 
+
 class MedicationKnowledgeMonograph(BackboneElement):
     """
     Associated documentation about the medication.
@@ -64,6 +66,7 @@ class MedicationKnowledgeMonograph(BackboneElement):
         description="Associated documentation about the medication",
         default=None,
     )
+
 
 class MedicationKnowledgeCost(BackboneElement):
     """
@@ -112,6 +115,7 @@ class MedicationKnowledgeCost(BackboneElement):
             required=True,
         )
 
+
 class MedicationKnowledgeMonitoringProgram(BackboneElement):
     """
     The program under which the medication is reviewed.
@@ -131,6 +135,7 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         alias="_name",
     )
 
+
 class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage(BackboneElement):
     """
     Dosage for the medication for the specific guidelines.
@@ -144,6 +149,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage(BackboneElemen
         description="Dosage for the medication for the specific guidelines",
         default=None,
     )
+
 
 class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic(
     BackboneElement
@@ -185,6 +191,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
             required=False,
         )
 
+
 class MedicationKnowledgeIndicationGuidelineDosingGuideline(BackboneElement):
     """
     The guidelines for the dosage of the medication for the indication.
@@ -205,11 +212,14 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline(BackboneElement):
         default=None,
     )
     patientCharacteristic: Optional[
-        ListType[MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic]
+        ListType[
+            MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
+        ]
     ] = Field(
         description="Characteristics of the patient that are relevant to the administration guidelines",
         default=None,
     )
+
 
 class MedicationKnowledgeIndicationGuideline(BackboneElement):
     """
@@ -226,6 +236,7 @@ class MedicationKnowledgeIndicationGuideline(BackboneElement):
         description="Guidelines for dosage of the medication",
         default=None,
     )
+
 
 class MedicationKnowledgeMedicineClassification(BackboneElement):
     """
@@ -275,6 +286,7 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
             required=False,
         )
 
+
 class MedicationKnowledgePackagingCost(BackboneElement):
     """
     The cost of the packaged medication.
@@ -322,6 +334,7 @@ class MedicationKnowledgePackagingCost(BackboneElement):
             required=True,
         )
 
+
 class MedicationKnowledgePackaging(BackboneElement):
     """
     Information that only applies to packages (not products).
@@ -335,6 +348,7 @@ class MedicationKnowledgePackaging(BackboneElement):
         description="The packaged medication that is being priced",
         default=None,
     )
+
 
 class MedicationKnowledgeStorageGuidelineEnvironmentalSetting(BackboneElement):
     """
@@ -374,6 +388,7 @@ class MedicationKnowledgeStorageGuidelineEnvironmentalSetting(BackboneElement):
             required=True,
         )
 
+
 class MedicationKnowledgeStorageGuideline(BackboneElement):
     """
     Information on how the medication should be stored, for example, refrigeration temperatures and length of stability at a given temperature.
@@ -403,6 +418,7 @@ class MedicationKnowledgeStorageGuideline(BackboneElement):
         default=None,
     )
 
+
 class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
     """
     Specifies if changes are allowed when dispensing a medication from a regulatory perspective.
@@ -422,6 +438,7 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
         alias="_allowed",
     )
 
+
 class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
     """
     The maximum number of units of the medication that can be dispensed in a period.
@@ -435,6 +452,7 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
         description="The period that applies to the maximum number of units",
         default=None,
     )
+
 
 class MedicationKnowledgeRegulatory(BackboneElement):
     """
@@ -457,6 +475,7 @@ class MedicationKnowledgeRegulatory(BackboneElement):
         description="The maximum number of units of the medication that can be dispensed in a period",
         default=None,
     )
+
 
 class MedicationKnowledgeDefinitionalIngredient(BackboneElement):
     """
@@ -499,6 +518,7 @@ class MedicationKnowledgeDefinitionalIngredient(BackboneElement):
             field_name_base="strength",
             required=False,
         )
+
 
 class MedicationKnowledgeDefinitionalDrugCharacteristic(BackboneElement):
     """
@@ -556,6 +576,7 @@ class MedicationKnowledgeDefinitionalDrugCharacteristic(BackboneElement):
             required=False,
         )
 
+
 class MedicationKnowledgeDefinitional(BackboneElement):
     """
     Along with the link to a Medicinal Product Definition resource, this information provides common definitional elements that are needed to understand the specific medication that is being described.
@@ -583,6 +604,7 @@ class MedicationKnowledgeDefinitional(BackboneElement):
         description="Specifies descriptive properties of the medicine",
         default=None,
     )
+
 
 class MedicationKnowledge(DomainResource):
     """
@@ -662,9 +684,11 @@ class MedicationKnowledge(DomainResource):
         description="Program under which a medication is reviewed",
         default=None,
     )
-    indicationGuideline: Optional[ListType[MedicationKnowledgeIndicationGuideline]] = Field(
-        description="Guidelines or protocols for administration of the medication for an indication",
-        default=None,
+    indicationGuideline: Optional[ListType[MedicationKnowledgeIndicationGuideline]] = (
+        Field(
+            description="Guidelines or protocols for administration of the medication for an indication",
+            default=None,
+        )
     )
     medicineClassification: Optional[
         ListType[MedicationKnowledgeMedicineClassification]
@@ -692,4 +716,3 @@ class MedicationKnowledge(DomainResource):
         description="Minimal definition information about the medication",
         default=None,
     )
-

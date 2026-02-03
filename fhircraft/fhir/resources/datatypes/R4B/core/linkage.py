@@ -17,6 +17,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class LinkageItem(BackboneElement):
     """
     Identifies which record considered as the reference to the same real-world occurrence as well as how the items should be evaluated within the collection of linked items.
@@ -35,6 +36,7 @@ class LinkageItem(BackboneElement):
         description="Resource being linked",
         default=None,
     )
+
 
 class Linkage(DomainResource):
     """

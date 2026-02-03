@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CompartmentDefinitionResource(BackboneElement):
     """
     Information about how a resource is related to the compartment.
@@ -57,6 +58,7 @@ class CompartmentDefinitionResource(BackboneElement):
         default=None,
         alias="_documentation",
     )
+
 
 class CompartmentDefinition(DomainResource):
     """

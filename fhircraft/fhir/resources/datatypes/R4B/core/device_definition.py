@@ -24,6 +24,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
     """
     Unique device identifier (UDI) assigned to device label or package.  Note that the Device may include multiple udiCarriers as it either may include just the udiCarrier for the jurisdiction it is sold, or for multiple jurisdictions it could have been sold.
@@ -57,6 +58,7 @@ class DeviceDefinitionUdiDeviceIdentifier(BackboneElement):
         alias="_jurisdiction",
     )
 
+
 class DeviceDefinitionDeviceName(BackboneElement):
     """
     A name given to the device to identify it.
@@ -80,6 +82,7 @@ class DeviceDefinitionDeviceName(BackboneElement):
         default=None,
         alias="_type",
     )
+
 
 class DeviceDefinitionSpecialization(BackboneElement):
     """
@@ -105,6 +108,7 @@ class DeviceDefinitionSpecialization(BackboneElement):
         alias="_version",
     )
 
+
 class DeviceDefinitionCapability(BackboneElement):
     """
     Device capabilities.
@@ -118,6 +122,7 @@ class DeviceDefinitionCapability(BackboneElement):
         description="Description of capability",
         default=None,
     )
+
 
 class DeviceDefinitionProperty(BackboneElement):
     """
@@ -136,6 +141,7 @@ class DeviceDefinitionProperty(BackboneElement):
         description="Property value as a code, e.g., NTP4 (synced to NTP)",
         default=None,
     )
+
 
 class DeviceDefinitionMaterial(BackboneElement):
     """
@@ -164,6 +170,7 @@ class DeviceDefinitionMaterial(BackboneElement):
         default=None,
         alias="_allergenicIndicator",
     )
+
 
 class DeviceDefinition(DomainResource):
     """

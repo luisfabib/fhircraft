@@ -80,11 +80,11 @@ class ChargeItemDefinitionPropertyGroup(BackboneElement):
     Group of properties which are applicable under the same conditions. If no applicability rules are established for the group, then all properties always apply.
     """
 
-    applicability: Optional[ListType[ChargeItemDefinitionPropertyGroupApplicability]] = (
-        Field(
-            description="Conditions under which the priceComponent is applicable",
-            default=None,
-        )
+    applicability: Optional[
+        ListType[ChargeItemDefinitionPropertyGroupApplicability]
+    ] = Field(
+        description="Conditions under which the priceComponent is applicable",
+        default=None,
     )
     priceComponent: Optional[ListType[MonetaryComponent]] = Field(
         description="Components of total line item price",

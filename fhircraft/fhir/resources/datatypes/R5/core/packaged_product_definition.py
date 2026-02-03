@@ -174,11 +174,11 @@ class PackagedProductDefinitionPackaging(BackboneElement):
         default=None,
         alias="property",
     )
-    containedItem: Optional[ListType[PackagedProductDefinitionPackagingContainedItem]] = (
-        Field(
-            description="The item(s) within the packaging",
-            default=None,
-        )
+    containedItem: Optional[
+        ListType[PackagedProductDefinitionPackagingContainedItem]
+    ] = Field(
+        description="The item(s) within the packaging",
+        default=None,
     )
     packaging: Optional[ListType["PackagedProductDefinitionPackaging"]] = Field(
         description="Allows containers (and parts of containers) within containers, still as a part of single packaged product",

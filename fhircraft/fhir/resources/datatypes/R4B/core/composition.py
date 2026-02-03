@@ -20,6 +20,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CompositionAttester(BackboneElement):
     """
     A participant who has attested to the accuracy of the composition/document.
@@ -47,6 +48,7 @@ class CompositionAttester(BackboneElement):
         description="Who attested the composition",
         default=None,
     )
+
 
 class CompositionRelatesTo(BackboneElement):
     """
@@ -87,6 +89,7 @@ class CompositionRelatesTo(BackboneElement):
             required=True,
         )
 
+
 class CompositionEvent(BackboneElement):
     """
     The clinical service, such as a colonoscopy or an appendectomy, being documented.
@@ -104,6 +107,7 @@ class CompositionEvent(BackboneElement):
         description="The event(s) being documented",
         default=None,
     )
+
 
 class CompositionSection(BackboneElement):
     """
@@ -160,6 +164,7 @@ class CompositionSection(BackboneElement):
         description="Nested Section",
         default=None,
     )
+
 
 class Composition(DomainResource):
     """

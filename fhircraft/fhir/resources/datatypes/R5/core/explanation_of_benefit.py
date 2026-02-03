@@ -733,9 +733,11 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="Detail level adjudication results",
         default=None,
     )
-    adjudication: Optional[ListType[ExplanationOfBenefitItemDetailAdjudication]] = Field(
-        description="Detail level adjudication details",
-        default=None,
+    adjudication: Optional[ListType[ExplanationOfBenefitItemDetailAdjudication]] = (
+        Field(
+            description="Detail level adjudication details",
+            default=None,
+        )
     )
     subDetail: Optional[ListType[ExplanationOfBenefitItemDetailSubDetail]] = Field(
         description="Additional items",

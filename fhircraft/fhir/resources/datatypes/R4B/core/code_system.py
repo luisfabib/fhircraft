@@ -30,6 +30,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CodeSystemFilter(BackboneElement):
     """
     A filter that can be used in a value set compose statement when selecting concepts using a filter.
@@ -71,6 +72,7 @@ class CodeSystemFilter(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class CodeSystemProperty(BackboneElement):
     """
@@ -114,6 +116,7 @@ class CodeSystemProperty(BackboneElement):
         alias="_type",
     )
 
+
 class CodeSystemConceptDesignation(BackboneElement):
     """
     Additional representations for the concept - other languages, aliases, specialized purposes, used for particular purposes, etc.
@@ -137,6 +140,7 @@ class CodeSystemConceptDesignation(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class CodeSystemConceptProperty(BackboneElement):
     """
@@ -227,6 +231,7 @@ class CodeSystemConceptProperty(BackboneElement):
             required=True,
         )
 
+
 class CodeSystemConcept(BackboneElement):
     """
     Concepts that are in the code system. The concept definitions are inherently hierarchical, but the definitions must be consulted to determine what the meanings of the hierarchical relationships are.
@@ -272,6 +277,7 @@ class CodeSystemConcept(BackboneElement):
         description="Child Concepts (is-a/contains/categorizes)",
         default=None,
     )
+
 
 class CodeSystem(DomainResource):
     """

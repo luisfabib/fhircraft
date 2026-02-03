@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DocumentManifestRelated(BackboneElement):
     """
     Related identifiers or resources associated with the DocumentManifest.
@@ -32,6 +33,7 @@ class DocumentManifestRelated(BackboneElement):
         description="Related Resource",
         default=None,
     )
+
 
 class DocumentManifest(DomainResource):
     """
@@ -122,4 +124,3 @@ class DocumentManifest(DomainResource):
         description="Related things",
         default=None,
     )
-

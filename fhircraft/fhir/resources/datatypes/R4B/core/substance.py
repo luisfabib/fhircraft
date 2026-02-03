@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SubstanceInstance(BackboneElement):
     """
     Substance may be used to describe a kind of substance, or a specific package/container of the substance: an instance.
@@ -43,6 +44,7 @@ class SubstanceInstance(BackboneElement):
         description="Amount of substance in the package",
         default=None,
     )
+
 
 class SubstanceIngredient(BackboneElement):
     """
@@ -77,6 +79,7 @@ class SubstanceIngredient(BackboneElement):
             field_name_base="substance",
             required=True,
         )
+
 
 class Substance(DomainResource):
     """
@@ -137,4 +140,3 @@ class Substance(DomainResource):
         description="Composition information about the substance",
         default=None,
     )
-

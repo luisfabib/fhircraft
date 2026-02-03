@@ -20,6 +20,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DetectedIssueEvidence(BackboneElement):
     """
     Supporting evidence or manifestations that provide the basis for identifying the detected issue such as a GuidanceResponse or MeasureReport.
@@ -33,6 +34,7 @@ class DetectedIssueEvidence(BackboneElement):
         description="Supporting information",
         default=None,
     )
+
 
 class DetectedIssueMitigation(BackboneElement):
     """
@@ -56,6 +58,7 @@ class DetectedIssueMitigation(BackboneElement):
         description="Who is committing?",
         default=None,
     )
+
 
 class DetectedIssue(DomainResource):
     """

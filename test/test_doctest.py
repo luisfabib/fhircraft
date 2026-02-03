@@ -176,6 +176,7 @@ def mock_open_func(file, mode="r", *args, **kwargs):
 @patch("fhircraft.utils.load_file", mock_load_file)
 @patch("builtins.open", side_effect=mock_open_func)
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
+@pytest.mark.integration
 def test_documentation_examples(mock_file, fpath):
     check_md_file(fpath=fpath, memory=True)
 
@@ -186,5 +187,6 @@ def test_documentation_examples(mock_file, fpath):
 @patch("fhircraft.utils.load_file", mock_load_file)
 @patch("builtins.open", side_effect=mock_open_func)
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
+@pytest.mark.integration
 def test_readme_examples(mock_file):
     check_md_file(fpath=pathlib.Path("README.md"), memory=True)

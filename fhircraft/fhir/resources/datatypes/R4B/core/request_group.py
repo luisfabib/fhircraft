@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class RequestGroupActionCondition(BackboneElement):
     """
     An expression that describes applicability criteria, or start/stop conditions for the action.
@@ -52,6 +53,7 @@ class RequestGroupActionCondition(BackboneElement):
         description="Boolean-valued expression",
         default=None,
     )
+
 
 class RequestGroupActionRelatedAction(BackboneElement):
     """
@@ -100,6 +102,7 @@ class RequestGroupActionRelatedAction(BackboneElement):
             field_name_base="offset",
             required=False,
         )
+
 
 class RequestGroupAction(BackboneElement):
     """
@@ -273,6 +276,7 @@ class RequestGroupAction(BackboneElement):
             field_name_base="timing",
             required=False,
         )
+
 
 class RequestGroup(DomainResource):
     """

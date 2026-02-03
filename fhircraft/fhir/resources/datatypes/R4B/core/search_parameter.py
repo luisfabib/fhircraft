@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SearchParameterComponent(BackboneElement):
     """
     Used to define the parts of a composite search parameter.
@@ -50,6 +51,7 @@ class SearchParameterComponent(BackboneElement):
         default=None,
         alias="_expression",
     )
+
 
 class SearchParameter(DomainResource):
     """

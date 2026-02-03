@@ -28,6 +28,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class PersonLink(BackboneElement):
     """
     Link to a resource that concerns the same actual person.
@@ -46,6 +47,7 @@ class PersonLink(BackboneElement):
         default=None,
         alias="_assurance",
     )
+
 
 class Person(DomainResource):
     """
@@ -123,4 +125,3 @@ class Person(DomainResource):
         description="Link to a resource that concerns the same actual person",
         default=None,
     )
-

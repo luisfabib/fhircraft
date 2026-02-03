@@ -585,9 +585,11 @@ class ValueSetExpansionContainsProperty(BackboneElement):
         default=None,
         alias="_valueDecimal",
     )
-    subProperty: Optional[ListType[ValueSetExpansionContainsPropertySubProperty]] = Field(
-        description="SubProperty value for the concept",
-        default=None,
+    subProperty: Optional[ListType[ValueSetExpansionContainsPropertySubProperty]] = (
+        Field(
+            description="SubProperty value for the concept",
+            default=None,
+        )
     )
 
     @property

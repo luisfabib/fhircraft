@@ -181,9 +181,11 @@ class OperationDefinitionParameter(BackboneElement):
         description="ValueSet details if this is coded",
         default=None,
     )
-    referencedFrom: Optional[ListType[OperationDefinitionParameterReferencedFrom]] = Field(
-        description="References to this parameter",
-        default=None,
+    referencedFrom: Optional[ListType[OperationDefinitionParameterReferencedFrom]] = (
+        Field(
+            description="References to this parameter",
+            default=None,
+        )
     )
     part: Optional[ListType["OperationDefinitionParameter"]] = Field(
         description="Parts of a nested Parameter",

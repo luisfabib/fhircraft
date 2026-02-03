@@ -20,6 +20,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DeviceMetricCalibration(BackboneElement):
     """
     Describes the calibrations that have been performed or that are required to be performed.
@@ -52,6 +53,7 @@ class DeviceMetricCalibration(BackboneElement):
         default=None,
         alias="_time",
     )
+
 
 class DeviceMetric(DomainResource):
     """
@@ -129,4 +131,3 @@ class DeviceMetric(DomainResource):
         description="Describes the calibrations that have been performed or that are required to be performed",
         default=None,
     )
-

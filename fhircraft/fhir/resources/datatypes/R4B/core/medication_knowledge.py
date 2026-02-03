@@ -30,6 +30,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
     """
     Associated or related knowledge about a medication.
@@ -44,6 +45,7 @@ class MedicationKnowledgeRelatedMedicationKnowledge(BackboneElement):
         default=None,
     )
 
+
 class MedicationKnowledgeMonograph(BackboneElement):
     """
     Associated documentation about the medication.
@@ -57,6 +59,7 @@ class MedicationKnowledgeMonograph(BackboneElement):
         description="Associated documentation about the medication",
         default=None,
     )
+
 
 class MedicationKnowledgeIngredient(BackboneElement):
     """
@@ -101,6 +104,7 @@ class MedicationKnowledgeIngredient(BackboneElement):
             required=True,
         )
 
+
 class MedicationKnowledgeCost(BackboneElement):
     """
     The price of the medication.
@@ -124,6 +128,7 @@ class MedicationKnowledgeCost(BackboneElement):
         default=None,
     )
 
+
 class MedicationKnowledgeMonitoringProgram(BackboneElement):
     """
     The program under which the medication is reviewed.
@@ -143,6 +148,7 @@ class MedicationKnowledgeMonitoringProgram(BackboneElement):
         alias="_name",
     )
 
+
 class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
     """
     Dosage for the medication for the specific guidelines.
@@ -156,6 +162,7 @@ class MedicationKnowledgeAdministrationGuidelinesDosage(BackboneElement):
         description="Dosage for the medication for the specific guidelines",
         default=None,
     )
+
 
 class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(
     BackboneElement
@@ -197,6 +204,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics(
             field_name_base="characteristic",
             required=True,
         )
+
 
 class MedicationKnowledgeAdministrationGuidelines(BackboneElement):
     """
@@ -240,6 +248,7 @@ class MedicationKnowledgeAdministrationGuidelines(BackboneElement):
             required=False,
         )
 
+
 class MedicationKnowledgeMedicineClassification(BackboneElement):
     """
     Categorization of the medication within a formulary or classification system.
@@ -254,6 +263,7 @@ class MedicationKnowledgeMedicineClassification(BackboneElement):
         default=None,
     )
 
+
 class MedicationKnowledgePackaging(BackboneElement):
     """
     Information that only applies to packages (not products).
@@ -267,6 +277,7 @@ class MedicationKnowledgePackaging(BackboneElement):
         description="The number of product units the package would contain if fully loaded",
         default=None,
     )
+
 
 class MedicationKnowledgeDrugCharacteristic(BackboneElement):
     """
@@ -320,6 +331,7 @@ class MedicationKnowledgeDrugCharacteristic(BackboneElement):
             required=False,
         )
 
+
 class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
     """
     Specifies if changes are allowed when dispensing a medication from a regulatory perspective.
@@ -339,6 +351,7 @@ class MedicationKnowledgeRegulatorySubstitution(BackboneElement):
         alias="_allowed",
     )
 
+
 class MedicationKnowledgeRegulatorySchedule(BackboneElement):
     """
     Specifies the schedule of a medication in jurisdiction.
@@ -348,6 +361,7 @@ class MedicationKnowledgeRegulatorySchedule(BackboneElement):
         description="Specifies the specific drug schedule",
         default=None,
     )
+
 
 class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
     """
@@ -362,6 +376,7 @@ class MedicationKnowledgeRegulatoryMaxDispense(BackboneElement):
         description="The period that applies to the maximum number of units",
         default=None,
     )
+
 
 class MedicationKnowledgeRegulatory(BackboneElement):
     """
@@ -385,6 +400,7 @@ class MedicationKnowledgeRegulatory(BackboneElement):
         default=None,
     )
 
+
 class MedicationKnowledgeKinetics(BackboneElement):
     """
     The time course of drug absorption, distribution, metabolism and excretion of a medication from the body.
@@ -402,6 +418,7 @@ class MedicationKnowledgeKinetics(BackboneElement):
         description="Time required for concentration in the body to decrease by half",
         default=None,
     )
+
 
 class MedicationKnowledge(DomainResource):
     """
@@ -535,4 +552,3 @@ class MedicationKnowledge(DomainResource):
         description="The time course of drug absorption, distribution, metabolism and excretion of a medication from the body",
         default=None,
     )
-

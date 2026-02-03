@@ -83,5 +83,7 @@ Documentation = "https://luisfabib.github.io/fhircraft/"
 python_files = [
     "**/test/test_*.py",
 ]
-
+markers = [
+    "integration",
+]
 testpaths = ['test']

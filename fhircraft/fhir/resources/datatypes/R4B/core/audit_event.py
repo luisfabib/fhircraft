@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class AuditEventAgentNetwork(BackboneElement):
     """
     Logical network location for application activity, if the activity has a network location.
@@ -50,6 +51,7 @@ class AuditEventAgentNetwork(BackboneElement):
         default=None,
         alias="_type",
     )
+
 
 class AuditEventAgent(BackboneElement):
     """
@@ -121,6 +123,7 @@ class AuditEventAgent(BackboneElement):
         default=None,
     )
 
+
 class AuditEventSource(BackboneElement):
     """
     The system that is reporting the event.
@@ -143,6 +146,7 @@ class AuditEventSource(BackboneElement):
         description="The type of source where event originated",
         default=None,
     )
+
 
 class AuditEventEntityDetail(BackboneElement):
     """
@@ -192,6 +196,7 @@ class AuditEventEntityDetail(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class AuditEventEntity(BackboneElement):
     """
@@ -249,6 +254,7 @@ class AuditEventEntity(BackboneElement):
         description="Additional Information about the entity",
         default=None,
     )
+
 
 class AuditEvent(DomainResource):
     """

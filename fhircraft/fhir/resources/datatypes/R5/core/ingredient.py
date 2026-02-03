@@ -175,11 +175,11 @@ class IngredientSubstanceStrength(BackboneElement):
         description="Where the strength range applies",
         default=None,
     )
-    referenceStrength: Optional[ListType[IngredientSubstanceStrengthReferenceStrength]] = (
-        Field(
-            description="Strength expressed in terms of a reference substance",
-            default=None,
-        )
+    referenceStrength: Optional[
+        ListType[IngredientSubstanceStrengthReferenceStrength]
+    ] = Field(
+        description="Strength expressed in terms of a reference substance",
+        default=None,
     )
 
     @property

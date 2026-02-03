@@ -324,9 +324,11 @@ class EvidenceStatistic(BackboneElement):
         description="An attribute of the Statistic",
         default=None,
     )
-    modelCharacteristic: Optional[ListType[EvidenceStatisticModelCharacteristic]] = Field(
-        description="An aspect of the statistical model",
-        default=None,
+    modelCharacteristic: Optional[ListType[EvidenceStatisticModelCharacteristic]] = (
+        Field(
+            description="An aspect of the statistical model",
+            default=None,
+        )
     )
 
 

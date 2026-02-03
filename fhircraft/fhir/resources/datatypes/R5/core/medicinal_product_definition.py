@@ -374,15 +374,19 @@ class MedicinalProductDefinition(DomainResource):
         description="The product\u0027s name, including full name and possibly coded parts",
         default=None,
     )
-    crossReference: Optional[ListType[MedicinalProductDefinitionCrossReference]] = Field(
-        description="Reference to another product, e.g. for linking authorised to investigational product",
-        default=None,
+    crossReference: Optional[ListType[MedicinalProductDefinitionCrossReference]] = (
+        Field(
+            description="Reference to another product, e.g. for linking authorised to investigational product",
+            default=None,
+        )
     )
     operation: Optional[ListType[MedicinalProductDefinitionOperation]] = Field(
         description="A manufacturing or administrative process for the medicinal product",
         default=None,
     )
-    characteristic: Optional[ListType[MedicinalProductDefinitionCharacteristic]] = Field(
-        description='Key product features such as "sugar free", "modified release"',
-        default=None,
+    characteristic: Optional[ListType[MedicinalProductDefinitionCharacteristic]] = (
+        Field(
+            description='Key product features such as "sugar free", "modified release"',
+            default=None,
+        )
     )

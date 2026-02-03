@@ -32,6 +32,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SubscriptionTopicResourceTriggerQueryCriteria(BackboneElement):
     """
     The FHIR query based rules that the server should use to determine when to trigger a notification for this subscription topic.
@@ -83,6 +84,7 @@ class SubscriptionTopicResourceTriggerQueryCriteria(BackboneElement):
         alias="_requireBoth",
     )
 
+
 class SubscriptionTopicResourceTrigger(BackboneElement):
     """
     A definition of a resource-based event that triggers a notification based on the SubscriptionTopic. The criteria may be just a human readable description and/or a full FHIR search string or FHIRPath expression. Multiple triggers are considered OR joined (e.g., a resource update matching ANY of the definitions will trigger a notification).
@@ -129,6 +131,7 @@ class SubscriptionTopicResourceTrigger(BackboneElement):
         alias="_fhirPathCriteria",
     )
 
+
 class SubscriptionTopicEventTrigger(BackboneElement):
     """
     Event definition which can be used to trigger the SubscriptionTopic.
@@ -156,6 +159,7 @@ class SubscriptionTopicEventTrigger(BackboneElement):
         default=None,
         alias="_resource",
     )
+
 
 class SubscriptionTopicCanFilterBy(BackboneElement):
     """
@@ -217,6 +221,7 @@ class SubscriptionTopicCanFilterBy(BackboneElement):
         alias="_modifier",
     )
 
+
 class SubscriptionTopicNotificationShape(BackboneElement):
     """
     List of properties to describe the shape (e.g., resources) included in notifications from this Subscription Topic.
@@ -249,6 +254,7 @@ class SubscriptionTopicNotificationShape(BackboneElement):
         default=None,
         alias="_revInclude",
     )
+
 
 class SubscriptionTopic(DomainResource):
     """

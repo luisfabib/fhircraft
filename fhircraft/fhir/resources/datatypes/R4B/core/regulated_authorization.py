@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class RegulatedAuthorizationCase(BackboneElement):
     """
     The case or regulatory procedure for granting or amending a regulated authorization. An authorization is granted in response to submissions/applications by those seeking authorization. A case is the administrative process that deals with the application(s) that relate to this and assesses them. Note: This area is subject to ongoing review and the workgroup is seeking implementer feedback on its use (see link at bottom of page).
@@ -77,6 +78,7 @@ class RegulatedAuthorizationCase(BackboneElement):
             field_name_base="date",
             required=False,
         )
+
 
 class RegulatedAuthorization(DomainResource):
     """
@@ -165,4 +167,3 @@ class RegulatedAuthorization(DomainResource):
         description="The case or regulatory procedure for granting or amending a regulated authorization. Note: This area is subject to ongoing review and the workgroup is seeking implementer feedback on its use (see link at bottom of page)",
         default=None,
     )
-

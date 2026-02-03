@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class IngredientManufacturer(BackboneElement):
     """
     The organization(s) that manufacture this ingredient. Can be used to indicate:         1) Organizations we are aware of that manufacture this ingredient         2) Specific Manufacturer(s) currently being used         3) Set of organisations allowed to manufacture this ingredient for this product         Users must be clear on the application of context relevant to their use case.
@@ -40,6 +41,7 @@ class IngredientManufacturer(BackboneElement):
         description="An organization that manufactures this ingredient",
         default=None,
     )
+
 
 class IngredientSubstanceStrengthReferenceStrength(BackboneElement):
     """
@@ -87,6 +89,7 @@ class IngredientSubstanceStrengthReferenceStrength(BackboneElement):
             field_name_base="strength",
             required=True,
         )
+
 
 class IngredientSubstanceStrength(BackboneElement):
     """
@@ -179,6 +182,7 @@ class IngredientSubstanceStrength(BackboneElement):
             required=False,
         )
 
+
 class IngredientSubstance(BackboneElement):
     """
     The substance that comprises this ingredient.
@@ -192,6 +196,7 @@ class IngredientSubstance(BackboneElement):
         description="The quantity of substance, per presentation, or per volume or mass, and type of quantity",
         default=None,
     )
+
 
 class Ingredient(DomainResource):
     """

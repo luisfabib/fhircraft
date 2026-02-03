@@ -70,11 +70,11 @@ class ClinicalUseDefinitionContraindication(BackboneElement):
         description="An expression that returns true or false, indicating whether the indication is applicable or not, after having applied its other elements",
         default=None,
     )
-    otherTherapy: Optional[ListType[ClinicalUseDefinitionContraindicationOtherTherapy]] = (
-        Field(
-            description="Information about use of the product in relation to other therapies described as part of the contraindication",
-            default=None,
-        )
+    otherTherapy: Optional[
+        ListType[ClinicalUseDefinitionContraindicationOtherTherapy]
+    ] = Field(
+        description="Information about use of the product in relation to other therapies described as part of the contraindication",
+        default=None,
     )
 
 
@@ -135,9 +135,11 @@ class ClinicalUseDefinitionIndication(BackboneElement):
         description="An expression that returns true or false, indicating whether the indication is applicable or not, after having applied its other elements",
         default=None,
     )
-    otherTherapy: Optional[ListType[ClinicalUseDefinitionIndicationOtherTherapy]] = Field(
-        description="The use of the medicinal product in relation to other therapies described as part of the indication",
-        default=None,
+    otherTherapy: Optional[ListType[ClinicalUseDefinitionIndicationOtherTherapy]] = (
+        Field(
+            description="The use of the medicinal product in relation to other therapies described as part of the indication",
+            default=None,
+        )
     )
 
     @property
@@ -193,9 +195,11 @@ class ClinicalUseDefinitionInteraction(BackboneElement):
     Specifics for when this is an interaction.
     """
 
-    interactant: Optional[ListType[ClinicalUseDefinitionInteractionInteractant]] = Field(
-        description="The specific medication, product, food etc. or laboratory test that interacts",
-        default=None,
+    interactant: Optional[ListType[ClinicalUseDefinitionInteractionInteractant]] = (
+        Field(
+            description="The specific medication, product, food etc. or laboratory test that interacts",
+            default=None,
+        )
     )
     type: Optional[CodeableConcept] = Field(
         description="The type of the interaction e.g. drug-drug interaction, drug-lab test interaction",

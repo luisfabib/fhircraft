@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class PaymentReconciliationDetail(BackboneElement):
     """
     Distribution of the payment amount for a previously acknowledged payable.
@@ -78,6 +79,7 @@ class PaymentReconciliationDetail(BackboneElement):
         default=None,
     )
 
+
 class PaymentReconciliationProcessNote(BackboneElement):
     """
     A note that describes or explains the processing in a human readable form.
@@ -101,6 +103,7 @@ class PaymentReconciliationProcessNote(BackboneElement):
         default=None,
         alias="_text",
     )
+
 
 class PaymentReconciliation(DomainResource):
     """
@@ -208,4 +211,3 @@ class PaymentReconciliation(DomainResource):
         description="Note concerning processing",
         default=None,
     )
-

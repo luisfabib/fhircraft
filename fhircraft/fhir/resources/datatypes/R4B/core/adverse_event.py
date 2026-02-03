@@ -19,6 +19,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class AdverseEventSuspectEntityCausality(BackboneElement):
     """
     Information on the possible cause of the event.
@@ -46,6 +47,7 @@ class AdverseEventSuspectEntityCausality(BackboneElement):
         default=None,
     )
 
+
 class AdverseEventSuspectEntity(BackboneElement):
     """
     Describes the entity that is suspected to have caused the adverse event.
@@ -59,6 +61,7 @@ class AdverseEventSuspectEntity(BackboneElement):
         description="Information on the possible cause of the event",
         default=None,
     )
+
 
 class AdverseEvent(DomainResource):
     """

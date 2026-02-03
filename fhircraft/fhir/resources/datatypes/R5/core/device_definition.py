@@ -593,13 +593,17 @@ class DeviceDefinition(DomainResource):
         description="Instance identifier",
         default=None,
     )
-    udiDeviceIdentifier: Optional[ListType[DeviceDefinitionUdiDeviceIdentifier]] = Field(
-        description="Unique Device Identifier (UDI) Barcode string",
-        default=None,
+    udiDeviceIdentifier: Optional[ListType[DeviceDefinitionUdiDeviceIdentifier]] = (
+        Field(
+            description="Unique Device Identifier (UDI) Barcode string",
+            default=None,
+        )
     )
-    regulatoryIdentifier: Optional[ListType[DeviceDefinitionRegulatoryIdentifier]] = Field(
-        description="Regulatory identifier(s) associated with this device",
-        default=None,
+    regulatoryIdentifier: Optional[ListType[DeviceDefinitionRegulatoryIdentifier]] = (
+        Field(
+            description="Regulatory identifier(s) associated with this device",
+            default=None,
+        )
     )
     partNumber: Optional[String] = Field(
         description="The part number or catalog number of the device",

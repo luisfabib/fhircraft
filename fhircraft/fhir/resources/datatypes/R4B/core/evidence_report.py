@@ -32,6 +32,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EvidenceReportSubjectCharacteristic(BackboneElement):
     """
     Characteristic.
@@ -96,6 +97,7 @@ class EvidenceReportSubjectCharacteristic(BackboneElement):
             required=True,
         )
 
+
 class EvidenceReportSubject(BackboneElement):
     """
     Specifies the subject or focus of the report. Answers "What is this report about?".
@@ -109,6 +111,7 @@ class EvidenceReportSubject(BackboneElement):
         description="Footnotes and/or explanatory notes",
         default=None,
     )
+
 
 class EvidenceReportRelatesTo(BackboneElement):
     """
@@ -148,6 +151,7 @@ class EvidenceReportRelatesTo(BackboneElement):
             field_name_base="target",
             required=True,
         )
+
 
 class EvidenceReportSection(BackboneElement):
     """
@@ -212,6 +216,7 @@ class EvidenceReportSection(BackboneElement):
         description="Nested Section",
         default=None,
     )
+
 
 class EvidenceReport(DomainResource):
     """

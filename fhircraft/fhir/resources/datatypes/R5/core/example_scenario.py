@@ -209,9 +209,11 @@ class ExampleScenarioInstance(BackboneElement):
         description="Snapshot of instance that changes",
         default=None,
     )
-    containedInstance: Optional[ListType[ExampleScenarioInstanceContainedInstance]] = Field(
-        description="Resources contained in the instance",
-        default=None,
+    containedInstance: Optional[ListType[ExampleScenarioInstanceContainedInstance]] = (
+        Field(
+            description="Resources contained in the instance",
+            default=None,
+        )
     )
 
     @property

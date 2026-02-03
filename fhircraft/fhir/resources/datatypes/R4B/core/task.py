@@ -66,6 +66,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class TaskRestriction(BackboneElement):
     """
     If the Task.focus is a request resource and the task is seeking fulfillment (i.e. is asking for the request to be actioned), this element identifies any limitations on what parts of the referenced request should be actioned.
@@ -88,6 +89,7 @@ class TaskRestriction(BackboneElement):
         description="For whom is fulfillment sought?",
         default=None,
     )
+
 
 class TaskInput(BackboneElement):
     """
@@ -461,6 +463,7 @@ class TaskInput(BackboneElement):
             required=True,
         )
 
+
 class TaskOutput(BackboneElement):
     """
     Outputs produced by the Task.
@@ -832,6 +835,7 @@ class TaskOutput(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class Task(DomainResource):
     """
