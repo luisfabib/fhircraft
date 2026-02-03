@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
 
 # Load the Pint unit registry with UCUM definitions
-ureg = UnitRegistry()
+ureg = UnitRegistry(autoconvert_offset_to_baseunit=True)
 ureg.load_definitions(Path(__file__).resolve().parent / "ucum_to_pint.txt")
 
 
