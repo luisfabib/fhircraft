@@ -210,9 +210,11 @@ class MeasureReportGroupStratifierStratum(BackboneElement):
         description="Stratifier component values",
         default=None,
     )
-    population: Optional[ListType[MeasureReportGroupStratifierStratumPopulation]] = Field(
-        description="Population results in this stratum",
-        default=None,
+    population: Optional[ListType[MeasureReportGroupStratifierStratumPopulation]] = (
+        Field(
+            description="Population results in this stratum",
+            default=None,
+        )
     )
     measureScoreQuantity: Optional[Quantity] = Field(
         description="What score this stratum achieved",

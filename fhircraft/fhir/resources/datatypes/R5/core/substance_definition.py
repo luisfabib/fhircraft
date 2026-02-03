@@ -301,9 +301,11 @@ class SubstanceDefinitionStructure(BackboneElement):
         description="Source of information for the structure",
         default=None,
     )
-    representation: Optional[ListType[SubstanceDefinitionStructureRepresentation]] = Field(
-        description="A depiction of the structure of the substance",
-        default=None,
+    representation: Optional[ListType[SubstanceDefinitionStructureRepresentation]] = (
+        Field(
+            description="A depiction of the structure of the substance",
+            default=None,
+        )
     )
 
 

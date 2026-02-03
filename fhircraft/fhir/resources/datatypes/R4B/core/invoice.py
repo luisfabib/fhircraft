@@ -29,6 +29,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class InvoiceParticipant(BackboneElement):
     """
     Indicates who or what performed or participated in the charged service.
@@ -42,6 +43,7 @@ class InvoiceParticipant(BackboneElement):
         description="Individual who was involved",
         default=None,
     )
+
 
 class InvoiceLineItemPriceComponent(BackboneElement):
     """
@@ -74,6 +76,7 @@ class InvoiceLineItemPriceComponent(BackboneElement):
         description="Monetary amount associated with this component",
         default=None,
     )
+
 
 class InvoiceLineItem(BackboneElement):
     """
@@ -118,6 +121,7 @@ class InvoiceLineItem(BackboneElement):
             required=True,
         )
 
+
 class InvoiceTotalPriceComponent(BackboneElement):
     """
     The total amount for the Invoice may be calculated as the sum of the line items with surcharges/deductions that apply in certain conditions.  The priceComponent element can be used to offer transparency to the recipient of the Invoice of how the total price was calculated.
@@ -149,6 +153,7 @@ class InvoiceTotalPriceComponent(BackboneElement):
         description="Monetary amount associated with this component",
         default=None,
     )
+
 
 class Invoice(DomainResource):
     """

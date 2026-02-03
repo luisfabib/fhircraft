@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SubscriptionChannel(BackboneElement):
     """
     Details where to send notifications when resources are received that meet the criteria.
@@ -64,6 +65,7 @@ class SubscriptionChannel(BackboneElement):
         default=None,
         alias="_header",
     )
+
 
 class Subscription(DomainResource):
     """
@@ -139,4 +141,3 @@ class Subscription(DomainResource):
         description="The channel on which to report matches to the criteria",
         default=None,
     )
-

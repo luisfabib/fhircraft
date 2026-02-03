@@ -28,6 +28,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class CoverageClass(BackboneElement):
     """
     A suite of underwriter specific classifiers.
@@ -56,6 +57,7 @@ class CoverageClass(BackboneElement):
         alias="_name",
     )
 
+
 class CoverageCostToBeneficiaryException(BackboneElement):
     """
     A suite of codes indicating exceptions or reductions to patient costs and their effective periods.
@@ -69,6 +71,7 @@ class CoverageCostToBeneficiaryException(BackboneElement):
         description="The effective period of the exception",
         default=None,
     )
+
 
 class CoverageCostToBeneficiary(BackboneElement):
     """
@@ -107,6 +110,7 @@ class CoverageCostToBeneficiary(BackboneElement):
             field_name_base="value",
             required=True,
         )
+
 
 class Coverage(DomainResource):
     """

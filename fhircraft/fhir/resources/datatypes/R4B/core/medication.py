@@ -26,6 +26,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MedicationIngredient(BackboneElement):
     """
     Identifies a particular constituent of interest in the product.
@@ -69,6 +70,7 @@ class MedicationIngredient(BackboneElement):
             required=True,
         )
 
+
 class MedicationBatch(BackboneElement):
     """
     Information that only applies to packages (not products).
@@ -92,6 +94,7 @@ class MedicationBatch(BackboneElement):
         default=None,
         alias="_expirationDate",
     )
+
 
 class Medication(DomainResource):
     """
@@ -151,4 +154,3 @@ class Medication(DomainResource):
         description="Details about packaged medications",
         default=None,
     )
-

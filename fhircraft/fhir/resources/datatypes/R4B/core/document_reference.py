@@ -22,6 +22,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class DocumentReferenceRelatesTo(BackboneElement):
     """
     Relationships that this document has with other document references that already exist.
@@ -41,6 +42,7 @@ class DocumentReferenceRelatesTo(BackboneElement):
         default=None,
     )
 
+
 class DocumentReferenceContent(BackboneElement):
     """
     The document and format referenced. There may be multiple content element repetitions, each with a different format.
@@ -54,6 +56,7 @@ class DocumentReferenceContent(BackboneElement):
         description="Format/content rules for the document",
         default=None,
     )
+
 
 class DocumentReferenceContext(BackboneElement):
     """
@@ -88,6 +91,7 @@ class DocumentReferenceContext(BackboneElement):
         description="Related identifiers or resources",
         default=None,
     )
+
 
 class DocumentReference(DomainResource):
     """
@@ -194,4 +198,3 @@ class DocumentReference(DomainResource):
         description="Clinical context of document",
         default=None,
     )
-

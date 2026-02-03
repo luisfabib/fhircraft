@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ResearchStudyArm(BackboneElement):
     """
     Describes an expected sequence of events for one of the participants of a study.  E.g. Exposure to drug A, wash-out, exposure to drug B, wash-out, follow-up.
@@ -51,6 +52,7 @@ class ResearchStudyArm(BackboneElement):
         alias="_description",
     )
 
+
 class ResearchStudyObjective(BackboneElement):
     """
     A goal that the study is aiming to achieve in terms of a scientific question to be answered by the analysis of data collected during the study.
@@ -69,6 +71,7 @@ class ResearchStudyObjective(BackboneElement):
         description="primary | secondary | exploratory",
         default=None,
     )
+
 
 class ResearchStudy(DomainResource):
     """
@@ -202,4 +205,3 @@ class ResearchStudy(DomainResource):
         description="A goal for the study",
         default=None,
     )
-

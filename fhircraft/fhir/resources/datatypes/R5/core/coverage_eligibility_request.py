@@ -296,9 +296,11 @@ class CoverageEligibilityRequest(DomainResource):
         description="Servicing facility",
         default=None,
     )
-    supportingInfo: Optional[ListType[CoverageEligibilityRequestSupportingInfo]] = Field(
-        description="Supporting information",
-        default=None,
+    supportingInfo: Optional[ListType[CoverageEligibilityRequestSupportingInfo]] = (
+        Field(
+            description="Supporting information",
+            default=None,
+        )
     )
     insurance: Optional[ListType[CoverageEligibilityRequestInsurance]] = Field(
         description="Patient insurance information",

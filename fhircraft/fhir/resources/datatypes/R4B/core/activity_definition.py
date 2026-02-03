@@ -39,6 +39,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ActivityDefinitionParticipant(BackboneElement):
     """
     Indicates who should participate in performing the action described.
@@ -58,6 +59,7 @@ class ActivityDefinitionParticipant(BackboneElement):
         default=None,
     )
 
+
 class ActivityDefinitionDynamicValue(BackboneElement):
     """
     Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the request resource that would contain the result.
@@ -76,6 +78,7 @@ class ActivityDefinitionDynamicValue(BackboneElement):
         description="An expression that provides the dynamic value for the customization",
         default=None,
     )
+
 
 class ActivityDefinition(DomainResource):
     """

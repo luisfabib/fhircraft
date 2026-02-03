@@ -228,9 +228,11 @@ class ManufacturedItemDefinitionComponent(BackboneElement):
         description="The measurable amount of total quantity of all substances in the component, expressable in different ways (e.g. by mass or volume)",
         default=None,
     )
-    constituent: Optional[ListType[ManufacturedItemDefinitionComponentConstituent]] = Field(
-        description="A reference to a constituent of the manufactured item as a whole, linked here so that its component location within the item can be indicated. This not where the item\u0027s ingredient are primarily stated (for which see Ingredient.for or ManufacturedItemDefinition.ingredient)",
-        default=None,
+    constituent: Optional[ListType[ManufacturedItemDefinitionComponentConstituent]] = (
+        Field(
+            description="A reference to a constituent of the manufactured item as a whole, linked here so that its component location within the item can be indicated. This not where the item\u0027s ingredient are primarily stated (for which see Ingredient.for or ManufacturedItemDefinition.ingredient)",
+            default=None,
+        )
     )
     property_: Optional[ListType[ManufacturedItemDefinitionComponentProperty]] = Field(
         description="General characteristics of this component",

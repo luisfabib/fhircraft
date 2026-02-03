@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EvidenceVariableCharacteristicTimeFromStart(BackboneElement):
     """
     Indicates duration, period, or point of observation from the participant's study entry.
@@ -60,6 +61,7 @@ class EvidenceVariableCharacteristicTimeFromStart(BackboneElement):
         description="Used for footnotes or explanatory notes",
         default=None,
     )
+
 
 class EvidenceVariableCharacteristic(BackboneElement):
     """
@@ -143,6 +145,7 @@ class EvidenceVariableCharacteristic(BackboneElement):
             required=True,
         )
 
+
 class EvidenceVariableCategory(BackboneElement):
     """
     A grouping (or set of values) described along with other groupings to specify the set of groupings allowed for the variable.
@@ -185,6 +188,7 @@ class EvidenceVariableCategory(BackboneElement):
             field_name_base="value",
             required=False,
         )
+
 
 class EvidenceVariable(DomainResource):
     """

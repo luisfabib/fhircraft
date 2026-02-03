@@ -17,6 +17,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class OperationOutcomeIssue(BackboneElement):
     """
     An error, warning, or information message that results from a system action.
@@ -72,6 +73,7 @@ class OperationOutcomeIssue(BackboneElement):
         alias="_expression",
     )
 
+
 class OperationOutcome(DomainResource):
     """
     A collection of error, warning, or information messages that result from a system action.
@@ -97,4 +99,3 @@ class OperationOutcome(DomainResource):
         description="A single issue associated with the action",
         default=None,
     )
-

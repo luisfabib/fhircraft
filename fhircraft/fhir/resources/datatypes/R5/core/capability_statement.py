@@ -610,11 +610,11 @@ class CapabilityStatementMessaging(BackboneElement):
         default=None,
         alias="_documentation",
     )
-    supportedMessage: Optional[ListType[CapabilityStatementMessagingSupportedMessage]] = (
-        Field(
-            description="Messages supported by this system",
-            default=None,
-        )
+    supportedMessage: Optional[
+        ListType[CapabilityStatementMessagingSupportedMessage]
+    ] = Field(
+        description="Messages supported by this system",
+        default=None,
     )
 
 

@@ -34,6 +34,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class EvidenceVariableDefinition(BackboneElement):
     """
     Evidence variable such as population, exposure, or outcome.
@@ -68,6 +69,7 @@ class EvidenceVariableDefinition(BackboneElement):
         description="low | moderate | high | exact",
         default=None,
     )
+
 
 class EvidenceStatisticSampleSize(BackboneElement):
     """
@@ -115,6 +117,7 @@ class EvidenceStatisticSampleSize(BackboneElement):
         alias="_knownDataCount",
     )
 
+
 class EvidenceStatisticAttributeEstimate(BackboneElement):
     """
     A statistical attribute of the statistic such as a measure of heterogeneity.
@@ -159,6 +162,7 @@ class EvidenceStatisticAttributeEstimate(BackboneElement):
         default=None,
     )
 
+
 class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
     """
     A variable adjusted for in the adjusted analysis.
@@ -189,6 +193,7 @@ class EvidenceStatisticModelCharacteristicVariable(BackboneElement):
         description="Range of values for grouping of ordinal or polychotomous variables",
         default=None,
     )
+
 
 class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
     """
@@ -234,6 +239,7 @@ class EvidenceStatisticModelCharacteristicAttributeEstimate(BackboneElement):
         default=None,
     )
 
+
 class EvidenceStatisticModelCharacteristic(BackboneElement):
     """
     A component of the method to generate the statistic.
@@ -257,6 +263,7 @@ class EvidenceStatisticModelCharacteristic(BackboneElement):
         description="An attribute of the statistic used as a model characteristic",
         default=None,
     )
+
 
 class EvidenceStatistic(BackboneElement):
     """
@@ -321,6 +328,7 @@ class EvidenceStatistic(BackboneElement):
         )
     )
 
+
 class EvidenceCertainty(BackboneElement):
     """
     Assessment of certainty, confidence in the estimates, or quality of the evidence.
@@ -360,6 +368,7 @@ class EvidenceCertainty(BackboneElement):
         description="A domain or subdomain of certainty",
         default=None,
     )
+
 
 class Evidence(DomainResource):
     """

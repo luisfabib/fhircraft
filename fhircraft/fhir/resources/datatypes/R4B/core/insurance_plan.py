@@ -25,6 +25,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class InsurancePlanContact(BackboneElement):
     """
     The contact for the health insurance product for a certain purpose.
@@ -47,6 +48,7 @@ class InsurancePlanContact(BackboneElement):
         default=None,
     )
 
+
 class InsurancePlanCoverageBenefitLimit(BackboneElement):
     """
     The specific limits on the benefit.
@@ -60,6 +62,7 @@ class InsurancePlanCoverageBenefitLimit(BackboneElement):
         description="Benefit limit details",
         default=None,
     )
+
 
 class InsurancePlanCoverageBenefit(BackboneElement):
     """
@@ -84,6 +87,7 @@ class InsurancePlanCoverageBenefit(BackboneElement):
         default=None,
     )
 
+
 class InsurancePlanCoverage(BackboneElement):
     """
     Details about the coverage offered by the insurance product.
@@ -101,6 +105,7 @@ class InsurancePlanCoverage(BackboneElement):
         description="List of benefits",
         default=None,
     )
+
 
 class InsurancePlanPlanGeneralCost(BackboneElement):
     """
@@ -134,6 +139,7 @@ class InsurancePlanPlanGeneralCost(BackboneElement):
         alias="_comment",
     )
 
+
 class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
     """
     List of the costs associated with a specific benefit.
@@ -156,6 +162,7 @@ class InsurancePlanPlanSpecificCostBenefitCost(BackboneElement):
         default=None,
     )
 
+
 class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
     """
     List of the specific benefits under this category of benefit.
@@ -170,6 +177,7 @@ class InsurancePlanPlanSpecificCostBenefit(BackboneElement):
         default=None,
     )
 
+
 class InsurancePlanPlanSpecificCost(BackboneElement):
     """
     Costs associated with the coverage provided by the product.
@@ -183,6 +191,7 @@ class InsurancePlanPlanSpecificCost(BackboneElement):
         description="Benefits list",
         default=None,
     )
+
 
 class InsurancePlanPlan(BackboneElement):
     """
@@ -213,6 +222,7 @@ class InsurancePlanPlan(BackboneElement):
         description="Specific costs",
         default=None,
     )
+
 
 class InsurancePlan(DomainResource):
     """

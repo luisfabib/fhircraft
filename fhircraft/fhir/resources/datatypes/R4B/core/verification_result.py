@@ -26,6 +26,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class VerificationResultPrimarySource(BackboneElement):
     """
     Information about the primary source(s) involved in validation.
@@ -64,6 +65,7 @@ class VerificationResultPrimarySource(BackboneElement):
         description="specific | any | source",
         default=None,
     )
+
 
 class VerificationResultAttestation(BackboneElement):
     """
@@ -118,6 +120,7 @@ class VerificationResultAttestation(BackboneElement):
         default=None,
     )
 
+
 class VerificationResultValidator(BackboneElement):
     """
     Information about the entity validating information.
@@ -140,6 +143,7 @@ class VerificationResultValidator(BackboneElement):
         description="Validator signature",
         default=None,
     )
+
 
 class VerificationResult(DomainResource):
     """
@@ -243,4 +247,3 @@ class VerificationResult(DomainResource):
         description="Information about the entity validating information",
         default=None,
     )
-

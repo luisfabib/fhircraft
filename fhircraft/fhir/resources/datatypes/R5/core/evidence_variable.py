@@ -307,9 +307,11 @@ class EvidenceVariableCharacteristic(BackboneElement):
         description="Length of time in which the characteristic is met",
         default=None,
     )
-    timeFromEvent: Optional[ListType[EvidenceVariableCharacteristicTimeFromEvent]] = Field(
-        description="Timing in which the characteristic is determined",
-        default=None,
+    timeFromEvent: Optional[ListType[EvidenceVariableCharacteristicTimeFromEvent]] = (
+        Field(
+            description="Timing in which the characteristic is determined",
+            default=None,
+        )
     )
 
     @property

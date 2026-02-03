@@ -30,6 +30,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class RelatedPersonCommunication(BackboneElement):
     """
     A language which may be used to communicate with about the patient's health.
@@ -48,6 +49,7 @@ class RelatedPersonCommunication(BackboneElement):
         default=None,
         alias="_preferred",
     )
+
 
 class RelatedPerson(DomainResource):
     """
@@ -133,4 +135,3 @@ class RelatedPerson(DomainResource):
         description="A language which may be used to communicate with about the patient\u0027s health",
         default=None,
     )
-

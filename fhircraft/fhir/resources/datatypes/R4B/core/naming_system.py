@@ -27,6 +27,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class NamingSystemUniqueId(BackboneElement):
     """
     Indicates how the system may be identified when referenced in electronic exchange.
@@ -72,6 +73,7 @@ class NamingSystemUniqueId(BackboneElement):
         description="When is identifier valid?",
         default=None,
     )
+
 
 class NamingSystem(DomainResource):
     """

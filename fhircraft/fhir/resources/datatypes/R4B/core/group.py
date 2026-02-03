@@ -28,6 +28,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class GroupCharacteristic(BackboneElement):
     """
     Identifies traits whose presence r absence is shared by members of the group.
@@ -92,6 +93,7 @@ class GroupCharacteristic(BackboneElement):
             required=True,
         )
 
+
 class GroupMember(BackboneElement):
     """
     Identifies the resource instances that are members of the group.
@@ -114,6 +116,7 @@ class GroupMember(BackboneElement):
         default=None,
         alias="_inactive",
     )
+
 
 class Group(DomainResource):
     """

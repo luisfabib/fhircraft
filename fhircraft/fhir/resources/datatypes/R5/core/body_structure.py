@@ -90,7 +90,9 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation(BackboneElement):
         default=None,
     )
     distanceFromLandmark: Optional[
-        ListType[BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark]
+        ListType[
+            BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark
+        ]
     ] = Field(
         description="Landmark relative location",
         default=None,

@@ -28,6 +28,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class TerminologyCapabilitiesSoftware(BackboneElement):
     """
     Software that is covered by this terminology capability statement.  It is used when the statement describes the capabilities of a particular software version, independent of an installation.
@@ -51,6 +52,7 @@ class TerminologyCapabilitiesSoftware(BackboneElement):
         default=None,
         alias="_version",
     )
+
 
 class TerminologyCapabilitiesImplementation(BackboneElement):
     """
@@ -76,6 +78,7 @@ class TerminologyCapabilitiesImplementation(BackboneElement):
         alias="_url",
     )
 
+
 class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
     """
     Filter Properties supported.
@@ -99,6 +102,7 @@ class TerminologyCapabilitiesCodeSystemVersionFilter(BackboneElement):
         default=None,
         alias="_op",
     )
+
 
 class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
     """
@@ -152,6 +156,7 @@ class TerminologyCapabilitiesCodeSystemVersion(BackboneElement):
         alias="_property",
     )
 
+
 class TerminologyCapabilitiesCodeSystem(BackboneElement):
     """
     Identifies a code system that is supported by the server. If there is a no code system URL, then this declares the general assumptions a client can make about support for any CodeSystem resource.
@@ -180,6 +185,7 @@ class TerminologyCapabilitiesCodeSystem(BackboneElement):
         alias="_subsumption",
     )
 
+
 class TerminologyCapabilitiesExpansionParameter(BackboneElement):
     """
     Supported expansion parameter.
@@ -203,6 +209,7 @@ class TerminologyCapabilitiesExpansionParameter(BackboneElement):
         default=None,
         alias="_documentation",
     )
+
 
 class TerminologyCapabilitiesExpansion(BackboneElement):
     """
@@ -250,6 +257,7 @@ class TerminologyCapabilitiesExpansion(BackboneElement):
         alias="_textFilter",
     )
 
+
 class TerminologyCapabilitiesValidateCode(BackboneElement):
     """
     Information about the [ValueSet/$validate-code](https://hl7.org/fhir/R4B/valueset-operation-validate-code.html) operation.
@@ -264,6 +272,7 @@ class TerminologyCapabilitiesValidateCode(BackboneElement):
         default=None,
         alias="_translations",
     )
+
 
 class TerminologyCapabilitiesTranslation(BackboneElement):
     """
@@ -280,6 +289,7 @@ class TerminologyCapabilitiesTranslation(BackboneElement):
         alias="_needsMap",
     )
 
+
 class TerminologyCapabilitiesClosure(BackboneElement):
     """
     Whether the $closure operation is supported.
@@ -294,6 +304,7 @@ class TerminologyCapabilitiesClosure(BackboneElement):
         default=None,
         alias="_translation",
     )
+
 
 class TerminologyCapabilities(DomainResource):
     """

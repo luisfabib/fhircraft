@@ -41,6 +41,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class PlanDefinitionGoalTarget(BackboneElement):
     """
     Indicates what should be done and within what timeframe.
@@ -83,6 +84,7 @@ class PlanDefinitionGoalTarget(BackboneElement):
             required=False,
         )
 
+
 class PlanDefinitionGoal(BackboneElement):
     """
     A goal describes an expected outcome that activities within the plan are intended to achieve. For example, weight loss, restoring an activity of daily living, obtaining herd immunity via immunization, meeting a process improvement objective, meeting the acceptance criteria for a test as specified by a quality specification, etc.
@@ -117,6 +119,7 @@ class PlanDefinitionGoal(BackboneElement):
         default=None,
     )
 
+
 class PlanDefinitionActionCondition(BackboneElement):
     """
     An expression that describes applicability criteria or start/stop conditions for the action.
@@ -135,6 +138,7 @@ class PlanDefinitionActionCondition(BackboneElement):
         description="Boolean-valued expression",
         default=None,
     )
+
 
 class PlanDefinitionActionRelatedAction(BackboneElement):
     """
@@ -184,6 +188,7 @@ class PlanDefinitionActionRelatedAction(BackboneElement):
             required=False,
         )
 
+
 class PlanDefinitionActionParticipant(BackboneElement):
     """
     Indicates who should participate in performing the action described.
@@ -203,6 +208,7 @@ class PlanDefinitionActionParticipant(BackboneElement):
         default=None,
     )
 
+
 class PlanDefinitionActionDynamicValue(BackboneElement):
     """
     Customizations that should be applied to the statically defined resource. For example, if the dosage of a medication must be computed based on the patient's weight, a customization would be used to specify an expression that calculated the weight, and the path on the resource that would contain the result.
@@ -221,6 +227,7 @@ class PlanDefinitionActionDynamicValue(BackboneElement):
         description="An expression that provides the dynamic value for the customization",
         default=None,
     )
+
 
 class PlanDefinitionAction(BackboneElement):
     """
@@ -495,6 +502,7 @@ class PlanDefinitionAction(BackboneElement):
             field_name_base="definition",
             required=False,
         )
+
 
 class PlanDefinition(DomainResource):
     """

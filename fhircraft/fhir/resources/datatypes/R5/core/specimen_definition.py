@@ -36,6 +36,7 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
     """
     Substance introduced in the kind of container to preserve, maintain or enhance the specimen. Examples: Formalin, Citrate, EDTA.
@@ -65,6 +66,7 @@ class SpecimenDefinitionTypeTestedContainerAdditive(BackboneElement):
             field_name_base="additive",
             required=True,
         )
+
 
 class SpecimenDefinitionTypeTestedContainer(BackboneElement):
     """
@@ -139,6 +141,7 @@ class SpecimenDefinitionTypeTestedContainer(BackboneElement):
             required=False,
         )
 
+
 class SpecimenDefinitionTypeTestedHandling(BackboneElement):
     """
     Set of instructions for preservation/transport of the specimen at a defined temperature interval, prior the testing process.
@@ -165,6 +168,7 @@ class SpecimenDefinitionTypeTestedHandling(BackboneElement):
         default=None,
         alias="_instruction",
     )
+
 
 class SpecimenDefinitionTypeTested(BackboneElement):
     """
@@ -231,6 +235,7 @@ class SpecimenDefinitionTypeTested(BackboneElement):
         description="Where the specimen will be tested",
         default=None,
     )
+
 
 class SpecimenDefinition(DomainResource):
     """

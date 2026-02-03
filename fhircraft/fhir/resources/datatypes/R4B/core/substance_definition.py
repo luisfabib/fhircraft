@@ -31,6 +31,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class SubstanceDefinitionMoiety(BackboneElement):
     """
     Moiety, for structural modifications.
@@ -104,6 +105,7 @@ class SubstanceDefinitionMoiety(BackboneElement):
             required=False,
         )
 
+
 class SubstanceDefinitionProperty(BackboneElement):
     """
     General specifications for this substance.
@@ -160,6 +162,7 @@ class SubstanceDefinitionProperty(BackboneElement):
             required=False,
         )
 
+
 class SubstanceDefinitionMolecularWeight(BackboneElement):
     """
     The molecular weight or weight range (for proteins, polymers or nucleic acids).
@@ -178,6 +181,7 @@ class SubstanceDefinitionMolecularWeight(BackboneElement):
         default=None,
     )
 
+
 class SubstanceDefinitionStructureMolecularWeight(BackboneElement):
     """
     The molecular weight or weight range (for proteins, polymers or nucleic acids).
@@ -195,6 +199,7 @@ class SubstanceDefinitionStructureMolecularWeight(BackboneElement):
         description="Used to capture quantitative values for a variety of elements",
         default=None,
     )
+
 
 class SubstanceDefinitionStructureRepresentation(BackboneElement):
     """
@@ -222,6 +227,7 @@ class SubstanceDefinitionStructureRepresentation(BackboneElement):
         description="An attachment with the structural representation e.g. a structure graphic or AnIML file",
         default=None,
     )
+
 
 class SubstanceDefinitionStructure(BackboneElement):
     """
@@ -273,6 +279,7 @@ class SubstanceDefinitionStructure(BackboneElement):
         )
     )
 
+
 class SubstanceDefinitionCode(BackboneElement):
     """
     Codes associated with the substance.
@@ -304,6 +311,7 @@ class SubstanceDefinitionCode(BackboneElement):
         default=None,
     )
 
+
 class SubstanceDefinitionNameOfficial(BackboneElement):
     """
     Details of the official nature of this name.
@@ -326,6 +334,7 @@ class SubstanceDefinitionNameOfficial(BackboneElement):
         default=None,
         alias="_date",
     )
+
 
 class SubstanceDefinitionName(BackboneElement):
     """
@@ -386,6 +395,7 @@ class SubstanceDefinitionName(BackboneElement):
         description="Supporting literature",
         default=None,
     )
+
 
 class SubstanceDefinitionRelationship(BackboneElement):
     """
@@ -475,6 +485,7 @@ class SubstanceDefinitionRelationship(BackboneElement):
             required=False,
         )
 
+
 class SubstanceDefinitionSourceMaterial(BackboneElement):
     """
     Material or taxonomic/anatomical source for the substance.
@@ -500,6 +511,7 @@ class SubstanceDefinitionSourceMaterial(BackboneElement):
         description="The country or countries where the material is harvested",
         default=None,
     )
+
 
 class SubstanceDefinition(DomainResource):
     """
@@ -609,4 +621,3 @@ class SubstanceDefinition(DomainResource):
         description="Material or taxonomic/anatomical source",
         default=None,
     )
-

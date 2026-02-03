@@ -311,11 +311,11 @@ class InventoryItem(DomainResource):
         description="The item name(s) - the brand name, or common name, functional name, generic name or others",
         default=None,
     )
-    responsibleOrganization: Optional[ListType[InventoryItemResponsibleOrganization]] = (
-        Field(
-            description="Organization(s) responsible for the product",
-            default=None,
-        )
+    responsibleOrganization: Optional[
+        ListType[InventoryItemResponsibleOrganization]
+    ] = Field(
+        description="Organization(s) responsible for the product",
+        default=None,
     )
     description: Optional[InventoryItemDescription] = Field(
         description="Descriptive characteristics of the item",

@@ -39,6 +39,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ContractContentDefinition(BackboneElement):
     """
     Precusory content developed with a focus and intent of supporting the formation a Contract instance, which may be associated with and transformable into a Contract.
@@ -84,6 +85,7 @@ class ContractContentDefinition(BackboneElement):
         alias="_copyright",
     )
 
+
 class ContractTermSecurityLabel(BackboneElement):
     """
     Security labels that protect the handling of information about the term and its elements, which may be specifically identified..
@@ -111,6 +113,7 @@ class ContractTermSecurityLabel(BackboneElement):
         default=None,
     )
 
+
 class ContractTermOfferParty(BackboneElement):
     """
     Offer Recipient.
@@ -124,6 +127,7 @@ class ContractTermOfferParty(BackboneElement):
         description="Participant engagement type",
         default=None,
     )
+
 
 class ContractTermOfferAnswer(BackboneElement):
     """
@@ -248,6 +252,7 @@ class ContractTermOfferAnswer(BackboneElement):
             required=True,
         )
 
+
 class ContractTermOffer(BackboneElement):
     """
     The matter of concern in the context of this provision of the agrement.
@@ -309,6 +314,7 @@ class ContractTermOffer(BackboneElement):
         alias="_securityLabelNumber",
     )
 
+
 class ContractTermAssetContext(BackboneElement):
     """
     Circumstance of the asset.
@@ -331,6 +337,7 @@ class ContractTermAssetContext(BackboneElement):
         default=None,
         alias="_text",
     )
+
 
 class ContractTermAssetAnswer(BackboneElement):
     """
@@ -455,6 +462,7 @@ class ContractTermAssetAnswer(BackboneElement):
             required=True,
         )
 
+
 class ContractTermAssetValuedItem(BackboneElement):
     """
     Contract Valued Item List.
@@ -572,6 +580,7 @@ class ContractTermAssetValuedItem(BackboneElement):
             required=False,
         )
 
+
 class ContractTermAsset(BackboneElement):
     """
     Contract Term Asset List.
@@ -658,6 +667,7 @@ class ContractTermAsset(BackboneElement):
         default=None,
     )
 
+
 class ContractTermActionSubject(BackboneElement):
     """
     Entity of the action.
@@ -671,6 +681,7 @@ class ContractTermActionSubject(BackboneElement):
         description="Role type of the agent",
         default=None,
     )
+
 
 class ContractTermAction(BackboneElement):
     """
@@ -831,6 +842,7 @@ class ContractTermAction(BackboneElement):
             required=False,
         )
 
+
 class ContractTerm(BackboneElement):
     """
     One or more Contract Provisions, which may be related and conveyed as a group, and may contain nested groups.
@@ -915,6 +927,7 @@ class ContractTerm(BackboneElement):
             required=False,
         )
 
+
 class ContractSigner(BackboneElement):
     """
     Parties with legal standing in the Contract, including the principal parties, the grantor(s) and grantee(s), which are any person or organization bound by the contract, and any ancillary parties, which facilitate the execution of the contract such as a notary or witness.
@@ -932,6 +945,7 @@ class ContractSigner(BackboneElement):
         description="Contract Documentation Signature",
         default=None,
     )
+
 
 class ContractFriendly(BackboneElement):
     """
@@ -963,6 +977,7 @@ class ContractFriendly(BackboneElement):
             required=True,
         )
 
+
 class ContractLegal(BackboneElement):
     """
     List of Legal expressions or representations of this Contract.
@@ -993,6 +1008,7 @@ class ContractLegal(BackboneElement):
             required=True,
         )
 
+
 class ContractRule(BackboneElement):
     """
     List of Computable Policy Rule Language Representations of this Contract.
@@ -1022,6 +1038,7 @@ class ContractRule(BackboneElement):
             field_name_base="content",
             required=True,
         )
+
 
 class Contract(DomainResource):
     """

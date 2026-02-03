@@ -254,11 +254,11 @@ class SubstanceSourceMaterial(DomainResource):
         description="Stage of life for animals, plants, insects and microorganisms. This information shall be provided only when the substance is significantly different in these stages (e.g. foetal bovine serum)",
         default=None,
     )
-    fractionDescription: Optional[ListType[SubstanceSourceMaterialFractionDescription]] = (
-        Field(
-            description="Many complex materials are fractions of parts of plants, animals, or minerals. Fraction elements are often necessary to define both Substances and Specified Group 1 Substances. For substances derived from Plants, fraction information will be captured at the Substance information level ( . Oils, Juices and Exudates). Additional information for Extracts, such as extraction solvent composition, will be captured at the Specified Substance Group 1 information level. For plasma-derived products fraction information will be captured at the Substance and the Specified Substance Group 1 levels",
-            default=None,
-        )
+    fractionDescription: Optional[
+        ListType[SubstanceSourceMaterialFractionDescription]
+    ] = Field(
+        description="Many complex materials are fractions of parts of plants, animals, or minerals. Fraction elements are often necessary to define both Substances and Specified Group 1 Substances. For substances derived from Plants, fraction information will be captured at the Substance information level ( . Oils, Juices and Exudates). Additional information for Extracts, such as extraction solvent composition, will be captured at the Specified Substance Group 1 information level. For plasma-derived products fraction information will be captured at the Substance and the Specified Substance Group 1 levels",
+        default=None,
     )
     organism: Optional[SubstanceSourceMaterialOrganism] = Field(
         description="This subclause describes the organism which the substance is derived from. For vaccines, the parent organism shall be specified based on these subclause elements. As an example, full taxonomy will be described for the Substance Name: ., Leaf",

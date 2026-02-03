@@ -218,9 +218,11 @@ class CoverageEligibilityResponseInsuranceItem(BackboneElement):
         description="Annual or lifetime",
         default=None,
     )
-    benefit: Optional[ListType[CoverageEligibilityResponseInsuranceItemBenefit]] = Field(
-        description="Benefit Summary",
-        default=None,
+    benefit: Optional[ListType[CoverageEligibilityResponseInsuranceItemBenefit]] = (
+        Field(
+            description="Benefit Summary",
+            default=None,
+        )
     )
     authorizationRequired: Optional[Boolean] = Field(
         description="Authorization required flag",

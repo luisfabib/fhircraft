@@ -31,6 +31,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class FamilyMemberHistoryCondition(BackboneElement):
     """
     The significant Conditions (or condition) that the family member had. This is a repeating section to allow a system to represent more than one condition per resource, though there is nothing stopping multiple resources - one per condition.
@@ -94,6 +95,7 @@ class FamilyMemberHistoryCondition(BackboneElement):
             field_name_base="onset",
             required=False,
         )
+
 
 class FamilyMemberHistory(DomainResource):
     """

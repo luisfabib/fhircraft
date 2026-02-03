@@ -35,7 +35,11 @@ from .distance import Distance
 from .duration import Duration
 from .money_quantity import MoneyQuantity
 from .simple_quantity import SimpleQuantity
-from .availability import Availability
+from .availability import (
+    Availability,
+    AvailabilityAvailableTime,
+    AvailabilityNotAvailableTime,
+)
 from .data_requirement import (
     DataRequirement,
     DataRequirementCodeFilter,
@@ -81,6 +85,8 @@ __all__ = [
     "Annotation",
     "Attachment",
     "Availability",
+    "AvailabilityAvailableTime",
+    "AvailabilityNotAvailableTime",
     "BackboneElement",
     "BackboneType",
     "Base",
@@ -174,6 +180,8 @@ Duration.model_rebuild()
 MoneyQuantity.model_rebuild()
 SimpleQuantity.model_rebuild()
 Availability.model_rebuild()
+AvailabilityAvailableTime.model_rebuild()
+AvailabilityNotAvailableTime.model_rebuild()
 DataRequirement.model_rebuild()
 DataRequirementCodeFilter.model_rebuild()
 DataRequirementDateFilter.model_rebuild()

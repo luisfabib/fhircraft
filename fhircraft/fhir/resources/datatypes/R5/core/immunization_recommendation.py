@@ -156,9 +156,11 @@ class ImmunizationRecommendation(DomainResource):
         description="Who is responsible for protocol",
         default=None,
     )
-    recommendation: Optional[ListType[ImmunizationRecommendationRecommendation]] = Field(
-        description="Vaccine administration recommendations",
-        default=None,
+    recommendation: Optional[ListType[ImmunizationRecommendationRecommendation]] = (
+        Field(
+            description="Vaccine administration recommendations",
+            default=None,
+        )
     )
 
     @model_validator(mode="after")

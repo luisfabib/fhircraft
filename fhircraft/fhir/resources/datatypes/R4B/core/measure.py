@@ -33,6 +33,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class MeasureGroupPopulation(BackboneElement):
     """
     A population criteria for the measure.
@@ -56,6 +57,7 @@ class MeasureGroupPopulation(BackboneElement):
         default=None,
     )
 
+
 class MeasureGroupStratifierComponent(BackboneElement):
     """
     A component of the stratifier criteria for the measure report, specified as either the name of a valid CQL expression defined within a referenced library or a valid FHIR Resource Path.
@@ -78,6 +80,7 @@ class MeasureGroupStratifierComponent(BackboneElement):
         description="Component of how the measure should be stratified",
         default=None,
     )
+
 
 class MeasureGroupStratifier(BackboneElement):
     """
@@ -106,6 +109,7 @@ class MeasureGroupStratifier(BackboneElement):
         default=None,
     )
 
+
 class MeasureGroup(BackboneElement):
     """
     A group of population criteria for the measure.
@@ -133,6 +137,7 @@ class MeasureGroup(BackboneElement):
         default=None,
     )
 
+
 class MeasureSupplementalData(BackboneElement):
     """
     The supplemental data criteria for the measure report, specified as either the name of a valid CQL expression within a referenced library, or a valid FHIR Resource Path.
@@ -159,6 +164,7 @@ class MeasureSupplementalData(BackboneElement):
         description="Expression describing additional data to be reported",
         default=None,
     )
+
 
 class Measure(DomainResource):
     """

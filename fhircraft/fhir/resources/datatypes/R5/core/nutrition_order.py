@@ -306,9 +306,11 @@ class NutritionOrderEnteralFormula(BackboneElement):
         description="How the formula should enter the patient\u0027s gastrointestinal tract",
         default=None,
     )
-    administration: Optional[ListType[NutritionOrderEnteralFormulaAdministration]] = Field(
-        description="Formula feeding instruction as structured data",
-        default=None,
+    administration: Optional[ListType[NutritionOrderEnteralFormulaAdministration]] = (
+        Field(
+            description="Formula feeding instruction as structured data",
+            default=None,
+        )
     )
     maxVolumeToDeliver: Optional[Quantity] = Field(
         description="Upper limit on formula volume per unit of time",

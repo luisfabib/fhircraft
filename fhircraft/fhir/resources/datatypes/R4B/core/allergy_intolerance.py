@@ -23,6 +23,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class AllergyIntoleranceReaction(BackboneElement):
     """
     Details about each adverse reaction event linked to exposure to the identified substance.
@@ -71,6 +72,7 @@ class AllergyIntoleranceReaction(BackboneElement):
         description="Text about event not captured in other fields",
         default=None,
     )
+
 
 class AllergyIntolerance(DomainResource):
     """

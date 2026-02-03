@@ -35,6 +35,7 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import (
 from .resource import Resource
 from .domain_resource import DomainResource
 
+
 class ExplanationOfBenefitRelated(BackboneElement):
     """
     Other claims which are related to this claim such as prior submissions or claims for related services or for the same event.
@@ -53,6 +54,7 @@ class ExplanationOfBenefitRelated(BackboneElement):
         default=None,
     )
 
+
 class ExplanationOfBenefitPayee(BackboneElement):
     """
     The party to be reimbursed for cost of the products and services according to the terms of the policy.
@@ -66,6 +68,7 @@ class ExplanationOfBenefitPayee(BackboneElement):
         description="Recipient reference",
         default=None,
     )
+
 
 class ExplanationOfBenefitCareTeam(BackboneElement):
     """
@@ -102,6 +105,7 @@ class ExplanationOfBenefitCareTeam(BackboneElement):
         description="Practitioner credential or specialization",
         default=None,
     )
+
 
 class ExplanationOfBenefitSupportingInfo(BackboneElement):
     """
@@ -205,6 +209,7 @@ class ExplanationOfBenefitSupportingInfo(BackboneElement):
             required=False,
         )
 
+
 class ExplanationOfBenefitDiagnosis(BackboneElement):
     """
     Information about diagnoses relevant to the claim items.
@@ -255,6 +260,7 @@ class ExplanationOfBenefitDiagnosis(BackboneElement):
             field_name_base="diagnosis",
             required=True,
         )
+
 
 class ExplanationOfBenefitProcedure(BackboneElement):
     """
@@ -312,6 +318,7 @@ class ExplanationOfBenefitProcedure(BackboneElement):
             required=True,
         )
 
+
 class ExplanationOfBenefitInsurance(BackboneElement):
     """
     Financial instruments for reimbursement for the health care products and services specified on the claim.
@@ -339,6 +346,7 @@ class ExplanationOfBenefitInsurance(BackboneElement):
         default=None,
         alias="_preAuthRef",
     )
+
 
 class ExplanationOfBenefitAccident(BackboneElement):
     """
@@ -383,6 +391,7 @@ class ExplanationOfBenefitAccident(BackboneElement):
             required=False,
         )
 
+
 class ExplanationOfBenefitItemAdjudication(BackboneElement):
     """
     If this item is a group then the values here are a summary of the adjudication of the detail items. If this item is a simple product or service then this is the result of the adjudication of this item.
@@ -410,6 +419,7 @@ class ExplanationOfBenefitItemAdjudication(BackboneElement):
         alias="_value",
     )
 
+
 class ExplanationOfBenefitItemDetailAdjudication(BackboneElement):
     """
     The adjudication results.
@@ -436,6 +446,7 @@ class ExplanationOfBenefitItemDetailAdjudication(BackboneElement):
         default=None,
         alias="_value",
     )
+
 
 class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
     """
@@ -509,6 +520,7 @@ class ExplanationOfBenefitItemDetailSubDetail(BackboneElement):
         description="Subdetail level adjudication details",
         default=None,
     )
+
 
 class ExplanationOfBenefitItemDetail(BackboneElement):
     """
@@ -588,6 +600,7 @@ class ExplanationOfBenefitItemDetail(BackboneElement):
         description="Additional items",
         default=None,
     )
+
 
 class ExplanationOfBenefitItem(BackboneElement):
     """
@@ -771,6 +784,7 @@ class ExplanationOfBenefitItem(BackboneElement):
             required=False,
         )
 
+
 class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
     """
     The third-tier service adjudications for payor added services.
@@ -818,6 +832,7 @@ class ExplanationOfBenefitAddItemDetailSubDetail(BackboneElement):
         description="Added items adjudication",
         default=None,
     )
+
 
 class ExplanationOfBenefitAddItemDetail(BackboneElement):
     """
@@ -870,6 +885,7 @@ class ExplanationOfBenefitAddItemDetail(BackboneElement):
         description="Insurer added line items",
         default=None,
     )
+
 
 class ExplanationOfBenefitAddItem(BackboneElement):
     """
@@ -1023,6 +1039,7 @@ class ExplanationOfBenefitAddItem(BackboneElement):
             required=False,
         )
 
+
 class ExplanationOfBenefitTotal(BackboneElement):
     """
     Categorized monetary totals for the adjudication.
@@ -1036,6 +1053,7 @@ class ExplanationOfBenefitTotal(BackboneElement):
         description="Financial total for the category",
         default=None,
     )
+
 
 class ExplanationOfBenefitPayment(BackboneElement):
     """
@@ -1071,6 +1089,7 @@ class ExplanationOfBenefitPayment(BackboneElement):
         description="Business identifier for the payment",
         default=None,
     )
+
 
 class ExplanationOfBenefitProcessNote(BackboneElement):
     """
@@ -1108,6 +1127,7 @@ class ExplanationOfBenefitProcessNote(BackboneElement):
         description="Language of the text",
         default=None,
     )
+
 
 class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
     """
@@ -1186,6 +1206,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial(BackboneElement):
             required=False,
         )
 
+
 class ExplanationOfBenefitBenefitBalance(BackboneElement):
     """
     Balance by Benefit Category.
@@ -1238,6 +1259,7 @@ class ExplanationOfBenefitBenefitBalance(BackboneElement):
         description="Benefit Summary",
         default=None,
     )
+
 
 class ExplanationOfBenefit(DomainResource):
     """
@@ -1467,4 +1489,3 @@ class ExplanationOfBenefit(DomainResource):
         description="Balance by Benefit Category",
         default=None,
     )
-
