@@ -76,6 +76,7 @@ from .linkage import *
 from .list import *
 from .location import *
 from .measure import *
+from .manufactured_item_definition import *
 from .measure_report import *
 from .media import *
 from .medication import *
@@ -90,6 +91,7 @@ from .message_header import *
 from .molecular_sequence import *
 from .naming_system import *
 from .nutrition_order import *
+from .nutrition_product import *
 from .observation import *
 from .observation_definition import *
 from .operation_definition import *

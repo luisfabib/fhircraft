@@ -134,6 +134,10 @@ class ExampleScenarioInstance(BackboneElement):
         default=None,
         alias="_resourceId",
     )
+    resourceType: Optional[String] = Field(
+        description="The type of the resource",
+        default=None,
+    )
     resourceType_ext: Optional[Element] = Field(
         description="Placeholder element for resourceType extensions",
         default=None,
