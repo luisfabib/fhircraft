@@ -87,12 +87,12 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     _resource: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
     _index: Union[int, None] = PrivateAttr(default=None)
 
-    @property
-    def _is_resource(self) -> bool:
+    @classmethod
+    def _is_resource(cls) -> bool:
         """Check if this instance is a FHIR resource."""
         return (
-            self._kind == FhirBaseModelKind.RESOURCE
-            or self._kind == FhirBaseModelKind.LOGICAL
+            cls._kind == FhirBaseModelKind.RESOURCE
+            or cls._kind == FhirBaseModelKind.LOGICAL
         )
 
     def model_post_init(self, context: Any) -> None:
@@ -103,20 +103,22 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     @model_validator(mode="before")
     @classmethod
     def _validate_resource_type(cls, data: Any) -> Any:
-        if not "resourceType" in cls.model_fields:
-            if isinstance(data, dict) and "resourceType" in data:
-                data = data.copy()
-                resource_type = data.pop("resourceType")
-                if resource_type != cls._type:
-                    raise ValueError(
-                        f"Invalid resourceType '{resource_type}' for model '{cls.__name__}', expected '{cls._type}'."
-                    )
 
-            elif isinstance(data, FHIRBaseModel):
-                if data._type != cls._type:
-                    raise ValueError(
-                        f"Invalid resourceType '{data._type}' for model '{cls.__name__}', expected '{cls._type}'."
-                    )
+        if cls._is_resource():
+            if not "resourceType" in cls.model_fields:
+                if isinstance(data, dict) and "resourceType" in data:
+                    data = data.copy()
+                    resource_type = data.pop("resourceType")
+                    if resource_type != cls._type:
+                        raise ValueError(
+                            f"Invalid resourceType '{resource_type}' for model '{cls.__name__}', expected '{cls._type}'."
+                        )
+
+                elif isinstance(data, FHIRBaseModel):
+                    if data._type != cls._type:
+                        raise ValueError(
+                            f"Invalid resourceType '{data._type}' for model '{cls.__name__}', expected '{cls._type}'."
+                        )
         return data
 
     @field_validator("*", mode="before")
@@ -160,7 +162,6 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 result = cls._deserialize_polymorphically(value, base_type)
                 return result
             except Exception:
-                # If polymorphic deserialization fails, return original value
                 return value
             finally:
                 # Always remove from stack when done
@@ -217,7 +218,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                                 self._serialize_fhir_field_polymorphically(value)
                             )
             if (
-                self._is_resource
+                self._is_resource()
                 and hasattr(self, "_type")
                 and "resourceType" not in list(info.exclude or [])
             ):
@@ -318,7 +319,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
         # Set resource: if this instance is a resource, it becomes the _resource
         # otherwise inherit from parent or explicit resource parameter
-        if self._is_resource:
+        if self._is_resource():
             # This is a resource or logical model itself
             object.__setattr__(self, "_resource", self)
         elif resource is not None:
@@ -348,7 +349,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             # Single FHIR model - set context
             # Determine resource: if self is a resource, use self; otherwise use self's _resource
             resource_context = (
-                self if self._is_resource else getattr(self, "_resource", None)
+                self if self._is_resource() else getattr(self, "_resource", None)
             )
             value._set_resource_context(
                 parent=self,
@@ -361,7 +362,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             if not isinstance(value, FHIRList):
                 # Replace the list with FHIRList
                 resource_context = (
-                    self if self._is_resource else getattr(self, "_resource", None)
+                    self if self._is_resource() else getattr(self, "_resource", None)
                 )
                 fhir_list = FHIRList(
                     value,
@@ -377,7 +378,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             else:
                 # Update context of existing FHIRList
                 resource_context = (
-                    self if self._is_resource else getattr(self, "_resource", None)
+                    self if self._is_resource() else getattr(self, "_resource", None)
                 )
                 value._parent = self
                 value._root = getattr(self, "_root_resource", self)
@@ -424,7 +425,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         register_namespace("", "http://hl7.org/fhir")
 
         # Determine the root element name BEFORE filtering (so exclude_defaults doesn't affect it)
-        if self._is_resource:
+        if self._is_resource():
             root_name = self._type
         else:
             root_name = self.__class__.__name__
@@ -526,7 +527,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         # Handle different value types
         if isinstance(value, dict):
             # For resources in arrays (like contained), wrap in proper element
-            if isinstance(value, FHIRBaseModel) and value._is_resource:
+            if isinstance(value, FHIRBaseModel) and value._is_resource():
                 # Create a child element with the resource type name
                 resource_elem = SubElement(
                     field_elem, f"{{http://hl7.org/fhir}}{value._type}"
@@ -608,8 +609,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         if isinstance(instance, FHIRBaseModel):
             instance._set_resource_context(
                 parent=None,
-                root=instance if instance._is_resource else None,
-                resource=instance if instance._is_resource else None,
+                root=instance if instance._is_resource() else None,
+                resource=instance if instance._is_resource() else None,
             )
 
         return instance
@@ -637,7 +638,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         )
 
         # Set up resource context for the root instance if it's a resource
-        if instance._is_resource:
+        if instance._is_resource():
             instance._set_resource_context(
                 parent=None, root=instance, resource=instance
             )
@@ -801,7 +802,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                         value,
                     )
                     return result
-                except (ValidationError, ValueError, TypeError):
+                except (ValidationError, ValueError, TypeError) as e:
                     # If specific class fails, continue trying other subclasses
                     continue
 
