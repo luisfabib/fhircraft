@@ -40,6 +40,12 @@ def test_R4_resource_model(path):
 
 
 @pytest.mark.integration
+@pytest.mark.parametrize("path", _get_core_example_filenames("R4B"))
+def test_R4B_resource_model(path):
+    _assert_core_resource_compliance("R4B", path)
+
+
+@pytest.mark.integration
 @pytest.mark.parametrize("path", _get_core_example_filenames("R5"))
 def test_R5_resource_model(path):
     _assert_core_resource_compliance("R5", path)
