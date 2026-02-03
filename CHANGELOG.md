@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+----------------- 
+
+## v0.6.1 - 2026-02-03
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.1) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.1...0.6.0)
+
+### Added
+
+- Implemented one official FHIR example file for each core FHIR resource and a corresponding unit test to validate core resource model compliance across R4, R4B, and R5 releases ([#244](https://github.com/luisfabib/fhircraft/pull/244))
+
+### Changed 
+
+- Removed redundant validator methods and duplicate field definitions that unnecessarily overrode their inherited counterparts from the base class ([#236](https://github.com/luisfabib/fhircraft/pull/236))
+
+
+### Fixed
+
+- Added missing aliases for fields containing reserved keywords (e.g. `class_`, `import_`,  etc.) in 15+ resources across R4, R4B, R5 ensuring correct (de)serialization ([#227](https://github.com/luisfabib/fhircraft/pull/227)) and ensured they are properly evaluated in FHIRPath ([#233](https://github.com/luisfabib/fhircraft/pull/233))
+- Added missing `_type` metadata attribute to the R4 `CommunicationRequest` class ([#229](https://github.com/luisfabib/fhircraft/pull/229))
+- Added validation to ensure the FHIRPath `iif()` function only operates on singleton collections, fixed criterion evaluation for empty input collections instead of iterating over collection items, and added type checking to ensure criterion evaluates to a boolean value ([#231](https://github.com/luisfabib/fhircraft/pull/231), fixes [#230](https://github.com/luisfabib/fhircraft/pull/230)) 
+- Fixed FHIRPath comparison operators when comparing `Quantity` subclasses such as `Age`, `Duration`, etc. ([#232](https://github.com/luisfabib/fhircraft/pull/232), fixes [#226](https://github.com/luisfabib/fhircraft/pull/226)) 
+- Updated the `ref-1` constraint validation logic to skip evaluation when `_root_resource` or `_resource` attributes are not set, preventing FHIRPath evaluation errors ([#234](https://github.com/luisfabib/fhircraft/pull/234))
+- Changed the FHIRBaseModel context setup for complex types by ensuring `_resource` and `_root_resource` are only set for actual FHIR resources and children objects, not root complex datatypes ([#234](https://github.com/luisfabib/fhircraft/pull/234))
+- Added the missing backbone elements for the elements of the R5 `Availability` class ([#236](https://github.com/luisfabib/fhircraft/pull/236))
+Ensured that the `List` exposed in the `fhircraft.fhir.resourcres.datatypes.R5.core` module is the FHIR model and not `typing.List` ([#236](https://github.com/luisfabib/fhircraft/pull/236))
+- Improved the FHIRPath `comparable()`, `lowBoundary()`, `highBoundary()`, `toQuantity()`, and `toString()` functions to work with `FHIR.Quantity` types and subclasses ([#238](https://github.com/luisfabib/fhircraft/pull/238))
+- Fixed issue in FHIRPath `comparable()` function to return `False` when one of the input values evaluates to `None`, conforming with the FHIRPath specification for this function ([#239](https://github.com/luisfabib/fhircraft/pull/239))
+- Fixed errors during validation due to `%resource` not being defined by moving all FHIR invariant constraint validators in classes inheriting from `BackboneElement` to their core resource parent class to ensure they evaluate within the context of the full resource ([#236](https://github.com/luisfabib/fhircraft/pull/236))
+- ixed FHIRPath math operators (addition, subtraction, multiplication, division) to work with mixed FHIRPath and FHIR `Quantity` types and with quantities of different (compatible) units ([#238](https://github.com/luisfabib/fhircraft/pull/238))
+- Fixed `toString()` conversion to properly extract unit from `FHIR.Quantity` objects ([#238](https://github.com/luisfabib/fhircraft/pull/238))
+- Fixed handling of UCUM unit codes with special characters (square brackets, quotes, curly braces) to ensure that UCUM unit codes such as, e.g. `mm[Hg]`, `{fractions}`, or `[arb'Unit]` are properly processed by FHIRPath `Quantity` objects ([#238](https://github.com/luisfabib/fhircraft/pull/238))
+- Added missing `manufactured_item_definition` and `nutrition_product` imports to the R4B core module ([#241](https://github.com/luisfabib/fhircraft/pull/241))
+- Added missing `resourceType` field to the R4B `ExampleScenarioInstance` class ([#241](https://github.com/luisfabib/fhircraft/pull/241))
+- Updated the initialization of `UnitRegistry` in FHIRPath `Quantity` literals to set `autoconvert_offset_to_baseunit=True`, ensuring offset units are automatically converted to their base units ([#243](https://github.com/luisfabib/fhircraft/pull/243), fixes [#242](https://github.com/luisfabib/fhircraft/pull/242))
+
+
 ----------------- 
 
 ## v0.6.0 - 2026-01-30
