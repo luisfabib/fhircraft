@@ -30,9 +30,16 @@ from fhircraft.fhir.path.engine.core import FHIRPath
 from fhircraft.fhir.resources.factory import ResourceFactory
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
-from .exceptions import MappingError, RuleProcessingError
+from .exceptions import (
+    MappingError,
+    RuleProcessingError,
+    SourceTypeError,
+    SourceConditionError,
+    SourceAssertionError,
+)
 from .scope import MappingScope
 from .transformer import MappingTransformer
+from .source import RuleSource
 
 logger = logging.getLogger(__name__)
 
@@ -470,61 +477,21 @@ class FHIRMappingEngine:
             # Process sources first to determine iteration
             source_iterations = {}
 
-            for source in rule.source or []:
-                var_name = self.process_source(source, scope)
-                source_fhirpath = scope.resolve_fhirpath(var_name)
-
-                if source.type:
-                    condition_fhirpath = source_fhirpath._invoke(
-                        getattr(fhirpath, f"Is{source.type.title()}")
+            # Process sources
+            sources = [RuleSource(source, rule) for source in rule.source or []]
+            for source in sources:
+                try:
+                    source.process(scope)
+                except (SourceTypeError, SourceConditionError):
+                    logger.debug(
+                        f"Source type or condition violated in rule {rule_name}. Skipping rule."
                     )
-                    if not bool(condition_fhirpath.single(scope.get_instances())):
-                        logger.debug(
-                            f"Source type condition not met for rule {rule_name}"
-                        )
-                        return scope
-
-                # Where condition
-                if source.condition:
-                    condition_fhirpath = fhirpath_parser.parse(source.condition)
-                    condition_fhirpath = self._replace_mapping_scope_elements(
-                        condition_fhirpath, scope
+                    return scope
+                except SourceAssertionError:
+                    raise SourceAssertionError(
+                        f"Source assertion failed for rule {rule_name}"
                     )
-
-                    if not bool(condition_fhirpath.single(scope.get_instances())):
-                        logger.debug(f"Source condition not met for rule {rule_name}")
-                        return scope
-
-                # Check condition
-                if source.check:
-                    condition_fhirpath = fhirpath_parser.parse(source.check)
-                    condition_fhirpath = self._replace_mapping_scope_elements(
-                        condition_fhirpath, scope
-                    )
-
-                    if not bool(condition_fhirpath.single(scope.get_instances())):
-                        raise RuleProcessingError(
-                            f"Source check failed for rule {rule_name}"
-                        )
-
-                # Collect source values for iteration
-                if source_fhirpath is None:
-                    raise RuleProcessingError(f"Source variable {var_name} not found")
-                source_iterations[var_name] = source_fhirpath.count(
-                    scope.get_instances()
-                )
-                if source.min is not None and source_iterations[var_name] < source.min:
-                    raise RuleProcessingError(
-                        f"Source minimum cardinality not met for rule {rule_name}"
-                    )
-                if (
-                    source.max is not None
-                    and source.max != "*"
-                    and source_iterations[var_name] > int(source.max)
-                ):
-                    raise RuleProcessingError(
-                        f"Source maximum cardinality exceeded for rule {rule_name}"
-                    )
+                source_iterations[source.variable] = source.iteration_count
 
             for source_var, iterations in source_iterations.items():
                 for source_iteration in range(iterations):
@@ -915,39 +882,6 @@ class FHIRMappingEngine:
         # Validate nested rules
         for nested_rule in rule.rule or []:
             self._validate_rule(nested_rule, issues)
-
-    def _replace_mapping_scope_elements(self, path, scope: MappingScope):
-        """
-        Recursively replaces elements in a FHIRPath expression tree with their corresponding values from the given mapping scope.
-
-        Args:
-            path: A FHIRPath expression node, which can be an instance of fhirpath.Element, fhirpath.Invocation, fhirpath.FHIRComparisonOperator, or other supported types.
-            scope (MappingScope): The mapping scope used to resolve FHIRPath element labels.
-
-        Returns:
-            The FHIRPath expression tree with elements replaced according to the mapping scope.
-
-        Raises:
-            MappingError: If a FHIRPath element label cannot be resolved in the mapping scope.
-
-        Notes:
-            - If a fhirpath.Element cannot be resolved in the scope, a new fhirpath.Element with the same label is returned.
-            - The function processes Invocation and FHIRComparisonOperator nodes recursively.
-        """
-        if isinstance(path, fhirpath.Element):
-            try:
-                return scope.resolve_fhirpath(path.label)
-            except MappingError:
-                return fhirpath.Element(f"{path.label}")
-        elif isinstance(path, (fhirpath.Invocation)):
-            left = self._replace_mapping_scope_elements(path.left, scope)
-            right = self._replace_mapping_scope_elements(path.right, scope)
-            return fhirpath.Invocation(left, right)
-        elif isinstance(path, fhirpath.FHIRComparisonOperator):
-            left = self._replace_mapping_scope_elements(path.left, scope)
-            right = self._replace_mapping_scope_elements(path.right, scope)
-            return path.__class__(left, right)
-        return path
 
 
 mapper = FHIRMappingEngine()
