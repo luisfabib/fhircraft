@@ -27,7 +27,7 @@ if TYPE_CHECKING:
         StructureMapGroupRuleSource as R5_StructureMapGroupRuleSource,
     )
     from fhircraft.fhir.mapper.engine.scope import MappingScope
-    from fhircraft.fhir.mapper.engine.rule import MappingRule
+    from fhircraft.fhir.mapper.engine.rule import Rule
 
 
 class RuleSource:
@@ -35,7 +35,7 @@ class RuleSource:
     def __init__(
         self,
         source: "R4_StructureMapGroupRuleSource | R4B_StructureMapGroupRuleSource | R5_StructureMapGroupRuleSource",
-        parent_rule: "MappingRule",
+        parent_rule: "Rule",
     ):
         """
         Initializes a RuleSource instance from a StructureMapGroupRuleSource.

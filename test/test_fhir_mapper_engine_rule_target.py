@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.target import RuleTarget
 from fhircraft.fhir.mapper.engine.scope import MappingScope
-from fhircraft.fhir.mapper.engine.rule import MappingRule
+from fhircraft.fhir.mapper.engine.rule import Rule
 from fhircraft.fhir.mapper.engine.exceptions import SourceProcessingError
 from fhircraft.fhir.path.engine.core import Element
 from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (

@@ -40,6 +40,7 @@ from .exceptions import (
 )
 from .scope import MappingScope
 from .source import RuleSource
+from .group import Group
 
 logger = logging.getLogger(__name__)
 
@@ -161,7 +162,7 @@ class FHIRMappingEngine:
                 **produced_models,
             },
             groups=OrderedDict(
-                [(str(group.name), group) for group in structure_map.group or []]  # type: ignore
+                [(str(group.name), Group(group)) for group in structure_map.group or []]  # type: ignore
             ),
             concept_maps={
                 str(map.id): map
@@ -197,7 +198,7 @@ class FHIRMappingEngine:
         expected_sources = len(
             [
                 input
-                for input in (target_group.input or [])
+                for input in (target_group.inputs)
                 if input.mode == StructureMapModelMode.SOURCE
             ]
         )
@@ -211,7 +212,7 @@ class FHIRMappingEngine:
             expected_targets = len(
                 [
                     input
-                    for input in (target_group.input or [])
+                    for input in target_group.inputs
                     if input.mode
                     in (StructureMapModelMode.TARGET, StructureMapModelMode.PRODUCED)
                 ]
@@ -223,7 +224,7 @@ class FHIRMappingEngine:
 
         # Bind source and target instances to group parameters
         parameters = []
-        for input in target_group.input or []:
+        for input in target_group.inputs:
             if not input.name:
                 raise ValueError(
                     f"Input in group '{target_group.name}' is missing a name."
@@ -286,7 +287,7 @@ class FHIRMappingEngine:
                 parameters.append(fhirpath.Element(target_instance_id))
 
         # Process the entrypoint group
-        self.process_group(target_group, parameters, global_scope)
+        target_group.process(scope=global_scope, parameters=parameters)
 
         # Return the resulting target instances
         return tuple(
@@ -330,250 +331,6 @@ class FHIRMappingEngine:
 
         # Store the default groups registry in global scope
         global_scope.default_groups = default_groups
-
-    def process_group(
-        self,
-        group: (
-            R4B_models.StructureMapGroup
-            | R5_models.StructureMapGroup
-            | R4_models.StructureMapGroup
-        ),
-        parameters: list[FHIRPath] | tuple[FHIRPath],
-        scope: MappingScope,
-        is_dependent: bool = False,
-    ):
-        """
-        Processes a StructureMap group by validating input parameters, constructing a local mapping scope,
-        and executing the group's rules in the correct order, handling special list modes ('first' and 'last').
-
-        Args:
-            group: The group definition containing mapping rules and input definitions.
-            parameters: The input parameters to be mapped, corresponding to the group's input definitions.
-            scope: The parent mapping scope to use as the basis for the group's local scope.
-
-        Raises:
-            MappingError: If the number of provided parameters does not match the group's input definitions.
-            RuntimeError: If more than one rule with 'first' or 'last' target list mode is found in the group.
-            NotImplementedError: If a target list mode other than 'first' or 'last' is encountered.
-
-        """
-        group_name = group.name or f"group_{id(group)}"
-
-        # Construct local group scope
-        group_scope = MappingScope(
-            name=group_name,
-            parent=scope,
-        )
-        if not group.input:
-            raise MappingError(f"Group '{group_name}' has no input definitions.")
-        # Validate input parameters
-        if len(group.input) != len(parameters):
-            raise MappingError(
-                f"Invalid number of parameters provided for group '{group_name}'. Expected {len(group.input)}, got {len(parameters)}."
-            )
-        for input, parameter in zip(group.input, parameters):
-            if input.mode == "target" and not is_dependent:
-                if not input.type:
-                    raise MappingError(
-                        f"Target input '{input.name}' in group '{group_name}' must have a type specified."
-                    )
-
-            if input.type:
-                try:
-                    scope.get_type(input.type)
-                except MappingError:
-                    raise MappingError(
-                        f"Input '{input.name}' in group '{group_name}' has unknown type '{input.type}'."
-                    )
-            if not input.name:
-                raise MappingError(
-                    f"A {input.mode} input in group '{group_name}' is missing a name."
-                )
-
-            group_scope.define_variable(input.name, parameter)
-
-        # Process rules in order, handling 'first' and 'last' list modes
-        rules = []
-        first_rule, last_rule = None, None
-        for rule in group.rule or []:
-            if rule.target and (
-                targetMode := next(
-                    (target.listMode for target in rule.target if target.listMode),
-                    [None],
-                )[0]
-            ):
-                if targetMode == StructureMapTargetListMode.FIRST:
-                    if first_rule:
-                        raise RuntimeError(
-                            'Only one rule with "first" target list mode is allowed per group.'
-                        )
-                    first_rule = rule
-                elif targetMode == StructureMapTargetListMode.LAST:
-                    if last_rule:
-                        raise RuntimeError(
-                            'Only one rule with "last" target list mode is allowed per group.'
-                        )
-                    last_rule = rule
-                else:
-                    raise NotImplementedError(
-                        "Only 'first' and 'last' target list modes are implemented so far. Mode '{}' not implemented"
-                    )
-            else:
-                rules.append(rule)
-        rules = (
-            ([first_rule] if first_rule else [])
-            + rules
-            + ([last_rule] if last_rule else [])
-        )
-
-        # Process each rule
-        for rule in rules:
-            self.process_rule(rule, group_scope)
-
-    def process_rule(
-        self,
-        rule: (
-            R4_models.StructureMapGroupRule
-            | R4B_models.StructureMapGroupRule
-            | R5_models.StructureMapGroupRule
-        ),
-        scope: MappingScope,
-    ) -> MappingScope:
-        """
-        Processes a single StructureMap rule within the given mapping scope.
-
-        This method handles the evaluation and execution of a StructureMapGroupRule, including:
-        - Cycle detection to prevent infinite recursion.
-        - Source processing to determine iteration counts and validate type, condition, and check constraints.
-        - Iterative processing for each source instance, including:
-            - Creating an iteration-specific mapping scope.
-            - Setting indexed FHIRPath variables for the current iteration.
-            - Processing target mappings, dependent rules/groups, and nested rules.
-            - Merging results from each iteration back into the main scope.
-
-        Args:
-            rule: The rule to process.
-            scope: The current mapping scope.
-
-        Returns:
-            MappingScope: The updated mapping scope after processing the rule.
-
-        Raises:
-            RuleProcessingError: If any rule constraints (such as cardinality, type, or checks) are violated,
-                or if required variables or dependent groups are not found.
-        """
-        rule_name = rule.name or f"rule_{id(rule)}"
-
-        # Check for cycles
-        if scope.is_processing_rule(rule_name):
-            logger.warning(f"Cycle detected in rule {rule_name}, skipping")
-            return scope
-        scope.start_processing_rule(rule_name)
-
-        try:
-            logger.debug(f"Processing rule: {rule_name}")
-
-            # Process sources first to determine iteration
-            source_iterations = {}
-
-            # Process sources
-            sources = [RuleSource(source, rule) for source in rule.source or []]
-            targets = [RuleTarget(target, rule) for target in rule.target or []]
-            for source in sources:
-                try:
-                    source.process(scope)
-                except (SourceTypeError, SourceConditionError):
-                    logger.debug(
-                        f"Source type or condition violated in rule {rule_name}. Skipping rule."
-                    )
-                    return scope
-                except SourceAssertionError:
-                    raise SourceAssertionError(
-                        f"Source assertion failed for rule {rule_name}"
-                    )
-                source_iterations[source.variable] = source.iteration_count
-
-            for source_var, iterations in source_iterations.items():
-                for source_iteration in range(iterations):
-
-                    logger.debug(
-                        f"Processing iteration {source_iteration} for rule {rule_name}"
-                    )
-                    # Create iteration scope
-                    iteration_scope = MappingScope(
-                        name=f"{scope.name}_iter_{source_iteration}",
-                        source_instances=scope.source_instances.copy(),
-                        target_instances=scope.target_instances.copy(),
-                        types=scope.types.copy(),
-                        variables=scope.variables.copy(),  # Copy existing variables
-                        parent=scope.parent,
-                    )
-
-                    # Set the source variable to an indexed FHIRPath
-                    if (rule_source := scope.resolve_fhirpath(source_var)) is None:
-                        raise RuleProcessingError(
-                            f"Source variable {source_var} not found"
-                        )
-                    iteration_scope.define_variable(
-                        source_var,
-                        rule_source._invoke(fhirpath.Index(source_iteration)),
-                    )
-
-                    # Process targets for this iteration
-                    for target in targets:
-                        target.process(iteration_scope)
-
-                    # Process dependent rules for this iteration
-                    for dependent in rule.dependent or []:
-                        if not dependent.name:
-                            raise RuleProcessingError(
-                                "Dependent rule or group must have a name"
-                            )
-                        dependent_group = iteration_scope.resolve_symbol(dependent.name)
-                        if not dependent_group:
-                            raise RuleProcessingError(
-                                f"Dependent group or rule '{dependent.name}' not found"
-                            )
-                        if not isinstance(
-                            dependent_group,
-                            (
-                                R4B_models.StructureMapGroup,
-                                R5_models.StructureMapGroup,
-                                R4_models.StructureMapGroup,
-                            ),
-                        ):
-                            raise RuleProcessingError(
-                                f"Dependent '{dependent.name}' is not a group"
-                            )
-                        # R5-specific logic
-                        if _parameters := getattr(dependent, "parameter", None):
-                            parameters = [
-                                iteration_scope.resolve_fhirpath(param.value)
-                                for param in _parameters or []
-                            ]
-                        # R4 and R4B-specific logic
-                        elif _variables := getattr(dependent, "variable", None):
-                            parameters = [
-                                iteration_scope.resolve_fhirpath(var)
-                                for var in _variables or []
-                            ]
-                        self.process_group(
-                            dependent_group,
-                            parameters,
-                            iteration_scope,
-                            is_dependent=True,
-                        )
-
-                    # Process nested rules for this iteration
-                    for nested_rule in rule.rule or []:
-                        self.process_rule(nested_rule, iteration_scope)
-
-                    # Merge back iteration results to main scope
-                    scope.target_instances.update(iteration_scope.target_instances)
-
-        finally:
-            scope.finish_processing_rule(rule_name)
-        return scope
 
     def validate_structure_map(self, structure_map: StructureMap) -> List[str]:
         """

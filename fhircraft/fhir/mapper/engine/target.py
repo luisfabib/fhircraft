@@ -27,7 +27,7 @@ if TYPE_CHECKING:
         StructureMapGroupRuleTarget as R5_StructureMapGroupRuleTarget,
     )
     from fhircraft.fhir.mapper.engine.scope import MappingScope
-    from fhircraft.fhir.mapper.engine.rule import MappingRule
+    from fhircraft.fhir.mapper.engine.rule import Rule
 
 
 class RuleTarget:
@@ -35,7 +35,7 @@ class RuleTarget:
     def __init__(
         self,
         source: "R4_StructureMapGroupRuleTarget | R4B_StructureMapGroupRuleTarget | R5_StructureMapGroupRuleTarget",
-        parent_rule: "MappingRule",
+        parent_rule: "Rule",
     ):
         """
         Initializes a RuleSource instance from a StructureMapGroupRuleTarget.
@@ -118,3 +118,10 @@ class RuleTarget:
                 return None
             case _:
                 raise SourceProcessingError(f"Unsupported transform: {transform_name}")
+
+    def has_list_mode(self, mode: str) -> bool:
+        """Check if this target has a specific list mode."""
+        target_mode = getattr(self.definition, "listMode", None)
+        if isinstance(target_mode, list):
+            return mode in target_mode
+        return target_mode == mode
