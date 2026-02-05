@@ -163,8 +163,8 @@ group main(source legacy, target patient: Patient) {
         legacy.lastName -> name.family;
     };
     legacy.dob -> patient.birthDate;
-    legacy.sex where($this = 'F') -> patient.gender = "female";
-    legacy.sex where($this = 'M') -> patient.gender = "male";
+    legacy.sex where(legacy.sex = 'F') -> patient.gender = "female";
+    legacy.sex where(legacy.sex = 'M') -> patient.gender = "male";
 }
 """ # (2)!
 
@@ -174,7 +174,7 @@ targets = mapper.execute_mapping(mapping_script, legacy_patient)  # (3)!
 patient = targets[0]
 
 print(patient.model_dump(exclude={'meta','resourceType'}))
-#> {'name': [{'family': 'Johnson', 'given': ['Alice']}], 'birthDate': '1985-03-15'}
+#> {'name': [{'family': 'Johnson', 'given': ['Alice']}], 'gender': 'female', 'birthDate': '1985-03-15'}
 ```
 
 1. This defines a dictionary with legacy patient data that doesn't match the FHIR Patient structure.

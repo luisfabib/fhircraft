@@ -187,16 +187,13 @@ class RuleSource:
             - The function processes Invocation and FHIRComparisonOperator nodes recursively.
         """
         if isinstance(path, fhirpath.Element):
-            try:
-                return scope.resolve_fhirpath(path.label)
-            except MappingError:
-                return fhirpath.Element(f"{path.label}")
-        elif isinstance(path, (fhirpath.Invocation)):
-            left = self._replace_mapping_scope_elements(path.left, scope)
-            right = self._replace_mapping_scope_elements(path.right, scope)
-            return fhirpath.Invocation(left, right)
-        elif isinstance(path, fhirpath.FHIRComparisonOperator):
-            left = self._replace_mapping_scope_elements(path.left, scope)
-            right = self._replace_mapping_scope_elements(path.right, scope)
-            return path.__class__(left, right)
-        return path
+            return scope.resolve_fhirpath(path.label)
+        elif (
+            isinstance(path, FHIRPath)
+            and hasattr(path, "left")
+            and hasattr(path, "right")
+        ):
+            left = self._replace_mapping_scope_elements(path.left, scope)  # type: ignore
+            return path.__class__(left, path.right)  # type: ignore
+        else:
+            return path
