@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Type
 
 from pydantic import BaseModel, ConfigDict
 
+from fhircraft.fhir.mapper.engine.target import RuleTarget
 import fhircraft.fhir.path.engine as fhirpath
 from fhircraft.fhir.resources.datatypes.R5.core.concept_map import ConceptMap
 
@@ -38,7 +39,6 @@ from .exceptions import (
     SourceAssertionError,
 )
 from .scope import MappingScope
-from .transformer import MappingTransformer
 from .source import RuleSource
 
 logger = logging.getLogger(__name__)
@@ -94,7 +94,6 @@ class FHIRMappingEngine:
     ):
         self.repository = repository or CompositeStructureDefinitionRepository()
         self.factory = factory or ResourceFactory(repository=self.repository)
-        self.transformer = MappingTransformer()
 
     def execute(
         self,
@@ -479,6 +478,7 @@ class FHIRMappingEngine:
 
             # Process sources
             sources = [RuleSource(source, rule) for source in rule.source or []]
+            targets = [RuleTarget(target, rule) for target in rule.target or []]
             for source in sources:
                 try:
                     source.process(scope)
@@ -520,8 +520,8 @@ class FHIRMappingEngine:
                     )
 
                     # Process targets for this iteration
-                    for target in rule.target or []:
-                        self.process_target(target, iteration_scope)
+                    for target in targets:
+                        target.process(iteration_scope)
 
                     # Process dependent rules for this iteration
                     for dependent in rule.dependent or []:
@@ -574,111 +574,6 @@ class FHIRMappingEngine:
         finally:
             scope.finish_processing_rule(rule_name)
         return scope
-
-    def process_source(
-        self,
-        source: (
-            R4_models.StructureMapGroupRuleSource
-            | R4B_models.StructureMapGroupRuleSource
-            | R5_models.StructureMapGroupRuleSource
-        ),
-        scope: MappingScope,
-    ) -> str:
-        """
-        Processes a StructureMapGroupRuleSource object within a given MappingScope and returns the variable name
-        associated with the resolved FHIRPath expression.
-
-        This method resolves the FHIRPath context from the source, applies any specified element path,
-        and modifies the path according to the listMode option (e.g., first, last, not_first, not_last, only_one).
-        The resulting FHIRPath expression is stored in the scope under a variable name, which is either
-        provided by the source or generated uniquely.
-
-        Args:
-            source: The source mapping definition containing context, element, listMode, and variable.
-            scope: The current mapping scope used to resolve FHIRPath and store variables.
-
-        Returns:
-            str: The variable name under which the resolved FHIRPath expression is stored in the scope.
-        """
-        if not source.context:
-            raise RuleProcessingError("Source context is required")
-        path = scope.resolve_fhirpath(source.context)
-        # Apply element path if specified
-        if source.element:
-            path = path._invoke(fhirpath.Element(source.element))
-
-        # Apply list-option condition if specified
-        if source.listMode == "first":
-            path = path._invoke(fhirpath.First())
-        elif source.listMode == "not_first":
-            path = path._invoke(fhirpath.Tail())
-        elif source.listMode == "not_last":
-            path = path._invoke(
-                fhirpath.Exclude(
-                    path._invoke(fhirpath.Last()).single(scope.get_instances())
-                )
-            )
-        elif source.listMode == "last":
-            path = path._invoke(fhirpath.Last())
-        elif source.listMode == "only_one":
-            path = path._invoke(fhirpath.Single())
-
-        # Store source FHIRPath
-        var_name = source.variable or f"source_{id(source)}"
-        scope.define_variable(var_name, path)
-        return var_name
-
-    def process_target(
-        self,
-        target: (
-            R4_models.StructureMapGroupRuleTarget
-            | R4B_models.StructureMapGroupRuleTarget
-            | R5_models.StructureMapGroupRuleTarget
-        ),
-        scope: MappingScope,
-    ) -> Any:
-        """
-        Processes a StructureMapGroupRuleTarget within the given mapping scope.
-
-        This method resolves the FHIRPath context for the target, applies any specified element path,
-        determines the appropriate insertion index, and stores the resulting FHIRPath in the scope as a variable.
-        If a transform is specified on the target, it executes the transform with the provided parameters and
-        updates the target structure with the transformed value.
-
-        Args:
-            target (StructureMapGroupRuleTarget): The mapping target to process, containing context, element, variable,
-                transform, and parameters.
-            scope (MappingScope): The current mapping scope, used for resolving FHIRPath contexts and managing variables.
-
-        Returns:
-            Any: The result of processing the target, typically the updated FHIRPath or transformed value.
-
-        Raises:
-            RuleProcessingError: If the target context is not specified.
-        """
-        if not target.context:
-            raise RuleProcessingError("Target context is required")
-        path = scope.resolve_fhirpath(target.context)
-        # Apply element path if specified
-        if target.element:
-            path = path._invoke(fhirpath.Element(target.element))
-
-        insert_index = path.count(scope.get_instances())
-        path = path._invoke(fhirpath.Index(insert_index))
-
-        # Store target FHIRPath
-        var_name = target.variable or f"target_{id(target)}"
-        scope.define_variable(var_name, path)
-
-        transform = target.transform
-        if transform:
-            target.parameter = target.parameter or []  # type: ignore
-            # Execute the transform
-            transformed_value = self.transformer.execute(
-                transform, scope, target.parameter
-            )
-            # Update the target structure
-            path.update_single(scope.get_instances(), transformed_value)
 
     def validate_structure_map(self, structure_map: StructureMap) -> List[str]:
         """

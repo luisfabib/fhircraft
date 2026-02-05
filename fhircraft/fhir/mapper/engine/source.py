@@ -27,6 +27,7 @@ if TYPE_CHECKING:
         StructureMapGroupRuleSource as R5_StructureMapGroupRuleSource,
     )
     from fhircraft.fhir.mapper.engine.scope import MappingScope
+    from fhircraft.fhir.mapper.engine.rule import MappingRule
 
 
 class RuleSource:
