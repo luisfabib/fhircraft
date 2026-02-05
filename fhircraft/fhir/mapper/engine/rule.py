@@ -4,6 +4,7 @@ from fhircraft.fhir.mapper.engine.exceptions import (
     SourceAssertionError,
     SourceConditionError,
     SourceTypeError,
+    MappingDigestionError,
 )
 from fhircraft.fhir.mapper.engine import transforms as tf
 from fhircraft.fhir.mapper.engine.source import RuleSource
@@ -78,7 +79,7 @@ class Rule:
         # Extract dependents
         for dependent in self.definition.dependent or []:
             if not dependent.name:
-                raise RuleProcessingError("Dependent rule or group must have a name")
+                raise MappingDigestionError("Dependent rule or group must have a name")
             self.dependents.append(dependent)
 
     def process(

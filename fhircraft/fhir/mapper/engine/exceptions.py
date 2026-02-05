@@ -28,6 +28,12 @@ class SourceAssertionError(MappingError):
     pass
 
 
+class MappingDigestionError(MappingError):
+    """Raised during the digestion of StructureMap definitions."""
+
+    pass
+
+
 class SourceProcessingError(MappingError):
     """Raised when source processing fails."""
 

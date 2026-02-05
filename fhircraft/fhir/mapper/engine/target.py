@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Optional
 from fhircraft.fhir.mapper.engine.exceptions import (
+    MappingDigestionError,
     MappingError,
     SourceAssertionError,
     SourceProcessingError,
@@ -47,7 +48,7 @@ class RuleTarget:
         """
         self.definition = source
         if self.definition.context is None:
-            raise SourceProcessingError("Source context is required")
+            raise MappingDigestionError("Source context is required")
         self.parent_rule = parent_rule
         self.variable = source.variable or f"tartget_{id(source)}"
         self.resolved_path: Optional[FHIRPath] = None

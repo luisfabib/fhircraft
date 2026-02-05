@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, List, Sequence
 from fhircraft.fhir.mapper.engine.exceptions import (
+    MappingDigestionError,
     MappingError,
 )
 import logging
@@ -52,7 +53,9 @@ class Group:
         self._organize_rules()
         # Parse inputs
         if not self.definition.input:
-            raise MappingError(f"Group '{self.name}' has no input definitions.")
+            raise MappingDigestionError(
+                f"Group '{self.name}' has no input definitions."
+            )
         self.inputs = self.definition.input
 
     def bind_parameters(
@@ -127,13 +130,13 @@ class Group:
             # Check for list mode ordering
             if rule.has_first_target:
                 if first_rule:
-                    raise MappingError(
+                    raise MappingDigestionError(
                         "Only one rule with 'first' target list mode allowed"
                     )
                 first_rule = rule
             elif rule.has_last_target:
                 if last_rule:
-                    raise MappingError(
+                    raise MappingDigestionError(
                         "Only one rule with 'last' target list mode allowed"
                     )
                 last_rule = rule
