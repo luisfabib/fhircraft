@@ -8,38 +8,24 @@ StructureMap resources to transform FHIR data from source to target structures.
 import enum
 import logging
 from collections import OrderedDict
-from typing import Any, Dict, List, Type
+from typing import Dict, Type
 
 from pydantic import BaseModel, ConfigDict
 
-from fhircraft.fhir.mapper.engine.target import RuleTarget
 import fhircraft.fhir.path.engine as fhirpath
-from fhircraft.fhir.resources.datatypes.R5.core.concept_map import ConceptMap
 
 from fhircraft.fhir.resources.datatypes.R4 import core as R4_models
 from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
 
-from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
-    StructureMap,
-    StructureMapGroupRule,
-    StructureMapGroupRuleSource,
-    StructureMapGroupRuleTarget,
-)
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
-from fhircraft.fhir.path.engine.core import FHIRPath
 from fhircraft.fhir.resources.factory import ResourceFactory
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 from .exceptions import (
     MappingError,
-    RuleProcessingError,
-    SourceTypeError,
-    SourceConditionError,
-    SourceAssertionError,
 )
 from .scope import MappingScope
-from .source import RuleSource
 from .group import Group
 
 logger = logging.getLogger(__name__)
@@ -332,52 +318,6 @@ class FHIRMappingEngine:
         # Store the default groups registry in global scope
         global_scope.default_groups = default_groups
 
-    def validate_structure_map(self, structure_map: StructureMap) -> List[str]:
-        """
-        Validates the structure and content of a given StructureMap instance.
-
-        This method checks for the presence of required groups and structure declarations,
-        ensures that both source and target structures are defined, and verifies that each
-        group contains rules. It also delegates rule-specific validation to the _validate_rule method.
-
-        Args:
-            structure_map (StructureMap): The StructureMap object to validate.
-
-        Returns:
-            List[str]: A list of validation issue messages. The list is empty if no issues are found.
-        """
-        issues = []
-
-        # Check basic structure
-        if not structure_map.group:
-            issues.append("StructureMap has no groups defined")
-
-        if not structure_map.structure:
-            issues.append("StructureMap has no structure declarations")
-
-        # Check structure declarations
-        source_structures = [
-            s for s in structure_map.structure or [] if s.mode == "source"
-        ]
-        target_structures = [
-            s for s in structure_map.structure or [] if s.mode == "target"
-        ]
-
-        if not source_structures:
-            issues.append("No source structures defined")
-        if not target_structures:
-            issues.append("No target structures defined")
-
-        # Check groups and rules
-        for group in structure_map.group or []:
-            if not group.rule:
-                issues.append(f"Group {group.name} has no rules")
-
-            for rule in group.rule or []:
-                self._validate_rule(rule, issues)
-
-        return issues
-
     def _resolve_structure_definitions(
         self,
         structure_map: (
@@ -496,44 +436,6 @@ class FHIRMappingEngine:
             matched_indices.add(idx)
 
         return validated_entries
-
-    def _validate_rule(self, rule: StructureMapGroupRule, issues: List[str]) -> None:
-        """
-        Validates a StructureMapGroupRule object and appends any issues found to the provided issues list.
-
-        This method checks for the following:
-            - The rule has at least one source element.
-            - The rule has at least one target element.
-            - The rule does not depend on itself (to prevent cycles).
-            - Recursively validates any nested rules.
-
-        Args:
-            rule (StructureMapGroupRule): The rule to validate.
-            issues (List[str]): A list to which validation issue messages will be appended.
-
-        Returns:
-            None
-        """
-        rule_name = rule.name or f"unnamed_rule_{id(rule)}"
-
-        if not rule.source:
-            issues.append(f"Rule {rule_name} has no source elements")
-
-        if not rule.target:
-            issues.append(f"Rule {rule_name} has no target elements")
-
-        # Check for potential cycles in dependent rules
-        if rule.dependent:
-            for dep in rule.dependent:
-                if dep.name == rule.name:
-                    issues.append(f"Rule {rule_name} depends on itself")
-
-        # Validate nested rules
-        for nested_rule in rule.rule or []:
-            self._validate_rule(nested_rule, issues)
-        # Validate nested rules
-        for nested_rule in rule.rule or []:
-            self._validate_rule(nested_rule, issues)
 
 
 mapper = FHIRMappingEngine()

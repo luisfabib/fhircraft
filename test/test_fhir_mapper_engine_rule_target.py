@@ -11,7 +11,10 @@ from pydantic import BaseModel
 from fhircraft.fhir.mapper.engine.target import RuleTarget
 from fhircraft.fhir.mapper.engine.scope import MappingScope
 from fhircraft.fhir.mapper.engine.rule import Rule
-from fhircraft.fhir.mapper.engine.exceptions import SourceProcessingError
+from fhircraft.fhir.mapper.engine.exceptions import (
+    MappingDigestionError,
+    SourceProcessingError,
+)
 from fhircraft.fhir.path.engine.core import Element
 from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
     StructureMapGroupRuleTarget,
@@ -151,7 +154,7 @@ def test_init_fails_missing_context(mock_rule):
     """Test initialization fails when context is missing."""
     target_def = StructureMapGroupRuleTarget(context=None)
 
-    with pytest.raises(SourceProcessingError, match="Source context is required"):
+    with pytest.raises(MappingDigestionError, match="Source context is required"):
         RuleTarget(target_def, mock_rule)
 
 
@@ -309,7 +312,7 @@ def test_invalid_context_initialization(mock_rule):
     """Test error when context is missing during initialization."""
     target_def = StructureMapGroupRuleTarget(context=None)
 
-    with pytest.raises(SourceProcessingError, match="Source context is required"):
+    with pytest.raises(MappingDigestionError, match="Source context is required"):
         RuleTarget(target_def, mock_rule)
 
 
