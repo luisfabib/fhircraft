@@ -646,10 +646,10 @@ class Literal(FHIRPath):
 
         if isinstance(self.value, bool):
             return "true" if self.value else "false"
-        elif is_date(self.value) or is_datetime(self.value) or is_time(self.value):
-            return self.value
         elif isinstance(self.value, str):
             return f"'{self.value}'"
+        elif is_date(self.value) or is_datetime(self.value) or is_time(self.value):
+            return f"@{self.value}"
         else:
             return str(self.value)
 

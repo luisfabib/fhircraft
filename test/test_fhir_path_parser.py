@@ -236,6 +236,10 @@ parser_test_cases = (
         Invocation(Element("parent"), Replace("John", "James")),
     ),
     (
+        "parent.replace('123','456')",
+        Invocation(Element("parent"), Replace("123", "456")),
+    ),
+    (
         "parent.matches('^(?:John)')",
         Invocation(Element("parent"), Matches("^(?:John)")),
     ),
