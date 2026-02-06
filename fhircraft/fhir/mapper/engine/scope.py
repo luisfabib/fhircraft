@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, TypeVar, Union
 
 from pydantic import BaseModel
 
@@ -25,6 +25,9 @@ from fhircraft.fhir.resources.datatypes.R5.core.structure_map import (
 )
 
 from .exceptions import MappingError
+
+if TYPE_CHECKING:
+    from .group import Group
 
 # Type variable for generic lookups
 T = TypeVar("T")
@@ -53,17 +56,13 @@ class MappingScope:
     )
     """Registry of available concept maps for value transformations"""
 
-    groups: OrderedDict[
-        str, R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup
-    ] = field(default_factory=OrderedDict)
+    groups: OrderedDict[str, "Group"] = field(default_factory=OrderedDict)
     """The groups defined on this scope"""
 
     variables: Dict[str, FHIRPath] = field(default_factory=dict)
     """Registry of variables mapped to resolved FHIRPath expressions"""
 
-    default_groups: Dict[
-        str, R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup
-    ] = field(default_factory=dict)
+    default_groups: Dict[str, "Group"] = field(default_factory=dict)
     """Registry of default mapping groups by type signature"""
 
     processing_rules: Set[str] = field(default_factory=set)
@@ -201,7 +200,7 @@ class MappingScope:
     def resolve_symbol(self, identifier: str) -> Union[
         FHIRPath,
         type[BaseModel],
-        R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup,
+        "Group",
     ]:
         """
         Resolves a symbol (variable, type, or group) by its identifier from the current scope or any parent scopes.
@@ -272,7 +271,7 @@ class MappingScope:
 
     def _resolve_default_mapping_group(
         self,
-    ) -> R4_StructureMapGroup | R4B_StructureMapGroup | R5_StructureMapGroup:
+    ) -> "Group":
         """
         Resolves the -DefaultMappingGroup- symbol by looking for appropriate default groups
         based on current context types.
@@ -298,8 +297,9 @@ class MappingScope:
             StructureMapGroupRuleTarget,
             StructureMapGroupRuleTargetParameter,
         )
+        from .group import Group
 
-        return StructureMapGroup(
+        definition = StructureMapGroup(
             name="-GeneratedCopyGroup-",
             typeMode="none",
             input=[
@@ -321,6 +321,7 @@ class MappingScope:
                 )
             ],
         )
+        return Group(definition=definition)
 
     def resolve_fhirpath(self, identifier: str) -> FHIRPath:
         """

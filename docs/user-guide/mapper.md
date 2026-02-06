@@ -48,8 +48,8 @@ group main(source legacy, target patient: Patient) {
     // Copy birth date directly
     legacy.dob -> patient.birthDate;
     // Convert sex code to FHIR gender values
-    legacy.sex where($this = 'F') -> patient.gender = 'female';
-    legacy.sex where($this = 'M') -> patient.gender = 'male';
+    legacy.sex where(legacy.sex = 'F') -> patient.gender = 'female';
+    legacy.sex where(legacy.sex = 'M') -> patient.gender = 'male';
 }
 """
 
@@ -59,7 +59,7 @@ targets = mapper.execute_mapping(mapping_script, legacy_patient)
 patient = targets[0]  # Get the transformed Patient resource
 
 print(f"Transformed: {patient.model_dump(exclude={'meta','resourceType'})}")
-#> Transformed: {'name': [{'family': 'Johnson', 'given': ['Alice']}], 'birthDate': '1985-03-15'}
+#> Transformed: {'name': [{'family': 'Johnson', 'given': ['Alice']}], 'gender': 'female', 'birthDate': '1985-03-15'}
 ```
 
 ## Understanding Mapping Benefits and Use Cases
@@ -140,8 +140,8 @@ group main(source legacy, target patient: Patient) {
     // Copy birth date to FHIR date field
     legacy.dob -> patient.birthDate;
     // Transform gender codes using conditional rules
-    legacy.sex where($this = 'F') -> patient.gender = 'female';
-    legacy.sex where($this = 'M') -> patient.gender = 'male';
+    legacy.sex where(legacy.sex = 'F') -> patient.gender = 'female';
+    legacy.sex where(legacy.sex = 'M') -> patient.gender = 'male';
 }
 """
 
@@ -158,7 +158,7 @@ targets = mapper.execute_mapping(script, legacy_data)
 patient = targets[0]  # This is a validated FHIR Patient resource
 
 print(f"Transformed: {patient.model_dump(exclude={'meta','resourceType'})}")
-#> Transformed: {'name': [{'family': 'Johnson', 'given': ['Alice']}], 'birthDate': '1985-03-15'}
+#> Transformed: {'name': [{'family': 'Johnson', 'given': ['Alice']}], 'gender': 'female', 'birthDate': '1985-03-15'}
 ```
 
 ## Handling Complex Transformations
