@@ -208,7 +208,7 @@ def test_arbitrary_source_to_fhir_target():
 
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_implicit_evluate_context():
-    """Test mapping from arbitrary dict to FHIR Patient resource."""
+    """Test mapping from arbitrary dict to FHIR Patient resource. Issue #217"""
 
     # Arbitrary source data (not a FHIR resource)
     source_data = {
@@ -233,3 +233,34 @@ def test_implicit_evluate_context():
     # Verify the target is a valid FHIR Patient
     assert patient._type == "Patient"
     assert patient.id == "B:123-45-678"
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_variables_as_transform_arguments():
+    """Test using variables as arguments to transforms. Issue #218"""
+
+    engine = FHIRMapper()
+
+    # Mapping script - only declares FHIR target
+    mapping_script = """
+    map "http://example.org" = 'Example'
+    uses "http://hl7.org/fhir/StructureDefinition/Condition" as target
+    group main(source src, target tgt: Condition) {
+        src.coded as c -> tgt then {
+            c.code as code, c.system as system, c.display as display -> tgt.code = cc(code, system, display);
+        };
+    }
+    """
+    result = engine.execute_mapping(
+        mapping_script,
+        {
+            "coded": {
+                "code": "1234",
+                "system": "http://loinc.org",
+                "display": "Test Code",
+            }
+        },
+    )
+    assert result[0].code.coding[0].code == "1234"  # type: ignore
+    assert result[0].code.coding[0].system == "http://loinc.org"  # type: ignore
+    assert result[0].code.coding[0].display == "Test Code"  # type: ignore
