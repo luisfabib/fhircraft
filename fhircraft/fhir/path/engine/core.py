@@ -870,6 +870,10 @@ class Invocation(FHIRPath):
         )
 
     def __str__(self):
+        from fhircraft.fhir.path.engine.subsetting import Index
+
+        if isinstance(self.right, Index):
+            return "%s%s" % (self.left, self.right)
         return "%s.%s" % (self.left, self.right)
 
     def __repr__(self):

@@ -5,6 +5,7 @@ import pytest
 
 from fhircraft.fhir.path.engine.core import (
     Element,
+    Invocation,
     FHIRPathCollectionItem,
     FHIRPathError,
 )
@@ -59,6 +60,11 @@ def test_indexing_returns_last_with_negative_index():
 def test_index_string_representation():
     expression = Index(2)
     assert str(expression) == "[2]"
+
+
+def test_invoked_index_string_representation():
+    expression = Invocation(Element("a"), Index(2))
+    assert str(expression) == "a[2]"
 
 
 class TestIndexPrimitive(TestCase):
