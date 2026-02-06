@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, List
+from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
 from fhircraft.fhir.mapper.engine.exceptions import (
     RuleProcessingError,
     SourceAssertionError,
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
     )
 
 
-class Rule:
+class Rule(FHIRMappingEngineComponent):
     """
     Represents a StructureMap Rule with iteration and condition logic.
 

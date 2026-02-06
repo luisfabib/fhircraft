@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Optional
+from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
 from fhircraft.fhir.mapper.engine.exceptions import (
     MappingDigestionError,
     MappingError,
@@ -31,7 +32,7 @@ if TYPE_CHECKING:
     from fhircraft.fhir.mapper.engine.rule import Rule
 
 
-class RuleTarget:
+class RuleTarget(FHIRMappingEngineComponent):
 
     def __init__(
         self,

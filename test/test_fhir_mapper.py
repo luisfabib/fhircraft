@@ -204,3 +204,32 @@ def test_arbitrary_source_to_fhir_target():
     assert patient.name[0].given[0] == "Alice"
     assert patient.name[0].family == "Johnson"
     assert str(patient.birthDate) == "1985-03-15"
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_implicit_evluate_context():
+    """Test mapping from arbitrary dict to FHIR Patient resource."""
+
+    # Arbitrary source data (not a FHIR resource)
+    source_data = {
+        "id": "A:123-45-678",
+    }
+
+    # Mapping script - only declares FHIR target
+    mapping_script = """
+    uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
+
+    group main(source src, target tgt: Patient) {
+        src.id -> tgt.id = (src.id.replace('A', 'B'));
+    }
+    """
+
+    mapper = FHIRMapper()
+    targets = mapper.execute_mapping(mapping_script, source_data)
+
+    assert len(targets) == 1
+    patient = targets[0]
+
+    # Verify the target is a valid FHIR Patient
+    assert patient._type == "Patient"
+    assert patient.id == "B:123-45-678"

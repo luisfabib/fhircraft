@@ -129,7 +129,7 @@ def test_init_success_minimal(basic_target_definition, mock_rule):
 
     assert target.definition == basic_target_definition
     assert target.parent_rule == mock_rule
-    assert target.variable.startswith("tartget_")  # Note: typo in original code
+    assert target.variable.startswith("target-")  # Note: typo in original code
     assert target.resolved_path is None
     assert target.transform is None
 
@@ -162,7 +162,7 @@ def test_init_auto_generates_variable_name(basic_target_definition, mock_rule):
     """Test that variable name is auto-generated when not provided."""
     target = RuleTarget(basic_target_definition, mock_rule)
 
-    assert target.variable.startswith("tartget_")
+    assert target.variable.startswith("target-")
     assert str(id(basic_target_definition)) in target.variable
 
 

@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Optional
+from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
 from fhircraft.fhir.mapper.engine.exceptions import (
     MappingDigestionError,
     MappingError,
@@ -31,7 +32,7 @@ if TYPE_CHECKING:
     from fhircraft.fhir.mapper.engine.rule import Rule
 
 
-class RuleSource:
+class RuleSource(FHIRMappingEngineComponent):
 
     def __init__(
         self,
@@ -53,16 +54,10 @@ class RuleSource:
         self.variable = source.variable or f"source-{id(source)}"
         self.resolved_path: Optional[FHIRPath] = None
         self.iteration_count = 0
-        self.parsed_condition = (
-            fhirpath_parser.parse(source.condition)
-            if source.condition
-            else fhirpath.Literal(True)
+        self.condition = (
+            source.condition if source.condition else fhirpath.Literal(True)
         )
-        self.parsed_assertion = (
-            fhirpath_parser.parse(source.check)
-            if source.check
-            else fhirpath.Literal(True)
-        )
+        self.assertion = source.check if source.check else fhirpath.Literal(True)
 
     def process(
         self,
@@ -119,16 +114,22 @@ class RuleSource:
 
     def _check_where_condition(self, scope: "MappingScope") -> bool:
         """Check where condition."""
-        condition_fhirpath = self._replace_mapping_scope_elements(
-            self.parsed_condition, scope
-        )
+        if not isinstance(self.condition, FHIRPath):
+            condition_fhirpath = self.resolve_fhirpath_within_context(
+                str(self.condition), scope
+            )
+        else:
+            condition_fhirpath = self.condition
         return bool(condition_fhirpath.single(scope.get_instances()))
 
     def _check_assertion_condition(self, scope: "MappingScope") -> bool:
         """Check assertion condition."""
-        assertion_fhirpath = self._replace_mapping_scope_elements(
-            self.parsed_assertion, scope
-        )
+        if not isinstance(self.assertion, FHIRPath):
+            assertion_fhirpath = self.resolve_fhirpath_within_context(
+                str(self.assertion), scope
+            )
+        else:
+            assertion_fhirpath = self.assertion
         return bool(assertion_fhirpath.single(scope.get_instances()))
 
     def _validate_cardinality(self) -> bool:
@@ -167,33 +168,3 @@ class RuleSource:
                     raise SourceProcessingError(
                         f"Unsupported listMode '{self.definition.listMode}' in source {self.variable}"
                     )
-
-    def _replace_mapping_scope_elements(self, path, scope: "MappingScope"):
-        """
-        Recursively replaces elements in a FHIRPath expression tree with their corresponding values from the given mapping scope.
-
-        Args:
-            path: A FHIRPath expression node, which can be an instance of fhirpath.Element, fhirpath.Invocation, fhirpath.FHIRComparisonOperator, or other supported types.
-            scope (MappingScope): The mapping scope used to resolve FHIRPath element labels.
-
-        Returns:
-            The FHIRPath expression tree with elements replaced according to the mapping scope.
-
-        Raises:
-            MappingError: If a FHIRPath element label cannot be resolved in the mapping scope.
-
-        Notes:
-            - If a fhirpath.Element cannot be resolved in the scope, a new fhirpath.Element with the same label is returned.
-            - The function processes Invocation and FHIRComparisonOperator nodes recursively.
-        """
-        if isinstance(path, fhirpath.Element):
-            return scope.resolve_fhirpath(path.label)
-        elif (
-            isinstance(path, FHIRPath)
-            and hasattr(path, "left")
-            and hasattr(path, "right")
-        ):
-            left = self._replace_mapping_scope_elements(path.left, scope)  # type: ignore
-            return path.__class__(left, path.right)  # type: ignore
-        else:
-            return path

@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, List, Sequence
+from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
 from fhircraft.fhir.mapper.engine.exceptions import (
     MappingDigestionError,
     MappingError,
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
     )
 
 
-class Group:
+class Group(FHIRMappingEngineComponent):
     """
     Represents a StructureMap Group with its own processing logic.
     """

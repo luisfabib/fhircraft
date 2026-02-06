@@ -1,8 +1,13 @@
+from abc import ABC
 import re
+from sys import path
 from typing import TYPE_CHECKING, Any, Sequence, Tuple, Type
+from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
 from fhircraft.fhir.path import engine as fp, fhirpath as fhirpath_parser
 from fhircraft.fhir.mapper.engine.exceptions import MappingError
 import uuid
+
+from fhircraft.fhir.path.engine.core import FHIRPath
 
 if TYPE_CHECKING:
     from fhircraft.fhir.mapper.engine.scope import MappingScope
@@ -17,7 +22,11 @@ if TYPE_CHECKING:
     )
 
 
-class Copy:
+class MappingTransform(FHIRMappingEngineComponent, ABC):
+    pass
+
+
+class Copy(MappingTransform):
     """Implements the 'copy' transform, which copies the source value to the target."""
 
     source: str | None = None
@@ -65,7 +74,7 @@ class Copy:
                 return f"CopyTransform(literal={self.literal})"
 
 
-class Create:
+class Create(MappingTransform):
     """Implements the 'create' transform, which creates a new instance of the specified type."""
 
     type_specifier: str
@@ -93,7 +102,7 @@ class Create:
         return scope.get_type(self.type_specifier).model_construct()
 
 
-class Truncate:
+class Truncate(MappingTransform):
     """Implements the 'truncate' transform, which truncates a string to a specified length."""
 
     source: str
@@ -126,7 +135,7 @@ class Truncate:
         )
 
 
-class Cast:
+class Cast(MappingTransform):
     """Implements the 'cast' transform, which casts a value to a specified type."""
 
     source: str
@@ -190,7 +199,7 @@ class Cast:
                 )
 
 
-class Append:
+class Append(MappingTransform):
     """Implements the 'append' transform, which appends string representations of parameters."""
 
     elements: Sequence[Tuple[bool, str]]
@@ -250,7 +259,7 @@ class Append:
         return "".join(strings)
 
 
-class Reference:
+class Reference(MappingTransform):
     """Implements the 'reference' transform, which creates a FHIR reference from a given source."""
 
     source: str
@@ -294,7 +303,7 @@ class Reference:
         return f"{resource_type}/{resource_id}"
 
 
-class UUID:
+class UUID(MappingTransform):
     """Implements the 'uuid' transform, which generates a UUID string."""
 
     def __init__(
@@ -319,7 +328,7 @@ class UUID:
         return str(uuid.uuid4())
 
 
-class Translate:
+class Translate(MappingTransform):
     """Implements the 'translate' transform, which translates a code using a concept map."""
 
     source: str
@@ -383,11 +392,11 @@ class Translate:
             )
 
 
-class Evaluate:
+class Evaluate(MappingTransform):
     """Implements the 'evaluate' transform, which evaluates a FHIRPath expression."""
 
     source: str | None = None
-    expression: fp.FHIRPath
+    expression: str
 
     def __init__(
         self,
@@ -401,7 +410,7 @@ class Evaluate:
             )
         if len(parameters) == 2:
             self.source = parameters[0].value
-        self.expression = fhirpath_parser.parse(parameters[-1].value)
+        self.expression = parameters[-1].value
 
     def process(self, scope: "MappingScope") -> Any:
         """
@@ -416,8 +425,9 @@ class Evaluate:
         if self.source:
             context = scope.resolve_fhirpath(self.source).single(scope.get_instances())
         else:
-            context = scope.get_all_visible_symbols()
-        transformed_values = self.expression.values(context)
+            context = scope.get_instances()
+        expression = self.resolve_fhirpath_within_context(self.expression, scope)
+        transformed_values = expression.values(context)
         if len(transformed_values) == 1:
             return transformed_values[0]
         elif len(transformed_values) > 1:
@@ -426,7 +436,7 @@ class Evaluate:
             return None
 
 
-class CodeableConcept:
+class CodeableConcept(MappingTransform):
     """Implements the 'cc' transform, which creates a CodeableConcept from parameters."""
 
     text: fp.FHIRPath | str | None = None
@@ -518,7 +528,7 @@ class CodeableConcept:
             )
 
 
-class Coding:
+class Coding(MappingTransform):
     """Implements the 'c' transform, which creates a Coding from parameters."""
 
     code: fp.FHIRPath | str | None = None
@@ -589,7 +599,7 @@ class Coding:
             )
 
 
-class Quantity:
+class Quantity(MappingTransform):
     """Implements the 'qty' transform, which creates a Quantity"""
 
     text: fp.FHIRPath | str | None = None
@@ -706,7 +716,7 @@ class Quantity:
             )
 
 
-class Identifier:
+class Identifier(MappingTransform):
     """Implements the 'id' transform, which creates an Identifier"""
 
     system: fp.FHIRPath | str
@@ -776,7 +786,7 @@ class Identifier:
         }
 
 
-class ContactPoint:
+class ContactPoint(MappingTransform):
     """Implements the 'cp' transform, which creates a ContactPoint"""
 
     system: fp.FHIRPath | str | None = None
