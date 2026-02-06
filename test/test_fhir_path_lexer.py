@@ -77,6 +77,8 @@ token_test_cases = (
     ("@2014T14", (("@2014T14", "DATETIME"),)),
     ("@2014T", (("@2014T", "DATETIME"),)),
     ("'string'", (("string", "STRING"),)),
+    ("'123'", (("123", "STRING"),)),
+    ("'12.34'", (("12.34", "STRING"),)),
     ("'test string'", (("test string", "STRING"),)),
     # ----------------- Identifiers -----------------
     ("parent", (("parent", "IDENTIFIER"),)),

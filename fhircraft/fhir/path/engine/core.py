@@ -646,10 +646,10 @@ class Literal(FHIRPath):
 
         if isinstance(self.value, bool):
             return "true" if self.value else "false"
-        elif is_date(self.value) or is_datetime(self.value) or is_time(self.value):
-            return self.value
         elif isinstance(self.value, str):
             return f"'{self.value}'"
+        elif is_date(self.value) or is_datetime(self.value) or is_time(self.value):
+            return f"@{self.value}"
         else:
             return str(self.value)
 
@@ -870,6 +870,10 @@ class Invocation(FHIRPath):
         )
 
     def __str__(self):
+        from fhircraft.fhir.path.engine.subsetting import Index
+
+        if isinstance(self.right, Index):
+            return "%s%s" % (self.left, self.right)
         return "%s.%s" % (self.left, self.right)
 
     def __repr__(self):

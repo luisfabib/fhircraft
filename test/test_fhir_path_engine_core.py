@@ -1,3 +1,4 @@
+from datetime import date
 from unittest import TestCase
 
 import pytest
@@ -334,8 +335,10 @@ class TestLiteral(TestCase):
 
     def test_literal_string_representation(self):
         assert str(Literal("foo")) == "'foo'"
+        assert str(Literal("123")) == "'123'"
         assert str(Literal(120)) == "120"
         assert str(Literal(True)) == "true"
+        assert str(Literal(date(2014, 1, 1))) == "@2014-01-01"
 
 
 @dataclass
