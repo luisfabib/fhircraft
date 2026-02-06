@@ -50,7 +50,7 @@ class RuleTarget:
         if self.definition.context is None:
             raise MappingDigestionError("Source context is required")
         self.parent_rule = parent_rule
-        self.variable = source.variable or f"tartget_{id(source)}"
+        self.variable = source.variable or f"target-{id(source)}"
         self.resolved_path: Optional[FHIRPath] = None
         self.transform = self._resolve_transform(
             self.definition.transform, self.definition.parameter

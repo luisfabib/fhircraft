@@ -30,7 +30,6 @@ if TYPE_CHECKING:
         StructureMapGroupRule as R5_StructureMapGroupRule,
         StructureMapGroupRuleDependent as R5_StructureMapGroupRuleDependent,
     )
-    from fhircraft.fhir.mapper.engine.group import Group
 
 
 class Rule:
@@ -55,7 +54,7 @@ class Rule:
             SourceProcessingError: If required fields are missing.
         """
         self.definition = definition
-        self.name = definition.name or f"rule_{id(definition)}"
+        self.name = definition.name or f"rule-{id(definition)}"
         self.parent_group = parent_group
         self.sources: List[RuleSource] = []
         self.targets: List[RuleTarget] = []

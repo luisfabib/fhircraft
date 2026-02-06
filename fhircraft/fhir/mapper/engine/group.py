@@ -45,7 +45,7 @@ class Group:
             SourceProcessingError: If required fields are missing.
         """
         self.definition = definition
-        self.name = definition.name or f"group_{id(definition)}"
+        self.name = definition.name or f"group-{id(definition)}"
         self.parent_group = parent_group
         self.rules: List[Rule] = [
             Rule(rule, parent_group=self) for rule in definition.rule or []
