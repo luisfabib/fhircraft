@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+----------------- 
+
+## v0.6.2 - 2026-02-09
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.2...0.6.1)
+
+### Added
+
+- Added support to the FHIRPath `resolve()` function for resolution of internal references when the `%resource` environment variable is available ([#252](https://github.com/luisfabib/fhircraft/pull/252))
+- Added support for implicit FHIRPath evaluation context to the `evaluate` transform during mapping ([#246](https://github.com/luisfabib/fhircraft/pull/246), fixes [#39](https://github.com/luisfabib/fhircraft/pull/39) and [#217](https://github.com/luisfabib/fhircraft/pull/217))
+- Added support for implicit type casting to the `cast` transform during mapping ([#246](https://github.com/luisfabib/fhircraft/pull/246), fixes [#38](https://github.com/luisfabib/fhircraft/pull/38))
+- Added support for implicit system detection to the `cp` transform during mapping ([#246](https://github.com/luisfabib/fhircraft/pull/246), fixes [#40](https://github.com/luisfabib/fhircraft/pull/40))
+
+
+
+### Changed 
+
+- Updated the FHIR Mapping Language parser to no longer strip quotes from FHIRPath expressions, ensuring that string FHIRPaths within the mappings (e.g. constants) retain their quotes during parsing ([#251](https://github.com/luisfabib/fhircraft/pull/251), fixes [#213](https://github.com/luisfabib/fhircraft/pull/213) and [#216](https://github.com/luisfabib/fhircraft/pull/216))
+- Removed support to the FHIRPath `resolve()` function for attempting resolution of URL references using the reference as absolute URL for security reasons, now warning instead ([#252](https://github.com/luisfabib/fhircraft/pull/252))
+
+
+
+### Fixed
+
+- Fixed resolution of FHIRPaths within source context scopes for the `where` and `check` statements ([#246](https://github.com/luisfabib/fhircraft/pull/246), fixes [#215](https://github.com/luisfabib/fhircraft/pull/215))
+- Fixed documentation mapping examples not returning the correct results ([#246](https://github.com/luisfabib/fhircraft/pull/246), fixes [#220](https://github.com/luisfabib/fhircraft/pull/220))
+- Fixed transforms to allow variables to be passed as arguments ([#246](https://github.com/luisfabib/fhircraft/pull/246), fixes [#218](https://github.com/luisfabib/fhircraft/pull/218))
+- Expanded the FHIR Mapper parser grammar to allow reserved words (e.g. `group`, `import`, `source`, etc.) to be used as identifiers both in mapping rules and its FHIRPath expressions ([#250](https://github.com/luisfabib/fhircraft/pull/250), fixes [#214](https://github.com/luisfabib/fhircraft/pull/214))
+- Modified the FHIRPath `Literal` class so that the string represenations of date, datetime, and time values are represented with an `@` prefix (e.g., `@2014-01-01`), aligning with FHIRPath conventions ([#249](https://github.com/luisfabib/fhircraft/pull/249), fixes [#247](https://github.com/luisfabib/fhircraft/pull/247))
+- Fixed the string representation of FHIRPath index invocations (e.g., `a[2]`), which was previously represented with a dot ([#249](https://github.com/luisfabib/fhircraft/pull/249), fixes [#248](https://github.com/luisfabib/fhircraft/pull/248))
+- Ensured that `resource_url` cannot be evaluated to `None` within the FHIRPath `resolve()` function, which was leading to `AttributeError` ([#252](https://github.com/luisfabib/fhircraft/pull/252), fixes [#240](https://github.com/luisfabib/fhircraft/pull/240))
+- Fixed XML serialization to wrap contained/nested resources in their respective resource type tags during XML serialization ([#253](https://github.com/luisfabib/fhircraft/pull/253), fixes [#219](https://github.com/luisfabib/fhircraft/pull/219))
+
 
 ----------------- 
 
