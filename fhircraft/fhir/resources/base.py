@@ -526,13 +526,14 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
         # Handle different value types
         if isinstance(value, dict):
-            # For resources in arrays (like contained), wrap in proper element
-            if isinstance(value, FHIRBaseModel) and value._is_resource():
-                # Create a child element with the resource type name
+            # Check if this dict is a serialized FHIR resource (has resourceType key)
+            if "resourceType" in value:
+                # This is a polymorphic FHIR resource - wrap it with the resource type element
+                resource_type = value["resourceType"]
                 resource_elem = SubElement(
-                    field_elem, f"{{http://hl7.org/fhir}}{value._type}"
+                    field_elem, f"{{http://hl7.org/fhir}}{resource_type}"
                 )
-                self._build_xml_element(resource_elem, value, value._type)
+                self._build_xml_element(resource_elem, value, resource_type)
             else:
                 # Complex type - build directly into field_elem
                 self._build_xml_element(field_elem, value, field_name)
