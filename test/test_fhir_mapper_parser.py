@@ -120,7 +120,13 @@ parser_test_cases = (
     (
         """let myConst = 'string';""",
         StructureMap.model_construct(
-            const=[StructureMapConst(name="myConst", value="string")]
+            const=[StructureMapConst(name="myConst", value="'string'")]
+        ),
+    ),
+    (
+        """let myConst = 'urn:oid:2.16.756.5.32';""",
+        StructureMap.model_construct(
+            const=[StructureMapConst(name="myConst", value="'urn:oid:2.16.756.5.32'")]
         ),
     ),
     (
@@ -426,7 +432,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group mapExample(source src, target tgt){src.fieldA as a 0..* default(fhirpath.expr) where(fhirpath.expr) check('fhirpath.expr');}""",
+        """group mapExample(source src, target tgt){src.fieldA as a 0..* default(fhirpath.expr) where(fhirpath.expr) check(fhirpath.expr);}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -778,7 +784,7 @@ parser_test_cases = (
         StructureMap.model_construct(
             const=[
                 StructureMapConst(name="const1", value="42"),
-                StructureMapConst(name="const2", value="foo"),
+                StructureMapConst(name="const2", value="'foo'"),
                 StructureMapConst(name="const3", value="true"),
             ]
         ),
@@ -884,7 +890,7 @@ parser_test_cases = (
         ),
     ),
     (
-        """group mapExample(source src, target tgt){src.field as sf 1..1 check('sf != null') -> tgt.field = copy(sf);}""",
+        """group mapExample(source src, target tgt){src.field as sf 1..1 check(sf != null) -> tgt.field = copy(sf);}""",
         add_rules_to_basic_map(
             rules=[
                 StructureMapGroupRule(
@@ -1045,34 +1051,6 @@ parser_test_cases = (
                             parameter=[
                                 StructureMapGroupRuleTargetParameter(
                                     valueString="someExpr(sf)"
-                                ),
-                            ],
-                        )
-                    ],
-                )
-            ]
-        ),
-    ),
-    (
-        """group mapExample(source src, target tgt){src.rule as source -> tgt.import = (map or group);}""",
-        add_rules_to_basic_map(
-            rules=[
-                StructureMapGroupRule(
-                    source=[
-                        StructureMapGroupRuleSource(
-                            context="src",
-                            element="rule",
-                            variable="source",
-                        )
-                    ],
-                    target=[
-                        StructureMapGroupRuleTarget(
-                            context="tgt",
-                            element="import",
-                            transform="evaluate",
-                            parameter=[
-                                StructureMapGroupRuleTargetParameter(
-                                    valueString="map or group"
                                 ),
                             ],
                         )

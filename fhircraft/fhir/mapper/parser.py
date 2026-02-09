@@ -1175,8 +1175,7 @@ class FhirMappingLanguageParser(FhirPathParser):
         """
         m_fhirpath : expression
         """
-        expr = str(p[1])
-        p[0] = expr.strip("'") if expr.startswith("'") and expr.endswith("'") else expr
+        p[0] = str(p[1])
 
     def p_mapper_url(self, p):
         """
