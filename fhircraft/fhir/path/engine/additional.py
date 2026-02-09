@@ -217,7 +217,12 @@ class Resolve(FHIRPathFunction):
             value = item.value
             if not (
                 (isinstance(value, dict) and (resource_url := value.get("reference")))
-                or (resource_url := getattr(value, "reference", None))
+                or (
+                    resource_url := (
+                        getattr(value, "reference", None)
+                        or getattr(value, "display", None)
+                    )
+                )
                 or ((resource_url := value))
             ) or not isinstance(resource_url, str):
                 raise FHIRPathError(
