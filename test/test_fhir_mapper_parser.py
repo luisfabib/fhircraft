@@ -1053,6 +1053,34 @@ parser_test_cases = (
             ]
         ),
     ),
+    (
+        """group mapExample(source src, target tgt){src.rule as source -> tgt.import = (map or group);}""",
+        add_rules_to_basic_map(
+            rules=[
+                StructureMapGroupRule(
+                    source=[
+                        StructureMapGroupRuleSource(
+                            context="src",
+                            element="rule",
+                            variable="source",
+                        )
+                    ],
+                    target=[
+                        StructureMapGroupRuleTarget(
+                            context="tgt",
+                            element="import",
+                            transform="evaluate",
+                            parameter=[
+                                StructureMapGroupRuleTargetParameter(
+                                    valueString="map or group"
+                                ),
+                            ],
+                        )
+                    ],
+                )
+            ]
+        ),
+    ),
 )
 
 

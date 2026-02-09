@@ -831,7 +831,7 @@ class FhirMappingLanguageParser(FhirPathParser):
             context=p[1].get("context"),
             element=p[1].get("element"),
             min=(
-                str(min_value) if (min_value := p[2].get("min")) is not None else None
+                int(min_value) if (min_value := p[2].get("min")) is not None else None
             ),
             max=(
                 str(max_value) if (max_value := p[2].get("max")) is not None else None
@@ -1190,6 +1190,40 @@ class FhirMappingLanguageParser(FhirPathParser):
         m_identifier : IDENTIFIER
                      | DELIMITEDIDENTIFIER
                      | ROOT_NODE
+                     | m_reserved_words
+        """
+        p[0] = p[1]
+
+    def p_fhirpath_identifier(self, p):
+        """
+        identifier : IDENTIFIER
+                   | DELIMITEDIDENTIFIER
+                   | ROOT_NODE
+                   | m_reserved_words
+        """
+        p[0] = p[1]
+
+    def p_reserved_words_as_identifier(self, p):
+        """
+        m_reserved_words : MAP
+                         | USES
+                         | AS
+                         | SOURCE
+                         | TARGET
+                         | PRODUCED
+                         | QUERIED
+                         | GROUP
+                         | EXTENDS
+                         | THEN
+                         | CONCEPTMAP
+                         | PREFIX
+                         | IMPORTS
+                         | LET
+                         | DEFAULT
+                         | FIRST
+                         | LAST
+                         | SHARE
+                         | SINGLE
         """
         p[0] = p[1]
 
