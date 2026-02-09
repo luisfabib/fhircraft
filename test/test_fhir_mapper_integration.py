@@ -278,3 +278,30 @@ def test_reserved_words_as_identifiers(engine):
         {"group": "A:123-45-678"},
     )
     assert result[0].id == "A:123-45-678"  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "constant, expected_type, expected_value",
+    [
+        (123, "Integer", 123),
+        ("'A string'", "String", "A string"),
+        ("true", "Boolean", True),
+        (3.14, "Decimal", 3.14),
+        ("'2024-01-01'", "Date", "2024-01-01"),
+        ("'2024-01-01T12:00:00Z'", "DateTime", "2024-01-01T12:00:00Z"),
+    ],
+)
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_constants_assignment(engine, constant, expected_type, expected_value):
+    """Test using constants with special characters. Issue #213"""
+
+    # Mapping script - only declares FHIR target
+    mapping_script = f"""
+    uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
+    let MYCONST = {constant};
+    group main(source src, target tgt: Patient) {{
+        MYCONST -> tgt.extension.value{expected_type};
+    }}
+    """
+    result = engine.execute_mapping(mapping_script, {})
+    assert getattr(result[0].extension[0], f"value{expected_type}") == expected_value

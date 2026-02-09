@@ -307,7 +307,7 @@ def create_simple_structure_map(map_content: str) -> StructureMap:
             ),
         ],
         const=[
-            StructureMapConst(name="fixName", value="fixed-name"),
+            StructureMapConst(name="fixName", value="'fixed-name'"),
             StructureMapConst(name="fixAge", value="25"),
         ],
         group=[
@@ -450,7 +450,7 @@ simple_mapping_test_cases = [
     (
         "Using constants in mapping",
         {"name": "Bob Johnson", "age": 45},
-        {"yearsOld": 25},
+        {"yearsOld": 25, "fullName": "fixed-name"},
         [
             StructureMapGroupRule(
                 name="mapNameOnly",
@@ -463,7 +463,15 @@ simple_mapping_test_cases = [
                         parameter=[
                             StructureMapGroupRuleTargetParameter(valueId="fixAge")
                         ],
-                    )
+                    ),
+                    StructureMapGroupRuleTarget(
+                        context="tgt",
+                        element="fullName",
+                        transform="copy",
+                        parameter=[
+                            StructureMapGroupRuleTargetParameter(valueId="fixName")
+                        ],
+                    ),
                 ],
             )
         ],
