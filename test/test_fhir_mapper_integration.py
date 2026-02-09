@@ -20,7 +20,12 @@ class SimpleTarget(BaseModel):
     yearsOld: int | None = None
 
 
-def test_parse_mapping_script():
+@pytest.fixture
+def engine():
+    return FHIRMapper()
+
+
+def test_parse_mapping_script(engine):
     """Test parsing a simple mapping script."""
     script = """
     map 'http://example.org/test' = 'test'
@@ -34,8 +39,7 @@ def test_parse_mapping_script():
     }
     """
 
-    mapper = FHIRMapper()
-    structure_map = mapper.parse_mapping_script(script)
+    structure_map = engine.parse_mapping_script(script)
 
     assert isinstance(structure_map, StructureMap)
     assert structure_map.name == "test"
@@ -43,7 +47,7 @@ def test_parse_mapping_script():
 
 
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
-def test_load_structure_map_from_dict():
+def test_load_structure_map_from_dict(engine):
     """Test loading structure map from dictionary."""
     map_dict = {
         "resourceType": "StructureMap",
@@ -61,8 +65,7 @@ def test_load_structure_map_from_dict():
         ],
     }
 
-    mapper = FHIRMapper()
-    structure_map = mapper.load_structure_map(map_dict)
+    structure_map = engine.load_structure_map(map_dict)
 
     assert isinstance(structure_map, StructureMap)
     assert structure_map.name == "TestMap"
@@ -81,18 +84,16 @@ def test_load_structure_map_from_existing():
     assert loaded is original
 
 
-def test_validate_mapping_script():
+def test_validate_mapping_script(engine):
     """Test script validation."""
-    mapper = FHIRMapper()
-
     valid_script = "map 'http://example.org' = 'test' group main(source src, target tgt) { src.name -> tgt.name; }"
     invalid_script = "map 'http://example.org' = 'test' group main(source src, target tgt) { src.name -> tgt.name"  # Missing brace
 
-    assert mapper.validate_mapping_script(valid_script) is True
-    assert mapper.validate_mapping_script(invalid_script) is False
+    assert engine.validate_mapping_script(valid_script) is True
+    assert engine.validate_mapping_script(invalid_script) is False
 
 
-def test_list_groups():
+def test_list_groups(engine):
     """Test listing groups in a mapping."""
     script = """
     map 'http://example.org/test' = 'test'
@@ -109,15 +110,14 @@ def test_list_groups():
     }
     """
 
-    mapper = FHIRMapper()
-    groups = mapper.list_groups(script)
+    groups = engine.list_groups(script)
 
     assert "firstMap" in groups
     assert "secondMap" in groups
     assert len(groups) == 2
 
 
-def test_basic_execute_mapping():
+def test_basic_execute_mapping(engine):
     """Test basic mapping execution."""
     script = """
     map 'http://example.org/test' = 'test'
@@ -133,15 +133,14 @@ def test_basic_execute_mapping():
 
     source = SimpleSource(name="John Doe", age=30)
 
-    mapper = FHIRMapper()
-    mapper.add_structure_definition(create_simple_source_structure_definition())
-    mapper.add_structure_definition(create_simple_target_structure_definition())
-    result = mapper.execute_mapping(script, source)
+    engine.add_structure_definition(create_simple_source_structure_definition())
+    engine.add_structure_definition(create_simple_target_structure_definition())
+    result = engine.execute_mapping(script, source)
 
     assert len(result) == 1
 
 
-def test_execute_mapping_with_options():
+def test_execute_mapping_with_options(engine):
     """Test mapping execution with options."""
     script = """
     map 'http://example.org/test' = 'test'
@@ -160,15 +159,15 @@ def test_execute_mapping_with_options():
 
     source = SimpleSource(name="Bob Smith", age=40)
 
-    mapper = FHIRMapper()
-    mapper.add_structure_definition(create_simple_source_structure_definition())
-    mapper.add_structure_definition(create_simple_target_structure_definition())
-    result = mapper.execute_mapping(script, source, group="secondMap")
+    engine.add_structure_definition(create_simple_source_structure_definition())
+    engine.add_structure_definition(create_simple_source_structure_definition())
+    engine.add_structure_definition(create_simple_target_structure_definition())
+    result = engine.execute_mapping(script, source, group="secondMap")
     assert len(result) == 1
 
 
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
-def test_arbitrary_source_to_fhir_target():
+def test_arbitrary_source_to_fhir_target(engine):
     """Test mapping from arbitrary dict to FHIR Patient resource."""
 
     # Arbitrary source data (not a FHIR resource)
@@ -193,8 +192,7 @@ def test_arbitrary_source_to_fhir_target():
     }
     """
 
-    mapper = FHIRMapper()
-    targets = mapper.execute_mapping(mapping_script, source_data)
+    targets = engine.execute_mapping(mapping_script, source_data)
 
     assert len(targets) == 1
     patient = targets[0]
@@ -207,7 +205,7 @@ def test_arbitrary_source_to_fhir_target():
 
 
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
-def test_implicit_evluate_context():
+def test_implicit_evluate_context(engine):
     """Test mapping from arbitrary dict to FHIR Patient resource. Issue #217"""
 
     # Arbitrary source data (not a FHIR resource)
@@ -224,8 +222,7 @@ def test_implicit_evluate_context():
     }
     """
 
-    mapper = FHIRMapper()
-    targets = mapper.execute_mapping(mapping_script, source_data)
+    targets = engine.execute_mapping(mapping_script, source_data)
 
     assert len(targets) == 1
     patient = targets[0]
@@ -236,10 +233,8 @@ def test_implicit_evluate_context():
 
 
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
-def test_variables_as_transform_arguments():
+def test_variables_as_transform_arguments(engine):
     """Test using variables as arguments to transforms. Issue #218"""
-
-    engine = FHIRMapper()
 
     # Mapping script - only declares FHIR target
     mapping_script = """
@@ -264,3 +259,22 @@ def test_variables_as_transform_arguments():
     assert result[0].code.coding[0].code == "1234"  # type: ignore
     assert result[0].code.coding[0].system == "http://loinc.org"  # type: ignore
     assert result[0].code.coding[0].display == "Test Code"  # type: ignore
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_reserved_words_as_identifiers(engine):
+    """Test using reserved words as identifiers. Issue #214"""
+
+    # Mapping script - only declares FHIR target
+    mapping_script = """
+    map "http://example.org" = 'Example'
+    uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
+    group main(source src, target tgt: Patient) {
+        src.group -> tgt.id;
+    }
+    """
+    result = engine.execute_mapping(
+        mapping_script,
+        {"group": "A:123-45-678"},
+    )
+    assert result[0].id == "A:123-45-678"  # type: ignore
