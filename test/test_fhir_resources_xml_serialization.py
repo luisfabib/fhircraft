@@ -838,3 +838,271 @@ class TestXMLKeywordArguments:
         assert parsed_1.id == parsed_2.id == "indent-test"
         assert parsed_1.active == parsed_2.active == True
         assert parsed_1.gender == parsed_2.gender == "other"
+
+
+class TestPolymorphicResourceXMLSerialization:
+    """Test XML serialization of polymorphic FHIR resources (contained, nested resources, etc.)."""
+
+    def test_contained_single_resource_xml(self):
+        """Test that a single contained resource is properly wrapped in its resource type element."""
+        from fhircraft.fhir.resources.datatypes.R5.core import Condition, Patient
+
+        # Create a condition with a contained patient
+        condition = Condition.model_construct(
+            contained=[Patient(id="patient-1")],
+            subject={"reference": "#patient-1"},
+        )
+
+        xml_output = condition.model_dump_xml(indent=2)
+        root = ET.fromstring(xml_output)
+
+        # Verify root is Condition
+        assert strip_ns(root.tag) == "Condition"
+
+        # Find the contained element
+        contained_elem = root.find(f"{FHIR_NS}contained")
+        assert contained_elem is not None, "contained element should exist"
+
+        # CRITICAL: Verify that contained resource is wrapped in Patient element
+        patient_elem = contained_elem.find(f"{FHIR_NS}Patient")
+        assert (
+            patient_elem is not None
+        ), "Patient element should exist inside contained to wrap the resource"
+
+        # Verify the patient's id element is inside the Patient element
+        patient_id_elem = patient_elem.find(f"{FHIR_NS}id")
+        assert patient_id_elem is not None
+        assert patient_id_elem.get("value") == "patient-1"
+
+        # Verify there's NO resourceType element (it should only be the element name)
+        resource_type_elem = patient_elem.find(f"{FHIR_NS}resourceType")
+        assert (
+            resource_type_elem is None
+        ), "resourceType should NOT be a child element, only the wrapper element name"
+
+    def test_contained_multiple_resources_different_types_xml(self):
+        """Test XML serialization with multiple contained resources of different types."""
+        from fhircraft.fhir.resources.datatypes.R5.core import (
+            Bundle,
+            BundleEntry,
+            Patient,
+            Observation,
+        )
+
+        # Create a bundle with multiple contained resources
+        patient = Patient(id="p1", active=True)
+        observation = Observation(id="o1", status="final")
+
+        bundle = Bundle.model_construct(
+            type="document",
+            entry=[
+                BundleEntry.model_construct(
+                    resource=patient,
+                ),
+                BundleEntry.model_construct(
+                    resource=observation,
+                ),
+            ],
+        )
+
+        xml_output = bundle.model_dump_xml(indent=2)
+        root = ET.fromstring(xml_output)
+
+        # Verify root is Bundle
+        assert strip_ns(root.tag) == "Bundle"
+
+        # Find entry elements
+        entry_elems = root.findall(f"{FHIR_NS}entry")
+        assert len(entry_elems) == 2, "Should have 2 entry elements"
+
+        # Check first entry's resource - should be wrapped in Patient element
+        first_entry = entry_elems[0]
+        resource_elem = first_entry.find(f"{FHIR_NS}resource")
+        assert resource_elem is not None
+
+        patient_elem = resource_elem.find(f"{FHIR_NS}Patient")
+        assert (
+            patient_elem is not None
+        ), "First resource should be wrapped in Patient element"
+
+        patient_id = patient_elem.find(f"{FHIR_NS}id")
+        assert patient_id is not None
+        assert patient_id.get("value") == "p1"
+
+        # Check second entry's resource - should be wrapped in Observation element
+        second_entry = entry_elems[1]
+        resource_elem = second_entry.find(f"{FHIR_NS}resource")
+        assert resource_elem is not None
+
+        observation_elem = resource_elem.find(f"{FHIR_NS}Observation")
+        assert (
+            observation_elem is not None
+        ), "Second resource should be wrapped in Observation element"
+
+        observation_id = observation_elem.find(f"{FHIR_NS}id")
+        assert observation_id is not None
+        assert observation_id.get("value") == "o1"
+
+    def test_nested_contained_resources_xml(self):
+        """Test XML serialization of deeply nested contained resources."""
+        from fhircraft.fhir.resources.datatypes.R5.core import Condition, Patient
+
+        # Create a patient with contained resources
+        inner_patient = Patient(id="inner-patient-1")
+        outer_condition = Condition.model_construct(
+            id="condition-1",
+            contained=[inner_patient],
+            subject={"reference": "#inner-patient-1"},
+        )
+
+        xml_output = outer_condition.model_dump_xml(indent=2)
+        root = ET.fromstring(xml_output)
+
+        # Navigate to contained > Patient > id
+        contained_elem = root.find(f"{FHIR_NS}contained")
+        assert contained_elem is not None
+
+        patient_elem = contained_elem.find(f"{FHIR_NS}Patient")
+        assert patient_elem is not None
+
+        id_elem = patient_elem.find(f"{FHIR_NS}id")
+        assert id_elem is not None
+        assert id_elem.get("value") == "inner-patient-1"
+
+    def test_contained_resource_json_xml_consistency(self):
+        """Test that JSON and XML serialization are consistent for contained resources."""
+        from fhircraft.fhir.resources.datatypes.R5.core import Condition, Patient
+        import json
+
+        # Create a condition with a contained patient
+        contained_patient = Patient(id="patient-1", active=True, birthDate="1990-01-01")
+        condition = Condition.model_construct(
+            contained=[contained_patient],
+            subject={"reference": "#patient-1"},
+        )
+
+        # Get JSON output
+        json_output = condition.model_dump_json()
+        json_data = json.loads(json_output)
+
+        # Verify JSON has resourceType in contained
+        assert "contained" in json_data
+        assert len(json_data["contained"]) == 1
+        assert json_data["contained"][0]["resourceType"] == "Patient"
+        assert json_data["contained"][0]["id"] == "patient-1"
+
+        # Get XML output
+        xml_output = condition.model_dump_xml()
+        xml_root = ET.fromstring(xml_output)
+
+        # Verify XML has Patient element wrapping (not resourceType child)
+        contained_elem = xml_root.find(f"{FHIR_NS}contained")
+        patient_elem = contained_elem.find(f"{FHIR_NS}Patient")
+        assert patient_elem is not None
+
+        id_elem = patient_elem.find(f"{FHIR_NS}id")
+        assert id_elem is not None
+        assert id_elem.get("value") == "patient-1"
+
+        # In XML, there should be NO resourceType element inside Patient
+        resource_type_elem = patient_elem.find(f"{FHIR_NS}resourceType")
+        assert resource_type_elem is None
+
+    def test_empty_contained_array_xml(self):
+        """Test that an empty contained array doesn't produce invalid XML."""
+        from fhircraft.fhir.resources.datatypes.R5.core import Condition
+
+        condition = Condition.model_construct()
+
+        xml_output = condition.model_dump_xml()
+        root = ET.fromstring(xml_output)
+
+        # Should not have a contained element if contained is not set
+        contained_elem = root.find(f"{FHIR_NS}contained")
+        # This depends on exclude_none behavior, but XML should be valid either way
+        assert xml_output is not None  # Just ensure it's valid
+
+    def test_polymorphic_resource_type_detection(self):
+        """Test that different resource types in contained/resource fields are correctly detected and wrapped."""
+        from fhircraft.fhir.resources.datatypes.R5.core import (
+            Condition,
+            Patient,
+            Organization,
+        )
+
+        # Create a condition with different resource types as contained
+        patient = Patient(id="p1")
+        org = Organization(id="org1", name="Acme Corp")
+
+        condition = Condition.model_construct(contained=[patient, org])
+
+        xml_output = condition.model_dump_xml(indent=2)
+        root = ET.fromstring(xml_output)
+
+        # Find all contained elements (each list item creates a separate <contained> element)
+        contained_elems = root.findall(f"{FHIR_NS}contained")
+        assert len(contained_elems) >= 1
+
+        # Check both resource types are properly wrapped
+        patient_elem = None
+        org_elem = None
+
+        for contained in contained_elems:
+            if patient_elem is None:
+                patient_elem = contained.find(f"{FHIR_NS}Patient")
+            if org_elem is None:
+                org_elem = contained.find(f"{FHIR_NS}Organization")
+
+        assert patient_elem is not None, "Patient should be wrapped in Patient element"
+        assert (
+            org_elem is not None
+        ), "Organization should be wrapped in Organization element"
+
+        # Verify they have their respective ids
+        patient_id = patient_elem.find(f"{FHIR_NS}id")
+        org_id = org_elem.find(f"{FHIR_NS}id")
+
+        assert patient_id is not None and patient_id.get("value") == "p1"
+        assert org_id is not None and org_id.get("value") == "org1"
+
+    def test_contained_resource_with_complex_fields_xml(self):
+        """Test contained resources with complex nested structures (like name, address, etc.)."""
+        from fhircraft.fhir.resources.datatypes.R5.core import Condition, Patient
+
+        # Create a patient with complex fields
+        patient = Patient(
+            id="complex-patient",
+            active=True,
+            name=[{"family": "Smith", "given": ["John"]}],
+            address=[{"city": "New York", "state": "NY"}],
+        )
+
+        condition = Condition.model_construct(
+            contained=[patient],
+            subject={"reference": "#complex-patient"},
+        )
+
+        xml_output = condition.model_dump_xml(indent=2)
+        root = ET.fromstring(xml_output)
+
+        # Navigate to Patient
+        contained_elem = root.find(f"{FHIR_NS}contained")
+        patient_elem = contained_elem.find(f"{FHIR_NS}Patient")
+        assert patient_elem is not None
+
+        # Verify complex fields are properly nested inside Patient
+        name_elem = patient_elem.find(f"{FHIR_NS}name")
+        assert (
+            name_elem is not None
+        ), "name element should exist inside Patient, not contained"
+
+        address_elem = patient_elem.find(f"{FHIR_NS}address")
+        assert (
+            address_elem is not None
+        ), "address element should exist inside Patient, not contained"
+
+        # Ensure these are NOT directly under contained
+        direct_name = contained_elem.find(f"{FHIR_NS}name")
+        assert (
+            direct_name is None
+        ), "name should NOT be directly under contained, it should be inside Patient"

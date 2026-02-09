@@ -7,11 +7,18 @@ from dataclasses import dataclass
 from datetime import date, datetime, time
 from typing import Optional, Union, Any, TYPE_CHECKING
 from pint import UnitRegistry, Quantity as PintQuantity
+from fhircraft.fhir.path.exceptions import FhirPathWarning
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
-    from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
-    from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
+    from fhircraft.fhir.resources.datatypes.R4.complex.quantity import (
+        Quantity as R4_Quantity,
+    )
+    from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import (
+        Quantity as R4B_Quantity,
+    )
+    from fhircraft.fhir.resources.datatypes.R5.complex.quantity import (
+        Quantity as R5_Quantity,
+    )
 
 # Load the Pint unit registry with UCUM definitions
 ureg = UnitRegistry(autoconvert_offset_to_baseunit=True)
@@ -29,27 +36,46 @@ class Quantity(FHIRPathLiteralType):
 
     @classmethod
     def is_quantity(cls, instance: Any) -> bool:
-        from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
-        from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
-        from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
-        return isinstance(
-            instance, (cls, R4_Quantity, R4B_Quantity, R5_Quantity)
+        from fhircraft.fhir.resources.datatypes.R4.complex.quantity import (
+            Quantity as R4_Quantity,
+        )
+        from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import (
+            Quantity as R4B_Quantity,
+        )
+        from fhircraft.fhir.resources.datatypes.R5.complex.quantity import (
+            Quantity as R5_Quantity,
         )
 
+        return isinstance(instance, (cls, R4_Quantity, R4B_Quantity, R5_Quantity))
+
     @classmethod
-    def parse_quantity(cls, instance: Union["Quantity", "R4_Quantity", "R4B_Quantity", "R5_Quantity", int, float]) -> "Quantity":
-        from fhircraft.fhir.resources.datatypes.R4.complex.quantity import Quantity as R4_Quantity
-        from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import Quantity as R4B_Quantity
-        from fhircraft.fhir.resources.datatypes.R5.complex.quantity import Quantity as R5_Quantity
+    def parse_quantity(
+        cls,
+        instance: Union[
+            "Quantity", "R4_Quantity", "R4B_Quantity", "R5_Quantity", int, float
+        ],
+    ) -> "Quantity":
+        from fhircraft.fhir.resources.datatypes.R4.complex.quantity import (
+            Quantity as R4_Quantity,
+        )
+        from fhircraft.fhir.resources.datatypes.R4B.complex.quantity import (
+            Quantity as R4B_Quantity,
+        )
+        from fhircraft.fhir.resources.datatypes.R5.complex.quantity import (
+            Quantity as R5_Quantity,
+        )
 
         if isinstance(instance, Quantity):
             return instance
         elif isinstance(instance, (R4_Quantity, R4B_Quantity, R5_Quantity)):
             if instance.system not in (None, "http://unitsofmeasure.org"):
                 warnings.warn(
-                    f"Quantity with non-UCUM system '{instance.system}' may not be parsed correctly."
+                    f"Quantity with non-UCUM system '{instance.system}' may not be parsed correctly.",
+                    FhirPathWarning,
                 )
-            return cls(value=instance.value, unit=instance.code or instance.unit)
+            if not instance.value:
+                raise ValueError("Quantity value is required")
+            return cls(value=float(instance.value), unit=instance.code or instance.unit)
         elif isinstance(instance, (int, float)):
             return cls(value=instance, unit="")
         else:
@@ -82,7 +108,7 @@ class Quantity(FHIRPathLiteralType):
             return op(self.value, other)
         else:
             return False
-    
+
     def __math__(self, other, op) -> PintQuantity:
         if isinstance(other, Quantity):
             return op(
@@ -153,7 +179,7 @@ class Quantity(FHIRPathLiteralType):
             value=result.magnitude,
             unit=f"{self.unit}/{other.unit}" if self.unit != other.unit else "",
         )
-    
+
     def __repr__(self):
         return f"Quantity({self.value}, '{self.unit}')"
 
