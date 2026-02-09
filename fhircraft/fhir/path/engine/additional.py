@@ -3,7 +3,7 @@ FHIR adds (compatible) functionality to the set of common FHIRPath functions. So
 are candidates for elevation to the base version of FHIRPath when the next version is released.
 """
 
-import calendar
+import warnings
 import re
 import sys
 from html.parser import HTMLParser
@@ -21,9 +21,11 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.equality import Equals
 from fhircraft.fhir.path.engine.filtering import Where
+from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
-from fhircraft.utils import ensure_list, load_url
-from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive, to_date
+from fhircraft.utils import ensure_list
+from fhircraft.fhir.resources.datatypes.utils import is_fhir_primitive
+from fhircraft.fhir.path.exceptions import FhirPathWarning
 
 
 class Extension(FHIRPathFunction):
@@ -209,28 +211,57 @@ class Resolve(FHIRPathFunction):
         Returns:
             collection (FHIRPathCollection): The output collection.
         """
-        from fhircraft.fhir.resources.factory import construct_resource_model
 
         output_collection = []
         for item in collection:
-            if "Reference" in type(item.value).__name__:
-                resource_url = item.value.reference
-            elif isinstance(item.value, str):
-                resource_url = item.value
-            else:
+            value = item.value
+            if not (
+                (isinstance(value, dict) and (resource_url := value.get("reference")))
+                or (
+                    resource_url := (
+                        getattr(value, "reference", None)
+                        or getattr(value, "display", None)
+                    )
+                )
+                or ((resource_url := value))
+            ) or not isinstance(resource_url, str):
                 raise FHIRPathError(
                     "The resolve() function requires either a collection of URIs, Canonicals, URLs or References."
                 )
-            if not resource_url.startswith("http://") and not resource_url.startswith(
-                "https://"
-            ):
-                return []
-            resource = load_url(resource_url)
-            profile_url = resource.get("meta", {}).get("profile", [None])[0]
-            if profile_url:
-                profile = construct_resource_model(profile_url)
-                resource = profile.model_validate(resource)
-            output_collection.append(resource)
+            if resource_url.startswith("http://"):
+                # Resolving URLs is not supported
+                warnings.warn(
+                    f"Resolving external URLs is not supported. Skipping resolution of '{resource_url}'.",
+                    FhirPathWarning,
+                )
+                continue
+            elif resource_url.startswith("#"):
+                # Internal reference
+                resource = EnvironmentVariable("%resource").single(
+                    [], environment=environment
+                )
+                if not resource:
+                    # If we can't find the resource in the environment, we can't resolve internal references, so we skip it
+                    continue
+                # Get contained resources from the parent resource
+                if isinstance(resource, dict):
+                    contained_resources = resource.get("contained", [])
+                elif hasattr(resource, "contained"):
+                    contained_resources = getattr(resource, "contained", [])
+                else:
+                    continue
+
+                # Search for the referenced resource in the contained resources
+                for contained in contained_resources:
+                    if (
+                        isinstance(contained, dict)
+                        and contained.get("id") == resource_url[1:]
+                    ) or (getattr(contained, "id", None) == resource_url[1:]):
+                        output_collection.append(FHIRPathCollectionItem.wrap(contained))
+                        break
+            else:
+                # Invalid strings
+                continue
         return output_collection
 
 

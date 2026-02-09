@@ -1,4 +1,5 @@
 from collections import namedtuple
+from unittest import result
 
 import pytest
 
@@ -7,9 +8,18 @@ from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime
 from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
-from fhircraft.fhir.resources.datatypes.R4.complex import Quantity as R4_Quantity, Age as R4_Age 
-from fhircraft.fhir.resources.datatypes.R4B.complex import Quantity as R4B_Quantity
-from fhircraft.fhir.resources.datatypes.R5.complex import Quantity as R5_Quantity
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Quantity as R4_Quantity,
+    Age as R4_Age,
+)
+from fhircraft.fhir.resources.datatypes.R4B.complex import (
+    Quantity as R4B_Quantity,
+    Reference as R4B_Reference,
+)
+from fhircraft.fhir.resources.datatypes.R5.complex import (
+    Quantity as R5_Quantity,
+    Reference as R5_Reference,
+)
 
 env = dict()
 
@@ -262,14 +272,13 @@ def test_lowboundary_non_datetime_string():
 def test_lowboundary_fhirpath_quantity():
     """Test low boundary for Quantity objects"""
 
-    quantity = Quantity(
-        value=10.5, unit="kg"
-    )
+    quantity = Quantity(value=10.5, unit="kg")
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = LowBoundary().evaluate(collection, env)
 
     assert result[0].value.value == 10.5 - sys.float_info.epsilon
     assert result[0].value.unit == "kg"
+
 
 def test_lowboundary_r4_quantity():
     """Test low boundary for Quantity objects"""
@@ -288,14 +297,13 @@ def test_lowboundary_r4_age():
     """Test low boundary for Quantity objects"""
     from test.test_fhir_path_engine_conversion import Quantity
 
-    quantity = R4_Age(
-        value=42, unit="a", system="http://unitsofmeasure.org", code="a"
-    )
+    quantity = R4_Age(value=42, unit="a", system="http://unitsofmeasure.org", code="a")
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = LowBoundary().evaluate(collection, env)
 
     assert result[0].value.value == 42 - sys.float_info.epsilon
     assert result[0].value.unit == "a"
+
 
 # -------------
 # HighBoundary
@@ -373,17 +381,17 @@ def test_highboundary_non_datetime_string():
     result = HighBoundary().evaluate(collection, env)
     assert result[0].value == "not-a-date"
 
+
 def test_highboundary_fhirpath_quantity():
     """Test high boundary for Quantity objects"""
 
-    quantity = Quantity(
-        value=10.5, unit="kg"
-    )
+    quantity = Quantity(value=10.5, unit="kg")
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = HighBoundary().evaluate(collection, env)
 
     assert result[0].value.value == 10.5 + sys.float_info.epsilon
     assert result[0].value.unit == "kg"
+
 
 def test_highboundary_r4_quantity():
     """Test high boundary for Quantity objects"""
@@ -397,18 +405,18 @@ def test_highboundary_r4_quantity():
     assert result[0].value.value == 10.5 + sys.float_info.epsilon
     assert result[0].value.unit == "kg"
 
+
 def test_highboundary_r4_age():
     """Test high boundary for Quantity objects"""
     from test.test_fhir_path_engine_conversion import Quantity
 
-    quantity = R4_Age(
-        value=42, unit="a", system="http://unitsofmeasure.org", code="a"
-    )
+    quantity = R4_Age(value=42, unit="a", system="http://unitsofmeasure.org", code="a")
     collection = [FHIRPathCollectionItem(value=quantity)]
     result = HighBoundary().evaluate(collection, env)
 
     assert result[0].value.value == 42 + sys.float_info.epsilon
     assert result[0].value.unit == "a"
+
 
 # -------------
 # Comparable
@@ -450,6 +458,7 @@ def test_comparable_same_units_with_fhirpath():
     )
     assert result[0].value == True
 
+
 def test_comparable_r4_fhir_quantity():
     collection = [FHIRPathCollectionItem(value=R4_Quantity(value=10, unit="mg"))]
     quantity = Quantity(
@@ -458,26 +467,96 @@ def test_comparable_r4_fhir_quantity():
     )
     assert Comparable(quantity).single(collection, env) == True
 
+
 def test_comparable_r4_fhir_quantity_subclass():
-    collection = [FHIRPathCollectionItem(value=R4_Age(value=10, system="http://unitsofmeasure.org", code="a"))]
+    collection = [
+        FHIRPathCollectionItem(
+            value=R4_Age(value=10, system="http://unitsofmeasure.org", code="a")
+        )
+    ]
     quantity = Quantity(
         value=12,
         unit="s",
     )
     assert Comparable(quantity).single(collection, env) == True
 
+
 def test_comparable_r4b_fhir_quantity():
-    collection = [FHIRPathCollectionItem(value=R4B_Quantity(value=10, system="http://unitsofmeasure.org", code="mg"))]
+    collection = [
+        FHIRPathCollectionItem(
+            value=R4B_Quantity(value=10, system="http://unitsofmeasure.org", code="mg")
+        )
+    ]
     quantity = Quantity(
         value=12,
         unit="mg",
     )
     assert Comparable(quantity).single(collection, env) == True
 
+
 def test_comparable_r5_fhir_quantity():
-    collection = [FHIRPathCollectionItem(value=R5_Quantity(value=10, system="http://unitsofmeasure.org", code="mg"))]
+    collection = [
+        FHIRPathCollectionItem(
+            value=R5_Quantity(value=10, system="http://unitsofmeasure.org", code="mg")
+        )
+    ]
     quantity = Quantity(
         value=12,
         unit="mg",
     )
     assert Comparable(quantity).single(collection, env) == True
+
+
+# -------------
+# Resolve
+# -------------
+
+
+def test_resolve_returns_empty_for_empty_collection():
+    collection = []
+    result = Resolve().evaluate(collection, env)
+    assert result == []
+
+
+def test_resolve_with_non_url_value():
+    collection = [FHIRPathCollectionItem(value="not-a-url")]
+    result = Resolve().evaluate(collection, env)
+    assert result == []
+
+
+def test_resolve_with_r4b_reference():
+    collection = [
+        FHIRPathCollectionItem(
+            value=R4B_Reference(reference="http://example.org/resource")
+        )
+    ]
+    with pytest.warns(FhirPathWarning, match="not supported"):
+        result = Resolve().evaluate(collection, env)
+    assert result == []
+
+
+def test_resolve_with_r5_reference():
+    collection = [
+        FHIRPathCollectionItem(
+            value=R5_Reference(reference="http://example.org/resource")
+        )
+    ]
+    with pytest.warns(FhirPathWarning, match="not supported"):
+        result = Resolve().evaluate(collection, env)
+    assert result == []
+
+
+def test_resolve_with_internal_reference():
+    contained_resource = {"id": "123", "resourceType": "Patient"}
+    resource = {"contained": [contained_resource]}
+    collection = [FHIRPathCollectionItem(value="#123")]
+    result = Resolve().evaluate(collection, {"%resource": resource})
+    assert result[0].value == contained_resource
+
+
+def test_resolve_with_unresolvable_internal_reference():
+    contained_resource = {"id": "123", "resourceType": "Patient"}
+    resource = {"contained": [contained_resource]}
+    collection = [FHIRPathCollectionItem(value="#1234")]
+    result = Resolve().evaluate(collection, {"%resource": resource})
+    assert result == []
