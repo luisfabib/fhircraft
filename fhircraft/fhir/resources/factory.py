@@ -1856,7 +1856,7 @@ class ResourceFactory:
         if not _structure_definition.fhirVersion:
             if not fhir_release:
                 raise ValueError(
-                    "StructureDefinition does not specify FHIR version. Please provide fhir_release."
+                    "StructureDefinition does not specify FHIR version. Please provide 'fhirVersion' in the structure definition."
                 )
         else:
             if fhir_release and fhir_release != get_FHIR_release_from_version(
