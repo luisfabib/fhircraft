@@ -73,7 +73,12 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     ElementDefinitionType as R5_ElementDefinitionType,
 )
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
-from fhircraft.utils import capitalize, ensure_list, get_FHIR_release_from_version
+from fhircraft.utils import (
+    _get_deepest_args,
+    capitalize,
+    ensure_list,
+    get_FHIR_release_from_version,
+)
 
 ModelT = TypeVar("ModelT", bound="BaseModel")
 SlicedModelT = TypeVar("SlicedModelT", bound="FHIRSliceModel")
@@ -1593,6 +1598,18 @@ class ResourceFactory:
                 else []
             )
             # If element has no type, skip it (only in snapshot mode)
+            if not field_types:
+                # Attempt to infer the type from the base model if type is not specified in the element definition (common in slices and backbone elements)
+                if (
+                    base
+                    and issubclass(base, BaseModel)
+                    and (field_info := base.model_fields.get(safe_field_name))
+                ):
+                    field_types = [
+                        t
+                        for t in _get_deepest_args(field_info.annotation)
+                        if t is not type(None)
+                    ]
             if not field_types:
                 continue
 
