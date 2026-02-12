@@ -849,7 +849,7 @@ class ResourceFactory:
     def _process_pattern_or_fixed_values(
         self,
         element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
-        constraint_prefix: str,
+        constraint_prefix: Literal["fixed", "pattern"],
     ) -> Any:
         """
         Process the pattern or fixed values of a StructureDefinition element.
@@ -888,6 +888,18 @@ class ResourceFactory:
                 else constrained_value
             )
         return constrained_value
+
+    def _process_pattern_values(
+        self,
+        element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+    ):
+        return self._process_pattern_or_fixed_values(element, "pattern")
+
+    def _process_fixed_values(
+        self,
+        element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+    ):
+        return self._process_pattern_or_fixed_values(element, "fixed")
 
     def _construct_type_choice_fields(
         self,
@@ -1643,9 +1655,7 @@ class ResourceFactory:
             # -------------------------------------
             # Pattern value constraints
             # -------------------------------------
-            if pattern_value := self._process_pattern_or_fixed_values(
-                node.definition, "pattern"
-            ):
+            if pattern_value := self._process_pattern_values(node.definition):
                 field_default = pattern_value
                 # Add the current field to the list of validated fields
                 validators.add(
@@ -1661,9 +1671,7 @@ class ResourceFactory:
             # -------------------------------------
             # Fixed value constraints
             # -------------------------------------
-            if fixed_value := self._process_pattern_or_fixed_values(
-                node.definition, "fixed"
-            ):
+            if fixed_value := self._process_fixed_values(node.definition):
                 # Use enum with single choice since Literal definition does not work at runtime
                 singleChoice = Enum(
                     f"{name}FixedValue",
