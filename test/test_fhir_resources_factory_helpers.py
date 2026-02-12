@@ -202,16 +202,13 @@ class TestBuildElementTreeStructure(FactoryTestCase):
         nodes = self.factory._build_element_tree_structure(elements)
         assert "code" == nodes[0].node_label
         assert "coding" in nodes[0].children
-        assert "coding" == nodes[0].children["coding"].node_label
-        assert "sliceA" == nodes[0].children["coding"].slices["sliceA"].node_label
-        assert (
-            "system"
-            == nodes[0]
-            .children["coding"]
-            .slices["sliceA"]
-            .children["system"]
-            .node_label
-        )
+        coding_node = nodes[0].children["coding"]
+        assert coding_node.node_label == "coding"
+        assert coding_node.definition
+        assert coding_node.definition.type is not None
+        assert "coding" == coding_node.node_label
+        assert "sliceA" == coding_node.slices["sliceA"].node_label
+        assert "system" == coding_node.slices["sliceA"].children["system"].node_label
 
     def test_handles_empty_list_of_elements(self):
         elements = []
@@ -1544,6 +1541,10 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
         # Differential slices component and constrains children
         differential_elements = [
             ElementDefinition(
+                id="Resource.component",
+                path="Resource.component",
+            ),
+            ElementDefinition(
                 id="Resource.component:systolic",
                 path="Resource.component",
                 sliceName="systolic",
@@ -1569,7 +1570,13 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
             differential_elements, base_sd
         )
 
-        assert len(merged) == 3
+        assert len(merged) == 4
+
+        # Check base
+        slice_elem = next(e for e in merged if e.id == "Resource.component")
+        assert slice_elem.type == [
+            ElementDefinitionType(code="BackboneElement")
+        ]  # Inherited
 
         # Check slice
         slice_elem = next(e for e in merged if e.id == "Resource.component:systolic")

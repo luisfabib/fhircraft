@@ -11,6 +11,7 @@ import pytest
 from fhircraft.config import with_config
 from fhircraft.fhir.resources.factory import (
     ConstructionMode,
+    ResourceFactory,
     construct_resource_model,
     factory,
 )
@@ -210,3 +211,146 @@ def test_construct_profiled_resource(mode, filename):
         fhir_resource
     )
     assert json.loads(fhir_resource_instance.model_dump_json()) == fhir_resource
+
+
+def _normalize(s):
+    import re
+
+    return re.sub(r"\s+", " ", s.strip())
+
+
+def assertBlockInCode(code, expected_block):
+    # Generate source code
+    # Assert code block (normalized)
+    norm_expected = _normalize(expected_block)
+    norm_code = _normalize(code)
+    assert (
+        norm_expected in norm_code
+    ), f"Expected block not found in generated code.\n\nExpected:\n{expected_block}\n\nGot:\n{code}"
+
+
+def test_regression_issue_255():
+
+    factory = ResourceFactory()
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "example",
+        "url": "http://example.org/fhir/StructureDefinition/example",
+        "version": "5.0.0",
+        "name": "ProfileExample",
+        "title": "Example Profile",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "derivation": "constraint",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "differential": {
+            "element": [
+                {
+                    "id": "Observation",
+                    "path": "Observation",
+                    "min": 0,
+                    "max": "*",
+                },
+                {
+                    "id": "Observation.code",
+                    "path": "Observation.code",
+                },
+                {
+                    "id": "Observation.code.coding",
+                    "path": "Observation.code.coding",
+                    "slicing": {
+                        "discriminator": [
+                            {"type": "value", "path": "code"},
+                            {"type": "value", "path": "system"},
+                        ],
+                        "ordered": False,
+                        "rules": "open",
+                    },
+                },
+                {
+                    "id": "Observation.code.coding:slicedCoding",
+                    "path": "Observation.code.coding",
+                    "sliceName": "slicedCoding",
+                    "min": 1,
+                    "max": "1",
+                },
+                {
+                    "id": "Observation.code.coding:slicedCoding.system",
+                    "path": "Observation.code.coding.system",
+                    "min": 1,
+                    "max": "1",
+                    "type": [{"code": "uri"}],
+                    "fixedUri": "http://example.org",
+                },
+                {
+                    "id": "Observation.code.coding:slicedCoding.code",
+                    "path": "Observation.code.coding.code",
+                    "min": 1,
+                    "max": "1",
+                    "type": [{"code": "code"}],
+                    "fixedCode": "12345-6",
+                },
+            ]
+        },
+    }
+
+    model = factory.construct_resource_model(
+        structure_definition=structure_definition, mode="differential"
+    )
+
+    source_code = CodeGenerator().generate_resource_model_code(model)
+
+    expected_code = '''
+    class ProfileExampleSlicedCoding(Coding, FHIRSliceModel):
+        min_cardinality: ClassVar[int] = 1
+        max_cardinality: ClassVar[int] = 1
+    
+    
+        system: Literal['http://example.org'] = Field(
+            description=None,
+            default="http://example.org",
+        )
+        code: Literal['12345-6'] = Field(
+            description=None,
+            default="12345-6",
+        )
+        
+        
+    class ProfileExampleCode(CodeableConcept):
+        """
+        Describes what was observed. Sometimes this is called the observation "name".
+        """
+    
+
+        coding: Optional[List[Annotated[Union[ProfileExampleSlicedCoding, Coding], Field(union_mode='left_to_right')]]] = Field(
+            description=None,
+            default=None,
+        )
+        
+        @field_validator(*('coding',), mode="after", check_fields=None)
+        @classmethod
+        def coding_slicing_cardinality_validator(cls, value):    
+            return validate_slicing_cardinalities(cls, value, 
+                field_name="coding",
+            )
+        
+    class ProfileExample(Observation):
+
+        _canonical_url = "http://example.org/fhir/StructureDefinition/example"
+
+        meta: Optional[Meta] = Field(
+            title="Meta",
+            description="Metadata about the resource.",
+            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/example']),
+        )
+        code: Optional[ProfileExampleCode] = Field(
+            description="Type of observation (code / type)",
+            default=None,
+        )
+    '''
+
+    assertBlockInCode(source_code, expected_code.strip())

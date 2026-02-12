@@ -73,7 +73,12 @@ from fhircraft.fhir.resources.datatypes.R5.complex import (
     ElementDefinitionType as R5_ElementDefinitionType,
 )
 from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
-from fhircraft.utils import capitalize, ensure_list, get_FHIR_release_from_version
+from fhircraft.utils import (
+    _get_deepest_args,
+    capitalize,
+    ensure_list,
+    get_FHIR_release_from_version,
+)
 
 ModelT = TypeVar("ModelT", bound="BaseModel")
 SlicedModelT = TypeVar("SlicedModelT", bound="FHIRSliceModel")
@@ -1166,20 +1171,23 @@ class ResourceFactory:
         base_snapshot_map = {
             elem.id: elem for elem in (base_structure_definition.snapshot.element or [])
         }
-
         merged_elements = []
         for diff_elem in differential_elements:
             # For slice children, strip the slice name when looking up base element
             # e.g., "MockBase.component:systolic.code" -> "MockBase.component.code"
-            lookup_id = diff_elem.id
-            if lookup_id and ":" in lookup_id:
+            if (
+                diff_elem.id
+                and (not diff_elem.id in base_snapshot_map)
+                and (":" in diff_elem.id)
+            ):
                 # Replace "element:sliceName" with "element" in the ID
-                parts = lookup_id.split(".")
+                parts = diff_elem.id.split(".")
                 normalized_parts = [part.split(":")[0] for part in parts]
-                lookup_id = ".".join(normalized_parts)
-
-            base_elem = base_snapshot_map.get(lookup_id)
+                base_elem = base_snapshot_map.get(".".join(normalized_parts))
+            else:
+                base_elem = base_snapshot_map.get(diff_elem.id)
             if base_elem:
+
                 for field_name in (
                     "min",
                     "max",
@@ -1590,6 +1598,23 @@ class ResourceFactory:
                 else []
             )
             # If element has no type, skip it (only in snapshot mode)
+            if not field_types:
+                # Attempt to infer the type from the base model if type is not specified in the element definition (common in slices and backbone elements)
+                if (
+                    base
+                    and issubclass(base, BaseModel)
+                    and (field_info := base.model_fields.get(safe_field_name))
+                ):
+                    field_types = [
+                        t
+                        for t in _get_deepest_args(field_info.annotation)
+                        if t is not type(None)
+                    ]
+                    node.definition.min = 0
+                    # TODO: This is a bit of a hack - if the field is a list, we set max to *, otherwise 1. We should ideally be able to get this info from the element definition itself, but in some cases (like slices) it may not be present, so we infer it from the base model field type.
+                    node.definition.max = (
+                        "1" if not "List" in str(field_info.annotation) else "*"
+                    )
             if not field_types:
                 continue
 
