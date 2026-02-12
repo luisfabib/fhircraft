@@ -78,6 +78,7 @@ from fhircraft.utils import (
     capitalize,
     ensure_list,
     get_FHIR_release_from_version,
+    is_list_field,
 )
 
 ModelT = TypeVar("ModelT", bound="BaseModel")
@@ -1610,6 +1611,10 @@ class ResourceFactory:
                         for t in _get_deepest_args(field_info.annotation)
                         if t is not type(None)
                     ]
+                    node.definition.min = 0
+                    node.definition.max = (
+                        "*" if is_list_field(field_info.annotation) else "1"
+                    )
             if not field_types:
                 continue
 
