@@ -1180,23 +1180,20 @@ class ResourceFactory:
 
             base_elem = base_snapshot_map.get(lookup_id)
             if base_elem:
-                ElementDefinition = get_complex_FHIR_type(
-                    "ElementDefinition", self.Config.FHIR_release
-                )
-                # Start with base snapshot element
-                merged = ElementDefinition.model_validate(base_elem.model_dump())
-                # Overlay differential changes
-                for field_name, field_info in ElementDefinition.model_fields.items():
-                    diff_value = getattr(diff_elem, field_name, None)
-                    # Only override non-None values (None means "not specified in differential")
-                    if diff_value is not None:
-                        setattr(merged, field_name, diff_value)
-                merged_elements.append(merged)
-            else:
-                # Element not in base (new element in differential)
-                merged_elements.append(diff_elem)
+                for field_name in (
+                    "min",
+                    "max",
+                    "type",
+                    "definition",
+                    "short",
+                ):
+                    if not getattr(diff_elem, field_name, None):
+                        setattr(
+                            diff_elem, field_name, getattr(base_elem, field_name, None)
+                        )
+            merged_elements.append(diff_elem)
 
-        return merged_elements
+        return differential_elements
 
     def _merge_differential_with_base_snapshot(
         self,

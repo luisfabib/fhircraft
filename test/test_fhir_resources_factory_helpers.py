@@ -1117,6 +1117,7 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
         assert merged[0].type == [ElementDefinitionType(code="code")]  # Inherited
         assert merged[0].short == "Base status field"  # Inherited
         assert merged[0].definition == "Status from base"  # Inherited
+        assert merged[0].constraint == None  # Not Inherited
 
     def test_merges_nested_backbone_element_children(self):
         """Test merging children of backbone elements."""
@@ -1216,6 +1217,7 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
         assert component.type == [
             ElementDefinitionType(code="BackboneElement")
         ]  # Inherited
+        assert component.constraint == None  # Not Inherited
 
         # Check child element
         value = next(e for e in merged if e.id == "Resource.component.value")
@@ -1223,6 +1225,7 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
         assert value.max == "1"  # Inherited
         assert value.type == [ElementDefinitionType(code="string")]  # Inherited
         assert value.short == "Required component value"  # From differential
+        assert value.constraint == None  # Not Inherited
 
     def test_merges_sliced_element(self):
         """Test merging a sliced element definition."""
@@ -1290,6 +1293,7 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
         assert merged[0].slicing.rules == "open"  # From differential
         assert merged[0].type == [ElementDefinitionType(code="Extension")]  # Inherited
         assert merged[0].short == "Base extensions"  # Inherited
+        assert merged[0].constraint == None  # Not Inherited
 
     def test_merges_sliced_element_children(self):
         """Test merging children of sliced elements (strips slice name for lookup)."""
