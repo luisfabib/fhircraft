@@ -1171,14 +1171,17 @@ class ResourceFactory:
         for diff_elem in differential_elements:
             # For slice children, strip the slice name when looking up base element
             # e.g., "MockBase.component:systolic.code" -> "MockBase.component.code"
-            lookup_id = diff_elem.id
-            if lookup_id and ":" in lookup_id:
+            if (
+                diff_elem.id
+                and (not diff_elem.id in base_snapshot_map)
+                and (":" in diff_elem.id)
+            ):
                 # Replace "element:sliceName" with "element" in the ID
-                parts = lookup_id.split(".")
+                parts = diff_elem.id.split(".")
                 normalized_parts = [part.split(":")[0] for part in parts]
-                lookup_id = ".".join(normalized_parts)
-
-            base_elem = base_snapshot_map.get(lookup_id)
+                base_elem = base_snapshot_map.get(".".join(normalized_parts))
+            else:
+                base_elem = base_snapshot_map.get(diff_elem.id)
             if base_elem:
                 for field_name in (
                     "min",
