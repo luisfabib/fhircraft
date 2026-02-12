@@ -438,14 +438,25 @@ class CodeGenerator:
                         # or are defined differently and don't need to be regenerated
                         continue
 
-            inherited_validator_functions = [
-                getattr(v.func, "__func__", v.func)
-                for base in model.__bases__
-                for v in [
-                    *base.__pydantic_decorators__.field_validators.values(),
-                    *base.__pydantic_decorators__.model_validators.values(),
-                ]
-            ]
+            def get_all_inherited_validators(base_class):
+                """Recursively collect validators from all base classes."""
+                validators = []
+                for base in base_class.__bases__:
+                    if not issubclass(base, BaseModel):
+                        continue
+                    validators.extend(
+                        [
+                            getattr(v.func, "__func__", v.func)
+                            for v in [
+                                *base.__pydantic_decorators__.field_validators.values(),
+                                *base.__pydantic_decorators__.model_validators.values(),
+                            ]
+                        ]
+                    )
+                    validators.extend(get_all_inherited_validators(base))
+                return validators
+
+            inherited_validator_functions = get_all_inherited_validators(model)
 
             validators = {}
             for mode, _validators in zip(
