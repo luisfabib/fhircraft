@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from pydantic import create_model as _create_model
 from pydantic import field_validator, model_validator
 
+from fhircraft.fhir.resources.datatypes.R4.core.domain_resource import DomainResource
 import fhircraft.fhir.resources.validators as fhir_validators
 from fhircraft.fhir.resources.base import FHIRSliceModel
 from fhircraft.fhir.resources.datatypes import primitives
@@ -14,11 +15,11 @@ from fhircraft.fhir.resources.datatypes.R4B.complex import CodeableConcept, Codi
 from fhircraft.fhir.resources.generator import generate_resource_model_code
 
 
-def create_model(*args, **kwargs):
+def create_model(*args, bases=(BaseModel,), **kwargs):
     """
     Helper function to create a Pydantic model dynamically.
     """
-    return _create_model(*args, __base__=(BaseModel,), **kwargs)
+    return _create_model(*args, __base__=bases, **kwargs)
 
 
 def create_slice_model(*args, **kwargs):
@@ -246,6 +247,50 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, model)
 
+    def test_inherited_validators_not_included(self):
+        # Create model dynamically
+        model = create_model(
+            "ModelWithModelValidator",
+            bases=(DomainResource,),
+            code=(
+                CodeableConcept,
+                Field(
+                    description="A code field with model constraint.",
+                ),
+            ),
+            __validators__={
+                "FHIR_custom_1_constraint_model_validator": (
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_model_constraint,
+                            expression="exists()",
+                            human="All FHIR elements must exist.",
+                            key="custom-1",
+                            severity="error",
+                        )
+                    )
+                )
+            },
+        )
+        # Expected code block
+        expected_block = """
+        class ModelWithModelValidator(DomainResource):
+            code: CodeableConcept = Field(
+                description="A code field with model constraint.",
+            )
+
+            @model_validator(mode="after")
+            def FHIR_custom_1_constraint_model_validator(self):
+                return validate_model_constraint(
+                    self,
+                    expression="exists()",
+                    human="All FHIR elements must exist.",
+                    key="custom-1",
+                    severity="error",
+                )
+        """
+        self.assertBlockInCode(expected_block, model)
+
     def test_model_with_field_title(self):
         # Create model dynamically
         model = create_model(
@@ -402,8 +447,6 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             min_cardinality: ClassVar[int] = 0
             max_cardinality: ClassVar[int] = 2
 
-            _kind = "logical"
-
             valueString: str = Field(
                 description="A string value",
             )
@@ -430,10 +473,6 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         class ExtensionSlice(Extension, FHIRSliceModel):
             min_cardinality: ClassVar[int] = 1
             max_cardinality: ClassVar[int] = 1
-
-            _fhir_release = "R4B"
-            _type = "Extension"
-            _kind = "complex-type"
             
             url: str = Field(
                 description="Extension URL",
@@ -636,6 +675,90 @@ class TestJinjaTemplateRendering(unittest.TestCase):
             "from fhircraft.fhir.resources.datatypes.R4B.complex.coding import Coding",
             code,
         )
+
+    def test_profile_with_multiple_ancestors(self):
+        # Create model dynamically
+        child_model = create_model(
+            "ChildModel",
+            bases=(DomainResource,),
+            childField=(
+                str,
+                Field(
+                    description="A field of the child model",
+                ),
+            ),
+            __validators__={
+                "FHIR_child_1_constraint_model_validator": (
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_model_constraint,
+                            expression="exists()",
+                            human="Child model constraint",
+                            key="child-1",
+                            severity="error",
+                        )
+                    )
+                )
+            },
+        )
+        grand_child_model = create_model(
+            "GrandChildModel",
+            bases=(child_model,),
+            grandChildField=(
+                int,
+                Field(
+                    description="A field of the grandchild model",
+                ),
+            ),
+            __validators__={
+                "FHIR_grandchild_1_constraint_model_validator": (
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_model_constraint,
+                            expression="exists()",
+                            human="Grandchild model constraint",
+                            key="grandchild-1",
+                            severity="error",
+                        )
+                    )
+                )
+            },
+        )
+        # Expected code block
+        expected_block = """
+        class ChildModel(DomainResource):
+        
+            childField: str = Field(
+                description="A field of the child model",
+            )
+
+            @model_validator(mode="after")
+            def FHIR_child_1_constraint_model_validator(self):
+                return validate_model_constraint(
+                    self,
+                    expression="exists()",
+                    human="Child model constraint",
+                    key="child-1",
+                    severity="error",
+                )
+
+        class GrandChildModel(ChildModel):
+        
+            grandChildField: int = Field(
+                description="A field of the grandchild model",
+            )
+
+            @model_validator(mode="after")
+            def FHIR_grandchild_1_constraint_model_validator(self):
+                return validate_model_constraint(
+                    self,
+                    expression="exists()",
+                    human="Grandchild model constraint",
+                    key="grandchild-1",
+                    severity="error",
+                )
+        """
+        self.assertBlockInCode(expected_block, grand_child_model)
 
 
 @pytest.mark.parametrize(

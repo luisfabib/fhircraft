@@ -278,6 +278,47 @@ class CodeGenerator:
 
         return module_objects
 
+    def _is_builtin_pydantic_model(self, model: type) -> bool:
+        """
+        Check if a model is a built-in pydantic model that should be imported, not serialized.
+
+        Args:
+            model: The model class to check
+
+        Returns:
+            bool: True if the model is from pydantic, False otherwise
+        """
+        if model == BaseModel:
+            return True
+        try:
+            module_name = get_module_name(model)
+            return module_name.startswith("pydantic")
+        except Exception:
+            return False
+
+    def _is_fhir_framework_model(self, model: type) -> bool:
+        """
+        Check if a model is part of the FHIR framework that should be imported, not serialized.
+
+        FHIR framework models like DomainResource, Resource, FHIRBaseModel are handwritten
+        and should be imported rather than serialized to avoid unnecessary code duplication.
+
+        Args:
+            model: The model class to check
+
+        Returns:
+            bool: True if the model is a FHIR framework model, False otherwise
+        """
+        try:
+            module_name = get_module_name(model)
+            # Framework models are in the fhircraft.fhir.resources package but not from factory
+            return (
+                module_name.startswith("fhircraft.fhir.resources")
+                and module_name != FACTORY_MODULE
+            )
+        except Exception:
+            return False
+
     def _serialize_model(self, model: type[BaseModel]) -> None:
         """
         Serialize the model by extracting information about its fields and properties.
@@ -294,14 +335,18 @@ class CodeGenerator:
 
         try:
             model_base = model.__base__
-            # Handle the base class: serialize if from factory, import otherwise
+            # Handle the base class: serialize custom bases, import built-in or framework models
+            # This ensures non-built-in base models (from factory or tests) are included before requested models
             if model_base and model_base != BaseModel:
-                if get_module_name(model_base) == FACTORY_MODULE:
-                    # If base class is from factory, serialize it
-                    self._serialize_model(model_base)
+                if self._is_builtin_pydantic_model(model_base):
+                    # Pydantic built-in models should be imported
+                    self._add_import_statement(model_base)
+                elif self._is_fhir_framework_model(model_base):
+                    # FHIR framework models should be imported to avoid code duplication
+                    self._add_import_statement(model_base)
                 else:
-                    # Otherwise, import it
-                    self._add_import_statement(model.__base__)
+                    # Custom models (factory-generated, test-created, etc.) should be serialized and included
+                    self._serialize_model(model_base)
 
             subdata = {}
             for field, info in model.model_fields.items():
@@ -393,14 +438,25 @@ class CodeGenerator:
                         # or are defined differently and don't need to be regenerated
                         continue
 
-            inherited_validator_functions = [
-                getattr(v.func, "__func__", v.func)
-                for base in model.__bases__
-                for v in [
-                    *base.__pydantic_decorators__.field_validators.values(),
-                    *base.__pydantic_decorators__.model_validators.values(),
-                ]
-            ]
+            def get_all_inherited_validators(base_class):
+                """Recursively collect validators from all base classes."""
+                validators = []
+                for base in base_class.__bases__:
+                    if not issubclass(base, BaseModel):
+                        continue
+                    validators.extend(
+                        [
+                            getattr(v.func, "__func__", v.func)
+                            for v in [
+                                *base.__pydantic_decorators__.field_validators.values(),
+                                *base.__pydantic_decorators__.model_validators.values(),
+                            ]
+                        ]
+                    )
+                    validators.extend(get_all_inherited_validators(base))
+                return validators
+
+            inherited_validator_functions = get_all_inherited_validators(model)
 
             validators = {}
             for mode, _validators in zip(
@@ -412,6 +468,9 @@ class CodeGenerator:
             ):
                 for name, validator in _validators.items():
                     if isinstance(validation_function := getattr(validator.func, "__func__", validator.func), functools.partial):  # type: ignore
+                        # Check if this partial validator is inherited from a base class
+                        if validation_function in inherited_validator_functions:
+                            continue  # Skip inherited validators
                         self._add_import_statement(validation_function.func)
                         func_args = [
                             self._cleanup_function_argument(arg)

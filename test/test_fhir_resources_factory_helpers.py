@@ -98,14 +98,17 @@ class TestBuildElementTreeStructure(FactoryTestCase):
         assert "Patient" == node.node_label
         assert "name" in node.children
         assert "Patient.name" == node.children["name"].id
+        assert node.children["name"].definition
         assert node.children["name"].definition.type is not None
         assert "string" == node.children["name"].definition.type[0].code
         assert "address" in node.children
         assert "Patient.address" == node.children["address"].id
+        assert node.children["address"].definition
         assert node.children["address"].definition.type is not None
         assert "Address" == node.children["address"].definition.type[0].code
         assert "identifier" in node.children
         assert "Patient.identifier" == node.children["identifier"].id
+        assert node.children["identifier"].definition
         assert node.children["identifier"].definition.type is not None
         assert "Identifier" == node.children["identifier"].definition.type[0].code
 
@@ -173,6 +176,43 @@ class TestBuildElementTreeStructure(FactoryTestCase):
             == nodes[0].slices["sliceA"].children["valueString"].node_label
         )
 
+    def test_handles_nested_slicing(self):
+        elements = [
+            ElementDefinition(
+                path="code",
+                id="code",
+                type=[ElementDefinitionType(code="CodeableConcept")],
+            ),
+            ElementDefinition(
+                path="code.coding",
+                id="code.coding",
+                type=[ElementDefinitionType(code="Coding")],
+            ),
+            ElementDefinition(
+                path="code.coding",
+                id="code.coding:sliceA",
+                type=[ElementDefinitionType(code="Address")],
+            ),
+            ElementDefinition(
+                path="code.coding",
+                id="code.coding:sliceA.system",
+                type=[ElementDefinitionType(code="string")],
+            ),
+        ]
+        nodes = self.factory._build_element_tree_structure(elements)
+        assert "code" == nodes[0].node_label
+        assert "coding" in nodes[0].children
+        assert "coding" == nodes[0].children["coding"].node_label
+        assert "sliceA" == nodes[0].children["coding"].slices["sliceA"].node_label
+        assert (
+            "system"
+            == nodes[0]
+            .children["coding"]
+            .slices["sliceA"]
+            .children["system"]
+            .node_label
+        )
+
     def test_handles_empty_list_of_elements(self):
         elements = []
         nodes = self.factory._build_element_tree_structure(elements)
@@ -232,31 +272,31 @@ class TestGetComplexFhirType(FactoryTestCase):
                 derivation="specialization",
                 snapshot=StructureDefinitionSnapshot(
                     element=[
-                        {
-                            "id": "BackboneElement",
-                            "path": "BackboneElement",
-                            "min": 0,
-                            "max": "*",
-                            "definition": "A custom type for testing.",
-                            "base": {
-                                "path": "BackboneElement",
-                                "min": 0,
-                                "max": "1",
-                            },
-                        },
-                        {
-                            "id": "BackboneElement.customField",
-                            "path": "BackboneElement.customField",
-                            "min": 0,
-                            "max": "1",
-                            "type": [{"code": "string"}],
-                            "definition": "A custom field in the custom type.",
-                            "base": {
-                                "path": "BackboneElement.customField",
-                                "min": 0,
-                                "max": "1",
-                            },
-                        },
+                        ElementDefinition(
+                            id="BackboneElement",
+                            path="BackboneElement",
+                            min=0,
+                            max="*",
+                            definition="A custom type for testing.",
+                            base=ElementDefinitionBase(
+                                path="BackboneElement",
+                                min=0,
+                                max="1",
+                            ),
+                        ),
+                        ElementDefinition(
+                            id="BackboneElement.customField",
+                            path="BackboneElement.customField",
+                            min=0,
+                            max="1",
+                            type=[ElementDefinitionType(code="string")],
+                            definition="A custom field in the custom type.",
+                            base=ElementDefinitionBase(
+                                path="BackboneElement.customField",
+                                min=0,
+                                max="1",
+                            ),
+                        ),
                     ]
                 ),
             )
@@ -955,6 +995,8 @@ class TestResolveContentReference(FactoryTestCase):
             result = self.factory._resolve_content_reference(element)
         assert isinstance(result, StructureNode)
         assert result.node_label == "dummy"
+        assert result.definition
+        assert self.mock_tree.children["gender"].definition
         assert (
             result.definition.type == self.mock_tree.children["gender"].definition.type
         )
@@ -977,6 +1019,8 @@ class TestResolveContentReference(FactoryTestCase):
             result = self.factory._resolve_content_reference(element)
         assert isinstance(result, StructureNode)
         assert result.node_label == "dummy"
+        assert result.definition
+        assert self.mock_tree.children["name"].definition
         assert result.definition.type == self.mock_tree.children["name"].definition.type
         assert result.children == self.mock_tree.children["name"].children
 
@@ -997,6 +1041,8 @@ class TestResolveContentReference(FactoryTestCase):
             result = self.factory._resolve_content_reference(element)
         assert isinstance(result, StructureNode)
         assert result.node_label == "dummy"
+        assert result.definition
+        assert self.mock_tree.definition
         assert result.definition.type == self.mock_tree.definition.type
 
     def test_returns_original_node_for_invalid_reference(self):
@@ -1032,6 +1078,7 @@ class TestResolveContentReference(FactoryTestCase):
             result = self.factory._resolve_content_reference(element)
         assert isinstance(result, StructureNode)
         assert result.node_label == "dummy"
+        assert result.definition
         assert result.definition.type == [ElementDefinitionType(code="CodeableConcept")]
         assert result.definition.binding
         assert (
@@ -1117,6 +1164,7 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
         assert merged[0].type == [ElementDefinitionType(code="code")]  # Inherited
         assert merged[0].short == "Base status field"  # Inherited
         assert merged[0].definition == "Status from base"  # Inherited
+        assert merged[0].constraint == None  # Not Inherited
 
     def test_merges_nested_backbone_element_children(self):
         """Test merging children of backbone elements."""
@@ -1216,6 +1264,7 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
         assert component.type == [
             ElementDefinitionType(code="BackboneElement")
         ]  # Inherited
+        assert component.constraint == None  # Not Inherited
 
         # Check child element
         value = next(e for e in merged if e.id == "Resource.component.value")
@@ -1223,6 +1272,7 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
         assert value.max == "1"  # Inherited
         assert value.type == [ElementDefinitionType(code="string")]  # Inherited
         assert value.short == "Required component value"  # From differential
+        assert value.constraint == None  # Not Inherited
 
     def test_merges_sliced_element(self):
         """Test merging a sliced element definition."""
@@ -1290,6 +1340,7 @@ class TestMergeDifferentialElementsWithBaseSnapshot(FactoryTestCase):
         assert merged[0].slicing.rules == "open"  # From differential
         assert merged[0].type == [ElementDefinitionType(code="Extension")]  # Inherited
         assert merged[0].short == "Base extensions"  # Inherited
+        assert merged[0].constraint == None  # Not Inherited
 
     def test_merges_sliced_element_children(self):
         """Test merging children of sliced elements (strips slice name for lookup)."""

@@ -849,7 +849,7 @@ class ResourceFactory:
     def _process_pattern_or_fixed_values(
         self,
         element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
-        constraint_prefix: str,
+        constraint_prefix: Literal["fixed", "pattern"],
     ) -> Any:
         """
         Process the pattern or fixed values of a StructureDefinition element.
@@ -888,6 +888,18 @@ class ResourceFactory:
                 else constrained_value
             )
         return constrained_value
+
+    def _process_pattern_values(
+        self,
+        element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+    ):
+        return self._process_pattern_or_fixed_values(element, "pattern")
+
+    def _process_fixed_values(
+        self,
+        element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+    ):
+        return self._process_pattern_or_fixed_values(element, "fixed")
 
     def _construct_type_choice_fields(
         self,
@@ -1168,23 +1180,20 @@ class ResourceFactory:
 
             base_elem = base_snapshot_map.get(lookup_id)
             if base_elem:
-                ElementDefinition = get_complex_FHIR_type(
-                    "ElementDefinition", self.Config.FHIR_release
-                )
-                # Start with base snapshot element
-                merged = ElementDefinition.model_validate(base_elem.model_dump())
-                # Overlay differential changes
-                for field_name, field_info in ElementDefinition.model_fields.items():
-                    diff_value = getattr(diff_elem, field_name, None)
-                    # Only override non-None values (None means "not specified in differential")
-                    if diff_value is not None:
-                        setattr(merged, field_name, diff_value)
-                merged_elements.append(merged)
-            else:
-                # Element not in base (new element in differential)
-                merged_elements.append(diff_elem)
+                for field_name in (
+                    "min",
+                    "max",
+                    "type",
+                    "definition",
+                    "short",
+                ):
+                    if not getattr(diff_elem, field_name, None):
+                        setattr(
+                            diff_elem, field_name, getattr(base_elem, field_name, None)
+                        )
+            merged_elements.append(diff_elem)
 
-        return merged_elements
+        return differential_elements
 
     def _merge_differential_with_base_snapshot(
         self,
@@ -1643,9 +1652,7 @@ class ResourceFactory:
             # -------------------------------------
             # Pattern value constraints
             # -------------------------------------
-            if pattern_value := self._process_pattern_or_fixed_values(
-                node.definition, "pattern"
-            ):
+            if pattern_value := self._process_pattern_values(node.definition):
                 field_default = pattern_value
                 # Add the current field to the list of validated fields
                 validators.add(
@@ -1661,9 +1668,7 @@ class ResourceFactory:
             # -------------------------------------
             # Fixed value constraints
             # -------------------------------------
-            if fixed_value := self._process_pattern_or_fixed_values(
-                node.definition, "fixed"
-            ):
+            if fixed_value := self._process_fixed_values(node.definition):
                 # Use enum with single choice since Literal definition does not work at runtime
                 singleChoice = Enum(
                     f"{name}FixedValue",
@@ -1851,7 +1856,7 @@ class ResourceFactory:
         if not _structure_definition.fhirVersion:
             if not fhir_release:
                 raise ValueError(
-                    "StructureDefinition does not specify FHIR version. Please provide fhir_release."
+                    "StructureDefinition does not specify FHIR version. Please provide 'fhirVersion' in the structure definition."
                 )
         else:
             if fhir_release and fhir_release != get_FHIR_release_from_version(
