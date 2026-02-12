@@ -78,7 +78,6 @@ from fhircraft.utils import (
     capitalize,
     ensure_list,
     get_FHIR_release_from_version,
-    is_list_field,
 )
 
 ModelT = TypeVar("ModelT", bound="BaseModel")
@@ -1172,7 +1171,6 @@ class ResourceFactory:
         base_snapshot_map = {
             elem.id: elem for elem in (base_structure_definition.snapshot.element or [])
         }
-
         merged_elements = []
         for diff_elem in differential_elements:
             # For slice children, strip the slice name when looking up base element
@@ -1189,6 +1187,7 @@ class ResourceFactory:
             else:
                 base_elem = base_snapshot_map.get(diff_elem.id)
             if base_elem:
+
                 for field_name in (
                     "min",
                     "max",
@@ -1612,8 +1611,9 @@ class ResourceFactory:
                         if t is not type(None)
                     ]
                     node.definition.min = 0
+                    # TODO: This is a bit of a hack - if the field is a list, we set max to *, otherwise 1. We should ideally be able to get this info from the element definition itself, but in some cases (like slices) it may not be present, so we infer it from the base model field type.
                     node.definition.max = (
-                        "*" if is_list_field(field_info.annotation) else "1"
+                        "1" if not "List" in str(field_info.annotation) else "*"
                     )
             if not field_types:
                 continue
