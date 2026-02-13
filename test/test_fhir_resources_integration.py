@@ -422,9 +422,8 @@ def test_regression_issue_258():
         
         @model_validator(mode="after")
         def FHIR_slice_pattern_constraint(self):    
-            return validate_FHIR_element_pattern(
+            return validate_FHIR_model_pattern(
                 self,
-                cls=None,
                 pattern=CodeableConcept(coding=[Coding(code="12345-6", display="Fixed Category", system="http://example.org")]),
             )
     

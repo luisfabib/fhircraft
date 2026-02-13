@@ -1030,8 +1030,7 @@ class ResourceFactory:
                     f"FHIR_{name}_pattern_constraint",
                     model_validator(mode="after")(
                         partial(
-                            fhir_validators.validate_FHIR_element_pattern,
-                            cls=None,
+                            fhir_validators.validate_FHIR_model_pattern,
                             pattern=pattern_value,
                         )
                     ),
