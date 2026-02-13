@@ -1241,7 +1241,6 @@ class ResourceFactory:
             else:
                 base_elem = base_snapshot_map.get(diff_elem.id)
             if base_elem:
-
                 for field_name in (
                     "min",
                     "max",
@@ -1255,7 +1254,7 @@ class ResourceFactory:
                         )
             merged_elements.append(diff_elem)
 
-        return differential_elements
+        return merged_elements
 
     def _merge_differential_with_base_snapshot(
         self,
@@ -1948,7 +1947,6 @@ class ResourceFactory:
                 fhir_release = get_FHIR_release_from_version(
                     _structure_definition.fhirVersion
                 )
-
         self.Config = self.FactoryConfig(
             FHIR_release=fhir_release,
             FHIR_version=_structure_definition.fhirVersion or "",
