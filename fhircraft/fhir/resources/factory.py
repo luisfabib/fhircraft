@@ -860,8 +860,8 @@ class ResourceFactory:
         Process the pattern or fixed values of a StructureDefinition element.
 
         Parameters:
-            element (Dict[str, Any]): The element to process.
-            constraint_prefix (str): The prefix indicating pattern or fixed values.
+            element: The element to process.
+            constraint_prefix: The prefix indicating pattern or fixed values.
 
         Returns:
             Any: The constrained value after processing.
@@ -870,7 +870,11 @@ class ResourceFactory:
         constraint_attribute, constrained_value = next(
             (
                 (attribute, getattr(element, attribute))
-                for attribute in element.__class__.model_fields
+                for attribute in (
+                    element.__class__.model_fields
+                    if isinstance(element, BaseModel)
+                    else []
+                )
                 if attribute.startswith(constraint_prefix)
                 and getattr(element, attribute) is not None
             ),
