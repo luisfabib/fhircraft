@@ -1010,6 +1010,57 @@ class ResourceFactory:
                     resource_name=slice_model_name,
                 )
             )
+            if node.definition and (
+                pattern_value := self._process_pattern_values(node.definition)
+            ):
+                for (
+                    field_name,
+                    field_info,
+                ) in pattern_value.__class__.model_fields.items():
+                    if (val := getattr(pattern_value, field_name, None)) is not None:
+                        slice_subfields[field_name] = (
+                            field_info.annotation,
+                            Field(
+                                default=val,
+                                description=field_info.description,
+                            ),
+                        )
+                # Add the current field to the list of validated fields
+                slice_validators.add(
+                    f"FHIR_{name}_pattern_constraint",
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_FHIR_element_pattern,
+                            cls=None,
+                            pattern=pattern_value,
+                        )
+                    ),
+                )
+
+            # -------------------------------------
+            # Fixed value constraints
+            # -------------------------------------
+            if node.definition and (
+                fixed_value := self._process_fixed_values(node.definition)
+            ):
+                # Use enum with single choice since Literal definition does not work at runtime
+                singleChoice = Enum(
+                    f"{name}FixedValue",
+                    [("fixedValue", fixed_value)],
+                    type=type(fixed_value),
+                )
+                for (
+                    field_name,
+                    field_info,
+                ) in pattern_value.__class__.model_fields.items():
+                    slice_subfields[field_name] = (
+                        singleChoice,
+                        Field(
+                            default=fixed_value,
+                            description=field_info.description,
+                        ),
+                    )
+
             # Construct the slice model
             bases = (
                 (base,)
