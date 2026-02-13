@@ -860,8 +860,8 @@ class ResourceFactory:
         Process the pattern or fixed values of a StructureDefinition element.
 
         Parameters:
-            element (Dict[str, Any]): The element to process.
-            constraint_prefix (str): The prefix indicating pattern or fixed values.
+            element: The element to process.
+            constraint_prefix: The prefix indicating pattern or fixed values.
 
         Returns:
             Any: The constrained value after processing.
@@ -870,7 +870,11 @@ class ResourceFactory:
         constraint_attribute, constrained_value = next(
             (
                 (attribute, getattr(element, attribute))
-                for attribute in element.__class__.model_fields
+                for attribute in (
+                    element.__class__.model_fields
+                    if issubclass(element.__class__, BaseModel)
+                    else []
+                )
                 if attribute.startswith(constraint_prefix)
                 and getattr(element, attribute) is not None
             ),
@@ -1010,6 +1014,56 @@ class ResourceFactory:
                     resource_name=slice_model_name,
                 )
             )
+            if node.definition and (
+                pattern_value := self._process_pattern_values(node.definition)
+            ):
+                for (
+                    field_name,
+                    field_info,
+                ) in pattern_value.__class__.model_fields.items():
+                    if (val := getattr(pattern_value, field_name, None)) is not None:
+                        slice_subfields[field_name] = (
+                            field_info.annotation,
+                            Field(
+                                default=val,
+                                description=field_info.description,
+                            ),
+                        )
+                # Add the current field to the list of validated fields
+                slice_validators.add(
+                    f"FHIR_{name}_pattern_constraint",
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_FHIR_model_pattern,
+                            pattern=pattern_value,
+                        )
+                    ),
+                )
+
+            # -------------------------------------
+            # Fixed value constraints
+            # -------------------------------------
+            if node.definition and (
+                fixed_value := self._process_fixed_values(node.definition)
+            ):
+                # Use enum with single choice since Literal definition does not work at runtime
+                singleChoice = Enum(
+                    f"{name}FixedValue",
+                    [("fixedValue", fixed_value)],
+                    type=type(fixed_value),
+                )
+                for (
+                    field_name,
+                    field_info,
+                ) in pattern_value.__class__.model_fields.items():
+                    slice_subfields[field_name] = (
+                        singleChoice,
+                        Field(
+                            default=fixed_value,
+                            description=field_info.description,
+                        ),
+                    )
+
             # Construct the slice model
             bases = (
                 (base,)
@@ -1187,7 +1241,6 @@ class ResourceFactory:
             else:
                 base_elem = base_snapshot_map.get(diff_elem.id)
             if base_elem:
-
                 for field_name in (
                     "min",
                     "max",
@@ -1201,7 +1254,7 @@ class ResourceFactory:
                         )
             merged_elements.append(diff_elem)
 
-        return differential_elements
+        return merged_elements
 
     def _merge_differential_with_base_snapshot(
         self,
@@ -1894,7 +1947,6 @@ class ResourceFactory:
                 fhir_release = get_FHIR_release_from_version(
                     _structure_definition.fhirVersion
                 )
-
         self.Config = self.FactoryConfig(
             FHIR_release=fhir_release,
             FHIR_version=_structure_definition.fhirVersion or "",

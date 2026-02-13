@@ -10,7 +10,6 @@ from pydantic import BaseModel
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
 
-from fhircraft.fhir.path.engine import environment
 from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
 
 T = TypeVar("T", bound=BaseModel)
@@ -230,9 +229,9 @@ def validate_model_constraint(
 
 def validate_FHIR_element_pattern(
     cls: Any,
-    element: Union["FHIRBaseModel", List["FHIRBaseModel"]],
+    element: Union["FHIRBaseModel", List["FHIRBaseModel"], Any],
     pattern: Union["FHIRBaseModel", List["FHIRBaseModel"], Any],
-) -> Union["FHIRBaseModel", List["FHIRBaseModel"], Any]:
+) -> Any:
     """
     Validate the FHIR element against a specified pattern and return the element if it fulfills the pattern.
 
@@ -264,6 +263,26 @@ def validate_FHIR_element_pattern(
     else:
         assert _element == pattern, f"Value does not fulfill pattern: {pattern}"
     return element
+
+
+def validate_FHIR_model_pattern(
+    model: Union["FHIRBaseModel", List["FHIRBaseModel"], Any],
+    pattern: Union["FHIRBaseModel", List["FHIRBaseModel"], Any],
+) -> Any:
+    """
+    Validate the FHIR model against a specified pattern and return the model if it fulfills the pattern.
+
+    Args:
+        model (Union[FHIRBaseModel, List[FHIRBaseModel]]): The FHIR model to validate against the pattern.
+        pattern (Union[FHIRBaseModel, List[FHIRBaseModel]]): The pattern to validate the model against.
+
+    Returns:
+        Union[FHIRBaseModel, List[FHIRBaseModel]]: The validated FHIR model.
+
+    Raises:
+        AssertionError: If the model does not fulfill the specified pattern.
+    """
+    return validate_FHIR_element_pattern(cls=None, element=model, pattern=pattern)
 
 
 def validate_type_choice_element(

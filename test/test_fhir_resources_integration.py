@@ -230,13 +230,13 @@ def assertBlockInCode(code, expected_block):
 
 
 def test_regression_issue_255():
-
-    factory = ResourceFactory()
+    # Clear factory cache to avoid state pollution from other tests
+    factory.clear_cache()
 
     structure_definition = {
         "resourceType": "StructureDefinition",
-        "id": "example",
-        "url": "http://example.org/fhir/StructureDefinition/example",
+        "id": "issue-255",
+        "url": "http://example.org/fhir/StructureDefinition/issue-255",
         "version": "5.0.0",
         "name": "ProfileExample",
         "title": "Example Profile",
@@ -298,7 +298,7 @@ def test_regression_issue_255():
         },
     }
 
-    model = factory.construct_resource_model(
+    model = ResourceFactory().construct_resource_model(
         structure_definition=structure_definition, mode="differential"
     )
 
@@ -340,17 +340,118 @@ def test_regression_issue_255():
         
     class ProfileExample(Observation):
 
-        _canonical_url = "http://example.org/fhir/StructureDefinition/example"
+        _canonical_url = "http://example.org/fhir/StructureDefinition/issue-255"
 
         meta: Optional[Meta] = Field(
             title="Meta",
             description="Metadata about the resource.",
-            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/example']),
+            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/issue-255']),
         )
         code: Optional[ProfileExampleCode] = Field(
             description="Type of observation (code / type)",
             default=None,
         )
     '''
-
     assertBlockInCode(source_code, expected_code.strip())
+    assert (
+        source_code.count("class ") == 3
+    ), f"Expected exactly 3 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+
+
+def test_regression_issue_258():
+    # Clear factory cache to avoid state pollution from other tests
+    factory.clear_cache()
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "issue-258",
+        "url": "http://example.org/fhir/StructureDefinition/issue-258",
+        "version": "5.0.0",
+        "name": "ProfileExample",
+        "title": "Example Profile",
+        "status": "draft",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "derivation": "constraint",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "differential": {
+            "element": [
+                {"id": "Observation", "path": "Observation", "min": 0, "max": "*"},
+                {
+                    "id": "Observation.category",
+                    "path": "Observation.category",
+                    "slicing": {"discriminator": [{"type": "value", "path": "coding"}]},
+                },
+                {
+                    "id": "Observation.category:slice",
+                    "path": "Observation.category",
+                    "max": "2",
+                    "sliceName": "slice",
+                    "patternCodeableConcept": {
+                        "coding": [
+                            {
+                                "system": "http://example.org",
+                                "code": "12345-6",
+                                "display": "Fixed Category",
+                            }
+                        ]
+                    },
+                },
+            ]
+        },
+    }
+
+    model = ResourceFactory().construct_resource_model(
+        structure_definition=structure_definition, mode="differential"
+    )
+
+    source_code = CodeGenerator().generate_resource_model_code(model)
+
+    expected_code = '''
+    class ProfileExampleSlice(CodeableConcept, FHIRSliceModel):
+        """
+        Classification of  type of observation
+        """
+        min_cardinality: ClassVar[int] = 0
+        max_cardinality: ClassVar[int] = 2
+
+        coding: Optional[List[Coding]] = Field(
+            description="Code defined by a terminology system",
+            default=[Coding(code="12345-6", display="Fixed Category", system="http://example.org")],
+        )
+        
+        @model_validator(mode="after")
+        def FHIR_slice_pattern_constraint(self):    
+            return validate_FHIR_model_pattern(
+                self,
+                pattern=CodeableConcept(coding=[Coding(code="12345-6", display="Fixed Category", system="http://example.org")]),
+            )
+    
+    class ProfileExample(Observation):
+
+        _canonical_url = "http://example.org/fhir/StructureDefinition/issue-258"
+
+        meta: Optional[Meta] = Field(
+            title="Meta",
+            description="Metadata about the resource.",
+            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/issue-258']),
+        )
+        category: Optional[List[Annotated[Union[ProfileExampleSlice, CodeableConcept], Field(union_mode='left_to_right')]]] = Field(
+            description="Classification of  type of observation",
+            default=None,
+        )
+        
+        @field_validator(*('category',), mode="after", check_fields=None)
+        @classmethod
+        def category_slicing_cardinality_validator(cls, value):    
+            return validate_slicing_cardinalities(cls, value, 
+                field_name="category",
+            )
+    '''
+    assertBlockInCode(source_code, expected_code)
+
+    assert (
+        source_code.count("class ") == 2
+    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"

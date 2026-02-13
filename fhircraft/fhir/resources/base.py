@@ -147,6 +147,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             base_type != object
             and hasattr(base_type, "__mro__")
             and issubclass(base_type, FHIRBaseModel)
+            and base_type._abstract is True
         ):
             # Create a unique key for this deserialization context
             context_key = (cls, field_name, base_type)

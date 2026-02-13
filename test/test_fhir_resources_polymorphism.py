@@ -15,6 +15,7 @@ from fhircraft.fhir.resources.base import FHIRBaseModel
 class MockResource(FHIRBaseModel):
 
     _kind = "resource"
+    _abstract = True
     _type = "MockResource"
 
     id: Optional[str] = None
@@ -36,6 +37,7 @@ class MockIntegerSpecializedResource(MockResource):
 
 class MockModel(MockResource):
     _kind = "resource"
+    _abstract = True
     _type = "MockModel"
 
     anyResource: MockResource
