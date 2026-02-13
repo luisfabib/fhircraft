@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## v0.6.3 - 2026-02-13
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.3...0.6.2)
+
+
+
+
+### Fixed
+
+- Improve code generator to reduce boilerplate and repetitive code in auto-generated model definitions source code ([#256](https://github.com/luisfabib/fhircraft/pull/256))
+  * Updated the code generator to serialize and include non-built-in bases in generated code, enabling proper handling of custom base classes
+  * Fixed the factory method for differential elements resolution to ensure properties such as constraints are not reintroduced if not specified by the differential definition
+  * Fixed the code generator to also check in ancestor bases of the requested models for inherited validators
+  * Prevented unnecessary class variable definitions from being inherited from parent classes to avoid duplicate
+- Resolve bug in factory when dealing with differentials that slice an element within a complex or backbone type. When profiling `Observation.code.coding:slice`, the slice cannot be resolved against the base because `Observation.code.coding` is implicitly derived from `Observation.code`'s type rather than explicitly defined in the snapshot. This causes the sliced element to lose type information and be omitted from code generation ([#257](https://github.com/luisfabib/fhircraft/pull/257), fixes [#255](https://github.com/luisfabib/fhircraft/pull/255))
+- Ensured that when merging the differential element definitions, if the sliced element's ID is present in the base snapshot, then it is resolved against it with fallback to resolution against the path ([#257](https://github.com/luisfabib/fhircraft/pull/257))
+- Pattern and fixed-value constraints on slices are now enforced. When a slice definition includes pattern values such as `patternCodeableConcept`, the generated model will validate  slice instances against the specified pattern and include appropriate default values. ([#259](https://github.com/luisfabib/fhircraft/pull/259), fixes [#258](https://github.com/luisfabib/fhircraft/pull/258))
+- Limited polymorphic deserialization to abstract FHIR resource classes (`_abstract=True`) to avoid pollution of deserialization of other classes after creating new resource models ([#258](https://github.com/luisfabib/fhircraft/pull/258))
+
+----------------- 
+
 ## v0.6.2 - 2026-02-09
 
 [GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.2) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.2...0.6.1)
