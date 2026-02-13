@@ -872,7 +872,7 @@ class ResourceFactory:
                 (attribute, getattr(element, attribute))
                 for attribute in (
                     element.__class__.model_fields
-                    if isinstance(element, BaseModel)
+                    if issubclass(element.__class__, BaseModel)
                     else []
                 )
                 if attribute.startswith(constraint_prefix)

@@ -230,13 +230,13 @@ def assertBlockInCode(code, expected_block):
 
 
 def test_regression_issue_255():
-
-    factory = ResourceFactory()
+    # Clear factory cache to avoid state pollution from other tests
+    factory.clear_cache()
 
     structure_definition = {
         "resourceType": "StructureDefinition",
-        "id": "example",
-        "url": "http://example.org/fhir/StructureDefinition/example",
+        "id": "issue-255",
+        "url": "http://example.org/fhir/StructureDefinition/issue-255",
         "version": "5.0.0",
         "name": "ProfileExample",
         "title": "Example Profile",
@@ -298,7 +298,7 @@ def test_regression_issue_255():
         },
     }
 
-    model = factory.construct_resource_model(
+    model = ResourceFactory().construct_resource_model(
         structure_definition=structure_definition, mode="differential"
     )
 
@@ -340,30 +340,32 @@ def test_regression_issue_255():
         
     class ProfileExample(Observation):
 
-        _canonical_url = "http://example.org/fhir/StructureDefinition/example"
+        _canonical_url = "http://example.org/fhir/StructureDefinition/issue-255"
 
         meta: Optional[Meta] = Field(
             title="Meta",
             description="Metadata about the resource.",
-            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/example']),
+            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/issue-255']),
         )
         code: Optional[ProfileExampleCode] = Field(
             description="Type of observation (code / type)",
             default=None,
         )
     '''
-
     assertBlockInCode(source_code, expected_code.strip())
+    assert (
+        source_code.count("class ") == 3
+    ), f"Expected exactly 3 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
 
 
 def test_regression_issue_258():
-
-    factory = ResourceFactory()
+    # Clear factory cache to avoid state pollution from other tests
+    factory.clear_cache()
 
     structure_definition = {
         "resourceType": "StructureDefinition",
-        "id": "example",
-        "url": "http://example.org/fhir/StructureDefinition/example",
+        "id": "issue-258",
+        "url": "http://example.org/fhir/StructureDefinition/issue-258",
         "version": "5.0.0",
         "name": "ProfileExample",
         "title": "Example Profile",
@@ -401,7 +403,7 @@ def test_regression_issue_258():
         },
     }
 
-    model = factory.construct_resource_model(
+    model = ResourceFactory().construct_resource_model(
         structure_definition=structure_definition, mode="differential"
     )
 
@@ -429,12 +431,12 @@ def test_regression_issue_258():
     
     class ProfileExample(Observation):
 
-        _canonical_url = "http://example.org/fhir/StructureDefinition/example"
+        _canonical_url = "http://example.org/fhir/StructureDefinition/issue-258"
 
         meta: Optional[Meta] = Field(
             title="Meta",
             description="Metadata about the resource.",
-            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/example']),
+            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/issue-258']),
         )
         category: Optional[List[Annotated[Union[ProfileExampleSlice, CodeableConcept], Field(union_mode='left_to_right')]]] = Field(
             description="Classification of  type of observation",
@@ -448,5 +450,8 @@ def test_regression_issue_258():
                 field_name="category",
             )
     '''
+    assertBlockInCode(source_code, expected_code)
 
-    assertBlockInCode(source_code, expected_code.strip())
+    assert (
+        source_code.count("class ") == 2
+    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
