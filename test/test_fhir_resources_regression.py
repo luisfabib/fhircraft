@@ -261,7 +261,7 @@ def test_regression_issue_258(factory, generator):
     ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
 
 
-def test_regression_issue_211(factory, generator):
+def test_regression_issue_111(factory, generator):
     # Clear factory cache to avoid state pollution from other tests
     structure_definition = {
         "resourceType": "StructureDefinition",

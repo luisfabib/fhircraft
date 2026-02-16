@@ -2012,15 +2012,6 @@ class TestConstructResourceModelSnapshotMode(FactoryTestCase):
                         "definition": "Base definition of Patient",
                         "base": {"path": "Patient", "min": 0, "max": "*"},
                     },
-                    {
-                        "id": "Patient.id",
-                        "path": "Patient.id",
-                        "min": 0,
-                        "max": "1",
-                        "type": [{"code": "id"}],
-                        "definition": "Patient id",
-                        "base": {"path": "Resource.id", "min": 0, "max": "1"},
-                    },
                 ]
             },
         }
@@ -3407,3 +3398,54 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
         )
         self.assertIsNotNone(instance.component)  # type: ignore
         self.assertEqual(len(instance.component), 2)  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "name, expected_class_name",
+    [
+        ("TestPatient", "TestPatient"),
+        ("Test-Patient", "TestPatient"),
+        ("Test_Patient", "TestPatient"),
+        ("Test@Patient", "TestPatient"),
+        ("Test Patient", "TestPatient"),
+        ("12TestPatient", "TestPatient"),
+        ("12TestPatient34", "TestPatient34"),
+        ("TestPatient34", "TestPatient34"),
+        ("Test.Patient.", "TestPatient"),
+        ("class.", "Class"),
+    ],
+)
+@pytest.mark.filterwarnings("ignore:.*sdf-0.*")
+def test_resource_name_is_sanitized(name, expected_class_name):
+    """Test that models can be constructed from snapshot with AUTO mode."""
+    snapshot_sd = {
+        "resourceType": "StructureDefinition",
+        "id": "test-snapshot-patient",
+        "url": "http://example.org/StructureDefinition/test-snapshot-patient",
+        "name": name,
+        "status": "draft",
+        "version": "2.1.0",
+        "fhirVersion": "4.3.0",
+        "kind": "resource",
+        "abstract": True,
+        "type": "Patient",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+        "derivation": "constraint",
+        "snapshot": {
+            "element": [
+                {
+                    "id": "Patient",
+                    "path": "Patient",
+                    "min": 0,
+                    "max": "*",
+                    "definition": "Base definition of Patient",
+                    "base": {"path": "Patient", "min": 0, "max": "*"},
+                },
+            ]
+        },
+    }
+
+    model = ResourceFactory().construct_resource_model(structure_definition=snapshot_sd)
+
+    assert model is not None
+    assert model.__name__ == expected_class_name

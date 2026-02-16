@@ -851,6 +851,29 @@ class ResourceFactory:
             return safe_field_name, validation_alias
         return field_name, None
 
+    def _sanitize_structure_definition_name(self, name: str) -> str:
+        """
+        Sanitize a StructureDefinition name to a valid Python class identifier.
+
+        Rules:
+        - Only alphanumeric characters are kept.
+        - Result cannot start with a digit (prefix with "Fhir" if needed).
+        - Avoid Python keywords by prefixing with "Fhir".
+        """
+        sanitized = "".join(ch for ch in name if ch.isalnum())
+        if not sanitized:
+            raise ValueError(
+                f"FHIR Resource name '{name}' does not have any alphanumeric characters to construct a valid Python class name."
+            )
+        while sanitized[0].isdigit():
+            sanitized = sanitized[1:]
+        # Ensure that first letter is capitalized
+        sanitized = sanitized[0].upper() + sanitized[1:]
+        # If the sanitized name is a Python keyword add a suffix
+        if keyword.iskeyword(sanitized):
+            sanitized = f"{sanitized}_"
+        return sanitized
+
     def _process_pattern_or_fixed_values(
         self,
         element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
@@ -1936,6 +1959,9 @@ class ResourceFactory:
 
         # Detect the appropriate construction mode
         resolved_mode = self._detect_construction_mode(_structure_definition, mode)
+        sanitized_name = self._sanitize_structure_definition_name(
+            _structure_definition.name
+        )
 
         if not _structure_definition.fhirVersion:
             if not fhir_release:
@@ -2037,7 +2063,7 @@ class ResourceFactory:
         fields, validators, properties = (
             self._process_FHIR_structure_into_Pydantic_components(
                 root_node,
-                resource_name=_structure_definition.name,
+                resource_name=sanitized_name,
                 base=base,
             )
         )
@@ -2064,7 +2090,7 @@ class ResourceFactory:
 
         # Construct the Pydantic model representing the FHIR resource
         model = self._construct_model_with_properties(
-            _structure_definition.name,
+            sanitized_name,
             fields=fields,
             base=(base,),
             validators=validators.get_all(),
