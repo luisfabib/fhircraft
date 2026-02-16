@@ -549,7 +549,7 @@ class TestProcessPatternOrFixedValues(FactoryTestCase):
         self, attribute, expected_type, expected_value
     ):
         element = ElementDefinition.model_construct(**{f"{self.prefix}{attribute}": expected_value})  # type: ignore
-        result = self.factory._process_pattern_or_fixed_values(element, self.prefix)  # type: ignore
+        result = self.factory._process_pattern_or_fixed_values(element, self.prefix, expected_type)  # type: ignore
         assert (
             type(result) in get_args(expected_type.__value__)
             or type(result) is expected_type.__value__
@@ -584,13 +584,13 @@ class TestProcessPatternOrFixedValues(FactoryTestCase):
         self, attribute, expected_type, expected_value
     ):
         element = ElementDefinition.model_construct(**{f"{self.prefix}{attribute}": expected_value})  # type: ignore
-        result = self.factory._process_pattern_or_fixed_values(element, self.prefix)  # type: ignore
+        result = self.factory._process_pattern_or_fixed_values(element, self.prefix, expected_type)  # type: ignore
         assert isinstance(result, expected_type)
         assert result == expected_type.model_validate(expected_value)
 
     def test_processes_no_constraints(self):
         element = ElementDefinition.model_construct()
-        result = self.factory._process_pattern_or_fixed_values(element, self.prefix)  # type: ignore
+        result = self.factory._process_pattern_or_fixed_values(element, self.prefix, None)  # type: ignore
         assert result is None
 
 

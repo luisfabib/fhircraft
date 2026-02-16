@@ -855,6 +855,7 @@ class ResourceFactory:
         self,
         element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
         constraint_prefix: Literal["fixed", "pattern"],
+        element_type,
     ) -> Any:
         """
         Process the pattern or fixed values of a StructureDefinition element.
@@ -885,30 +886,33 @@ class ResourceFactory:
             constrained_type = self._resolve_FHIR_type(
                 constraint_attribute.replace(constraint_prefix, "")
             )
-            # Parse the value
-            constrained_value = (
-                constrained_type.model_validate(
+            if inspect.isclass(constrained_type) and issubclass(
+                constrained_type, BaseModel
+            ):
+                assert issubclass(
+                    element_type, constrained_type
+                ), f"Constrained type {constrained_type} is not a valid type for element of type {element_type}"
+                # Parse the value
+                constrained_value = element_type.model_validate(
                     constrained_value.model_dump()
                     if isinstance(constrained_value, BaseModel)
                     else constrained_value
                 )
-                if inspect.isclass(constrained_type)
-                and issubclass(constrained_type, BaseModel)
-                else constrained_value
-            )
         return constrained_value
 
     def _process_pattern_values(
         self,
         element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+        element_type: Any,
     ):
-        return self._process_pattern_or_fixed_values(element, "pattern")
+        return self._process_pattern_or_fixed_values(element, "pattern", element_type)
 
     def _process_fixed_values(
         self,
         element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+        element_type: Any,
     ):
-        return self._process_pattern_or_fixed_values(element, "fixed")
+        return self._process_pattern_or_fixed_values(element, "fixed", element_type)
 
     def _construct_type_choice_fields(
         self,
@@ -1015,7 +1019,7 @@ class ResourceFactory:
                 )
             )
             if node.definition and (
-                pattern_value := self._process_pattern_values(node.definition)
+                pattern_value := self._process_pattern_values(node.definition, base)
             ):
                 for (
                     field_name,
@@ -1044,7 +1048,7 @@ class ResourceFactory:
             # Fixed value constraints
             # -------------------------------------
             if node.definition and (
-                fixed_value := self._process_fixed_values(node.definition)
+                fixed_value := self._process_fixed_values(node.definition, base)
             ):
                 # Use enum with single choice since Literal definition does not work at runtime
                 singleChoice = Enum(
@@ -1728,45 +1732,6 @@ class ResourceFactory:
             field_default = _Unset
 
             # -------------------------------------
-            # Pattern value constraints
-            # -------------------------------------
-            if pattern_value := self._process_pattern_values(node.definition):
-                field_default = pattern_value
-                # Add the current field to the list of validated fields
-                validators.add(
-                    f"FHIR_{name}_pattern_constraint",
-                    field_validator(safe_field_name, mode="after")(
-                        partial(
-                            fhir_validators.validate_FHIR_element_pattern,
-                            pattern=pattern_value,
-                        )
-                    ),
-                )
-
-            # -------------------------------------
-            # Fixed value constraints
-            # -------------------------------------
-            if fixed_value := self._process_fixed_values(node.definition):
-                # Use enum with single choice since Literal definition does not work at runtime
-                singleChoice = Enum(
-                    f"{name}FixedValue",
-                    [("fixedValue", fixed_value)],
-                    type=type(fixed_value),
-                )
-                field_default = fixed_value
-                field_type = singleChoice
-
-            # -------------------------------------
-            # Fixed value constraints
-            # -------------------------------------
-            if constraints := node.definition.constraint:
-                # Process FHIR constraint invariants on the element
-                for constraint in constraints:
-                    validators.add_element_constraint_validator(
-                        safe_field_name, constraint, base
-                    )
-
-            # -------------------------------------
             # Slicing
             # -------------------------------------
             if node.slices:
@@ -1846,6 +1811,47 @@ class ResourceFactory:
                     docstring=node.definition.definition,
                 )
                 self.local_cache[backbone_model_name] = field_type
+
+            # -------------------------------------
+            # Pattern value constraints
+            # -------------------------------------
+            if pattern_value := self._process_pattern_values(
+                node.definition, field_type
+            ):
+                field_default = pattern_value
+                # Add the current field to the list of validated fields
+                validators.add(
+                    f"FHIR_{name}_pattern_constraint",
+                    field_validator(safe_field_name, mode="after")(
+                        partial(
+                            fhir_validators.validate_FHIR_element_pattern,
+                            pattern=pattern_value,
+                        )
+                    ),
+                )
+
+            # -------------------------------------
+            # Fixed value constraints
+            # -------------------------------------
+            if fixed_value := self._process_fixed_values(node.definition, field_type):
+                # Use enum with single choice since Literal definition does not work at runtime
+                singleChoice = Enum(
+                    f"{name}FixedValue",
+                    [("fixedValue", fixed_value)],
+                    type=type(fixed_value),
+                )
+                field_default = fixed_value
+                field_type = singleChoice
+
+            # -------------------------------------
+            # Invariant constraints
+            # -------------------------------------
+            if constraints := node.definition.constraint:
+                # Process FHIR constraint invariants on the element
+                for constraint in constraints:
+                    validators.add_element_constraint_validator(
+                        safe_field_name, constraint, base
+                    )
 
             # Handle Python reserved keywords for field names
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
