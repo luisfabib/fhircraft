@@ -359,7 +359,7 @@ def test_regression_issue_111(factory, generator):
     assertBlockInCode(source_code, expected_code.strip())
     assert (
         source_code.count("class ") == 2
-    ), f"Expected exactly 3 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
 
 
 def test_regression_issue_263(factory, generator):
@@ -430,28 +430,29 @@ def test_regression_issue_263(factory, generator):
     expected_code = '''    
     class VitalspanelVitalsPanelCode(Coding, FHIRSliceModel):
         min_cardinality: ClassVar[int] = 0
-        max_cardinality: ClassVar[int] = 99999
+        max_cardinality: ClassVar[int] = 1
 
 
         system: Optional[Uri] = Field(
-            default='http://loinc.org',
+            default="http://loinc.org",
         )
         code: Optional[Code] = Field(
-            default='85353-1',
+            default="85353-1",
         )
 
-        @field_validator(*('code',), mode="after", check_fields=None)
-        def FHIR_code_fixed_value_constraint(cls, value):    
-            return validate_FHIR_element_pattern(cls, value, 
-                constant="85353-1",
-            )
-
         @field_validator(*('system',), mode="after", check_fields=None)
+        @classmethod
         def FHIR_system_fixed_value_constraint(cls, value):    
-            return validate_FHIR_element_pattern(cls, value, 
+            return validate_FHIR_element_fixed_value(cls, value, 
                 constant="http://loinc.org",
             )
 
+        @field_validator(*('code',), mode="after", check_fields=None)
+        @classmethod  
+        def FHIR_code_fixed_value_constraint(cls, value):    
+            return validate_FHIR_element_fixed_value(cls, value, 
+                constant="85353-1",
+            )
         
     
     class VitalspanelCode(CodeableConcept):
@@ -473,5 +474,5 @@ def test_regression_issue_263(factory, generator):
     '''
     assertBlockInCode(source_code, expected_code.strip())
     assert (
-        source_code.count("class ") == 2
+        source_code.count("class ") == 3
     ), f"Expected exactly 3 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
