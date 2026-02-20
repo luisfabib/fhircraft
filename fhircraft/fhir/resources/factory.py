@@ -809,8 +809,7 @@ class ResourceFactory:
         # Handle list types
         if is_list_type:
             actual_field_type = List[actual_field_type]
-        if default is None:
-            actual_field_type = Optional[actual_field_type]
+        actual_field_type = Optional[actual_field_type]
         # Construct the Pydantic field
         return (
             actual_field_type,
