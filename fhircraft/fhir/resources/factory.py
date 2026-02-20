@@ -1793,13 +1793,9 @@ class ResourceFactory:
                 assert (
                     node.path is not None
                 ), "Node path cannot be None when processing children"
-                assert isinstance(field_type, type) and issubclass(
-                    field_type, BaseModel
-                ), f"Expected field_type to be a BaseModel subclass but got {field_type} for element {node.path}"
                 backbone_model_name = capitalize(resource_name).strip() + "".join(
                     [capitalize(label).strip() for label in node.path.split(".")[1:]]
                 )
-                backbone_base_model = None
                 if self.in_differential_mode:
                     try:
                         field_type = get_fhir_resource_type(
@@ -1810,6 +1806,20 @@ class ResourceFactory:
                         )
                     except AttributeError:
                         pass
+                if not isinstance(field_type, type) or not issubclass(
+                    field_type, BaseModel
+                ):
+                    if base and f"{name}_ext" in base.model_fields:
+                        field_type = get_complex_FHIR_type(
+                            "Element",
+                            self.Config.FHIR_release if self.Config else "4.3.0",
+                        )
+                        name = f"{name}_ext"
+                        backbone_model_name = f"{backbone_model_name}Ext"
+                    else:
+                        raise ValueError(
+                            f"Field type for element with children must be a BaseModel subclass or primitive value with extension placeholder, but got {field_type} for element {node.path}"
+                        )
                 field_subfields, subfield_validators, subfield_properties = (
                     self._process_FHIR_structure_into_Pydantic_components(
                         node, field_type, resource_name=resource_name
