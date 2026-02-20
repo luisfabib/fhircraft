@@ -1693,14 +1693,21 @@ class ResourceFactory:
                         for t in _get_deepest_args(field_info.annotation)
                         if t is not type(None)
                     ]
+            if not field_types:
+                continue
+
+            if node.definition.min is None or node.definition.max is None:
+                # Attempt to infer the cardinality
+                if (
+                    base
+                    and issubclass(base, BaseModel)
+                    and (field_info := base.model_fields.get(safe_field_name))
+                ):
                     node.definition.min = 0
                     # TODO: This is a bit of a hack - if the field is a list, we set max to *, otherwise 1. We should ideally be able to get this info from the element definition itself, but in some cases (like slices) it may not be present, so we infer it from the base model field type.
                     node.definition.max = (
                         "1" if not "List" in str(field_info.annotation) else "*"
                     )
-            if not field_types:
-                continue
-
             # Unify types into single annotation
             field_type = (
                 Union[tuple(field_types)] if len(field_types) > 1 else field_types[0]
