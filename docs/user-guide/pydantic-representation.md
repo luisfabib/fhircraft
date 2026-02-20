@@ -344,9 +344,7 @@ This polymorphic behavior extends to all models derived from `FHIRBaseModel` thr
 
 FHIR profiles and implementation guides often define additional constraints beyond basic type validation. These constraints can specify fixed values (elements that must always have a specific value) or pattern requirements (elements that must conform to particular patterns or contain specific sub-elements). Fhircraft automatically enforces these constraints during model validation, ensuring that resources conform to their intended profiles.
 
-Fixed value constraints treat the specified value as a constant in the Pydantic model. When a resource is constructed, these fixed values are automatically added regardless of any input provided—the field will always contain the predefined value. This ensures profile conformance by making certain fields immutable.
-
-Pattern constraints work differently: if the field is not provided during construction, the pattern value is used as the default. However, if a value is explicitly provided, Fhircraft uses Pydantic validators to ensure the supplied value matches the required pattern structure. This allows for flexibility while maintaining conformance requirements.
+Fixed and pattern value constraints are treated as follows: if the field is not provided during construction, the pattern value is used as the default. However, if a value is explicitly provided, Fhircraft uses Pydantic validators to ensure the supplied value matches either the exact constrained value (for fixed-value constraints) or partially matches with the full required pattern value (for pattern-value constraints). This allows for flexibility while maintaining conformance requirements.
 
 
 ### Extensions
