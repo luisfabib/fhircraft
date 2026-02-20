@@ -529,10 +529,10 @@ class CodeGenerator:
                 self._track_typing_import("ClassVar")
 
             # Track FhirBaseModelKind import if model._kind is an instance of it
-            if hasattr(model, "_kind") and model._kind is not None:
+            if kind := getattr(model, "_kind", None):
                 if (
-                    hasattr(model._kind, "__class__")
-                    and model._kind.__class__.__name__ == "FhirBaseModelKind"
+                    hasattr(kind, "__class__")
+                    and kind.__class__.__name__ == "FhirBaseModelKind"
                 ):
                     # Import FhirBaseModelKind from base module
                     from fhircraft.fhir.resources.base import (
