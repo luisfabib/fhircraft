@@ -225,6 +225,78 @@ class TestPolymorphicDeserialization:
             assert "Extra inputs are not permitted" in str(e)
         MockModel._enable_polymorphic_deserialization = original_setting
 
+    def test_profile_accepts_parent_class_instance(self):
+        """Test that profile models accept instances of their parent classes.
+
+        This tests the scenario where a profile extends a base datatype (e.g., ExamplePatientName
+        extending HumanName), and we want to pass an instance of the parent class.
+        """
+
+        # Create mock models simulating a profile scenario
+        class BaseName(FHIRBaseModel):
+            _kind = "complex-type"
+            _abstract = True
+            _type = "BaseName"
+            given: Optional[List[str]] = None
+            family: Optional[str] = None
+
+        class ProfileName(BaseName):
+            _kind = "complex-type"
+            _abstract = False
+            _type = "ProfileName"
+            # Profile adds additional constraints or fields
+
+        class Patient(FHIRBaseModel):
+            _kind = "resource"
+            _abstract = True
+            _type = "Patient"
+            id: Optional[str] = None
+            name: Optional[List[ProfileName]] = None
+
+        # Test 1: Accepting dict should work
+        instance_dict = Patient(name=[{"given": ["John"], "family": "Doe"}])  # type: ignore
+        assert instance_dict.name
+        assert len(instance_dict.name) == 1
+        assert instance_dict.name[0].given == ["John"]
+        assert instance_dict.name[0].family == "Doe"
+
+        # Test 2: Accepting parent class instance should also work
+        base_name_instance = BaseName(given=["Jane"], family="Smith")
+        instance_obj = Patient(name=[base_name_instance])  # type: ignore
+        assert instance_obj.name
+        assert len(instance_obj.name) == 1
+        assert isinstance(instance_obj.name[0], (BaseName, ProfileName))
+        assert instance_obj.name[0].given == ["Jane"]
+        assert instance_obj.name[0].family == "Smith"
+
+    def test_profile_accepts_parent_in_direct_assignment(self):
+        """Test that profile models accept parent class instances in direct assignment."""
+
+        # Create mock models
+        class BaseDataType(FHIRBaseModel):
+            _kind = "complex-type"
+            _abstract = True
+            _type = "BaseDataType"
+            value: Optional[str] = None
+
+        class ProfileDataType(BaseDataType):
+            _kind = "complex-type"
+            _abstract = False
+            _type = "ProfileDataType"
+
+        class Container(FHIRBaseModel):
+            _kind = "resource"
+            _abstract = True
+            _type = "Container"
+            data: ProfileDataType
+
+        # Create and assign a parent class instance
+        base_instance = BaseDataType(value="test_value")
+        container = Container(data=base_instance)  # type: ignore
+
+        # Should accept the parent instance
+        assert container.data.value == "test_value"
+
 
 class TestPolymorphicUtilityMethods:
     """Test utility methods used in polymorphic functionality."""

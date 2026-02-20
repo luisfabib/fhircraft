@@ -142,33 +142,58 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         field_info = cls.model_fields[field_name]
         base_type = cls._get_field_base_type(field_info)
 
-        # Only apply to FHIR fields
-        if (
+        # Check if polymorphic deserialization should apply:
+        # 1. Abstract FHIR base types (always)
+        # 2. Non-abstract FHIR types when receiving an instance of a parent class
+        should_apply_polymorphic = (
             base_type != object
             and hasattr(base_type, "__mro__")
             and issubclass(base_type, FHIRBaseModel)
-            and base_type._abstract is True
-        ):
-            # Create a unique key for this deserialization context
-            context_key = (cls, field_name, base_type)
-            stack = _get_polymorphic_deserialization_stack()
+        )
 
-            # Check if we're already processing this context to prevent recursion
-            if context_key in stack:
-                return value
+        if not should_apply_polymorphic:
+            return value
 
-            # Add to stack and process
-            stack.add(context_key)
-            try:
-                result = cls._deserialize_polymorphically(value, base_type)
-                return result
-            except Exception:
-                return value
-            finally:
-                # Always remove from stack when done
-                stack.discard(context_key)
+        # Check if this is an abstract type or if we're receiving a parent class instance
+        is_abstract = base_type._abstract is True
 
-        return value
+        # Check if we have a parent class instance
+        is_parent_instance = False
+        if isinstance(value, FHIRBaseModel):
+            # Single instance: check if it's a parent class
+            is_parent_instance = type(value) != base_type and issubclass(
+                base_type, type(value)
+            )
+        elif isinstance(value, list):
+            # List: check if any items are parent class instances
+            is_parent_instance = any(
+                isinstance(item, FHIRBaseModel)
+                and type(item) != base_type
+                and issubclass(base_type, type(item))
+                for item in value
+            )
+
+        if not (is_abstract or is_parent_instance):
+            return value
+
+        # Create a unique key for this deserialization context
+        context_key = (cls, field_name, base_type)
+        stack = _get_polymorphic_deserialization_stack()
+
+        # Check if we're already processing this context to prevent recursion
+        if context_key in stack:
+            return value
+
+        # Add to stack and process
+        stack.add(context_key)
+        try:
+            result = cls._deserialize_polymorphically(value, base_type)
+            return result
+        except Exception:
+            return value
+        finally:
+            # Always remove from stack when done
+            stack.discard(context_key)
 
     @model_serializer(mode="wrap")
     def _serialize_polymorphic_fields(
@@ -787,10 +812,28 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     @classmethod
     def _deserialize_polymorphically(cls, value: Any, base_type: Type) -> Any:
-        """Deserialize a value using the best matching subclass."""
+        """Deserialize a value using the best matching subclass.
+
+        Handles:
+        - Lists of items to deserialize recursively
+        - FHIR instances (parent class instances) by converting to dict for re-validation
+        - Dictionaries (potential FHIR objects) by trying subclasses
+        """
         # Handle lists
         if isinstance(value, list):
             return [cls._deserialize_polymorphically(item, base_type) for item in value]
+
+        # Handle FHIRBaseModel instances (e.g., parent class instances for profile fields)
+        if isinstance(value, FHIRBaseModel):
+            # If the value is already an instance of the target type or a subclass, return as-is
+            if isinstance(value, base_type):
+                return value
+
+            # Convert the parent instance to a dictionary for re-validation against the target type
+            # This allows Pydantic to validate and convert it properly
+            value_dict = value.model_dump()
+            # Recursively deserialize the dictionary
+            return cls._deserialize_polymorphically(value_dict, base_type)
 
         # Handle dictionaries (potential FHIR objects)
         if isinstance(value, dict):
