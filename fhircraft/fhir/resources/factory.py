@@ -1021,7 +1021,8 @@ class ResourceFactory:
             # Construct the slice model from the canonical URL
             slice_model = self.construct_resource_model(
                 canonical_urls[0],
-                base_model=FHIRSliceModel,
+                base_model=base,
+                mixins=(FHIRSliceModel,),
                 mode=(
                     self.Config.construction_mode
                     if self.Config

@@ -527,3 +527,131 @@ def test_regression_issue_262():
     assert isinstance(instance, ExamplePatient)
     assert instance.name
     assert instance.name[0].given == ["John"]
+
+
+def test_regression_issue_266(factory, generator):
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "example-profile",
+        "url": "http://hl7.org/fhir/StructureDefinition/example-profile",
+        "version": "5.0.0",
+        "name": "ExampleProfile",
+        "title": "Example Profile",
+        "status": "draft",
+        "experimental": False,
+        "date": "2018-08-11",
+        "description": "Example Profile Description",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "AdverseEvent",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/AdverseEvent",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "AdverseEvent", "path": "AdverseEvent"},
+                {
+                    "id": "AdverseEvent.extension",
+                    "path": "AdverseEvent.extension",
+                    "slicing": {
+                        "discriminator": [{"type": "value", "path": "url"}],
+                        "ordered": False,
+                        "rules": "open",
+                    },
+                    "min": 1,
+                },
+                {
+                    "id": "AdverseEvent.extension:grade",
+                    "path": "AdverseEvent.extension",
+                    "sliceName": "grade",
+                    "short": "grade",
+                    "min": 1,
+                    "max": "1",
+                    "type": [
+                        {
+                            "code": "Extension",
+                            "profile": [
+                                "http://example.org/fhir/StructureDefinition/grade-extension"
+                            ],
+                        }
+                    ],
+                    "mustSupport": True,
+                },
+            ]
+        },
+    }
+
+    extension_structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "grade-extension",
+        "url": "http://example.org/fhir/StructureDefinition/grade-extension",
+        "version": "0.1.0",
+        "name": "GradeExtension",
+        "title": "Grade Extension",
+        "status": "active",
+        "date": "2025-12-04T10:59:28+00:00",
+        "description": "The grade of the adverse event",
+        "fhirVersion": "5.0.0",
+        "kind": "complex-type",
+        "abstract": False,
+        "context": [{"type": "element", "expression": "AdverseEvent.extension"}],
+        "type": "Extension",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {
+                    "id": "Extension",
+                    "path": "Extension",
+                },
+                {
+                    "id": "Extension.url",
+                    "path": "Extension.url",
+                    "fixedUri": "http://example.org/fhir/StructureDefinition/grade-extension",
+                },
+                {
+                    "id": "Extension.value[x]",
+                    "path": "Extension.value[x]",
+                    "short": "Grade",
+                    "definition": "The grade of the adverse event",
+                    "type": [{"code": "integer"}],
+                    "min": 1,
+                    "max": "1",
+                },
+            ]
+        },
+    }
+
+    factory.configure_repository(
+        definitions=[structure_definition, extension_structure_definition]
+    )
+
+    model = factory.construct_resource_model(
+        structure_definition=structure_definition, mode="differential"
+    )
+
+    source_code = generator.generate_resource_model_code(model)
+
+    expected_code = '''    
+    class GradeExtension(Extension, FHIRSliceModel):
+        """
+        The grade of the adverse event
+        """
+        min_cardinality: ClassVar[int] = 1
+        max_cardinality: ClassVar[int] = 1
+
+        _canonical_url = "http://example.org/fhir/StructureDefinition/grade-extension"
+
+        url: Optional[String] = Field(
+            default="http://example.org/fhir/StructureDefinition/grade-extension",
+        )
+        valueInteger: Optional[Integer] = Field(
+            description="Grade",
+            default=None,
+        )
+    '''
+    assertBlockInCode(source_code, expected_code.strip())
+    assert (
+        source_code.count("class ") == 2
+    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
