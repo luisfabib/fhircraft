@@ -527,3 +527,92 @@ def test_regression_issue_262():
     assert isinstance(instance, ExamplePatient)
     assert instance.name
     assert instance.name[0].given == ["John"]
+
+
+def test_regression_issue_265(factory, generator):
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "example-profile",
+        "text": {
+            "status": "generated",
+            "div": '<div xmlns="http://www.w3.org/1999/xhtml">to do</div>',
+        },
+        "url": "http://hl7.org/fhir/StructureDefinition/example-profile",
+        "version": "5.0.0",
+        "name": "ExampleProfile",
+        "title": "Example Profile",
+        "status": "draft",
+        "experimental": False,
+        "date": "2018-08-11",
+        "description": "Example Profile Description",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {
+                    "id": "Observation",
+                    "path": "Observation",
+                    "short": "assessment observation",
+                },
+                {
+                    "id": "Observation.category",
+                    "path": "Observation.category",
+                    "min": 1,
+                    "mustSupport": True,
+                },
+                {
+                    "id": "Observation.category:slice",
+                    "path": "Observation.category",
+                    "sliceName": "slice",
+                    "short": "Classification of type of observation",
+                    "min": 0,
+                    "mustSupport": False,
+                    "binding": {
+                        "strength": "required",
+                        "valueSet": "http://hl7.org/fhir/ValueSet/observation-category",
+                    },
+                },
+            ]
+        },
+    }
+
+    model = factory.construct_resource_model(
+        structure_definition=structure_definition, mode="differential"
+    )
+
+    source_code = generator.generate_resource_model_code(model)
+
+    expected_code = '''    
+    class ExampleProfile(Observation):
+        """
+        Example Profile Description
+        """
+
+        _canonical_url = "http://hl7.org/fhir/StructureDefinition/example-profile"
+
+        meta: Optional[Meta] = Field(
+            title="Meta",
+            description="Metadata about the resource.",
+            default_factory=lambda: Meta(profile=['http://hl7.org/fhir/StructureDefinition/example-profile']),
+        )
+        category: Optional[List[CodeableConcept]] = Field(
+            description="Classification of type of observation",
+            default=None,
+        )
+        
+        @field_validator(*('category',), mode="after", check_fields=None)
+        @classmethod
+        def category_slicing_cardinality_validator(cls, value):    
+            return validate_slicing_cardinalities(cls, value, 
+                field_name="category",
+            )
+    '''
+    assertBlockInCode(source_code, expected_code.strip())
+    assert (
+        source_code.count("class ") == 1
+    ), f"Expected exactly 1 class to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"

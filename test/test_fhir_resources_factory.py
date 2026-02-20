@@ -1205,17 +1205,25 @@ class TestSliceModelInheritance(FactoryTestCase):
 
         mock_node = MockElementDefinitionNode(
             definition=MockElementDefinition(
-                type=[], short="Test extension slice", min=0, max="1"
+                type=[],
+                short="Test extension slice",
+                min=0,
+                max="1",
             )
         )
 
-        # Call _construct_slice_model directly
-        slice_model = self.factory._construct_slice_model(
-            name="test-extension-slice",
-            node=mock_node,  # type: ignore
-            base=Extension,
-            base_name="TestExtension",
-        )
+        with patch(
+            "fhircraft.fhir.resources.factory.ResourceFactoryValidators.get_all"
+        ) as mock_validators:
+            mock_validators.return_value = {
+                "mock_validator": lambda x: x  # Dummy validator that does nothing
+            }
+            slice_model = self.factory._construct_slice_model(
+                name="test-extension-slice",
+                node=mock_node,  # type: ignore
+                base=Extension,
+                base_name="TestExtension",
+            )
 
         # Verify dual inheritance
         assert issubclass(slice_model, Extension), "Slice should inherit from Extension"
@@ -1243,13 +1251,19 @@ class TestSliceModelInheritance(FactoryTestCase):
             )
         )
 
-        # Call _construct_slice_model with BackboneElement base
-        slice_model = self.factory._construct_slice_model(
-            name="test-backbone-slice",
-            node=mock_node,  # type: ignore
-            base=BackboneElement,
-            base_name="TestBackbone",
-        )
+        with patch(
+            "fhircraft.fhir.resources.factory.ResourceFactoryValidators.get_all"
+        ) as mock_validators:
+            mock_validators.return_value = {
+                "mock_validator": lambda x: x  # Dummy validator that does nothing
+            }
+            # Call _construct_slice_model with BackboneElement base
+            slice_model = self.factory._construct_slice_model(
+                name="test-backbone-slice",
+                node=mock_node,  # type: ignore
+                base=BackboneElement,
+                base_name="TestBackbone",
+            )
 
         # Verify dual inheritance
         assert issubclass(
@@ -1279,13 +1293,18 @@ class TestSliceModelInheritance(FactoryTestCase):
             )
         )
 
-        # Create slice model
-        ExtensionSlice = self.factory._construct_slice_model(
-            name="simple-extension-slice",
-            node=mock_node,  # type: ignore
-            base=Extension,
-            base_name="SimpleExtension",
-        )
+        with patch(
+            "fhircraft.fhir.resources.factory.ResourceFactoryValidators.get_all"
+        ) as mock_validators:
+            mock_validators.return_value = {
+                "mock_validator": lambda x: x  # Dummy validator that does nothing
+            }
+            ExtensionSlice = self.factory._construct_slice_model(
+                name="simple-extension-slice",
+                node=mock_node,  # type: ignore
+                base=Extension,
+                base_name="SimpleExtension",
+            )
 
         # Create instance
         instance = ExtensionSlice(
@@ -1318,13 +1337,19 @@ class TestSliceModelInheritance(FactoryTestCase):
             )
         )
 
-        # Extension inherits from Element, which may inherit from other classes
-        ExtensionSlice = self.factory._construct_slice_model(
-            name="complex-mock_node-slice",
-            node=mock_node,  # type: ignore
-            base=Extension,
-            base_name="ComplexExtension",
-        )
+        with patch(
+            "fhircraft.fhir.resources.factory.ResourceFactoryValidators.get_all"
+        ) as mock_validators:
+            mock_validators.return_value = {
+                "mock_validator": lambda x: x  # Dummy validator that does nothing
+            }
+            # Extension inherits from Element, which may inherit from other classes
+            ExtensionSlice = self.factory._construct_slice_model(
+                name="complex-mock_node-slice",
+                node=mock_node,  # type: ignore
+                base=Extension,
+                base_name="ComplexExtension",
+            )
 
         # Should inherit from all the proper classes in the chain
         assert issubclass(ExtensionSlice, Extension)
@@ -1348,20 +1373,24 @@ class TestSliceModelInheritance(FactoryTestCase):
     def test_slice_models_can_be_used_in_union_types(self):
         """Test that slice models work correctly in Union type validations."""
 
-        # Create two different Extension slices using _construct_slice_model
-        ExtensionSliceA = self.factory._construct_slice_model(
-            name="extension-a-slice",
-            node=MockElementDefinitionNode(definition=MockElementDefinition(short="Extension A slice", min=0, max="1")),  # type: ignore
-            base=Extension,
-            base_name="ExtensionA",
-        )
-
-        ExtensionSliceB = self.factory._construct_slice_model(
-            name="extension-b-slice",
-            node=MockElementDefinitionNode(definition=MockElementDefinition(short="Extension B slice", min=0, max="1")),  # type: ignore
-            base=Extension,
-            base_name="ExtensionB",
-        )
+        with patch(
+            "fhircraft.fhir.resources.factory.ResourceFactoryValidators.get_all"
+        ) as mock_validators:
+            mock_validators.return_value = {
+                "mock_validator": lambda x: x  # Dummy validator that does nothing
+            }
+            ExtensionSliceA = self.factory._construct_slice_model(
+                name="extension-a-slice",
+                node=MockElementDefinitionNode(definition=MockElementDefinition(short="Extension A slice", min=0, max="1")),  # type: ignore
+                base=Extension,
+                base_name="ExtensionA",
+            )
+            ExtensionSliceB = self.factory._construct_slice_model(
+                name="extension-b-slice",
+                node=MockElementDefinitionNode(definition=MockElementDefinition(short="Extension B slice", min=0, max="1")),  # type: ignore
+                base=Extension,
+                base_name="ExtensionB",
+            )
 
         # Create a test model with a Union field that should accept either slice or base Extension
         class TestModel(BaseModel):
@@ -1397,12 +1426,18 @@ class TestSliceModelInheritance(FactoryTestCase):
             )
         )
 
-        ExtensionSlice = self.factory._construct_slice_model(
-            name="cardinality-extension-slice",
-            node=mock_node,  # type: ignore
-            base=Extension,
-            base_name="CardinalityExtension",
-        )
+        with patch(
+            "fhircraft.fhir.resources.factory.ResourceFactoryValidators.get_all"
+        ) as mock_validators:
+            mock_validators.return_value = {
+                "mock_validator": lambda x: x  # Dummy validator that does nothing
+            }
+            ExtensionSlice = self.factory._construct_slice_model(
+                name="cardinality-extension-slice",
+                node=mock_node,  # type: ignore
+                base=Extension,
+                base_name="CardinalityExtension",
+            )
 
         # Should have custom cardinality from the slice definition
         assert hasattr(ExtensionSlice, "min_cardinality")
@@ -1424,13 +1459,18 @@ class TestSliceModelInheritance(FactoryTestCase):
             )
         )
 
-        # Create extension slice
-        ExtensionSlice = self.factory._construct_slice_model(
-            name="patient-extension-slice",
-            node=mock_node,  # type: ignore
-            base=Extension,
-            base_name="PatientExtension",
-        )
+        with patch(
+            "fhircraft.fhir.resources.factory.ResourceFactoryValidators.get_all"
+        ) as mock_validators:
+            mock_validators.return_value = {
+                "mock_validator": lambda x: x  # Dummy validator that does nothing
+            }
+            ExtensionSlice = self.factory._construct_slice_model(
+                name="patient-extension-slice",
+                node=mock_node,  # type: ignore
+                base=Extension,
+                base_name="PatientExtension",
+            )
 
         # Create an instance of the slice
         extension_instance = ExtensionSlice(
@@ -1458,13 +1498,18 @@ class TestSliceModelInheritance(FactoryTestCase):
             )
         )
 
-        # Create slice model
-        ExtensionSlice = self.factory._construct_slice_model(
-            name="mro-test-slice",
-            node=mock_node,  # type: ignore
-            base=Extension,
-            base_name="MROTestExtension",
-        )
+        with patch(
+            "fhircraft.fhir.resources.factory.ResourceFactoryValidators.get_all"
+        ) as mock_validators:
+            mock_validators.return_value = {
+                "mock_validator": lambda x: x  # Dummy validator that does nothing
+            }
+            ExtensionSlice = self.factory._construct_slice_model(
+                name="mro-test-slice",
+                node=mock_node,  # type: ignore
+                base=Extension,
+                base_name="MROTestExtension",
+            )
 
         # Test MRO (Method Resolution Order) is sensible
         mro = ExtensionSlice.__mro__
