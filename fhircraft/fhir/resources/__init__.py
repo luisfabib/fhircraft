@@ -13,6 +13,7 @@ Recommended imports:
 """
 
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
+from fhircraft.fhir.resources.generator import CodeGenerator
 from fhircraft.fhir.resources.factory import ResourceFactory, construct_resource_model
 from fhircraft.fhir.resources.repository import (
     CompositeStructureDefinitionRepository,

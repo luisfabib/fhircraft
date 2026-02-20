@@ -809,8 +809,7 @@ class ResourceFactory:
         # Handle list types
         if is_list_type:
             actual_field_type = List[actual_field_type]
-        if default is None:
-            actual_field_type = Optional[actual_field_type]
+        actual_field_type = Optional[actual_field_type]
         # Construct the Pydantic field
         return (
             actual_field_type,
@@ -851,10 +850,34 @@ class ResourceFactory:
             return safe_field_name, validation_alias
         return field_name, None
 
+    def _sanitize_structure_definition_name(self, name: str) -> str:
+        """
+        Sanitize a StructureDefinition name to a valid Python class identifier.
+
+        Rules:
+        - Only alphanumeric characters are kept.
+        - Result cannot start with a digit (prefix with "Fhir" if needed).
+        - Avoid Python keywords by prefixing with "Fhir".
+        """
+        sanitized = "".join(ch for ch in name if ch.isalnum())
+        if not sanitized:
+            raise ValueError(
+                f"FHIR Resource name '{name}' does not have any alphanumeric characters to construct a valid Python class name."
+            )
+        while sanitized[0].isdigit():
+            sanitized = sanitized[1:]
+        # Ensure that first letter is capitalized
+        sanitized = sanitized[0].upper() + sanitized[1:]
+        # If the sanitized name is a Python keyword add a suffix
+        if keyword.iskeyword(sanitized):
+            sanitized = f"{sanitized}_"
+        return sanitized
+
     def _process_pattern_or_fixed_values(
         self,
         element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
         constraint_prefix: Literal["fixed", "pattern"],
+        element_type,
     ) -> Any:
         """
         Process the pattern or fixed values of a StructureDefinition element.
@@ -885,30 +908,33 @@ class ResourceFactory:
             constrained_type = self._resolve_FHIR_type(
                 constraint_attribute.replace(constraint_prefix, "")
             )
-            # Parse the value
-            constrained_value = (
-                constrained_type.model_validate(
+            if inspect.isclass(constrained_type) and issubclass(
+                constrained_type, BaseModel
+            ):
+                assert issubclass(
+                    element_type, constrained_type
+                ), f"Constrained type {constrained_type} is not a valid type for element of type {element_type}"
+                # Parse the value
+                constrained_value = element_type.model_validate(
                     constrained_value.model_dump()
                     if isinstance(constrained_value, BaseModel)
                     else constrained_value
                 )
-                if inspect.isclass(constrained_type)
-                and issubclass(constrained_type, BaseModel)
-                else constrained_value
-            )
         return constrained_value
 
     def _process_pattern_values(
         self,
         element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+        element_type: Any,
     ):
-        return self._process_pattern_or_fixed_values(element, "pattern")
+        return self._process_pattern_or_fixed_values(element, "pattern", element_type)
 
     def _process_fixed_values(
         self,
         element: R4_ElementDefinition | R4B_ElementDefinition | R5_ElementDefinition,
+        element_type: Any,
     ):
-        return self._process_pattern_or_fixed_values(element, "fixed")
+        return self._process_pattern_or_fixed_values(element, "fixed", element_type)
 
     def _construct_type_choice_fields(
         self,
@@ -1010,12 +1036,12 @@ class ResourceFactory:
             slice_subfields, slice_validators, slice_properties = (
                 self._process_FHIR_structure_into_Pydantic_components(
                     node,
-                    FHIRSliceModel,
+                    base or FHIRSliceModel,
                     resource_name=slice_model_name,
                 )
             )
             if node.definition and (
-                pattern_value := self._process_pattern_values(node.definition)
+                pattern_value := self._process_pattern_values(node.definition, base)
             ):
                 for (
                     field_name,
@@ -1044,25 +1070,29 @@ class ResourceFactory:
             # Fixed value constraints
             # -------------------------------------
             if node.definition and (
-                fixed_value := self._process_fixed_values(node.definition)
+                fixed_value := self._process_fixed_values(node.definition, base)
             ):
-                # Use enum with single choice since Literal definition does not work at runtime
-                singleChoice = Enum(
-                    f"{name}FixedValue",
-                    [("fixedValue", fixed_value)],
-                    type=type(fixed_value),
-                )
                 for (
                     field_name,
                     field_info,
                 ) in pattern_value.__class__.model_fields.items():
                     slice_subfields[field_name] = (
-                        singleChoice,
+                        field_info.annotation,
                         Field(
                             default=fixed_value,
                             description=field_info.description,
                         ),
                     )
+                # Add the current field to the list of validated fields
+                slice_validators.add(
+                    f"FHIR_{name}_fixed_value_constraint",
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_FHIR_model_fixed_value,
+                            constant=fixed_value,
+                        )
+                    ),
+                )
 
             # Construct the slice model
             bases = (
@@ -1663,14 +1693,21 @@ class ResourceFactory:
                         for t in _get_deepest_args(field_info.annotation)
                         if t is not type(None)
                     ]
+            if not field_types:
+                continue
+
+            if node.definition.min is None or node.definition.max is None:
+                # Attempt to infer the cardinality
+                if (
+                    base
+                    and issubclass(base, BaseModel)
+                    and (field_info := base.model_fields.get(safe_field_name))
+                ):
                     node.definition.min = 0
                     # TODO: This is a bit of a hack - if the field is a list, we set max to *, otherwise 1. We should ideally be able to get this info from the element definition itself, but in some cases (like slices) it may not be present, so we infer it from the base model field type.
                     node.definition.max = (
                         "1" if not "List" in str(field_info.annotation) else "*"
                     )
-            if not field_types:
-                continue
-
             # Unify types into single annotation
             field_type = (
                 Union[tuple(field_types)] if len(field_types) > 1 else field_types[0]
@@ -1726,45 +1763,6 @@ class ResourceFactory:
 
             # Start by not setting any default value (important, 'None' implies optional in Pydantic)
             field_default = _Unset
-
-            # -------------------------------------
-            # Pattern value constraints
-            # -------------------------------------
-            if pattern_value := self._process_pattern_values(node.definition):
-                field_default = pattern_value
-                # Add the current field to the list of validated fields
-                validators.add(
-                    f"FHIR_{name}_pattern_constraint",
-                    field_validator(safe_field_name, mode="after")(
-                        partial(
-                            fhir_validators.validate_FHIR_element_pattern,
-                            pattern=pattern_value,
-                        )
-                    ),
-                )
-
-            # -------------------------------------
-            # Fixed value constraints
-            # -------------------------------------
-            if fixed_value := self._process_fixed_values(node.definition):
-                # Use enum with single choice since Literal definition does not work at runtime
-                singleChoice = Enum(
-                    f"{name}FixedValue",
-                    [("fixedValue", fixed_value)],
-                    type=type(fixed_value),
-                )
-                field_default = fixed_value
-                field_type = singleChoice
-
-            # -------------------------------------
-            # Fixed value constraints
-            # -------------------------------------
-            if constraints := node.definition.constraint:
-                # Process FHIR constraint invariants on the element
-                for constraint in constraints:
-                    validators.add_element_constraint_validator(
-                        safe_field_name, constraint, base
-                    )
 
             # -------------------------------------
             # Slicing
@@ -1846,6 +1844,51 @@ class ResourceFactory:
                     docstring=node.definition.definition,
                 )
                 self.local_cache[backbone_model_name] = field_type
+
+            # -------------------------------------
+            # Pattern value constraints
+            # -------------------------------------
+            if pattern_value := self._process_pattern_values(
+                node.definition, field_type
+            ):
+                field_default = pattern_value
+                # Add the current field to the list of validated fields
+                validators.add(
+                    f"FHIR_{name}_pattern_constraint",
+                    field_validator(safe_field_name, mode="after")(
+                        partial(
+                            fhir_validators.validate_FHIR_element_pattern,
+                            pattern=pattern_value,
+                        )
+                    ),
+                )
+
+            # -------------------------------------
+            # Fixed value constraints
+            # -------------------------------------
+            if fixed_value := self._process_fixed_values(node.definition, field_type):
+                # Use enum with single choice since Literal definition does not work at runtime
+                field_default = fixed_value
+                # Add the current field to the list of validated fields
+                validators.add(
+                    f"FHIR_{name}_fixed_value_constraint",
+                    field_validator(safe_field_name, mode="after")(
+                        partial(
+                            fhir_validators.validate_FHIR_element_fixed_value,
+                            constant=fixed_value,
+                        )
+                    ),
+                )
+
+            # -------------------------------------
+            # Invariant constraints
+            # -------------------------------------
+            if constraints := node.definition.constraint:
+                # Process FHIR constraint invariants on the element
+                for constraint in constraints:
+                    validators.add_element_constraint_validator(
+                        safe_field_name, constraint, base
+                    )
 
             # Handle Python reserved keywords for field names
             safe_field_name, validation_alias = self._handle_python_reserved_keyword(
@@ -1930,6 +1973,9 @@ class ResourceFactory:
 
         # Detect the appropriate construction mode
         resolved_mode = self._detect_construction_mode(_structure_definition, mode)
+        sanitized_name = self._sanitize_structure_definition_name(
+            _structure_definition.name
+        )
 
         if not _structure_definition.fhirVersion:
             if not fhir_release:
@@ -2031,7 +2077,7 @@ class ResourceFactory:
         fields, validators, properties = (
             self._process_FHIR_structure_into_Pydantic_components(
                 root_node,
-                resource_name=_structure_definition.name,
+                resource_name=sanitized_name,
                 base=base,
             )
         )
@@ -2058,7 +2104,7 @@ class ResourceFactory:
 
         # Construct the Pydantic model representing the FHIR resource
         model = self._construct_model_with_properties(
-            _structure_definition.name,
+            sanitized_name,
             fields=fields,
             base=(base,),
             validators=validators.get_all(),

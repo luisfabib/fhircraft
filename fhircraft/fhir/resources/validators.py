@@ -285,6 +285,61 @@ def validate_FHIR_model_pattern(
     return validate_FHIR_element_pattern(cls=None, element=model, pattern=pattern)
 
 
+def validate_FHIR_element_fixed_value(
+    cls: Any,
+    element: Union["FHIRBaseModel", List["FHIRBaseModel"], Any],
+    constant: Union["FHIRBaseModel", List["FHIRBaseModel"], Any],
+) -> Any:
+    """
+    Validate the FHIR element against a specified constant value and return the element if it fulfills the constant.
+
+    Args:
+        cls (Any): Placeholder for an argument that is not used in the function.
+        element (Union[FHIRBaseModel, List[FHIRBaseModel]]): The FHIR element to validate against the constant.
+        constant (Union[FHIRBaseModel, List[FHIRBaseModel]]): The constant value to validate the element against.
+
+    Returns:
+        Union[FHIRBaseModel, List[FHIRBaseModel]]: The validated FHIR element.
+
+    Raises:
+        AssertionError: If the element does not fulfill the specified constant.
+    """
+    from fhircraft.fhir.resources.base import FHIRBaseModel
+
+    if isinstance(constant, list):
+        constant = constant[0]
+    _element = element[0] if isinstance(element, list) else element
+    if isinstance(_element, FHIRBaseModel):
+        assert (
+            constant.model_dump() == _element.model_dump()
+        ), f"Value does not fulfill constant:\n{constant.model_dump_json(indent=2)}"
+    elif isinstance(_element, dict) and isinstance(constant, dict):
+        assert constant == _element, f"Value does not fulfill constant: {constant}"
+    else:
+        assert constant == _element, f"Value does not fulfill constant: {constant}"
+    return element
+
+
+def validate_FHIR_model_fixed_value(
+    model: Union["FHIRBaseModel", List["FHIRBaseModel"], Any],
+    constant: Union["FHIRBaseModel", List["FHIRBaseModel"], Any],
+) -> Any:
+    """
+    Validate the FHIR model against a specified constant value and return the model if it fulfills the constant.
+
+    Args:
+        model (Union[FHIRBaseModel, List[FHIRBaseModel]]): The FHIR model to validate against the constant.
+        constant (Union[FHIRBaseModel, List[FHIRBaseModel]]): The constant value to validate the model against.
+
+    Returns:
+        Union[FHIRBaseModel, List[FHIRBaseModel]]: The validated FHIR element.
+
+    Raises:
+        AssertionError: If the element does not fulfill the specified constant.
+    """
+    return validate_FHIR_element_fixed_value(cls=None, element=model, constant=constant)
+
+
 def validate_type_choice_element(
     instance: T,
     field_types: List[Any],
