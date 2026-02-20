@@ -476,3 +476,54 @@ def test_regression_issue_263(factory, generator):
     assert (
         source_code.count("class ") == 3
     ), f"Expected exactly 3 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+
+
+def test_regression_issue_262():
+    from pydantic import Field, model_validator
+    from typing import Optional, List
+    from fhircraft.fhir.resources.datatypes.R5.core import Patient
+    from typing import List, Optional
+    from fhircraft.fhir.resources.datatypes.R5.complex import HumanName, Meta
+    from fhircraft.fhir.resources.datatypes.primitives import String
+    from fhircraft.fhir.resources.validators import validate_element_constraint
+
+    class ExamplePatientName(HumanName):
+        family: Optional[String] = Field(
+            description="(USCDI) Family name (often called \u0027Surname\u0027)",
+            default=None,
+        )
+
+    class ExamplePatient(Patient):
+
+        _canonical_url = "http://example.org/fhir/StructureDefinition/example"
+
+        meta: Optional[Meta] = Field(
+            title="Meta",
+            description="Metadata about the resource.",
+            default_factory=lambda: Meta(
+                profile=["http://example.org/fhir/StructureDefinition/example"]
+            ),
+        )
+        name: Optional[List[ExamplePatientName]] = Field(
+            description="(USCDI) A name associated with the patient",
+            default=None,
+        )
+
+        @model_validator(mode="after")
+        def FHIR_us_core_6_constraint_validator(self):
+            return validate_element_constraint(
+                self,
+                elements=["name"],
+                expression="(family.exists() or given.exists()) xor extension.where(url='http://hl7.org/fhir/StructureDefinition/data-absent-reason').exists()",
+                human="At least name.given and/or name.family are present or, if neither is available, the Data Absent Reason Extension is present.",
+                key="us-core-6",
+                severity="error",
+            )
+
+    instance = ExamplePatient(
+        name=[HumanName(given=["John"], family="Doe")]  # type: ignore
+    )
+
+    assert isinstance(instance, ExamplePatient)
+    assert instance.name
+    assert instance.name[0].given == ["John"]
