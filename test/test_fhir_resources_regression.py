@@ -114,15 +114,26 @@ def test_regression_issue_255(factory, generator):
         max_cardinality: ClassVar[int] = 1
     
     
-        system: Literal['http://example.org'] = Field(
-            description=None,
+        system: Optional[Uri] = Field(
             default="http://example.org",
         )
-        code: Literal['12345-6'] = Field(
-            description=None,
+        code: Optional[Code] = Field(
             default="12345-6",
         )
-        
+
+        @field_validator(*('system',), mode="after", check_fields=None)
+        @classmethod
+        def FHIR_system_fixed_value_constraint(cls, value):    
+            return validate_FHIR_element_fixed_value(cls, value, 
+                constant="http://example.org",
+            )
+            
+        @field_validator(*('code',), mode="after", check_fields=None)
+        @classmethod
+        def FHIR_code_fixed_value_constraint(cls, value):    
+            return validate_FHIR_element_fixed_value(cls, value, 
+                constant="12345-6",
+            )        
         
     class ProfileExampleCode(CodeableConcept):
         """
@@ -131,7 +142,6 @@ def test_regression_issue_255(factory, generator):
     
 
         coding: Optional[List[Annotated[Union[ProfileExampleSlicedCoding, Coding], Field(union_mode='left_to_right')]]] = Field(
-            description=None,
             default=None,
         )
         
@@ -163,9 +173,6 @@ def test_regression_issue_255(factory, generator):
 
 
 def test_regression_issue_258(factory, generator):
-    # Clear factory cache to avoid state pollution from other tests
-    factory.clear_cache()
-
     structure_definition = {
         "resourceType": "StructureDefinition",
         "id": "issue-258",
@@ -262,7 +269,7 @@ def test_regression_issue_258(factory, generator):
 
 
 def test_regression_issue_111(factory, generator):
-    # Clear factory cache to avoid state pollution from other tests
+
     structure_definition = {
         "resourceType": "StructureDefinition",
         "id": "example-procedure",
@@ -298,6 +305,7 @@ def test_regression_issue_111(factory, generator):
                     "id": "Procedure.code.text",
                     "path": "Procedure.code.text",
                     "fixedString": "Tumor Board Review",
+                    "min": 0,
                 },
             ]
         },
@@ -314,11 +322,17 @@ def test_regression_issue_111(factory, generator):
         """
         The specific procedure that is performed. Use text if the exact nature of the procedure cannot be coded (e.g. "Laparoscopic Appendectomy").
         """
-        
-        text: Literal['Tumor Board Review'] = Field(
-            description=None,
+            
+        text: Optional[String] = Field(
             default="Tumor Board Review",
         )
+        
+        @field_validator(*('text',), mode="after", check_fields=None)
+        @classmethod
+        def FHIR_text_fixed_value_constraint(cls, value):    
+            return validate_FHIR_element_fixed_value(cls, value, 
+                constant="Tumor Board Review",
+            )
         
     
     class ExampleProcedure(Procedure):
@@ -330,7 +344,7 @@ def test_regression_issue_111(factory, generator):
             description="Metadata about the resource.",
             default_factory=lambda: Meta(profile=['http://example.org/StructureDefinition/example-procedure']),
         )
-        code: ExampleProcedureCode = Field(
+        code: Optional[ExampleProcedureCode] = Field(
             description="Identification of the procedure",
             default_factory=lambda: ExampleProcedureCode(coding=[Coding(code="C93304", display="Tumor Board Review", system="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl")]),
         )
@@ -340,6 +354,121 @@ def test_regression_issue_111(factory, generator):
         def FHIR_code_pattern_constraint(cls, value):    
             return validate_FHIR_element_pattern(cls, value, 
                 pattern=ExampleProcedureCode(coding=[Coding(code="C93304", display="Tumor Board Review", system="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl")]),
+            )
+    '''
+    assertBlockInCode(source_code, expected_code.strip())
+    assert (
+        source_code.count("class ") == 2
+    ), f"Expected exactly 3 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+
+
+def test_regression_issue_263(factory, generator):
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "vitalspanel",
+        "url": "http://hl7.org/fhir/StructureDefinition/vitalspanel",
+        "version": "5.0.0",
+        "name": "Vitalspanel",
+        "title": "Observation Vital Signs Panel Profile",
+        "status": "draft",
+        "experimental": False,
+        "date": "2018-08-11",
+        "description": "FHIR Vital Signs Panel Profile",
+        "fhirVersion": "5.0.0",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Observation",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {
+                    "id": "Observation.code",
+                    "path": "Observation.code",
+                    "slicing": {
+                        "discriminator": [
+                            {"type": "value", "path": "code"},
+                            {"type": "value", "path": "system"},
+                        ],
+                        "ordered": False,
+                        "rules": "open",
+                    },
+                },
+                {
+                    "id": "Observation.code.coding",
+                    "path": "Observation.code.coding",
+                },
+                {
+                    "id": "Observation.code.coding:VitalsPanelCode",
+                    "path": "Observation.code.coding",
+                    "sliceName": "VitalsPanelCode",
+                    "max": "1",
+                },
+                {
+                    "id": "Observation.code.coding:VitalsPanelCode.system",
+                    "path": "Observation.code.coding.system",
+                    "type": [{"code": "uri"}],
+                    "fixedUri": "http://loinc.org",
+                },
+                {
+                    "id": "Observation.code.coding:VitalsPanelCode.code",
+                    "path": "Observation.code.coding.code",
+                    "type": [{"code": "code"}],
+                    "fixedCode": "85353-1",
+                },
+            ]
+        },
+    }
+
+    model = factory.construct_resource_model(
+        structure_definition=structure_definition, mode="differential"
+    )
+
+    source_code = generator.generate_resource_model_code(model)
+
+    expected_code = '''    
+    class VitalspanelVitalsPanelCode(Coding, FHIRSliceModel):
+        min_cardinality: ClassVar[int] = 0
+        max_cardinality: ClassVar[int] = 99999
+
+
+        system: Optional[Uri] = Field(
+            default='http://loinc.org',
+        )
+        code: Optional[Code] = Field(
+            default='85353-1',
+        )
+
+        @field_validator(*('code',), mode="after", check_fields=None)
+        def FHIR_code_fixed_value_constraint(cls, value):    
+            return validate_FHIR_element_pattern(cls, value, 
+                constant="85353-1",
+            )
+
+        @field_validator(*('system',), mode="after", check_fields=None)
+        def FHIR_system_fixed_value_constraint(cls, value):    
+            return validate_FHIR_element_pattern(cls, value, 
+                constant="http://loinc.org",
+            )
+
+        
+    
+    class VitalspanelCode(CodeableConcept):
+        """
+        Describes what was observed. Sometimes this is called the observation "name".
+        """
+
+
+        coding: Optional[List[Annotated[Union[VitalspanelVitalsPanelCode, Coding], Field(union_mode='left_to_right')]]] = Field(
+            default=None,
+        )
+        
+        @field_validator(*('coding',), mode="after", check_fields=None)
+        @classmethod
+        def coding_slicing_cardinality_validator(cls, value):    
+            return validate_slicing_cardinalities(cls, value, 
+                field_name="coding",
             )
     '''
     assertBlockInCode(source_code, expected_code.strip())

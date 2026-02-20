@@ -1072,23 +1072,27 @@ class ResourceFactory:
             if node.definition and (
                 fixed_value := self._process_fixed_values(node.definition, base)
             ):
-                # Use enum with single choice since Literal definition does not work at runtime
-                singleChoice = Enum(
-                    f"{name}FixedValue",
-                    [("fixedValue", fixed_value)],
-                    type=type(fixed_value),
-                )
                 for (
                     field_name,
                     field_info,
                 ) in pattern_value.__class__.model_fields.items():
                     slice_subfields[field_name] = (
-                        singleChoice,
+                        field_info.annotation,
                         Field(
                             default=fixed_value,
                             description=field_info.description,
                         ),
                     )
+                # Add the current field to the list of validated fields
+                slice_validators.add(
+                    f"FHIR_{name}_fixed_value_constraint",
+                    model_validator(mode="after")(
+                        partial(
+                            fhir_validators.validate_FHIR_model_fixed_value,
+                            constant=fixed_value,
+                        )
+                    ),
+                )
 
             # Construct the slice model
             bases = (
@@ -1857,13 +1861,17 @@ class ResourceFactory:
             # -------------------------------------
             if fixed_value := self._process_fixed_values(node.definition, field_type):
                 # Use enum with single choice since Literal definition does not work at runtime
-                singleChoice = Enum(
-                    f"{name}FixedValue",
-                    [("fixedValue", fixed_value)],
-                    type=type(fixed_value),
-                )
                 field_default = fixed_value
-                field_type = singleChoice
+                # Add the current field to the list of validated fields
+                validators.add(
+                    f"FHIR_{name}_fixed_value_constraint",
+                    field_validator(safe_field_name, mode="after")(
+                        partial(
+                            fhir_validators.validate_FHIR_element_fixed_value,
+                            constant=fixed_value,
+                        )
+                    ),
+                )
 
             # -------------------------------------
             # Invariant constraints

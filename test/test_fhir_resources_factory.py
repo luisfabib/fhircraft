@@ -2393,7 +2393,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
 
         # Test that only the fixed value is accepted
         instance = mock_resource.model_validate({"status": "active"})
-        self.assertEqual(instance.status.value, "active")  # type: ignore
+        self.assertEqual(instance.status, "active")  # type: ignore
 
         # Test that other values are rejected
         with self.assertRaises(ValidationError):
@@ -2951,7 +2951,7 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
         instance = mock_resource.model_validate(
             {"status": "active", "priority": "high", "text": "Test text"}
         )
-        self.assertEqual(instance.status.value, "active")  # type: ignore
+        self.assertEqual(instance.status, "active")  # type: ignore
 
         # Test that fixed value is enforced
         with self.assertRaises(ValidationError):
