@@ -1102,6 +1102,8 @@ class ResourceFactory:
                 if base is FHIRSliceModel or issubclass(base, FHIRSliceModel)
                 else (base, FHIRSliceModel)
             )
+            if not slice_subfields and not slice_validators.get_all():
+                return None
             slice_model = self._construct_model_with_properties(
                 slice_model_name,
                 fields=slice_subfields,
@@ -1135,16 +1137,24 @@ class ResourceFactory:
         Returns:
             (Annotated): An annotated type representing a union of all constructed slice models and the base field type, with additional field metadata specifying union mode as "left_to_right".
         """
+        slice_models = [
+            slice_model
+            for slice_name, slice_element in slices.items()
+            if (
+                slice_model := self._construct_slice_model(
+                    slice_name, slice_element, field_type, base_name
+                )
+            )
+        ]
+        # If there are no slices, return the original field type without annotation
+        if not slice_models:
+            return field_type
+        # Otherwise return an annotated union of the slice models and the base field type
         return Annotated[
             Union[
                 tuple(
                     [
-                        *[
-                            self._construct_slice_model(
-                                slice_name, slice_element, field_type, base_name
-                            )
-                            for slice_name, slice_element in slices.items()
-                        ],
+                        *slice_models,
                         field_type,
                     ]
                 )
