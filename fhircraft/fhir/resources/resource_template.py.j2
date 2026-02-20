@@ -57,7 +57,9 @@ class {{ model.__name__ }}({% for base in model.__bases__ %}{{ base.__name__ }}{
         {% if info.title %}
         title="{{ info.title }}",
         {% endif %}
-        description={% if info.description %}{{ info.description|tojson }}{% else %}None{% endif %},
+        {% if info.description %}
+        description={{ info.description|tojson }},
+        {% endif %}
         {% if info.default != '...' %}
         default={{ info.default }},
         {% endif %}
