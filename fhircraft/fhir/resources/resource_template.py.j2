@@ -106,9 +106,3 @@ class {{ model.__name__ }}({% for base in model.__bases__ %}{{ base.__name__ }}{
     {% endif %}
     {% endfor %}
 {% endfor %}
-
-{% for model, model_data in data.items() %}
-{% if not model.__pydantic_complete__ %}
-{{ model.__name__ }}.model_rebuild()
-{% endif %}
-{% endfor %}
