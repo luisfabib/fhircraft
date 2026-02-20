@@ -7,12 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
-## v0.6.3 - 2026-02-13
+## v0.6.4 - 2026-02-20
 
 [GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.3...0.6.2)
 
+### Fixed
 
 
+- Ensured that profiled complex types with pattern or fixed values result in the correct default type when set ([#269](https://github.com/luisfabib/fhircraft/pull/269), fixes [#111](https://github.com/luisfabib/fhircraft/pull/111)) 
+- Sanitized StructureDefinition.name values to ensure valid Python class identifiers ([#269](https://github.com/luisfabib/fhircraft/pull/269), fixes [#264](https://github.com/luisfabib/fhircraft/pull/264)) 
+- Fixed cardinality resolution to fall back to base model when not resolved in structure definition ([#269](https://github.com/luisfabib/fhircraft/pull/269))
+- Fixed the construction of slice models by passing the correct base class for constructing its element fields ([#269](https://github.com/luisfabib/fhircraft/pull/269))
+- Changed the representation of fixed-value constraints from `Enum` and `Literal` to proper Pydantic field validators to ensure correct functionality even for complex values ([#269](https://github.com/luisfabib/fhircraft/pull/269), fixes [#263](https://github.com/luisfabib/fhircraft/pull/263)) 
+-  Enabled polymorphic deserialization for profile models to accept instances of their parent classes, matching the behavior of dictionary deserialization. Profile fields now properly validate and adopt parent class instances while preserving all data ([#270](https://github.com/luisfabib/fhircraft/pull/270), fixes [#262](https://github.com/luisfabib/fhircraft/pull/262))
+-  Ensured FHIR Pydantic fields are always nullable independently of default value ([#269](https://github.com/luisfabib/fhircraft/pull/269))
+- Updated the model source code generation logic and template ([#272](https://github.com/luisfabib/fhircraft/pull/272), [#271](https://github.com/luisfabib/fhircraft/pull/271))
+   * Removed hardcoded import statements in favor of dynamically generated imports, ensuring that only the required modules and objects are imported for each generated resource ([#272](https://github.com/luisfabib/fhircraft/pull/272), fixes [#261](https://github.com/luisfabib/fhircraft/pull/261))
+   * Removed the `model_rebuild()` calls to avoid unnecessary model rebuilds ([#271](https://github.com/luisfabib/fhircraft/pull/271), fixes [#261](https://github.com/luisfabib/fhircraft/pull/267))
+   * Avoided setting field descriptions when explicitly set as `None` or empty strings ([#269](https://github.com/luisfabib/fhircraft/pull/269))
+- Prevented the resource factory of creating empty slice models if there are no fields and no validators specified for the slice ([#273](https://github.com/luisfabib/fhircraft/pull/273), fixes [#265](https://github.com/luisfabib/fhircraft/pull/265))
+
+----------------- 
+
+## v0.6.3 - 2026-02-13
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.3...0.6.2)
 
 ### Fixed
 
