@@ -19,6 +19,7 @@ from typing import (
     List,
     Literal,
     Optional,
+    Sequence,
     Tuple,
     TypeVar,
     Union,
@@ -1020,7 +1021,8 @@ class ResourceFactory:
             # Construct the slice model from the canonical URL
             slice_model = self.construct_resource_model(
                 canonical_urls[0],
-                base_model=FHIRSliceModel,
+                base_model=base,
+                mixins=(FHIRSliceModel,),
                 mode=(
                     self.Config.construction_mode
                     if self.Config
@@ -1664,11 +1666,6 @@ class ResourceFactory:
                 name
             )
 
-            # Prevent circular references
-            if self.in_snapshot_mode:
-                if base and name in base.model_fields:
-                    continue
-
             # -------------------------------------
             # Element content references
             # -------------------------------------
@@ -1934,6 +1931,7 @@ class ResourceFactory:
         ) = None,
         base_model: type[ModelT] | None = None,
         mode: ConstructionMode | str = ConstructionMode.AUTO,
+        mixins: Sequence[type] | None = None,
         fhir_release: Literal["DSTU2", "STU3", "R4", "R4B", "R5", "R6"] | None = None,
     ) -> type[ModelT | BaseModel]:
         """
@@ -1944,6 +1942,7 @@ class ResourceFactory:
             structure_definition: The FHIR StructureDefinition to build the model from specified as a filename or as a dictionary.
             base_model: Optional base model to inherit from (overrides baseDefinition in differential mode).
             mode: Construction mode (SNAPSHOT, DIFFERENTIAL, or AUTO). Defaults to AUTO which auto-detects.
+            mixins: Optional sequence of mixin classes to include in the model.
             fhir_release: Optional FHIR release version ("DSTU2", "STU3", "R4", "R4B", "R5", "R6") to use for model construction.
 
         Returns:
@@ -2116,7 +2115,7 @@ class ResourceFactory:
         model = self._construct_model_with_properties(
             sanitized_name,
             fields=fields,
-            base=(base,),
+            base=(base, *mixins) if mixins else (base,),
             validators=validators.get_all(),
             properties=properties,
             docstring=_structure_definition.description,
@@ -2154,6 +2153,7 @@ class ResourceFactory:
         Clears the factory cache.
         """
         self.construction_cache = {}
+        self.local_cache = {}
 
 
 # Create default factory instance

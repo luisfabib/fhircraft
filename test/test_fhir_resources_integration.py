@@ -12,8 +12,6 @@ from fhircraft.config import with_config
 from fhircraft.fhir.resources.factory import (
     ConstructionMode,
     ResourceFactory,
-    construct_resource_model,
-    factory,
 )
 from fhircraft.fhir.resources.generator import CodeGenerator
 
@@ -60,7 +58,14 @@ fhir_resources_test_cases = {
 }
 
 
-def _assert_construct_core_resource(version, resource_label, filename):
+@pytest.fixture
+def factory():
+    return ResourceFactory()
+
+
+def _assert_construct_core_resource(
+    version, resource_label, filename, factory: ResourceFactory
+):
 
     with with_config(validation_mode="skip"):
         # Disable internet access to ensure we use local definitions
@@ -128,14 +133,14 @@ def _assert_construct_core_resource(version, resource_label, filename):
 
 @pytest.mark.integration
 @pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases["R4B"])
-def test_construct_R4B_core_resource(resource_label, filename):
-    _assert_construct_core_resource("R4B", resource_label, filename)
+def test_construct_R4B_core_resource(resource_label, filename, factory):
+    _assert_construct_core_resource("R4B", resource_label, filename, factory)
 
 
 @pytest.mark.integration
 @pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases["R5"])
-def test_construct_R5_core_resource(resource_label, filename):
-    _assert_construct_core_resource("R5", resource_label, filename)
+def test_construct_R5_core_resource(resource_label, filename, factory):
+    _assert_construct_core_resource("R5", resource_label, filename, factory)
 
 
 def _get_profiles_example_filenames(prefix):
@@ -167,7 +172,7 @@ fhir_profiles_test_cases = [
 )
 @pytest.mark.parametrize("filename", fhir_profiles_test_cases)
 @pytest.mark.filterwarnings("ignore:.*eld-24.*")
-def test_construct_profiled_resource(mode, filename):
+def test_construct_profiled_resource(mode, filename, factory):
     # Use the auto-generated model to validate a FHIR resource
     with open(
         os.path.join(os.path.abspath(f"{PROFILES_EXAMPLES_DIRECTORY}"), filename),
@@ -184,10 +189,11 @@ def test_construct_profiled_resource(mode, filename):
             factory.load_definitions_from_directory(Path(PROFILES_DEFINTIONS_DIRECTORY))
             factory.clear_cache()
         # Generate source code for Pydantic FHIR model
-        resource = construct_resource_model(
+        resource = factory.construct_resource_model(
             canonical_url=fhir_resource["meta"]["profile"][0],
             mode=mode,
         )
+        source_code = CodeGenerator().generate_resource_model_code(resource)
         assert (
             json.loads(resource.model_validate(fhir_resource).model_dump_json())
             == fhir_resource

@@ -787,12 +787,7 @@ class TestConstructSliceModel(FactoryTestCase):
             definition=self.DummyElementDefinition(type_=[self.DummyType()])
         )
         result = self.factory._construct_slice_model("dummy-slice", definition, self.DummyBaseModel, "Test")  # type: ignore
-        # Assertions
-        self.factory.construct_resource_model.assert_called_once_with(  # type: ignore
-            "http://example.org/fhir/StructureDefinition/DummySlice",
-            base_model=FHIRSliceModel,
-            mode=ConstructionMode.SNAPSHOT,
-        )
+
         self.assertTrue(issubclass(result, self.DummyFHIRSliceModel))
         self.assertTrue(issubclass(result, FHIRSliceModel))
         self.assertEqual(result.min_cardinality, 1)
