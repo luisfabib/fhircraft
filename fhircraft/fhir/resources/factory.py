@@ -1036,7 +1036,7 @@ class ResourceFactory:
             slice_subfields, slice_validators, slice_properties = (
                 self._process_FHIR_structure_into_Pydantic_components(
                     node,
-                    FHIRSliceModel,
+                    base or FHIRSliceModel,
                     resource_name=slice_model_name,
                 )
             )
