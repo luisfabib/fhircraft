@@ -231,6 +231,26 @@ class CodeGenerator:
                     if isinstance(item, BaseModel):
                         self._add_constant_value_imports(item)
 
+    def _track_pydantic_import(self, obj_name: str) -> None:
+        """
+        Adds a pydantic object to the import statements if not already present.
+
+        Args:
+            obj_name (str): The name of the pydantic object to import (e.g., 'Field', 'field_validator').
+        """
+        if obj_name not in self.import_statements["pydantic"]:
+            self.import_statements["pydantic"].append(obj_name)
+
+    def _track_typing_import(self, obj_name: str) -> None:
+        """
+        Adds a typing object to the import statements if not already present.
+
+        Args:
+            obj_name (str): The name of the typing object to import (e.g., 'ClassVar', 'List').
+        """
+        if obj_name not in self.import_statements["typing"]:
+            self.import_statements["typing"].append(obj_name)
+
     def _group_imports_by_common_parent(self) -> Dict[str, List[str]]:
         """
         Groups imports by their common parent modules to reduce redundancy.
@@ -334,19 +354,20 @@ class CodeGenerator:
         self._processing_models.add(model)
 
         try:
-            model_base = model.__base__
-            # Handle the base class: serialize custom bases, import built-in or framework models
+            # Handle ALL base classes: serialize custom bases, import built-in or framework models
             # This ensures non-built-in base models (from factory or tests) are included before requested models
-            if model_base and model_base != BaseModel:
-                if self._is_builtin_pydantic_model(model_base):
-                    # Pydantic built-in models should be imported
-                    self._add_import_statement(model_base)
-                elif self._is_fhir_framework_model(model_base):
-                    # FHIR framework models should be imported to avoid code duplication
-                    self._add_import_statement(model_base)
-                else:
-                    # Custom models (factory-generated, test-created, etc.) should be serialized and included
-                    self._serialize_model(model_base)
+            for model_base in model.__bases__:
+                if model_base:
+                    if self._is_builtin_pydantic_model(model_base):
+                        # Pydantic built-in models (including BaseModel) should be imported
+                        self._add_import_statement(model_base)
+                    elif self._is_fhir_framework_model(model_base):
+                        # FHIR framework models should be imported to avoid code duplication
+                        self._add_import_statement(model_base)
+                    elif model_base != BaseModel:
+                        # Custom models (factory-generated, test-created, etc.) should be serialized and included
+                        # Skip BaseModel itself as it's handled by _is_builtin_pydantic_model
+                        self._serialize_model(model_base)
 
             subdata = {}
             for field, info in model.model_fields.items():
@@ -411,6 +432,10 @@ class CodeGenerator:
                     "default": default,
                     "default_factory": default_factory,
                 }
+
+            # Track Field import if there are any fields
+            if subdata:
+                self._track_pydantic_import("Field")
 
             model_properties = {}
             for key, value in model.__dict__.items():
@@ -487,12 +512,34 @@ class CodeGenerator:
                             args=func_args,
                             keywords=func_kwargs,
                         )
+                        # Track validator imports
+                        if mode == "field":
+                            self._track_pydantic_import("field_validator")
+                        elif mode == "model":
+                            self._track_pydantic_import("model_validator")
                     else:
                         if validation_function in inherited_validator_functions:
                             continue  # Skip inherited validators
                         # Skip validators that are not partial functions as they likely come from inheritance
                         # or are defined differently and don't need to be regenerated
                         continue
+
+            # Track ClassVar import if model has min_cardinality/max_cardinality (FHIRSliceModel)
+            if hasattr(model, "min_cardinality") or hasattr(model, "max_cardinality"):
+                self._track_typing_import("ClassVar")
+
+            # Track FhirBaseModelKind import if model._kind is an instance of it
+            if kind := getattr(model, "_kind", None):
+                if (
+                    hasattr(kind, "__class__")
+                    and kind.__class__.__name__ == "FhirBaseModelKind"
+                ):
+                    # Import FhirBaseModelKind from base module
+                    from fhircraft.fhir.resources.base import (
+                        FhirBaseModelKind as FBMKind,
+                    )
+
+                    self._add_import_statement(FBMKind)
 
             self.data.update(
                 {
