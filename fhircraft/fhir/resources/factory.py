@@ -1666,11 +1666,6 @@ class ResourceFactory:
                 name
             )
 
-            # Prevent circular references
-            if self.in_snapshot_mode:
-                if base and name in base.model_fields:
-                    continue
-
             # -------------------------------------
             # Element content references
             # -------------------------------------
@@ -2158,6 +2153,7 @@ class ResourceFactory:
         Clears the factory cache.
         """
         self.construction_cache = {}
+        self.local_cache = {}
 
 
 # Create default factory instance
