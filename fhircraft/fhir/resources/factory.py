@@ -1924,6 +1924,23 @@ class ResourceFactory:
                     field_subfields["extension"] = self._construct_Pydantic_field(
                         extension_type, extension_min_card, extension_max_card
                     )
+                # If in differential mode, instead of BackboneElement, use the base model's backbone model
+                if (
+                    self.Config.construction_mode == ConstructionMode.DIFFERENTIAL
+                    and base
+                    and issubclass(base, BaseModel)
+                    and name in base.model_fields
+                ):
+                    from typing import get_args as get_type_args
+
+                    _field_type = get_type_args(base.model_fields[name].annotation)[0]
+                    while _field_type and not (
+                        inspect.isclass(_field_type)
+                        and issubclass(_field_type, BaseModel)
+                    ):
+                        _field_type = get_type_args(_field_type)[0]
+                    field_type = _field_type
+                # Construct the model for the element with children (backbone element)
                 field_type = self._construct_model_with_properties(
                     backbone_model_name,
                     fields=field_subfields,

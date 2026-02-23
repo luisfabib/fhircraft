@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+  {{ super() }}
+  <meta name="google-site-verification" content="WxBOYzoPwXEpbBzRPFEWMfnkd3QZMNjCuVtsikkDhgU" />
+{% endblock %}
+
 {% block announce %}
   <span class="twemoji">
     {% include ".icons/material/tools.svg" %}
