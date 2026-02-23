@@ -42,6 +42,26 @@ We welcome all types of contributions:
 
 No contribution is too small—every improvement counts!
 
+
+!!! info "AI Tools and Human Attribution"
+    
+    We **welcome** the use of AI tools and AI-based changes to help solve issues and implement features. However, contributions must be submitted by **humans** who take responsibility for the changes.
+    
+    **We do not accept:**
+    
+    - Automated bot-driven contributions or pull requests
+    - Unattended automated commits or pushes
+    - Autonomous AI agent contributions without human oversight
+    - Automated dependency update bots, auto-formatting bots, etc. without human review
+    
+    **What we do accept:**
+    
+    - Code and documentation created or improved with AI assistance (ChatGPT, Copilot, Claude, etc.)
+    - Any changes where **you (the human contributor) personally review, test, and validate** all code before submitting
+    - Pull requests from humans who take responsibility and attest to understanding every change
+    
+    **The key requirement:** The person submitting the contribution must be human and must personally verify that all changes are correct, tested, and align with project standards. You are responsible for attesting that you understand and agree with every change you submit.
+
 ---
 
 ## Quick Start for Contributors
