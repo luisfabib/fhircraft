@@ -110,14 +110,18 @@ def test_regression_issue_255(factory, generator):
 
     expected_code = '''
     class ProfileExampleSlicedCoding(Coding, FHIRSliceModel):
+        """
+        Code defined by a terminology system
+        """
         min_cardinality: ClassVar[int] = 1
         max_cardinality: ClassVar[int] = 1
     
-    
         system: Optional[Uri] = Field(
+            description="Identity of the terminology system",
             default="http://example.org",
         )
         code: Optional[Code] = Field(
+            description="Symbol in syntax defined by the system",
             default="12345-6",
         )
 
@@ -142,6 +146,7 @@ def test_regression_issue_255(factory, generator):
     
 
         coding: Optional[List[Annotated[Union[ProfileExampleSlicedCoding, Coding], Field(union_mode='left_to_right')]]] = Field(
+            description="Code defined by a terminology system",
             default=None,
         )
         
@@ -324,6 +329,7 @@ def test_regression_issue_111(factory, generator):
         """
             
         text: Optional[String] = Field(
+            description="Plain text representation of the concept",
             default="Tumor Board Review",
         )
         
@@ -429,14 +435,19 @@ def test_regression_issue_263(factory, generator):
 
     expected_code = '''    
     class VitalspanelVitalsPanelCode(Coding, FHIRSliceModel):
+        """
+        Code defined by a terminology system
+        """
         min_cardinality: ClassVar[int] = 0
         max_cardinality: ClassVar[int] = 1
 
 
         system: Optional[Uri] = Field(
+            description="Identity of the terminology system",
             default="http://loinc.org",
         )
         code: Optional[Code] = Field(
+            description="Symbol in syntax defined by the system",
             default="85353-1",
         )
 
@@ -460,8 +471,8 @@ def test_regression_issue_263(factory, generator):
         Describes what was observed. Sometimes this is called the observation "name".
         """
 
-
         coding: Optional[List[Annotated[Union[VitalspanelVitalsPanelCode, Coding], Field(union_mode='left_to_right')]]] = Field(
+            description="Code defined by a terminology system",
             default=None,
         )
         
@@ -527,8 +538,6 @@ def test_regression_issue_262():
     assert isinstance(instance, ExamplePatient)
     assert instance.name
     assert instance.name[0].given == ["John"]
-
-
 
 
 def test_regression_issue_265(factory, generator):
@@ -747,3 +756,160 @@ def test_regression_issue_266(factory, generator):
         source_code.count("class ") == 2
     ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
 
+
+def test_regression_issue_279(factory, generator):
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "my-condition",
+        "url": "http://example.org/fhir/StructureDefinition/condition",
+        "name": "MyCondition",
+        "title": "Condition Profile",
+        "status": "active",
+        "description": "A description",
+        "fhirVersion": "4.0.1",
+        "kind": "resource",
+        "abstract": False,
+        "type": "Condition",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Condition",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {
+                    "id": "Condition.clinicalStatus.extension:slice1",
+                    "path": "Condition.clinicalStatus.extension",
+                    "sliceName": "slice1",
+                    "min": 0,
+                    "max": "1",
+                    "type": [
+                        {
+                            "code": "Extension",
+                            "profile": [
+                                "http://example.org/fhir/StructureDefinition/my-extension-1"
+                            ],
+                        }
+                    ],
+                },
+                {
+                    "id": "Condition.clinicalStatus.extension:slice2",
+                    "path": "Condition.clinicalStatus.extension",
+                    "sliceName": "slice2",
+                    "min": 0,
+                    "max": "1",
+                    "type": [
+                        {
+                            "code": "Extension",
+                            "profile": [
+                                "http://example.org/fhir/StructureDefinition/my-extension-2"
+                            ],
+                        }
+                    ],
+                },
+            ]
+        },
+    }
+
+    extension_1_structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "my-extension-1",
+        "url": "http://example.org/fhir/StructureDefinition/my-extension-1",
+        "name": "MyExtension1",
+        "title": "My Extension 1",
+        "status": "active",
+        "description": "A description of my extension 1.",
+        "fhirVersion": "4.0.1",
+        "kind": "complex-type",
+        "abstract": False,
+        "context": [
+            {"expression": "Condition.clinicalStatus.extension", "type": "element"}
+        ],
+        "type": "Extension",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Extension", "path": "Extension"},
+                {
+                    "id": "Extension.url",
+                    "path": "Extension.url",
+                    "fixedUri": "http://example.org/fhir/StructureDefinition/my-extension-1",
+                },
+                {
+                    "id": "Extension.value[x]",
+                    "path": "Extension.value[x]",
+                    "type": [{"code": "CodeableConcept"}],
+                    "binding": {
+                        "strength": "required",
+                        "valueSet": "http://example.org/fhir/ValueSet/my-value-set-1",
+                    },
+                },
+            ]
+        },
+    }
+
+    extension_2_structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "my-extension-2",
+        "url": "http://example.org/fhir/StructureDefinition/my-extension-2",
+        "name": "MyExtension2",
+        "title": "My Extension 2",
+        "status": "active",
+        "description": "A description of my extension 2.",
+        "fhirVersion": "4.0.1",
+        "kind": "complex-type",
+        "abstract": False,
+        "context": [
+            {"expression": "Condition.clinicalStatus.extension", "type": "element"}
+        ],
+        "type": "Extension",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {"id": "Extension", "path": "Extension"},
+                {
+                    "id": "Extension.url",
+                    "path": "Extension.url",
+                    "fixedUri": "http://example.org/fhir/StructureDefinition/my-extension-2",
+                },
+                {
+                    "id": "Extension.value[x]",
+                    "path": "Extension.value[x]",
+                    "type": [{"code": "Reference"}],
+                },
+            ]
+        },
+    }
+
+    factory.configure_repository(
+        definitions=[
+            structure_definition,
+            extension_1_structure_definition,
+            extension_2_structure_definition,
+        ]
+    )
+
+    model = factory.construct_resource_model(
+        structure_definition=structure_definition, mode="differential"
+    )
+
+    source_code = generator.generate_resource_model_code(model)
+
+    expected_code = """    
+    class MyExtension1(Extension, FHIRSliceModel):
+    """
+    assertBlockInCode(source_code, expected_code.strip())
+
+    expected_code = """    
+    class MyExtension2(Extension, FHIRSliceModel):
+    """
+    assertBlockInCode(source_code, expected_code.strip())
+
+    expected_code = """    
+    class MyConditionClinicalStatus(CodeableConcept):
+    """
+    assertBlockInCode(source_code, expected_code.strip())
+
+    assert (
+        source_code.count("class ") == 4
+    ), f"Expected exactly 4 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
