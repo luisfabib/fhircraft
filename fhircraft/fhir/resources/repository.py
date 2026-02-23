@@ -20,6 +20,7 @@ from fhircraft.fhir.packages import (
 from fhircraft.fhir.resources.datatypes.R4.core import (
     StructureDefinition as StructureDefinitionR4,
 )
+from fhircraft.fhir.resources.indexer import Manifest
 from fhircraft.fhir.resources.datatypes.R4B.core import (
     StructureDefinition as StructureDefinitionR4B,
 )
@@ -798,35 +799,60 @@ class CompositeStructureDefinitionRepository(
                 # Package repository couldn't find it, continue to internet fallback
                 pass
 
-        # Last chance, lookg for canonical resource definition
-        # Try to find the resource in the local FHIR definitions bundle if available
+        # Last chance, look for indexed definitions
+        # Try to find the resource using the manifest-based indexer
         current_file_path = Path(__file__).resolve()
-        profiles_path = (
-            current_file_path.parent
-            / "definitions"
-            / get_FHIR_release_from_version(version or "4.0.0")
-            / "profiles-resources.json"
-        )
-        if profiles_path.exists():
-            with open(profiles_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                entry = next(
-                    (
-                        entry
-                        for entry in data["entry"]
-                        if entry["resource"]["url"] == canonical_url
-                        and entry["resource"]["resourceType"] == "StructureDefinition"
-                    ),
-                    None,
-                )
-                if entry:
-                    # Detect FHIR version and use appropriate class
-                    detected_version = detect_fhir_version_from_data(entry["resource"])
-                    structure_def = validate_structure_definition(
-                        entry["resource"], detected_version
-                    )
-                    self.add(structure_def)
-                    return structure_def
+        release = get_FHIR_release_from_version(version or target_version or "4.0.0")
+        definitions_dir = current_file_path.parent / "definitions" / release
+        manifest_path = definitions_dir / ".manifest.json"
+
+        if manifest_path.exists():
+            # Load manifest
+            manifest = Manifest.load(manifest_path)
+
+            # Try to find by URL first
+            if base_url in manifest.by_url:
+                filename = manifest.by_url[base_url]
+                file_path = definitions_dir / "entries" / filename
+
+                if file_path.exists():
+                    try:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+
+                        # Detect FHIR version and validate
+                        detected_version = detect_fhir_version_from_data(data)
+                        structure_def = validate_structure_definition(
+                            data, detected_version
+                        )
+                        self.add(structure_def)
+                        return structure_def
+                    except (json.JSONDecodeError, ValidationError) as e:
+                        # Log error but continue to fallback
+                        pass
+
+            # Try to find by name
+            resource_name = base_url.split("/")[-1]  # Extract name from URL
+            if resource_name in manifest.by_name:
+                urls = manifest.by_name[resource_name]
+                for url in urls:
+                    if url in manifest.by_url:
+                        filename = manifest.by_url[url]
+                        file_path = definitions_dir / "entries" / filename
+
+                        if file_path.exists():
+                            try:
+                                with open(file_path, "r", encoding="utf-8") as f:
+                                    data = json.load(f)
+
+                                detected_version = detect_fhir_version_from_data(data)
+                                structure_def = validate_structure_definition(
+                                    data, detected_version
+                                )
+                                self.add(structure_def)
+                                return structure_def
+                            except (json.JSONDecodeError, ValidationError):
+                                continue
 
         # Fall back to internet if enabled
         if self._internet_enabled:
