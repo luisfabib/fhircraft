@@ -1036,3 +1036,65 @@ def test_regression_issue_278(factory, generator):
     assert (
         source_code.count("class ") == 2
     ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+
+
+def test_regression_issue_277(factory, generator):
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "my-adverse-event",
+        "url": "http://example.org/fhir/StructureDefinition/my-adverse-event",
+        "name": "MyAdverseEvent",
+        "title": "Adverse Event Profile",
+        "status": "active",
+        "description": "A description",
+        "fhirVersion": "4.0.1",
+        "kind": "resource",
+        "abstract": False,
+        "type": "AdverseEvent",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/AdverseEvent",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {
+                    "id": "AdverseEvent",
+                    "path": "AdverseEvent",
+                    "short": "Adverse Event Profile",
+                    "definition": "A description",
+                    "min": 0,
+                    "max": "*",
+                },
+                {
+                    "id": "AdverseEvent.suspectEntity",
+                    "path": "AdverseEvent.suspectEntity",
+                },
+                {
+                    "id": "AdverseEvent.suspectEntity.instance",
+                    "path": "AdverseEvent.suspectEntity.instance",
+                    "type": [
+                        {
+                            "code": "Reference",
+                            "targetProfile": [
+                                "http://example.org/fhir/StructureDefinition/example-medication",
+                            ],
+                        }
+                    ],
+                },
+            ]
+        },
+    }
+
+    model = factory.construct_resource_model(
+        structure_definition=structure_definition, mode="differential"
+    )
+
+    source_code = generator.generate_resource_model_code(model)
+
+    expected_code = """    
+    class MyAdverseEventSuspectEntity(AdverseEventSuspectEntity):
+    """
+    assertBlockInCode(source_code, expected_code.strip())
+
+    assert (
+        source_code.count("class ") == 2
+    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
