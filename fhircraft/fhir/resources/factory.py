@@ -600,7 +600,7 @@ class ResourceFactory:
                                     element.id if index == len(id_parts) - 1 else None
                                 ),
                                 "path": (
-                                    element.path if index == len(id_parts) - 1 else None
+                                    element.path if index == len(id_parts) - 1 else ".".join(id_parts[: index + 1])
                                 ),
                                 "definition": (
                                     element if index == len(id_parts) - 1 else None
@@ -622,7 +622,7 @@ class ResourceFactory:
                                     element.id if index == len(id_parts) - 1 else None
                                 ),
                                 "path": (
-                                    element.path if index == len(id_parts) - 1 else None
+                                    element.path if index == len(id_parts) - 1 else ".".join(id_parts[: index + 1])
                                 ),
                                 "definition": (
                                     element if index == len(id_parts) - 1 else None
