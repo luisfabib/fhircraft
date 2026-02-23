@@ -293,15 +293,15 @@ When you provide a canonical URL to Fhircraft, the library follows a resolution 
 The canonical URL serves as the primary way to request structure definitions from the factory. Once you know the URL for a structure definition, you can construct a model from it regardless of whether that definition came from a local file, a package, or an internet download. This abstraction simplifies your code because you do not need to know or manage where definitions are stored.
 
 ```python
-from fhircraft.fhir.resources.factory import construct_resource_model
+from fhircraft.fhir.resources.factory import factory
 
 # Create a model from the standard FHIR Patient definition
-Patient = construct_resource_model(
+Patient = factory.construct_resource_model(
     canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
 )
 
 # Create a model from a US Core profile
-USCorePatient = construct_resource_model(
+USCorePatient = factory.construct_resource_model(
     canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
 )
 
@@ -323,10 +323,10 @@ Structure definitions evolve over time as healthcare standards mature and requir
 Two methods exist for specifying versions. You can append the version to the canonical URL using a vertical bar separator, following the [FHIR canonical reference format](https://www.hl7.org/fhir/references.html#canonical) (for example, `http://example.org/StructureDefinition/Patient|1.0.0`). Alternatively, you can pass the version as a separate parameter. Both approaches produce the same result, so choose whichever fits your code style
 
 ```python
-from fhircraft.fhir.resources.factory import construct_resource_model
+from fhircraft.fhir.resources.factory import factory
 
 # Request a specific version by adding it to the URL
-PatientR4 = construct_resource_model(
+PatientR4 = factory.construct_resource_model(
     canonical_url="http://hl7.org/fhir/StructureDefinition/Patient|4.0.1"
 )
 

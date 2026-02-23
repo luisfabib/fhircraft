@@ -347,15 +347,27 @@ class FHIRMappingEngine:
         for s in structure_map.structure:
             if s.mode != mode:
                 continue
-            if not s.url:
+            if not (canonical_url := s.url):
                 logger.warning(
                     f"Structure definition for mode {mode} is missing URL. "
                     f"Data for this structure will be treated as arbitrary."
                 )
                 resolved[s.alias or "arbitrary"] = ArbitraryModel
                 continue
+            # Handle core FHIR types with known canonical URLs to avoid unnecessary repository lookups
+            if canonical_url.startswith("http://hl7.org/fhir/StructureDefinition/"):
+                from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+
+                core_type = canonical_url.removeprefix(
+                    "http://hl7.org/fhir/StructureDefinition/"
+                )
+                try:
+                    resolved[s.alias or core_type] = get_fhir_resource_type(core_type)
+                    return resolved
+                except AttributeError:
+                    pass
             try:
-                structure_def = self.repository.get(s.url)
+                structure_def = self.repository.get(canonical_url)
                 model = self.factory.construct_resource_model(
                     structure_definition=structure_def
                 )
@@ -363,11 +375,11 @@ class FHIRMappingEngine:
             except (KeyError, ValueError, AttributeError) as e:
                 # If StructureDefinition not found, log warning but continue
                 logger.warning(
-                    f"Could not resolve structure definition for {s.url}: {e}. "
+                    f"Could not resolve structure definition for {canonical_url}: {e}. "
                     f"Data for this structure will be treated as arbitrary."
                 )
                 # Mark as no model validation available
-                resolved[s.alias or s.url] = ArbitraryModel
+                resolved[s.alias or canonical_url] = ArbitraryModel
 
         return resolved
 

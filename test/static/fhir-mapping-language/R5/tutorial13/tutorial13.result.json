@@ -6,7 +6,6 @@
   "f2": [
     {
       "resourceType": "Basic",
-      "meta": {"profile": ["http://hl7.org/fhir/StructureDefinition/Basic"]},
       "id": "1",
       "code": {
         "text": "test"

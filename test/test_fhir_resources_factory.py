@@ -3375,8 +3375,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         },
                     },
                     {
-                        "id": "Resource.component:systolic.valueQuantity",
-                        "path": "Resource.component.valueQuantity",
+                        "id": "Resource.component:systolic.value[x]",
+                        "path": "Resource.component.value[x]",
                         "min": 1,
                         "max": "1",
                         "type": [{"code": "Quantity"}],
@@ -3396,8 +3396,8 @@ class TestFactoryDifferentialConstruction(FactoryTestCase):
                         },
                     },
                     {
-                        "id": "Resource.component:diastolic.valueQuantity",
-                        "path": "Resource.component.valueQuantity",
+                        "id": "Resource.component:diastolic.value[x]",
+                        "path": "Resource.component.value[x]",
                         "min": 1,
                         "max": "1",
                         "type": [{"code": "Quantity"}],

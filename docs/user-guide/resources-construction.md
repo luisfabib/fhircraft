@@ -262,10 +262,7 @@ patient = CustomPatient(
     This recipe shows the complete workflow for working with an implementation guide. You load the package, construct models for the profiles, and use those models with profile-specific validation.
 
     ```python
-    from fhircraft.fhir.resources.factory import ResourceFactory
-
-    # Create a factory with package support enabled
-    factory = ResourceFactory(enable_packages=True)
+    from fhircraft.fhir.resources.factory import factory
 
     # Load the US Core implementation guide
     # See managing-fhir-artifacts.md for package loading details

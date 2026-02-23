@@ -5,6 +5,7 @@ Pydantic FHIR Model Factory
 
 import inspect
 import keyword
+import re
 import warnings
 
 # Standard modules
@@ -1260,43 +1261,114 @@ class ResourceFactory:
         Returns:
             List of merged elements with complete property information
         """
+
         if not base_structure_definition or not base_structure_definition.snapshot:
             return differential_elements
 
         # Create a lookup map for base snapshot elements
         base_snapshot_map = {
-            elem.id: elem for elem in (base_structure_definition.snapshot.element or [])
+            elem.id.split(".", 1)[1] if elem.id and "." in elem.id else "": elem
+            for elem in (base_structure_definition.snapshot.element or [])
         }
-        merged_elements = []
-        for diff_elem in differential_elements:
+        merged_elements = {}
+
+        def _merge_element(
+            id: str,
+            element: (
+                R4_ElementDefinition
+                | R4B_ElementDefinition
+                | R5_ElementDefinition
+                | None
+            ) = None,
+        ):
+            query_id = id.split(".", 1)[1] if id and "." in id else ""
             # For slice children, strip the slice name when looking up base element
             # e.g., "MockBase.component:systolic.code" -> "MockBase.component.code"
-            if (
-                diff_elem.id
-                and (not diff_elem.id in base_snapshot_map)
-                and (":" in diff_elem.id)
-            ):
+            if (not query_id in base_snapshot_map) and (":" in id):
                 # Replace "element:sliceName" with "element" in the ID
-                parts = diff_elem.id.split(".")
-                normalized_parts = [part.split(":")[0] for part in parts]
-                base_elem = base_snapshot_map.get(".".join(normalized_parts))
+                parts = query_id.split(".")
+                slice_path = ".".join([part.split(":")[0] for part in parts])
+                base_elem = base_snapshot_map.get(slice_path)
             else:
-                base_elem = base_snapshot_map.get(diff_elem.id)
+                slice_path = None
+                base_elem = base_snapshot_map.get(query_id)
+            # Merge properties from base element if not explicitly set in differential
             if base_elem:
-                for field_name in (
-                    "min",
-                    "max",
-                    "type",
-                    "definition",
-                    "short",
-                ):
-                    if not getattr(diff_elem, field_name, None):
-                        setattr(
-                            diff_elem, field_name, getattr(base_elem, field_name, None)
+                if base_elem.type and (datatype := base_elem.type[0].code):
+                    try:
+                        element_sd = self.repository.get(
+                            "http://hl7.org/fhir/StructureDefinition/" + datatype,
+                            self.Config.FHIR_version,
                         )
-            merged_elements.append(diff_elem)
+                        for el in (
+                            element_sd.snapshot.element
+                            if element_sd.snapshot and element_sd.snapshot.element
+                            else []
+                        ):
+                            subpath = (el.id or el.path or "").removeprefix(
+                                datatype + "."
+                            )
+                            base_snapshot_map[f"{query_id}.{subpath}"] = el.__class__(
+                                id=f"{id}.{subpath}",
+                                path=f"{slice_path or id}.{subpath}",
+                                **el.model_dump(
+                                    include={
+                                        "min",
+                                        "max",
+                                        "type",
+                                        "definition",
+                                        "short",
+                                    }
+                                ),
+                            )
+                    except:
+                        pass
+                if element:
+                    for field_name in (
+                        "min",
+                        "max",
+                        "type",
+                        "definition",
+                        "short",
+                    ):
+                        if not getattr(element, field_name, None):
+                            setattr(
+                                element,
+                                field_name,
+                                getattr(base_elem, field_name, None),
+                            )
+                    merged_elements[id] = element
+                else:
+                    merged_elements[id] = base_elem.__class__(
+                        id=base_elem.id,
+                        path=base_elem.path,
+                        **base_elem.model_dump(
+                            include={
+                                "min",
+                                "max",
+                                "type",
+                                "definition",
+                                "short",
+                            }
+                        ),
+                    )
 
-        return merged_elements
+        for diff_elem in differential_elements:
+            if not diff_elem.id:
+                continue
+            path = ""
+            for segment in re.split(r"[\.\:]", diff_elem.id):
+                separator = diff_elem.id[len(path)] if path else "."
+                path = f"{path}{separator}{segment}" if path else segment
+                if path in merged_elements:
+                    continue
+                # Build up the path segment by segment to ensure all parent elements are merged
+                _merge_element(
+                    path,
+                    element=diff_elem if path == diff_elem.id else None,
+                )
+
+        return list(merged_elements.values())
 
     def _merge_differential_with_base_snapshot(
         self,
@@ -2020,42 +2092,41 @@ class ResourceFactory:
 
         # Determine the base model and StructureDefinition to inherit from
         _base_structure_definition = None
-        if not (base := base_model):
-            # For DIFFERENTIAL mode, we must resolve the base definition
-            if resolved_mode == ConstructionMode.DIFFERENTIAL:
-                if base_canonical_url := _structure_definition.baseDefinition:
-                    # Resolve and store the base StructureDefinition for snapshot merging
-                    try:
-                        _base_structure_definition = self.resolve_structure_definition(
-                            base_canonical_url, version=structure_definition.fhirVersion  # type: ignore
-                        )
-                    except Exception as e:
-                        # Base StructureDefinition not in repository
-                        # It may have been constructed inline - we'll construct without snapshot merging
-                        pass
-                    base = self._resolve_and_construct_base_model(
-                        base_canonical_url, _structure_definition
+        # For DIFFERENTIAL mode, we must resolve the base definition
+        if resolved_mode == ConstructionMode.DIFFERENTIAL:
+            if base_canonical_url := _structure_definition.baseDefinition:
+                # Resolve and store the base StructureDefinition for snapshot merging
+                try:
+                    _base_structure_definition = self.resolve_structure_definition(
+                        base_canonical_url, version=structure_definition.fhirVersion  # type: ignore
                     )
-                    resolved_base_sd = self.repository.get(base_canonical_url)
-                    # Use resolved StructureDefinition if we didn't get it from repository
-                    if not _base_structure_definition and resolved_base_sd:
-                        _base_structure_definition = resolved_base_sd
-                else:
-                    warnings.warn(
-                        f"DIFFERENTIAL mode for '{_structure_definition.name}' but no baseDefinition specified. "
-                        "Using FHIRBaseModel as base."
-                    )
-                    base = FHIRBaseModel
-            # For SNAPSHOT mode, check if there's a baseDefinition to inherit from
-            elif base_canonical_url := _structure_definition.baseDefinition:
-                if not (base := self.construction_cache.get(base_canonical_url)):
-                    try:
-                        base = self._resolve_FHIR_type(base_canonical_url)
-                        assert inspect.isclass(base) and issubclass(base, FHIRBaseModel)
-                    except:
-                        base = FHIRBaseModel
+                except Exception as e:
+                    # Base StructureDefinition not in repository
+                    # It may have been constructed inline - we'll construct without snapshot merging
+                    pass
+                base = self._resolve_and_construct_base_model(
+                    base_canonical_url, _structure_definition
+                )
+                resolved_base_sd = self.repository.get(base_canonical_url)
+                # Use resolved StructureDefinition if we didn't get it from repository
+                if not _base_structure_definition and resolved_base_sd:
+                    _base_structure_definition = resolved_base_sd
             else:
+                warnings.warn(
+                    f"DIFFERENTIAL mode for '{_structure_definition.name}' but no baseDefinition specified. "
+                    "Using FHIRBaseModel as base."
+                )
                 base = FHIRBaseModel
+        # For SNAPSHOT mode, check if there's a baseDefinition to inherit from
+        elif base_canonical_url := _structure_definition.baseDefinition:
+            if not (base := self.construction_cache.get(base_canonical_url)):
+                try:
+                    base = self._resolve_FHIR_type(base_canonical_url)
+                    assert inspect.isclass(base) and issubclass(base, FHIRBaseModel)
+                except:
+                    base = FHIRBaseModel
+        else:
+            base = FHIRBaseModel
 
         # Select element source based on mode
         if resolved_mode == ConstructionMode.DIFFERENTIAL:
@@ -2077,7 +2148,7 @@ class ResourceFactory:
             elements = _structure_definition.snapshot.element
         if not elements:
             raise ValueError(
-                f"StructureDefinition '{_structure_definition.name}' has no elements to process."
+                f"StructureDefinition {'differential' if resolved_mode == ConstructionMode.DIFFERENTIAL else 'snapshot'} '{_structure_definition.name}' has no elements to process."
             )
         # Pre-process the elements into a tree structure to simplify model construction later
         nodes = self._build_element_tree_structure(elements)
