@@ -760,6 +760,195 @@ class TestJinjaTemplateRendering(unittest.TestCase):
         """
         self.assertBlockInCode(expected_block, grand_child_model)
 
+    def test_property_inheritance_skips_identical_property(self):
+        """Test that inherited properties with identical implementations are skipped."""
+        # Create a base model with a property
+        base_model = _create_model(
+            "BaseModelWithProperty",
+            valueString=(primitives.String, Field(description="A value.")),
+            __base__=(BaseModel,),
+        )
+        setattr(
+            base_model,
+            "value",
+            property(
+                partial(fhir_validators.get_type_choice_value_by_base, base="value")
+            ),
+        )
+
+        # Create a derived model that inherits the same property
+        derived_model = _create_model(
+            "DerivedModelWithInheritedProperty",
+            valueInteger=(primitives.Integer, Field(description="Another value.")),
+            __base__=(base_model,),
+        )
+        # Inherit the property by setting it to the same implementation
+        setattr(
+            derived_model,
+            "value",
+            property(
+                partial(fhir_validators.get_type_choice_value_by_base, base="value")
+            ),
+        )
+
+        code = generate_resource_model_code(derived_model)
+        # The property should NOT be in the derived model code since it's identical to the base
+        # Count how many @property decorators appear in the generated code for the derived model
+        lines = code.split("\n")
+        derived_class_started = False
+        derived_class_property_count = 0
+        for line in lines:
+            if "class DerivedModelWithInheritedProperty" in line:
+                derived_class_started = True
+            elif derived_class_started and line.strip().startswith("class "):
+                # Another class started, so we're done with derived model
+                break
+            elif derived_class_started and "@property" in line:
+                derived_class_property_count += 1
+
+        self.assertEqual(
+            derived_class_property_count,
+            0,
+            "Identical inherited property should not be in generated code for derived model",
+        )
+
+    def test_property_inheritance_includes_overridden_property(self):
+        """Test that properties with different implementations are included."""
+        # Create a base model with a property
+        base_model = _create_model(
+            "BaseModelWithOriginalProperty",
+            valueString=(primitives.String, Field(description="A value.")),
+            __base__=(BaseModel,),
+        )
+        setattr(
+            base_model,
+            "value",
+            property(
+                partial(fhir_validators.get_type_choice_value_by_base, base="value")
+            ),
+        )
+
+        # Create a derived model that overrides the property with different implementation
+        derived_model = _create_model(
+            "DerivedModelWithOverriddenProperty",
+            valueInteger=(primitives.Integer, Field(description="Another value.")),
+            __base__=(base_model,),
+        )
+        # Override the property with different base parameter
+        setattr(
+            derived_model,
+            "value",
+            property(
+                partial(
+                    fhir_validators.get_type_choice_value_by_base, base="different_base"
+                )
+            ),
+        )
+
+        code = generate_resource_model_code(derived_model)
+        # The property SHOULD be in the derived model code since it's different
+        expected_block = """
+        class DerivedModelWithOverriddenProperty(BaseModelWithOriginalProperty):
+            valueInteger: Integer = Field(
+                description="Another value.",
+            )
+
+            @property 
+            def value(self):
+                return get_type_choice_value_by_base(self,
+                    base="different_base", 
+                )
+        """
+        self.assertBlockInCode(expected_block, derived_model)
+
+    def test_property_inheritance_includes_new_property(self):
+        """Test that new properties not in base class are included."""
+        # Create a base model without any property
+        base_model = _create_model(
+            "BaseModelWithoutProperty",
+            valueString=(primitives.String, Field(description="A value.")),
+            __base__=(BaseModel,),
+        )
+
+        # Create a derived model that adds a new property
+        derived_model = _create_model(
+            "DerivedModelWithNewProperty",
+            valueInteger=(primitives.Integer, Field(description="Another value.")),
+            __base__=(base_model,),
+        )
+        # Add a new property that doesn't exist in base
+        setattr(
+            derived_model,
+            "newProperty",
+            property(
+                partial(fhir_validators.get_type_choice_value_by_base, base="value")
+            ),
+        )
+
+        code = generate_resource_model_code(derived_model)
+        # The new property SHOULD be in the derived model code
+        expected_block = """
+        class DerivedModelWithNewProperty(BaseModelWithoutProperty):
+            valueInteger: Integer = Field(
+                description="Another value.",
+            )
+
+            @property 
+            def newProperty(self):
+                return get_type_choice_value_by_base(self,
+                    base="value", 
+                )
+        """
+        self.assertBlockInCode(expected_block, derived_model)
+
+    def test_property_inheritance_multiple_levels(self):
+        """Test property inheritance checking across multiple levels of inheritance."""
+        # Create a grandparent model with a property
+        grandparent_model = _create_model(
+            "GrandparentWithProperty",
+            value=(primitives.String, Field(description="A value.")),
+            __base__=(BaseModel,),
+        )
+        setattr(
+            grandparent_model,
+            "computedValue",
+            property(
+                partial(fhir_validators.get_type_choice_value_by_base, base="value")
+            ),
+        )
+
+        # Create a parent model that inherits from grandparent
+        parent_model = _create_model(
+            "ParentModel",
+            parentField=(primitives.String, Field(description="Parent field.")),
+            __base__=(grandparent_model,),
+        )
+
+        # Create a child model that inherits from parent but doesn't override the property
+        child_model = _create_model(
+            "ChildModel",
+            childField=(primitives.String, Field(description="Child field.")),
+            __base__=(parent_model,),
+        )
+
+        code = generate_resource_model_code(child_model)
+        # The computedValue property should NOT be in child model since it's inherited
+        lines = code.split("\n")
+        child_class_started = False
+        child_class_has_property = False
+        for line in lines:
+            if "class ChildModel" in line:
+                child_class_started = True
+            elif child_class_started and line.strip().startswith("class "):
+                break
+            elif child_class_started and "@property" in line:
+                child_class_has_property = True
+
+        self.assertFalse(
+            child_class_has_property,
+            "Inherited property should not appear in child class",
+        )
+
 
 @pytest.mark.parametrize(
     "model",

@@ -437,9 +437,53 @@ class CodeGenerator:
             if subdata:
                 self._track_pydantic_import("Field")
 
+            def get_all_inherited_properties(base_class):
+                """Recursively collect property getters from all base classes."""
+                properties = {}
+                for base in base_class.__bases__:
+                    if not issubclass(base, BaseModel):
+                        continue
+                    for key, value in base.__dict__.items():
+                        if isinstance(value, property) and value.fget:
+                            properties[key] = value.fget
+                    properties.update(get_all_inherited_properties(base))
+                return properties
+
+            def properties_are_equivalent(current_getter, inherited_getter):
+                """Check if two property getters are equivalent based on their implementation."""
+                # If both are partial functions, compare their func, args, and keywords
+                if isinstance(current_getter, functools.partial) and isinstance(
+                    inherited_getter, functools.partial
+                ):
+                    if current_getter.func != inherited_getter.func:
+                        return False
+                    if current_getter.args != inherited_getter.args:
+                        return False
+                    if current_getter.keywords != inherited_getter.keywords:
+                        return False
+                    return True
+
+                # Try to compare by source code if available
+                try:
+                    current_source = inspect.getsource(current_getter)
+                    inherited_source = inspect.getsource(inherited_getter)
+                    return current_source == inherited_source
+                except (OSError, TypeError):
+                    # If source is not available, consider them different
+                    return False
+
+            inherited_properties = get_all_inherited_properties(model)
+
             model_properties = {}
             for key, value in model.__dict__.items():
                 if isinstance(value, property):
+                    # Check if inherited and if implementations are equivalent
+                    if key in inherited_properties:
+                        if properties_are_equivalent(
+                            value.fget, inherited_properties[key]
+                        ):
+                            continue  # Skip if property exists in base class with same implementation
+
                     if not value.fget:
                         raise ValueError(
                             f"Property {key} does not have a getter function."
