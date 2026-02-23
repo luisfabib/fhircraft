@@ -54,6 +54,9 @@ extra:
       link: https://github.com/luisfabib/fhircraft
     - icon: fontawesome/brands/python 
       link: https://pypi.org/project/fhircraft/
+  meta:
+    - name: google-site-verification
+      content: WxBOYzoPwXEpbBzRPFEWMfnkd3QZMNjCuVtsikkDhgU
 
 markdown_extensions:
   - attr_list
