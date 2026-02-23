@@ -1267,7 +1267,8 @@ class ResourceFactory:
 
         # Create a lookup map for base snapshot elements
         base_snapshot_map = {
-            elem.id: elem for elem in (base_structure_definition.snapshot.element or [])
+            elem.id.split(".", 1)[1] if elem.id and "." in elem.id else "": elem
+            for elem in (base_structure_definition.snapshot.element or [])
         }
         merged_elements = {}
 
@@ -1280,16 +1281,17 @@ class ResourceFactory:
                 | None
             ) = None,
         ):
+            query_id = id.split(".", 1)[1] if id and "." in id else ""
             # For slice children, strip the slice name when looking up base element
             # e.g., "MockBase.component:systolic.code" -> "MockBase.component.code"
-            if (not id in base_snapshot_map) and (":" in id):
+            if (not query_id in base_snapshot_map) and (":" in id):
                 # Replace "element:sliceName" with "element" in the ID
-                parts = id.split(".")
+                parts = query_id.split(".")
                 slice_path = ".".join([part.split(":")[0] for part in parts])
                 base_elem = base_snapshot_map.get(slice_path)
             else:
                 slice_path = None
-                base_elem = base_snapshot_map.get(id)
+                base_elem = base_snapshot_map.get(query_id)
             # Merge properties from base element if not explicitly set in differential
             if base_elem:
                 if base_elem.type and (datatype := base_elem.type[0].code):
@@ -1306,7 +1308,7 @@ class ResourceFactory:
                             subpath = (el.id or el.path or "").removeprefix(
                                 datatype + "."
                             )
-                            base_snapshot_map[f"{id}.{subpath}"] = el.__class__(
+                            base_snapshot_map[f"{query_id}.{subpath}"] = el.__class__(
                                 id=f"{id}.{subpath}",
                                 path=f"{slice_path or id}.{subpath}",
                                 **el.model_dump(
@@ -2147,7 +2149,7 @@ class ResourceFactory:
             elements = _structure_definition.snapshot.element
         if not elements:
             raise ValueError(
-                f"StructureDefinition '{_structure_definition.name}' has no elements to process."
+                f"StructureDefinition {'differential' if resolved_mode == ConstructionMode.DIFFERENTIAL else 'snapshot'} '{_structure_definition.name}' has no elements to process."
             )
         # Pre-process the elements into a tree structure to simplify model construction later
         nodes = self._build_element_tree_structure(elements)

@@ -55,15 +55,17 @@ def mock_configure_repository(
             self, definitions=definitions, internet_enabled=internet_enabled
         )
     elif packages:
-        return _original_configure_repository(
-            self, packages=packages, internet_enabled=internet_enabled
-        )
+        return mock_load_package(self, *packages[0])
     else:
         raise ValueError("Either directory/files or definitions must be provided.")
 
 
 def mock_construct_resource_model(
-    self, canonical_url=None, structure_definition=None, mode=None
+    self,
+    canonical_url=None,
+    structure_definition=None,
+    mode=None,
+    **kwargs,
 ):
     """Mock construct_resource_model"""
     if canonical_url:
@@ -72,6 +74,10 @@ def mock_construct_resource_model(
         elif canonical_url == "http://hl7.org/fhir/StructureDefinition/Patient":
             return Patient
         elif canonical_url == "http://example.org/StructureDefinition/CustomPatient":
+            return Patient
+        elif canonical_url == "http://hl7.org/fhir/StructureDefinition/Patient":
+            return Patient
+        elif canonical_url == "http://hl7.org/fhir/StructureDefinition/Patient|4.0.1":
             return Patient
         elif canonical_url == "http://example.org/StructureDefinition/MyObservation":
             return Observation
@@ -96,7 +102,8 @@ def mock_construct_resource_model(
         self,
         canonical_url=canonical_url,
         structure_definition=structure_definition,
-        mode=ConstructionMode.AUTO,
+        mode=mode or ConstructionMode.SNAPSHOT,
+        **kwargs,
     )
 
 
