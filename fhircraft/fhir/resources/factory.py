@@ -2092,42 +2092,41 @@ class ResourceFactory:
 
         # Determine the base model and StructureDefinition to inherit from
         _base_structure_definition = None
-        if not (base := base_model):
-            # For DIFFERENTIAL mode, we must resolve the base definition
-            if resolved_mode == ConstructionMode.DIFFERENTIAL:
-                if base_canonical_url := _structure_definition.baseDefinition:
-                    # Resolve and store the base StructureDefinition for snapshot merging
-                    try:
-                        _base_structure_definition = self.resolve_structure_definition(
-                            base_canonical_url, version=structure_definition.fhirVersion  # type: ignore
-                        )
-                    except Exception as e:
-                        # Base StructureDefinition not in repository
-                        # It may have been constructed inline - we'll construct without snapshot merging
-                        pass
-                    base = self._resolve_and_construct_base_model(
-                        base_canonical_url, _structure_definition
+        # For DIFFERENTIAL mode, we must resolve the base definition
+        if resolved_mode == ConstructionMode.DIFFERENTIAL:
+            if base_canonical_url := _structure_definition.baseDefinition:
+                # Resolve and store the base StructureDefinition for snapshot merging
+                try:
+                    _base_structure_definition = self.resolve_structure_definition(
+                        base_canonical_url, version=structure_definition.fhirVersion  # type: ignore
                     )
-                    resolved_base_sd = self.repository.get(base_canonical_url)
-                    # Use resolved StructureDefinition if we didn't get it from repository
-                    if not _base_structure_definition and resolved_base_sd:
-                        _base_structure_definition = resolved_base_sd
-                else:
-                    warnings.warn(
-                        f"DIFFERENTIAL mode for '{_structure_definition.name}' but no baseDefinition specified. "
-                        "Using FHIRBaseModel as base."
-                    )
-                    base = FHIRBaseModel
-            # For SNAPSHOT mode, check if there's a baseDefinition to inherit from
-            elif base_canonical_url := _structure_definition.baseDefinition:
-                if not (base := self.construction_cache.get(base_canonical_url)):
-                    try:
-                        base = self._resolve_FHIR_type(base_canonical_url)
-                        assert inspect.isclass(base) and issubclass(base, FHIRBaseModel)
-                    except:
-                        base = FHIRBaseModel
+                except Exception as e:
+                    # Base StructureDefinition not in repository
+                    # It may have been constructed inline - we'll construct without snapshot merging
+                    pass
+                base = self._resolve_and_construct_base_model(
+                    base_canonical_url, _structure_definition
+                )
+                resolved_base_sd = self.repository.get(base_canonical_url)
+                # Use resolved StructureDefinition if we didn't get it from repository
+                if not _base_structure_definition and resolved_base_sd:
+                    _base_structure_definition = resolved_base_sd
             else:
+                warnings.warn(
+                    f"DIFFERENTIAL mode for '{_structure_definition.name}' but no baseDefinition specified. "
+                    "Using FHIRBaseModel as base."
+                )
                 base = FHIRBaseModel
+        # For SNAPSHOT mode, check if there's a baseDefinition to inherit from
+        elif base_canonical_url := _structure_definition.baseDefinition:
+            if not (base := self.construction_cache.get(base_canonical_url)):
+                try:
+                    base = self._resolve_FHIR_type(base_canonical_url)
+                    assert inspect.isclass(base) and issubclass(base, FHIRBaseModel)
+                except:
+                    base = FHIRBaseModel
+        else:
+            base = FHIRBaseModel
 
         # Select element source based on mode
         if resolved_mode == ConstructionMode.DIFFERENTIAL:

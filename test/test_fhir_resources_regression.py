@@ -744,6 +744,7 @@ def test_regression_issue_266(factory, generator):
         _canonical_url = "http://example.org/fhir/StructureDefinition/grade-extension"
 
         url: Optional[String] = Field(
+            description="identifies the meaning of the extension",
             default="http://example.org/fhir/StructureDefinition/grade-extension",
         )
         valueInteger: Optional[Integer] = Field(
@@ -913,3 +914,125 @@ def test_regression_issue_279(factory, generator):
     assert (
         source_code.count("class ") == 4
     ), f"Expected exactly 4 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+
+
+def test_regression_issue_278(factory, generator):
+
+    structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "my-adverse-event",
+        "url": "http://example.org/fhir/StructureDefinition/adverse-event",
+        "name": "MyAdverseEvent",
+        "title": "Adverse Event Profile",
+        "status": "active",
+        "description": "A description",
+        "fhirVersion": "4.0.1",
+        "kind": "resource",
+        "abstract": False,
+        "type": "AdverseEvent",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/AdverseEvent",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {
+                    "id": "AdverseEvent",
+                    "path": "AdverseEvent",
+                    "short": "Adverse Event Profile",
+                    "definition": "A description",
+                    "min": 0,
+                    "max": "*",
+                },
+                {
+                    "id": "AdverseEvent.extension",
+                    "path": "AdverseEvent.extension",
+                    "slicing": {
+                        "discriminator": [{"type": "value", "path": "url"}],
+                        "ordered": False,
+                        "rules": "open",
+                    },
+                    "min": 1,
+                },
+                {
+                    "id": "AdverseEvent.extension:my-extension",
+                    "path": "AdverseEvent.extension",
+                    "sliceName": "myExtension",
+                    "short": "My Extension",
+                    "type": [
+                        {
+                            "code": "Extension",
+                            "profile": [
+                                "http://example.org/fhir/StructureDefinition/my-extension"
+                            ],
+                        }
+                    ],
+                },
+            ]
+        },
+    }
+
+    extension_structure_definition = {
+        "resourceType": "StructureDefinition",
+        "id": "my-extension",
+        "url": "http://example.org/fhir/StructureDefinition/my-extension",
+        "name": "MyExtension",
+        "title": "My Extension",
+        "status": "active",
+        "description": "A description of my extension.",
+        "fhirVersion": "4.0.1",
+        "kind": "complex-type",
+        "abstract": False,
+        "context": [{"expression": "AdverseEvent.extension", "type": "element"}],
+        "type": "Extension",
+        "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+        "derivation": "constraint",
+        "differential": {
+            "element": [
+                {
+                    "id": "Extension",
+                    "path": "Extension",
+                },
+                {
+                    "id": "Extension.extension",
+                    "path": "Extension.extension",
+                    "max": "0",
+                },
+                {
+                    "id": "Extension.url",
+                    "path": "Extension.url",
+                    "fixedUri": "http://example.org/fhir/StructureDefinition/my-extension",
+                },
+                {
+                    "id": "Extension.value[x]",
+                    "path": "Extension.value[x]",
+                    "short": "Custom value",
+                    "definition": "The custom value of the extension",
+                    "type": [{"code": "integer"}],
+                },
+            ]
+        },
+    }
+
+    factory.configure_repository(
+        definitions=[
+            structure_definition,
+            extension_structure_definition,
+        ]
+    )
+
+    model = factory.construct_resource_model(
+        structure_definition=structure_definition, mode="differential"
+    )
+
+    source_code = generator.generate_resource_model_code(model)
+
+    expected_code = """    
+    valueInteger: Optional[Integer] = Field(
+        description="Custom value",
+        default=None,
+    )
+    """
+    assertBlockInCode(source_code, expected_code.strip())
+
+    assert (
+        source_code.count("class ") == 2
+    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
