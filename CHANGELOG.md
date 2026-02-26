@@ -7,9 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ----------------- 
 
+## v0.6.5 - 2026-02-26
+
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.5) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.5...0.6.4)
+
+### Added
+
+- Added an "AI Tools and Human Attribution" info box to the contributing guidelines, outlining acceptable and unacceptable types of AI-assisted contributions, and emphasizing the requirement for human review and responsibility ([286](https://github.com/luisfabib/fhircraft/pull/286))
+- Implemented a manifest-based FHIR resource `StructureDefinition` lookup system for factory model construction based on canonical URL and name for performance and stability ([281](https://github.com/luisfabib/fhircraft/pull/281))
+
+### Changed
+
+- Splited the `definitions/R{x}/profiles-resources.json` and `definitions/R{x}/profiles-types.json` files into individual files containing just the bundled `StructureDefinition` resources, largely decreasing the overall package size ([281](https://github.com/luisfabib/fhircraft/pull/281))
+
+### Fixed
+
+- Added support for the logic that allows correctly creating models for slices of primitive types with extension placeholders, improving compatibility with FHIR extension patterns ([#276](https://github.com/luisfabib/fhircraft/pull/276))
+- Fixed errors in factory methods when trying to load structure definitions of complex-type resources ([#281](https://github.com/luisfabib/fhircraft/pull/281))
+- Fixed the differential element merging to recursively merge parent elements in the element path hierarchy. This ensures all intervening elements are created and properly merged with base definitions ([#278](https://github.com/luisfabib/fhircraft/pull/278), fixes [#279](https://github.com/luisfabib/fhircraft/pull/279))
+- Fixed an issue with the differential merging to ensure that it succeeds even if the base definition has a different base name as the derived resource ([#278](https://github.com/luisfabib/fhircraft/pull/278))
+- Ensured that when constructing differential mode profiles, specialized BackboneElement subclasses from the base model are used as bases instead of generic BackboneElement, allowing proper inheritance of backbone element structure ([#283](https://github.com/luisfabib/fhircraft/pull/283), fixes [#277](https://github.com/luisfabib/fhircraft/pull/277))
+- Prevented identical inherited properties from being in generated source code of derived classes, while still generating properties that are new or have different implementations ([#285](https://github.com/luisfabib/fhircraft/pull/285))
+
+----------------- 
+
 ## v0.6.4 - 2026-02-20
 
-[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.3) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.3...0.6.2)
+[GitHub Release](https://github.com/luisfabib/fhircraft/releases/tag/0.6.4) | [Full Changelog](https://github.com/luisfabib/fhircraft/compare/0.6.4...0.6.3)
 
 ### Fixed
 
