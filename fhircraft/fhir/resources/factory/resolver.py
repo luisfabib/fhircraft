@@ -1,0 +1,308 @@
+"""
+SnapshotResolver — turns any StructureDefinition into a complete
+:class:`~fhircraft.fhir.resources.factory.index.DefinitionIndex`.
+"""
+
+from typing import Sequence, Literal, TYPE_CHECKING
+
+from fhircraft.fhir.resources.factory.element_node import (
+    ElementNode,
+    FHIRPATH_TYPE_PREFIX,
+    FHIR_TYPE_PREFIX,
+)
+from fhircraft.fhir.resources.factory.exceptions import (
+    DefinitionResolutionError,
+)
+from fhircraft.fhir.resources.factory.index import DefinitionIndex
+from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
+
+if TYPE_CHECKING:
+    from fhircraft.fhir.resources.datatypes.R4.complex import (
+        ElementDefinition as R4_ElementDefinition,
+    )
+    from fhircraft.fhir.resources.datatypes.R4B.complex import (
+        ElementDefinition as R4B_ElementDefinition,
+    )
+    from fhircraft.fhir.resources.datatypes.R5.complex import (
+        ElementDefinition as R5_ElementDefinition,
+    )
+    from fhircraft.fhir.resources.datatypes.R4.core import (
+        StructureDefinition as R4_StructureDefinition,
+    )
+    from fhircraft.fhir.resources.datatypes.R4B.core import (
+        StructureDefinition as R4B_StructureDefinition,
+    )
+    from fhircraft.fhir.resources.datatypes.R5.core import (
+        StructureDefinition as R5_StructureDefinition,
+    )
+
+_BASE_MERGE_FIELDS = {"min", "max", "type", "short", "definition", "comment"}
+
+
+class SnapshotResolver:
+    """
+    Resolves a FHIR ``StructureDefinition`` into a complete
+    :class:`DefinitionIndex`.
+    """
+
+    def __init__(
+        self, repository: CompositeStructureDefinitionRepository, fhir_version: str
+    ) -> None:
+        self._repo = repository
+        self.fhir_version = fhir_version
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def resolve(
+        self,
+        sd: "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition",
+        base_index: DefinitionIndex,
+        mode: Literal["auto", "snapshot", "differential"] = "auto",
+    ) -> DefinitionIndex:
+        """
+        Produce a complete :class:`DefinitionIndex` for a given structure definition.
+        """
+
+        if mode == "auto":
+            mode = "differential" if sd.differential else "snapshot"
+
+        if mode == "snapshot":
+            # Type check assertions
+            assert (
+                sd.snapshot
+            ), f"StructureDefinition {sd.name or sd.url} snapshot is None"
+            assert (
+                sd.snapshot.element
+            ), f"StructureDefinition {sd.name or sd.url} snapshot.element is None"
+            assert all(
+                [e is not None for e in sd.snapshot.element]
+            ), f"StructureDefinition {sd.name or sd.url} snapshot.element contains None"
+            # Fast path: wrap snapshot elements directly without merging
+            elements = sd.snapshot.element
+            return DefinitionIndex.from_elements(elements)
+
+        if mode == "differential":
+            # Type check assertions
+            assert (
+                sd.differential
+            ), f"StructureDefinition {sd.name or sd.url} differential is None"
+            assert (
+                sd.differential.element
+            ), f"StructureDefinition {sd.name or sd.url} differential.element is None"
+            assert all(
+                [e is not None for e in sd.differential.element]
+            ), f"StructureDefinition {sd.name or sd.url} differential.element contains None"
+            # Slow path: merge differential over base snapshot to produce a synthetic snapshot
+            return self._resolve_differential(sd.differential.element, base_index)
+
+        raise DefinitionResolutionError(
+            f"StructureDefinition '{getattr(sd, 'name', '?')}' has neither a "
+            "snapshot nor a differential element list."
+        )
+
+    # ------------------------------------------------------------------
+    # Differential resolution
+    # ------------------------------------------------------------------
+
+    def _resolve_differential(
+        self,
+        diff_elements: "Sequence[R4_ElementDefinition] | Sequence[R4B_ElementDefinition] | Sequence[R5_ElementDefinition]",
+        base_index: DefinitionIndex,
+    ) -> DefinitionIndex:
+        """
+        Merge element definitions of a differential over the base definition's snapshot.
+        """
+
+        nodes = [ElementNode(definition=e) for e in diff_elements]
+
+        # The merged result; keys are full element ids of the profile being resolved
+        merged_nodes: dict[str, ElementNode] = {}
+
+        # Iterate over all differential elements, merging each one (and any missing
+        for node in nodes:
+            if not node.id:
+                raise DefinitionResolutionError(
+                    "Differential element with missing id cannot be resolved."
+                )
+
+            # Build intermediate segments from base snapshot as needed to support this node's id
+            for id in node.id_ancestry:
+                if id not in merged_nodes:
+                    intermediate_node = self._build_intermediate_node(id, base_index)
+                    if intermediate_node is not None and id != node.id:
+                        merged_nodes[id] = intermediate_node
+
+            if node.is_root:
+                # Root element of the differential; must match the base snapshot root
+                base_node = base_index.root()
+            else:
+                # Look up the base node for this element
+                if not base_index.contains(id=node.id, ignore_root=True):
+                    base_node = base_index.get_single_by_path(
+                        node.path, ignore_root=True
+                    )
+                else:
+                    base_node = base_index.get(node.id, ignore_root=True)
+
+            # Now, merge the actual differential node
+            merged_nodes[node.id] = self._merge_node_with_base(node, base_node)
+
+        if not merged_nodes:
+            raise DefinitionResolutionError(
+                "Differential resolution produced an empty element list."
+            )
+
+        return DefinitionIndex(list(merged_nodes.values()))
+
+    def _build_intermediate_node(
+        self, id: str, base_index: DefinitionIndex
+    ) -> ElementNode | None:
+        """
+        Build an intermediate ElementNode from a base definition.
+
+        This is used to fill in missing segments of the element hierarchy
+        that are not explicitly defined in the differential but are needed
+        to support the full element ids used by the differential nodes.
+
+        It first checks if the exact node id exists in the base index. If not
+        defined in the base, it attempts to build the intermediate node by looking up
+        its parent node in the base index and expanding its types. If neither of these
+        approaches succeed, an error is raised.
+        """
+        root_name = id.rsplit(".", 1)[0] if "." in id else ""
+        path = ".".join([seg.split(":")[0] for seg in id.split(".")])
+        if not "." in id:
+            base_node = base_index.root()
+        elif base_index.contains(id=id, ignore_root=True):
+            base_node = base_index.get(id, ignore_root=True)
+        elif base_index.contains(path=path, ignore_root=True):
+            base_node = base_index.get_single_by_path(path, ignore_root=True)
+        elif (parent_path := path.rsplit(".", 1)[0]) and base_index.contains(
+            path=parent_path, ignore_root=True
+        ):
+            parent_base_node = base_index.get_single_by_path(
+                parent_path, ignore_root=True
+            )
+            node = self._build_type_node(parent_base_node.type_codes, id, base_index)
+            base_index.add(node)
+            return node
+        else:
+            return None
+        new_definition = base_node.definition.__class__(
+            id=id,
+            path=".".join(filter(None, [root_name, *base_node.path_segments[1:]])),
+            **base_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS)),
+        )
+        return ElementNode(definition=new_definition)
+
+    def _build_type_node(
+        self,
+        datatypes: Sequence[str],
+        id: str,
+        base_index: DefinitionIndex,
+    ) -> ElementNode:
+        """
+        Build a type node by resolving and expanding a complex FHIR type.
+        This method constructs an ElementNode for a given FHIR datatype by retrieving
+        the corresponding StructureDefinition from the repository and extracting the
+        matching element definition from its snapshot.
+
+        Args:
+            datatypes: A sequence of datatype names to expand. Must contain exactly one type.
+            id: The unique identifier for the element node to be created.
+            base_index: A DefinitionIndex used to check for existing elements.
+
+        Returns:
+            ElementNode: A newly constructed ElementNode with the expanded type definition.
+
+        Raises:
+            DefinitionResolutionError
+
+        Notes:
+            - This method is used during differential StructureDefinition resolution.
+            - Only complex types are supported for expansion.
+            - The generated element id is checked against the base index to prevent conflicts.
+        """
+        if not self._repo:
+            raise DefinitionResolutionError(
+                "Repository is required for type expansion during differential resolution."
+            )
+
+        if len(datatypes) != 1:
+            raise DefinitionResolutionError(
+                "Type expansion is only supported for elements with a single type."
+            )
+        datatype = datatypes[0]
+        if datatype.startswith(FHIRPATH_TYPE_PREFIX):
+            raise DefinitionResolutionError(
+                f"Type expansion is not supported for FHIRPath types. Found type '{datatype}'."
+            )
+
+        type_structure_definition = self._repo.get(
+            f"{FHIR_TYPE_PREFIX}{datatype}", self.fhir_version
+        )
+        if type_structure_definition.kind != "complex-type":
+            raise DefinitionResolutionError(
+                f"Type expansion is only supported for complex types. Type '{datatype}' has kind '{type_structure_definition.kind}'."
+            )
+        if not type_structure_definition:
+            raise DefinitionResolutionError(
+                f"Type expansion failed: StructureDefinition for type '{datatype}' not found in repository."
+            )
+        snapshot = type_structure_definition.snapshot
+        if not snapshot or not snapshot.element:
+            raise DefinitionResolutionError(
+                f"Type expansion failed: StructureDefinition for type '{datatype}' has no snapshot or snapshot elements."
+            )
+        local_id = id.rsplit(".", 1)[-1]
+        matching_node = next(
+            (n for e in snapshot.element if (n := ElementNode(e)).local_id == local_id),
+            None,
+        )
+        if not matching_node:
+            raise DefinitionResolutionError(
+                f"Type expansion failed: no matching element with local id '{local_id}' found in snapshot of type '{datatype}'."
+            )
+        id_path = ".".join([seg.split(":")[0] for seg in id.split(".")])
+        if id in base_index:
+            raise DefinitionResolutionError(
+                f"Type expansion failed: generated intermediate node id '{id}' already exists in base index."
+            )
+        # Determine unsliced path for newly synthesised element
+        return ElementNode(
+            definition=matching_node.definition.__class__(
+                id=id,
+                path=id_path,
+                **matching_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS)),
+            )
+        )
+
+    def _merge_node_with_base(
+        self, node: ElementNode, base_node: ElementNode
+    ) -> ElementNode:
+        """
+        Merge a node with its base node to create a new ElementNode with combined definitions.
+        This method combines the definition attributes from both the given node and its base node,
+        with the given node's attributes taking precedence. The merged definition retains the
+        node's id and path, or uses the base node's path if the node's path is not defined.
+
+        Args:
+            node: The node to merge, whose definition attributes take precedence.
+            base_node: The base node providing default definition attributes.
+
+        Returns:
+            ElementNode: A new ElementNode containing the merged definition from both nodes.
+        """
+        merged_definition = base_node.definition.__class__(
+            id=node.id,
+            path=node.path or base_node.path,
+            **{
+                **base_node.definition.model_dump(
+                    exclude_none=True, exclude={"id", "path"}
+                ),
+                **node.definition.model_dump(exclude_none=True, exclude={"id", "path"}),
+            },
+        )
+        return ElementNode(definition=merged_definition)

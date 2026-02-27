@@ -38,6 +38,59 @@ def test_element_node_id(element, id):
 
 
 @pytest.mark.parametrize(
+    "id, expected",
+    [
+        ("Resource.name", ["Resource", "name"]),
+        ("Resource.name[x]", ["Resource", "name[x]"]),
+        ("Resource.value[x]", ["Resource", "value[x]"]),
+        ("Resource.component.value[x]", ["Resource", "component", "value[x]"]),
+        ("Resource.component.code", ["Resource", "component", "code"]),
+        ("Resource.extension:slice", ["Resource", "extension", "slice"]),
+        ("Resource.extension:slice.url", ["Resource", "extension", "slice", "url"]),
+    ],
+)
+def test_element_node_id_segments(element, id, expected):
+    element.id = id
+    node = ElementNode(definition=element)
+    assert node.id_segments == expected
+
+
+@pytest.mark.parametrize(
+    "id, expected",
+    [
+        ("Resource", ["Resource"]),
+        ("Resource.name[x]", ["Resource", "Resource.name[x]"]),
+        (
+            "Resource.component.value[x]",
+            ["Resource", "Resource.component", "Resource.component.value[x]"],
+        ),
+        (
+            "Resource.component.code",
+            ["Resource", "Resource.component", "Resource.component.code"],
+        ),
+        (
+            "Resource.extension:slice",
+            ["Resource", "Resource.extension", "Resource.extension:slice"],
+        ),
+        (
+            "Resource.extension:slice.url",
+            [
+                "Resource",
+                "Resource.extension",
+                "Resource.extension:slice",
+                "Resource.extension:slice.url",
+            ],
+        ),
+    ],
+)
+def test_element_node_id_ancestry(element, id, expected):
+    element.id = id
+    element.path = id
+    node = ElementNode(definition=element)
+    assert node.id_ancestry == expected
+
+
+@pytest.mark.parametrize(
     "path",
     [
         ("Resource.name"),
@@ -52,6 +105,41 @@ def test_element_node_path(element, path):
     element.path = path
     node = ElementNode(definition=element)
     assert node.path == path
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        ("Resource.name"),
+        ("Resource.name[x]"),
+        ("Resource.component.code"),
+    ],
+)
+def test_element_node_path_segments(element, path):
+    element.path = path
+    node = ElementNode(definition=element)
+    assert node.path_segments == [seg.split(":")[0] for seg in path.split(".")]
+
+
+@pytest.mark.parametrize(
+    "path, expected",
+    [
+        ("Resource", ["Resource"]),
+        ("Resource.name[x]", ["Resource", "Resource.name[x]"]),
+        (
+            "Resource.component.value[x]",
+            ["Resource", "Resource.component", "Resource.component.value[x]"],
+        ),
+        (
+            "Resource.component.code",
+            ["Resource", "Resource.component", "Resource.component.code"],
+        ),
+    ],
+)
+def test_element_node_path_ancestry(element, path, expected):
+    element.path = path
+    node = ElementNode(definition=element)
+    assert node.path_ancestry == expected
 
 
 @pytest.mark.parametrize(

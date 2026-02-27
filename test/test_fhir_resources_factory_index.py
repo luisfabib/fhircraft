@@ -6,11 +6,6 @@ from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.exceptions import DefinitionIndexError
 
 
-# ------------------------------------------------------------------
-# Helpers
-# ------------------------------------------------------------------
-
-
 def make_node(id: str, path: str | None = None, slicing=None) -> ElementNode:
     """Create an :class:`ElementNode` backed by a MagicMock definition."""
     defn = MagicMock()
@@ -21,11 +16,6 @@ def make_node(id: str, path: str | None = None, slicing=None) -> ElementNode:
     local = id.rsplit(".", 1)[-1]
     defn.sliceName = local.split(":", 1)[1] if ":" in local else None
     return ElementNode(definition=defn)
-
-
-# ------------------------------------------------------------------
-# Fixtures
-# ------------------------------------------------------------------
 
 
 @pytest.fixture
@@ -108,10 +98,31 @@ def test_index_get_raises_for_missing(simple_index):
         simple_index.get("Observation.missing")
 
 
-def test_index_get_by_path_returns_nodes(slicing_index):
-    nodes = slicing_index.get_by_path("Observation.component")
-    assert len(nodes) >= 1
-    assert all(n.path == "Observation.component" for n in nodes)
+@pytest.mark.parametrize(
+    "id, expected, count",
+    [
+        ("Observation", "Observation", 1),
+        ("Observation.component", "Observation.component", 3),
+        ("Observation.component.value[x]", "Observation.component.value[x]", 1),
+    ],
+)
+def test_index_get_by_path_returns_nodes(slicing_index, id, expected, count):
+    nodes = slicing_index.get_by_path(id)
+    assert len(nodes) == count
+    assert expected in {n.path for n in nodes}
+
+
+@pytest.mark.parametrize(
+    "id, expected, count",
+    [
+        ("Other.component", "Observation.component", 3),
+        ("Other.component.value[x]", "Observation.component.value[x]", 1),
+    ],
+)
+def test_index_get_by_path_ignore_root(slicing_index, id, expected, count):
+    nodes = slicing_index.get_by_path(id, ignore_root=True)
+    assert len(nodes) == count
+    assert expected in {n.path for n in nodes}
 
 
 def test_index_get_by_path_raises_for_missing(simple_index):

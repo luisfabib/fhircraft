@@ -7,7 +7,7 @@ string-key lookups and filtering rather than pointer traversal.
 
 from __future__ import annotations
 
-from typing import Any, Iterator, List
+from typing import Any, Iterator, List, overload
 
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.exceptions import DefinitionIndexError
@@ -45,21 +45,102 @@ class DefinitionIndex:
         """List of all nodes in this index."""
         return list(self._nodes_by_id.values())
 
-    def get(self, id: str) -> ElementNode:
+    def add(self, node: ElementNode) -> None:
+        """Add an :class:`ElementNode` to this index."""
+        if node.id in self._nodes_by_id:
+            raise DefinitionIndexError(
+                f"Duplicate element id {node.id!r} cannot be added to index."
+            )
+        self._nodes_by_id[node.id] = node
+        self._nodes_by_path.setdefault(node.path, []).append(node)
+
+    @overload
+    def _get_without_root(self, *, id: str, path: None = ...) -> ElementNode | None: ...
+
+    @overload
+    def _get_without_root(
+        self, *, id: None = ..., path: str
+    ) -> List[ElementNode] | None: ...
+
+    def _get_without_root(
+        self, *, id: str | None = None, path: str | None = None
+    ) -> ElementNode | List[ElementNode] | None:
+        """Helper for get() that ignores the root element when matching by id or path."""
+        if id is not None:
+            return next(
+                (
+                    n
+                    for n in self.nodes
+                    if ".".join(n.id_segments[1:])
+                    == (id.split(".", 1)[1] if "." in id else id)
+                ),
+                None,
+            )
+        if path is not None:
+            return [
+                n
+                for n in self.nodes
+                if ".".join(n.path_segments[1:])
+                == (path.split(".", 1)[1] if "." in path else path)
+            ]
+        return None
+
+    def contains(
+        self,
+        *,
+        id: str | None = None,
+        path: str | None = None,
+        ignore_root: bool = False,
+    ) -> bool:
+        """
+        Check if an element node exists by id or path.
+        """
+        if ignore_root:
+            if id:
+                node = self._get_without_root(id=id)
+            elif path:
+                node = self._get_without_root(path=path)
+        else:
+            if id:
+                node = self._nodes_by_id.get(id)
+            elif path:
+                node = self._nodes_by_path.get(path, [])
+        return bool(node)
+
+    def get(self, id: str, ignore_root: bool = False) -> ElementNode:
         """
         Get element node by id
         """
-        if id not in self._nodes_by_id:
+        if ignore_root:
+            node = self._get_without_root(id=id)
+        else:
+            node = self._nodes_by_id.get(id)
+        if not node:
             raise DefinitionIndexError(f"Element id {id!r} not found in index.")
-        return self._nodes_by_id[id]
+        return node
 
-    def get_by_path(self, path: str) -> List[ElementNode]:
+    def get_by_path(self, path: str, ignore_root: bool = False) -> List[ElementNode]:
         """
         Get element node by path, can return multiple matches
         """
-        if path not in self._nodes_by_path:
+        if ignore_root:
+            nodes = self._get_without_root(path=path)
+        else:
+            nodes = self._nodes_by_path.get(path, [])
+        if not nodes:
             raise DefinitionIndexError(f"Element path {path!r} not found in index.")
-        return self._nodes_by_path[path]
+        return nodes
+
+    def get_single_by_path(self, path: str, ignore_root: bool = False) -> ElementNode:
+        """
+        Get a single element node by path, raises an error if multiple matches are found.
+        """
+        nodes = self.get_by_path(path=path, ignore_root=ignore_root)
+        if len(nodes) > 1:
+            raise DefinitionIndexError(
+                f"expected a single element node but found {len(nodes)} for path {path!r} in index."
+            )
+        return nodes[0]
 
     def __contains__(self, element_id: str) -> bool:
         return element_id in self._nodes_by_id

@@ -8,8 +8,9 @@ the definition's own fields; no external state is required.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
-from typing import Any, TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
@@ -51,6 +52,24 @@ class ElementNode:
         return self.definition.id or ""
 
     @property
+    def id_segments(self) -> list[str]:
+        """
+        List of segments of `id`.
+        """
+        return re.split(r"[\.\:]", self.id) if self.id else []
+
+    @property
+    def id_ancestry(self) -> list[str]:
+        """
+        List of ancestor ids of `id`.
+        """
+        segments_with_separators = re.split(r"([\.\:])", self.id)
+        return [
+            "".join(segments_with_separators[: (2 * i + 1)])
+            for i in range(0, len(self.id_segments))
+        ]
+
+    @property
     def path(self) -> str:
         """Element path (dot-separated, no slice names)."""
         return self.definition.path or ""
@@ -68,11 +87,11 @@ class ElementNode:
         return self.path.split(".") if self.path else []
 
     @property
-    def id_segments(self) -> list[str]:
+    def path_ancestry(self) -> list[str]:
         """
-        List of segments of `id`.
+        List of ancestor segments of `path`.
         """
-        return self.id.split(".")
+        return [".".join(self.path_segments[: i + 1]) for i in range(0, self.depth + 1)]
 
     @property
     def name(self) -> str:
@@ -271,6 +290,27 @@ class ElementNode:
             for p in getattr(t, "profile", None) or []:
                 urls.append(str(p))
         return urls
+
+    # ------------------------------------------------------------------
+    # Documentation
+    # ------------------------------------------------------------------
+
+    @property
+    def documentation(self) -> str:
+        """
+        Full combination of the elemments's `short`,  `definition`, and `comment` fields, in
+        that order of preference.  Returns an empty string if none of those fields are set.
+        """
+        return "\n".join(
+            filter(
+                None,
+                [
+                    self.definition.short,
+                    self.definition.definition,
+                    self.definition.comment,
+                ],
+            )
+        )
 
     # ------------------------------------------------------------------
     # Dunder helpers
