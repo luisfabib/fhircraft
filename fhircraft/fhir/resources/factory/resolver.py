@@ -41,8 +41,7 @@ _BASE_MERGE_FIELDS = {"min", "max", "type", "short", "definition", "comment"}
 
 class SnapshotResolver:
     """
-    Resolves a FHIR ``StructureDefinition`` into a complete
-    :class:`DefinitionIndex`.
+    Resolves a FHIR ``StructureDefinition`` into a complete :class:`DefinitionIndex`.
     """
 
     def __init__(
@@ -62,7 +61,27 @@ class SnapshotResolver:
         mode: Literal["auto", "snapshot", "differential"] = "auto",
     ) -> DefinitionIndex:
         """
-        Produce a complete :class:`DefinitionIndex` for a given structure definition.
+        Resolve a StructureDefinition into a DefinitionIndex.
+        This method resolves either the snapshot or differential representation of a
+        StructureDefinition into a normalized DefinitionIndex. When mode is set to "auto",
+        the method automatically selects the differential mode if available, otherwise uses
+        snapshot mode.
+
+        Args:
+            sd: A FHIR StructureDefinition resource (R4, R4B, or R5 version).
+            base_index: A DefinitionIndex containing the base elements to merge against
+                        when resolving differential mode.
+            mode: Resolution mode to use. Defaults to "auto". Options are:
+                  - "auto": Automatically selects "differential" if available, else "snapshot"
+                  - "snapshot": Uses the snapshot representation directly
+                  - "differential": Merges the differential over the base_index
+
+        Returns:
+            DefinitionIndex: A resolved index of FHIR elements.
+
+        Raises:
+            AssertionError: If the selected mode's required elements are missing or contain None values.
+            DefinitionResolutionError: If neither snapshot nor differential elements are available.
         """
 
         if mode == "auto":
@@ -112,7 +131,23 @@ class SnapshotResolver:
         base_index: DefinitionIndex,
     ) -> DefinitionIndex:
         """
-        Merge element definitions of a differential over the base definition's snapshot.
+        Resolve differential elements by merging them with base elements from a snapshot.
+        This method takes a sequence of differential elements and merges each one with
+        its corresponding base element to produce a complete definition index. It handles
+        building intermediate nodes as needed to support the element hierarchy.
+
+        Args:
+            diff_elements: A sequence of differential element definitions to resolve.
+                           Can be R4, R4B, or R5 ElementDefinition objects.
+            base_index: A DefinitionIndex containing the base snapshot elements to merge against.
+
+        Returns:
+            DefinitionIndex: A new DefinitionIndex containing the merged result, with keys
+                             representing full element ids of the profile being resolved.
+
+        Raises:
+            DefinitionResolutionError: If a differential element is missing an id,
+                                       or if the resolution produces an empty element list.
         """
 
         nodes = [ElementNode(definition=e) for e in diff_elements]

@@ -10,17 +10,20 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Sequence
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
         ElementDefinition as R4ElementDefinition,
+        ElementDefinitionType as R4ElementDefinitionType,
     )
     from fhircraft.fhir.resources.datatypes.R4B.complex.element_definition import (
         ElementDefinition as R4BElementDefinition,
+        ElementDefinitionType as R4BElementDefinitionType,
     )
     from fhircraft.fhir.resources.datatypes.R5.complex.element_definition import (
         ElementDefinition as R5ElementDefinition,
+        ElementDefinitionType as R5ElementDefinitionType,
     )
 
 POLYMORPHIC_PATH_SUFFIX = "[x]"
@@ -266,10 +269,16 @@ class ElementNode:
     # ------------------------------------------------------------------
 
     @property
+    def types(
+        self,
+    ) -> "Sequence[R4ElementDefinitionType] | Sequence[R4BElementDefinitionType] | Sequence[R5ElementDefinitionType]":
+        """List of FHIR type codes from ``definition.type``."""
+        return self.definition.type or []
+
+    @property
     def type_codes(self) -> list[str]:
         """List of FHIR type codes from ``definition.type``."""
-        types = self.definition.type or []
-        return [str(t.code) for t in types if t.code]
+        return [str(t.code) for t in self.types if t.code]
 
     @property
     def is_polymorphic_type(self) -> bool:
@@ -284,9 +293,8 @@ class ElementNode:
     @property
     def profile_urls(self) -> list[str]:
         """All profile canonical URLs collected from ``definition.type[*].profile``."""
-        types = self.definition.type or []
         urls: list[str] = []
-        for t in types:
+        for t in self.types:
             for p in getattr(t, "profile", None) or []:
                 urls.append(str(p))
         return urls
