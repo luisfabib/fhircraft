@@ -12,6 +12,7 @@ MIN_SIGNED_64BIT_INT = -9223372036854775808
 MAX_UNSIGNED_32BIT_INT = 4294967295
 MIN_UNSIGNED_32BIT_INT = 0
 
+
 def __integer_validator(criterion: Callable) -> Callable:
     def _validate(value: str):
         integer = int(value)
@@ -20,6 +21,7 @@ def __integer_validator(criterion: Callable) -> Callable:
         return integer
 
     return _validate
+
 
 String = TypeAliasType("String", str)
 
@@ -35,62 +37,67 @@ Boolean = TypeAliasType(
 
 Integer = TypeAliasType(
     "Integer",
-    Union[
+    Annotated[
+        int,
         Annotated[
-            int, 
-            Annotated[
-                str, 
-                Field(pattern=r"^[0]|[-+]?[1-9][0-9]*$"), 
-            ],
-            AfterValidator(__integer_validator(lambda x: (x >= MIN_SIGNED_32BIT_INT) and (x <= MAX_SIGNED_32BIT_INT)))
+            str,
+            Field(pattern=r"^[0]|[-+]?[1-9][0-9]*$"),
         ],
+        AfterValidator(
+            __integer_validator(
+                lambda x: (x >= MIN_SIGNED_32BIT_INT) and (x <= MAX_SIGNED_32BIT_INT)
+            )
+        ),
     ],
 )
 
 
 Integer64 = TypeAliasType(
     "Integer64",
-    Union[
+    Annotated[
+        int,
         Annotated[
-            int, 
-            Annotated[
-                str, 
-                Field(pattern=r"^[0]|[-+]?[1-9][0-9]*$"), 
-            ],
-            AfterValidator(__integer_validator(lambda x: x >= MIN_SIGNED_64BIT_INT and x <= MAX_SIGNED_64BIT_INT))
+            str,
+            Field(pattern=r"^[0]|[-+]?[1-9][0-9]*$"),
         ],
+        AfterValidator(
+            __integer_validator(
+                lambda x: x >= MIN_SIGNED_64BIT_INT and x <= MAX_SIGNED_64BIT_INT
+            )
+        ),
     ],
 )
 
 
 UnsignedInt = TypeAliasType(
     "UnsignedInt",
-    Union[
+    Annotated[
+        int,
         Annotated[
-            int,
-            Annotated[
-                str,
-                Field(pattern=r"[0]|([1-9][0-9]*)"),
-            ],
-            AfterValidator(__integer_validator(lambda x: x >= MIN_UNSIGNED_32BIT_INT and x <= MAX_UNSIGNED_32BIT_INT)),
+            str,
+            Field(pattern=r"[0]|([1-9][0-9]*)"),
         ],
+        AfterValidator(
+            __integer_validator(
+                lambda x: x >= MIN_UNSIGNED_32BIT_INT and x <= MAX_UNSIGNED_32BIT_INT
+            )
+        ),
     ],
 )
 
 PositiveInt = TypeAliasType(
     "PositiveInt",
-    Union[
+    Annotated[
+        int,
         Annotated[
-            int,
-            Annotated[
-                str,
-                Field(pattern=r"\+?[1-9][0-9]*"),
-            ],
-            AfterValidator(__integer_validator(lambda x: x >= 1 and x <= MAX_SIGNED_32BIT_INT)),
+            str,
+            Field(pattern=r"\+?[1-9][0-9]*"),
         ],
+        AfterValidator(
+            __integer_validator(lambda x: x >= 1 and x <= MAX_SIGNED_32BIT_INT)
+        ),
     ],
 )
-
 
 
 Decimal = TypeAliasType(
@@ -110,7 +117,9 @@ Uri = TypeAliasType(
     "Uri",
     Annotated[
         str,
-        Field(pattern=r"^\S+$",),
+        Field(
+            pattern=r"^\S+$",
+        ),
     ],
 )
 
@@ -119,7 +128,9 @@ Url = TypeAliasType(
     "Url",
     Annotated[
         str,
-        Field(pattern=r"^\S+$",),
+        Field(
+            pattern=r"^\S+$",
+        ),
     ],
 )
 
@@ -128,13 +139,21 @@ Canonical = TypeAliasType(
     "Canonical",
     Annotated[
         str,
-        Field(pattern=r"^\S+$",),
+        Field(
+            pattern=r"^\S+$",
+        ),
     ],
 )
 
 
 Base64Binary = TypeAliasType(
-    "Base64Binary", Annotated[str, Field(pattern=r"^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$")]
+    "Base64Binary",
+    Annotated[
+        str,
+        Field(
+            pattern=r"^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$"
+        ),
+    ],
 )
 
 
@@ -218,7 +237,9 @@ Uuid = TypeAliasType(
     "Uuid",
     Annotated[
         str,
-        Field(pattern=r"^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"),
+        Field(
+            pattern=r"^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        ),
     ],
 )
 
@@ -237,4 +258,3 @@ Markdown = TypeAliasType(
         Field(pattern=r"^\s*(\S|\s)*$"),
     ],
 )
-
