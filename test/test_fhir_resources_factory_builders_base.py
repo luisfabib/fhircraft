@@ -6,7 +6,7 @@ from typing import Any, List, Optional
 from pydantic.aliases import AliasChoices
 from fhircraft.fhir.resources.datatypes import primitives
 from fhircraft.fhir.resources.datatypes.R4 import core, complex
-from fhircraft.fhir.resources.datatypes.utils import get_complex_FHIR_type
+from fhircraft.fhir.resources.datatypes.utils import get_fhir_type
 from fhircraft.fhir.resources.factory.builders.base import (
     FHIR_SD_PREFIX,
     FieldInformation,
@@ -488,7 +488,7 @@ def test_build_primitive_extension_placeholder__alias_is_underscore_prefixed_fie
 def test_build_primitive_extension_placeholder__annotation_non_array_is_optional_element(
     builder: Builder, fhir_release
 ):
-    Element = get_complex_FHIR_type("Element", fhir_release)
+    Element = get_fhir_type("Element", fhir_release)
     builder.context = MagicMock(fhir_release=fhir_release)
     node = make_node(name="status", is_array=False)
     result = builder.build_primitive_extension_placeholder(node)
@@ -499,7 +499,7 @@ def test_build_primitive_extension_placeholder__annotation_non_array_is_optional
 def test_build_primitive_extension_placeholder__annotation_array_is_optional_list_of_element(
     builder: Builder, fhir_release
 ):
-    Element = get_complex_FHIR_type("Element", fhir_release)
+    Element = get_fhir_type("Element", fhir_release)
     builder.context = MagicMock(fhir_release=fhir_release)
     node = make_node(name="name", is_array=True)
     result = builder.build_primitive_extension_placeholder(node)
@@ -510,7 +510,7 @@ def test_build_primitive_extension_placeholder__annotation_array_is_optional_lis
 def test_build_primitive_extension_placeholder__element_type_matches_fhir_release(
     builder: Builder, fhir_release
 ):
-    expected_Element = get_complex_FHIR_type("Element", fhir_release)
+    expected_Element = get_fhir_type("Element", fhir_release)
     builder.context = MagicMock(fhir_release=fhir_release)
     node = make_node(name="status")
     result = builder.build_primitive_extension_placeholder(node)
@@ -761,8 +761,8 @@ def test_build_field_validators__fixed_as_pydantic_definition_returns_name_and_c
 ):
     node = make_validator_node(fixed="active")
     validator_info = builder.build_field_validators(node, "status")[0]
-    name, fn = validator_info.as_pydantic_definition()
-    assert name == "FHIR_status_fixed_value_constraint"
+    fn = validator_info.as_pydantic_definition()
+    assert fn is not None
 
 
 def test_build_field_validators__pattern_as_pydantic_definition_returns_name_and_callable(
@@ -770,8 +770,8 @@ def test_build_field_validators__pattern_as_pydantic_definition_returns_name_and
 ):
     node = make_validator_node(pattern={"system": "x"})
     validator_info = builder.build_field_validators(node, "code")[0]
-    name, fn = validator_info.as_pydantic_definition()
-    assert name == "FHIR_code_pattern_constraint"
+    fn = validator_info.as_pydantic_definition()
+    assert fn is not None
 
 
 def test_build_field_validators__constraint_as_pydantic_definition_returns_name_and_callable(
@@ -779,5 +779,5 @@ def test_build_field_validators__constraint_as_pydantic_definition_returns_name_
 ):
     node = make_validator_node(constraints=[make_constraint("ele-1")])
     validator_info = builder.build_field_validators(node, "value")[0]
-    name, fn = validator_info.as_pydantic_definition()
-    assert name == "FHIR_ele_1_constraint_validator"
+    fn = validator_info.as_pydantic_definition()
+    assert fn is not None

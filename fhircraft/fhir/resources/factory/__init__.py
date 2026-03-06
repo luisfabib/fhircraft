@@ -21,6 +21,7 @@ needed during migration.
 
 from __future__ import annotations
 
+from fhircraft.fhir.resources.datatypes.registry import TypeRegistry
 from fhircraft.fhir.resources.factory.assembler import ModelAssembler
 
 # from fhircraft.fhir.resources.factory.builders import (
@@ -51,7 +52,6 @@ from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
 
 #: Default :class:`ProfileFactory` instance used by the convenience function
 #: :func:`construct_resource_model`.  Configures itself lazily.
-factory = FHIRStructureFactory()
 
 # ------------------------------------------------------------------
 # Compatibility shims (legacy names)
@@ -60,9 +60,6 @@ factory = FHIRStructureFactory()
 #: Alias kept for backward compatibility.  New code should use
 #: :class:`FHIRStructureFactory` directly.
 ResourceFactory = FHIRStructureFactory
-
-#: Convenience function; equivalent to ``factory.build(sd=...)``.
-construct_resource_model = factory.build
 
 __all__ = [
     # New API

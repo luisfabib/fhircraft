@@ -89,15 +89,6 @@ class ModelAssembler:
                     f"Element '{child_node.id}' has no definition in the index."
                 )
 
-            # Special case: element has no type AND no children AND no slices
-            # → it carries only metadata (e.g. a slicing discriminator stub)
-            has_type = bool(getattr(child_node.definition, "type", None))
-            has_children = bool(self.index.get_children(child_node.id))
-            has_slices = bool(self.index.get_slices(child_node.id))
-            if not has_type and not has_children and not has_slices:
-                if not child_node.is_content_reference:
-                    continue
-
             # ----------------------------------------------------------
             # Dispatch through builder chain
             # ----------------------------------------------------------

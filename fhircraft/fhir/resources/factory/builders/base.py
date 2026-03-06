@@ -13,9 +13,8 @@ from pydantic.aliases import AliasChoices
 from pydantic.fields import FieldInfo
 from pydantic_core import PydanticUndefined
 
-from fhircraft.fhir.resources.datatypes.utils import (
+from fhircraft.fhir.resources.datatypes.registry import (
     get_fhir_type,
-    get_complex_FHIR_type,
 )
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
@@ -47,6 +46,8 @@ if TYPE_CHECKING:
         ElementDefinitionType as R5_ElementDefinitionType,
         ElementDefinitionConstraint as R5_ElementDefinitionConstraint,
     )
+
+_type = type
 
 # Class-level attribute names that collide with Pydantic's metaclass machinery
 CLASS_RESERVED_KEYWORDS: frozenset[str] = frozenset(
@@ -327,7 +328,7 @@ class Builder(ABC):
         if kind == "field":
             return ValidatorInformation(
                 name=validator_name,
-                kind="field",
+                kind="model",
                 function=validate_element_constraint,
                 arguments={
                     "elements": field_name,
@@ -437,7 +438,7 @@ class Builder(ABC):
         safe_placeholder_name, ext_alias = self.handle_python_keyword(placeholder_name)
 
         # Get the appropriate Element type for the placeholder field
-        placeholder_type = get_complex_FHIR_type("Element", self.context.fhir_release)
+        placeholder_type = get_fhir_type("Element", self.context.fhir_release)
 
         info = self.build_field_information(
             safe_placeholder_name,

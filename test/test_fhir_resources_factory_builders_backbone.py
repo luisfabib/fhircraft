@@ -1,5 +1,5 @@
 from typing import List, Optional, get_args
-from unittest.mock import MagicMock
+from unittest.mock import ANY, MagicMock
 
 import pytest
 from pydantic import BaseModel
@@ -232,12 +232,14 @@ def test_build__assembler_assemble_called_with_backbone_name(
 
 
 def test_build__backbone_base_is_fhir_base_model_when_context_base_is_none(
-    index, mock_assembler
+    index, mock_assembler: MagicMock
 ):
     builder = make_builder(base=None)
     node = make_node()
     builder.build(node, index)
-    assert mock_assembler.call_args.kwargs["base_model"] is FHIRBaseModel
+    assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
+        FHIRBaseModel,
+    )
 
 
 def test_build__backbone_base_resolved_from_context_base_model_fields(
@@ -252,7 +254,9 @@ def test_build__backbone_base_resolved_from_context_base_model_fields(
     builder = make_builder(base=ParentModel)
     node = make_node(name="component", path="ParentModel.component")
     builder.build(node, index)
-    assert mock_assembler.call_args.kwargs["base_model"] is InnerModel
+    assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
+        InnerModel,
+    )
 
 
 def test_build__backbone_base_digs_through_optional_list(index, mock_assembler):
@@ -265,7 +269,9 @@ def test_build__backbone_base_digs_through_optional_list(index, mock_assembler):
     builder = make_builder(base=ParentModel)
     node = make_node(name="component", path="ParentModel.component")
     builder.build(node, index)
-    assert mock_assembler.call_args.kwargs["base_model"] is InnerModel
+    assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
+        InnerModel,
+    )
 
 
 def test_build__backbone_base_is_fhir_base_model_when_field_not_in_context_base(
@@ -277,7 +283,9 @@ def test_build__backbone_base_is_fhir_base_model_when_field_not_in_context_base(
     builder = make_builder(base=ParentModel)
     node = make_node(name="component", path="ParentModel.component")
     builder.build(node, index)
-    assert mock_assembler.call_args.kwargs["base_model"] is FHIRBaseModel
+    assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
+        FHIRBaseModel,
+    )
 
 
 def test_build__python_keyword_field_receives_validation_alias(

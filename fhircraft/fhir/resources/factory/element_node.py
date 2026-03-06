@@ -123,9 +123,9 @@ class ElementNode:
         intentional — slices are accessed via :meth:`DefinitionIndex.slices`, never
         via :meth:`DefinitionIndex.children`.
         """
-        if self.depth == 0:
+        if "." not in self.id:
             return None
-        return ".".join(self.id_segments[:-1])
+        return self.id.rsplit(".", 1)[0]
 
     # ------------------------------------------------------------------
     # Structural flags

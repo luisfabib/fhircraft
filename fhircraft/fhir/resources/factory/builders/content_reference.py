@@ -27,10 +27,8 @@ class ContentReferenceBuilder(Builder):
 
         # Locate the referenced sub-tree
         if resource_url:
-            # External reference — load from repository
-            ref_sd = self.context.repository.get(
-                resource_url, self.context.fhir_version
-            )
+            # External reference — load from registry
+            ref_sd = self.context.registry.get(resource_url)
             if not ref_sd or not ref_sd.snapshot or not ref_sd.snapshot.element:
                 raise ValueError(
                     f"Cannot resolve contentReference '{ref}' — resource not found."

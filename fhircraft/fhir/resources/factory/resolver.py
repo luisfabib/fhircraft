@@ -5,6 +5,7 @@ SnapshotResolver — turns any StructureDefinition into a complete
 
 from typing import Sequence, Literal, TYPE_CHECKING
 
+from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory.element_node import (
     ElementNode,
     FHIRPATH_TYPE_PREFIX,
@@ -14,7 +15,6 @@ from fhircraft.fhir.resources.factory.exceptions import (
     DefinitionResolutionError,
 )
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
-from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.complex import (
@@ -45,9 +45,9 @@ class SnapshotResolver:
     """
 
     def __init__(
-        self, repository: CompositeStructureDefinitionRepository, fhir_version: str
+        self, repository: StructureDefinitionRegistry, fhir_version: str
     ) -> None:
-        self._repo = repository
+        self._registry = repository
         self.fhir_version = fhir_version
 
     # ------------------------------------------------------------------
@@ -57,7 +57,7 @@ class SnapshotResolver:
     def resolve(
         self,
         sd: "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition",
-        base_index: DefinitionIndex,
+        base_index: DefinitionIndex | None = None,
         mode: Literal["auto", "snapshot", "differential"] = "auto",
     ) -> DefinitionIndex:
         """
@@ -103,6 +103,9 @@ class SnapshotResolver:
             return DefinitionIndex.from_elements(elements)
 
         if mode == "differential":
+            assert (
+                base_index is not None
+            ), "Base index is required for differential resolution."
             # Type check assertions
             assert (
                 sd.differential
@@ -260,7 +263,7 @@ class SnapshotResolver:
             - Only complex types are supported for expansion.
             - The generated element id is checked against the base index to prevent conflicts.
         """
-        if not self._repo:
+        if not self._registry:
             raise DefinitionResolutionError(
                 "Repository is required for type expansion during differential resolution."
             )
@@ -275,9 +278,7 @@ class SnapshotResolver:
                 f"Type expansion is not supported for FHIRPath types. Found type '{datatype}'."
             )
 
-        type_structure_definition = self._repo.get(
-            f"{FHIR_TYPE_PREFIX}{datatype}", self.fhir_version
-        )
+        type_structure_definition = self._registry.get(f"{FHIR_TYPE_PREFIX}{datatype}")
         if type_structure_definition.kind != "complex-type":
             raise DefinitionResolutionError(
                 f"Type expansion is only supported for complex types. Type '{datatype}' has kind '{type_structure_definition.kind}'."

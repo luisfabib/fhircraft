@@ -18,6 +18,9 @@ if TYPE_CHECKING:
     from fhircraft.fhir.resources.repository import (
         CompositeStructureDefinitionRepository,
     )
+    from fhircraft.fhir.resources.definitions.registry import (
+        StructureDefinitionRegistry,
+    )
 
 
 @dataclass(frozen=True)
@@ -38,5 +41,5 @@ class BuildContext:
     factory: FHIRStructureFactory
     """ The FHIR structure factory for this build session. """
 
-    repository: "CompositeStructureDefinitionRepository"
-    """ The structure definition repository for resolving references and looking up base definitions. """
+    registry: "StructureDefinitionRegistry"
+    """ The structure definition registry for resolving references and looking up base definitions. """

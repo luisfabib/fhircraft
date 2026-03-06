@@ -17,7 +17,6 @@ from fhircraft.fhir.resources.generator import CodeGenerator
 from fhircraft.fhir.resources.factory import (
     ResourceFactory,
     FHIRStructureFactory,
-    construct_resource_model,
 )
 from fhircraft.fhir.resources.repository import (
     CompositeStructureDefinitionRepository,
@@ -35,5 +34,4 @@ __all__ = [
     "configure_repository",
     "ResourceFactory",
     "FHIRStructureFactory",
-    "construct_resource_model",
 ]

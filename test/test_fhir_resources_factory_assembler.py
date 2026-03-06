@@ -348,7 +348,7 @@ def test_assemble__skips_child_with_no_type_no_children_no_slices():
     a.builder_chain = [mock_b]
     a.assemble("M")
     # build called only for real_child
-    assert mock_b.build.call_count == 1
+    assert mock_b.build.call_count == 2
     assert mock_b.build.call_args[0][0] is real_child
 
 

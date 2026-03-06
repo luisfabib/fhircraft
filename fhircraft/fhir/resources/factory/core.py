@@ -14,7 +14,7 @@ Usage::
 
 from __future__ import annotations
 
-import inspect
+import re
 import keyword
 import warnings
 from pathlib import Path
@@ -27,7 +27,6 @@ from fhircraft.fhir.resources.base import (
     FHIRSliceModel,
     FhirBaseModelKind,
 )
-from fhircraft.fhir.resources.datatypes.utils import get_complex_FHIR_type
 from fhircraft.fhir.resources.factory.assembler import ModelAssembler
 from fhircraft.fhir.resources.factory.context import BuildContext
 from fhircraft.fhir.resources.factory.exceptions import (
@@ -35,8 +34,12 @@ from fhircraft.fhir.resources.factory.exceptions import (
 )
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
-from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
-from fhircraft.utils import get_FHIR_release_from_version
+from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
+from fhircraft.fhir.resources.datatypes.registry import (
+    get_fhir_type_by_url,
+    get_fhir_type,
+)
+from fhircraft.utils import get_FHIR_release_from_version, capitalize
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.core import (
@@ -51,54 +54,17 @@ if TYPE_CHECKING:
 
 
 class FHIRStructureFactory:
-    """
-    Builds Pydantic models from FHIR ``StructureDefinition`` objects.
-
-    **Pipeline** (per call to :meth:`build`):
-
-    1. Normalise the input (dict → Pydantic SD object, URL → fetch from repo).
-    2. Cache-check (return cached model if already built).
-    3. Detect FHIR version → create a :class:`BuildContext` with a
-       :class:`TypeRegistry`.
-    4. Resolve ``baseDefinition`` → obtain *base_model* and *base_index*.
-    5. :class:`SnapshotResolver` → fully resolved :class:`DefinitionIndex`.
-    6. :class:`ModelAssembler` → Pydantic model class.
-    7. Post-build: set ``meta.profile`` default, attach ``_fhir_release`` etc.
-    8. Cache under canonical URL; return.
-
-    To build a profile that depends on another profile, register the dependency
-    first via :meth:`register`::
-
-        factory.register(base_sd)        # builds + registers base
-        model = factory.build(profile_sd)  # base is now in TypeRegistry
-
-    Args:
-        repository: A :class:`CompositeStructureDefinitionRepository`.  A
-            default instance is created when omitted.
-        internet_enabled: Whether to enable internet access in the repository.
-        enable_packages: Whether to enable FHIR-package support.
-        registry_base_url: Override for the FHIR package registry URL.
-        timeout: HTTP request timeout for package downloads.
-    """
 
     def __init__(
-        self,
-        repository: CompositeStructureDefinitionRepository | None = None,
-        internet_enabled: bool = True,
-        enable_packages: bool = True,
-        registry_base_url: str | None = None,
-        timeout: float = 30.0,
+        self, fhir_release: str, registry: StructureDefinitionRegistry | None = None
     ) -> None:
-        if repository is None:
-            self.repository = CompositeStructureDefinitionRepository(
-                internet_enabled=internet_enabled,
-                enable_packages=enable_packages,
-                registry_base_url=registry_base_url,
-                timeout=timeout,
-            )
-        else:
-            self.repository = repository
 
+        self.fhir_release: str = fhir_release
+        if registry and registry.fhir_release != fhir_release:
+            raise ValueError(
+                f"Provided registry FHIR release '{registry.fhir_release}' does not match factory FHIR release '{fhir_release}'."
+            )
+        self.definition_registry = registry or StructureDefinitionRegistry(fhir_release)
         # Global cache: canonical URL → built Pydantic model
         self.construction_cache: dict[str, type[BaseModel]] = {}
 
@@ -137,7 +103,13 @@ class FHIRStructureFactory:
             DefinitionResolutionError: When the differential cannot be resolved.
             UnregisteredTypeError: When a required type is not in the registry.
         """
-        structure_definition = self._normalise_sd(structure_definition, canonical_url)
+
+        if structure_definition:
+            structure_definition = self._normalise_structure_definition(
+                self.definition_registry, structure_definition
+            )
+        elif canonical_url:
+            structure_definition = self.definition_registry.get(canonical_url)
         # Cache check
         if structure_definition.url in self.construction_cache:
             return self.construction_cache[structure_definition.url]
@@ -175,11 +147,17 @@ class FHIRStructureFactory:
         # ------------------------------------------------------------------
         base_canonical = structure_def.baseDefinition
         base_model: type = FHIRBaseModel
-
+        base_index = None
         if base_canonical:
-            # Try directly from registry / datatypes first (fast path)
-            resolved = ctx.resolve_type_safe(base_canonical)
-            if resolved is not None and issubclass(resolved, FHIRBaseModel):
+            # Try directly from registry of built-in types first
+            resolved = get_fhir_type_by_url(
+                base_canonical, fhir_release, fail_if_not_found=False
+            )
+            if (
+                resolved is not None
+                and isinstance(resolved, type)
+                and issubclass(resolved, FHIRBaseModel)
+            ):
                 base_model = resolved
             else:
                 # Try to build from repository
@@ -193,7 +171,7 @@ class FHIRStructureFactory:
                     base_model = FHIRBaseModel
 
             # Obtain the base snapshot for differential resolution
-            base_definition = self.repository.get(base_canonical, fhir_version)
+            base_definition = self.definition_registry.get(base_canonical)
             if base_definition.snapshot and base_definition.snapshot.element:
                 base_index = DefinitionIndex.from_elements(
                     base_definition.snapshot.element
@@ -206,7 +184,7 @@ class FHIRStructureFactory:
         # ------------------------------------------------------------------
         # Produce the complete DefinitionIndex
         # ------------------------------------------------------------------
-        resolver = SnapshotResolver(self.repository, fhir_version=fhir_version)
+        resolver = SnapshotResolver(self.definition_registry, fhir_version=fhir_version)
         definition_index = resolver.resolve(structure_def, base_index, mode=mode)
 
         # ------------------------------------------------------------------
@@ -219,9 +197,9 @@ class FHIRStructureFactory:
         assembler = ModelAssembler(
             index=definition_index,
             ctx=BuildContext(
-                fhir_release=fhir_release,
+                fhir_release=self.fhir_release,
                 fhir_version=fhir_version,
-                repository=self.repository,
+                registry=self.definition_registry,
                 factory=self,
                 base=base_model,
             ),
@@ -238,7 +216,7 @@ class FHIRStructureFactory:
             )
             if has_meta:
                 try:
-                    Meta = get_complex_FHIR_type("Meta", fhir_release)
+                    Meta = get_fhir_type("Meta", fhir_release)
                     meta_field: tuple = (
                         Optional[Meta],
                         Field(
@@ -288,10 +266,10 @@ class FHIRStructureFactory:
     # Input normalisation
     # ------------------------------------------------------------------
 
-    def _normalise_sd(
+    def _normalise_structure_definition(
         self,
+        registry: StructureDefinitionRegistry,
         sd: Any,
-        canonical_url: str | None,
     ) -> "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition":
         """
         Normalise *sd* (dict / str / Pydantic SD / ``None``) to a validated
@@ -300,36 +278,15 @@ class FHIRStructureFactory:
         """
 
         if getattr(sd, "_resource_type", None) == "StructureDefinition":
-            self.repository.add(sd)
+            registry.add(sd)
             return sd
 
-        if isinstance(sd, dict):
-            self.repository.load_from_definitions(sd)
-            url = sd.get("url", "")
-            if url:
-                return self.repository.get(url)
-            else:
-                raise ValueError(
-                    "No URL found in the provided StructureDefinition dictionary."
-                )
+        elif isinstance(sd, dict):
+            return registry.from_dict(sd)
 
-        if isinstance(sd, str) and sd.startswith("http"):
+        elif isinstance(sd, str):
             # Canonical URL
-            return self.repository.get(sd)
-
-        if isinstance(sd, str):
-            # File path
-            loaded = self.repository.load_from_files(Path(sd))
-            if loaded:
-                return loaded[0] if isinstance(loaded, list) else loaded
-
-            raise ValueError(
-                "No StructureDefinition provided. Pass a parsed SD object, a dict, "
-                "a file path, or a canonical URL."
-            )
-
-        if sd is None and canonical_url:
-            return self.repository.get(canonical_url)
+            return registry.get(sd)
 
         return sd
 
@@ -341,6 +298,10 @@ class FHIRStructureFactory:
     def _sanitize_name(name: str) -> str:
         """Produce a valid Python class name from a FHIR resource name."""
         sanitized = "".join(ch for ch in name if ch.isalnum())
+        sanitized = "".join(
+            capitalize(word) for word in re.split("[^a-zA-Z]", name) if word
+        )
+
         if not sanitized:
             raise ValueError(
                 f"FHIR resource name '{name}' has no alphanumeric characters."
@@ -351,103 +312,6 @@ class FHIRStructureFactory:
         if keyword.iskeyword(sanitized):
             sanitized = f"{sanitized}_"
         return sanitized
-
-    # ------------------------------------------------------------------
-    # Repository management helpers (mirrors legacy ResourceFactory API)
-    # ------------------------------------------------------------------
-
-    def configure_repository(
-        self,
-        directory: str | Path | None = None,
-        files: list[str | Path] | None = None,
-        definitions: list[dict] | None = None,
-        packages: list[str | tuple[str, str]] | None = None,
-        internet_enabled: bool = True,
-        registry_base_url: str | None = None,
-    ) -> None:
-        """Configure the repository in one call."""
-        self.repository.set_internet_enabled(internet_enabled)
-        if registry_base_url and hasattr(self.repository, "set_registry_base_url"):
-            self.repository.set_registry_base_url(registry_base_url)
-        if directory:
-            self.load_definitions_from_directory(directory)
-        if files:
-            self.load_definitions_from_files(*files)
-        if definitions:
-            self.load_definitions_from_list(*definitions)
-        if packages:
-            for pkg in packages:
-                if isinstance(pkg, str):
-                    self.load_package(pkg)
-                elif isinstance(pkg, tuple) and len(pkg) == 2:
-                    self.load_package(pkg[0], pkg[1])
-
-    def disable_internet_access(self) -> None:
-        self.repository.set_internet_enabled(False)
-
-    def enable_internet_access(self) -> None:
-        self.repository.set_internet_enabled(True)
-
-    def load_definitions_from_directory(self, directory_path: str | Path) -> None:
-        if hasattr(self.repository, "load_from_directory"):
-            self.repository.load_from_directory(directory_path)
-        else:
-            raise NotImplementedError(
-                "Repository does not support loading from directory"
-            )
-
-    def load_definitions_from_files(self, *file_paths: str | Path) -> None:
-        if hasattr(self.repository, "load_from_files"):
-            self.repository.load_from_files(*file_paths)
-        else:
-            raise NotImplementedError("Repository does not support loading from files")
-
-    def load_definitions_from_list(self, *definitions: dict) -> None:
-        if hasattr(self.repository, "load_from_definitions"):
-            self.repository.load_from_definitions(*definitions)
-        else:
-            raise NotImplementedError(
-                "Repository does not support loading from definitions"
-            )
-
-    def load_package(self, package_name: str, version: str | None = None) -> None:
-        if hasattr(self.repository, "load_package"):
-            self.repository.load_package(package_name, version)
-        else:
-            raise NotImplementedError("Repository does not support package loading")
-
-    def get_loaded_packages(self) -> dict[str, str]:
-        if hasattr(self.repository, "get_loaded_packages"):
-            return self.repository.get_loaded_packages()
-        return {}
-
-    def has_package(self, package_name: str, version: str | None = None) -> bool:
-        if hasattr(self.repository, "has_package"):
-            return self.repository.has_package(package_name, version)
-        return False
-
-    def remove_package(self, package_name: str, version: str | None = None) -> None:
-        if hasattr(self.repository, "remove_package"):
-            self.repository.remove_package(package_name, version)
-
-    def set_registry_base_url(self, base_url: str) -> None:
-        if hasattr(self.repository, "set_registry_base_url"):
-            self.repository.set_registry_base_url(base_url)
-        else:
-            raise NotImplementedError(
-                "Repository does not support registry configuration"
-            )
-
-    def clear_package_cache(self) -> None:
-        if hasattr(self.repository, "clear_package_cache"):
-            self.repository.clear_package_cache()
-
-    def resolve_structure_definition(
-        self, canonical_url: str, version: str | None = None
-    ) -> Any:
-        if sd := self.repository.get(canonical_url, version):
-            return sd
-        raise ValueError(f"Could not resolve structure definition: {canonical_url}")
 
     def clear_cache(self) -> None:
         """Clear the construction cache."""

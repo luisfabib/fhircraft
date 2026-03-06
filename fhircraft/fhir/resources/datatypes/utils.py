@@ -11,7 +11,8 @@ import re
 import warnings
 from datetime import date, datetime, time
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Type, Union, TypeAliasType
+from typing import TYPE_CHECKING, Any, Type, Union
+from typing_extensions import TypeAliasType
 
 from pydantic import TypeAdapter, BaseModel, ValidationError
 

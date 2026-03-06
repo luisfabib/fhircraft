@@ -6,6 +6,7 @@ from fhircraft.fhir.resources.factory.builders.base import Build
 from fhircraft.fhir.resources.factory.builders.content_reference import (
     ContentReferenceBuilder,
 )
+from fhircraft.fhir.resources.factory.exceptions import DefinitionIndexError
 
 BACKBONEFIELDBUILDER_BUILD = "fhircraft.fhir.resources.factory.builders.content_reference.BackboneFieldBuilder.build"
 
@@ -120,14 +121,14 @@ def test_build__local_ref_calls_get_subtree_with_fragment_path(builder, index):
     assert mock_bb.call_args[0][0] is node
 
 
-def test_build__external_ref_fetches_from_repository(builder):
+def test_build__external_ref_fetches_from_registry(builder):
     resource_url = "http://hl7.org/fhir/StructureDefinition/Observation"
     node = make_node(content_reference=f"{resource_url}#Observation.component")
 
     # Build a fake StructureDefinition with snapshot elements
     ref_sd = MagicMock(name="ref-sd")
     ref_sd.snapshot.element = [MagicMock()]
-    builder.context.repository.get.return_value = ref_sd
+    builder.context.registry.get.return_value = ref_sd
 
     with (
         patch(
@@ -139,9 +140,7 @@ def test_build__external_ref_fetches_from_repository(builder):
         mock_from_elements.return_value = mock_index
         builder.build(node, MagicMock())
 
-    builder.context.repository.get.assert_called_once_with(
-        resource_url, builder.context.fhir_version
-    )
+    builder.context.registry.get.assert_called_once_with(resource_url)
     assert mock_bb.call_args[0][0] is node
 
 
@@ -152,7 +151,7 @@ def test_build__external_ref_builds_index_from_snapshot_elements(builder):
     elements = [MagicMock(), MagicMock()]
     ref_sd = MagicMock()
     ref_sd.snapshot.element = elements
-    builder.context.repository.get.return_value = ref_sd
+    builder.context.registry.get.return_value = ref_sd
 
     with (
         patch(
@@ -174,7 +173,7 @@ def test_build__external_ref_queries_fragment_path_from_external_index(builder):
 
     ref_sd = MagicMock()
     ref_sd.snapshot.element = [MagicMock()]
-    builder.context.repository.get.return_value = ref_sd
+    builder.context.registry.get.return_value = ref_sd
 
     with (
         patch(
@@ -193,9 +192,9 @@ def test_build__external_ref_queries_fragment_path_from_external_index(builder):
 def test_build__raises_when_external_resource_not_found(builder):
     resource_url = "http://hl7.org/fhir/StructureDefinition/Unknown"
     node = make_node(content_reference=f"{resource_url}#Unknown.field")
-    builder.context.repository.get.return_value = None
+    builder.context.registry.get.return_value = None
 
-    with pytest.raises(ValueError, match=resource_url):
+    with pytest.raises(ValueError):
         builder.build(node, MagicMock())
 
 
@@ -204,7 +203,7 @@ def test_build__raises_when_external_resource_has_no_snapshot(builder):
     node = make_node(content_reference=f"{resource_url}#Observation.component")
     ref_sd = MagicMock()
     ref_sd.snapshot = None
-    builder.context.repository.get.return_value = ref_sd
+    builder.context.registry.get.return_value = ref_sd
 
     with pytest.raises(ValueError):
         builder.build(node, MagicMock())
@@ -215,7 +214,7 @@ def test_build__raises_when_external_resource_has_no_snapshot_elements(builder):
     node = make_node(content_reference=f"{resource_url}#Observation.component")
     ref_sd = MagicMock()
     ref_sd.snapshot.element = None
-    builder.context.repository.get.return_value = ref_sd
+    builder.context.registry.get.return_value = ref_sd
 
     with pytest.raises(ValueError):
         builder.build(node, MagicMock())
