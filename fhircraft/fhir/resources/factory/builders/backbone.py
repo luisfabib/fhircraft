@@ -60,7 +60,6 @@ class BackboneFieldBuilder(Builder):
         assembler = ModelAssembler(
             index=index.get_subtree(node.id),
             ctx=self.context,
-            base_model=backbone_base,
             resource_name=backbone_name,
         )
         backbone_model = assembler.assemble(backbone_name, base=(backbone_base,))

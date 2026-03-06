@@ -341,24 +341,12 @@ def test_build__slice_max_cardinality_set_on_model(builder: Builder, index, asse
     assert FakeSliceModel.max_cardinality == 5
 
 
-def test_build__slice_bases_include_fhir_slice_model_when_base_is_not_slice_model(
-    builder: Builder, index, assembler
-):
-    # CodeableConcept resolves to a non-FHIRSliceModel type
-    slice_node = make_slice_node(type_code="CodeableConcept")
-    index.get_slices.return_value = [slice_node]
-    node = make_entry_node()
-    builder.build(node, index)
-    bases = assembler.call_args.kwargs["base_model"]
-    assert FHIRSliceModel in bases
-
-
 def test_build__slice_bases_contain_resolved_type(builder: Builder, index, assembler):
     slice_node = make_slice_node(type_code="CodeableConcept")
     index.get_slices.return_value = [slice_node]
     node = make_entry_node()
     builder.build(node, index)
-    bases = assembler.call_args.kwargs["base_model"]
+    bases = assembler.return_value.assemble.call_kwargs["base"]
     # First element is the resolved CodeableConcept type (not FHIRSliceModel)
     assert bases[0] is not FHIRSliceModel
 

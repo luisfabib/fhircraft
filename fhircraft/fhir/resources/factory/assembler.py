@@ -1,0 +1,164 @@
+from __future__ import annotations
+
+from typing import Any, Sequence
+
+from pydantic import create_model
+from fhircraft.fhir.resources.base import FHIRBaseModel
+
+from fhircraft.fhir.resources.factory.builders.base import Builder
+from fhircraft.fhir.resources.factory.context import BuildContext
+from fhircraft.fhir.resources.factory.index import DefinitionIndex
+from fhircraft.fhir.resources.factory.exceptions import AssemblerError
+from fhircraft.fhir.resources.factory.builders import (
+    ContentReferenceBuilder,
+    TypeChoiceFieldBuilder,
+    SlicedFieldBuilder,
+    BackboneFieldBuilder,
+    SimpleFieldBuilder,
+)
+
+BUILDER_CHAIN: list[type[Builder]] = [
+    ContentReferenceBuilder,
+    TypeChoiceFieldBuilder,
+    SlicedFieldBuilder,
+    BackboneFieldBuilder,
+    SimpleFieldBuilder,
+]
+
+
+class ModelAssembler:
+
+    index: DefinitionIndex
+    """   The definition index to assemble from. """
+
+    ctx: BuildContext
+    """   The build context. """
+
+    resource_name: str
+    """   The name of the resource being assembled (for error messages). """
+
+    builder_chain: Sequence[Builder]
+    """   The chain of builders to use for assembling fields.  Initialized from :attr:`BUILDER_CHAIN`. """
+
+    def __init__(
+        self,
+        index: DefinitionIndex,
+        ctx: BuildContext,
+        resource_name: str = "Unknown",
+    ) -> None:
+        self.index = index
+        self.ctx = ctx
+        self.resource_name = resource_name
+        self.builder_chain = [builder(ctx) for builder in BUILDER_CHAIN]
+
+    def assemble(
+        self,
+        name: str,
+        base: type | tuple[type, ...] | None = None,
+    ) -> type:
+        """
+        Construct and return a Pydantic model class for this scope.
+
+        Args:
+            name: The Python class name for the resulting model.
+            base: The base class(es) to inherit from.  If ``None``,
+                :attr:`base_model` is used.  May be a single type or a tuple of
+                types (for multiple inheritance, e.g. ``(Observation, FHIRSliceModel)``).
+
+        Returns:
+            The constructed Pydantic model class.
+        """
+
+        # Resolve base classes
+        if base is None:
+            base_classes: tuple[type, ...] = (self.ctx.base or FHIRBaseModel,)
+        elif isinstance(base, tuple):
+            base_classes = base
+        else:
+            base_classes = (base,)
+
+        # ------------------------------------------------------------------
+        # Iterate children (direct non-slice elements of the root)
+        # ------------------------------------------------------------------
+        root = self.index.root()
+        root_id = root.id
+
+        for child_node in self.index.get_children(root_id):
+            if not child_node.definition:
+                raise ValueError(
+                    f"Element '{child_node.id}' has no definition in the index."
+                )
+
+            # Special case: element has no type AND no children AND no slices
+            # → it carries only metadata (e.g. a slicing discriminator stub)
+            has_type = bool(getattr(child_node.definition, "type", None))
+            has_children = bool(self.index.get_children(child_node.id))
+            has_slices = bool(self.index.get_slices(child_node.id))
+            if not has_type and not has_children and not has_slices:
+                if not child_node.is_content_reference:
+                    continue
+
+            # ----------------------------------------------------------
+            # Dispatch through builder chain
+            # ----------------------------------------------------------
+            builder = self._find_builder(child_node)
+
+            try:
+                build = builder.build(
+                    child_node,
+                    self.index,
+                )
+            except Exception as exc:
+                raise AssemblerError(
+                    f"Builder failed for element '{child_node.id}': {exc}."
+                ) from exc
+
+            # ----------------------------------------------------------
+            # Accumulate results
+            # ----------------------------------------------------------
+            fields = {info.name: info.as_pydantic_definition() for info in build.fields}
+            field_validators = {
+                info.name: info.as_pydantic_definition() for info in build.validators
+            }
+            model_validators = {
+                info.name: info.as_pydantic_definition()
+                for constraint in (root.definition.constraint or [])
+                if (
+                    info := Builder.build_invariant_constraint(
+                        child_node.path, constraint, kind="model"
+                    )
+                )
+            }
+
+        if not fields:
+            raise AssemblerError(
+                f"No fields built for model '{name}' and no fields defined on base class(es) {base_classes}."
+            )
+
+        # ------------------------------------------------------------------
+        # Build the Pydantic model
+        # ------------------------------------------------------------------
+
+        model = create_model(
+            name,
+            **fields,  # type: ignore[arg-type]
+            __base__=base_classes,
+            __validators__={**field_validators, **model_validators},  # type: ignore[arg-type]
+            __doc__=root.documentation,
+        )
+
+        # Attach properties
+        for attr_name, property_getter in build.properties.items():
+            setattr(model, attr_name, property(property_getter))
+
+        return model
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
+
+    def _find_builder(self, node: Any) -> Builder:
+        for builder in self.builder_chain:
+            if builder.can_handle(node, self.index):
+                return builder
+        raise AssemblerError(f"No suitable builder found for node '{node.id}'.")

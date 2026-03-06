@@ -53,7 +53,6 @@ class SlicedFieldBuilder(Builder):
             assembler = ModelAssembler(
                 index=slice_index,
                 ctx=self.context,
-                base_model=slice_bases,
                 resource_name=slice_model_name,
             )
             slice_model = assembler.assemble(slice_model_name, base=slice_bases)

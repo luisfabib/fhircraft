@@ -14,7 +14,7 @@ from typing import Any, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.resources.factory.profile_factory import FHIRStructureFactory
+    from fhircraft.fhir.resources.factory.core import FHIRStructureFactory
     from fhircraft.fhir.resources.repository import (
         CompositeStructureDefinitionRepository,
     )
@@ -24,17 +24,19 @@ if TYPE_CHECKING:
 class BuildContext:
     """
     Immutable context container passed through the entire factory pipeline.
-
-    Attributes:
-        fhir_release: FHIR release short-name (``"R4"``, ``"R4B"``, ``"R5"``).
-        fhir_version: Full FHIR version string (e.g. ``"4.3.0"``).
-        registry: The :class:`TypeRegistry` for this build session.
-        repository: The ``StructureDefinition`` repository for resolving
-            references and looking up base definitions.
     """
 
     fhir_release: str
+    """ FHIR release version (e.g. 'R4', 'STU3', 'R5'). """
+
     fhir_version: str
+    """ Full FHIR version string (e.g. '4.3.0'). """
+
     base: type
+    """ The base model class for this build session. """
+
     factory: FHIRStructureFactory
+    """ The FHIR structure factory for this build session. """
+
     repository: "CompositeStructureDefinitionRepository"
+    """ The structure definition repository for resolving references and looking up base definitions. """

@@ -30,6 +30,7 @@ from fhircraft.fhir.resources.validators import (
     validate_FHIR_element_fixed_value,
     validate_FHIR_element_pattern,
     validate_element_constraint,
+    validate_model_constraint,
 )
 from fhircraft.utils import capitalize, ensure_list
 
@@ -94,7 +95,7 @@ class ValidatorInformation:
     field: str | None = None
     """The fields this validator applies to (for field validators). """
 
-    def as_pydantic_definition(self) -> tuple[str, Any]:
+    def as_pydantic_definition(self):
 
         if self.kind == "field":
             if not self.field:
@@ -106,10 +107,7 @@ class ValidatorInformation:
             validator_decorator = model_validator(mode="after")
         else:
             raise ValueError(f"Invalid validator kind: {self.kind}")
-        return (
-            self.name,
-            validator_decorator(partial(self.function, **self.arguments)),
-        )
+        return validator_decorator(partial(self.function, **self.arguments))
 
 
 @dataclass
@@ -291,6 +289,7 @@ class Builder(ABC):
     def build_invariant_constraint(
         field_name: str,
         constraint: "R4_ElementDefinitionConstraint | R4B_ElementDefinitionConstraint | R5_ElementDefinitionConstraint",
+        kind: Literal["field", "model"] = "field",
     ) -> ValidatorInformation:
         """
         Build validator information for a FHIR invariant constraint.
@@ -303,6 +302,7 @@ class Builder(ABC):
             constraint: An ElementDefinitionConstraint object (from FHIR R4, R4B, or R5)
                        containing the constraint definition with required attributes:
                        key, expression, human, and severity.
+            kind: The kind of validator to create, either "field" for field-level validation or "model" for model-level validation. Defaults to "field".
 
         Returns:
             ValidatorInformation: An object containing the name, kind, function, and arguments for the constraint validator.
@@ -324,18 +324,31 @@ class Builder(ABC):
         constraint_name = constraint.key.replace("-", "_")
         validator_name = f"FHIR_{constraint_name}_constraint_validator"
 
-        return ValidatorInformation(
-            name=validator_name,
-            kind="model",
-            function=validate_element_constraint,
-            arguments={
-                "elements": field_name,
-                "expression": constraint.expression,
-                "human": constraint.human,
-                "key": constraint.key,
-                "severity": constraint.severity,
-            },
-        )
+        if kind == "field":
+            return ValidatorInformation(
+                name=validator_name,
+                kind="field",
+                function=validate_element_constraint,
+                arguments={
+                    "elements": field_name,
+                    "expression": constraint.expression,
+                    "human": constraint.human,
+                    "key": constraint.key,
+                    "severity": constraint.severity,
+                },
+            )
+        elif kind == "model":
+            return ValidatorInformation(
+                name=validator_name,
+                kind="model",
+                function=validate_model_constraint,
+                arguments={
+                    "expression": constraint.expression,
+                    "human": constraint.human,
+                    "key": constraint.key,
+                    "severity": constraint.severity,
+                },
+            )
 
     def resolve_type(
         self,
@@ -468,6 +481,8 @@ class Builder(ABC):
             )
 
         for constraint in node.definition.constraint or []:
-            validators.append(self.build_invariant_constraint(safe_name, constraint))
+            validators.append(
+                self.build_invariant_constraint(safe_name, constraint, kind="field")
+            )
 
         return validators

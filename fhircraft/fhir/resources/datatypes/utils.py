@@ -11,10 +11,9 @@ import re
 import warnings
 from datetime import date, datetime, time
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Type, Union
+from typing import TYPE_CHECKING, Any, Type, Union, TypeAliasType
 
 from pydantic import TypeAdapter, BaseModel, ValidationError, create_model
-from typing_extensions import TypeAliasType
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.utils import get_FHIR_release_from_version
@@ -169,7 +168,9 @@ def is_fhir_primitive_type(
 
 
 def is_fhir_complex_type(
-    value: Any, fhir_type: "FHIRBaseModel | type | str", raise_on_error: bool = True
+    value: Any,
+    fhir_type: "type[FHIRBaseModel] | type | str",
+    raise_on_error: bool = True,
 ) -> bool:
     """
     Check if a value conforms to a complex FHIR type.
@@ -204,7 +205,9 @@ def is_fhir_complex_type(
 
 
 def is_fhir_resource_type(
-    value: Any, fhir_type: "FHIRBaseModel | type | str", raise_on_error: bool = True
+    value: Any,
+    fhir_type: "type[FHIRBaseModel] | type | str",
+    raise_on_error: bool = True,
 ) -> bool:
     """
     Check if a value conforms to a FHIR resource.

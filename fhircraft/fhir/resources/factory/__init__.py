@@ -42,9 +42,8 @@ from fhircraft.fhir.resources.factory.exceptions import (
     DefinitionResolutionError,
 )
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
-from fhircraft.fhir.resources.factory.profile_factory import FHIRStructureFactory
+from fhircraft.fhir.resources.factory.core import FHIRStructureFactory
 from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
-from fhircraft.fhir.resources.factory.validators import ValidatorCollector
 
 # ------------------------------------------------------------------
 # Module-level singleton
