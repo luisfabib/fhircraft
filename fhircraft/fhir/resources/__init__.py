@@ -18,20 +18,10 @@ from fhircraft.fhir.resources.factory import (
     ResourceFactory,
     FHIRStructureFactory,
 )
-from fhircraft.fhir.resources.repository import (
-    CompositeStructureDefinitionRepository,
-    HttpStructureDefinitionRepository,
-    PackageStructureDefinitionRepository,
-    configure_repository,
-)
 
 __all__ = [
     "FHIRBaseModel",
     "FHIRSliceModel",
-    "CompositeStructureDefinitionRepository",
-    "HttpStructureDefinitionRepository",
-    "PackageStructureDefinitionRepository",
-    "configure_repository",
     "ResourceFactory",
     "FHIRStructureFactory",
 ]

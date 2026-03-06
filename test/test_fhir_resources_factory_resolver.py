@@ -12,6 +12,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
     ElementDefinition,
     ElementDefinitionType,
 )
+from fhircraft.fhir.resources.definitions import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.exceptions import (
     DefinitionIndexError,
@@ -19,7 +20,6 @@ from fhircraft.fhir.resources.factory.exceptions import (
 )
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
-from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 
 # ------------------------------------------------------------------
@@ -80,9 +80,9 @@ def skip_validation():
 
 @pytest.fixture
 def resolver():
-    repo = CompositeStructureDefinitionRepository()
-    repo._internet_enabled = False  # Disable internet access for tests
-    return SnapshotResolver(repository=repo, fhir_version="4.0.1")
+    register = StructureDefinitionRegistry(fhir_release="R4")
+    register._internet_access_enabled = False  # Disable internet access for tests
+    return SnapshotResolver(repository=register)
 
 
 @pytest.fixture

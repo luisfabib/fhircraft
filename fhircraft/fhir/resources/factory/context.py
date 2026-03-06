@@ -15,9 +15,6 @@ from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.factory.core import FHIRStructureFactory
-    from fhircraft.fhir.resources.repository import (
-        CompositeStructureDefinitionRepository,
-    )
     from fhircraft.fhir.resources.definitions.registry import (
         StructureDefinitionRegistry,
     )

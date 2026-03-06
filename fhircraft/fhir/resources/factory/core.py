@@ -184,7 +184,7 @@ class FHIRStructureFactory:
         # ------------------------------------------------------------------
         # Produce the complete DefinitionIndex
         # ------------------------------------------------------------------
-        resolver = SnapshotResolver(self.definition_registry, fhir_version=fhir_version)
+        resolver = SnapshotResolver(self.definition_registry)
         definition_index = resolver.resolve(structure_def, base_index, mode=mode)
 
         # ------------------------------------------------------------------

@@ -297,22 +297,6 @@ def test_build_internal__assembler_receives_resolver_output_as_index(factory):
     assert mock_assembler.call_args.kwargs["index"] is index
 
 
-def test_build_internal__snapshot_resolver_receives_fhir_version(factory):
-    sd = make_sd(fhir_version="4.3.0", base_definition=None)
-    model = make_pydantic_model()
-
-    with (
-        patch(_GET_FHIR_RELEASE, return_value="R4B"),
-        patch(_SNAPSHOT_RESOLVER) as mock_resolver,
-        patch(_MODEL_ASSEMBLER) as mock_assembler,
-    ):
-        mock_resolver.return_value.resolve.return_value = MagicMock()
-        mock_assembler.return_value.assemble.return_value = model
-        factory._build(sd)
-
-    assert mock_resolver.call_args.kwargs["fhir_version"] == "4.3.0"
-
-
 def test_build_internal__snapshot_resolver_receives_repository(factory):
     sd = make_sd(base_definition=None)
     model = make_pydantic_model()

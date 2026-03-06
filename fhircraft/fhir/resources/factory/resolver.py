@@ -44,11 +44,8 @@ class SnapshotResolver:
     Resolves a FHIR ``StructureDefinition`` into a complete :class:`DefinitionIndex`.
     """
 
-    def __init__(
-        self, repository: StructureDefinitionRegistry, fhir_version: str
-    ) -> None:
+    def __init__(self, repository: StructureDefinitionRegistry) -> None:
         self._registry = repository
-        self.fhir_version = fhir_version
 
     # ------------------------------------------------------------------
     # Public API

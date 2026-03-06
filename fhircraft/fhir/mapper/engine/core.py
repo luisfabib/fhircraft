@@ -21,7 +21,6 @@ from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory import ResourceFactory
-from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
 
 from .exceptions import (
     MappingError,
