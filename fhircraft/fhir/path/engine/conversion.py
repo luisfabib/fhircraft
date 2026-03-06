@@ -575,7 +575,8 @@ class ToQuantity(FHIRTypeConversionFunction):
                 return [
                     FHIRPathCollectionItem.wrap(
                         Quantity(
-                            value=float(quantity_match.group(1)), unit=quantity_match.group(4)
+                            value=float(quantity_match.group(1)),
+                            unit=quantity_match.group(4),
                         )
                     )
                 ]
@@ -652,7 +653,6 @@ class ToString(FHIRTypeConversionFunction):
         Raises:
             FHIRPathRuntimeError: If input collection has more than one item.
         """
-        from fhircraft.fhir.resources.datatypes.utils import get_complex_FHIR_type
 
         self.validate_collection(collection)
         if not collection:

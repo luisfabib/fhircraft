@@ -10,7 +10,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import Coding
 from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
     ElementDefinitionSlicingDiscriminator,
 )
-from fhircraft.fhir.resources.datatypes.utils import ( 
+from fhircraft.fhir.resources.datatypes.utils import (
     get_primitive_type_by_name,
     get_primitive_type_name,
     is_boolean,
@@ -81,15 +81,15 @@ def test_is_boolean(value, expected):
         ("A123", False),
         ("123B", False),
         ("urn:ietf:rfc:3986", False),
-        (0, True), 
+        (0, True),
         ("0", True),
-        (-2147483648, True),  
+        (-2147483648, True),
         ("-2147483648", True),
-        (2147483647, True), 
+        (2147483647, True),
         ("2147483647", True),
         (-2147483649, False),
-        ("-2147483649", False),  
-        (2147483648, False), 
+        ("-2147483649", False),
+        (2147483648, False),
         ("2147483648", False),
     ],
 )
@@ -108,20 +108,21 @@ def test_is_integer(value, expected):
         ("A123", False),
         ("123B", False),
         ("urn:ietf:rfc:3986", False),
-        (0, True), 
+        (0, True),
         ("0", True),
-        (-9223372036854775808, True),  
+        (-9223372036854775808, True),
         ("-9223372036854775808", True),
-        (9223372036854775807, True), 
+        (9223372036854775807, True),
         ("9223372036854775807", True),
         (-9223372036854775809, False),
-        ("-9223372036854775809", False),  
-        (9223372036854775808, False), 
+        ("-9223372036854775809", False),
+        (9223372036854775808, False),
         ("9223372036854775808", False),
     ],
 )
 def test_is_integer64(value, expected):
     assert is_integer64(value) == expected
+
 
 @pytest.mark.parametrize(
     "value,expected",
@@ -150,14 +151,15 @@ def test_is_string(value, expected):
     assert is_string(value) == expected
 
 
-
-
 @pytest.mark.parametrize(
     "value,expected",
     [
         ("http://helloworld.com/", True),
         ("foo+://example.com:8042/over/there?name=ferret#nose", True),
-        ("foo+://andrewj:myPassword:mySecondPassword@example.com:8042/over/there?name=ferret#nose", True),
+        (
+            "foo+://andrewj:myPassword:mySecondPassword@example.com:8042/over/there?name=ferret#nose",
+            True,
+        ),
         ("urn:example:animal:ferret:nose", True),
         ("http://10.15.20.73/", True),
         ("http://user.@com/", True),
@@ -182,7 +184,10 @@ def test_is_uri(value, expected):
         ("http://222.helloworld.com/", True),
         ("http://www.helloworld.com/", True),
         ("foo+://example.com:8042/over/there?name=ferret#nose", True),
-        ("foo+://andrewj:myPassword:mySecondPassword@example.com:8042/over/there?name=ferret#nose", True),
+        (
+            "foo+://andrewj:myPassword:mySecondPassword@example.com:8042/over/there?name=ferret#nose",
+            True,
+        ),
         ("urn:example:animal:ferret:nose", True),
         ("http://10.15.20.73/", True),
         ("http://user.@com/", True),
@@ -241,7 +246,6 @@ def test_is_base64binary(value, expected):
     assert is_base64binary(value) == expected
 
 
-
 @pytest.mark.parametrize(
     "value,expected",
     [
@@ -260,6 +264,7 @@ def test_is_base64binary(value, expected):
 )
 def test_is_canonical(value, expected):
     assert is_canonical(value) == expected
+
 
 @pytest.mark.parametrize(
     "value,expected",
@@ -381,7 +386,7 @@ def test_is_code(value, expected):
         ("urn:ntfl:1.2.3.4.5", False),
         ("urn:oid:12.12.32.32", False),
         (123, False),
-        ('ABC', False),
+        ("ABC", False),
     ],
 )
 def test_is_oid(value, expected):
@@ -407,11 +412,12 @@ def test_is_oid(value, expected):
         ("uuid:123e4567-e89b-12d3-a456-426614174000", False),
         ("urn:guid:123e4567-e89b-12d3-a456-426614174000", False),
         (123, False),
-        ('ABC', False),
+        ("ABC", False),
     ],
 )
 def test_is_uuid(value, expected):
     assert is_uuid(value) == expected
+
 
 @pytest.mark.parametrize(
     "value,expected",
@@ -421,7 +427,7 @@ def test_is_uuid(value, expected):
         ("ABC-123-45", True),
         ("ABC.123.45", True),
         ("ABC:123:45", False),
-        ("12345"*60, False),
+        ("12345" * 60, False),
         (123, False),
         (0, False),
         (-123, False),
@@ -439,7 +445,7 @@ def test_is_id(value, expected):
         ("ABC-123-45", True),
         ("ABC.123.45", True),
         ("ABC:123:45", True),
-        ("12345"*60, True),
+        ("12345" * 60, True),
         (123, False),
         (0, False),
         (-123, False),
@@ -593,7 +599,7 @@ def test_is_fhir_primitive(value, expected):
     ],
 )
 def test_is_fhir_complex_type(value, fhir_type, expected):
-    assert is_fhir_complex_type(value, fhir_type) == expected
+    assert is_fhir_complex_type(value, fhir_type, "R4") == expected
 
 
 @pytest.mark.parametrize(
@@ -608,4 +614,4 @@ def test_is_fhir_complex_type(value, fhir_type, expected):
     ],
 )
 def test_is_fhir_resource_type(value, fhir_type, expected):
-    assert is_fhir_resource_type(value, fhir_type) == expected
+    assert is_fhir_resource_type(value, fhir_type, "R4") == expected

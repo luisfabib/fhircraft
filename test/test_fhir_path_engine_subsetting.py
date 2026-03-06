@@ -12,10 +12,10 @@ from fhircraft.fhir.path.engine.core import (
 from fhircraft.fhir.path.engine.core import This
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.subsetting import *
-from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
+from fhircraft.fhir.resources.datatypes import get_fhir_type
 
-Coding = get_complex_FHIR_type("Coding")
-CodeableConcept = get_complex_FHIR_type("CodeableConcept")
+Coding = get_fhir_type("Coding", "R4")
+CodeableConcept = get_fhir_type("CodeableConcept", "R4")
 
 
 env = dict()
