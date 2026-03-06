@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, Sequence
+from typing import TYPE_CHECKING, Any, Literal, Sequence
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
@@ -319,6 +319,64 @@ class ElementNode:
                 ],
             )
         )
+
+    # ------------------------------------------------------------------
+    # Constraint values
+    # ------------------------------------------------------------------
+
+    @property
+    def pattern(
+        self,
+    ):
+        """
+        The pattern[x] value for this element, if any.  Returns ``None`` if no pattern is specified.
+        """
+        return self.definition.pattern
+
+    @property
+    def fixed(
+        self,
+    ):
+        """
+        The fixed[x] value for this element, if any.  Returns ``None`` if no fixed is specified.
+        """
+        return self.definition.fixed
+
+    @property
+    def default_value(
+        self,
+    ):
+        """
+        The defaultValue[x] value for this element, if any.  Returns ``None`` if no default is specified.
+        """
+        return self.definition.defaultValue
+
+    @property
+    def min_value(
+        self,
+    ):
+        """
+        The minValue[x] value for this element, if any.  Returns ``None`` if no minValue is specified.
+        """
+        return self.definition.minValue
+
+    @property
+    def max_value(
+        self,
+    ):
+        """
+        The maxValue[x] value for this element, if any.  Returns ``None`` if no maxValue is specified.
+        """
+        return self.definition.maxValue
+
+    @property
+    def max_length(
+        self,
+    ):
+        """
+        The maxLength[x] value for this element, if any.  Returns ``None`` if no maxLength is specified.
+        """
+        return self.definition.maxLength
 
     # ------------------------------------------------------------------
     # Dunder helpers

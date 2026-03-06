@@ -940,7 +940,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
                 slice_resources.extend(
                     [
                         slice.model_construct_with_slices()
-                        for _ in range(min(slice.max_cardinality, slice_copies))
+                        for _ in range(min(slice.max_cardinality or 9999, slice_copies))
                     ]
                 )
             # Set the whole list of slices in the resource
@@ -1053,7 +1053,7 @@ class FHIRSliceModel(FHIRBaseModel):
     """
 
     min_cardinality: ClassVar[int] = 0
-    max_cardinality: ClassVar[int] = 1
+    max_cardinality: ClassVar[int | None] = None
 
     @property
     def is_FHIR_complete(self):

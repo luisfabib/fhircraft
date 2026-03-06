@@ -11,5 +11,13 @@ class DefinitionResolutionError(Exception):
     """Raised when a SnapshotResolver or DefinitionIndex operation fails."""
 
 
-class UnregisteredTypeError(LookupError):
-    """Raised when TypeRegistry cannot resolve a type code or canonical URL."""
+class BuilderError(Exception):
+    """Raised when a Builder operation fails."""
+
+
+class TypeResolutionError(LookupError):
+    """Raised when resolving a FHIR type fails."""
+
+
+class AssemblerError(LookupError):
+    """Raised when the assembler encounters an error."""
