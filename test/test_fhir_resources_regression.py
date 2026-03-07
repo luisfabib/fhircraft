@@ -29,7 +29,7 @@ def generator():
 @pytest.fixture
 def factory():
 
-    factory = ResourceFactory()
+    factory = ResourceFactory(fhir_release="R5")
     yield factory
     factory.clear_cache()
 

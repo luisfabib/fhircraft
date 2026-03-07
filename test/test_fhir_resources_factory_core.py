@@ -154,7 +154,7 @@ def test_build__calls_build_internal_when_not_cached(factory):
     ):
         factory.build(sd)
 
-    mock_internal.assert_called_once_with(sd, mixins=None)
+    mock_internal.assert_called_once_with(sd, mixins=None, mode="auto")
 
 
 def test_build__passes_mixins_to_build_internal(factory):
@@ -168,7 +168,7 @@ def test_build__passes_mixins_to_build_internal(factory):
     ):
         factory.build(sd, mixins=[mixin])
 
-    mock_internal.assert_called_once_with(sd, mixins=[mixin])
+    mock_internal.assert_called_once_with(sd, mixins=[mixin], mode="auto")
 
 
 # ===========================================================================

@@ -334,6 +334,22 @@ def test_assemble__each_child_dispatches_to_its_own_builder_call():
     assert mock_b.build.call_count == 2
 
 
+def test_assemble__multiple_children_produce_multiple_fields():
+    root = make_root_node()
+    child_a = make_child_node(id="Resource.a", path="Resource.a")
+    child_b = make_child_node(id="Resource.b", path="Resource.b")
+    a = make_assembler(root=root, children={root.id: [child_a, child_b]})
+    mock_b = make_mock_builder()
+    mock_b.build.side_effect = [
+        Build(fields=[make_field("score", int)]),
+        Build(fields=[make_field("label", str)]),
+    ]
+    a.builder_chain = [mock_b]
+    model = a.assemble("M")
+    assert "score" in model.model_fields
+    assert "label" in model.model_fields
+
+
 def test_assemble__skips_child_with_no_type_no_children_no_slices():
     root = make_root_node()
     meta_child = make_child_node(has_type=False, is_content_reference=False)

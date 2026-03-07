@@ -10,7 +10,6 @@ import pytest
 
 from fhircraft.config import with_config
 from fhircraft.fhir.resources.factory import (
-    ConstructionMode,
     ResourceFactory,
 )
 from fhircraft.fhir.resources.generator import CodeGenerator
@@ -58,38 +57,27 @@ fhir_resources_test_cases = {
 }
 
 
-@pytest.fixture
-def factory():
-    return ResourceFactory()
-
-
-def _assert_construct_core_resource(
-    version, resource_label, filename, factory: ResourceFactory
-):
-
+def _assert_construct_core_resource(fhir_release, resource_label, filename):
+    factory = ResourceFactory(fhir_release=fhir_release)
     with with_config(validation_mode="skip"):
         # Disable internet access to ensure we use local definitions
-        factory.disable_internet_access()
+        factory.definition_registry.disable_internet_access()
         # Load the FHIR resource definition from local files
-        factory.load_definitions_from_files(
+        with open(
             Path(CORE_DEFINITIONS_DIRECTORY)
-            / Path(version)
-            / Path(f"{resource_label.lower()}.profile.json")
-        )
-
-    fhir_version = {
-        "R4B": "4.3.0",
-        "R5": "5.0.0",
-    }.get(version, version)
-
-    # Generate source code for Pydantic FHIR model
-    resource = factory.construct_resource_model(
-        canonical_url=f"http://hl7.org/fhir/StructureDefinition/{resource_label}|{fhir_version}",
-        mode=ConstructionMode.SNAPSHOT,
-    )
+            / Path(fhir_release)
+            / Path(f"{resource_label.lower()}.profile.json"),
+            encoding="utf8",
+        ) as file:
+            struct_def = json.load(file)
+            struct_def["baseDefinition"] = None
+        # Generate source code for Pydantic FHIR model
+        resource = factory.build(struct_def, mode="snapshot")
     # Load example FHIR resource data
     with open(
-        os.path.join(os.path.abspath(f"{CORE_EXAMPLES_DIRECTORY}/{version}"), filename),
+        os.path.join(
+            os.path.abspath(f"{CORE_EXAMPLES_DIRECTORY}/{fhir_release}"), filename
+        ),
         encoding="utf8",
     ) as file:
         fhir_resource_data = json.load(file)
@@ -106,6 +94,7 @@ def _assert_construct_core_resource(
     with tempfile.TemporaryDirectory() as d:
 
         source_code = CodeGenerator().generate_resource_model_code(resource)
+        print(f"Generated code for {resource_label}:\n{source_code}")
         # Store source code in a file
         temp_file_name = os.path.join(d, "temp_test.py")
         with open(temp_file_name, "w") as test_file:
@@ -133,14 +122,14 @@ def _assert_construct_core_resource(
 
 @pytest.mark.integration
 @pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases["R4B"])
-def test_construct_R4B_core_resource(resource_label, filename, factory):
-    _assert_construct_core_resource("R4B", resource_label, filename, factory)
+def test_construct_R4B_core_resource(resource_label, filename):
+    _assert_construct_core_resource("R4B", resource_label, filename)
 
 
 @pytest.mark.integration
 @pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases["R5"])
-def test_construct_R5_core_resource(resource_label, filename, factory):
-    _assert_construct_core_resource("R5", resource_label, filename, factory)
+def test_construct_R5_core_resource(resource_label, filename):
+    _assert_construct_core_resource("R5", resource_label, filename)
 
 
 def _get_profiles_example_filenames(prefix):
@@ -167,12 +156,10 @@ fhir_profiles_test_cases = [
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize(
-    "mode", [ConstructionMode.DIFFERENTIAL, ConstructionMode.SNAPSHOT]
-)
+@pytest.mark.parametrize("mode", ["differential", "snapshot"])
 @pytest.mark.parametrize("filename", fhir_profiles_test_cases)
 @pytest.mark.filterwarnings("ignore:.*eld-24.*")
-def test_construct_profiled_resource(mode, filename, factory):
+def test_construct_profiled_resource(mode, filename):
     # Use the auto-generated model to validate a FHIR resource
     with open(
         os.path.join(os.path.abspath(f"{PROFILES_EXAMPLES_DIRECTORY}"), filename),
@@ -180,16 +167,20 @@ def test_construct_profiled_resource(mode, filename, factory):
     ) as file:
         fhir_resource = json.load(file)
 
+    factory = ResourceFactory(fhir_release="R4B")
+
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
         with with_config(validation_mode="skip"):
             # Disable internet access to ensure we use local definitions
-            factory.disable_internet_access()
+            factory.definition_registry.disable_internet_access()
             # Load the FHIR resource definition from local files
-            factory.load_definitions_from_directory(Path(PROFILES_DEFINTIONS_DIRECTORY))
+            for file in glob.glob(f"{PROFILES_DEFINTIONS_DIRECTORY}/*.json"):
+                with open(file, encoding="utf8") as def_file:
+                    factory.definition_registry.from_dict(json.load(def_file))
             factory.clear_cache()
         # Generate source code for Pydantic FHIR model
-        resource = factory.construct_resource_model(
+        resource = factory.build(
             canonical_url=fhir_resource["meta"]["profile"][0],
             mode=mode,
         )
