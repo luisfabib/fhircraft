@@ -164,7 +164,7 @@ class ElementNode:
     @property
     def is_content_reference(self) -> bool:
         """True when ``definition.contentReference`` is set."""
-        return self.definition.contentReference is True
+        return self.definition.contentReference is not None
 
     # ------------------------------------------------------------------
     # Slice identity

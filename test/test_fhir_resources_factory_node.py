@@ -243,6 +243,19 @@ def test_element_node_is_slice_entry(element, slicing, expected):
     assert node.is_slice_entry == expected
 
 
+@pytest.mark.parametrize(
+    "reference, expected",
+    [
+        (MagicMock(), True),
+        (None, False),
+    ],
+)
+def test_element_node_is_content_reference(element, reference, expected):
+    element.contentReference = reference
+    node = ElementNode(definition=element)
+    assert node.is_content_reference == expected
+
+
 # ------------------------------------------------------------------
 # Slice identity
 # ------------------------------------------------------------------
