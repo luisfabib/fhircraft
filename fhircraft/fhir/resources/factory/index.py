@@ -220,18 +220,58 @@ class DefinitionIndex:
         """
         Return a new :class:`DefinitionIndex` scoped to *id* and all of
         its descendants (children, slices, and their sub-elements).
+
+        The returned index is re-rooted: the matched element becomes the root
+        with an id equal to its capitalised :attr:`~ElementNode.name`
+        (e.g. ``Observation.component`` → ``Component``), and all descendant
+        ids and paths are rewritten accordingly.
         """
+        root_node = self.get(id)
+        raw_name = root_node.name
+        new_root_name = raw_name[0].upper() + raw_name[1:]
+
+        # Original path prefix used for rewriting path fields (no slice names).
+        original_path = root_node.path
+        original_path_dot = original_path + "."
+
         prefix_dot = id + "."
         prefix_colon = id + ":"
-        subtree_nodes = [
-            node
-            for node in self.nodes
+
+        def _rewrite_id(original_id: str) -> str:
+            if original_id == id:
+                return new_root_name
+            if original_id.startswith(prefix_dot):
+                return new_root_name + "." + original_id[len(prefix_dot) :]
+            if original_id.startswith(prefix_colon):
+                return new_root_name + ":" + original_id[len(prefix_colon) :]
+            return original_id
+
+        def _rewrite_path(original_path_value: str) -> str:
+            if original_path_value == original_path:
+                return new_root_name
+            if original_path_value.startswith(original_path_dot):
+                return (
+                    new_root_name + "." + original_path_value[len(original_path_dot) :]
+                )
+            return original_path_value
+
+        subtree_nodes = []
+        for node in self.nodes:
+            node_id = node.id
             if (
-                node.id == id
-                or node.id.startswith(prefix_dot)
-                or node.id.startswith(prefix_colon)
+                node_id != id
+                and not node_id.startswith(prefix_dot)
+                and not node_id.startswith(prefix_colon)
+            ):
+                continue
+            new_definition = node.definition.model_copy(
+                update={
+                    "id": _rewrite_id(node_id),
+                    "path": _rewrite_path(node.path),
+                }
             )
-        ]
+            subtree_nodes.append(ElementNode(definition=new_definition))
+
         return DefinitionIndex(subtree_nodes)
 
     # ------------------------------------------------------------------

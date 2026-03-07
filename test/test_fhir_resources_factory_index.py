@@ -280,32 +280,82 @@ def test_get_slice_children_returns_children_of_slice(slicing_index):
 # ------------------------------------------------------------------
 
 
-def test_get_subtree_includes_root_and_descendants(slicing_index):
-    subtree = slicing_index.get_subtree("Observation.component")
-    ids = {n.id for n in subtree}
+class CopyableMagickyMock(MagicMock):
+    def model_copy(self, update=dict()):
+        self_copy = CopyableMagickyMock()
+        for attr in self.__dict__:
+            setattr(self_copy, attr, getattr(self, attr))
+        for k, v in update.items():
+            setattr(self_copy, k, v)
+        return self_copy
+
+
+@pytest.fixture
+def deep_index():
+    return DefinitionIndex(
+        [
+            ElementNode(
+                definition=CopyableMagickyMock(id="Observation", path="Observation")
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.component", path="Observation.component"
+                )
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.component.code", path="Observation.component.code"
+                )
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.component.valueCodableConcept",
+                    path="Observation.component.valueCodableConcept",
+                )
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.component.valueCodableConcept.coding",
+                    path="Observation.component.valueCodableConcept.coding",
+                )
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.extension", path="Observation.extension"
+                )
+            ),
+        ]
+    )
+
+
+def test_get_subtree_includes_root_and_descendants(deep_index: DefinitionIndex):
+    subtree_index = deep_index.get_subtree("Observation.component")
+    ids = {n.id for n in subtree_index}
+    print(ids)
+    assert subtree_index.root() is not None
     assert ids == {
-        "Observation.component",
-        "Observation.component:systolic",
-        "Observation.component:diastolic",
-        "Observation.component.value[x]",
+        "Component",
+        "Component.code",
+        "Component.valueCodableConcept",
+        "Component.valueCodableConcept.coding",
     }
 
 
-def test_get_subtree_excludes_unrelated_nodes(slicing_index):
-    subtree = slicing_index.get_subtree("Observation.component")
-    ids = {n.id for n in subtree}
+def test_get_subtree_excludes_unrelated_nodes(deep_index: DefinitionIndex):
+    subtree_index = deep_index.get_subtree("Observation.component")
+    ids = {n.id for n in subtree_index}
     assert "Observation" not in ids
 
 
-def test_get_subtree_single_leaf(simple_index):
-    subtree = simple_index.get_subtree("Observation.code")
-    ids = {n.id for n in subtree}
-    assert ids == {"Observation.code"}
+def test_get_subtree_single_leaf(deep_index: DefinitionIndex):
+    subtree_index = deep_index.get_subtree("Observation.component.code")
+    ids = {n.id for n in subtree_index}
+    assert ids == {"Code"}
 
 
-def test_get_subtree_returns_definition_index(simple_index):
-    subtree = simple_index.get_subtree("Observation")
-    assert isinstance(subtree, DefinitionIndex)
+def test_get_subtree_returns_definition_index(deep_index: DefinitionIndex):
+    subtree_index = deep_index.get_subtree("Observation")
+    assert isinstance(subtree_index, DefinitionIndex)
 
 
 # ------------------------------------------------------------------
