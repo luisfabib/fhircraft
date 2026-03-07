@@ -210,32 +210,6 @@ class FHIRStructureFactory:
         model = assembler.assemble(sanitized_name, base=base_classes)
 
         # ------------------------------------------------------------------
-        # Override / inject meta.profile default
-        # ------------------------------------------------------------------
-        if sd_url:
-            has_meta = "meta" in model.model_fields or (
-                issubclass(base_model, BaseModel) and "meta" in base_model.model_fields
-            )
-            if has_meta:
-                try:
-                    Meta = get_fhir_type("Meta", fhir_release)
-                    meta_field: tuple = (
-                        Optional[Meta],
-                        Field(
-                            title="Meta",
-                            description="Metadata about the resource.",
-                            default=Meta(profile=[sd_url]),
-                        ),
-                    )
-                    model = create_model(
-                        sanitized_name,
-                        meta=meta_field,
-                        __base__=model,
-                    )
-                except Exception:
-                    pass  # non-fatal
-
-        # ------------------------------------------------------------------
         # Attach structural class metadata
         # ------------------------------------------------------------------
         if issubclass(model, FHIRBaseModel):
