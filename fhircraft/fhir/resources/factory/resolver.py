@@ -225,9 +225,14 @@ class SnapshotResolver:
             return node
         else:
             return None
+        new_path = (
+            ".".join(filter(None, [root_name, *base_node.path_segments[1:]]))
+            if root_name
+            else base_node.path
+        )
         new_definition = base_node.definition.__class__(
             id=id,
-            path=".".join(filter(None, [root_name, *base_node.path_segments[1:]])),
+            path=new_path,
             **base_node.definition.model_dump(include=set(_BASE_MERGE_FIELDS)),
         )
         return ElementNode(definition=new_definition)
