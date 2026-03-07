@@ -68,17 +68,20 @@ def make_index(children=None):
     return index
 
 
-def make_builder(fhir_release: str = "R4B", base=None) -> BackboneFieldBuilder:
+def make_builder(
+    resource_name: str, fhir_release: str = "R4B", base=None
+) -> BackboneFieldBuilder:
     ctx = MagicMock(name="mock-build-context")
     ctx.fhir_release = fhir_release
     ctx.base = base
+    ctx.resource_name = resource_name
     return BackboneFieldBuilder(context=ctx)
 
 
 @pytest.fixture
 def builder() -> BackboneFieldBuilder:
     # context.base=None so build() goes through resolve_type → FHIRBaseModel fallback
-    return make_builder(base=None)
+    return make_builder(resource_name="TestResource", base=None)
 
 
 @pytest.fixture
@@ -180,7 +183,7 @@ def test_build__backbone_name_uses_base_name_and_single_path_part(
     node = make_node(name="component", path="Observation.component")
     builder.build(node, index)
     called_name = mock_assembler.return_value.assemble.call_args[0][0]
-    assert called_name == "FHIRBaseModelComponent"
+    assert called_name == "TestResourceComponent"
 
 
 def test_build__backbone_name_capitalises_multiple_path_parts(
@@ -189,7 +192,7 @@ def test_build__backbone_name_capitalises_multiple_path_parts(
     node = make_node(name="value", path="Observation.component.value")
     builder.build(node, index)
     called_name = mock_assembler.return_value.assemble.call_args[0][0]
-    assert called_name == "FHIRBaseModelComponentValue"
+    assert called_name == "TestResourceComponentValue"
 
 
 def test_build__backbone_name_strips_type_choice_marker(builder, index, mock_assembler):
@@ -197,7 +200,7 @@ def test_build__backbone_name_strips_type_choice_marker(builder, index, mock_ass
     builder.build(node, index)
     called_name = mock_assembler.return_value.assemble.call_args[0][0]
     # [x] is stripped before capitalisation
-    assert called_name == "FHIRBaseModelValue"
+    assert called_name == "TestResourceValue"
 
 
 def test_build__assembler_constructed_with_subtree(builder, index, mock_assembler):
@@ -228,13 +231,13 @@ def test_build__assembler_assemble_called_with_backbone_name(
     node = make_node(name="component", path="Observation.component")
     builder.build(node, index)
     called_name = mock_assembler.return_value.assemble.call_args[0][0]
-    assert called_name == "FHIRBaseModelComponent"
+    assert called_name == "TestResourceComponent"
 
 
 def test_build__backbone_base_is_fhir_base_model_when_context_base_is_none(
     index, mock_assembler: MagicMock
 ):
-    builder = make_builder(base=None)
+    builder = make_builder(resource_name="TestResource", base=None)
     node = make_node()
     builder.build(node, index)
     assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
@@ -251,7 +254,7 @@ def test_build__backbone_base_resolved_from_context_base_model_fields(
     class ParentModel(BaseModel):
         component: Optional[InnerModel] = None
 
-    builder = make_builder(base=ParentModel)
+    builder = make_builder(resource_name="TestResource", base=ParentModel)
     node = make_node(name="component", path="ParentModel.component")
     builder.build(node, index)
     assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
@@ -266,7 +269,7 @@ def test_build__backbone_base_digs_through_optional_list(index, mock_assembler):
     class ParentModel(BaseModel):
         component: Optional[List[InnerModel]] = None
 
-    builder = make_builder(base=ParentModel)
+    builder = make_builder(resource_name="TestResource", base=ParentModel)
     node = make_node(name="component", path="ParentModel.component")
     builder.build(node, index)
     assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
@@ -280,7 +283,7 @@ def test_build__backbone_base_is_fhir_base_model_when_field_not_in_context_base(
     class ParentModel(BaseModel):
         pass  # no "component" field
 
-    builder = make_builder(base=ParentModel)
+    builder = make_builder(resource_name="TestResource", base=ParentModel)
     node = make_node(name="component", path="ParentModel.component")
     builder.build(node, index)
     assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
@@ -291,7 +294,7 @@ def test_build__backbone_base_is_fhir_base_model_when_field_not_in_context_base(
 def test_build__python_keyword_field_receives_validation_alias(
     index, mock_assembler, monkeypatch
 ):
-    builder = make_builder(base=None)
+    builder = make_builder(resource_name="TestResource", base=None)
     node = make_node(name="component")
     alias = AliasChoices("component")
 

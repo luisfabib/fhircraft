@@ -200,6 +200,7 @@ class FHIRStructureFactory:
                 fhir_release=self.fhir_release,
                 fhir_version=fhir_version,
                 registry=self.definition_registry,
+                resource_name=sanitized_name,
                 factory=self,
                 base=base_model,
             ),

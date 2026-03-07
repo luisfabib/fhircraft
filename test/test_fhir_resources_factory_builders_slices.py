@@ -119,6 +119,7 @@ def make_builder(fhir_release: str = "R4B") -> SlicedFieldBuilder:
     ctx = MagicMock(name="mock-build-context")
     ctx.fhir_release = fhir_release
     ctx.base = FakeBase
+    ctx.resource_name = "TestResource"
     return SlicedFieldBuilder(context=ctx)
 
 
@@ -300,7 +301,7 @@ def test_build__slice_model_name_uses_context_base_name(
     node = make_entry_node()
     builder.build(node, index)
     called_name = assembler.return_value.assemble.call_args[0][0]
-    assert called_name.startswith("FakeBase")
+    assert called_name.startswith("TestResource")
 
 
 def test_build__slice_model_name_capitalises_slice_name(
@@ -311,7 +312,7 @@ def test_build__slice_model_name_capitalises_slice_name(
     node = make_entry_node()
     builder.build(node, index)
     called_name = assembler.return_value.assemble.call_args[0][0]
-    assert called_name == "FakeBaseLaboratory"
+    assert called_name == "TestResourceLaboratory"
 
 
 def test_build__slice_model_name_capitalises_hyphenated_slice_name(
@@ -322,7 +323,7 @@ def test_build__slice_model_name_capitalises_hyphenated_slice_name(
     node = make_entry_node()
     builder.build(node, index)
     called_name = assembler.return_value.assemble.call_args[0][0]
-    assert called_name == "FakeBaseVitalSigns"
+    assert called_name == "TestResourceVitalSigns"
 
 
 def test_build__slice_min_cardinality_set_on_model(builder: Builder, index, assembler):

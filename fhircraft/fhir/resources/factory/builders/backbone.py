@@ -53,7 +53,7 @@ class BackboneFieldBuilder(Builder):
 
         # Build the backbone model name from the element path
         path_parts = node.path.split(".")[1:]  # strip resource prefix
-        backbone_name = backbone_base.__name__ + "".join(
+        backbone_name = self.context.resource_name + "".join(
             capitalize(part.replace("[x]", "")) for part in path_parts
         )
 

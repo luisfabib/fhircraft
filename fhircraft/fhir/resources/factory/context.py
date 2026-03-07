@@ -35,6 +35,9 @@ class BuildContext:
     base: type
     """ The base model class for this build session. """
 
+    resource_name: str
+    """ The resource name for this build session. """
+
     factory: FHIRStructureFactory
     """ The FHIR structure factory for this build session. """
 

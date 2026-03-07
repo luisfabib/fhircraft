@@ -40,7 +40,7 @@ class SlicedFieldBuilder(Builder):
                 )
             slice_base_type = self.resolve_type(slice_node.types[0]).type
             slice_model_name = (
-                f"{self.context.base.__name__}{_capitalise_slice_name(slice_name)}"
+                f"{self.context.resource_name}{_capitalise_slice_name(slice_name)}"
             )
 
             if slice_base_type is FHIRSliceModel or issubclass(
