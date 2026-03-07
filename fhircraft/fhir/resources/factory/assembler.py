@@ -82,8 +82,15 @@ class ModelAssembler:
         # ------------------------------------------------------------------
         root = self.index.root()
         root_id = root.id
+        fields = {}
+        field_validators = {}
 
-        for child_node in self.index.get_children(root_id):
+        if len(child_nodes := self.index.get_children(root_id)) == 0:
+            raise AssemblerError(
+                f"No child nodes found for root element '{root_id}' in index; cannot assemble model '{name}'."
+            )
+
+        for child_node in child_nodes:
             if not child_node.definition:
                 raise ValueError(
                     f"Element '{child_node.id}' has no definition in the index."
@@ -101,25 +108,28 @@ class ModelAssembler:
                 )
             except Exception as exc:
                 raise AssemblerError(
-                    f"Builder failed for element '{child_node.id}': {exc}."
+                    f"Builder failed for element '{child_node.id}': {exc}"
                 ) from exc
 
             # ----------------------------------------------------------
             # Accumulate results
             # ----------------------------------------------------------
-            fields = {info.name: info.as_pydantic_definition() for info in build.fields}
-            field_validators = {
-                info.name: info.as_pydantic_definition() for info in build.validators
-            }
-            model_validators = {
-                info.name: info.as_pydantic_definition()
-                for constraint in (root.definition.constraint or [])
-                if (
-                    info := Builder.build_invariant_constraint(
-                        child_node.path, constraint, kind="model"
-                    )
+            fields.update(
+                {info.name: info.as_pydantic_definition() for info in build.fields}
+            )
+            field_validators.update(
+                {info.name: info.as_pydantic_definition() for info in build.validators}
+            )
+
+        model_validators = {
+            info.name: info.as_pydantic_definition()
+            for constraint in (root.definition.constraint or [])
+            if (
+                info := Builder.build_invariant_constraint(
+                    root.path, constraint, kind="model"
                 )
-            }
+            )
+        }
 
         if not fields:
             raise AssemblerError(
