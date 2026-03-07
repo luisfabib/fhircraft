@@ -146,10 +146,9 @@ class FHIRStructureFactory:
         # ------------------------------------------------------------------
         # Resolve base definition
         # ------------------------------------------------------------------
-        base_canonical = structure_def.baseDefinition
         base_model: type = FHIRBaseModel
         base_index = None
-        if base_canonical:
+        if base_canonical := structure_def.baseDefinition:
             # Try directly from registry of built-in types first
             resolved = get_fhir_type_by_url(
                 base_canonical, fhir_release, fail_if_not_found=False
@@ -169,7 +168,6 @@ class FHIRStructureFactory:
                         f"Could not resolve base definition '{base_canonical}' for "
                         f"'{sd_name}': {exc}.  Using FHIRBaseModel as fallback."
                     )
-                    base_model = FHIRBaseModel
 
             # Obtain the base snapshot for differential resolution
             base_definition = self.definition_registry.get(base_canonical)

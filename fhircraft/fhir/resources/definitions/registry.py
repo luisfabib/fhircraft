@@ -244,7 +244,7 @@ class StructureDefinitionRegistry:
         try:
             return StructureDefinition.model_validate(data)
         except ValidationError as e:
-            raise ValidationError(
+            raise ValueError(
                 f"Data does not conform to expected structure definition for FHIR release {self.fhir_release}: \n\n{str(e)}"
             ) from e
 
