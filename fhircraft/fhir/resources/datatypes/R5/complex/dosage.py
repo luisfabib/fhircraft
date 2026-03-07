@@ -51,7 +51,7 @@ class DosageDoseAndRate(BackboneType):
     def dose_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=["Range", "SimpleQuantity"],
+            field_types=["Range", "Quantity"],
             field_name_base="dose",
         )
 
@@ -66,7 +66,7 @@ class DosageDoseAndRate(BackboneType):
     def rate_type_choice_validator(self):
         return fhir_validators.validate_type_choice_element(
             self,
-            field_types=["Ratio", "Range", "SimpleQuantity"],
+            field_types=["Ratio", "Range", "Quantity"],
             field_name_base="rate",
         )
 
