@@ -146,6 +146,7 @@ class ModelAssembler:
             __base__=base_classes,
             __validators__={**field_validators, **model_validators},  # type: ignore[arg-type]
             __doc__=root.documentation,
+            __module__=self.ctx.factory.__module__,
         )
 
         # Attach properties
