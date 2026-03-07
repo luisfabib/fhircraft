@@ -345,7 +345,7 @@ def validate_type_choice_element(
     field_types: List[Any],
     field_name_base: str,
     required: bool = False,
-    non_allowed_types: List[Any] | None = None,
+    non_allowed_types=[],
 ) -> T:
     """
     Validate the type choice element for a given instance.
@@ -363,18 +363,15 @@ def validate_type_choice_element(
     Raises:
         AssertionError: If more than one value is set for the type choice element or if a non-allowed type is set.
     """
+    field_types: List[str] = [
+        field_type if isinstance(field_type, str) else str(field_type.__name__)
+        for field_type in field_types
+    ]
     types_set_count = sum(
         (
             getattr(
                 instance,
-                (
-                    field_name_base
-                    + (
-                        field_type
-                        if isinstance(field_type, str)
-                        else field_type.__name__
-                    )
-                ),
+                (field_name_base + field_type),
                 None,
             )
         )
@@ -387,8 +384,17 @@ def validate_type_choice_element(
     assert not required or (
         required and types_set_count > 0
     ), f"Type choice element {field_name_base}[x] must have one value set. Got {types_set_count}."
-
+    all_types = [
+        field.replace(field_name_base, "")
+        for field in instance.__class__.model_fields
+        if field.startswith(field_name_base)
+    ]
     # Check that non-allowed types are not set
+    non_allowed_types = non_allowed_types or [
+        field_type
+        for field_type in all_types
+        if field_type.replace("_ext", "") not in field_types
+    ]
     if non_allowed_types:
         for non_allowed_type in non_allowed_types:
             field_name = field_name_base + (
