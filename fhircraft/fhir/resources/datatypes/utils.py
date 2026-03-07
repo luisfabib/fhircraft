@@ -89,7 +89,7 @@ def is_fhir_primitive_type(
 def is_fhir_complex_type(
     value: Any,
     fhir_type: "type[FHIRBaseModel] | type | TypeAliasType | str",
-    release: str,
+    release: str | None = None,
 ) -> bool:
     """
     Check if a value conforms to a complex FHIR type.
@@ -105,13 +105,17 @@ def is_fhir_complex_type(
         FHIRTypeError: If the fhir_type is a string and does not correspond to a known complex type
     """
     if isinstance(fhir_type, str):
+        if not release:
+            raise FHIRTypeError(
+                f"Release must be specified when fhir_type is given as a string: '{fhir_type}'"
+            )
         fhir_type = get_fhir_type(fhir_type, release)  # type: ignore
 
-    if isinstance(fhir_type, type) and issubclass(fhir_type, FHIRBaseModel):
-        if fhir_type._kind != "complex-type":
+    if isinstance(fhir_type, type) and issubclass(fhir_type, BaseModel):
+        if getattr(fhir_type, "_kind", None) != "complex-type":
             return False
-        if isinstance(value, BaseModel):
-            return isinstance(value, fhir_type)
+        elif isinstance(value, fhir_type):
+            return True
         else:
             try:
                 fhir_type.model_validate(value)
@@ -125,7 +129,7 @@ def is_fhir_complex_type(
 def is_fhir_resource_type(
     value: Any,
     fhir_type: "type[FHIRBaseModel] | type | TypeAliasType | str",
-    release: str,
+    release: str | None = None,
 ) -> bool:
     """
     Check if a value conforms to a FHIR resource.
@@ -142,13 +146,17 @@ def is_fhir_resource_type(
         FHIRTypeError: If the fhir_type is a string and does not correspond to a known resource type
     """
     if isinstance(fhir_type, str):
+        if not release:
+            raise FHIRTypeError(
+                f"Release must be specified when fhir_type is given as a string: '{fhir_type}'"
+            )
         fhir_type = get_fhir_type(fhir_type, release)  # type: ignore
 
-    if isinstance(fhir_type, type) and issubclass(fhir_type, FHIRBaseModel):
-        if fhir_type._kind != "resource":
+    if isinstance(fhir_type, type) and issubclass(fhir_type, BaseModel):
+        if getattr(fhir_type, "_kind", None) != "resource":
             return False
-        if isinstance(value, BaseModel):
-            return isinstance(value, fhir_type)
+        elif isinstance(value, fhir_type):
+            return True
         else:
             try:
                 fhir_type.model_validate(value)
@@ -156,6 +164,7 @@ def is_fhir_resource_type(
             except ValidationError as e:
                 return False
     else:
+        print(f"Type {fhir_type} is not a valid resource type.")
         return False
 
 
