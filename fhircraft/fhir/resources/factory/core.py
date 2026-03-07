@@ -78,6 +78,7 @@ class FHIRStructureFactory:
         *,
         canonical_url: str | None = None,
         mixins: Sequence[type] | None = None,
+        mode: Literal["auto", "snapshot", "differential"] = "auto",
     ) -> type[BaseModel]:
         """
         Build and return a Pydantic model for the given ``StructureDefinition``.
@@ -114,7 +115,7 @@ class FHIRStructureFactory:
         if structure_definition.url in self.construction_cache:
             return self.construction_cache[structure_definition.url]
 
-        return self._build(structure_definition, mixins=mixins)
+        return self._build(structure_definition, mixins=mixins, mode=mode)
 
     # ------------------------------------------------------------------
     # Internal build pipeline
