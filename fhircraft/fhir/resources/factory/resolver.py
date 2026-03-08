@@ -44,8 +44,8 @@ class SnapshotResolver:
     Resolves a FHIR ``StructureDefinition`` into a complete :class:`DefinitionIndex`.
     """
 
-    def __init__(self, repository: StructureDefinitionRegistry) -> None:
-        self._registry = repository
+    def __init__(self, registry: StructureDefinitionRegistry) -> None:
+        self._registry = registry
 
     # ------------------------------------------------------------------
     # Public API
@@ -97,9 +97,9 @@ class SnapshotResolver:
             ), f"StructureDefinition {sd.name or sd.url} snapshot.element contains None"
             # Fast path: wrap snapshot elements directly without merging
             elements = sd.snapshot.element
-            return DefinitionIndex.from_elements(elements)
+            resolved_index = DefinitionIndex.from_elements(elements)
 
-        if mode == "differential":
+        elif mode == "differential":
             assert (
                 base_index is not None
             ), "Base index is required for differential resolution."
@@ -113,13 +113,21 @@ class SnapshotResolver:
             assert all(
                 [e is not None for e in sd.differential.element]
             ), f"StructureDefinition {sd.name or sd.url} differential.element contains None"
-            # Slow path: merge differential over base snapshot to produce a synthetic snapshot
-            return self._resolve_differential(sd.differential.element, base_index)
+            # Merge differential over base snapshot to produce a synthetic snapshot
+            resolved_index = self._resolve_differential(
+                sd.differential.element, base_index
+            )
+        else:
 
-        raise DefinitionResolutionError(
-            f"StructureDefinition '{getattr(sd, 'name', '?')}' has neither a "
-            "snapshot nor a differential element list."
-        )
+            raise DefinitionResolutionError(
+                f"StructureDefinition '{getattr(sd, 'name', '?')}' has neither a "
+                "snapshot nor a differential element list."
+            )
+
+        # Finally, resolve any contentReferences in the resulting index
+        resolved_index = self._resolve_content_references(resolved_index)
+
+        return resolved_index
 
     # ------------------------------------------------------------------
     # Differential resolution
@@ -344,3 +352,53 @@ class SnapshotResolver:
             },
         )
         return ElementNode(definition=merged_definition)
+
+    def _resolve_content_references(self, index: DefinitionIndex) -> DefinitionIndex:
+        """
+        Resolve contentReferences in the given DefinitionIndex by replacing them with the
+        referenced element definitions.
+
+        This method iterates through all elements in the provided DefinitionIndex and identifies
+        any elements that contain a contentReference. For each contentReference found, it locates
+        the referenced element definition within the same index (or an external StructureDefinition if specified)
+        and replaces the original element's definition with a new definition based on the referenced one.
+
+        Args:
+            index: The DefinitionIndex to process for contentReference resolution.
+
+        Returns:
+            DefinitionIndex: A new DefinitionIndex with all contentReferences resolved to their actual definitions.
+        """
+        resolved_nodes = []
+        for node in index.nodes:
+            if not node.is_content_reference:
+                resolved_nodes.append(node)
+                continue
+
+            reference: str = node.definition.contentReference  # type: ignore[union-attr]
+            resource_url, ref_path = (
+                reference.split("#") if "#" in reference else ("", reference)
+            )
+
+            # Locate the referenced sub-tree
+            if resource_url:
+                # External reference — load from registry
+                ref_sd = self._registry.get(resource_url)
+                if not ref_sd or not ref_sd.snapshot or not ref_sd.snapshot.element:
+                    raise ValueError(
+                        f"Cannot resolve contentReference '{reference}' — resource not found."
+                    )
+                ref_index = DefinitionIndex.from_elements(ref_sd.snapshot.element)
+            else:
+                ref_index = index
+
+            # Navigate to the referenced element
+            ref_node = ref_index.get(ref_path)
+            resolved_nodes.append(
+                self._merge_node_with_base(
+                    node,
+                    ref_node,
+                )
+            )
+
+        return DefinitionIndex(nodes=resolved_nodes)

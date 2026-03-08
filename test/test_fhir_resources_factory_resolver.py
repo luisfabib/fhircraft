@@ -82,7 +82,7 @@ def skip_validation():
 def resolver():
     register = StructureDefinitionRegistry(fhir_release="R4")
     register._internet_access_enabled = False  # Disable internet access for tests
-    return SnapshotResolver(repository=register)
+    return SnapshotResolver(registry=register)
 
 
 @pytest.fixture
@@ -432,6 +432,153 @@ def test_resolve_differential__raises_for_empty_diff(resolver, base_index):
 
 
 # ==================================================================
+# SnapshotResolver._resolve_content_references
+# ==================================================================
+
+
+def test_resolve_content_references__returns_definition_index(resolver, base_index):
+    result = resolver._resolve_content_references(base_index)
+    assert isinstance(result, DefinitionIndex)
+
+
+def test_resolve_content_references__passthrough_nodes_without_content_reference(
+    resolver, base_index
+):
+    result = resolver._resolve_content_references(base_index)
+    result_ids = {n.id for n in result.nodes}
+    base_ids = {n.id for n in base_index.nodes}
+    assert result_ids == base_ids
+
+
+def test_resolve_content_references__resolves_hash_prefixed_local_reference(
+    resolver, base_index
+):
+    cr_elem = make_element(
+        "BaseResource.extra",
+        "BaseResource.extra",
+        contentReference="#BaseResource.status",
+    )
+    index = DefinitionIndex.from_elements(
+        [n.definition for n in base_index.nodes] + [cr_elem]
+    )
+    result = resolver._resolve_content_references(index)
+    extra_node = result.get("BaseResource.extra")
+    assert extra_node is not None
+    assert extra_node.definition.short == "The status"
+
+
+def test_resolve_content_references__resolved_node_keeps_its_own_id(
+    resolver, base_index
+):
+    cr_elem = make_element(
+        "BaseResource.extra",
+        "BaseResource.extra",
+        contentReference="#BaseResource.status",
+    )
+    index = DefinitionIndex.from_elements(
+        [n.definition for n in base_index.nodes] + [cr_elem]
+    )
+    result = resolver._resolve_content_references(index)
+    extra_node = result.get("BaseResource.extra")
+    assert extra_node.id == "BaseResource.extra"
+
+
+def test_resolve_content_references__resolves_bare_path_reference(resolver, base_index):
+    """A contentReference without '#' resolves from the same index."""
+    cr_elem = make_element(
+        "BaseResource.extra",
+        "BaseResource.extra",
+        contentReference="BaseResource.status",
+    )
+    index = DefinitionIndex.from_elements(
+        [n.definition for n in base_index.nodes] + [cr_elem]
+    )
+    result = resolver._resolve_content_references(index)
+    extra_node = result.get("BaseResource.extra")
+    assert extra_node is not None
+    assert extra_node.definition.short == "The status"
+
+
+def test_resolve_content_references__external_reference_uses_registry(
+    resolver, base_index
+):
+    """An external contentReference (URL#path) is resolved via the registry."""
+    ext_sd = MagicMock()
+    ext_sd.snapshot = MagicMock()
+    ext_sd.snapshot.element = [
+        make_element("External.status", "External.status", short="External status")
+    ]
+    resolver._registry.get = MagicMock(return_value=ext_sd)
+
+    cr_elem = make_element(
+        "BaseResource.extra",
+        "BaseResource.extra",
+        contentReference="http://example.org/External#External.status",
+    )
+    index = DefinitionIndex.from_elements(
+        [n.definition for n in base_index.nodes] + [cr_elem]
+    )
+    result = resolver._resolve_content_references(index)
+    extra_node = result.get("BaseResource.extra")
+    assert extra_node is not None
+    assert extra_node.definition.short == "External status"
+    resolver._registry.get.assert_called_once_with("http://example.org/External")
+
+
+def test_resolve_content_references__raises_when_external_resource_not_found(
+    resolver, base_index
+):
+    resolver._registry.get = MagicMock(return_value=None)
+    cr_elem = make_element(
+        "BaseResource.extra",
+        "BaseResource.extra",
+        contentReference="http://example.org/Missing#Missing.field",
+    )
+    index = DefinitionIndex.from_elements(
+        [n.definition for n in base_index.nodes] + [cr_elem]
+    )
+    with pytest.raises(ValueError):
+        resolver._resolve_content_references(index)
+
+
+def test_resolve_content_references__raises_when_external_resource_has_no_snapshot(
+    resolver, base_index
+):
+    ext_sd = MagicMock()
+    ext_sd.snapshot = None
+    resolver._registry.get = MagicMock(return_value=ext_sd)
+
+    cr_elem = make_element(
+        "BaseResource.extra",
+        "BaseResource.extra",
+        contentReference="http://example.org/External#External.field",
+    )
+    index = DefinitionIndex.from_elements(
+        [n.definition for n in base_index.nodes] + [cr_elem]
+    )
+    with pytest.raises(ValueError):
+        resolver._resolve_content_references(index)
+
+
+def test_resolve_content_references__mixed_nodes_all_present_in_result(
+    resolver, base_index
+):
+    """Non-reference and resolved reference nodes all appear in result."""
+    cr_elem = make_element(
+        "BaseResource.extra",
+        "BaseResource.extra",
+        contentReference="#BaseResource.component",
+    )
+    index = DefinitionIndex.from_elements(
+        [n.definition for n in base_index.nodes] + [cr_elem]
+    )
+    result = resolver._resolve_content_references(index)
+    for n in base_index.nodes:
+        assert n.id in result
+    assert "BaseResource.extra" in result
+
+
+# ==================================================================
 # SnapshotResolver.resolve
 # ==================================================================
 
@@ -490,10 +637,12 @@ def test_resolve__differential_mode_delegates_to_resolve_differential(
 
     expected = DefinitionIndex(list(base_index.nodes))
     resolver._resolve_differential = MagicMock(return_value=expected)
+    resolver._resolve_content_references = MagicMock(return_value=expected)
 
     result = resolver.resolve(sd, base_index, mode="differential")
 
     resolver._resolve_differential.assert_called_once_with(diff_elements, base_index)
+    resolver._resolve_content_references.assert_called_once_with(expected)
     assert result is expected
 
 
@@ -502,6 +651,9 @@ def test_resolve__differential_mode_returns_definition_index(resolver, base_inde
     sd = make_structure_def(differential_elements=diff_elements)
 
     resolver._resolve_differential = MagicMock(
+        return_value=DefinitionIndex(list(base_index.nodes))
+    )
+    resolver._resolve_content_references = MagicMock(
         return_value=DefinitionIndex(list(base_index.nodes))
     )
     result = resolver.resolve(sd, base_index, mode="differential")
@@ -541,6 +693,7 @@ def test_resolve__auto_mode_uses_differential_when_present(resolver, base_index)
 
     expected = DefinitionIndex(list(base_index.nodes))
     resolver._resolve_differential = MagicMock(return_value=expected)
+    resolver._resolve_content_references = MagicMock(return_value=expected)
 
     result = resolver.resolve(sd, base_index, mode="auto")
 
@@ -563,6 +716,7 @@ def test_resolve__auto_mode_is_default(resolver, base_index):
 
     expected = DefinitionIndex(list(base_index.nodes))
     resolver._resolve_differential = MagicMock(return_value=expected)
+    resolver._resolve_content_references = MagicMock(return_value=expected)
 
     result = resolver.resolve(sd, base_index)  # no mode kwarg
 

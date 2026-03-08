@@ -10,7 +10,6 @@ from fhircraft.fhir.resources.factory.context import BuildContext
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.exceptions import AssemblerError
 from fhircraft.fhir.resources.factory.builders import (
-    ContentReferenceBuilder,
     TypeChoiceFieldBuilder,
     SlicedFieldBuilder,
     BackboneFieldBuilder,
@@ -18,7 +17,6 @@ from fhircraft.fhir.resources.factory.builders import (
 )
 
 BUILDER_CHAIN: list[type[Builder]] = [
-    ContentReferenceBuilder,
     TypeChoiceFieldBuilder,
     SlicedFieldBuilder,
     BackboneFieldBuilder,
