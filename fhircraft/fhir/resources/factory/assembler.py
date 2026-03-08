@@ -79,16 +79,11 @@ class ModelAssembler:
         # Iterate children (direct non-slice elements of the root)
         # ------------------------------------------------------------------
         root = self.index.root()
-        root_id = root.id
         fields = {}
         field_validators = {}
+        properties = {}
 
-        if len(child_nodes := self.index.get_children(root_id)) == 0:
-            raise AssemblerError(
-                f"No child nodes found for root element '{root_id}' in index; cannot assemble model '{name}'."
-            )
-
-        for child_node in child_nodes:
+        for child_node in self.index.get_children(root.id):
             if not child_node.definition:
                 raise ValueError(
                     f"Element '{child_node.id}' has no definition in the index."
@@ -118,6 +113,7 @@ class ModelAssembler:
             field_validators.update(
                 {info.name: info.as_pydantic_definition() for info in build.validators}
             )
+            properties.update(build.properties)
 
         model_validators = {
             info.name: info.as_pydantic_definition()
@@ -129,7 +125,10 @@ class ModelAssembler:
             )
         }
 
-        if not fields:
+        has_inherited_fields = any(
+            len(getattr(base, "model_fields", [])) for base in base_classes
+        )
+        if not fields and not has_inherited_fields:
             raise AssemblerError(
                 f"No fields built for model '{name}' and no fields defined on base class(es) {base_classes}."
             )
@@ -148,7 +147,7 @@ class ModelAssembler:
         )
 
         # Attach properties
-        for attr_name, property_getter in build.properties.items():
+        for attr_name, property_getter in properties.items():
             setattr(model, attr_name, property(property_getter))
 
         return model

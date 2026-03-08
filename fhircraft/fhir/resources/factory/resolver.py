@@ -184,7 +184,7 @@ class SnapshotResolver:
                 # Look up the base node for this element
                 if not base_index.contains(id=node.id, ignore_root=True):
                     base_node = base_index.get_single_by_path(
-                        node.path, ignore_root=True
+                        node.path, ignore_root=True, ignore_slices=True
                     )
                 else:
                     base_node = base_index.get(node.id, ignore_root=True)
@@ -228,7 +228,7 @@ class SnapshotResolver:
             path=parent_path, ignore_root=True
         ):
             parent_base_node = base_index.get_single_by_path(
-                parent_path, ignore_root=True
+                parent_path, ignore_root=True, ignore_slices=True
             )
             node = self._build_type_node(parent_base_node.type_codes, id, base_index)
             base_index.add(node)
