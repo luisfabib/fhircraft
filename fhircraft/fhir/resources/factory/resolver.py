@@ -221,7 +221,9 @@ class SnapshotResolver:
         elif base_index.contains(id=id, ignore_root=True):
             base_node = base_index.get(id, ignore_root=True)
         elif base_index.contains(path=path, ignore_root=True):
-            base_node = base_index.get_single_by_path(path, ignore_root=True)
+            base_node = base_index.get_single_by_path(
+                path, ignore_root=True, ignore_slices=True
+            )
         elif (parent_path := path.rsplit(".", 1)[0]) and base_index.contains(
             path=parent_path, ignore_root=True
         ):

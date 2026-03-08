@@ -119,7 +119,9 @@ class DefinitionIndex:
             raise DefinitionIndexError(f"Element id {id!r} not found in index.")
         return node
 
-    def get_by_path(self, path: str, ignore_root: bool = False) -> List[ElementNode]:
+    def get_by_path(
+        self, path: str, ignore_root: bool = False, ignore_slices: bool = False
+    ) -> List[ElementNode]:
         """
         Get element node by path, can return multiple matches
         """
@@ -127,15 +129,21 @@ class DefinitionIndex:
             nodes = self._get_without_root(path=path)
         else:
             nodes = self._nodes_by_path.get(path, [])
+        if nodes and ignore_slices:
+            nodes = [n for n in nodes if not n.is_slice]
         if not nodes:
             raise DefinitionIndexError(f"Element path {path!r} not found in index.")
         return nodes
 
-    def get_single_by_path(self, path: str, ignore_root: bool = False) -> ElementNode:
+    def get_single_by_path(
+        self, path: str, ignore_root: bool = False, ignore_slices: bool = False
+    ) -> ElementNode:
         """
         Get a single element node by path, raises an error if multiple matches are found.
         """
-        nodes = self.get_by_path(path=path, ignore_root=ignore_root)
+        nodes = self.get_by_path(
+            path=path, ignore_root=ignore_root, ignore_slices=ignore_slices
+        )
         if len(nodes) > 1:
             raise DefinitionIndexError(
                 f"expected a single element node but found {len(nodes)} for path {path!r} in index."

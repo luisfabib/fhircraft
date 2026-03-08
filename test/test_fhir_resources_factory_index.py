@@ -125,6 +125,20 @@ def test_index_get_by_path_ignore_root(slicing_index, id, expected, count):
     assert expected in {n.path for n in nodes}
 
 
+@pytest.mark.parametrize(
+    "id, expected, count",
+    [
+        ("Observation.component", "Observation.component", 1),
+        ("Observation.component.value[x]", "Observation.component.value[x]", 1),
+    ],
+)
+def test_index_get_by_path_ignore_slices(slicing_index, id, expected, count):
+    slicing_index.add(make_node(f"{expected}:slice", expected))
+    nodes = slicing_index.get_by_path(id, ignore_slices=True)
+    assert len(nodes) == count
+    assert expected in {n.path for n in nodes}
+
+
 def test_index_get_by_path_raises_for_missing(simple_index):
     with pytest.raises(DefinitionIndexError):
         simple_index.get_by_path("Observation.missing")

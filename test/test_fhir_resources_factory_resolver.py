@@ -242,6 +242,15 @@ def test_build_intermediate_node__return_inherited_from_type(resolver, base_inde
     assert node.definition.short == "Unique id for inter-element referencing"
 
 
+def test_build_intermediate_node__path_lookup_ignores_slices(resolver, base_index):
+    base_index.add(
+        make_node(id="BaseResource.component:sliceA", path="BaseResource.component")
+    )
+    base_node = base_index.get("BaseResource.component")
+    node = resolver._build_intermediate_node("MyProfile.component:sliceB", base_index)
+    assert type(node.definition) is type(base_node.definition)
+
+
 def test_build_intermediate_node__definition_class_is_same_as_base(
     resolver, base_index
 ):
