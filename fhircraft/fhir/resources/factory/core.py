@@ -4,41 +4,25 @@ ProfileFactory — the top-level façade for building Pydantic models from FHIR
 
 This is the main public entry point; the rest of the pipeline (resolver,
 assembler, builders, validators) is invoked from here.
-
-Usage::
-
-    factory = ProfileFactory(repository)
-    factory.register_sd_dict(my_profile_dict)   # pre-register dependency
-    model = factory.build(sd=my_profile_sd)
 """
-
-from __future__ import annotations
 
 import re
 import keyword
-import warnings
-from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Sequence, TYPE_CHECKING
+from typing import Any, Literal, Sequence, TYPE_CHECKING
 
-from pydantic import BaseModel, Field, create_model
+from pydantic import BaseModel
 
 from fhircraft.fhir.resources.base import (
     FHIRBaseModel,
-    FHIRSliceModel,
     FhirBaseModelKind,
 )
 from fhircraft.fhir.resources.factory.assembler import ModelAssembler
 from fhircraft.fhir.resources.factory.context import BuildContext
-from fhircraft.fhir.resources.factory.exceptions import (
-    DefinitionResolutionError,
-)
+from fhircraft.fhir.resources.factory.exceptions import DefinitionResolutionError
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
 from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
-from fhircraft.fhir.resources.datatypes.registry import (
-    get_fhir_type_by_url,
-    get_fhir_type,
-)
+from fhircraft.fhir.resources.datatypes.registry import get_fhir_type_by_url
 from fhircraft.utils import get_FHIR_release_from_version, capitalize
 
 if TYPE_CHECKING:
@@ -54,6 +38,27 @@ if TYPE_CHECKING:
 
 
 class FHIRStructureFactory:
+    """
+    FHIRStructureFactory is responsible for constructing Pydantic model classes from FHIR StructureDefinitions.
+    This factory manages a registry of StructureDefinitions, supports loading FHIR packages, and caches constructed models
+    to optimize performance. It provides methods to build models from StructureDefinitions, add new definitions, clear the
+    internal cache, and normalize input definitions.
+
+    Attributes:
+        fhir_release (str): The FHIR release version (e.g., "R4", "R5") used by the factory.
+        definition_registry (StructureDefinitionRegistry): Registry for storing and retrieving StructureDefinitions.
+        construction_cache (dict[str, type[BaseModel]]): Cache mapping canonical URLs to constructed Pydantic model classes.
+
+    Methods:
+        build(structure_definition=None, *, canonical_url=None, mixins=None, mode="auto") -> type[BaseModel]:
+            Uses caching to avoid redundant model construction.
+        load_package(package_name: str, version: str) -> None:
+            Loads all StructureDefinitions from a specified FHIR package into the registry.
+        add_structure_definition(sd) -> None:
+            Adds a StructureDefinition to the registry. Accepts either a dict or a StructureDefinition model instance.
+        clear_cache() -> None:
+            Clears the construction cache, removing all cached model classes.
+    """
 
     def __init__(
         self, fhir_release: str, registry: StructureDefinitionRegistry | None = None
@@ -81,28 +86,25 @@ class FHIRStructureFactory:
         mode: Literal["auto", "snapshot", "differential"] = "auto",
     ) -> type[BaseModel]:
         """
-        Build and return a Pydantic model for the given ``StructureDefinition``.
+        Constructs and returns a Pydantic model class based on a FHIR StructureDefinition.
 
         Args:
-            structure_definition: The ``StructureDefinition`` to build from.  Accepted forms:
-
-                * A parsed ``R4 / R4B / R5 StructureDefinition`` Pydantic object
-                * A ``dict`` (will be validated as a ``StructureDefinition``)
-                * A file path string (``*.json`` / ``*.yaml``)
-                * A canonical URL string (fetched from the repository)
-                * ``None`` — requires *canonical_url* to be set
-
-            canonical_url: Canonical URL to look up when *sd* is ``None``.
-            mixins: Optional extra base classes added to the constructed model
-                (e.g. ``(FHIRSliceModel,)``).
+            structure_definition (Any, optional): The FHIR StructureDefinition object to build the model from.
+            canonical_url (str, optional): The canonical URL of the StructureDefinition to retrieve from the registry.
+            mixins (Sequence[type], optional): Additional mixin classes to include in the generated model.
+            mode (Literal["auto", "snapshot", "differential"], optional): The mode for building the model.
+                "auto" selects the best mode automatically, "snapshot" uses the snapshot representation,
+                and "differential" uses the differential representation.
 
         Returns:
-            A Pydantic model class representing the FHIR resource / profile.
+            type[BaseModel]: The constructed Pydantic model class.
 
         Raises:
-            ValueError: For invalid / missing inputs.
-            DefinitionResolutionError: When the differential cannot be resolved.
-            UnregisteredTypeError: When a required type is not in the registry.
+            KeyError: If neither structure_definition nor canonical_url is provided, or if the canonical_url is not found in the registry.
+
+        Notes:
+            - Uses a cache to avoid rebuilding models for the same StructureDefinition URL.
+            - If both structure_definition and canonical_url are provided, structure_definition takes precedence.
         """
 
         if structure_definition:
@@ -143,7 +145,12 @@ class FHIRStructureFactory:
             )
 
     def clear_cache(self) -> None:
-        """Clear the construction cache."""
+        """
+        Clears the construction cache by removing all cached items.
+        This method resets the internal cache used for resource construction,
+        ensuring that subsequent operations do not use stale or previously stored data.
+        """
+
         self.construction_cache.clear()
 
     # ------------------------------------------------------------------
@@ -156,6 +163,7 @@ class FHIRStructureFactory:
         mixins: Sequence[type] | None = None,
         mode: Literal["auto", "snapshot", "differential"] = "auto",
     ) -> type[BaseModel]:
+        """Internal build method, assumes input is already normalised and validated."""
 
         sd_url = structure_def.url or ""
         sd_name = structure_def.name or ""
@@ -267,11 +275,7 @@ class FHIRStructureFactory:
         registry: StructureDefinitionRegistry,
         sd: Any,
     ) -> "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition":
-        """
-        Normalise *sd* (dict / str / Pydantic SD / ``None``) to a validated
-        ``StructureDefinition`` Pydantic object, fetching from the repository
-        when necessary.
-        """
+        """Normalizes a StructureDefinition input to a standard StructureDefinition object."""
 
         if getattr(sd, "_resource_type", None) == "StructureDefinition":
             registry.add(sd)
@@ -281,14 +285,9 @@ class FHIRStructureFactory:
             return registry.from_dict(sd)
 
         elif isinstance(sd, str):
-            # Canonical URL
             return registry.get(sd)
 
         return sd
-
-    # ------------------------------------------------------------------
-    # Name sanitisation (carried over from legacy factory)
-    # ------------------------------------------------------------------
 
     @staticmethod
     def _sanitize_name(name: str) -> str:

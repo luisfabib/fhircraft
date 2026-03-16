@@ -1,8 +1,5 @@
 """
 DefinitionIndex — flat, dict-based index of :class:`ElementNode` objects.
-
-Replaces the ``StructureNode`` tree.  All navigation is performed through
-string-key lookups and filtering rather than pointer traversal.
 """
 
 from __future__ import annotations

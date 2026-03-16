@@ -33,16 +33,16 @@ BUILDER_CHAIN: list[type[Builder]] = [
 class ModelAssembler:
 
     index: DefinitionIndex
-    """   The definition index to assemble from. """
+    """ The definition index to assemble from. """
 
     ctx: BuildContext
-    """   The build context. """
+    """ The build context. """
 
     resource_name: str
-    """   The name of the resource being assembled (for error messages). """
+    """ The name of the resource being assembled (for error messages). """
 
     builder_chain: Sequence[Builder]
-    """   The chain of builders to use for assembling fields.  Initialized from :attr:`BUILDER_CHAIN`. """
+    """ The chain of builders to use for assembling fields.  Initialized from :attr:`BUILDER_CHAIN`. """
 
     def __init__(
         self,
@@ -61,16 +61,21 @@ class ModelAssembler:
         base: type | tuple[type, ...] | None = None,
     ) -> type:
         """
-        Construct and return a Pydantic model class for this scope.
-
+        Dynamically assembles and returns a Pydantic model class based on the provided name, base classes,
+        and the structure defined in the internal index.
         Args:
-            name: The Python class name for the resulting model.
-            base: The base class(es) to inherit from.  If ``None``,
-                :attr:`base_model` is used.  May be a single type or a tuple of
-                types (for multiple inheritance, e.g. ``(Observation, FHIRSliceModel)``).
-
+            name (str): The name of the model to be created.
+            base (type or tuple[type, ...], optional): The base class(es) for the model. If None, uses the default base from context or FHIRBaseModel.
         Returns:
-            The constructed Pydantic model class.
+            type: The dynamically created Pydantic model class.
+        Raises:
+            ValueError: If a child element in the index lacks a definition.
+            AssemblerError: If a builder fails to construct a field or validator.
+        Notes:
+            - Resolves base classes and iterates over child elements to build fields, validators, and properties.
+            - Handles model-level constraints, including fixed values and patterns.
+            - Attaches properties and sets constraint defaults as needed.
+            - Issues a warning if no fields are built and no fields are inherited from base classes.
         """
 
         # Resolve base classes
@@ -209,6 +214,14 @@ class ModelAssembler:
 
     @staticmethod
     def build_model_fixed_value_constraint(node: ElementNode) -> ValidatorInformation:
+        """
+        Constructs a ValidatorInformation object for enforcing a fixed value constraint on a FHIR model element.
+        Args:
+            node (ElementNode): The element node containing the fixed value to be validated.
+        Returns:
+            ValidatorInformation: An object encapsulating the validator's name, kind, function, and arguments for the fixed value constraint.
+        """
+
         return ValidatorInformation(
             name=f"FHIR_{node.name}_fixed_value_constraint",
             kind="model",
@@ -218,6 +231,15 @@ class ModelAssembler:
 
     @staticmethod
     def build_model_pattern_constraint(node: ElementNode) -> ValidatorInformation:
+        """
+        Constructs a ValidatorInformation object for enforcing a pattern constraint on a FHIR model element.
+        Args:
+            node (ElementNode): The element node containing the pattern to be validated.
+        Returns:
+            ValidatorInformation: An object containing the validator's name, kind, and a partial function
+            for pattern validation specific to the provided node.
+        """
+
         return ValidatorInformation(
             name=f"FHIR_{node.name}_pattern_constraint",
             kind="model",

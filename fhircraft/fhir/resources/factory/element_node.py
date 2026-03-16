@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal, Sequence
+from typing import TYPE_CHECKING, Literal, Sequence
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (

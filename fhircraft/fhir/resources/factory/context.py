@@ -1,10 +1,5 @@
 """
-BuildContext and TypeRegistry — immutable configuration passed through the
-factory pipeline.
-
-``TypeRegistry`` resolves FHIR type codes and canonical URLs to Python types.
-``BuildContext`` is the frozen context container passed to every builder,
-assembler, and validator collector.
+Module defining the BuildContext dataclass, which serves as an immutable container for contextual information during the FHIR structure building process in the factory pipeline.
 """
 
 from __future__ import annotations
