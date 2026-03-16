@@ -374,7 +374,6 @@ def test_construct_profiled_resource(mode, release, example_filename, definition
             mode=mode,
         )
         source_code = CodeGenerator().generate_resource_model_code(resource)
-        print(source_code)
         assert (
             json.loads(resource.model_validate(fhir_resource).model_dump_json())
             == fhir_resource

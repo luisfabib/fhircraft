@@ -6,9 +6,9 @@ from fhircraft.fhir.resources.factory.builders.base import (
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.base import FHIRSliceModel
-from typing import Union, Annotated
-from pydantic import Field
+from pydantic import BaseModel, Field
 import warnings
+from typing import Annotated, Union
 from fhircraft.fhir.resources.validators import (
     validate_slicing_cardinalities,
 )
@@ -26,31 +26,47 @@ class SlicedFieldBuilder(Builder):
         build = Build()
         safe_name, val_alias = self.handle_python_keyword(node.name)
 
-        slice_entry_field_types = [self.resolve_type(type) for type in node.types]
+        # Determine the base class for the slice models
+        slice_entry_base: type | None = None
+        if self.context.base is not None:
+            # First try to resolve the slice base type from the base model's field annotation
+            slice_entry_base = self.resolve_type_from_base_model(safe_name)
+        if not slice_entry_base and len(node.types) == 1:
+            # If that fails, fall back to the FHIR type resolved from the element definition
+            slice_entry_base = self.resolve_type(node.types[0]).type
 
         # Build a slice model for each named slice
         slice_models: list[type] = []
         for slice_node in index.get_slices(node.id):
-
             slice_name: str = slice_node.slice_name  # type: ignore[union-attr]
+            slice_model_name = (
+                f"{self.context.resource_name}{self._capitalise_slice_name(slice_name)}"
+            )
             slice_index = index.get_subtree(slice_node.id)
-
             if len(slice_node.types) > 1:
                 warnings.warn(
                     f"Slice '{slice_name}' on element '{node.path}' has multiple types; "
                     f"only the first will be used for slice model base class resolution."
                 )
-            slice_base_type = self.resolve_type(slice_node.types[0]).type
-            slice_model_name = (
-                f"{self.context.resource_name}{self._capitalise_slice_name(slice_name)}"
-            )
 
-            if slice_base_type is FHIRSliceModel or issubclass(
-                slice_base_type, FHIRSliceModel
-            ):
-                slice_bases = (slice_base_type,)
+            if slice_node.profile_urls:
+                print(slice_node.profile_urls)
+                slice_base = self.resolve_type(slice_node.types[0]).type
+            elif not slice_entry_base and len(slice_node.types):
+                slice_base = self.resolve_type(slice_node.types[0]).type
             else:
-                slice_bases = (slice_base_type, FHIRSliceModel)
+                slice_base = slice_entry_base
+            assert isinstance(
+                slice_base, type
+            ), f"Resolved slice base for slice '{node.id}' is not a type"
+
+            # Ensure the slice base is a subclass of FHIRSliceModel, as all slice models must inherit from it for validation purposes
+            if slice_base is FHIRSliceModel or (
+                isinstance(slice_base, type) and issubclass(slice_base, FHIRSliceModel)
+            ):
+                slice_bases = (slice_base,)
+            else:
+                slice_bases = (slice_base, FHIRSliceModel)
 
             assembler = ModelAssembler(
                 index=slice_index,
@@ -72,7 +88,7 @@ class SlicedFieldBuilder(Builder):
 
             slice_models.append(slice_model)
 
-        union_types = [*slice_models, *[t.type for t in slice_entry_field_types]]
+        union_types = [*slice_models] + ([slice_entry_base] if slice_entry_base else [])
         if len(union_types) == 1:
             annotation = union_types[0]
         else:

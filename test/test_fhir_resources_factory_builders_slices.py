@@ -29,6 +29,37 @@ class FakeSliceModel(FHIRSliceModel):
     """Concrete FHIRSliceModel subclass returned by the mock assembler."""
 
 
+class _FakeProfiled(FHIRBaseModel):
+    """Simulates a type resolved from a profile URL, e.g. a profiled Extension."""
+
+
+class _FakeEntryBase(FHIRBaseModel):
+    """Simulates the entry-level base resolved from the parent model field (e.g. ObservationComponent)."""
+
+
+class _FakeSliceBase(FHIRSliceModel):
+    """Simulates a FHIR type that already inherits from FHIRSliceModel."""
+
+
+def make_builder_with_entry_base(entry_base_type: type) -> SlicedFieldBuilder:
+    """Return a builder that will resolve *entry_base_type* from its context.base field annotation."""
+    from pydantic import BaseModel as PydanticBaseModel
+
+    # Dynamically build a pydantic model that exposes `component` with the right type
+    ComponentHolder = type(
+        "_ComponentHolder",
+        (PydanticBaseModel,),
+        {"__annotations__": {"component": Optional[List[entry_base_type]]}},
+    )
+    ComponentHolder.model_fields  # trigger pydantic field registration
+
+    ctx = MagicMock(name="mock-ctx-with-entry-base")
+    ctx.fhir_release = "R4B"
+    ctx.base = ComponentHolder
+    ctx.resource_name = "TestResource"
+    return SlicedFieldBuilder(context=ctx)
+
+
 # ---------------------------------------------------------------------------
 # Helpers & Fixtures
 # ---------------------------------------------------------------------------
@@ -79,8 +110,9 @@ def make_entry_node(
     node.max_value = None
     node.types = [
         make_type_definition(code, fhir_release)
-        for code in (type_codes or ["CodeableConcept"])
+        for code in (type_codes if type_codes is not None else ["CodeableConcept"])
     ]
+    node.profile_urls = []
     return node
 
 
@@ -91,6 +123,7 @@ def make_slice_node(
     fhir_release: str = "R4B",
     min_cardinality: int = 0,
     max_cardinality: int | None = 1,
+    profile_urls: list | None = None,
 ):
     node = MagicMock(name=f"mock-slice-{slice_name}")
     node.id = path
@@ -99,6 +132,7 @@ def make_slice_node(
     node.min_cardinality = min_cardinality
     node.max_cardinality = max_cardinality
     node.types = [make_type_definition(type_code, fhir_release)]
+    node.profile_urls = profile_urls if profile_urls is not None else []
     return node
 
 
@@ -487,3 +521,229 @@ def test_build__warns_when_slice_has_multiple_types(builder: Builder, index, ass
         builder.build(node, index)
     assert len(w) == 1
     assert issubclass(w[0].category, UserWarning)
+
+
+def test_per_slice__profile_urls_causes_resolve_type_to_be_called(
+    index, assembler, monkeypatch
+):
+    """When slice_node.profile_urls is truthy, resolve_type is used for that slice's base."""
+    builder = make_builder()
+    resolved = MagicMock(type=_FakeProfiled)
+    resolve_type_mock = MagicMock(return_value=resolved)
+    monkeypatch.setattr(builder, "resolve_type", resolve_type_mock)
+
+    slice_node = make_slice_node(profile_urls=["http://example.org/fhir/profile"])
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node(name="component", type_codes=["Extension"])
+
+    builder.build(node, index)
+
+    resolve_type_mock.assert_called()
+
+
+def test_per_slice__profile_urls_uses_resolved_type_as_slice_base(
+    index, assembler, monkeypatch
+):
+    """Slice base equals the type returned by resolve_type when profile_urls is set."""
+    builder = make_builder()
+    resolved = MagicMock(type=_FakeProfiled)
+    monkeypatch.setattr(builder, "resolve_type", lambda _: resolved)
+
+    slice_node = make_slice_node(profile_urls=["http://example.org/fhir/profile"])
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node(name="component", type_codes=["Extension"])
+
+    builder.build(node, index)
+
+    bases = assembler.return_value.assemble.call_args.kwargs["base"]
+    assert _FakeProfiled in bases
+
+
+def test_per_slice__profile_urls_overrides_slice_entry_base(
+    index, assembler, monkeypatch
+):
+    """profile_urls takes precedence: even when slice_entry_base resolves to _FakeEntryBase,
+    the profiled type is used as slice base instead."""
+    builder = make_builder_with_entry_base(_FakeEntryBase)
+    resolved = MagicMock(type=_FakeProfiled)
+    monkeypatch.setattr(builder, "resolve_type", lambda _: resolved)
+
+    slice_node = make_slice_node(
+        slice_name="profiled",
+        path="Resource.component:profiled",
+        profile_urls=["http://example.org/fhir/profile"],
+    )
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node(name="component", type_codes=["Extension"])
+
+    builder.build(node, index)
+
+    bases = assembler.return_value.assemble.call_args.kwargs["base"]
+    assert _FakeProfiled in bases
+    assert _FakeEntryBase not in bases
+
+
+def test_per_slice__no_entry_base_and_has_types_calls_resolve_type(
+    index, assembler, monkeypatch
+):
+    """When slice_entry_base is None (no base model, no entry-level type) and the
+    slice node has types, resolve_type is invoked for the slice's type."""
+    ctx = MagicMock(name="mock-ctx-no-base")
+    ctx.fhir_release = "R4B"
+    ctx.base = None
+    ctx.resource_name = "TestResource"
+    builder = SlicedFieldBuilder(context=ctx)
+
+    resolved = MagicMock(type=_FakeProfiled)
+    resolve_type_mock = MagicMock(return_value=resolved)
+    monkeypatch.setattr(builder, "resolve_type", resolve_type_mock)
+
+    slice_node = make_slice_node(type_code="CodeableConcept")
+    index.get_slices.return_value = [slice_node]
+    # No types on the entry node → entry-level fallback also stays None,
+    # so the per-slice elif fires.
+    node = make_entry_node(name="category", type_codes=[])
+
+    builder.build(node, index)
+
+    resolve_type_mock.assert_called_with(slice_node.types[0])
+
+
+def test_per_slice__no_entry_base_uses_resolved_type_as_slice_base(
+    index, assembler, monkeypatch
+):
+    """slice_base is the type resolved from the slice node when slice_entry_base is None."""
+    ctx = MagicMock(name="mock-ctx-no-base")
+    ctx.fhir_release = "R4B"
+    ctx.base = None
+    ctx.resource_name = "TestResource"
+    builder = SlicedFieldBuilder(context=ctx)
+
+    resolved = MagicMock(type=_FakeProfiled)
+    monkeypatch.setattr(builder, "resolve_type", lambda _: resolved)
+
+    slice_node = make_slice_node(type_code="CodeableConcept")
+    index.get_slices.return_value = [slice_node]
+    # No types on the entry node keeps slice_entry_base=None so the per-slice elif fires.
+    node = make_entry_node(name="category", type_codes=[])
+
+    builder.build(node, index)
+
+    bases = assembler.return_value.assemble.call_args.kwargs["base"]
+    assert _FakeProfiled in bases
+
+
+def test_per_slice__entry_base_used_when_no_profile_urls(index, assembler, monkeypatch):
+    """When slice_entry_base is resolved and slice has no profile_urls, it is reused."""
+    builder = make_builder_with_entry_base(_FakeEntryBase)
+
+    # resolve_type should NOT be called for the per-slice branch in this case
+    resolve_type_spy = MagicMock(
+        side_effect=AssertionError("resolve_type must not be called per-slice")
+    )
+    monkeypatch.setattr(builder, "resolve_type", resolve_type_spy)
+
+    slice_node = make_slice_node(profile_urls=[])
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node(name="component", type_codes=["BackboneElement"])
+
+    builder.build(node, index)
+
+    bases = assembler.return_value.assemble.call_args.kwargs["base"]
+    assert _FakeEntryBase in bases
+
+
+def test_per_slice__entry_base_does_not_call_resolve_type_per_slice(
+    index, assembler, monkeypatch
+):
+    """When slice_entry_base is non-None and no profile_urls, resolve_type is never invoked."""
+    builder = make_builder_with_entry_base(_FakeEntryBase)
+    resolve_type_mock = MagicMock(return_value=MagicMock(type=_FakeProfiled))
+    monkeypatch.setattr(builder, "resolve_type", resolve_type_mock)
+
+    slice_node = make_slice_node(profile_urls=[])
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node(name="component", type_codes=["BackboneElement"])
+
+    builder.build(node, index)
+
+    resolve_type_mock.assert_not_called()
+
+
+def test_per_slice__fhirslicemodel_base_not_duplicated_in_bases(
+    index, assembler, monkeypatch
+):
+    """When slice_base already inherits from FHIRSliceModel, it is not re-added."""
+    builder = make_builder()
+    monkeypatch.setattr(
+        builder, "resolve_type", lambda _: MagicMock(type=_FakeSliceBase)
+    )
+
+    slice_node = make_slice_node()
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node()
+
+    builder.build(node, index)
+
+    bases = assembler.return_value.assemble.call_args.kwargs["base"]
+    assert bases == (_FakeSliceBase,)
+
+
+def test_per_slice__non_fhirslicemodel_base_gets_fhirslicemodel_appended(
+    index, assembler, monkeypatch
+):
+    """When slice_base does NOT inherit from FHIRSliceModel, FHIRSliceModel is appended."""
+    builder = make_builder()
+    monkeypatch.setattr(
+        builder, "resolve_type", lambda _: MagicMock(type=_FakeEntryBase)
+    )
+
+    slice_node = make_slice_node()
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node()
+
+    builder.build(node, index)
+
+    bases = assembler.return_value.assemble.call_args.kwargs["base"]
+    assert _FakeEntryBase in bases
+    assert FHIRSliceModel in bases
+
+
+def test_per_slice__fhirslicemodel_itself_as_base_not_duplicated(
+    index, assembler, monkeypatch
+):
+    """Passing FHIRSliceModel itself as the base should result in a single-element tuple."""
+    builder = make_builder()
+    monkeypatch.setattr(
+        builder, "resolve_type", lambda _: MagicMock(type=FHIRSliceModel)
+    )
+
+    slice_node = make_slice_node()
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node()
+
+    builder.build(node, index)
+
+    bases = assembler.return_value.assemble.call_args.kwargs["base"]
+    assert bases == (FHIRSliceModel,)
+
+
+def test_per_slice__assert_fires_when_slice_base_is_not_a_type(
+    index, assembler, monkeypatch
+):
+    """An AssertionError is raised when slice_base resolves to a non-type value."""
+    ctx = MagicMock(name="mock-ctx-no-base")
+    ctx.fhir_release = "R4B"
+    ctx.base = None
+    ctx.resource_name = "TestResource"
+    builder = SlicedFieldBuilder(context=ctx)
+
+    # resolve_type returns an instance (not a class)
+    monkeypatch.setattr(builder, "resolve_type", lambda _: MagicMock(type="not-a-type"))
+
+    slice_node = make_slice_node(type_code="CodeableConcept")
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node(name="category", type_codes=["CodeableConcept"])
+
+    with pytest.raises(AssertionError):
+        builder.build(node, index)

@@ -1,6 +1,7 @@
 from fhircraft.fhir.resources.factory.builders.base import Build, Builder
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
+from fhircraft.fhir.resources.base import FHIRBaseModel
 
 from pydantic import BaseModel
 from typing import get_args as _get_args
@@ -22,35 +23,19 @@ class BackboneFieldBuilder(Builder):
         # Determine the base class for the backbone model:
         backbone_base: type | None = None
         if self.context.base is not None:
-
-            if issubclass(self.context.base, BaseModel):
-                fi = self.context.base.model_fields.get(safe_name)
-                if fi:
-                    # Dig through Optional[List[...]] to find the inner type
-                    inner = fi.annotation
-                    while inner:
-                        args = _get_args(inner)
-                        if not args:
-                            break
-                        # Filter out NoneType
-                        non_none = [a for a in args if a is not type(None)]
-                        if not non_none:
-                            break
-                        inner = non_none[0]
-
-                    if isinstance(inner, type) and issubclass(inner, BaseModel):
-                        backbone_base = inner
-
+            # First try to resolve the backbone base type from the base model's field annotation
+            backbone_base = self.resolve_type_from_base_model(safe_name)
         if backbone_base is None:
             # Fallback: use the FHIR type resolved from the element definition
             ft = self.resolve_type(node.types[0])
-            backbone_base = ft if isinstance(ft, type) else None
-
-        if backbone_base is None:
-            from fhircraft.fhir.resources.base import FHIRBaseModel
-
             backbone_base = (
-                self.resolve_type(node.types[0]).type if node.types else FHIRBaseModel
+                ft
+                if isinstance(ft, type)
+                else (
+                    self.resolve_type(node.types[0]).type
+                    if node.types
+                    else FHIRBaseModel
+                )
             )
 
         # Build the backbone model name from the element path
