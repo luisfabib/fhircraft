@@ -85,6 +85,7 @@ def make_entry_node(
     min_cardinality: int = 0,
     max_cardinality: int | None = None,
     documentation: str | None = None,
+    slicing_rules: str = "open",
     short: str | None = None,
     fixed=None,
     pattern=None,
@@ -105,6 +106,7 @@ def make_entry_node(
     node.fixed = fixed
     node.pattern = pattern
     node.default_value = default_value
+    node.slicing_rules = slicing_rules
     node.max_length = None
     node.min_value = None
     node.max_value = None
@@ -265,16 +267,49 @@ def test_build__field_annotation_is_annotated(builder: Builder, index, assembler
     assert len(args) >= 2  # type + at least one Field metadata
 
 
-def test_build__field_annotation_union_contains_entry_type(
+def test_build__open_slicing_union_contains_base_type(
     builder: Builder, index, assembler
 ):
     # With no slices the union only contains the resolved entry types
-    node = make_entry_node(type_codes=["CodeableConcept"])
+    node = make_entry_node(type_codes=["CodeableConcept"], slicing_rules="open")
+    slice_node = make_slice_node()
+    index.get_slices.return_value = [slice_node]
     build = builder.build(node, index)
     union_type = get_args(build.fields[0].annotation)[0]
     # The union args should include the resolved Python type for CodeableConcept
     union_args = get_args(union_type)
     assert len(union_args) >= 1
+    assert "CodeableConcept" in str(union_type)
+
+
+def test_build__openAtEnd_slicing_union_contains_base_type(
+    builder: Builder, index, assembler
+):
+    # With no slices the union only contains the resolved entry types
+    node = make_entry_node(type_codes=["CodeableConcept"], slicing_rules="openAtEnd")
+    slice_node = make_slice_node()
+    index.get_slices.return_value = [slice_node]
+    build = builder.build(node, index)
+    union_type = get_args(build.fields[0].annotation)[0]
+    # The union args should include the resolved Python type for CodeableConcept
+    union_args = get_args(union_type)
+    assert len(union_args) >= 1
+    assert "CodeableConcept" in str(union_type)
+
+
+def test_build__closed_slicing_union_not_contains_base_type(
+    builder: Builder, index, assembler
+):
+    # With no slices the union only contains the resolved entry types
+    node = make_entry_node(type_codes=["CodeableConcept"], slicing_rules="closed")
+    slice_node = make_slice_node()
+    index.get_slices.return_value = [slice_node]
+    build = builder.build(node, index)
+    union_type = get_args(build.fields[0].annotation)[0]
+    # The union args should include the resolved Python type for CodeableConcept
+    union_args = get_args(union_type)
+    assert len(union_args) == 1
+    assert "CodeableConcept" not in str(union_type)
 
 
 def test_build__no_slices_does_not_call_assembler(builder: Builder, index, assembler):

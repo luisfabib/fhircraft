@@ -88,7 +88,10 @@ class SlicedFieldBuilder(Builder):
 
             slice_models.append(slice_model)
 
-        union_types = [*slice_models] + ([slice_entry_base] if slice_entry_base else [])
+        union_types = slice_models
+        # If the slicing rules are not 'closed', include the base type (either from the slice entry or the slice definition) in the union to allow for unsliced entries
+        if not node.slicing_rules == "closed":
+            union_types += [slice_entry_base or slice_base]
         if len(union_types) == 1:
             annotation = union_types[0]
         else:
