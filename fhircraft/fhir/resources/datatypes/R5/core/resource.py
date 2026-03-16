@@ -17,14 +17,9 @@ class Resource(Base):
     _kind = "resource"
     _canonical_url = "http://hl7.org/fhir/StructureDefinition/Resource"
 
-    id: Optional[String] = Field(
+    id: Optional[Id] = Field(
         description="Logical id of this artifact",
         default=None,
-    )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
     )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource",

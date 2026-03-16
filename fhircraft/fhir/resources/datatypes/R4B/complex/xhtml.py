@@ -17,8 +17,3 @@ class xhtml(Element):
         description="Actual xhtml",
         default=None,
     )
-    value_ext: Optional[Element] = Field(
-        description="Placeholder element for value extensions",
-        default=None,
-        alias="_value",
-    )

@@ -24,11 +24,6 @@ class Resource(FHIRBaseModel):
         description="Logical id of this artifact",
         default=None,
     )
-    id_ext: Optional[Element] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
     meta: Optional[Meta] = Field(
         description="Metadata about the resource",
         default=None,
