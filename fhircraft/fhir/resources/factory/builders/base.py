@@ -68,6 +68,9 @@ CLASS_RESERVED_KEYWORDS: frozenset[str] = frozenset(
 )
 FHIR_SD_PREFIX = "http://hl7.org/fhir/StructureDefinition/"
 FHIRPATH_TYPE_PREFIX = "http://hl7.org/fhirpath/System."
+FHIR_TYPE_EXT_URL = (
+    "http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type"
+)
 
 _Unset: Any = PydanticUndefined
 
@@ -400,12 +403,16 @@ class Builder(ABC):
 
         # Handle the special case of FHIRPath system types, which are identified by a URL but do not have a profile and are not valid FHIR type names
         if is_fhirpath_system_type:
-            if not type.profile:
+            fhir_type_extension = next(
+                (ext for ext in type.extension or [] if ext.url == FHIR_TYPE_EXT_URL),
+                None,
+            )
+            if not fhir_type_extension or not fhir_type_extension.valueUrl:
                 # Fallback to the raw code if no profile is provided
                 type_code = type_code.removeprefix(FHIRPATH_TYPE_PREFIX)
             else:
                 # For FHIRPath system types, the profile URL contains the actual FHIR type name
-                type_code = type.profile[0]
+                type_code = fhir_type_extension.valueUrl
 
         # This is a rare case, only logical models and FHIRPath system types should use this
         if type_code.startswith(FHIR_SD_PREFIX):

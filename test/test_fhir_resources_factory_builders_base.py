@@ -9,6 +9,7 @@ from fhircraft.fhir.resources.datatypes.R4 import core, complex
 from fhircraft.fhir.resources.datatypes.utils import get_fhir_type
 from fhircraft.fhir.resources.factory.builders.base import (
     FHIR_SD_PREFIX,
+    FHIR_TYPE_EXT_URL,
     FieldInformation,
 )
 
@@ -31,12 +32,13 @@ def make_context(factory_build_result=None):
     return ctx
 
 
-def make_type(code, profile=None, fhir_release="R4"):
+def make_type(code, profile=None, fhir_release="R4", extension=None):
     """Return a minimal stand-in for an ElementDefinitionType-like object."""
     t = MagicMock()
     t.code = code
     t.profile = profile
     t._fhir_release = fhir_release
+    t.extension = extension
     return t
 
 
@@ -293,7 +295,7 @@ def test_resolve_type__fhirpath_without_profile(builder: Builder, code, expected
 
 
 @pytest.mark.parametrize(
-    "code, profile, expected",
+    "code, fhir_type, expected",
     [
         ("System.String", "Uri", primitives.Uri),
         ("System.String", "Code", primitives.Code),
@@ -307,11 +309,16 @@ def test_resolve_type__fhirpath_without_profile(builder: Builder, code, expected
         ("System.Time", "Time", primitives.Time),
     ],
 )
-def test_resolve_type__fhirpath_with_profile(builder: Builder, code, profile, expected):
+def test_resolve_type__fhirpath_with_extension(
+    builder: Builder, code, fhir_type, expected
+):
+    type_extension = MagicMock()
+    type_extension.url = FHIR_TYPE_EXT_URL
+    type_extension.valueUrl = fhir_type
     info = builder.resolve_type(
         make_type(
             code=f"http://hl7.org/fhirpath/{code}",
-            profile=[f"{FHIR_SD_PREFIX}{profile}"],
+            extension=[type_extension],
         )
     )
     assert info.kind == "primitive"
