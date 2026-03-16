@@ -31,7 +31,7 @@ def factory():
 
     factory = ResourceFactory(fhir_release="R5")
     yield factory
-    factory.clear_cache()
+    factory.reset_cache()
 
 
 def test_regression_issue_255(factory):

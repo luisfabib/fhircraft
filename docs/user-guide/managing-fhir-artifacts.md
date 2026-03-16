@@ -14,7 +14,7 @@ Artifacts are needed at resource model build time to resolve all these dependenc
 
     Managing artifacts carefully provides important benefits beyond just building models. It gives you fine control over which structure definition files and versions your application uses, ensuring consistency and predictability. It also allows you to work in offline or restricted network settings where accessing the internet or FHIR server resources is not possible or limited. Many healthcare environments have strict security policies that prevent applications from making external network requests. By loading artifacts from local files or pre-downloaded packages, you can build FHIR models in these restricted environments without any internet dependency.
 
-## Factory Repository
+## Factory Registry
 
 The `factory` repository is a central storage and indexing system within Fhircraft resource model factory that manages all loaded structure definitions and makes them available for resource model construction. Think of it as a library catalog: when you load structure definitions from files, directories, packages, or the internet, they all get registered in this repository. When you later request a model using a canonical URL, the factory searches the repository to find the matching structure definition.
 
@@ -46,8 +46,8 @@ factory = ResourceFactory(fhir_release="R4")
 with open("test/static/fhir-profiles-definitions/us-core-patient.json", "r") as file:
     definition_dict = json.load(file)
 
-# Load the definition from the dictionary
-factory.add_structure_definition(definition_dict)
+# Register the definition from the dictionary
+factory.register(definition_dict)
 
 # Create a model from the loaded definition
 USCorePatient = factory.build(
@@ -62,6 +62,44 @@ patient = USCorePatient(
 
 print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
 #> Created patient: Maria Garcia
+```
+
+## Inspecting the Registry
+
+Once definitions are loaded, you can query the registry without triggering any builds. These methods are useful for pre-flight checks, dynamic dispatch, and debugging.
+
+### Checking and retrieving definitions
+
+`has_registered_definition` tells you whether a canonical URL is present, `get_registered_definition` retrieves the raw StructureDefinition object, and `list_registered_definitions` returns all registered URLs — optionally filtered by SD kind (`"resource"`, `"complex-type"`, `"primitive-type"`, or `"logical"`):
+
+```python
+from fhircraft.fhir.resources import ResourceFactory
+factory = ResourceFactory(fhir_release="R4")
+
+# Check before trying to build
+url = "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+if factory.has_registered_definition(url):
+    USCorePatient = factory.build(canonical_url=url)
+
+# Inspect all loaded resource-kind definitions
+resource_urls = factory.list_registered_definitions(kind="resource")
+print(f"Loaded {len(resource_urls)} resource definitions")
+
+# Retrieve the raw StructureDefinition for inspection
+sd = factory.get_registered_definition(url)
+print(f"SD version: {sd.version}")
+```
+
+### Removing definitions
+
+The method `unregister` unregisters a canonical URL from the registry and simultaneously evicts any cached model, ensuring a stale definition is never used:
+
+```python
+from fhircraft.fhir.resources import ResourceFactory
+factory = ResourceFactory(fhir_release="R4")
+
+# Remove a definition that is no longer needed
+factory.unregister("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
 ```
 
 ## Working with FHIR Packages
@@ -81,6 +119,23 @@ Packages solve a practical problem: healthcare interoperability requires many st
 
 Fhircraft connects to the FHIR package registry at [:material-fire: `packages.fhir.org`](https://packages.fhir.org/), downloads requested packages (and their dependencies) following the [:material-fire: FHIR NPM Package Specification](https://confluence.hl7.org/display/FHIR/NPM+Package+Specification), extracts the structure definitions, and caches them locally for future use. After the first download, subsequent loads use the cached version, making your application faster and reducing network dependencies.
 
+### Controlling internet access
+
+By default the registry may reach out to the internet to resolve unknown canonical URLs. You can toggle this behaviour explicitly:
+
+```python
+from fhircraft.fhir.resources import ResourceFactory
+factory = ResourceFactory(fhir_release="R4")
+
+# Allow outgoing HTTP requests (default behaviour)
+factory.enable_internet_access()
+
+# Prevent all outgoing HTTP requests — suitable for air-gapped environments
+factory.disable_internet_access()
+```
+
+Disabling internet access is recommended in production and in security-sensitive healthcare environments. Pre-load all required packages and local definitions at startup, then disable internet access to ensure your application never makes unexpected outgoing requests.
+
 !!! warning "Internet Access"
 
     The following functionality and examples require a connection to the internet and to 3rd party servers. 
@@ -98,7 +153,7 @@ Fhircraft connects to the FHIR package registry at [:material-fire: `packages.fh
     factory = ResourceFactory(fhir_release="R4")
 
     # Download and load the US Core package version 5.0.1
-    factory.load_package("hl7.fhir.us.core", "5.0.1")
+    factory.register_package("hl7.fhir.us.core", "5.0.1")
 
     # Create a model from the package
     USCorePatient = factory.build(
@@ -129,8 +184,8 @@ Fhircraft connects to the FHIR package registry at [:material-fire: `packages.fh
     factory = ResourceFactory(fhir_release="R4")
 
     # Configure the factory to load multiple packages
-    factory.load_package("hl7.fhir.us.core", "5.0.1")  # US healthcare standards
-    factory.load_package("hl7.fhir.us.mcode", "1.1.0"), # Minimal Common Oncology Data Elements
+    factory.register_package("hl7.fhir.us.core", "5.0.1")  # US healthcare standards
+    factory.register_package("hl7.fhir.us.mcode", "1.1.0"), # Minimal Common Oncology Data Elements
 
     # Create models from different packages
     USCorePatient = factory.build(

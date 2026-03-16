@@ -108,7 +108,7 @@ from fhircraft.fhir.resources import ResourceFactory
 factory = ResourceFactory(fhir_release="R4")
 
 # Load an implementation guide (e.g., US Core)
-factory.load_package('hl7.fhir.us.core') # (1)!
+factory.register_package('hl7.fhir.us.core') # (1)!
 
 # Build a model from a profile
 USCorePatient = factory.build(

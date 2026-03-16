@@ -1,22 +1,5 @@
 """
 FHIR Resource Factory — public API package.
-
-New API (clean break)
----------------------
-
-``ProfileFactory``  — the new factory class.
-``factory``         — module-level singleton for convenience.
-
-Compatibility shims for existing callers
------------------------------------------
-
-``ResourceFactory``         → ``ProfileFactory`` (alias)
-``construct_resource_model`` → ``factory.build``
-
-The old ``StructureNode``, ``ConstructionMode``, and
-``ResourceFactoryValidators`` are no longer provided by this package.
-Import them from :mod:`fhircraft.fhir.resources.factory_legacy` if still
-needed during migration.
 """
 
 from __future__ import annotations
@@ -53,41 +36,19 @@ from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
 #: Default :class:`ProfileFactory` instance used by the convenience function
 #: :func:`construct_resource_model`.  Configures itself lazily.
 
-# ------------------------------------------------------------------
-# Compatibility shims (legacy names)
-# ------------------------------------------------------------------
-
-#: Alias kept for backward compatibility.  New code should use
-#: :class:`FHIRStructureFactory` directly.
 ResourceFactory = FHIRStructureFactory
 
 __all__ = [
-    # New API
-    "FHIRStructureFactory",
+    # Core factory
+    "ResourceFactory",
+    # Pipeline internals (public access)
     "ModelAssembler",
     "SnapshotResolver",
     "DefinitionIndex",
     "ElementNode",
     "BuildContext",
     "TypeRegistry",
-    "ValidatorCollector",
-    "BuiltField",
-    "FieldBuilder",
-    "BUILDER_CHAIN",
-    "BackboneFieldBuilder",
-    "ContentReferenceFieldBuilder",
-    "SimpleFieldBuilder",
-    "SlicedFieldBuilder",
-    "TypeChoiceFieldBuilder",
-    "build_pydantic_field",
-    "handle_python_keyword",
     # Exceptions
     "DefinitionIndexError",
     "DefinitionResolutionError",
-    "UnregisteredTypeError",
-    # Singletons / convenience
-    "factory",
-    "construct_resource_model",
-    # Compatibility shims
-    "ResourceFactory",
 ]

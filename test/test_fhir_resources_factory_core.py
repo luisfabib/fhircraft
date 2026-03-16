@@ -104,13 +104,13 @@ def test_sanitize_name__hyphens_stripped():
 
 
 # ===========================================================================
-# FHIRStructureFactory.clear_cache
+# FHIRStructureFactory.reset_cache
 # ===========================================================================
 
 
-def test_clear_cache__empties_construction_cache(factory):
+def test_reset_cache__empties_construction_cache(factory):
     factory.construction_cache["http://example.org/X"] = MagicMock()  # type: ignore
-    factory.clear_cache()
+    factory.reset_cache()
     assert factory.construction_cache == {}
 
 
@@ -434,3 +434,216 @@ def test_build_internal__canonical_url_set_on_model():
         factory._build(sd)
 
     assert M._canonical_url == "http://example.org/X"
+
+
+# ===========================================================================
+# FHIRStructureFactory.register
+# ===========================================================================
+
+
+def test_register__dict_is_added_to_registry_and_returns_sd():
+    registry = make_registry()
+    sd = make_sd()
+    registry.from_dict.return_value = sd
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+
+    result = factory.register({"resourceType": "StructureDefinition"})
+
+    registry.from_dict.assert_called_once()
+    assert result is sd
+
+
+def test_register__sd_object_is_added_to_registry_and_returned():
+    registry = make_registry()
+    sd = make_sd()
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+
+    result = factory.register(sd)
+
+    registry.add.assert_called_once_with(sd)
+    assert result is sd
+
+
+def test_register__invalid_input_raises_value_error():
+    factory = make_factory()
+    with pytest.raises(ValueError):
+        factory.register(object())  # type: ignore
+
+
+# ===========================================================================
+# FHIRStructureFactory.register_package
+# ===========================================================================
+
+
+def test_register_package__delegates_to_registry():
+    registry = make_registry()
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory.register_package("hl7.fhir.us.core", "5.0.1")
+    registry.download_package.assert_called_once_with("hl7.fhir.us.core", "5.0.1")
+
+
+# ===========================================================================
+# FHIRStructureFactory.reset_cache
+# (basic test already covered above; additional assertion tested here)
+# ===========================================================================
+
+
+def test_reset_cache__multiple_entries_all_removed(factory):
+    factory.construction_cache["http://a.org/A"] = MagicMock()  # type: ignore
+    factory.construction_cache["http://a.org/B"] = MagicMock()  # type: ignore
+    factory.reset_cache()
+    assert len(factory.construction_cache) == 0
+
+
+# ===========================================================================
+# FHIRStructureFactory.has_definition / get_definition / list_definitions
+# ===========================================================================
+
+
+def test_has_definition__true_when_url_in_registry():
+    registry = make_registry()
+    registry.__contains__ = MagicMock(return_value=True)
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    assert factory.has_registered_definition("http://example.org/X") is True
+
+
+def test_has_registered_definition__false_when_url_not_in_registry():
+    registry = make_registry()
+    registry.__contains__ = MagicMock(return_value=False)
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    assert factory.has_registered_definition("http://example.org/missing") is False
+
+
+def test_get_registered_definition__delegates_to_registry_get():
+    registry = make_registry()
+    sd = make_sd()
+    registry.get.return_value = sd
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+
+    result = factory.get_registered_definition("http://example.org/X")
+
+    registry.get.assert_called_once_with("http://example.org/X")
+    assert result is sd
+
+
+def test_list_registered_definitions__returns_all_urls_when_no_kind_filter():
+    registry = make_registry()
+    sd_a = make_sd(url="http://example.org/A", kind="resource")
+    sd_b = make_sd(url="http://example.org/B", kind="complex-type")
+    registry.structure_definitions_by_url = {
+        "http://example.org/A": sd_a,
+        "http://example.org/B": sd_b,
+    }
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+
+    result = factory.list_registered_definitions()
+
+    assert sorted(result) == ["http://example.org/A", "http://example.org/B"]
+
+
+def test_list_registered_definitions__filters_by_kind():
+    registry = make_registry()
+    sd_a = make_sd(url="http://example.org/A", kind="resource")
+    sd_b = make_sd(url="http://example.org/B", kind="complex-type")
+    registry.structure_definitions_by_url = {
+        "http://example.org/A": sd_a,
+        "http://example.org/B": sd_b,
+    }
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+
+    result = factory.list_registered_definitions(kind="resource")
+
+    assert result == ["http://example.org/A"]
+
+
+# ===========================================================================
+# FHIRStructureFactory.unregister
+# ===========================================================================
+
+
+def test_remove_definition__removes_from_registry_dict():
+    registry = make_registry()
+    sd = make_sd(url="http://example.org/X")
+    registry.structure_definitions_by_url = {"http://example.org/X": sd}
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory.construction_cache["http://example.org/X"] = MagicMock()  # type: ignore
+
+    factory.unregister("http://example.org/X")
+
+    assert "http://example.org/X" not in registry.structure_definitions_by_url
+    assert "http://example.org/X" not in factory.construction_cache
+
+
+def test_remove_definition__no_op_when_url_absent():
+    registry = make_registry()
+    registry.structure_definitions_by_url = {}
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    # Should not raise
+    factory.unregister("http://example.org/nonexistent")
+
+
+# ===========================================================================
+# FHIRStructureFactory.is_built / list_built / evict / rebuild
+# ===========================================================================
+
+
+def test_is_built__true_when_url_in_cache(factory):
+    factory.construction_cache["http://example.org/X"] = MagicMock()  # type: ignore
+    assert factory.is_built("http://example.org/X") is True
+
+
+def test_is_built__false_when_url_not_in_cache(factory):
+    assert factory.is_built("http://example.org/missing") is False
+
+
+def test_list_built__returns_all_cached_urls(factory):
+    factory.construction_cache["http://example.org/A"] = MagicMock()  # type: ignore
+    factory.construction_cache["http://example.org/B"] = MagicMock()  # type: ignore
+    listed = factory.list_built()
+    assert set(listed) == {"http://example.org/A", "http://example.org/B"}
+
+
+def test_evict__removes_url_from_cache(factory):
+    factory.construction_cache["http://example.org/X"] = MagicMock()  # type: ignore
+    factory.evict("http://example.org/X")
+    assert "http://example.org/X" not in factory.construction_cache
+
+
+def test_evict__noop_when_url_absent(factory):
+    # Should not raise
+    factory.evict("http://example.org/nonexistent")
+
+
+def test_rebuild__evicts_then_builds(factory):
+    url = "http://example.org/X"
+    model = make_pydantic_model()
+    factory.construction_cache[url] = make_pydantic_model()  # type: ignore
+
+    with patch.object(factory, "build", return_value=model) as mock_build:
+        result = factory.rebuild(url, mode="snapshot")
+
+    assert (
+        url not in factory.construction_cache
+        or factory.construction_cache[url] is model
+    )
+    mock_build.assert_called_once_with(canonical_url=url, mixins=None, mode="snapshot")
+    assert result is model
+
+
+# ===========================================================================
+# FHIRStructureFactory.enable/disable_internet_access
+# ===========================================================================
+
+
+def test_enable_internet_access__delegates_to_registry():
+    registry = make_registry()
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory.enable_internet_access()
+    registry.enable_internet_access.assert_called_once()
+
+
+def test_disable_internet_access__delegates_to_registry():
+    registry = make_registry()
+    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory.disable_internet_access()
+    registry.disable_internet_access.assert_called_once()

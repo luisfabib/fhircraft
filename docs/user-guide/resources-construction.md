@@ -246,7 +246,7 @@ factory = ResourceFactory(fhir_release="R4")
 
 # Load the custom patient profile definition from a file into the factory
 struct_def = load_file("custom-patient.profile.json") 
-factory.add_structure_definition(struct_def)
+factory.register(struct_def)
 
 # Construct a model using the canonical URL
 # The factory retrieves the definition from the repository
@@ -273,7 +273,7 @@ patient = CustomPatient(
 
     # Load the US Core implementation guide
     # See managing-fhir-artifacts.md for package loading details
-    factory.load_package("hl7.fhir.us.core", "5.0.1")
+    factory.register_package("hl7.fhir.us.core", "5.0.1")
 
     # Construct a model for the US Core Patient profile
     # The canonical URL comes from the implementation guide
@@ -305,8 +305,8 @@ patient = CustomPatient(
     factory = ResourceFactory(fhir_release="R4")
 
     # Load both US Core and International Patient Summary
-    factory.load_package("hl7.fhir.us.core", "5.0.1")
-    factory.load_package("hl7.fhir.us.mcode", "1.1.0")
+    factory.register_package("hl7.fhir.us.core", "5.0.1")
+    factory.register_package("hl7.fhir.us.mcode", "1.1.0")
 
     # Construct models for different profiles
     USCorePatient = factory.build(
@@ -370,7 +370,7 @@ print(f"Cached: {cached_construction_time}s")
 print(f"Original: {original_construction_time}s") # (2)!
 
 # Clear the cache when definitions change
-factory.clear_cache()
+factory.reset_cache()
 
 
 ```
@@ -381,6 +381,61 @@ factory.clear_cache()
 4. New variable no longer references the old class
 
 See the [:simple-pydantic: Pydantic performance documentation](https://docs.pydantic.dev/latest/concepts/performance/) for information about model validation performance.
+
+
+### Inspecting the cache
+
+`is_built` and `list_built` let you query what is currently cached without triggering any builds:
+
+```python
+from fhircraft.fhir.resources import ResourceFactory
+factory = ResourceFactory(fhir_release="R4")
+
+url = "http://hl7.org/fhir/StructureDefinition/Patient"
+
+Patient = factory.build(canonical_url=url)
+print(factory.is_built(url))      # True
+print(factory.list_built())       # [url, ...]
+```
+
+### Evicting a single model
+
+`evict` removes one URL from the cache. The next call to `build` for that URL will construct a fresh model. Use this when you have updated the underlying StructureDefinition and want the change reflected without discarding other cached models:
+
+```python
+from fhircraft.fhir.resources import ResourceFactory
+factory = ResourceFactory(fhir_release="R4")
+
+url = "http://hl7.org/fhir/StructureDefinition/Patient"
+factory.evict(url)
+print(factory.is_built(url))  # False
+```
+
+### Forcing a rebuild
+
+`rebuild` combines `evict` with an immediate `build` call, returning the freshly constructed model:
+
+```python
+from fhircraft.fhir.resources import ResourceFactory
+factory = ResourceFactory(fhir_release="R4")
+
+url = "http://hl7.org/fhir/StructureDefinition/Patient"
+
+# Force a fresh build of an already-cached model
+Patient = factory.rebuild(url)
+```
+
+### Resetting the entire cache
+
+`reset_cache` discards all cached models at once. Use it when you have reloaded a batch of definitions and want all subsequent builds to start fresh:
+
+```python
+from fhircraft.fhir.resources import ResourceFactory
+factory = ResourceFactory(fhir_release="R4")
+
+factory.reset_cache()
+print(factory.list_built())  # []
+```
 
 ## Code Generation
 
@@ -397,7 +452,7 @@ from fhircraft.fhir.resources.generator import generate_resource_model_code
 factory = ResourceFactory(fhir_release="R4")
 
 # Load a package and construct a model
-factory.load_package("hl7.fhir.us.core", "5.0.1")
+factory.register_package("hl7.fhir.us.core", "5.0.1")
 USCorePatient = factory.build(
     "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
 )
@@ -426,7 +481,7 @@ See the [Pydantic JSON schema documentation](https://docs.pydantic.dev/latest/co
     factory = ResourceFactory(fhir_release="R4")
     
     # Load the implementation guide
-    factory.load_package("hl7.fhir.us.core", "5.0.1")
+    factory.register_package("hl7.fhir.us.core", "5.0.1")
 
     # Construct multiple related models
     models_to_generate = []
@@ -502,5 +557,5 @@ The generator handles inheritance, forward references, and circular dependencies
 | Base definition not found in differential mode | The baseDefinition URL cannot be resolved | Ensure the base profile is loaded into the repository before constructing the differential profile |
 | Cannot find profile from implementation guide | Package not loaded or incorrect canonical URL | Verify the package is loaded and check the canonical URL in the implementation guide documentation |
 | Models conflict between FHIR versions | Multiple FHIR versions loaded | Use version-specific canonical URLs or load only one FHIR version per repository |
-| Memory usage increases over time | Many models cached | Clear the cache periodically with `factory.clear_cache()` if needed |
+| Memory usage increases over time | Many models cached | Clear the cache periodically with `factory.reset_cache()` if needed |
 | Thread safety issues | Concurrent modifications to repository | Load all definitions during application startup before concurrent access |

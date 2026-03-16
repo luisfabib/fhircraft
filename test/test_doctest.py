@@ -142,6 +142,10 @@ def mock_load_file(filepath):
 _original_open = open
 
 
+def mock_get_registered_definition(self, url):
+    return MagicMock()
+
+
 def mock_open_func(file, mode="r", *args, **kwargs):
     """Mock open to prevent creating files."""
     if isinstance(file, str) and "w" in mode:
@@ -153,12 +157,17 @@ def mock_open_func(file, mode="r", *args, **kwargs):
 
 @pytest.mark.parametrize("fpath", pathlib.Path("docs").glob("**/*.md"), ids=str)
 @patch(
-    "fhircraft.fhir.resources.factory.ResourceFactory.load_package", mock_load_package
+    "fhircraft.fhir.resources.factory.ResourceFactory.register_package",
+    mock_load_package,
 )
 @patch("fhircraft.fhir.mapper.FHIRMapper.load_structure_map", mock_load_structure_map)
 @patch(
     "fhircraft.fhir.resources.factory.ResourceFactory.build",
     mock_factory_build,
+)
+@patch(
+    "fhircraft.fhir.resources.factory.ResourceFactory.get_registered_definition",
+    mock_get_registered_definition,
 )
 @patch("fhircraft.utils.load_file", mock_load_file)
 @patch("builtins.open", side_effect=mock_open_func)
@@ -169,7 +178,8 @@ def test_documentation_examples(mock_file, fpath):
 
 
 @patch(
-    "fhircraft.fhir.resources.factory.ResourceFactory.load_package", mock_load_package
+    "fhircraft.fhir.resources.factory.ResourceFactory.register_package",
+    mock_load_package,
 )
 @patch("fhircraft.utils.load_file", mock_load_file)
 @patch("builtins.open", side_effect=mock_open_func)

@@ -109,7 +109,7 @@ from fhircraft.fhir.resources import ResourceFactory
 factory = ResourceFactory(fhir_release="R4")
 
 # Load US Core Implementation Guide
-factory.load_package("hl7.fhir.us.core", "5.0.1")
+factory.register_package("hl7.fhir.us.core", "5.0.1")
 
 # Create US Core Patient model with enhanced validation
 USCorePatient = factory.build(

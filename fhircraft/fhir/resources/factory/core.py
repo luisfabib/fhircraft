@@ -6,8 +6,10 @@ This is the main public entry point; the rest of the pipeline (resolver,
 assembler, builders, validators) is invoked from here.
 """
 
+import json
 import re
 import keyword
+from pathlib import Path
 from typing import Any, Literal, Sequence, TYPE_CHECKING
 
 from pydantic import BaseModel
@@ -39,25 +41,17 @@ if TYPE_CHECKING:
 
 class FHIRStructureFactory:
     """
-    FHIRStructureFactory is responsible for constructing Pydantic model classes from FHIR StructureDefinitions.
-    This factory manages a registry of StructureDefinitions, supports loading FHIR packages, and caches constructed models
-    to optimize performance. It provides methods to build models from StructureDefinitions, add new definitions, clear the
-    internal cache, and normalize input definitions.
+    FHIRStructureFactory constructs Pydantic model classes from FHIR StructureDefinitions.
+
+    The factory manages a registry of StructureDefinitions, supports loading FHIR packages, and
+    caches constructed models to optimise performance.
 
     Attributes:
-        fhir_release (str): The FHIR release version (e.g., "R4", "R5") used by the factory.
-        definition_registry (StructureDefinitionRegistry): Registry for storing and retrieving StructureDefinitions.
-        construction_cache (dict[str, type[BaseModel]]): Cache mapping canonical URLs to constructed Pydantic model classes.
-
-    Methods:
-        build(structure_definition=None, *, canonical_url=None, mixins=None, mode="auto") -> type[BaseModel]:
-            Uses caching to avoid redundant model construction.
-        load_package(package_name: str, version: str) -> None:
-            Loads all StructureDefinitions from a specified FHIR package into the registry.
-        add_structure_definition(sd) -> None:
-            Adds a StructureDefinition to the registry. Accepts either a dict or a StructureDefinition model instance.
-        clear_cache() -> None:
-            Clears the construction cache, removing all cached model classes.
+        fhir_release (str): The FHIR release version (e.g. "R4", "R5") used by the factory.
+        definition_registry (StructureDefinitionRegistry): Registry for storing and retrieving
+            StructureDefinitions.
+        construction_cache (dict[str, type[BaseModel]]): Cache mapping canonical URLs to
+            constructed Pydantic model classes.
     """
 
     def __init__(
@@ -74,7 +68,7 @@ class FHIRStructureFactory:
         self.construction_cache: dict[str, type[BaseModel]] = {}
 
     # ------------------------------------------------------------------
-    # Main entry points
+    # Public API
     # ------------------------------------------------------------------
 
     def build(
@@ -119,39 +113,150 @@ class FHIRStructureFactory:
 
         return self._build(structure_definition, mixins=mixins, mode=mode)
 
-    def load_package(self, package_name: str, version: str) -> None:
+    def register_package(self, package_name: str, version: str) -> None:
         """
-        Load all StructureDefinitions from a given package into the repository.
+        Download and register all StructureDefinitions from a FHIR npm package.
 
         Args:
-            package_name: The name of the package to load (e.g. "hl7.fhir.us.mcode").
-            version: The version of the package to load (e.g. "1.0.0").
-        Raises:
-            NotImplementedError: If the package is not supported by the mock.
+            package_name: Package identifier (e.g. ``"hl7.fhir.us.mcode"``).
+            version: Package version string (e.g. ``"1.0.0"``).
         """
         self.definition_registry.download_package(package_name, version)
 
-    def add_structure_definition(
+    def register(
         self,
         sd: "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition | dict",
-    ) -> None:
+    ) -> "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition":
+        """
+        Register a StructureDefinition with the factory.
+
+        Accepts a typed StructureDefinition model instance or a plain dict.  The
+        normalised, validated SD instance is returned so callers can inspect it.
+
+        Args:
+            sd: A StructureDefinition model instance or a ``dict`` representation.
+
+        Returns:
+            The normalised StructureDefinition instance that was stored.
+
+        Raises:
+            ValueError: If *sd* is neither a dict nor a StructureDefinition instance.
+        """
         if isinstance(sd, dict):
-            self.definition_registry.from_dict(sd)
+            return self.definition_registry.from_dict(sd)
         elif getattr(sd, "_resource_type", None) == "StructureDefinition":
             self.definition_registry.add(sd)
+            return sd
         else:
             raise ValueError(
                 "Input must be a dict or a StructureDefinition model instance."
             )
 
-    def clear_cache(self) -> None:
+    def unregister(self, url: str) -> None:
         """
-        Clears the construction cache by removing all cached items.
-        This method resets the internal cache used for resource construction,
-        ensuring that subsequent operations do not use stale or previously stored data.
-        """
+        Remove a StructureDefinition from the registry and evict it from the cache.
 
+        If *url* is not registered, the call is a no-op.
+
+        Args:
+            url: The canonical URL of the StructureDefinition to remove.
+        """
+        self.definition_registry.structure_definitions_by_url.pop(url, None)
+        self.evict(url)
+
+    def reset_cache(self) -> None:
+        """Discard the entire construction cache."""
         self.construction_cache.clear()
+
+    def has_registered_definition(self, url: str) -> bool:
+        """Return ``True`` if *url* is present in the definition registry."""
+        return url in self.definition_registry
+
+    def get_registered_definition(
+        self, url: str
+    ) -> "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition":
+        """
+        Retrieve a registered StructureDefinition by canonical URL.
+
+        Args:
+            url: The canonical URL of the StructureDefinition.
+
+        Returns:
+            The StructureDefinition instance stored in the registry.
+
+        Raises:
+            KeyError: If *url* is not registered.
+        """
+        return self.definition_registry.get(url)
+
+    def list_registered_definitions(self, kind: str | None = None) -> list[str]:
+        """
+        Return all canonical URLs registered in the definition registry.
+
+        Args:
+            kind: When provided, only URLs whose StructureDefinition has a matching
+                ``kind`` field (e.g. ``"resource"``, ``"complex-type"``) are returned.
+
+        Returns:
+            Sorted list of canonical URL strings.
+        """
+        sds = self.definition_registry.structure_definitions_by_url
+        if kind is None:
+            return sorted(sds)
+        return sorted(
+            url for url, sd in sds.items() if getattr(sd, "kind", None) == kind
+        )
+
+    def is_built(self, url: str) -> bool:
+        """Return ``True`` if a model for *url* is present in the construction cache."""
+        return url in self.construction_cache
+
+    def list_built(self) -> list[str]:
+        """Return all canonical URLs whose models are currently cached."""
+        return list(self.construction_cache)
+
+    def evict(self, url: str) -> None:
+        """
+        Remove a single entry from the construction cache.
+
+        If *url* is not cached, the call is a no-op.
+
+        Args:
+            url: Canonical URL of the model to evict.
+        """
+        self.construction_cache.pop(url, None)
+
+    def rebuild(
+        self,
+        url: str,
+        *,
+        mixins: Sequence[type] | None = None,
+        mode: Literal["auto", "snapshot", "differential"] = "auto",
+    ) -> type[BaseModel]:
+        """
+        Evict *url* from the cache and build a fresh model.
+
+        Useful when the underlying StructureDefinition has changed after the
+        initial build (e.g. after calling :meth:`register` again with an updated SD).
+
+        Args:
+            url: Canonical URL of the StructureDefinition to rebuild.
+            mixins: Optional mixin classes forwarded to :meth:`build`.
+            mode: Build mode forwarded to :meth:`build`.
+
+        Returns:
+            The newly constructed Pydantic model class.
+        """
+        self.evict(url)
+        return self.build(canonical_url=url, mixins=mixins, mode=mode)
+
+    def enable_internet_access(self) -> None:
+        """Allow the definition registry to resolve unknown URLs from the internet."""
+        self.definition_registry.enable_internet_access()
+
+    def disable_internet_access(self) -> None:
+        """Prevent the definition registry from making any outgoing HTTP requests."""
+        self.definition_registry.disable_internet_access()
 
     # ------------------------------------------------------------------
     # Internal build pipeline

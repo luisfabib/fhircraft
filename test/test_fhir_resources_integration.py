@@ -367,7 +367,7 @@ def test_construct_profiled_resource(mode, release, example_filename, definition
                 ) as def_file:
                     struct_def = json.load(def_file)
                     factory.definition_registry.from_dict(struct_def)
-            factory.clear_cache()
+            factory.reset_cache()
         # Generate source code for Pydantic FHIR model
         resource = factory.build(
             canonical_url=fhir_resource["meta"]["profile"][0],
