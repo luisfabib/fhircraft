@@ -24,8 +24,8 @@ from fhircraft import configure
 configure(disable_validation_warnings=True)
 
 # Create FHIR resources without validation warnings appearing
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
-Patient = get_fhir_resource_type("Patient", "R5")
+from fhircraft.fhir.resources import get_fhir_type
+Patient = get_fhir_type("Patient", "R5")
 
 # This patient creation will not show warnings about missing narrative
 patient = Patient(name=[{"given": ["Alice"]}])
@@ -41,9 +41,9 @@ The context manager `with_config` creates an isolated configuration scope. Any v
 
 ```python
 from fhircraft import with_config
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+from fhircraft.fhir.resources import get_fhir_type
 
-Patient = get_fhir_resource_type("Patient", "R5")
+Patient = get_fhir_type("Patient", "R5")
 
 # Temporarily disable warnings for importing external data
 with with_config(disable_validation_warnings=True):
@@ -64,12 +64,12 @@ Disabling constraints by key provides surgical precision. You turn off only the 
 
 ```python
 from fhircraft import disable_constraint, enable_constraint
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+from fhircraft.fhir.resources import get_fhir_type
 
 # Disable the dom-6 constraint that requires narrative text
 disable_constraint('dom-6')
 
-Patient = get_fhir_resource_type("Patient", "R5")
+Patient = get_fhir_type("Patient", "R5")
 
 # Now creating patients without narrative will not trigger dom-6 warnings
 patient = Patient(name=[{"given": ["Alice"]}])
@@ -93,12 +93,12 @@ Strict mode enforces the complete set of FHIR constraints. Validation errors rai
 
 ```python hl_lines="5"
 from fhircraft import configure
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+from fhircraft.fhir.resources import get_fhir_type
 
 # Explicitly set strict mode (this is the default)
 configure(validation_mode='strict')
 
-Patient = get_fhir_resource_type("Patient", "R5")
+Patient = get_fhir_type("Patient", "R5")
 
 # Validation errors will raise exceptions
 # Validation warnings will emit Python warnings

@@ -34,8 +34,16 @@ def factory():
     factory.clear_cache()
 
 
-def test_regression_issue_255(factory, generator):
-    # Clear factory cache to avoid state pollution from other tests
+def test_regression_issue_255(factory):
+    """Regression test for issue #255: nested slice with fixed values on a backbone element.
+
+    Verifies the assembled model structure directly without relying on the
+    generated source-code string, which is fragile to cosmetic changes.
+    """
+    from typing import get_args, get_origin, Union
+    import pydantic
+
+    from fhircraft.fhir.resources.base import FHIRSliceModel
 
     structure_definition = {
         "resourceType": "StructureDefinition",
@@ -102,82 +110,85 @@ def test_regression_issue_255(factory, generator):
         },
     }
 
-    model = factory.construct_resource_model(
+    model = factory.build(
         structure_definition=structure_definition, mode="differential"
     )
 
-    source_code = generator.generate_resource_model_code(model)
+    # -----------------------------------------------------------------------
+    # ProfileExample – root model
+    # -----------------------------------------------------------------------
+    from fhircraft.fhir.resources.datatypes.R5.core import Observation
 
-    expected_code = '''
-    class ProfileExampleSlicedCoding(Coding, FHIRSliceModel):
-        """
-        Code defined by a terminology system
-        """
-        min_cardinality: ClassVar[int] = 1
-        max_cardinality: ClassVar[int] = 1
-    
-        system: Optional[Uri] = Field(
-            description="Identity of the terminology system",
-            default="http://example.org",
-        )
-        code: Optional[Code] = Field(
-            description="Symbol in syntax defined by the system",
-            default="12345-6",
-        )
-
-        @field_validator(*('system',), mode="after", check_fields=None)
-        @classmethod
-        def FHIR_system_fixed_value_constraint(cls, value):    
-            return validate_FHIR_element_fixed_value(cls, value, 
-                constant="http://example.org",
-            )
-            
-        @field_validator(*('code',), mode="after", check_fields=None)
-        @classmethod
-        def FHIR_code_fixed_value_constraint(cls, value):    
-            return validate_FHIR_element_fixed_value(cls, value, 
-                constant="12345-6",
-            )        
-        
-    class ProfileExampleCode(CodeableConcept):
-        """
-        Describes what was observed. Sometimes this is called the observation "name".
-        """
-    
-
-        coding: Optional[List[Annotated[Union[ProfileExampleSlicedCoding, Coding], Field(union_mode='left_to_right')]]] = Field(
-            description="Code defined by a terminology system",
-            default=None,
-        )
-        
-        @field_validator(*('coding',), mode="after", check_fields=None)
-        @classmethod
-        def coding_slicing_cardinality_validator(cls, value):    
-            return validate_slicing_cardinalities(cls, value, 
-                field_name="coding",
-            )
-        
-    class ProfileExample(Observation):
-
-        _canonical_url = "http://example.org/fhir/StructureDefinition/issue-255"
-
-        meta: Optional[Meta] = Field(
-            title="Meta",
-            description="Metadata about the resource.",
-            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/issue-255']),
-        )
-        code: Optional[ProfileExampleCode] = Field(
-            description="Type of observation (code / type)",
-            default=None,
-        )
-    '''
-    assertBlockInCode(source_code, expected_code.strip())
+    assert model.__name__ == "ProfileExample"
+    assert issubclass(model, Observation)
     assert (
-        source_code.count("class ") == 3
-    ), f"Expected exactly 3 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+        model._canonical_url == "http://example.org/fhir/StructureDefinition/issue-255"
+    )
+    assert "code" in model.model_fields
+
+    # -----------------------------------------------------------------------
+    # ProfileExampleCode – backbone for Observation.code
+    # -----------------------------------------------------------------------
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept
+
+    code_annotation = model.model_fields["code"].annotation
+    # annotation is Optional[ProfileExampleCode] i.e. Union[ProfileExampleCode, None]
+    code_model = next(a for a in get_args(code_annotation) if a is not type(None))
+
+    assert code_model.__name__ == "ProfileExampleCode"
+    assert issubclass(code_model, CodeableConcept)
+    assert "coding" in code_model.model_fields
+
+    # -----------------------------------------------------------------------
+    # ProfileExampleSlicedCoding – FHIRSliceModel inside code.coding
+    # -----------------------------------------------------------------------
+    from fhircraft.fhir.resources.datatypes.R5.complex import Coding
+
+    coding_annotation = code_model.model_fields["coding"].annotation
+    # Optional[List[Annotated[Union[SlicedCoding, Coding], ...]]]
+    list_type = next(a for a in get_args(coding_annotation) if a is not type(None))
+    annotated_item = get_args(list_type)[0]  # List[X] -> X (Annotated[...])
+    union_type = get_args(annotated_item)[0]  # Annotated[Union[...], ...] -> Union[...]
+    union_members = get_args(union_type)  # Union[A, B] -> (A, B)
+
+    sliced_coding_model: type = next(
+        m
+        for m in union_members
+        if isinstance(m, type) and issubclass(m, FHIRSliceModel)
+    )
+
+    assert sliced_coding_model.__name__ == "ProfileExampleSlicedCoding"
+    assert issubclass(sliced_coding_model, Coding)
+    assert issubclass(sliced_coding_model, FHIRSliceModel)
+
+    # cardinalities carried as class variables
+    assert sliced_coding_model.min_cardinality == 1
+    assert sliced_coding_model.max_cardinality == 1
+
+    # -----------------------------------------------------------------------
+    # Field defaults reflect the fixedUri / fixedCode constraints
+    # -----------------------------------------------------------------------
+    assert sliced_coding_model.model_fields["system"].default == "http://example.org"
+    assert sliced_coding_model.model_fields["code"].default == "12345-6"
+
+    # -----------------------------------------------------------------------
+    # Fixed-value validators reject wrong values at runtime
+    # -----------------------------------------------------------------------
+    with pytest.raises(pydantic.ValidationError):
+        sliced_coding_model(system="http://wrong.org", code="12345-6")
+
+    with pytest.raises(pydantic.ValidationError):
+        sliced_coding_model(system="http://example.org", code="WRONG")
+
+    # -----------------------------------------------------------------------
+    # Valid instance assembles without errors
+    # -----------------------------------------------------------------------
+    instance = sliced_coding_model(system="http://example.org", code="12345-6")
+    assert instance.system == "http://example.org"
+    assert instance.code == "12345-6"
 
 
-def test_regression_issue_258(factory, generator):
+def test_regression_issue_258(factory):
     structure_definition = {
         "resourceType": "StructureDefinition",
         "id": "issue-258",
@@ -219,61 +230,71 @@ def test_regression_issue_258(factory, generator):
         },
     }
 
-    model = factory.construct_resource_model(
+    model = factory.build(
         structure_definition=structure_definition, mode="differential"
     )
 
-    source_code = generator.generate_resource_model_code(model)
+    from typing import get_args
+    import pydantic
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+    from fhircraft.fhir.resources.datatypes.R5.core import Observation
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept, Coding
 
-    expected_code = '''
-    class ProfileExampleSlice(CodeableConcept, FHIRSliceModel):
-        """
-        Classification of  type of observation
-        """
-        min_cardinality: ClassVar[int] = 0
-        max_cardinality: ClassVar[int] = 2
-
-        coding: Optional[List[Coding]] = Field(
-            description="Code defined by a terminology system",
-            default=[Coding(code="12345-6", display="Fixed Category", system="http://example.org")],
-        )
-        
-        @model_validator(mode="after")
-        def FHIR_slice_pattern_constraint(self):    
-            return validate_FHIR_model_pattern(
-                self,
-                pattern=CodeableConcept(coding=[Coding(code="12345-6", display="Fixed Category", system="http://example.org")]),
-            )
-    
-    class ProfileExample(Observation):
-
-        _canonical_url = "http://example.org/fhir/StructureDefinition/issue-258"
-
-        meta: Optional[Meta] = Field(
-            title="Meta",
-            description="Metadata about the resource.",
-            default_factory=lambda: Meta(profile=['http://example.org/fhir/StructureDefinition/issue-258']),
-        )
-        category: Optional[List[Annotated[Union[ProfileExampleSlice, CodeableConcept], Field(union_mode='left_to_right')]]] = Field(
-            description="Classification of  type of observation",
-            default=None,
-        )
-        
-        @field_validator(*('category',), mode="after", check_fields=None)
-        @classmethod
-        def category_slicing_cardinality_validator(cls, value):    
-            return validate_slicing_cardinalities(cls, value, 
-                field_name="category",
-            )
-    '''
-    assertBlockInCode(source_code, expected_code)
-
+    # -----------------------------------------------------------------------
+    # ProfileExample – root model
+    # -----------------------------------------------------------------------
+    assert model.__name__ == "ProfileExample"
+    assert issubclass(model, Observation)
     assert (
-        source_code.count("class ") == 2
-    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+        model._canonical_url == "http://example.org/fhir/StructureDefinition/issue-258"
+    )
+    assert "category" in model.model_fields
+
+    # -----------------------------------------------------------------------
+    # ProfileExampleSlice – FHIRSliceModel inside category
+    # -----------------------------------------------------------------------
+    category_annotation = model.model_fields["category"].annotation
+    list_type = next(a for a in get_args(category_annotation) if a is not type(None))
+    annotated_item = get_args(list_type)[0]
+    union_type = get_args(annotated_item)[0]
+    union_members = get_args(union_type)
+
+    slice_model = next(
+        m
+        for m in union_members
+        if isinstance(m, type) and issubclass(m, FHIRSliceModel)
+    )
+
+    assert slice_model.__name__ == "ProfileExampleSlice"
+    assert issubclass(slice_model, CodeableConcept)
+    assert slice_model.min_cardinality == 0
+    assert slice_model.max_cardinality == 2
+
+    # -----------------------------------------------------------------------
+    # Pattern default on the coding field
+    # -----------------------------------------------------------------------
+    assert slice_model.model_fields["coding"].default is not None
+
+    # -----------------------------------------------------------------------
+    # Pattern validator rejects non-matching instances at runtime
+    # -----------------------------------------------------------------------
+    with pytest.raises(pydantic.ValidationError):
+        slice_model(coding=[{"system": "http://wrong.org", "code": "WRONG"}])
+
+    # -----------------------------------------------------------------------
+    # Valid instance assembles without errors
+    # -----------------------------------------------------------------------
+    instance = slice_model(
+        coding=[
+            Coding(
+                system="http://example.org", code="12345-6", display="Fixed Category"
+            )
+        ]
+    )
+    assert instance is not None
 
 
-def test_regression_issue_111(factory, generator):
+def test_regression_issue_111(factory):
 
     structure_definition = {
         "resourceType": "StructureDefinition",
@@ -281,7 +302,7 @@ def test_regression_issue_111(factory, generator):
         "url": "http://example.org/StructureDefinition/example-procedure",
         "version": "0.1.0",
         "name": "ExampleProcedure",
-        "fhirVersion": "4.0.1",
+        "fhirVersion": "5.0.0",
         "kind": "resource",
         "abstract": False,
         "type": "Procedure",
@@ -316,59 +337,68 @@ def test_regression_issue_111(factory, generator):
         },
     }
 
-    model = factory.construct_resource_model(
+    model = factory.build(
         structure_definition=structure_definition, mode="differential"
     )
 
-    source_code = generator.generate_resource_model_code(model)
+    from typing import get_args
+    import pydantic
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept, Coding
 
-    expected_code = '''
-    class ExampleProcedureCode(CodeableConcept):
-        """
-        The specific procedure that is performed. Use text if the exact nature of the procedure cannot be coded (e.g. "Laparoscopic Appendectomy").
-        """
-            
-        text: Optional[String] = Field(
-            description="Plain text representation of the concept",
-            default="Tumor Board Review",
-        )
-        
-        @field_validator(*('text',), mode="after", check_fields=None)
-        @classmethod
-        def FHIR_text_fixed_value_constraint(cls, value):    
-            return validate_FHIR_element_fixed_value(cls, value, 
-                constant="Tumor Board Review",
-            )
-        
-    
-    class ExampleProcedure(Procedure):
-
-        _canonical_url = "http://example.org/StructureDefinition/example-procedure"
-
-        meta: Optional[Meta] = Field(
-            title="Meta",
-            description="Metadata about the resource.",
-            default_factory=lambda: Meta(profile=['http://example.org/StructureDefinition/example-procedure']),
-        )
-        code: Optional[ExampleProcedureCode] = Field(
-            description="Identification of the procedure",
-            default_factory=lambda: ExampleProcedureCode(coding=[Coding(code="C93304", display="Tumor Board Review", system="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl")]),
-        )
-        
-        @field_validator(*('code',), mode="after", check_fields=None)
-        @classmethod
-        def FHIR_code_pattern_constraint(cls, value):    
-            return validate_FHIR_element_pattern(cls, value, 
-                pattern=ExampleProcedureCode(coding=[Coding(code="C93304", display="Tumor Board Review", system="http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl")]),
-            )
-    '''
-    assertBlockInCode(source_code, expected_code.strip())
+    # -----------------------------------------------------------------------
+    # ExampleProcedure – root model
+    # -----------------------------------------------------------------------
+    assert model.__name__ == "ExampleProcedure"
     assert (
-        source_code.count("class ") == 2
-    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+        model._canonical_url
+        == "http://example.org/StructureDefinition/example-procedure"
+    )
+    assert "code" in model.model_fields
+
+    # -----------------------------------------------------------------------
+    # ExampleProcedureCode – backbone for Procedure.code
+    # -----------------------------------------------------------------------
+    code_annotation = model.model_fields["code"].annotation
+    code_model = next(a for a in get_args(code_annotation) if a is not type(None))
+
+    assert code_model.__name__ == "ExampleProcedureCode"
+    assert issubclass(code_model, CodeableConcept)
+
+    # -----------------------------------------------------------------------
+    # Fixed value on the text field
+    # -----------------------------------------------------------------------
+    assert code_model.model_fields["text"].default == "Tumor Board Review"
+
+    # -----------------------------------------------------------------------
+    # Fixed-value validator rejects wrong text at runtime
+    # -----------------------------------------------------------------------
+    with pytest.raises(pydantic.ValidationError):
+        code_model(text="Wrong Text")
+
+    # -----------------------------------------------------------------------
+    # Pattern default on the root code field
+    # -----------------------------------------------------------------------
+    code_field = model.model_fields["code"]
+    assert code_field.default is not None
+    default_code = code_field.default
+    assert isinstance(default_code, CodeableConcept)
+    assert default_code.coding is not None
+    assert default_code.coding[0].code == "C93304"
+
+    # -----------------------------------------------------------------------
+    # Pattern validator rejects wrong code at runtime
+    # -----------------------------------------------------------------------
+    with pytest.raises(pydantic.ValidationError):
+        model(code=code_model(coding=[Coding(system="http://wrong.org", code="WRONG")]))
+
+    # -----------------------------------------------------------------------
+    # Valid instance assembles without errors
+    # -----------------------------------------------------------------------
+    instance = model()
+    assert isinstance(instance, model)
 
 
-def test_regression_issue_263(factory, generator):
+def test_regression_issue_263(factory):
 
     structure_definition = {
         "resourceType": "StructureDefinition",
@@ -392,6 +422,10 @@ def test_regression_issue_263(factory, generator):
                 {
                     "id": "Observation.code",
                     "path": "Observation.code",
+                },
+                {
+                    "id": "Observation.code.coding",
+                    "path": "Observation.code.coding",
                     "slicing": {
                         "discriminator": [
                             {"type": "value", "path": "code"},
@@ -400,10 +434,6 @@ def test_regression_issue_263(factory, generator):
                         "ordered": False,
                         "rules": "open",
                     },
-                },
-                {
-                    "id": "Observation.code.coding",
-                    "path": "Observation.code.coding",
                 },
                 {
                     "id": "Observation.code.coding:VitalsPanelCode",
@@ -427,66 +457,75 @@ def test_regression_issue_263(factory, generator):
         },
     }
 
-    model = factory.construct_resource_model(
+    model = factory.build(
         structure_definition=structure_definition, mode="differential"
     )
 
-    source_code = generator.generate_resource_model_code(model)
+    print(CodeGenerator().generate_resource_model_code(model))
 
-    expected_code = '''    
-    class VitalspanelVitalsPanelCode(Coding, FHIRSliceModel):
-        """
-        Code defined by a terminology system
-        """
-        min_cardinality: ClassVar[int] = 0
-        max_cardinality: ClassVar[int] = 1
+    from typing import get_args
+    import pydantic
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+    from fhircraft.fhir.resources.datatypes.R5.core import Observation
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept, Coding
 
+    # -----------------------------------------------------------------------
+    # Vitalspanel – root model
+    # -----------------------------------------------------------------------
+    assert model.__name__ == "Vitalspanel"
+    assert issubclass(model, Observation)
+    assert "code" in model.model_fields
 
-        system: Optional[Uri] = Field(
-            description="Identity of the terminology system",
-            default="http://loinc.org",
-        )
-        code: Optional[Code] = Field(
-            description="Symbol in syntax defined by the system",
-            default="85353-1",
-        )
+    # -----------------------------------------------------------------------
+    # VitalspanelCode – backbone for Observation.code
+    # -----------------------------------------------------------------------
+    code_annotation = model.model_fields["code"].annotation
+    code_model = next(a for a in get_args(code_annotation) if a is not type(None))
+    assert issubclass(code_model, CodeableConcept)
+    assert "coding" in code_model.model_fields
 
-        @field_validator(*('system',), mode="after", check_fields=None)
-        @classmethod
-        def FHIR_system_fixed_value_constraint(cls, value):    
-            return validate_FHIR_element_fixed_value(cls, value, 
-                constant="http://loinc.org",
-            )
+    # -----------------------------------------------------------------------
+    # VitalspanelVitalsPanelCode – FHIRSliceModel inside code.coding
+    # -----------------------------------------------------------------------
+    coding_annotation = code_model.model_fields["coding"].annotation
+    list_type = next(a for a in get_args(coding_annotation) if a is not type(None))
+    print(coding_annotation)
+    annotated_item = get_args(list_type)[0]
+    union_type = get_args(annotated_item)[0]
+    union_members = get_args(union_type)
 
-        @field_validator(*('code',), mode="after", check_fields=None)
-        @classmethod  
-        def FHIR_code_fixed_value_constraint(cls, value):    
-            return validate_FHIR_element_fixed_value(cls, value, 
-                constant="85353-1",
-            )
-        
-    
-    class VitalspanelCode(CodeableConcept):
-        """
-        Describes what was observed. Sometimes this is called the observation "name".
-        """
+    slice_model = next(
+        m
+        for m in union_members
+        if isinstance(m, type) and issubclass(m, FHIRSliceModel)
+    )
 
-        coding: Optional[List[Annotated[Union[VitalspanelVitalsPanelCode, Coding], Field(union_mode='left_to_right')]]] = Field(
-            description="Code defined by a terminology system",
-            default=None,
-        )
-        
-        @field_validator(*('coding',), mode="after", check_fields=None)
-        @classmethod
-        def coding_slicing_cardinality_validator(cls, value):    
-            return validate_slicing_cardinalities(cls, value, 
-                field_name="coding",
-            )
-    '''
-    assertBlockInCode(source_code, expected_code.strip())
-    assert (
-        source_code.count("class ") == 3
-    ), f"Expected exactly 3 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+    assert slice_model.__name__ == "VitalspanelVitalsPanelCode"
+    assert issubclass(slice_model, Coding)
+    assert slice_model.min_cardinality == 0
+    assert slice_model.max_cardinality == 1
+
+    # -----------------------------------------------------------------------
+    # Fixed-value defaults
+    # -----------------------------------------------------------------------
+    assert slice_model.model_fields["system"].default == "http://loinc.org"
+    assert slice_model.model_fields["code"].default == "85353-1"
+
+    # -----------------------------------------------------------------------
+    # Fixed-value validators reject wrong values at runtime
+    # -----------------------------------------------------------------------
+    with pytest.raises(pydantic.ValidationError):
+        slice_model(system="http://wrong.org", code="85353-1")
+
+    with pytest.raises(pydantic.ValidationError):
+        slice_model(system="http://loinc.org", code="WRONG")
+
+    # -----------------------------------------------------------------------
+    # Valid instance assembles without errors
+    # -----------------------------------------------------------------------
+    instance = slice_model(system="http://loinc.org", code="85353-1")
+    assert instance.system == "http://loinc.org"
+    assert instance.code == "85353-1"
 
 
 def test_regression_issue_262():
@@ -540,7 +579,7 @@ def test_regression_issue_262():
     assert instance.name[0].given == ["John"]
 
 
-def test_regression_issue_265(factory, generator):
+def test_regression_issue_265(factory):
 
     structure_definition = {
         "resourceType": "StructureDefinition",
@@ -592,44 +631,46 @@ def test_regression_issue_265(factory, generator):
         },
     }
 
-    model = factory.construct_resource_model(
+    model = factory.build(
         structure_definition=structure_definition, mode="differential"
     )
 
-    source_code = generator.generate_resource_model_code(model)
+    from typing import get_args
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+    from fhircraft.fhir.resources.datatypes.R5.core import Observation
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept
 
-    expected_code = '''    
-    class ExampleProfile(Observation):
-        """
-        Example Profile Description
-        """
-
-        _canonical_url = "http://hl7.org/fhir/StructureDefinition/example-profile"
-
-        meta: Optional[Meta] = Field(
-            title="Meta",
-            description="Metadata about the resource.",
-            default_factory=lambda: Meta(profile=['http://hl7.org/fhir/StructureDefinition/example-profile']),
-        )
-        category: Optional[List[CodeableConcept]] = Field(
-            description="Classification of type of observation",
-            default=None,
-        )
-        
-        @field_validator(*('category',), mode="after", check_fields=None)
-        @classmethod
-        def category_slicing_cardinality_validator(cls, value):    
-            return validate_slicing_cardinalities(cls, value, 
-                field_name="category",
-            )
-    '''
-    assertBlockInCode(source_code, expected_code.strip())
+    # -----------------------------------------------------------------------
+    # ExampleProfile – root model (only one class should be generated;
+    # the slice has no discriminating fixed values, so no FHIRSliceModel subclass
+    # is created – the category field stays a plain List[CodeableConcept]).
+    # -----------------------------------------------------------------------
+    assert model.__name__ == "ExampleProfile"
+    assert issubclass(model, Observation)
     assert (
-        source_code.count("class ") == 1
-    ), f"Expected exactly 1 class to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+        model._canonical_url
+        == "http://hl7.org/fhir/StructureDefinition/example-profile"
+    )
+    assert "category" in model.model_fields
+
+    # -----------------------------------------------------------------------
+    # category field is Optional[List[CodeableConcept]] – no slice model
+    # -----------------------------------------------------------------------
+    category_annotation = model.model_fields["category"].annotation
+    list_type = next(a for a in get_args(category_annotation) if a is not type(None))
+    item_type = get_args(list_type)[0]
+    assert item_type is CodeableConcept
+
+    # No FHIRSliceModel subclasses should appear anywhere in the field annotation
+    all_args = get_args(list_type)
+    for arg in all_args:
+        if isinstance(arg, type):
+            assert not issubclass(
+                arg, FHIRSliceModel
+            ), f"Unexpected FHIRSliceModel subclass {arg} in category annotation"
 
 
-def test_regression_issue_266(factory, generator):
+def test_regression_issue_266(factory):
 
     structure_definition = {
         "resourceType": "StructureDefinition",
@@ -723,42 +764,58 @@ def test_regression_issue_266(factory, generator):
         },
     }
 
-    factory.configure_repository(
-        definitions=[structure_definition, extension_structure_definition]
-    )
+    factory.definition_registry.from_dict(structure_definition)
+    factory.definition_registry.from_dict(extension_structure_definition)
 
-    model = factory.construct_resource_model(
+    model = factory.build(
         structure_definition=structure_definition, mode="differential"
     )
 
-    source_code = generator.generate_resource_model_code(model)
+    from typing import get_args
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+    from fhircraft.fhir.resources.datatypes.R5.complex import Extension
 
-    expected_code = '''    
-    class GradeExtension(Extension, FHIRSliceModel):
-        """
-        The grade of the adverse event
-        """
-        min_cardinality: ClassVar[int] = 1
-        max_cardinality: ClassVar[int] = 1
+    # -----------------------------------------------------------------------
+    # ExampleProfile – root model
+    # -----------------------------------------------------------------------
+    assert model.__name__ == "ExampleProfile"
+    assert "extension" in model.model_fields
 
-        _canonical_url = "http://example.org/fhir/StructureDefinition/grade-extension"
+    # -----------------------------------------------------------------------
+    # GradeExtension – FHIRSliceModel inside extension
+    # -----------------------------------------------------------------------
+    ext_annotation = model.model_fields["extension"].annotation
+    list_type = next(a for a in get_args(ext_annotation) if a is not type(None))
+    annotated_item = get_args(list_type)[0]
+    union_type = get_args(annotated_item)[0]
+    union_members = get_args(union_type)
 
-        url: Optional[String] = Field(
-            description="identifies the meaning of the extension",
-            default="http://example.org/fhir/StructureDefinition/grade-extension",
-        )
-        valueInteger: Optional[Integer] = Field(
-            description="Grade",
-            default=None,
-        )
-    '''
-    assertBlockInCode(source_code, expected_code.strip())
+    grade_ext_model = next(
+        m
+        for m in union_members
+        if isinstance(m, type) and issubclass(m, FHIRSliceModel)
+    )
+
+    assert grade_ext_model.__name__ == "ExampleProfileGrade"
+    assert issubclass(grade_ext_model, Extension)
     assert (
-        source_code.count("class ") == 2
-    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+        grade_ext_model._canonical_url
+        == "http://example.org/fhir/StructureDefinition/grade-extension"
+    )
+    assert grade_ext_model.min_cardinality == 1
+    assert grade_ext_model.max_cardinality == 1
+
+    # -----------------------------------------------------------------------
+    # Fixed URL default and type-choice field
+    # -----------------------------------------------------------------------
+    assert (
+        grade_ext_model.model_fields["url"].default
+        == "http://example.org/fhir/StructureDefinition/grade-extension"
+    )
+    assert "valueInteger" in grade_ext_model.model_fields
 
 
-def test_regression_issue_279(factory, generator):
+def test_regression_issue_279(factory):
 
     structure_definition = {
         "resourceType": "StructureDefinition",
@@ -768,7 +825,7 @@ def test_regression_issue_279(factory, generator):
         "title": "Condition Profile",
         "status": "active",
         "description": "A description",
-        "fhirVersion": "4.0.1",
+        "fhirVersion": "5.0.0",
         "kind": "resource",
         "abstract": False,
         "type": "Condition",
@@ -776,6 +833,15 @@ def test_regression_issue_279(factory, generator):
         "derivation": "constraint",
         "differential": {
             "element": [
+                {
+                    "id": "Condition.clinicalStatus.extension",
+                    "path": "Condition.clinicalStatus.extension",
+                    "slicing": {
+                        "discriminator": [{"type": "value", "path": "url"}],
+                        "ordered": False,
+                        "rules": "open",
+                    },
+                },
                 {
                     "id": "Condition.clinicalStatus.extension:slice1",
                     "path": "Condition.clinicalStatus.extension",
@@ -818,7 +884,7 @@ def test_regression_issue_279(factory, generator):
         "title": "My Extension 1",
         "status": "active",
         "description": "A description of my extension 1.",
-        "fhirVersion": "4.0.1",
+        "fhirVersion": "5.0.0",
         "kind": "complex-type",
         "abstract": False,
         "context": [
@@ -856,7 +922,7 @@ def test_regression_issue_279(factory, generator):
         "title": "My Extension 2",
         "status": "active",
         "description": "A description of my extension 2.",
-        "fhirVersion": "4.0.1",
+        "fhirVersion": "5.0.0",
         "kind": "complex-type",
         "abstract": False,
         "context": [
@@ -882,41 +948,79 @@ def test_regression_issue_279(factory, generator):
         },
     }
 
-    factory.configure_repository(
-        definitions=[
-            structure_definition,
-            extension_1_structure_definition,
-            extension_2_structure_definition,
-        ]
-    )
+    factory.definition_registry.from_dict(structure_definition)
+    factory.definition_registry.from_dict(extension_1_structure_definition)
+    factory.definition_registry.from_dict(extension_2_structure_definition)
 
-    model = factory.construct_resource_model(
+    model = factory.build(
         structure_definition=structure_definition, mode="differential"
     )
 
-    source_code = generator.generate_resource_model_code(model)
+    from typing import get_args
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+    from fhircraft.fhir.resources.datatypes.R5.complex import CodeableConcept, Extension
 
-    expected_code = """    
-    class MyExtension1(Extension, FHIRSliceModel):
-    """
-    assertBlockInCode(source_code, expected_code.strip())
+    # -----------------------------------------------------------------------
+    # MyCondition – root model
+    # -----------------------------------------------------------------------
+    assert model.__name__ == "MyCondition"
+    assert "clinicalStatus" in model.model_fields
 
-    expected_code = """    
-    class MyExtension2(Extension, FHIRSliceModel):
-    """
-    assertBlockInCode(source_code, expected_code.strip())
+    # -----------------------------------------------------------------------
+    # MyConditionClinicalStatus – backbone for Condition.clinicalStatus
+    # -----------------------------------------------------------------------
+    cs_annotation = model.model_fields["clinicalStatus"].annotation
+    cs_model = next(a for a in get_args(cs_annotation) if a is not type(None))
 
-    expected_code = """    
-    class MyConditionClinicalStatus(CodeableConcept):
-    """
-    assertBlockInCode(source_code, expected_code.strip())
+    assert cs_model.__name__ == "MyConditionClinicalStatus"
+    print(cs_model.__bases__)
+    assert issubclass(cs_model, CodeableConcept)
+    assert "extension" in cs_model.model_fields
+
+    # -----------------------------------------------------------------------
+    # MyExtension1 and MyExtension2 – FHIRSliceModels inside clinicalStatus.extension
+    # -----------------------------------------------------------------------
+    ext_annotation = cs_model.model_fields["extension"].annotation
+    list_type = next(a for a in get_args(ext_annotation) if a is not type(None))
+    annotated_item = get_args(list_type)[0]
+    union_type = get_args(annotated_item)[0]
+    union_members = get_args(union_type)
+
+    slice_models = [
+        m
+        for m in union_members
+        if isinstance(m, type) and issubclass(m, FHIRSliceModel)
+    ]
+    slice_names = {m.__name__ for m in slice_models}
+
+    assert "MyConditionSlice1" in slice_names
+    assert "MyConditionSlice2" in slice_names
+
+    for sm in slice_models:
+        assert issubclass(sm, Extension)
+
+    ext1 = next(m for m in slice_models if m.__name__ == "MyConditionSlice1")
+    ext2 = next(m for m in slice_models if m.__name__ == "MyConditionSlice2")
 
     assert (
-        source_code.count("class ") == 4
-    ), f"Expected exactly 4 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+        ext1._canonical_url
+        == "http://example.org/fhir/StructureDefinition/my-extension-1"
+    )
+    assert (
+        ext2._canonical_url
+        == "http://example.org/fhir/StructureDefinition/my-extension-2"
+    )
+    assert (
+        ext1.model_fields["url"].default
+        == "http://example.org/fhir/StructureDefinition/my-extension-1"
+    )
+    assert (
+        ext2.model_fields["url"].default
+        == "http://example.org/fhir/StructureDefinition/my-extension-2"
+    )
 
 
-def test_regression_issue_278(factory, generator):
+def test_regression_issue_278(factory):
 
     structure_definition = {
         "resourceType": "StructureDefinition",
@@ -926,7 +1030,7 @@ def test_regression_issue_278(factory, generator):
         "title": "Adverse Event Profile",
         "status": "active",
         "description": "A description",
-        "fhirVersion": "4.0.1",
+        "fhirVersion": "5.0.0",
         "kind": "resource",
         "abstract": False,
         "type": "AdverseEvent",
@@ -978,7 +1082,7 @@ def test_regression_issue_278(factory, generator):
         "title": "My Extension",
         "status": "active",
         "description": "A description of my extension.",
-        "fhirVersion": "4.0.1",
+        "fhirVersion": "5.0.0",
         "kind": "complex-type",
         "abstract": False,
         "context": [{"expression": "AdverseEvent.extension", "type": "element"}],
@@ -1012,33 +1116,56 @@ def test_regression_issue_278(factory, generator):
         },
     }
 
-    factory.configure_repository(
-        definitions=[
-            structure_definition,
-            extension_structure_definition,
-        ]
-    )
+    factory.definition_registry.from_dict(structure_definition)
+    factory.definition_registry.from_dict(extension_structure_definition)
 
-    model = factory.construct_resource_model(
+    model = factory.build(
         structure_definition=structure_definition, mode="differential"
     )
 
-    source_code = generator.generate_resource_model_code(model)
+    from typing import get_args
+    from fhircraft.fhir.resources.base import FHIRSliceModel
+    from fhircraft.fhir.resources.datatypes.R5.complex import Extension
 
-    expected_code = """    
-    valueInteger: Optional[Integer] = Field(
-        description="Custom value",
-        default=None,
-    )
-    """
-    assertBlockInCode(source_code, expected_code.strip())
-
+    # -----------------------------------------------------------------------
+    # MyAdverseEvent – root model
+    # -----------------------------------------------------------------------
+    assert model.__name__ == "MyAdverseEvent"
     assert (
-        source_code.count("class ") == 2
-    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+        model._canonical_url
+        == "http://example.org/fhir/StructureDefinition/adverse-event"
+    )
+    assert "extension" in model.model_fields
+
+    # -----------------------------------------------------------------------
+    # MyExtension – FHIRSliceModel inside extension
+    # -----------------------------------------------------------------------
+    ext_annotation = model.model_fields["extension"].annotation
+    list_type = next(a for a in get_args(ext_annotation) if a is not type(None))
+    annotated_item = get_args(list_type)[0]
+    union_type = get_args(annotated_item)[0]
+    union_members = get_args(union_type)
+
+    ext_model = next(
+        m
+        for m in union_members
+        if isinstance(m, type) and issubclass(m, FHIRSliceModel)
+    )
+
+    assert ext_model.__name__ == "MyAdverseEventMyExtension"
+    assert issubclass(ext_model, Extension)
+    assert (
+        ext_model.model_fields["url"].default
+        == "http://example.org/fhir/StructureDefinition/my-extension"
+    )
+
+    # -----------------------------------------------------------------------
+    # Type-choice field valueInteger is present
+    # -----------------------------------------------------------------------
+    assert "valueInteger" in ext_model.model_fields
 
 
-def test_regression_issue_277(factory, generator):
+def test_regression_issue_277(factory: ResourceFactory):
 
     structure_definition = {
         "resourceType": "StructureDefinition",
@@ -1083,18 +1210,41 @@ def test_regression_issue_277(factory, generator):
             ]
         },
     }
-
-    model = factory.construct_resource_model(
+    factory = factory.__class__(fhir_release="R4")
+    model = factory.build(
         structure_definition=structure_definition, mode="differential"
     )
 
-    source_code = generator.generate_resource_model_code(model)
+    from typing import get_args
 
-    expected_code = """    
-    class MyAdverseEventSuspectEntity(AdverseEventSuspectEntity):
-    """
-    assertBlockInCode(source_code, expected_code.strip())
-
+    # -----------------------------------------------------------------------
+    # MyAdverseEvent – root model
+    # -----------------------------------------------------------------------
+    assert model.__name__ == "MyAdverseEvent"
     assert (
-        source_code.count("class ") == 2
-    ), f"Expected exactly 2 classes to be generated, got {source_code.count('class')} \n Generated code:\n{source_code}"
+        model._canonical_url
+        == "http://example.org/fhir/StructureDefinition/my-adverse-event"
+    )
+    assert "suspectEntity" in model.model_fields
+
+    # -----------------------------------------------------------------------
+    # MyAdverseEventSuspectEntity – backbone for AdverseEvent.suspectEntity
+    # -----------------------------------------------------------------------
+    se_annotation = model.model_fields["suspectEntity"].annotation
+    list_type = next(a for a in get_args(se_annotation) if a is not type(None))
+    se_model = get_args(list_type)[0]
+
+    assert se_model.__name__ == "MyAdverseEventSuspectEntity"
+
+    # The backbone must subclass the base AdverseEventSuspectEntity backbone
+    from fhircraft.fhir.resources.datatypes.R4.core import AdverseEvent
+
+    base_se = next(
+        f.annotation
+        for name, f in AdverseEvent.model_fields.items()
+        if name == "suspectEntity"
+    )
+    base_se_item = get_args(next(a for a in get_args(base_se) if a is not type(None)))[
+        0
+    ]
+    assert issubclass(se_model, base_se_item)

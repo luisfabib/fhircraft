@@ -228,6 +228,7 @@ class Builder(ABC):
         alias: str | None = None,
         validation_alias: AliasChoices | None = None,
         description: str | None = None,
+        default: Any = _Unset,
     ) -> FieldInformation:
         """
         Build field information for a FHIR resource field.
@@ -239,6 +240,7 @@ class Builder(ABC):
             alias: Optional alias for the field during serialization.
             validation_alias: Optional validation alias choices for the field.
             description: Optional description of the field. If not provided, uses node.documentation.
+            default: Optional default value for the field. If not provided, it will be determined based on node's default_value, fixed, or pattern.
 
         Returns:
             FieldInformation: A FieldInformation object containing the field's name, annotation,
@@ -253,14 +255,15 @@ class Builder(ABC):
             - Min/max cardinality constraints only apply to array fields.
         """
 
-        if node.default_value is not None:
-            default = node.default_value
-        elif node.fixed is not None:
-            default = node.fixed
-        elif node.pattern is not None:
-            default = node.pattern
-        else:
-            default = None
+        if default is _Unset:
+            if node.default_value is not None:
+                default = node.default_value
+            elif node.fixed is not None:
+                default = node.fixed
+            elif node.pattern is not None:
+                default = node.pattern
+            else:
+                default = None
 
         if node.is_array and default is not None:
             default = ensure_list(default)
@@ -396,12 +399,13 @@ class Builder(ABC):
             type_code = type_code.removeprefix(FHIR_SD_PREFIX)
 
         type_code = capitalize(type_code)
-        # Get the Fhircraft type
-        fhir_type = get_fhir_type(type_code, fhir_release)
 
         # If a profile is specified and it's not a FHIRPath system type, resolve and build the profile to get the actual type to use
         if type.profile and not is_fhirpath_system_type:
             fhir_type = self.context.factory.build(canonical_url=type.profile[0])
+        else:
+            # Get the Fhircraft type
+            fhir_type = get_fhir_type(type_code, fhir_release)
 
         kind = (
             fhir_type._kind
@@ -443,7 +447,8 @@ class Builder(ABC):
         info = self.build_field_information(
             safe_placeholder_name,
             node,
-            placeholder_type,
+            type=placeholder_type,
+            default=None,
             alias=original_name,
             validation_alias=ext_alias,
             description=f"Placeholder element for {node.name} extensions",

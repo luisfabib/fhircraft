@@ -22,11 +22,11 @@ class SimpleTarget(BaseModel):
 
 @pytest.fixture
 def engine():
-    return FHIRMapper()
+    return FHIRMapper(fhir_release="R4B")
 
 
 def test_parse_mapping_script(engine):
-    """Test parsing a simple mapping script."""
+
     script = """
     map 'http://example.org/test' = 'test'
     

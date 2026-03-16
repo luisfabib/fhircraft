@@ -6,8 +6,12 @@ from pydantic import BaseModel
 from pydantic.aliases import AliasChoices
 
 from fhircraft.fhir.resources.base import FHIRBaseModel
+from fhircraft.fhir.resources.datatypes.R4B.complex.backbone_element import (
+    BackboneElement,
+)
 from fhircraft.fhir.resources.factory.builders.backbone import BackboneFieldBuilder
 from fhircraft.fhir.resources.factory.builders.base import Build
+from fhircraft.fhir.resources.datatypes.R4B import Coding
 
 
 # ---------------------------------------------------------------------------
@@ -234,15 +238,13 @@ def test_build__assembler_assemble_called_with_backbone_name(
     assert called_name == "TestResourceComponent"
 
 
-def test_build__backbone_base_is_fhir_base_model_when_context_base_is_none(
+def test_build__backbone_base_is_fhir_type_model_when_context_base_is_none(
     index, mock_assembler: MagicMock
 ):
     builder = make_builder(resource_name="TestResource", base=None)
-    node = make_node()
+    node = make_node(type_code="Coding")
     builder.build(node, index)
-    assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
-        FHIRBaseModel,
-    )
+    assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (Coding,)
 
 
 def test_build__backbone_base_resolved_from_context_base_model_fields(
@@ -284,10 +286,12 @@ def test_build__backbone_base_is_fhir_base_model_when_field_not_in_context_base(
         pass  # no "component" field
 
     builder = make_builder(resource_name="TestResource", base=ParentModel)
-    node = make_node(name="component", path="ParentModel.component")
+    node = make_node(
+        name="component", path="ParentModel.component", type_code="BackboneElement"
+    )
     builder.build(node, index)
     assert mock_assembler.return_value.assemble.call_args.kwargs["base"] == (
-        FHIRBaseModel,
+        BackboneElement,
     )
 
 

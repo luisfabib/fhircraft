@@ -7,6 +7,7 @@ from pydantic import ValidationError
 
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.datatypes.R4.complex import Coding
+from fhircraft.fhir.resources.datatypes.R4.core import Observation
 from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
     ElementDefinitionSlicingDiscriminator,
 )
@@ -543,8 +544,8 @@ def test_utility_functions():
     """Test utility functions for working with types."""
 
     # Test getting type names
-    assert get_primitive_type_name(primitives.Boolean) == "Boolean"
-    assert get_primitive_type_name(primitives.Integer) == "Integer"
+    assert get_primitive_type_name(primitives.Boolean) == "Boolean"  # type: ignore
+    assert get_primitive_type_name(primitives.Integer) == "Integer"  # type: ignore
 
     # Test getting types by name
     boolean_type = get_primitive_type_by_name("Boolean")
@@ -606,12 +607,12 @@ def test_is_fhir_complex_type(value, fhir_type, expected):
     "value,fhir_type,expected",
     [
         (
-            ElementDefinitionSlicingDiscriminator(type="value", path="example"),
-            ElementDefinitionSlicingDiscriminator,
+            Observation(valueString="value", id="example"),
+            Observation,
             True,
         ),
-        ("not-elementdefinition", ElementDefinitionSlicingDiscriminator, False),
+        (Coding(code="123", system="http://example.com"), Observation, False),
     ],
 )
 def test_is_fhir_resource_type(value, fhir_type, expected):
-    assert is_fhir_resource_type(value, fhir_type, "R4") == expected
+    assert is_fhir_resource_type(value, fhir_type) == expected

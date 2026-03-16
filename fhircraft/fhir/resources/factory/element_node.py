@@ -309,15 +309,11 @@ class ElementNode:
         Full combination of the elemments's `short`,  `definition`, and `comment` fields, in
         that order of preference.  Returns an empty string if none of those fields are set.
         """
-        return "\n".join(
-            filter(
-                None,
-                [
-                    self.definition.short,
-                    self.definition.definition,
-                    self.definition.comment,
-                ],
-            )
+        return (
+            self.definition.definition
+            or self.definition.short
+            or self.definition.comment
+            or ""
         )
 
     # ------------------------------------------------------------------

@@ -36,6 +36,8 @@ def make_root_node(
     root = MagicMock(name="mock-root")
     root.id = id
     root.documentation = documentation
+    root.fixed = None
+    root.pattern = None
     root.definition = MagicMock()
     root.definition.constraint = constraints or []
     return root
@@ -437,3 +439,255 @@ def test_assemble__model_without_properties_has_none_extra():
     model = a.assemble("M")
     # just confirm it assembles cleanly
     assert isinstance(model, type)
+
+
+# ===========================================================================
+# ModelAssembler.assemble – missing definition / no-field edge cases
+# ===========================================================================
+
+
+def test_assemble__raises_value_error_when_child_has_no_definition():
+    root = make_root_node()
+    child = make_child_node()
+    child.definition = None  # Force falsy definition
+    a = make_assembler(root=root, children={root.id: [child]})
+    a.builder_chain = [make_mock_builder()]
+    with pytest.raises(ValueError, match=child.id):
+        a.assemble("M")
+
+
+def test_assemble__raises_assembler_error_when_no_fields_and_no_base_fields():
+    """Builder returns no fields and the base class also has no model_fields."""
+    root = make_root_node()
+    child = make_child_node()
+    a = make_assembler(root=root, children={root.id: [child]})
+    a.builder_chain = [make_mock_builder(build_return=Build(fields=[]))]
+    with pytest.warns(match="no fields"):
+        a.assemble("M")
+
+
+def test_assemble__no_fields_built_but_base_has_fields_does_not_raise():
+    """No fields from builders but the explicit base class already has fields."""
+
+    class BaseWithField(FHIRBaseModel):
+        existing: str = "x"
+
+    root = make_root_node()
+    child = make_child_node()
+    a = make_assembler(root=root, children={root.id: [child]})
+    a.builder_chain = [make_mock_builder(build_return=Build(fields=[]))]
+    model = a.assemble("M", base=BaseWithField)
+    assert isinstance(model, type)
+    assert issubclass(model, BaseWithField)
+
+
+def test_assemble__calls_set_constraint_default_values_when_root_has_fixed():
+    from unittest.mock import patch
+
+    root = make_root_node()
+    root.fixed = MagicMock(spec=BaseModel)  # non-None fixed value
+    child = make_child_node()
+    a = make_assembler(root=root, children={root.id: [child]})
+    a.builder_chain = [
+        make_mock_builder(build_return=Build(fields=[make_field("v", str)]))
+    ]
+    with (
+        patch.object(ModelAssembler, "build_model_fixed_value_constraint") as mock_fvc,
+        patch.object(ModelAssembler, "_set_constraint_default_values") as mock_scdv,
+    ):
+        mock_fvc.return_value = MagicMock(
+            name="vi", **{"as_pydantic_definition.return_value": MagicMock()}
+        )
+        a.assemble("M")
+    mock_scdv.assert_called_once()
+
+
+def test_assemble__calls_set_constraint_default_values_when_root_has_pattern():
+    from unittest.mock import patch
+
+    root = make_root_node()
+    root.pattern = MagicMock(spec=BaseModel)  # non-None pattern value
+    child = make_child_node()
+    a = make_assembler(root=root, children={root.id: [child]})
+    a.builder_chain = [
+        make_mock_builder(build_return=Build(fields=[make_field("v", str)]))
+    ]
+    with (
+        patch.object(ModelAssembler, "build_model_pattern_constraint") as mock_pc,
+        patch.object(ModelAssembler, "_set_constraint_default_values") as mock_scdv,
+    ):
+        mock_pc.return_value = MagicMock(
+            name="vi", **{"as_pydantic_definition.return_value": MagicMock()}
+        )
+        a.assemble("M")
+    mock_scdv.assert_called_once()
+
+
+def test_assemble__does_not_call_set_constraint_default_values_without_fixed_or_pattern():
+    from unittest.mock import patch
+
+    root = make_root_node()  # fixed=None, pattern=None by default
+    child = make_child_node()
+    a = make_assembler(root=root, children={root.id: [child]})
+    a.builder_chain = [
+        make_mock_builder(build_return=Build(fields=[make_field("v", str)]))
+    ]
+    with patch.object(ModelAssembler, "_set_constraint_default_values") as mock_scdv:
+        a.assemble("M")
+    mock_scdv.assert_not_called()
+
+
+# ===========================================================================
+# ModelAssembler._set_constraint_default_values
+# ===========================================================================
+
+
+def test_set_constraint_default_values__sets_default_from_fixed_value():
+    from pydantic import create_model, Field
+
+    class ConstraintModel(BaseModel):
+        status: str = "final"
+
+    SliceModel = create_model(
+        "SliceModel", status=(Optional[str], Field(None)), __base__=FHIRBaseModel
+    )
+    node = MagicMock()
+    node.fixed = ConstraintModel(status="final")
+    node.pattern = None
+
+    ModelAssembler._set_constraint_default_values(SliceModel, node)
+
+    assert SliceModel.model_fields["status"].default == "final"
+
+
+def test_set_constraint_default_values__skips_none_values():
+    """Fields whose constrain_value attribute is None should keep their original default."""
+    from pydantic import create_model, Field
+
+    class ConstraintModel(BaseModel):
+        status: Optional[str] = None  # None → should NOT override default
+
+    SliceModel = create_model(
+        "SliceModel",
+        status=(Optional[str], Field("original")),
+        __base__=FHIRBaseModel,
+    )
+    node = MagicMock()
+    node.fixed = ConstraintModel()
+    node.pattern = None
+
+    ModelAssembler._set_constraint_default_values(SliceModel, node)
+
+    assert SliceModel.model_fields["status"].default == "original"
+
+
+def test_set_constraint_default_values__raises_type_error_for_non_pydantic_fixed():
+    from pydantic import create_model, Field
+
+    SliceModel = create_model(
+        "SliceModel", status=(Optional[str], Field(None)), __base__=FHIRBaseModel
+    )
+    node = MagicMock()
+    node.fixed = "not_a_pydantic_model"
+    node.pattern = None
+
+    with pytest.raises(TypeError):
+        ModelAssembler._set_constraint_default_values(SliceModel, node)
+
+
+def test_set_constraint_default_values__raises_value_error_for_unknown_constraint_field():
+    from pydantic import create_model, Field
+
+    class ConstraintModel(BaseModel):
+        unknown_field: str = "value"
+
+    SliceModel = create_model(
+        "SliceModel", status=(Optional[str], Field(None)), __base__=FHIRBaseModel
+    )
+    node = MagicMock()
+    node.fixed = ConstraintModel(unknown_field="value")
+    node.pattern = None
+
+    with pytest.raises(ValueError, match="unknown_field"):
+        ModelAssembler._set_constraint_default_values(SliceModel, node)
+
+
+# ===========================================================================
+# ModelAssembler.build_model_fixed_value_constraint
+# ===========================================================================
+
+
+def test_build_model_fixed_value_constraint__name_format():
+    node = MagicMock()
+    node.name = "coding"
+    node.fixed = MagicMock()
+
+    result = ModelAssembler.build_model_fixed_value_constraint(node)
+
+    assert result.name == "FHIR_coding_fixed_value_constraint"
+
+
+def test_build_model_fixed_value_constraint__kind_is_model():
+    node = MagicMock()
+    node.name = "coding"
+    node.fixed = MagicMock()
+
+    result = ModelAssembler.build_model_fixed_value_constraint(node)
+
+    assert result.kind == "model"
+
+
+def test_build_model_fixed_value_constraint__arguments_contain_constant():
+    node = MagicMock()
+    node.name = "coding"
+    sentinel = object()
+    node.fixed = sentinel
+
+    result = ModelAssembler.build_model_fixed_value_constraint(node)
+
+    assert result.arguments["constant"] is sentinel
+
+
+def test_build_model_fixed_value_constraint__returns_validator_information():
+    node = MagicMock()
+    node.name = "coding"
+    node.fixed = MagicMock()
+
+    result = ModelAssembler.build_model_fixed_value_constraint(node)
+
+    assert isinstance(result, ValidatorInformation)
+
+
+# ===========================================================================
+# ModelAssembler.build_model_pattern_constraint
+# ===========================================================================
+
+
+def test_build_model_pattern_constraint__name_format():
+    node = MagicMock()
+    node.name = "component"
+    node.pattern = MagicMock()
+
+    result = ModelAssembler.build_model_pattern_constraint(node)
+
+    assert result.name == "FHIR_component_pattern_constraint"
+
+
+def test_build_model_pattern_constraint__kind_is_model():
+    node = MagicMock()
+    node.name = "component"
+    node.pattern = MagicMock()
+
+    result = ModelAssembler.build_model_pattern_constraint(node)
+
+    assert result.kind == "model"
+
+
+def test_build_model_pattern_constraint__returns_validator_information():
+    node = MagicMock()
+    node.name = "component"
+    node.pattern = MagicMock()
+
+    result = ModelAssembler.build_model_pattern_constraint(node)
+
+    assert isinstance(result, ValidatorInformation)

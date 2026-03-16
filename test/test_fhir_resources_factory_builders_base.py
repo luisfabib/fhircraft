@@ -426,7 +426,7 @@ def test_build_field_information__defaults(
     node = make_node(is_array=is_array, default_value=default)
     info = Builder.build_field_information("status", node, type)
     assert info.name == "status"
-    assert info.annotation is expected_annotation
+    assert info.annotation == expected_annotation
     assert info.default == expected_default
 
 

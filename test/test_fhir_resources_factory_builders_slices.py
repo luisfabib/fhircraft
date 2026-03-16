@@ -12,7 +12,6 @@ from fhircraft.fhir.resources.factory.builders.base import (
 )
 from fhircraft.fhir.resources.factory.builders.slices import (
     SlicedFieldBuilder,
-    _capitalise_slice_name,
     DefinitionIndex,
 )
 from fhircraft.fhir.resources.validators import validate_slicing_cardinalities
@@ -149,20 +148,23 @@ def assembler(monkeypatch):
 # ===========================================================================
 
 
-def test_capitalise_slice_name__single_word():
-    assert _capitalise_slice_name("laboratory") == "Laboratory"
+def test_capitalise_slice_name__single_word(builder):
+    assert builder._capitalise_slice_name("laboratory") == "Laboratory"
 
 
-def test_capitalise_slice_name__hyphenated_words():
-    assert _capitalise_slice_name("vital-signs") == "VitalSigns"
+def test_capitalise_slice_name__hyphenated_words(builder):
+    assert builder._capitalise_slice_name("vital-signs") == "VitalSigns"
 
 
-def test_capitalise_slice_name__already_capitalised():
-    assert _capitalise_slice_name("Laboratory") == "Laboratory"
+def test_capitalise_slice_name__already_capitalised(builder):
+    assert builder._capitalise_slice_name("Laboratory") == "Laboratory"
 
 
-def test_capitalise_slice_name__multiple_hyphens():
-    assert _capitalise_slice_name("blood-pressure-systolic") == "BloodPressureSystolic"
+def test_capitalise_slice_name__multiple_hyphens(builder):
+    assert (
+        builder._capitalise_slice_name("blood-pressure-systolic")
+        == "BloodPressureSystolic"
+    )
 
 
 # ===========================================================================
@@ -319,6 +321,17 @@ def test_build__slice_model_name_capitalises_hyphenated_slice_name(
     builder: Builder, index, assembler
 ):
     slice_node = make_slice_node(slice_name="vital-signs")
+    index.get_slices.return_value = [slice_node]
+    node = make_entry_node()
+    builder.build(node, index)
+    called_name = assembler.return_value.assemble.call_args[0][0]
+    assert called_name == "TestResourceVitalSigns"
+
+
+def test_build__slice_model_name_capitalises_camel_case_slice_name(
+    builder: Builder, index, assembler
+):
+    slice_node = make_slice_node(slice_name="vitalSigns")
     index.get_slices.return_value = [slice_node]
     node = make_entry_node()
     builder.build(node, index)

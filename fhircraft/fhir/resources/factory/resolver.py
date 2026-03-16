@@ -82,8 +82,11 @@ class SnapshotResolver:
         """
 
         if mode == "auto":
-            mode = "differential" if sd.differential else "snapshot"
-
+            mode = (
+                "differential"
+                if sd.differential and len(sd.differential.element or []) > 1
+                else "snapshot"
+            )
         if mode == "snapshot":
             # Type check assertions
             assert (
@@ -182,15 +185,20 @@ class SnapshotResolver:
                 base_node = base_index.root()
             else:
                 # Look up the base node for this element
-                if not base_index.contains(id=node.id, ignore_root=True):
+                if base_index.contains(id=node.id, ignore_root=True):
+                    base_node = base_index.get(node.id, ignore_root=True)
+                elif base_index.contains(path=node.path, ignore_root=True):
                     base_node = base_index.get_single_by_path(
                         node.path, ignore_root=True, ignore_slices=True
                     )
                 else:
-                    base_node = base_index.get(node.id, ignore_root=True)
+                    base_node = None
 
-            # Now, merge the actual differential node
-            merged_nodes[node.id] = self._merge_node_with_base(node, base_node)
+            if base_node is None:
+                merged_nodes[node.id] = node
+            else:
+                # Now, merge the actual differential node
+                merged_nodes[node.id] = self._merge_node_with_base(node, base_node)
 
         if not merged_nodes:
             raise DefinitionResolutionError(
@@ -348,9 +356,11 @@ class SnapshotResolver:
             path=node.path or base_node.path,
             **{
                 **base_node.definition.model_dump(
-                    exclude_none=True, exclude={"id", "path"}
+                    exclude_none=True, exclude={"id", "path", "contentReference"}
                 ),
-                **node.definition.model_dump(exclude_none=True, exclude={"id", "path"}),
+                **node.definition.model_dump(
+                    exclude_none=True, exclude={"id", "path", "contentReference"}
+                ),
             },
         )
         return ElementNode(definition=merged_definition)
@@ -402,5 +412,4 @@ class SnapshotResolver:
                     ref_node,
                 )
             )
-
         return DefinitionIndex(nodes=resolved_nodes)

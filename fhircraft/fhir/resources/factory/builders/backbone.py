@@ -49,7 +49,9 @@ class BackboneFieldBuilder(Builder):
         if backbone_base is None:
             from fhircraft.fhir.resources.base import FHIRBaseModel
 
-            backbone_base = FHIRBaseModel
+            backbone_base = (
+                self.resolve_type(node.types[0]).type if node.types else FHIRBaseModel
+            )
 
         # Build the backbone model name from the element path
         path_parts = node.path.split(".")[1:]  # strip resource prefix

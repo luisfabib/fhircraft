@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple, Union, overload
 
 import requests
+from pydantic import BaseModel
 
 from pydantic_core import ValidationError
 from fhircraft.fhir.packages.client import FHIRPackageRegistryClient
@@ -242,6 +243,8 @@ class StructureDefinitionRegistry:
     ) -> "StructureDefinitionR4 | StructureDefinitionR4B | StructureDefinitionR5":
         StructureDefinition = get_fhir_type("StructureDefinition", self.fhir_release)
         try:
+            if isinstance(data, BaseModel):
+                data = data.model_dump()
             return StructureDefinition.model_validate(data)
         except ValidationError as e:
             raise ValueError(

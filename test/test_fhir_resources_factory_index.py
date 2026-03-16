@@ -6,12 +6,29 @@ from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.exceptions import DefinitionIndexError
 
 
-def make_node(id: str, path: str | None = None, slicing=None) -> ElementNode:
+class CopyableMagickyMock(MagicMock):
+    def model_copy(self, update=dict()):
+        self_copy = CopyableMagickyMock()
+        for attr in self.__dict__:
+            setattr(self_copy, attr, getattr(self, attr))
+        for k, v in update.items():
+            setattr(self_copy, k, v)
+        return self_copy
+
+
+def make_node(
+    id: str, path: str | None = None, slicing=None, types=None
+) -> ElementNode:
     """Create an :class:`ElementNode` backed by a MagicMock definition."""
-    defn = MagicMock()
+    defn = CopyableMagickyMock()
     defn.id = id
     defn.path = path if path is not None else id
     defn.slicing = slicing
+    defn.type = []
+    for type in types or []:
+        typedef = CopyableMagickyMock()
+        typedef.code = type
+        defn.type.append(typedef)
     defn.contentReference = False
     local = id.rsplit(".", 1)[-1]
     defn.sliceName = local.split(":", 1)[1] if ":" in local else None
@@ -42,7 +59,9 @@ def slicing_index():
             make_node("Observation.component:systolic", "Observation.component"),
             make_node("Observation.component:diastolic", "Observation.component"),
             make_node(
-                "Observation.component.value[x]", "Observation.component.value[x]"
+                "Observation.component.value[x]",
+                "Observation.component.value[x]",
+                types=["String", "CodeableConcept"],
             ),
         ]
     )
@@ -73,6 +92,25 @@ def test_index_from_elements():
     index = DefinitionIndex.from_elements([defn])
     assert len(index) == 1
     assert "Patient" in index
+
+
+def test_index_add__splits_type_choices():
+    index = DefinitionIndex([])
+    index.add(
+        make_node(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            types=["String", "CodeableConcept"],
+        )
+    )
+    assert "Observation.value[x]" in index
+    assert index.get("Observation.value[x]").type_codes == ["String", "CodeableConcept"]
+    assert "Observation.valueString" in index
+    assert index.get("Observation.valueString").type_codes == ["String"]
+    assert "Observation.valueCodeableConcept" in index
+    assert index.get("Observation.valueCodeableConcept").type_codes == [
+        "CodeableConcept"
+    ]
 
 
 # ------------------------------------------------------------------
@@ -278,6 +316,7 @@ def test_get_slice_children_returns_children_of_slice(slicing_index):
             make_node(
                 "Observation.component:systolic.value[x]",
                 "Observation.component.value[x]",
+                types=["String", "CodeableConcept"],
             ),
         ]
     )
@@ -286,22 +325,14 @@ def test_get_slice_children_returns_children_of_slice(slicing_index):
     assert ids == {
         "Observation.component:systolic.code",
         "Observation.component:systolic.value[x]",
+        "Observation.component:systolic.valueString",
+        "Observation.component:systolic.valueCodeableConcept",
     }
 
 
 # ------------------------------------------------------------------
 # Navigation — get_subtree
 # ------------------------------------------------------------------
-
-
-class CopyableMagickyMock(MagicMock):
-    def model_copy(self, update=dict()):
-        self_copy = CopyableMagickyMock()
-        for attr in self.__dict__:
-            setattr(self_copy, attr, getattr(self, attr))
-        for k, v in update.items():
-            setattr(self_copy, k, v)
-        return self_copy
 
 
 @pytest.fixture

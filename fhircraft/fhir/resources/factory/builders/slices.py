@@ -3,14 +3,16 @@ from fhircraft.fhir.resources.factory.builders.base import (
     Builder,
     ValidatorInformation,
 )
-from fhircraft.fhir.resources.factory.context import BuildContext
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
-from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
-from typing import Union, List, Any, Annotated
-from pydantic import Field, BaseModel
+from fhircraft.fhir.resources.base import FHIRSliceModel
+from typing import Union, Annotated
+from pydantic import Field
 import warnings
-from fhircraft.fhir.resources.validators import validate_slicing_cardinalities
+from fhircraft.fhir.resources.validators import (
+    validate_slicing_cardinalities,
+)
+from fhircraft.utils import capitalize
 
 
 class SlicedFieldBuilder(Builder):
@@ -40,7 +42,7 @@ class SlicedFieldBuilder(Builder):
                 )
             slice_base_type = self.resolve_type(slice_node.types[0]).type
             slice_model_name = (
-                f"{self.context.resource_name}{_capitalise_slice_name(slice_name)}"
+                f"{self.context.resource_name}{self._capitalise_slice_name(slice_name)}"
             )
 
             if slice_base_type is FHIRSliceModel or issubclass(
@@ -71,10 +73,13 @@ class SlicedFieldBuilder(Builder):
             slice_models.append(slice_model)
 
         union_types = [*slice_models, *[t.type for t in slice_entry_field_types]]
-        annotation = Annotated[
-            Union[tuple(union_types)],
-            Field(union_mode="left_to_right"),
-        ]
+        if len(union_types) == 1:
+            annotation = union_types[0]
+        else:
+            annotation = Annotated[
+                Union[tuple(union_types)],
+                Field(union_mode="left_to_right"),
+            ]
 
         build.fields.append(
             self.build_field_information(
@@ -100,64 +105,6 @@ class SlicedFieldBuilder(Builder):
 
         return build
 
-
-def _capitalise_slice_name(name: str) -> str:
-    return "".join(part.capitalize() for part in name.split("-"))
-
-
-# def _apply_pattern_to_slice_model(
-#     slice_model: type,
-#     pattern_value: Any,
-#     slice_name: str,
-#     vc: Any,
-# ) -> None:
-#     """Override slice model field defaults with pattern values and register validator."""
-#     from pydantic import model_validator
-
-#     for fname, finfo in pattern_value.__class__.model_fields.items():
-#         val = getattr(pattern_value, fname, None)
-#         if val is not None and fname in slice_model.model_fields:
-#             # Update default on the field
-#             slice_model.model_fields[fname].default = val
-
-#     # Attach model validator directly to class
-#     validator = model_validator(mode="after")(
-#         partial(
-#             fhir_validators.validate_FHIR_model_pattern,
-#             pattern=pattern_value,
-#         )
-#     )
-#     # Register via setattr on the model's __pydantic_decorators__
-#     validator_name = f"FHIR_{slice_name}_pattern_constraint"
-#     if not hasattr(slice_model, "__pydantic_decorators__"):
-#         return
-#     try:
-#         slice_model.__pydantic_decorators__.model_validators[validator_name] = validator
-#     except Exception:
-#         pass
-
-
-# def _apply_fixed_to_slice_model(
-#     slice_model: type,
-#     fixed_value: Any,
-#     slice_name: str,
-#     vc: Any,
-# ) -> None:
-#     """Override slice model field defaults with fixed values and register validator."""
-#     from pydantic import model_validator
-
-#     for fname, finfo in fixed_value.__class__.model_fields.items():
-#         if fname in slice_model.model_fields:
-#             slice_model.model_fields[fname].default = fixed_value
-
-#     validator = model_validator(mode="after")(
-#         partial(
-#             fhir_validators.validate_FHIR_model_fixed_value,
-#             constant=fixed_value,
-#         )
-#     )
-#     validator_name = f"FHIR_{slice_name}_fixed_value_constraint"
-#     try:
-#         slice_model.__pydantic_decorators__.model_validators[validator_name] = validator
-#     except Exception:
-#         pass
+    @staticmethod
+    def _capitalise_slice_name(name: str) -> str:
+        return "".join(capitalize(part) for part in name.split("-"))

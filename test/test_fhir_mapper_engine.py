@@ -36,7 +36,7 @@ from fhircraft.fhir.resources.datatypes.R4.complex import (
     ElementDefinitionType,
     ElementDefinitionBase,
 )
-from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
+from fhircraft.fhir.resources.definitions import StructureDefinitionRegistry
 
 EXAMPLES_DIRECTORY = "test/static/fhir-mapping-language/R5"
 
@@ -107,11 +107,11 @@ def test_integration_tutorial_examples(directory):
     ) as file:
         expected_result = json.load(file)
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     for structure in structure_definitions:
         repository.add(structure)
 
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(repository=repository, fhir_release="R5")
 
     result = engine.execute(structure_map, input)
     assert isinstance(result[0], BaseModel)
@@ -647,7 +647,7 @@ def test_simple_mapping_scenarios(test_name, source_data, expected_target, rules
     assert structure_map.group is not None, "Group should be initialized"
     structure_map.group[0].rule = rules
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_target_structure_definition())
     repository.add(create_simple_source_structure_definition())
 
@@ -685,7 +685,7 @@ def test_resolve_aliased_source_structure_definitions():
         ]
     )
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_source_structure_definition())
 
     engine = FHIRMappingEngine(repository=repository)
@@ -710,7 +710,7 @@ def test_resolve_unaliased_source_structure_definitions():
         ]
     )
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_source_structure_definition())
 
     engine = FHIRMappingEngine(repository=repository)
@@ -736,7 +736,7 @@ def test_resolve_aliased_target_structure_definitions():
         ]
     )
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_target_structure_definition())
     repository.add(create_simple_source_structure_definition())
 
@@ -762,7 +762,7 @@ def test_resolve_unaliased_target_structure_definitions():
         ]
     )
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_target_structure_definition())
     repository.add(create_simple_source_structure_definition())
 
@@ -781,7 +781,7 @@ def test_resolve_structure_definitions_empty_structure_map():
     """Test resolving structure definitions when StructureMap has no structures defined."""
     structure_map = StructureMap(structure=None)
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     engine = FHIRMappingEngine(repository=repository)
 
     resolved = engine._resolve_structure_definitions(
@@ -803,7 +803,7 @@ def test_resolve_structure_definitions_missing_url():
         ]
     )
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     engine = FHIRMappingEngine(repository=repository)
 
     resolved = engine._resolve_structure_definitions(
@@ -825,7 +825,7 @@ def test_resolve_structure_definitions_missing_url_no_alias():
         ]
     )
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     engine = FHIRMappingEngine(repository=repository)
 
     resolved = engine._resolve_structure_definitions(
@@ -854,7 +854,7 @@ def test_resolve_structure_definitions_different_mode():
         ]
     )
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_source_structure_definition())
     repository.add(create_simple_target_structure_definition())
 
@@ -895,7 +895,7 @@ def test_resolve_structure_definitions_mixed_scenarios():
         ]
     )
 
-    repository = CompositeStructureDefinitionRepository(internet_enabled=False)
+    repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_source_structure_definition())
 
     engine = FHIRMappingEngine(repository=repository)

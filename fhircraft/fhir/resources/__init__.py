@@ -13,7 +13,10 @@ Recommended imports:
 """
 
 from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
-from fhircraft.fhir.resources.generator import CodeGenerator
+from fhircraft.fhir.resources.datatypes.registry import (
+    get_fhir_type,
+    get_fhir_type_by_url,
+)
 from fhircraft.fhir.resources.factory import (
     ResourceFactory,
     FHIRStructureFactory,
@@ -24,4 +27,6 @@ __all__ = [
     "FHIRSliceModel",
     "ResourceFactory",
     "FHIRStructureFactory",
+    "get_fhir_type",
+    "get_fhir_type_by_url",
 ]

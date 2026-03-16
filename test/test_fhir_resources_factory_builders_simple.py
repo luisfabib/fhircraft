@@ -150,6 +150,14 @@ def test_build__primitive_placeholder_field_name(builder: Builder, index):
     assert "status_ext" in names
 
 
+def test_build__primitive_placeholder_does_not_set_default(builder: Builder, index):
+    node = make_node("status", type_codes=["string"], default_value="active")
+    build = builder.build(node, index)
+    placeholder = next((f for f in build.fields if f.name == "status_ext"), None)
+    assert placeholder is not None
+    assert placeholder.default is None
+
+
 def test_build__primitive_placeholder_alias_is_underscore_name(builder: Builder, index):
     node = make_node("status", type_codes=["string"])
     build = builder.build(node, index)

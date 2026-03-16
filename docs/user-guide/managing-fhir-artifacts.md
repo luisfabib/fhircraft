@@ -18,8 +18,6 @@ Artifacts are needed at resource model build time to resolve all these dependenc
 
 The `factory` repository is a central storage and indexing system within Fhircraft resource model factory that manages all loaded structure definitions and makes them available for resource model construction. Think of it as a library catalog: when you load structure definitions from files, directories, packages, or the internet, they all get registered in this repository. When you later request a model using a canonical URL, the factory searches the repository to find the matching structure definition.
 
-The repository configuration can be set through the [`factory.configure_repository`](/reference/fhir-resources-factory/#fhircraft.fhir.resources.factory.ResourceFactory.configure_repository) method determines where Fhircraft looks for structure definitions and in what order. You can configure it to search local directories first for fast access to custom profiles, then check loaded packages for standard definitions, and finally fall back to internet downloads for occasional needs. This layered approach gives you control over performance, security, and resource management while maintaining the flexibility to access any structure definition your application requires.
-
 Understanding the repository helps you make informed decisions about when to load definitions, how to organize your project resources, and how to optimize your application's startup time and memory footprint. The following sections show you specific methods for loading structure definitions into the repository from different sources.
 
 ??? abstract "Technical Documentation"
@@ -31,96 +29,28 @@ Understanding the repository helps you make informed decisions about when to loa
 
 When you have structure definition files saved on your computer, you can load them into Fhircraft. This approach works without an internet connection and gives you full control over which definitions you use. Many organizations maintain their own structure definitions for custom data requirements or internal profiles. By storing these files locally, you ensure that your application always uses the exact versions you have tested and approved, rather than relying on external sources that might change.
 
-### Loading from a Directory
-
-If you have organized your structure definition files into a folder, Fhircraft can scan that folder and load all valid definitions automatically. This method works well when you maintain a collection of related definitions that your application needs. The factory looks for valid files, validates them as structure definitions, and makes them available for model construction. Any files that are not valid structure definitions are skipped without raising errors.
-
-This approach simplifies project setup because you can keep all your definitions in one place and load them with a single command. As you add new structure definitions to the folder, they become available immediately without changing your code:
-
-```python
-# Import the factory that manages FHIR resources
-from fhircraft.fhir.resources.factory import factory
-
-# Point to the folder containing your structure definition files
-definitions_folder = "/path/to/your/definitions"
-
-# Load all structure definitions from the folder
-factory.configure_repository(directory=definitions_folder)
-
-# Now you can create models from the loaded definitions
-Patient = factory.construct_resource_model(
-    canonical_url="http://example.org/StructureDefinition/MyPatient"
-)
-
-# Use the model to create a patient record
-patient = Patient(
-    name=[{"given": ["Maria"], "family": "Garcia"}],
-    gender="female"
-)
-
-print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
-#> Created patient: Maria Garcia
-```
-
-!!! note "Resource Construction"
-
-    The details on resource model construction and how to use the `resolve_structure_definition` factory method see the [dedicated guide](../resources-construction/).
-
-### Loading from Individual Files
+### Loading from files or Python Dictionaries
 
 Sometimes you need precise control over which structure definitions get loaded. Perhaps you are working with a small set of definitions, or you want to load files from different directories, or you need to ensure only specific versions are used. In these cases, explicitly listing the files gives you that control.
+
+In some workflows, you receive structure definitions as data rather than files. You might fetch them from a database, receive them through an API, or generate them programmatically. When structure definitions exist as Python dictionaries in your code, you can load them directly without writing temporary files to disk.
 
 This method also helps during development and testing. You can load just the definitions you are actively working with, making it easier to isolate problems and verify behavior. As your code evolves, you can add or remove files from the list without restructuring your project directories:
 
 ```python
-from fhircraft.fhir.resources.factory import factory
-
-# List the exact files you want to load
-patient_file = "/path/to/patient_definition.json"
-observation_file = "/path/to/observation_definition.json"
-
-# Load the structure definitions from these files
-factory.configure_repository(files=[patient_file, observation_file])
-
-# Create models from the loaded definitions
-Patient = factory.construct_resource_model(
-    canonical_url="http://example.org/StructureDefinition/MyPatient"
-)
-
-Observation = factory.construct_resource_model(
-    canonical_url="http://example.org/StructureDefinition/MyObservation"
-)
-
-# Use the models to create records
-patient = Patient(name=[{"family": "Smith", "given": ["John"]}])
-observation = Observation(status="final", code={"text": "Weight"}, valueQuantity={"value": "74", "unit": "kg"})
-
-print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
-#> Created patient: John Smith
-
-print(f"Created observation: {observation.code.text}={observation.valueQuantity.value}{observation.valueQuantity.unit}")
-#> Created observation: Weight=74.0kg
-```
-
-### Loading from Python Dictionaries
-
-In some workflows, you receive structure definitions as data rather than files. You might fetch them from a database, receive them through an API, or generate them programmatically. When structure definitions exist as Python dictionaries in your code, you can load them directly without writing temporary files to disk.
-
-This method integrates well with dynamic applications where structure definitions might change based on user input, configuration settings, or external data sources. The factory validates the dictionary structure and adds it to the repository just as it would with a file-based definition:
-
-```python
-from fhircraft.fhir.resources.factory import factory
 import json
+from fhircraft.fhir.resources import ResourceFactory
+factory = ResourceFactory(fhir_release="R4")
 
 # Read a structure definition file into a dictionary
 with open("test/static/fhir-profiles-definitions/us-core-patient.json", "r") as file:
     definition_dict = json.load(file)
 
 # Load the definition from the dictionary
-factory.configure_repository(definitions=[definition_dict])
+factory.add_structure_definition(definition_dict)
 
 # Create a model from the loaded definition
-USCorePatient = factory.construct_resource_model(
+USCorePatient = factory.build(
     canonical_url=definition_dict["url"]
 )
 
@@ -165,16 +95,13 @@ Fhircraft connects to the FHIR package registry at [:material-fire: `packages.fh
     from fhircraft.fhir.resources.factory import ResourceFactory
 
     # Create a factory that can download packages
-    factory = ResourceFactory(enable_packages=True)
+    factory = ResourceFactory(fhir_release="R4")
 
     # Download and load the US Core package version 5.0.1
-    factory.configure_repository(
-        packages=[("hl7.fhir.us.core", "5.0.1")],
-        internet_enabled=True
-    )
+    factory.load_package("hl7.fhir.us.core", "5.0.1")
 
     # Create a model from the package
-    USCorePatient = factory.construct_resource_model(
+    USCorePatient = factory.build(
         "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
     )
 
@@ -198,23 +125,19 @@ Fhircraft connects to the FHIR package registry at [:material-fire: `packages.fh
     Use this method when your project needs several FHIR packages:
 
     ```python
-    from fhircraft.fhir.resources.factory import factory
+    from fhircraft.fhir.resources import ResourceFactory
+    factory = ResourceFactory(fhir_release="R4")
 
     # Configure the factory to load multiple packages
-    factory.configure_repository(
-        packages=[
-            ("hl7.fhir.us.core", "5.0.1"),  # US healthcare standards
-            ("hl7.fhir.us.mcode", "1.1.0"), # Minimal Common Oncology Data Elements
-        ],
-        internet_enabled=True
-    )
+    factory.load_package("hl7.fhir.us.core", "5.0.1")  # US healthcare standards
+    factory.load_package("hl7.fhir.us.mcode", "1.1.0"), # Minimal Common Oncology Data Elements
 
     # Create models from different packages
-    USCorePatient = factory.construct_resource_model(
+    USCorePatient = factory.build(
         "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
     )
 
-    CancerPatient = factory.construct_resource_model(
+    CancerPatient = factory.build(
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient"
     )
 
@@ -224,57 +147,6 @@ Fhircraft connects to the FHIR package registry at [:material-fire: `packages.fh
 
     print(f"Loaded {len([USCorePatient, mcode_patient])} different patient types")
     ```
-
-As your application grows, you might lose track of which packages are loaded, especially if different parts of your code load different packages. Checking loaded packages helps you understand the current state of your factory and debug issues where expected structure definitions are not available.
-
-This information is also useful for logging and diagnostics. When troubleshooting problems, knowing exactly which package versions are active helps you reproduce issues and verify that your production environment matches your testing environment
-
-```python
-from fhircraft.fhir.resources.factory import factory
-
-# Load some packages
-factory.configure_repository(
-    packages=[("hl7.fhir.us.core", "5.0.1")],
-    internet_enabled=True
-)
-
-# Get a list of all loaded packages
-loaded_packages = factory.get_loaded_packages()
-
-# Display the loaded packages
-print("Currently loaded packages:")
-for name, version in loaded_packages.items():
-    print(f"  - {name} version {version}")
-
-# Check if a specific package is loaded
-if factory.has_package("hl7.fhir.us.core"):
-    print("US Core package is available")
-else:
-    print("US Core package is not loaded")
-```
-
-Packages consume memory because Fhircraft stores their structure definitions in active memory for fast access. In long-running applications or when processing many different data types, you might want to remove packages after you finish using them. This frees up memory and keeps your application responsive.
-
-```python
-from fhircraft.fhir.resources.factory import factory
-
-# Load a package
-factory.configure_repository(
-    packages=[("hl7.fhir.us.core", "5.0.1")],
-    internet_enabled=True
-)
-
-# Later, remove it when you are done
-factory.remove_package("hl7.fhir.us.core", "5.0.1")
-
-# Or remove all versions of a package
-factory.remove_package("hl7.fhir.us.core")
-
-# Or clear all loaded packages at once
-factory.clear_package_cache()
-
-print("Package cache cleared")
-```
 
 ## Canonical URLs
 
@@ -293,15 +165,17 @@ When you provide a canonical URL to Fhircraft, the library follows a resolution 
 The canonical URL serves as the primary way to request structure definitions from the factory. Once you know the URL for a structure definition, you can construct a model from it regardless of whether that definition came from a local file, a package, or an internet download. This abstraction simplifies your code because you do not need to know or manage where definitions are stored.
 
 ```python
-from fhircraft.fhir.resources.factory import factory
+from fhircraft.fhir.resources import ResourceFactory
+
+factory = ResourceFactory(fhir_release="R4")
 
 # Create a model from the standard FHIR Patient definition
-Patient = factory.construct_resource_model(
+Patient = factory.build(
     canonical_url="http://hl7.org/fhir/StructureDefinition/Patient"
 )
 
 # Create a model from a US Core profile
-USCorePatient = factory.construct_resource_model(
+USCorePatient = factory.build(
     canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
 )
 
@@ -316,23 +190,6 @@ us_patient = USCorePatient(
 print(f"Created {len([patient, us_patient])} patient records")
 ```
 
-### Specifying Versions
-
-Structure definitions evolve over time as healthcare standards mature and requirements change. A structure definition that was appropriate last year might have new requirements this year. [Version numbers](https://www.hl7.org/fhir/versioning.html) track these changes and ensure you use the exact definition you intend. Without version specifications, you get whatever version the factory finds first, which might not match your expectations.
-
-Two methods exist for specifying versions. You can append the version to the canonical URL using a vertical bar separator, following the [FHIR canonical reference format](https://www.hl7.org/fhir/references.html#canonical) (for example, `http://example.org/StructureDefinition/Patient|1.0.0`). Alternatively, you can pass the version as a separate parameter. Both approaches produce the same result, so choose whichever fits your code style
-
-```python
-from fhircraft.fhir.resources.factory import factory
-
-# Request a specific version by adding it to the URL
-PatientR4 = factory.construct_resource_model(
-    canonical_url="http://hl7.org/fhir/StructureDefinition/Patient|4.0.1"
-)
-
-# Each version may have different rules
-patient_r4 = PatientR4(name=[{"family": "Wilson"}])
-```
 
 ## Common Problems and Solutions
 

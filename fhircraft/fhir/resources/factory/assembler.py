@@ -1,12 +1,14 @@
-from __future__ import annotations
+import warnings
 
+from functools import partial
 from typing import Any, Sequence
 
-from pydantic import create_model
+from pydantic import BaseModel, create_model
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
-from fhircraft.fhir.resources.factory.builders.base import Builder
+from fhircraft.fhir.resources.factory.builders.base import Builder, ValidatorInformation
 from fhircraft.fhir.resources.factory.context import BuildContext
+from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.exceptions import AssemblerError
 from fhircraft.fhir.resources.factory.builders import (
@@ -14,6 +16,10 @@ from fhircraft.fhir.resources.factory.builders import (
     SlicedFieldBuilder,
     BackboneFieldBuilder,
     SimpleFieldBuilder,
+)
+from fhircraft.fhir.resources.validators import (
+    validate_FHIR_model_fixed_value,
+    validate_FHIR_model_pattern,
 )
 
 BUILDER_CHAIN: list[type[Builder]] = [
@@ -124,12 +130,24 @@ class ModelAssembler:
                 )
             )
         }
+        # Handle fixed value and pattern constraints on the model itself (e.g. for slices)
+        if root.fixed is not None:
+            fixed_validator = self.build_model_fixed_value_constraint(root)
+            model_validators[fixed_validator.name] = (
+                fixed_validator.as_pydantic_definition()
+            )
+
+        if root.pattern is not None:
+            pattern_validator = self.build_model_pattern_constraint(root)
+            model_validators[pattern_validator.name] = (
+                pattern_validator.as_pydantic_definition()
+            )
 
         has_inherited_fields = any(
             len(getattr(base, "model_fields", [])) for base in base_classes
         )
         if not fields and not has_inherited_fields:
-            raise AssemblerError(
+            warnings.warn(
                 f"No fields built for model '{name}' and no fields defined on base class(es) {base_classes}."
             )
 
@@ -146,6 +164,10 @@ class ModelAssembler:
             __module__=self.ctx.factory.__module__,
         )
 
+        if root.fixed or root.pattern:
+            # If the slice entry has a fixed value or pattern, set it as default on the field and register a validator
+            self._set_constraint_default_values(model, root)
+
         # Attach properties
         for attr_name, property_getter in properties.items():
             setattr(model, attr_name, property(property_getter))
@@ -161,3 +183,43 @@ class ModelAssembler:
             if builder.can_handle(node, self.index):
                 return builder
         raise AssemblerError(f"No suitable builder found for node '{node.id}'.")
+
+    @staticmethod
+    def _set_constraint_default_values(
+        model: type,
+        node: Any,
+    ) -> None:
+        """Override slice model field defaults with pattern values and register validator."""
+        constrain_value = node.fixed or node.pattern
+
+        if not isinstance(constrain_value, BaseModel):
+            raise TypeError(
+                f"Expected fixed or pattern value for a slice to be a Pydantic model instance, got {type(constrain_value)}"
+            )
+
+        for constraint_field in constrain_value.__class__.model_fields:
+            if constraint_field not in model.model_fields:
+                raise ValueError(
+                    f"Constraint field '{constraint_field}' not found in slice model fields: {list(model.model_fields.keys())}"
+                )
+            val = getattr(constrain_value, constraint_field, None)
+            if val is not None:
+                # Update default on the field
+                model.model_fields[constraint_field].default = val
+
+    @staticmethod
+    def build_model_fixed_value_constraint(node: ElementNode) -> ValidatorInformation:
+        return ValidatorInformation(
+            name=f"FHIR_{node.name}_fixed_value_constraint",
+            kind="model",
+            function=partial(validate_FHIR_model_fixed_value, constant=node.fixed),
+            arguments={"constant": node.fixed},
+        )
+
+    @staticmethod
+    def build_model_pattern_constraint(node: ElementNode) -> ValidatorInformation:
+        return ValidatorInformation(
+            name=f"FHIR_{node.name}_pattern_constraint",
+            kind="model",
+            function=partial(validate_FHIR_model_pattern, pattern=node.pattern),
+        )

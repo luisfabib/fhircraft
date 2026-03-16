@@ -338,7 +338,7 @@ def get_fhir_type(
     """
     result = get_registry(release).get_by_name(type_str)
     if fail_if_not_found and result is None:
-        raise AttributeError(f"No FHIR type found for name: {type_str}")
+        raise AttributeError(f"No FHIR {release} type found for name: {type_str}")
     return result
 
 
@@ -372,5 +372,5 @@ def get_fhir_type_by_url(
     """
     result = get_registry(release).get_by_url(url)
     if fail_if_not_found and result is None:
-        raise AttributeError(f"No FHIR type found for URL: {url}")
+        raise AttributeError(f"No FHIR {release} type found for URL: {url}")
     return result

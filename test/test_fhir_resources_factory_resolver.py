@@ -1,11 +1,5 @@
-"""
-Unit tests for SnapshotResolver private methods.
-"""
-
-from unittest import result
-
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from fhircraft.config import configure, reset_config
 from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
@@ -15,7 +9,6 @@ from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
 from fhircraft.fhir.resources.definitions import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.exceptions import (
-    DefinitionIndexError,
     DefinitionResolutionError,
 )
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
@@ -440,6 +433,87 @@ def test_resolve_differential__raises_for_empty_diff(resolver, base_index):
         resolver._resolve_differential([], base_index)
 
 
+def test_resolve_differential__element_not_in_base_stored_as_is(resolver, base_index):
+    new_elem = make_element(
+        "MyProfile.brand_new_field",
+        "MyProfile.brand_new_field",
+        min=0,
+        max="1",
+        short="Never in base",
+    )
+    diff = [
+        make_element("MyProfile", "MyProfile"),
+        new_elem,
+    ]
+    index = resolver._resolve_differential(diff, base_index)
+    stored = index.get("MyProfile.brand_new_field")
+    assert stored is not None
+    assert stored.definition.short == "Never in base"
+    assert stored.min_cardinality == 0
+    assert stored.max_cardinality == 1
+
+
+def test_resolve_differential__element_not_in_base(resolver, base_index):
+
+    new_elem = make_element("MyProfile.novel", "MyProfile.novel", min=1, max="1")
+    diff = [
+        make_element("MyProfile", "MyProfile"),
+        new_elem,
+    ]
+    with patch.object(
+        resolver, "_merge_node_with_base", wraps=resolver._merge_node_with_base
+    ) as mock_merge:
+        index = resolver._resolve_differential(diff, base_index)
+
+    # _merge_node_with_base must not have been called for the novel element
+    novel_calls = [
+        c for c in mock_merge.call_args_list if c.args[0].id == "MyProfile.novel"
+    ]
+    assert novel_calls == []
+    # The node is still present in the result
+    assert index.get("MyProfile.novel") is not None
+
+
+def test_resolve_differential__calls_merge_when_base_node_found(resolver, base_index):
+
+    diff = [
+        make_element("MyProfile", "MyProfile"),
+        make_element("MyProfile.status", "MyProfile.status", min=1),
+    ]
+    sentinel = make_node(id="MyProfile.status", min=1, max="1")
+
+    with patch.object(
+        resolver, "_merge_node_with_base", return_value=sentinel
+    ) as mock_merge:
+        index = resolver._resolve_differential(diff, base_index)
+
+    # At least one call must have the diff status node and base status node
+    assert mock_merge.called
+    call_args_list = mock_merge.call_args_list
+    # Find the call for MyProfile.status
+    status_calls = [c for c in call_args_list if c.args[0].id == "MyProfile.status"]
+    assert len(status_calls) == 1
+    diff_arg, base_arg = status_calls[0].args
+    assert diff_arg.id == "MyProfile.status"
+    assert base_arg.id == "BaseResource.status"
+
+
+def test_resolve_differential__merge_result_is_stored_not_diff_node(
+    resolver, base_index
+):
+    merged_sentinel = make_node(id="MyProfile.status", min=99, max="99")
+
+    diff = [
+        make_element("MyProfile", "MyProfile"),
+        make_element("MyProfile.status", "MyProfile.status", min=1),
+    ]
+    with patch.object(resolver, "_merge_node_with_base", return_value=merged_sentinel):
+        index = resolver._resolve_differential(diff, base_index)
+
+    stored = index.get("MyProfile.status")
+    assert stored is merged_sentinel
+
+
 # ==================================================================
 # SnapshotResolver._resolve_content_references
 # ==================================================================
@@ -697,7 +771,10 @@ def test_resolve__differential_mode_raises_when_differential_elements_contain_no
 
 
 def test_resolve__auto_mode_uses_differential_when_present(resolver, base_index):
-    diff_elements = [make_element("MyProfile.status", "MyProfile.status")]
+    diff_elements = [
+        make_element("MyProfile", "MyProfile"),
+        make_element("MyProfile.status", "MyProfile.status"),
+    ]
     sd = make_structure_def(differential_elements=diff_elements)
 
     expected = DefinitionIndex(list(base_index.nodes))
@@ -720,7 +797,10 @@ def test_resolve__auto_mode_uses_snapshot_when_no_differential(resolver, base_in
 
 
 def test_resolve__auto_mode_is_default(resolver, base_index):
-    diff_elements = [make_element("MyProfile.status", "MyProfile.status")]
+    diff_elements = [
+        make_element("MyProfile", "MyProfile"),
+        make_element("MyProfile.status", "MyProfile.status"),
+    ]
     sd = make_structure_def(differential_elements=diff_elements)
 
     expected = DefinitionIndex(list(base_index.nodes))

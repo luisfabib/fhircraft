@@ -11,6 +11,7 @@ from typing import Any, Iterator, List, overload
 
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.exceptions import DefinitionIndexError
+from fhircraft.utils import capitalize
 
 
 class DefinitionIndex:
@@ -19,10 +20,10 @@ class DefinitionIndex:
     """
 
     def __init__(self, nodes: list[ElementNode]) -> None:
-        self._nodes_by_id: dict[str, ElementNode] = {node.id: node for node in nodes}
+        self._nodes_by_id: dict[str, ElementNode] = {}
         self._nodes_by_path: dict[str, List[ElementNode]] = {}
         for node in nodes:
-            self._nodes_by_path.setdefault(node.path, []).append(node)
+            self.add(node, replace=True)
 
     @classmethod
     def from_elements(cls, elements: list[Any]) -> DefinitionIndex:
@@ -45,14 +46,31 @@ class DefinitionIndex:
         """List of all nodes in this index."""
         return list(self._nodes_by_id.values())
 
-    def add(self, node: ElementNode) -> None:
+    def add(self, node: ElementNode, replace: bool = False) -> None:
         """Add an :class:`ElementNode` to this index."""
         if node.id in self._nodes_by_id:
-            raise DefinitionIndexError(
-                f"Duplicate element id {node.id!r} cannot be added to index."
-            )
+            if not replace:
+                raise DefinitionIndexError(
+                    f"Duplicate element id {node.id!r} cannot be added to index."
+                )
+            else:
+                self._nodes_by_id[node.id] = node
         self._nodes_by_id[node.id] = node
         self._nodes_by_path.setdefault(node.path, []).append(node)
+        if node.is_polymorphic_type and node.type_codes:
+            # Add synthetic nodes for each type choice (e.g. Observation.valueString)
+            for type_code in node.type_codes:
+                type_node = ElementNode(
+                    definition=node.definition.model_copy(
+                        update={
+                            "id": node.id.replace("[x]", capitalize(type_code)),
+                            "path": node.path.replace("[x]", capitalize(type_code)),
+                            "type": [node.definition.type[0].model_copy(update={"code": type_code})],  # type: ignore
+                        }
+                    )
+                )
+                if type_node.id not in self:
+                    self.add(type_node)
 
     @overload
     def _get_without_root(self, *, id: str, path: None = ...) -> ElementNode | None: ...

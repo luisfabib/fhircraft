@@ -117,6 +117,35 @@ class FHIRStructureFactory:
 
         return self._build(structure_definition, mixins=mixins, mode=mode)
 
+    def load_package(self, package_name: str, version: str) -> None:
+        """
+        Load all StructureDefinitions from a given package into the repository.
+
+        Args:
+            package_name: The name of the package to load (e.g. "hl7.fhir.us.mcode").
+            version: The version of the package to load (e.g. "1.0.0").
+        Raises:
+            NotImplementedError: If the package is not supported by the mock.
+        """
+        self.definition_registry.download_package(package_name, version)
+
+    def add_structure_definition(
+        self,
+        sd: "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition | dict",
+    ) -> None:
+        if isinstance(sd, dict):
+            self.definition_registry.from_dict(sd)
+        elif getattr(sd, "_resource_type", None) == "StructureDefinition":
+            self.definition_registry.add(sd)
+        else:
+            raise ValueError(
+                "Input must be a dict or a StructureDefinition model instance."
+            )
+
+    def clear_cache(self) -> None:
+        """Clear the construction cache."""
+        self.construction_cache.clear()
+
     # ------------------------------------------------------------------
     # Internal build pipeline
     # ------------------------------------------------------------------
@@ -160,14 +189,7 @@ class FHIRStructureFactory:
             ):
                 base_model = resolved
             else:
-                # Try to build from repository
-                try:
-                    base_model = self.build(canonical_url=base_canonical)
-                except Exception as exc:
-                    warnings.warn(
-                        f"Could not resolve base definition '{base_canonical}' for "
-                        f"'{sd_name}': {exc}.  Using FHIRBaseModel as fallback."
-                    )
+                base_model = self.build(canonical_url=base_canonical)
 
             # Obtain the base snapshot for differential resolution
             base_definition = self.definition_registry.get(base_canonical)
@@ -286,7 +308,3 @@ class FHIRStructureFactory:
         if keyword.iskeyword(sanitized):
             sanitized = f"{sanitized}_"
         return sanitized
-
-    def clear_cache(self) -> None:
-        """Clear the construction cache."""
-        self.construction_cache.clear()
