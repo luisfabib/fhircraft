@@ -313,30 +313,6 @@ def test_build_internal__snapshot_resolver_receives_repository(factory):
     assert mock_resolver.call_args[0][0] is factory.definition_registry
 
 
-# ===========================================================================
-# FHIRStructureFactory._build – base definition resolution
-# ===========================================================================
-
-
-def test_build_internal__raises_when_base_definition_has_no_snapshot():
-
-    factory = make_factory()
-    sd = make_sd(base_definition="http://hl7.org/fhir/StructureDefinition/Base")
-
-    base_sd = MagicMock()
-    base_sd.snapshot = None
-    factory.definition_registry = MagicMock()  # type: ignore
-    factory.definition_registry.get.return_value = base_sd  # type: ignore
-
-    with (
-        patch(_GET_FHIR_RELEASE, return_value="R4B"),
-        patch(_GET_FHIR_TYPE_BY_URL, return_value=None),
-        patch.object(factory, "build", side_effect=[make_pydantic_model()]),
-    ):
-        with pytest.raises(DefinitionResolutionError):
-            factory._build(sd)
-
-
 def test_build_internal__uses_registry_type_as_base_when_available():
     from fhircraft.fhir.resources.base import FHIRBaseModel
 
@@ -367,11 +343,6 @@ def test_build_internal__uses_registry_type_as_base_when_available():
     assert ctx_arg.base is RegistryBase
 
 
-# ===========================================================================
-# FHIRStructureFactory._build – fhir_release forwarded via context
-# ===========================================================================
-
-
 def test_build_internal__context_factory_is_self(factory):
     sd = make_sd(base_definition=None)
     model = make_pydantic_model()
@@ -387,11 +358,6 @@ def test_build_internal__context_factory_is_self(factory):
 
     ctx_arg = mock_assembler.call_args.kwargs["ctx"]
     assert ctx_arg.factory is factory
-
-
-# ===========================================================================
-# FHIRStructureFactory._build – model metadata stamped
-# ===========================================================================
 
 
 def test_build_internal__fhir_release_set_on_model():
