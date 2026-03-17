@@ -744,6 +744,10 @@ class ElementDefinition(BackboneElement):
 
     _type = "ElementDefinition"
 
+    id: Optional[String] = Field(
+        description="Unique id for the element within a resource (for internal references)",
+        default=None,
+    )
     path: Optional[String] = Field(
         description="Path of the element in the hierarchy of elements",
         default=None,
