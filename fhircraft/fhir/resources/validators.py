@@ -436,15 +436,17 @@ def validate_slicing_cardinalities(
     )
     for slice in slices:
         slice_instances_count = sum([isinstance(value, slice) for value in values])
-        assert (
-            slice_instances_count >= slice.min_cardinality
-        ), f"Slice '{slice.__name__}' for field '{field_name}' violates its min. cardinality. \
-                Requires min. cardinality of {slice.min_cardinality}, but got {slice_instances_count}"
-        if slice.max_cardinality is not None:
+        # Only validate cardinalities if there are instances of the slice present
+        if slice_instances_count > 0:
             assert (
-                slice_instances_count <= slice.max_cardinality
-            ), f"Slice '{slice.__name__}' for field '{field_name}' violates its max. cardinality. \
-                    Requires max. cardinality of {slice.max_cardinality}, but got {slice_instances_count}"
+                slice_instances_count >= slice.min_cardinality
+            ), f"Slice '{slice.__name__}' for field '{field_name}' violates its min. cardinality. \
+                    Requires min. cardinality of {slice.min_cardinality}, but got {slice_instances_count}"
+            if slice.max_cardinality is not None:
+                assert (
+                    slice_instances_count <= slice.max_cardinality
+                ), f"Slice '{slice.__name__}' for field '{field_name}' violates its max. cardinality. \
+                        Requires max. cardinality of {slice.max_cardinality}, but got {slice_instances_count}"
     return values
 
 
