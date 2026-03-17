@@ -113,6 +113,28 @@ def test_index_add__splits_type_choices():
     ]
 
 
+def test_index_update__adds_multiple_nodes_and_replaces():
+    index = DefinitionIndex([])
+    index.update(
+        [
+            make_node(
+                "Observation.code",
+                "Observation.code",
+                types=["String", "CodeableConcept"],
+            ),
+            make_node(
+                "Observation.category",
+                "Observation.category",
+                types=["String", "CodeableConcept"],
+            ),
+        ]
+    )
+    assert "Observation.code" in index
+    assert index.get("Observation.code").type_codes == ["String", "CodeableConcept"]
+    assert "Observation.category" in index
+    assert index.get("Observation.category").type_codes == ["String", "CodeableConcept"]
+
+
 # ------------------------------------------------------------------
 # Basic access
 # ------------------------------------------------------------------

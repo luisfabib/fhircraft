@@ -81,7 +81,9 @@ class SnapshotResolver:
         if mode == "auto":
             mode = (
                 "differential"
-                if sd.differential and len(sd.differential.element or []) > 1
+                if sd.baseDefinition
+                and sd.differential
+                and len(sd.differential.element or []) > 1
                 else "snapshot"
             )
         if mode == "snapshot":
@@ -111,17 +113,20 @@ class SnapshotResolver:
                 [e is not None for e in sd.differential.element]
             ), f"StructureDefinition {sd.name or sd.url} differential.element contains None"
 
-            if base_canonical := sd.baseDefinition:
-                # Obtain the base snapshot for differential resolution
-                base_definition = self._registry.get(base_canonical)
-                base_index = self.resolve(base_definition, mode="auto")
-            elif sd.snapshot and sd.snapshot.element:
-                # No baseDefinition, but snapshot is available — use it as the base for merging
-                base_index = DefinitionIndex.from_elements(sd.snapshot.element)
-            else:
+            if not (base_canonical := sd.baseDefinition):
                 raise DefinitionResolutionError(
-                    f"StructureDefinition '{getattr(sd, 'name', '?')}' has no baseDefinition and no snapshot to serve as a base for differential resolution."
+                    f"StructureDefinition '{getattr(sd, 'name', '?')}' has no baseDefinition, which is required for differential resolution."
                 )
+            # Obtain the base snapshot for differential resolution
+            base_definition = self._registry.get(base_canonical)
+            partial_base_index = self.resolve(base_definition, mode="auto")
+            if base_definition.snapshot and base_definition.snapshot.element:
+                base_index = DefinitionIndex.from_elements(
+                    base_definition.snapshot.element
+                )
+                base_index.update(partial_base_index.nodes, replace=True)
+            else:
+                base_index = partial_base_index
             # Merge differential over base snapshot to produce a synthetic snapshot
             resolved_index = self._resolve_differential(
                 sd.differential.element, base_index

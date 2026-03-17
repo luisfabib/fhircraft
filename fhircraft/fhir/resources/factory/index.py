@@ -69,6 +69,11 @@ class DefinitionIndex:
                 if type_node.id not in self:
                     self.add(type_node)
 
+    def update(self, nodes: list[ElementNode], replace: bool = False) -> None:
+        """Add multiple :class:`ElementNode` objects to this index."""
+        for node in nodes:
+            self.add(node, replace=replace)
+
     @overload
     def _get_without_root(self, *, id: str, path: None = ...) -> ElementNode | None: ...
 
