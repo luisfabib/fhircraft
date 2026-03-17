@@ -286,10 +286,9 @@ class FHIRStructureFactory:
         sanitized_name = self._sanitize_name(sd_name)
 
         # ------------------------------------------------------------------
-        # Resolve base definition
+        # Resolve base model/class
         # ------------------------------------------------------------------
         base_model: type = FHIRBaseModel
-        base_index = None
         if base_canonical := structure_def.baseDefinition:
             # Try directly from registry of built-in types first
             resolved = get_fhir_type_by_url(
@@ -304,22 +303,11 @@ class FHIRStructureFactory:
             else:
                 base_model = self.build(canonical_url=base_canonical)
 
-            # Obtain the base snapshot for differential resolution
-            base_definition = self.definition_registry.get(base_canonical)
-            if base_definition.snapshot and base_definition.snapshot.element:
-                base_index = DefinitionIndex.from_elements(
-                    base_definition.snapshot.element
-                )
-            else:
-                raise DefinitionResolutionError(
-                    f"Base definition '{base_canonical}' for '{sd_name}' has no snapshot or elements."
-                )
-
         # ------------------------------------------------------------------
         # Produce the complete DefinitionIndex
         # ------------------------------------------------------------------
         resolver = SnapshotResolver(self.definition_registry)
-        definition_index = resolver.resolve(structure_def, base_index, mode=mode)
+        definition_index = resolver.resolve(structure_def, mode=mode)
 
         # ------------------------------------------------------------------
         # Assemble the Pydantic model

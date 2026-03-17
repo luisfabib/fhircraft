@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 
 from fhircraft.config import configure, reset_config
 from fhircraft.fhir.resources.datatypes.R4.complex.element_definition import (
@@ -38,11 +38,14 @@ def make_base_index(*elements: ElementDefinition) -> DefinitionIndex:
     return DefinitionIndex.from_elements(list(elements))
 
 
-def make_structure_def(*, snapshot_elements=None, differential_elements=None):
+def make_structure_def(
+    *, snapshot_elements=None, differential_elements=None, base_definition=None
+):
     """Build a minimal StructureDefinition mock."""
     sd = MagicMock()
     sd.name = "MockProfile"
     sd.url = "http://example.org/MockProfile"
+    sd.baseDefinition = base_definition
 
     if snapshot_elements is not None:
         sd.snapshot = MagicMock()
@@ -669,14 +672,14 @@ def test_resolve_content_references__mixed_nodes_all_present_in_result(
 def test_resolve__snapshot_mode_returns_definition_index(resolver, base_index):
     elements = list(base_index.nodes)
     sd = make_structure_def(snapshot_elements=[n.definition for n in elements])
-    result = resolver.resolve(sd, base_index, mode="snapshot")
+    result = resolver.resolve(sd, mode="snapshot")
     assert isinstance(result, DefinitionIndex)
 
 
 def test_resolve__snapshot_mode_index_contains_all_elements(resolver, base_index):
     elements = [n.definition for n in base_index.nodes]
     sd = make_structure_def(snapshot_elements=elements)
-    result = resolver.resolve(sd, base_index, mode="snapshot")
+    result = resolver.resolve(sd, mode="snapshot")
     for elem in elements:
         assert elem.id in result
 
@@ -684,7 +687,7 @@ def test_resolve__snapshot_mode_index_contains_all_elements(resolver, base_index
 def test_resolve__snapshot_mode_raises_when_snapshot_is_none(resolver, base_index):
     sd = make_structure_def(snapshot_elements=None)
     with pytest.raises(AssertionError):
-        resolver.resolve(sd, base_index, mode="snapshot")
+        resolver.resolve(sd, mode="snapshot")
 
 
 def test_resolve__snapshot_mode_raises_when_snapshot_elements_is_none(
@@ -694,7 +697,7 @@ def test_resolve__snapshot_mode_raises_when_snapshot_elements_is_none(
     sd.snapshot = MagicMock()
     sd.snapshot.element = None
     with pytest.raises(AssertionError):
-        resolver.resolve(sd, base_index, mode="snapshot")
+        resolver.resolve(sd, mode="snapshot")
 
 
 def test_resolve__snapshot_mode_raises_when_snapshot_elements_contain_none(
@@ -704,7 +707,7 @@ def test_resolve__snapshot_mode_raises_when_snapshot_elements_contain_none(
     elements.append(None)
     sd = make_structure_def(snapshot_elements=elements)
     with pytest.raises(AssertionError):
-        resolver.resolve(sd, base_index, mode="snapshot")
+        resolver.resolve(sd, mode="snapshot")
 
 
 # ------------------------------------------------------------------
@@ -717,21 +720,33 @@ def test_resolve__differential_mode_delegates_to_resolve_differential(
 ):
     diff_elements = [make_element("MyProfile.status", "MyProfile.status")]
     sd = make_structure_def(differential_elements=diff_elements)
+    sd.baseDefinition = "http://example.org/BaseResource"
+
+    base_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    resolver._registry.get = MagicMock(return_value=base_sd)
 
     expected = DefinitionIndex(list(base_index.nodes))
     resolver._resolve_differential = MagicMock(return_value=expected)
     resolver._resolve_content_references = MagicMock(return_value=expected)
 
-    result = resolver.resolve(sd, base_index, mode="differential")
+    result = resolver.resolve(sd, mode="differential")
 
-    resolver._resolve_differential.assert_called_once_with(diff_elements, base_index)
-    resolver._resolve_content_references.assert_called_once_with(expected)
+    resolver._resolve_differential.assert_called_once_with(diff_elements, ANY)
+    resolver._resolve_content_references.assert_called_with(expected)
     assert result is expected
 
 
 def test_resolve__differential_mode_returns_definition_index(resolver, base_index):
     diff_elements = [make_element("MyProfile.status", "MyProfile.status")]
     sd = make_structure_def(differential_elements=diff_elements)
+    sd.baseDefinition = "http://example.org/BaseResource"
+
+    base_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    resolver._registry.get = MagicMock(return_value=base_sd)
 
     resolver._resolve_differential = MagicMock(
         return_value=DefinitionIndex(list(base_index.nodes))
@@ -739,7 +754,7 @@ def test_resolve__differential_mode_returns_definition_index(resolver, base_inde
     resolver._resolve_content_references = MagicMock(
         return_value=DefinitionIndex(list(base_index.nodes))
     )
-    result = resolver.resolve(sd, base_index, mode="differential")
+    result = resolver.resolve(sd, mode="differential")
     assert isinstance(result, DefinitionIndex)
 
 
@@ -748,7 +763,7 @@ def test_resolve__differential_mode_raises_when_differential_is_none(
 ):
     sd = make_structure_def(differential_elements=None)
     with pytest.raises(AssertionError):
-        resolver.resolve(sd, base_index, mode="differential")
+        resolver.resolve(sd, mode="differential")
 
 
 def test_resolve__differential_mode_raises_when_differential_elements_is_none(
@@ -758,7 +773,7 @@ def test_resolve__differential_mode_raises_when_differential_elements_is_none(
     sd.differential = MagicMock()
     sd.differential.element = None
     with pytest.raises(AssertionError):
-        resolver.resolve(sd, base_index, mode="differential")
+        resolver.resolve(sd, mode="differential")
 
 
 def test_resolve__differential_mode_raises_when_differential_elements_contain_none(
@@ -767,7 +782,7 @@ def test_resolve__differential_mode_raises_when_differential_elements_contain_no
     diff_elements = [make_element("MyProfile.status", "MyProfile.status"), None]
     sd = make_structure_def(differential_elements=diff_elements)
     with pytest.raises(AssertionError):
-        resolver.resolve(sd, base_index, mode="differential")
+        resolver.resolve(sd, mode="differential")
 
 
 def test_resolve__auto_mode_uses_differential_when_present(resolver, base_index):
@@ -775,15 +790,23 @@ def test_resolve__auto_mode_uses_differential_when_present(resolver, base_index)
         make_element("MyProfile", "MyProfile"),
         make_element("MyProfile.status", "MyProfile.status"),
     ]
-    sd = make_structure_def(differential_elements=diff_elements)
+    sd = make_structure_def(
+        differential_elements=diff_elements,
+        base_definition="http://example.org/BaseResource",
+    )
+
+    base_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    resolver._registry.get = MagicMock(return_value=base_sd)
 
     expected = DefinitionIndex(list(base_index.nodes))
     resolver._resolve_differential = MagicMock(return_value=expected)
     resolver._resolve_content_references = MagicMock(return_value=expected)
 
-    result = resolver.resolve(sd, base_index, mode="auto")
+    result = resolver.resolve(sd, mode="auto")
 
-    resolver._resolve_differential.assert_called_once_with(diff_elements, base_index)
+    resolver._resolve_differential.assert_called_once_with(diff_elements, ANY)
     assert result is expected
 
 
@@ -791,7 +814,7 @@ def test_resolve__auto_mode_uses_snapshot_when_no_differential(resolver, base_in
     elements = [n.definition for n in base_index.nodes]
     sd = make_structure_def(snapshot_elements=elements)  # differential=None by default
 
-    result = resolver.resolve(sd, base_index, mode="auto")
+    result = resolver.resolve(sd, mode="auto")
 
     assert isinstance(result, DefinitionIndex)
 
@@ -801,13 +824,100 @@ def test_resolve__auto_mode_is_default(resolver, base_index):
         make_element("MyProfile", "MyProfile"),
         make_element("MyProfile.status", "MyProfile.status"),
     ]
-    sd = make_structure_def(differential_elements=diff_elements)
+    sd = make_structure_def(
+        differential_elements=diff_elements,
+        base_definition="http://example.org/BaseResource",
+    )
+
+    base_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    resolver._registry.get = MagicMock(return_value=base_sd)
 
     expected = DefinitionIndex(list(base_index.nodes))
     resolver._resolve_differential = MagicMock(return_value=expected)
     resolver._resolve_content_references = MagicMock(return_value=expected)
 
-    result = resolver.resolve(sd, base_index)  # no mode kwarg
+    result = resolver.resolve(sd)  # no mode kwarg
 
     resolver._resolve_differential.assert_called_once()
     assert result is expected
+
+
+def test_resolve__differential_resolves_base_via_registry(resolver, base_index):
+    """resolve() fetches the base StructureDefinition from the registry and recursively
+    resolves it to build the base_index used for differential merging."""
+    diff_elements = [
+        make_element("MyProfile", "MyProfile"),
+        make_element("MyProfile.status", "MyProfile.status", min=1),
+    ]
+    sd = make_structure_def(
+        differential_elements=diff_elements,
+        base_definition="http://example.org/BaseResource",
+    )
+
+    base_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+    resolver._registry.get = MagicMock(return_value=base_sd)
+
+    result = resolver.resolve(sd, mode="differential")
+
+    resolver._registry.get.assert_called_once_with("http://example.org/BaseResource")
+    assert isinstance(result, DefinitionIndex)
+    assert "MyProfile.status" in result
+
+
+def test_resolve__differential_recursive_chain(resolver, base_index):
+    """resolve() recursively resolves a chain of differential definitions until a
+    snapshot is found, without requiring any intermediate snapshot."""
+    # Deepest base — provides the snapshot for the whole chain.
+    root_sd = make_structure_def(
+        snapshot_elements=[n.definition for n in base_index.nodes]
+    )
+
+    # Mid-level differential: adds min=1 on status.
+    mid_diff = [
+        make_element("MidProfile", "MidProfile"),
+        make_element("MidProfile.status", "MidProfile.status", min=1),
+    ]
+    mid_sd = make_structure_def(
+        differential_elements=mid_diff,
+        base_definition="http://example.org/RootResource",
+    )
+
+    # Top-level differential: further restricts max="1" on status.
+    top_diff = [
+        make_element("TopProfile", "TopProfile"),
+        make_element("TopProfile.status", "TopProfile.status", max="0"),
+    ]
+    top_sd = make_structure_def(
+        differential_elements=top_diff, base_definition="http://example.org/MidProfile"
+    )
+
+    resolver._registry.get = MagicMock(
+        side_effect=lambda url: {
+            "http://example.org/MidProfile": mid_sd,
+            "http://example.org/RootResource": root_sd,
+        }[url]
+    )
+
+    result = resolver.resolve(top_sd, mode="differential")
+
+    assert isinstance(result, DefinitionIndex)
+    node = result.get("TopProfile.status")
+    assert node is not None
+    assert node.max_cardinality == 0
+
+
+def test_resolve__differential_raises_when_base_definition_is_missing(resolver):
+    """resolve() raises DefinitionResolutionError when the SD has no baseDefinition."""
+    sd = make_structure_def(
+        differential_elements=[
+            make_element("MyProfile", "MyProfile"),
+            make_element("MyProfile.status", "MyProfile.status"),
+        ]
+    )
+
+    with pytest.raises(DefinitionResolutionError):
+        resolver.resolve(sd, mode="differential")

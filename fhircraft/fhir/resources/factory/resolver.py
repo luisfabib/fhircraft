@@ -54,7 +54,6 @@ class SnapshotResolver:
     def resolve(
         self,
         sd: "R4_StructureDefinition | R4B_StructureDefinition | R5_StructureDefinition",
-        base_index: DefinitionIndex | None = None,
         mode: Literal["auto", "snapshot", "differential"] = "auto",
     ) -> DefinitionIndex:
         """
@@ -66,8 +65,6 @@ class SnapshotResolver:
 
         Args:
             sd: A FHIR StructureDefinition resource (R4, R4B, or R5 version).
-            base_index: A DefinitionIndex containing the base elements to merge against
-                        when resolving differential mode.
             mode: Resolution mode to use. Defaults to "auto". Options are:
                   - "auto": Automatically selects "differential" if available, else "snapshot"
                   - "snapshot": Uses the snapshot representation directly
@@ -103,9 +100,6 @@ class SnapshotResolver:
             resolved_index = DefinitionIndex.from_elements(elements)
 
         elif mode == "differential":
-            assert (
-                base_index is not None
-            ), "Base index is required for differential resolution."
             # Type check assertions
             assert (
                 sd.differential
@@ -116,12 +110,23 @@ class SnapshotResolver:
             assert all(
                 [e is not None for e in sd.differential.element]
             ), f"StructureDefinition {sd.name or sd.url} differential.element contains None"
+
+            if base_canonical := sd.baseDefinition:
+                # Obtain the base snapshot for differential resolution
+                base_definition = self._registry.get(base_canonical)
+                base_index = self.resolve(base_definition, mode="auto")
+            elif sd.snapshot and sd.snapshot.element:
+                # No baseDefinition, but snapshot is available — use it as the base for merging
+                base_index = DefinitionIndex.from_elements(sd.snapshot.element)
+            else:
+                raise DefinitionResolutionError(
+                    f"StructureDefinition '{getattr(sd, 'name', '?')}' has no baseDefinition and no snapshot to serve as a base for differential resolution."
+                )
             # Merge differential over base snapshot to produce a synthetic snapshot
             resolved_index = self._resolve_differential(
                 sd.differential.element, base_index
             )
         else:
-
             raise DefinitionResolutionError(
                 f"StructureDefinition '{getattr(sd, 'name', '?')}' has neither a "
                 "snapshot nor a differential element list."
