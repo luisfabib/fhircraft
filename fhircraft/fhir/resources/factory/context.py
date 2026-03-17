@@ -9,7 +9,7 @@ from typing import Any, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from fhircraft.fhir.resources.factory.core import FHIRStructureFactory
+    from fhircraft.fhir.resources.factory.core import FHIRModelFactory
     from fhircraft.fhir.resources.definitions.registry import (
         StructureDefinitionRegistry,
     )
@@ -33,7 +33,7 @@ class BuildContext:
     resource_name: str
     """ The resource name for this build session. """
 
-    factory: FHIRStructureFactory
+    factory: FHIRModelFactory
     """ The FHIR structure factory for this build session. """
 
     registry: "StructureDefinitionRegistry"

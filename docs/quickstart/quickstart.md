@@ -103,9 +103,9 @@ Base FHIR resources are designed to work across all healthcare contexts, but rea
 Load [:material-fire: FHIR implementation guides](https://hl7.org/fhir/implementationguide.html) and create specialized resource models:
 
 ```python
-from fhircraft.fhir.resources import ResourceFactory
+from fhircraft.fhir.resources import FHIRModelFactory
 
-factory = ResourceFactory(fhir_release="R4")
+factory = FHIRModelFactory(fhir_release="R4")
 
 # Load an implementation guide (e.g., US Core)
 factory.register_package('hl7.fhir.us.core') # (1)!

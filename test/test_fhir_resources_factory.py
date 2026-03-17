@@ -13,7 +13,7 @@ from fhircraft.fhir.resources.base import FHIRBaseModel
 from fhircraft.fhir.resources.datatypes.R4B.core.patient import Patient
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.resources.factory import (
-    ResourceFactory,
+    FHIRModelFactory,
 )
 from fhircraft.fhir.resources.base import FHIRBaseModel, BaseModel
 from fhircraft.fhir.resources.datatypes.R4B.core import StructureDefinition
@@ -54,11 +54,11 @@ class MockElementDefinition:
 
 @pytest.fixture
 def factory():
-    factory = ResourceFactory(fhir_release="R4")
+    factory = FHIRModelFactory(fhir_release="R4")
     return factory
 
 
-def test_factory__constructs_model_with_keyword_field_names(factory: ResourceFactory):
+def test_factory__constructs_model_with_keyword_field_names(factory: FHIRModelFactory):
     """Test that models can be constructed with keyword field names."""
     # Create a structure definition with a reserved keyword field
     structure_def_dict = {
@@ -133,7 +133,7 @@ def test_factory__constructs_model_with_keyword_field_names(factory: ResourceFac
     assert isinstance(import_field.validation_alias, AliasChoices)
 
 
-def test_factory___accepts_both_keyword_and_safe_field_names(factory: ResourceFactory):
+def test_factory___accepts_both_keyword_and_safe_field_names(factory: FHIRModelFactory):
     """Test that the constructed model accepts both original and safe field names."""
     # Create a simple structure definition with a keyword field
     structure_def_dict = {
@@ -182,7 +182,7 @@ def test_factory___accepts_both_keyword_and_safe_field_names(factory: ResourceFa
     assert getattr(instance2, "class_") == "test_value"
 
 
-def test_factory__handles_choice_type_fields_with_keywords(factory: ResourceFactory):
+def test_factory__handles_choice_type_fields_with_keywords(factory: FHIRModelFactory):
     structure_def_dict = {
         "resourceType": "StructureDefinition",
         "url": "http://example.org/StructureDefinition/TestResource",
@@ -237,7 +237,7 @@ def test_factory__handles_choice_type_fields_with_keywords(factory: ResourceFact
         assert not keyword.iskeyword(field_name)
 
 
-def test_factory__handles_extension_fields_with_keywords(factory: ResourceFactory):
+def test_factory__handles_extension_fields_with_keywords(factory: FHIRModelFactory):
     """Test that extension fields (_ext suffix) with keywords are handled correctly."""
     structure_def_dict = {
         "resourceType": "StructureDefinition",
@@ -284,7 +284,7 @@ def test_factory__handles_extension_fields_with_keywords(factory: ResourceFactor
 
 
 def test_factory__uses_base_definition_from_structure_definition(
-    factory: ResourceFactory,
+    factory: FHIRModelFactory,
 ):
     # Create a base resource structure definition
     base_structure_def = {
@@ -382,7 +382,7 @@ def test_factory__uses_base_definition_from_structure_definition(
     assert instance.derivedField == "derived_value"  # type: ignore
 
 
-def test_factory__uses_cached_base_definition(factory: ResourceFactory):
+def test_factory__uses_cached_base_definition(factory: FHIRModelFactory):
     base_structure_def = {
         "resourceType": "StructureDefinition",
         "url": "http://example.org/StructureDefinition/CachedBase",
@@ -473,7 +473,7 @@ def test_factory__uses_cached_base_definition(factory: ResourceFactory):
     assert issubclass(DerivedModel, cached_base)
 
 
-def test_factory__inherits_from_builtin_fhir_resource(factory: ResourceFactory):
+def test_factory__inherits_from_builtin_fhir_resource(factory: FHIRModelFactory):
     """Test that factory can use built-in FHIR resources as base."""
     structure_def = {
         "resourceType": "StructureDefinition",
@@ -526,7 +526,7 @@ def test_factory__inherits_from_builtin_fhir_resource(factory: ResourceFactory):
     assert isinstance(instance, Patient)
 
 
-def test_factory__chain_of_inheritance(factory: ResourceFactory):
+def test_factory__chain_of_inheritance(factory: FHIRModelFactory):
     # Level 1: Base
     base_def = {
         "resourceType": "StructureDefinition",
@@ -647,7 +647,7 @@ def test_factory__chain_of_inheritance(factory: ResourceFactory):
     assert instance.level3Field == "value3"  # type: ignore
 
 
-def test_factory__does_not_duplicate_inherited_fields(factory: ResourceFactory):
+def test_factory__does_not_duplicate_inherited_fields(factory: FHIRModelFactory):
     base_def = {
         "resourceType": "StructureDefinition",
         "url": "http://example.org/StructureDefinition/BaseWithField",
@@ -751,7 +751,7 @@ def test_factory__does_not_duplicate_inherited_fields(factory: ResourceFactory):
 
 
 def test_factory__allows_mixing_additional_parent_classes(
-    factory: ResourceFactory,
+    factory: FHIRModelFactory,
 ):
     """Test that explicit base_model parameter takes precedence over baseDefinition."""
     from fhircraft.fhir.resources.base import FHIRBaseModel
@@ -801,7 +801,9 @@ def test_factory__allows_mixing_additional_parent_classes(
     assert issubclass(model, AdditionalMixin)
 
 
-def test_factory__no_basedefinition_defaults_to_fhirbasemodel(factory: ResourceFactory):
+def test_factory__no_basedefinition_defaults_to_fhirbasemodel(
+    factory: FHIRModelFactory,
+):
     """Test that resources without baseDefinition inherit from FHIRBaseModel."""
     from fhircraft.fhir.resources.base import FHIRBaseModel
 
@@ -851,7 +853,7 @@ def test_factory__no_basedefinition_defaults_to_fhirbasemodel(factory: ResourceF
 
 
 def test_factory__resource_with_sliced_extensions_processes_correctly(
-    factory: ResourceFactory,
+    factory: FHIRModelFactory,
 ):
     # Create a Patient resource with sliced extensions
     patient_with_sliced_extensions = {
@@ -943,7 +945,7 @@ def test_factory__resource_with_sliced_extensions_processes_correctly(
 
 
 def test_factory__constructs_model_from_differential_auto_mode(
-    factory: ResourceFactory,
+    factory: FHIRModelFactory,
 ):
     differential_sd = {
         "resourceType": "StructureDefinition",
@@ -991,7 +993,7 @@ def test_factory__constructs_model_from_differential_auto_mode(
     assert "identifier" in model_fields
 
 
-def test_factory__caches_differential_model(factory: ResourceFactory):
+def test_factory__caches_differential_model(factory: FHIRModelFactory):
     """Test that differential models are cached."""
     differential_sd = {
         "resourceType": "StructureDefinition",
@@ -1029,7 +1031,7 @@ def test_factory__caches_differential_model(factory: ResourceFactory):
     assert model1 is model2
 
 
-def test_factory__differential_inherits_from_base(factory: ResourceFactory):
+def test_factory__differential_inherits_from_base(factory: FHIRModelFactory):
     """Test that differential models inherit from their base."""
     differential_sd = {
         "resourceType": "StructureDefinition",
@@ -1058,7 +1060,7 @@ def test_factory__differential_inherits_from_base(factory: ResourceFactory):
     assert issubclass(model, FHIRBaseModel)
 
 
-def test_factory__constructs_model_from_snapshot_auto_mode(factory: ResourceFactory):
+def test_factory__constructs_model_from_snapshot_auto_mode(factory: FHIRModelFactory):
     """Test that models can be constructed from snapshot with AUTO mode."""
     snapshot_sd = {
         "resourceType": "StructureDefinition",
@@ -1103,7 +1105,7 @@ def test_factory__constructs_model_from_snapshot_auto_mode(factory: ResourceFact
 
 
 def test_factory__constructs_model_from_snapshot_explicit_mode(
-    factory: ResourceFactory,
+    factory: FHIRModelFactory,
 ):
     """Test that models can be constructed with explicit SNAPSHOT mode."""
     snapshot_sd = {
@@ -1146,7 +1148,7 @@ def test_factory__constructs_model_from_snapshot_explicit_mode(
     assert model.__name__ == "TestSnapshotExplicit"
 
 
-def test_factory__construct_diff_min_cardinality(factory: ResourceFactory):
+def test_factory__construct_diff_min_cardinality(factory: FHIRModelFactory):
     """Test that construct_resource_model sets construction_mode in Config."""
     differential_sd = {
         "resourceType": "StructureDefinition",
@@ -1201,7 +1203,7 @@ def test_factory__construct_diff_min_cardinality(factory: ResourceFactory):
         mock_resource.model_validate({"id": []})
 
 
-def test_factory__construct_diff_fixed_value_constraint(factory: ResourceFactory):
+def test_factory__construct_diff_fixed_value_constraint(factory: FHIRModelFactory):
     """Test that differential can add fixed value constraints to elements."""
     # Create base with a status field
     base_sd = {
@@ -1278,7 +1280,7 @@ def test_factory__construct_diff_fixed_value_constraint(factory: ResourceFactory
         mock_resource.model_validate({"status": "inactive"})
 
 
-def test_factory__construct_diff_pattern_value_constraint(factory: ResourceFactory):
+def test_factory__construct_diff_pattern_value_constraint(factory: FHIRModelFactory):
     """Test that differential can add pattern value constraints to elements."""
     # Create base with a coding field
     base_sd = {
@@ -1366,7 +1368,7 @@ def test_factory__construct_diff_pattern_value_constraint(factory: ResourceFacto
         )
 
 
-def test_construct_diff_type_choice_element(factory: ResourceFactory):
+def test_construct_diff_type_choice_element(factory: FHIRModelFactory):
     """Test that differential can constrain type choice elements."""
     # Create base with a value[x] type choice field
     base_sd = {
@@ -1454,7 +1456,7 @@ def test_construct_diff_type_choice_element(factory: ResourceFactory):
         mock_resource.model_validate({"valueInteger": 2})
 
 
-def test_construct_diff_nested_backbone_element(factory: ResourceFactory):
+def test_construct_diff_nested_backbone_element(factory: FHIRModelFactory):
     """Test that differential can constrain nested backbone elements."""
     # Create base with simple nested structure using ContactPoint
     base_sd = {
@@ -1541,7 +1543,7 @@ def test_construct_diff_nested_backbone_element(factory: ResourceFactory):
         mock_resource.model_validate({"telecom": []})
 
 
-def test_construct_diff_element_cardinality(factory: ResourceFactory):
+def test_construct_diff_element_cardinality(factory: FHIRModelFactory):
     """Test that differential can constrain element cardinality."""
     # Create base with identifier field that can be sliced
     base_sd = {
@@ -1627,7 +1629,7 @@ def test_construct_diff_element_cardinality(factory: ResourceFactory):
     )
 
 
-def test_construct_diff_constraint_invariant(factory: ResourceFactory):
+def test_construct_diff_constraint_invariant(factory: FHIRModelFactory):
     """Test that differential can add constraint invariants to elements."""
     # Create base
     base_sd = {
@@ -1723,7 +1725,7 @@ def test_construct_diff_constraint_invariant(factory: ResourceFactory):
         mock_resource.model_validate({"valueInteger": -2})
 
 
-def test_construct_diff_multiple_elements_constraints(factory: ResourceFactory):
+def test_construct_diff_multiple_elements_constraints(factory: FHIRModelFactory):
     """Test that differential can apply different constraint types to multiple elements."""
     # Create base with multiple fields
     base_sd = {
@@ -1842,7 +1844,7 @@ def test_construct_diff_multiple_elements_constraints(factory: ResourceFactory):
         )
 
 
-def test_construct_diff_inherits_base_structure(factory: ResourceFactory):
+def test_construct_diff_inherits_base_structure(factory: FHIRModelFactory):
     """Test that differential models properly inherit complete structure from base."""
     # Create base with multiple nested elements
     base_sd = {
@@ -1939,7 +1941,7 @@ def test_construct_diff_inherits_base_structure(factory: ResourceFactory):
     assert instance.field3 == True  # type: ignore
 
 
-def test_factory__construct_diff_sliced_backbone_elements(factory: ResourceFactory):
+def test_factory__construct_diff_sliced_backbone_elements(factory: FHIRModelFactory):
     """Test that differential can slice backbone elements with specific constraints."""
     # Create base with component backbone element
     base_sd = {

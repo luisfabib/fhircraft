@@ -10,7 +10,7 @@ import pytest
 
 from fhircraft.config import with_config
 from fhircraft.fhir.resources.factory import (
-    ResourceFactory,
+    FHIRModelFactory,
 )
 from fhircraft.fhir.resources.generator import CodeGenerator
 
@@ -58,7 +58,7 @@ fhir_resources_test_cases = {
 
 
 def _assert_construct_core_resource(fhir_release, resource_label, filename):
-    factory = ResourceFactory(fhir_release=fhir_release)
+    factory = FHIRModelFactory(fhir_release=fhir_release)
     with with_config(validation_mode="skip"):
         # Disable internet access to ensure we use local definitions
         factory.definition_registry.disable_internet_access()
@@ -355,7 +355,7 @@ def test_construct_profiled_resource(mode, release, example_filename, definition
     ) as file:
         fhir_resource = json.load(file)
 
-    factory = ResourceFactory(fhir_release=release)
+    factory = FHIRModelFactory(fhir_release=release)
 
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:

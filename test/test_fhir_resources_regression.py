@@ -1,5 +1,5 @@
 import pytest
-from fhircraft.fhir.resources.factory import ResourceFactory
+from fhircraft.fhir.resources.factory import FHIRModelFactory
 from fhircraft.fhir.resources.generator import CodeGenerator
 
 
@@ -29,7 +29,7 @@ def generator():
 @pytest.fixture
 def factory():
 
-    factory = ResourceFactory(fhir_release="R5")
+    factory = FHIRModelFactory(fhir_release="R5")
     yield factory
     factory.reset_cache()
 
@@ -1165,7 +1165,7 @@ def test_regression_issue_278(factory):
     assert "valueInteger" in ext_model.model_fields
 
 
-def test_regression_issue_277(factory: ResourceFactory):
+def test_regression_issue_277(factory: FHIRModelFactory):
 
     structure_definition = {
         "resourceType": "StructureDefinition",

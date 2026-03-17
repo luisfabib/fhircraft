@@ -103,10 +103,10 @@ print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
 Extend base FHIR models with implementation guide profiles loaded directly from the official FHIR package registry:
 
 ```python
-from fhircraft.fhir.resources import ResourceFactory
+from fhircraft.fhir.resources import FHIRModelFactory
 
 # Create a FHIR (R5 release) factory
-factory = ResourceFactory(fhir_release="R4")
+factory = FHIRModelFactory(fhir_release="R4")
 
 # Load US Core Implementation Guide
 factory.register_package("hl7.fhir.us.core", "5.0.1")

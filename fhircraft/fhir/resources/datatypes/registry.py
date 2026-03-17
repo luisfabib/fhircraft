@@ -91,7 +91,7 @@ class TypeRegistry:
         """Return the Python type for a canonical FHIR URL, or ``None``.
 
         The factory singleton's ``construction_cache`` is checked first so that
-        profiled resources built via :class:`~fhircraft.fhir.resources.factory.FHIRStructureFactory`
+        profiled resources built via :class:`~fhircraft.fhir.resources.factory.FHIRModelFactory`
         are also reachable by their canonical URL alongside built-in types.
         """
         # Factory construction_cache has priority (includes runtime-profiled resources)

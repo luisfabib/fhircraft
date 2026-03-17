@@ -39,8 +39,8 @@ This method also helps during development and testing. You can load just the def
 
 ```python
 import json
-from fhircraft.fhir.resources import ResourceFactory
-factory = ResourceFactory(fhir_release="R4")
+from fhircraft.fhir.resources import FHIRModelFactory
+factory = FHIRModelFactory(fhir_release="R4")
 
 # Read a structure definition file into a dictionary
 with open("test/static/fhir-profiles-definitions/us-core-patient.json", "r") as file:
@@ -73,8 +73,8 @@ Once definitions are loaded, you can query the registry without triggering any b
 `has_registered_definition` tells you whether a canonical URL is present, `get_registered_definition` retrieves the raw StructureDefinition object, and `list_registered_definitions` returns all registered URLs — optionally filtered by SD kind (`"resource"`, `"complex-type"`, `"primitive-type"`, or `"logical"`):
 
 ```python
-from fhircraft.fhir.resources import ResourceFactory
-factory = ResourceFactory(fhir_release="R4")
+from fhircraft.fhir.resources import FHIRModelFactory
+factory = FHIRModelFactory(fhir_release="R4")
 
 # Check before trying to build
 url = "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
@@ -95,8 +95,8 @@ print(f"SD version: {sd.version}")
 The method `unregister` unregisters a canonical URL from the registry and simultaneously evicts any cached model, ensuring a stale definition is never used:
 
 ```python
-from fhircraft.fhir.resources import ResourceFactory
-factory = ResourceFactory(fhir_release="R4")
+from fhircraft.fhir.resources import FHIRModelFactory
+factory = FHIRModelFactory(fhir_release="R4")
 
 # Remove a definition that is no longer needed
 factory.unregister("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
@@ -124,8 +124,8 @@ Fhircraft connects to the FHIR package registry at [:material-fire: `packages.fh
 By default the registry may reach out to the internet to resolve unknown canonical URLs. You can toggle this behaviour explicitly:
 
 ```python
-from fhircraft.fhir.resources import ResourceFactory
-factory = ResourceFactory(fhir_release="R4")
+from fhircraft.fhir.resources import FHIRModelFactory
+factory = FHIRModelFactory(fhir_release="R4")
 
 # Allow outgoing HTTP requests (default behaviour)
 factory.enable_internet_access()
@@ -147,10 +147,10 @@ Disabling internet access is recommended in production and in security-sensitive
     Use this method to download and load a published FHIR package:
 
     ```python
-    from fhircraft.fhir.resources.factory import ResourceFactory
+    from fhircraft.fhir.resources.factory import FHIRModelFactory
 
     # Create a factory that can download packages
-    factory = ResourceFactory(fhir_release="R4")
+    factory = FHIRModelFactory(fhir_release="R4")
 
     # Download and load the US Core package version 5.0.1
     factory.register_package("hl7.fhir.us.core", "5.0.1")
@@ -180,8 +180,8 @@ Disabling internet access is recommended in production and in security-sensitive
     Use this method when your project needs several FHIR packages:
 
     ```python
-    from fhircraft.fhir.resources import ResourceFactory
-    factory = ResourceFactory(fhir_release="R4")
+    from fhircraft.fhir.resources import FHIRModelFactory
+    factory = FHIRModelFactory(fhir_release="R4")
 
     # Configure the factory to load multiple packages
     factory.register_package("hl7.fhir.us.core", "5.0.1")  # US healthcare standards
@@ -220,9 +220,9 @@ When you provide a canonical URL to Fhircraft, the library follows a resolution 
 The canonical URL serves as the primary way to request structure definitions from the factory. Once you know the URL for a structure definition, you can construct a model from it regardless of whether that definition came from a local file, a package, or an internet download. This abstraction simplifies your code because you do not need to know or manage where definitions are stored.
 
 ```python
-from fhircraft.fhir.resources import ResourceFactory
+from fhircraft.fhir.resources import FHIRModelFactory
 
-factory = ResourceFactory(fhir_release="R4")
+factory = FHIRModelFactory(fhir_release="R4")
 
 # Create a model from the standard FHIR Patient definition
 Patient = factory.build(

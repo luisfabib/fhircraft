@@ -20,7 +20,7 @@ from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
 
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
-from fhircraft.fhir.resources.factory import ResourceFactory
+from fhircraft.fhir.resources.factory import FHIRModelFactory
 
 from .exceptions import (
     MappingError,
@@ -70,20 +70,20 @@ class FHIRMappingEngine:
 
     Attributes:
         repository (StructureDefinitionRegistry): Registry for FHIR StructureDefinitions.
-        factory (ResourceFactory): Factory for constructing FHIR resource models.
+        factory (FHIRModelFactory): Factory for constructing FHIR resource models.
         transformer (MappingTransformer): Executes FHIRPath-based transforms.
     """
 
     def __init__(
         self,
         repository: StructureDefinitionRegistry | None = None,
-        factory: ResourceFactory | None = None,
+        factory: FHIRModelFactory | None = None,
         fhir_release: str = "R5",
     ):
         self.repository = repository or StructureDefinitionRegistry(
             fhir_release=fhir_release
         )
-        self.factory = factory or ResourceFactory(
+        self.factory = factory or FHIRModelFactory(
             registry=self.repository, fhir_release=fhir_release
         )
 

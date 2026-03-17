@@ -4,7 +4,7 @@ import json
 from unittest.mock import patch, MagicMock, mock_open
 from pathlib import Path
 
-from fhircraft.fhir.resources.factory import ResourceFactory
+from fhircraft.fhir.resources.factory import FHIRModelFactory
 from fhircraft.fhir.resources.datatypes.R5.core import (
     Patient,
     Observation,
@@ -14,7 +14,7 @@ from fhircraft.fhir.resources.datatypes.R5.core import (
 from .mktestdocs import check_md_file
 
 # Store original methods before patching
-_original_factory_build = ResourceFactory.build
+_original_factory_build = FHIRModelFactory.build
 
 
 def mock_load_package(self, package_name, version=None):
@@ -157,16 +157,16 @@ def mock_open_func(file, mode="r", *args, **kwargs):
 
 @pytest.mark.parametrize("fpath", pathlib.Path("docs").glob("**/*.md"), ids=str)
 @patch(
-    "fhircraft.fhir.resources.factory.ResourceFactory.register_package",
+    "fhircraft.fhir.resources.factory.FHIRModelFactory.register_package",
     mock_load_package,
 )
 @patch("fhircraft.fhir.mapper.FHIRMapper.load_structure_map", mock_load_structure_map)
 @patch(
-    "fhircraft.fhir.resources.factory.ResourceFactory.build",
+    "fhircraft.fhir.resources.factory.FHIRModelFactory.build",
     mock_factory_build,
 )
 @patch(
-    "fhircraft.fhir.resources.factory.ResourceFactory.get_registered_definition",
+    "fhircraft.fhir.resources.factory.FHIRModelFactory.get_registered_definition",
     mock_get_registered_definition,
 )
 @patch("fhircraft.utils.load_file", mock_load_file)
@@ -178,7 +178,7 @@ def test_documentation_examples(mock_file, fpath):
 
 
 @patch(
-    "fhircraft.fhir.resources.factory.ResourceFactory.register_package",
+    "fhircraft.fhir.resources.factory.FHIRModelFactory.register_package",
     mock_load_package,
 )
 @patch("fhircraft.utils.load_file", mock_load_file)

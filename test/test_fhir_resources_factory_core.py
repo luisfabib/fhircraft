@@ -1,4 +1,4 @@
-"""Unit tests for FHIRStructureFactory (core.py)."""
+"""Unit tests for FHIRModelFactory (core.py)."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from fhircraft.fhir.resources.factory.core import FHIRStructureFactory
+from fhircraft.fhir.resources.factory.core import FHIRModelFactory
 from fhircraft.fhir.resources.factory.exceptions import DefinitionResolutionError
 
 # Patch targets
@@ -54,8 +54,8 @@ def make_registry():
     return registry
 
 
-def make_factory(registry=None) -> FHIRStructureFactory:
-    return FHIRStructureFactory(fhir_release="R4", registry=registry)
+def make_factory(registry=None) -> FHIRModelFactory:
+    return FHIRModelFactory(fhir_release="R4", registry=registry)
 
 
 def make_pydantic_model():
@@ -74,37 +74,37 @@ def factory():
 
 
 # ===========================================================================
-# FHIRStructureFactory._sanitize_name
+# FHIRModelFactory._sanitize_name
 # ===========================================================================
 
 
 def test_sanitize_name__normal_name_returned_unchanged():
-    assert FHIRStructureFactory._sanitize_name("Observation") == "Observation"
+    assert FHIRModelFactory._sanitize_name("Observation") == "Observation"
 
 
 def test_sanitize_name__first_char_uppercased():
-    assert FHIRStructureFactory._sanitize_name("observation") == "Observation"
+    assert FHIRModelFactory._sanitize_name("observation") == "Observation"
 
 
 def test_sanitize_name__strips_non_alphanumeric_chars():
-    assert FHIRStructureFactory._sanitize_name("My-Profile!") == "MyProfile"
+    assert FHIRModelFactory._sanitize_name("My-Profile!") == "MyProfile"
 
 
 def test_sanitize_name__strips_leading_digits():
-    assert FHIRStructureFactory._sanitize_name("99Obs") == "Obs"
+    assert FHIRModelFactory._sanitize_name("99Obs") == "Obs"
 
 
 def test_sanitize_name__empty_after_stripping_raises_value_error():
     with pytest.raises(ValueError):
-        FHIRStructureFactory._sanitize_name("---")
+        FHIRModelFactory._sanitize_name("---")
 
 
 def test_sanitize_name__hyphens_stripped():
-    assert FHIRStructureFactory._sanitize_name("bp-measurement") == "BpMeasurement"
+    assert FHIRModelFactory._sanitize_name("bp-measurement") == "BpMeasurement"
 
 
 # ===========================================================================
-# FHIRStructureFactory.reset_cache
+# FHIRModelFactory.reset_cache
 # ===========================================================================
 
 
@@ -115,7 +115,7 @@ def test_reset_cache__empties_construction_cache(factory):
 
 
 # ===========================================================================
-# FHIRStructureFactory.build – cache behaviour
+# FHIRModelFactory.build – cache behaviour
 # ===========================================================================
 
 
@@ -172,13 +172,13 @@ def test_build__passes_mixins_to_build_internal(factory):
 
 
 # ===========================================================================
-# FHIRStructureFactory._normalise_structure_definition
+# FHIRModelFactory._normalise_structure_definition
 # ===========================================================================
 
 
 def test_normalise_structure_definition__sd_object_added_to_repository_and_returned():
     registry = make_registry()
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
     sd = make_sd()
     result = factory._normalise_structure_definition(registry, sd)
     registry.add.assert_called_once_with(sd)
@@ -186,7 +186,7 @@ def test_normalise_structure_definition__sd_object_added_to_repository_and_retur
 
 
 # ===========================================================================
-# FHIRStructureFactory._build – validation
+# FHIRModelFactory._build – validation
 # ===========================================================================
 
 
@@ -203,7 +203,7 @@ def test_build_internal__raises_value_error_when_fhir_version_is_missing(factory
 
 
 # ===========================================================================
-# FHIRStructureFactory._build – assembler delegation
+# FHIRModelFactory._build – assembler delegation
 # ===========================================================================
 
 
@@ -403,7 +403,7 @@ def test_build_internal__canonical_url_set_on_model():
 
 
 # ===========================================================================
-# FHIRStructureFactory.register
+# FHIRModelFactory.register
 # ===========================================================================
 
 
@@ -411,7 +411,7 @@ def test_register__dict_is_added_to_registry_and_returns_sd():
     registry = make_registry()
     sd = make_sd()
     registry.from_dict.return_value = sd
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
 
     result = factory.register({"resourceType": "StructureDefinition"})
 
@@ -422,7 +422,7 @@ def test_register__dict_is_added_to_registry_and_returns_sd():
 def test_register__sd_object_is_added_to_registry_and_returned():
     registry = make_registry()
     sd = make_sd()
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
 
     result = factory.register(sd)
 
@@ -437,19 +437,19 @@ def test_register__invalid_input_raises_value_error():
 
 
 # ===========================================================================
-# FHIRStructureFactory.register_package
+# FHIRModelFactory.register_package
 # ===========================================================================
 
 
 def test_register_package__delegates_to_registry():
     registry = make_registry()
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
     factory.register_package("hl7.fhir.us.core", "5.0.1")
     registry.download_package.assert_called_once_with("hl7.fhir.us.core", "5.0.1")
 
 
 # ===========================================================================
-# FHIRStructureFactory.reset_cache
+# FHIRModelFactory.reset_cache
 # (basic test already covered above; additional assertion tested here)
 # ===========================================================================
 
@@ -462,21 +462,21 @@ def test_reset_cache__multiple_entries_all_removed(factory):
 
 
 # ===========================================================================
-# FHIRStructureFactory.has_definition / get_definition / list_definitions
+# FHIRModelFactory.has_definition / get_definition / list_definitions
 # ===========================================================================
 
 
 def test_has_definition__true_when_url_in_registry():
     registry = make_registry()
     registry.__contains__ = MagicMock(return_value=True)
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
     assert factory.has_registered_definition("http://example.org/X") is True
 
 
 def test_has_registered_definition__false_when_url_not_in_registry():
     registry = make_registry()
     registry.__contains__ = MagicMock(return_value=False)
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
     assert factory.has_registered_definition("http://example.org/missing") is False
 
 
@@ -484,7 +484,7 @@ def test_get_registered_definition__delegates_to_registry_get():
     registry = make_registry()
     sd = make_sd()
     registry.get.return_value = sd
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
 
     result = factory.get_registered_definition("http://example.org/X")
 
@@ -500,7 +500,7 @@ def test_list_registered_definitions__returns_all_urls_when_no_kind_filter():
         "http://example.org/A": sd_a,
         "http://example.org/B": sd_b,
     }
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
 
     result = factory.list_registered_definitions()
 
@@ -515,7 +515,7 @@ def test_list_registered_definitions__filters_by_kind():
         "http://example.org/A": sd_a,
         "http://example.org/B": sd_b,
     }
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
 
     result = factory.list_registered_definitions(kind="resource")
 
@@ -523,7 +523,7 @@ def test_list_registered_definitions__filters_by_kind():
 
 
 # ===========================================================================
-# FHIRStructureFactory.unregister
+# FHIRModelFactory.unregister
 # ===========================================================================
 
 
@@ -531,7 +531,7 @@ def test_remove_definition__removes_from_registry_dict():
     registry = make_registry()
     sd = make_sd(url="http://example.org/X")
     registry.structure_definitions_by_url = {"http://example.org/X": sd}
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
     factory.construction_cache["http://example.org/X"] = MagicMock()  # type: ignore
 
     factory.unregister("http://example.org/X")
@@ -543,13 +543,13 @@ def test_remove_definition__removes_from_registry_dict():
 def test_remove_definition__no_op_when_url_absent():
     registry = make_registry()
     registry.structure_definitions_by_url = {}
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
     # Should not raise
     factory.unregister("http://example.org/nonexistent")
 
 
 # ===========================================================================
-# FHIRStructureFactory.is_built / list_built / evict / rebuild
+# FHIRModelFactory.is_built / list_built / evict / rebuild
 # ===========================================================================
 
 
@@ -597,19 +597,19 @@ def test_rebuild__evicts_then_builds(factory):
 
 
 # ===========================================================================
-# FHIRStructureFactory.enable/disable_internet_access
+# FHIRModelFactory.enable/disable_internet_access
 # ===========================================================================
 
 
 def test_enable_internet_access__delegates_to_registry():
     registry = make_registry()
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
     factory.enable_internet_access()
     registry.enable_internet_access.assert_called_once()
 
 
 def test_disable_internet_access__delegates_to_registry():
     registry = make_registry()
-    factory = FHIRStructureFactory(registry=registry, fhir_release="R4")
+    factory = FHIRModelFactory(registry=registry, fhir_release="R4")
     factory.disable_internet_access()
     registry.disable_internet_access.assert_called_once()

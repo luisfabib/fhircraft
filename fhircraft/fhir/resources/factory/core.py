@@ -6,10 +6,8 @@ This is the main public entry point; the rest of the pipeline (resolver,
 assembler, builders, validators) is invoked from here.
 """
 
-import json
 import re
 import keyword
-from pathlib import Path
 from typing import Any, Literal, Sequence, TYPE_CHECKING
 
 from pydantic import BaseModel
@@ -39,9 +37,9 @@ if TYPE_CHECKING:
     )
 
 
-class FHIRStructureFactory:
+class FHIRModelFactory:
     """
-    FHIRStructureFactory constructs Pydantic model classes from FHIR StructureDefinitions.
+    FHIRModelFactory constructs Pydantic model classes from FHIR StructureDefinitions.
 
     The factory manages a registry of StructureDefinitions, supports loading FHIR packages, and
     caches constructed models to optimise performance.

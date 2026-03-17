@@ -26,7 +26,7 @@ from fhircraft.fhir.resources.factory.exceptions import (
     DefinitionResolutionError,
 )
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
-from fhircraft.fhir.resources.factory.core import FHIRStructureFactory
+from fhircraft.fhir.resources.factory.core import FHIRModelFactory
 from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
 
 # ------------------------------------------------------------------
@@ -36,11 +36,11 @@ from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
 #: Default :class:`ProfileFactory` instance used by the convenience function
 #: :func:`construct_resource_model`.  Configures itself lazily.
 
-ResourceFactory = FHIRStructureFactory
+FHIRModelFactory = FHIRModelFactory
 
 __all__ = [
     # Core factory
-    "ResourceFactory",
+    "FHIRModelFactory",
     # Pipeline internals (public access)
     "ModelAssembler",
     "SnapshotResolver",

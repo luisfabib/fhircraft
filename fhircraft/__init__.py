@@ -17,10 +17,10 @@ def __getattr__(name):
         from fhircraft.fhir.mapper import FHIRMapper
 
         return FHIRMapper
-    elif name == "ResourceFactory":
-        from fhircraft.fhir.resources.factory import ResourceFactory
+    elif name == "FHIRModelFactory":
+        from fhircraft.fhir.resources.factory import FHIRModelFactory
 
-        return ResourceFactory
+        return FHIRModelFactory
     elif name == "FHIRBaseModel":
         from fhircraft.fhir.resources.base import FHIRBaseModel
 
