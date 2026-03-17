@@ -5,7 +5,7 @@ from fhircraft.fhir.resources.base import FHIRBaseModel
 
 from pydantic import BaseModel
 from typing import get_args as _get_args
-from fhircraft.utils import capitalize
+from fhircraft.utils import _get_deepest_args, capitalize
 
 
 class BackboneFieldBuilder(Builder):
@@ -22,9 +22,21 @@ class BackboneFieldBuilder(Builder):
 
         # Determine the base class for the backbone model:
         backbone_base: type | None = None
-        if self.context.base is not None:
+        if self.context.base and safe_name in self.context.base.model_fields:
             # First try to resolve the backbone base type from the base model's field annotation
-            backbone_base = self.resolve_type_from_base_model(safe_name)
+            backbone_base = next(
+                (
+                    model
+                    for model in _get_deepest_args(
+                        self.context.base.model_fields.get(safe_name).annotation
+                    )
+                    if isinstance(model, type)
+                    and issubclass(model, BaseModel)
+                    and not model is type(None)
+                ),
+                None,
+            )
+
         if backbone_base is None:
             # Fallback: use the FHIR type resolved from the element definition
             ft = self.resolve_type(node.types[0])

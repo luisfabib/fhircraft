@@ -12,7 +12,7 @@ from typing import Annotated, Union
 from fhircraft.fhir.resources.validators import (
     validate_slicing_cardinalities,
 )
-from fhircraft.utils import capitalize
+from fhircraft.utils import _get_deepest_args, capitalize
 
 
 class SlicedFieldBuilder(Builder):
@@ -28,9 +28,25 @@ class SlicedFieldBuilder(Builder):
 
         # Determine the base class for the slice models
         slice_entry_base: type | None = None
+        inherited_slices: list[type] = []
         if self.context.base is not None:
-            # First try to resolve the slice base type from the base model's field annotation
-            slice_entry_base = self.resolve_type_from_base_model(safe_name)
+            if base_field := self.context.base.model_fields.get(safe_name):
+                # First try to resolve the slice base type from the base model's field annotation
+                slice_entry_base = next(
+                    (
+                        model
+                        for model in _get_deepest_args(base_field.annotation)
+                        if isinstance(model, type)
+                        and not issubclass(model, FHIRSliceModel)
+                        and not model is type(None)
+                    ),
+                    None,
+                )
+                inherited_slices = [
+                    slice
+                    for slice in _get_deepest_args(base_field.annotation)
+                    if isinstance(slice, type) and issubclass(slice, FHIRSliceModel)
+                ]
         if not slice_entry_base and len(node.types) == 1:
             # If that fails, fall back to the FHIR type resolved from the element definition
             slice_entry_base = self.resolve_type(node.types[0]).type
@@ -50,12 +66,12 @@ class SlicedFieldBuilder(Builder):
                 )
 
             if slice_node.profile_urls:
-                print(slice_node.profile_urls)
                 slice_base = self.resolve_type(slice_node.types[0]).type
             elif not slice_entry_base and len(slice_node.types):
                 slice_base = self.resolve_type(slice_node.types[0]).type
             else:
                 slice_base = slice_entry_base
+
             assert isinstance(
                 slice_base, type
             ), f"Resolved slice base for slice '{node.id}' is not a type"
@@ -88,7 +104,7 @@ class SlicedFieldBuilder(Builder):
 
             slice_models.append(slice_model)
 
-        union_types = slice_models
+        union_types = [*inherited_slices, *slice_models]
         # If the slicing rules are not 'closed', include the base type (either from the slice entry or the slice definition) in the union to allow for unsliced entries
         if not node.slicing_rules == "closed":
             union_types += [slice_entry_base or slice_base]

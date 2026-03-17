@@ -525,37 +525,3 @@ class Builder(ABC):
             )
 
         return validators
-
-    def resolve_type_from_base_model(self, element_name: str) -> type | None:
-        """
-        Resolves and returns the innermost Pydantic BaseModel-derived type for a given element name
-        from the base model's field annotation.
-        This method inspects the type annotation of the specified field, unwrapping nested
-        generics such as Optional and List, to identify the underlying BaseModel subclass.
-        If the field is not found or does not resolve to a BaseModel subclass, returns None.
-        Args:
-            element_name (str): The name of the field whose type should be resolved.
-        Returns:
-            type | None: The innermost BaseModel subclass type if found, otherwise None.
-        """
-
-        if issubclass(self.context.base, BaseModel):
-            fi = self.context.base.model_fields.get(element_name)
-            if fi:
-                # Dig through Optional[List[...]] to find the inner type
-                inner_annotation = fi.annotation
-                while inner_annotation:
-                    args = _get_args(inner_annotation)
-                    if not args:
-                        break
-                    # Filter out NoneType
-                    inner_annotation = next(
-                        (a for a in reversed(args) if a is not type(None)), None
-                    )
-                    if not inner_annotation:
-                        break
-
-                if isinstance(inner_annotation, type) and issubclass(
-                    inner_annotation, BaseModel
-                ):
-                    return inner_annotation
