@@ -5,7 +5,7 @@ Module defining the BuildContext dataclass, which serves as an immutable contain
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:

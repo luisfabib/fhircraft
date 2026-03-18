@@ -1,6 +1,5 @@
 """
-ProfileFactory — the top-level façade for building Pydantic models from FHIR
-``StructureDefinition`` objects.
+FHIRModelFactory — the top-level façade for building Pydantic models from FHIR ``StructureDefinition`` objects.
 
 This is the main public entry point; the rest of the pipeline (resolver,
 assembler, builders, validators) is invoked from here.
@@ -18,8 +17,6 @@ from fhircraft.fhir.resources.base import (
 )
 from fhircraft.fhir.resources.factory.assembler import ModelAssembler
 from fhircraft.fhir.resources.factory.context import BuildContext
-from fhircraft.fhir.resources.factory.exceptions import DefinitionResolutionError
-from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
 from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
 from fhircraft.fhir.resources.datatypes.registry import get_fhir_type_by_url

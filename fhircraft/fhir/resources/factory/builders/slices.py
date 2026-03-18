@@ -1,3 +1,7 @@
+"""
+Builders for handling sliced elements and their associated slice models.
+"""
+
 from fhircraft.fhir.resources.factory.builders.base import (
     Build,
     Builder,
@@ -6,7 +10,7 @@ from fhircraft.fhir.resources.factory.builders.base import (
 from fhircraft.fhir.resources.factory.element_node import ElementNode
 from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.base import FHIRSliceModel
-from pydantic import BaseModel, Field
+from pydantic import Field
 import warnings
 from typing import Annotated, Union
 from fhircraft.fhir.resources.validators import (

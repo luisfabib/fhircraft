@@ -1,3 +1,7 @@
+"""
+Module responsible for assembling Pydantic models from the internal definition index using a chain of builders.
+"""
+
 import warnings
 
 from functools import partial

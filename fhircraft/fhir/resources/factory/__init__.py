@@ -36,8 +36,6 @@ from fhircraft.fhir.resources.factory.resolver import SnapshotResolver
 #: Default :class:`ProfileFactory` instance used by the convenience function
 #: :func:`construct_resource_model`.  Configures itself lazily.
 
-FHIRModelFactory = FHIRModelFactory
-
 __all__ = [
     # Core factory
     "FHIRModelFactory",

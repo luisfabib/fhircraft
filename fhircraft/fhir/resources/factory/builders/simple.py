@@ -1,3 +1,7 @@
+"""
+Builders for handling simple fields, which are the most common type of element in FHIR resources.
+"""
+
 from typing import Any, Union, Union
 from typing import Any
 

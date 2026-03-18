@@ -4,7 +4,6 @@ from fhircraft.fhir.resources.factory.index import DefinitionIndex
 from fhircraft.fhir.resources.base import FHIRBaseModel
 
 from pydantic import BaseModel
-from typing import get_args as _get_args
 from fhircraft.utils import _get_deepest_args, capitalize
 
 

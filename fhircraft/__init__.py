@@ -25,20 +25,12 @@ def __getattr__(name):
         from fhircraft.fhir.resources.base import FHIRBaseModel
 
         return FHIRBaseModel
-    elif name == "CompositeStructureDefinitionRepository":
-        from fhircraft.fhir.resources.repository import (
-            CompositeStructureDefinitionRepository,
+    elif name == "StructureDefinitionRegistry":
+        from fhircraft.fhir.resources.definitions.registry import (
+            StructureDefinitionRegistry,
         )
 
-        return CompositeStructureDefinitionRepository
-    elif name == "StructureDefinition":
-        from fhircraft.fhir.resources.definitions import StructureDefinition
-
-        return StructureDefinition
-    elif name == "ElementDefinition":
-        from fhircraft.fhir.resources.definitions import ElementDefinition
-
-        return ElementDefinition
+        return StructureDefinitionRegistry
     elif name == "FHIRPath":
         from fhircraft.fhir.path import FHIRPath
 
@@ -56,10 +48,6 @@ def __getattr__(name):
         from fhircraft.config import ValidationConfig
 
         return ValidationConfig
-    elif name == "FHIRValidationConfig":
-        from fhircraft.config import FHIRValidationConfig
-
-        return FHIRValidationConfig
     elif name == "FhircraftConfig":
         from fhircraft.config import FhircraftConfig
 

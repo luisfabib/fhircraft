@@ -1,7 +1,6 @@
 from copy import copy
 import enum
 from functools import lru_cache
-import json
 import threading
 import warnings
 from typing import Any, ClassVar, Union, Dict, List, Type, get_origin, get_args, Literal

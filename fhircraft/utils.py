@@ -22,7 +22,7 @@ T = TypeVar("T")
 import requests
 import yaml
 from dotenv import dotenv_values
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
 # URL regex pattern

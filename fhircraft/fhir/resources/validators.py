@@ -1,8 +1,6 @@
-# Fhircraft modules
 import traceback
 import warnings
 
-# Standard modules
 from typing import TYPE_CHECKING, Any, List, TypeVar, Union, Sequence
 
 from pydantic import BaseModel
@@ -363,7 +361,7 @@ def validate_type_choice_element(
     Raises:
         AssertionError: If more than one value is set for the type choice element or if a non-allowed type is set.
     """
-    field_types: List[str] = [
+    _field_types: List[str] = [
         field_type if isinstance(field_type, str) else str(field_type.__name__)
         for field_type in field_types
     ]
@@ -376,7 +374,7 @@ def validate_type_choice_element(
             )
         )
         is not None
-        for field_type in field_types
+        for field_type in _field_types
     )
     assert (
         types_set_count <= 1
@@ -393,7 +391,7 @@ def validate_type_choice_element(
     non_allowed_types = non_allowed_types or [
         field_type
         for field_type in all_types
-        if field_type.replace("_ext", "") not in field_types
+        if field_type.replace("_ext", "") not in _field_types
     ]
     if non_allowed_types:
         for non_allowed_type in non_allowed_types:

@@ -1,3 +1,7 @@
+"""
+Builders for handling polymorphic type-choice elements, which can have multiple types defined in FHIR (e.g., value[x]).
+"""
+
 from functools import partial
 from fhircraft.fhir.resources.factory.builders.base import (
     Build,
