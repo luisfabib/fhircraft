@@ -54,7 +54,7 @@ class FHIRTypesOperator(FHIRPath):
         # Laxy import to avoid circular dependencies
         from fhircraft.fhir.resources.datatypes import utils as type_utils
 
-        type_ = self.type_specifier.evaluate([], environment, create)[0].value
+        type_: type = self.type_specifier.evaluate([], environment, create)[0].value
         # Handle the FHIRPath literal types as special cases
         if isinstance(value, fhirpath_literals.Quantity):
             return type_.__name__ == "Quantity"
@@ -68,10 +68,9 @@ class FHIRTypesOperator(FHIRPath):
             try:
                 return type_utils.is_fhir_primitive_type(value, type_)
             except type_utils.FHIRTypeError:
-                try:
-                    return type_utils.is_fhir_complex_type(value, type_)
-                except type_utils.FHIRTypeError:
-                    return type_utils.is_fhir_resource_type(value, type_)
+                return type_utils.is_fhir_complex_type(
+                    value, type_
+                ) or type_utils.is_fhir_resource_type(value, type_)
 
     def __str__(self):
         raise NotImplementedError("Subclasses must implement __str__ method.")

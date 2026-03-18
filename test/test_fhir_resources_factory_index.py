@@ -1,0 +1,447 @@
+import pytest
+from unittest.mock import MagicMock
+
+from fhircraft.fhir.resources.factory.element_node import ElementNode
+from fhircraft.fhir.resources.factory.index import DefinitionIndex
+from fhircraft.fhir.resources.factory.exceptions import DefinitionIndexError
+
+
+class CopyableMagickyMock(MagicMock):
+    def model_copy(self, update=dict()):
+        self_copy = CopyableMagickyMock()
+        for attr in self.__dict__:
+            setattr(self_copy, attr, getattr(self, attr))
+        for k, v in update.items():
+            setattr(self_copy, k, v)
+        return self_copy
+
+
+def make_node(
+    id: str, path: str | None = None, slicing=None, types=None
+) -> ElementNode:
+    """Create an :class:`ElementNode` backed by a MagicMock definition."""
+    defn = CopyableMagickyMock()
+    defn.id = id
+    defn.path = path if path is not None else id
+    defn.slicing = slicing
+    defn.type = []
+    for type in types or []:
+        typedef = CopyableMagickyMock()
+        typedef.code = type
+        defn.type.append(typedef)
+    defn.contentReference = False
+    local = id.rsplit(".", 1)[-1]
+    defn.sliceName = local.split(":", 1)[1] if ":" in local else None
+    return ElementNode(definition=defn)
+
+
+@pytest.fixture
+def simple_index():
+    """Flat index with a root and two plain children."""
+    return DefinitionIndex(
+        [
+            make_node("Observation", "Observation"),
+            make_node("Observation.status", "Observation.status"),
+            make_node("Observation.code", "Observation.code"),
+        ]
+    )
+
+
+@pytest.fixture
+def slicing_index():
+    """Index that includes a slice entry, two named slices, and a sub-child."""
+    return DefinitionIndex(
+        [
+            make_node("Observation", "Observation"),
+            make_node(
+                "Observation.component", "Observation.component", slicing=MagicMock()
+            ),
+            make_node("Observation.component:systolic", "Observation.component"),
+            make_node("Observation.component:diastolic", "Observation.component"),
+            make_node(
+                "Observation.component.value[x]",
+                "Observation.component.value[x]",
+                types=["String", "CodeableConcept"],
+            ),
+        ]
+    )
+
+
+# ------------------------------------------------------------------
+# Construction
+# ------------------------------------------------------------------
+
+
+def test_index_len(simple_index):
+    assert len(simple_index) == 3
+
+
+def test_index_nodes_returns_all(simple_index):
+    ids = {n.id for n in simple_index.nodes}
+    assert ids == {"Observation", "Observation.status", "Observation.code"}
+
+
+def test_index_from_elements():
+    """from_elements wraps raw definitions in ElementNodes."""
+    defn = MagicMock()
+    defn.id = "Patient"
+    defn.path = "Patient"
+    defn.slicing = None
+    defn.contentReference = False
+    defn.sliceName = None
+    index = DefinitionIndex.from_elements([defn])
+    assert len(index) == 1
+    assert "Patient" in index
+
+
+def test_index_add__splits_type_choices():
+    index = DefinitionIndex([])
+    index.add(
+        make_node(
+            "Observation.value[x]",
+            "Observation.value[x]",
+            types=["String", "CodeableConcept"],
+        )
+    )
+    assert "Observation.value[x]" in index
+    assert index.get("Observation.value[x]").type_codes == ["String", "CodeableConcept"]
+    assert "Observation.valueString" in index
+    assert index.get("Observation.valueString").type_codes == ["String"]
+    assert "Observation.valueCodeableConcept" in index
+    assert index.get("Observation.valueCodeableConcept").type_codes == [
+        "CodeableConcept"
+    ]
+
+
+def test_index_update__adds_multiple_nodes_and_replaces():
+    index = DefinitionIndex([])
+    index.update(
+        [
+            make_node(
+                "Observation.code",
+                "Observation.code",
+                types=["String", "CodeableConcept"],
+            ),
+            make_node(
+                "Observation.category",
+                "Observation.category",
+                types=["String", "CodeableConcept"],
+            ),
+        ]
+    )
+    assert "Observation.code" in index
+    assert index.get("Observation.code").type_codes == ["String", "CodeableConcept"]
+    assert "Observation.category" in index
+    assert index.get("Observation.category").type_codes == ["String", "CodeableConcept"]
+
+
+# ------------------------------------------------------------------
+# Basic access
+# ------------------------------------------------------------------
+
+
+def test_index_contains_known_id(simple_index):
+    assert "Observation.status" in simple_index
+
+
+def test_index_not_contains_unknown_id(simple_index):
+    assert "Observation.unknown" not in simple_index
+
+
+def test_index_get_returns_node(simple_index):
+    node = simple_index.get("Observation.code")
+    assert node.id == "Observation.code"
+
+
+def test_index_get_raises_for_missing(simple_index):
+    with pytest.raises(DefinitionIndexError):
+        simple_index.get("Observation.missing")
+
+
+@pytest.mark.parametrize(
+    "id, expected, count",
+    [
+        ("Observation", "Observation", 1),
+        ("Observation.component", "Observation.component", 3),
+        ("Observation.component.value[x]", "Observation.component.value[x]", 1),
+    ],
+)
+def test_index_get_by_path_returns_nodes(slicing_index, id, expected, count):
+    nodes = slicing_index.get_by_path(id)
+    assert len(nodes) == count
+    assert expected in {n.path for n in nodes}
+
+
+@pytest.mark.parametrize(
+    "id, expected, count",
+    [
+        ("Other.component", "Observation.component", 3),
+        ("Other.component.value[x]", "Observation.component.value[x]", 1),
+    ],
+)
+def test_index_get_by_path_ignore_root(slicing_index, id, expected, count):
+    nodes = slicing_index.get_by_path(id, ignore_root=True)
+    assert len(nodes) == count
+    assert expected in {n.path for n in nodes}
+
+
+@pytest.mark.parametrize(
+    "id, expected, count",
+    [
+        ("Observation.component", "Observation.component", 1),
+        ("Observation.component.value[x]", "Observation.component.value[x]", 1),
+    ],
+)
+def test_index_get_by_path_ignore_slices(slicing_index, id, expected, count):
+    slicing_index.add(make_node(f"{expected}:slice", expected))
+    nodes = slicing_index.get_by_path(id, ignore_slices=True)
+    assert len(nodes) == count
+    assert expected in {n.path for n in nodes}
+
+
+def test_index_get_by_path_raises_for_missing(simple_index):
+    with pytest.raises(DefinitionIndexError):
+        simple_index.get_by_path("Observation.missing")
+
+
+def test_index_iter(simple_index):
+    ids = [n.id for n in simple_index]
+    assert sorted(ids) == sorted(
+        ["Observation", "Observation.status", "Observation.code"]
+    )
+
+
+def test_index_ids_sorted(simple_index):
+    assert simple_index.ids() == sorted(
+        ["Observation", "Observation.status", "Observation.code"]
+    )
+
+
+def test_index_paths(simple_index):
+    assert simple_index.paths() == {
+        "Observation",
+        "Observation.status",
+        "Observation.code",
+    }
+
+
+# ------------------------------------------------------------------
+# Root detection
+# ------------------------------------------------------------------
+
+
+def test_index_root_returns_root_node(simple_index):
+    root = simple_index.root()
+    assert root.id == "Observation"
+
+
+def test_index_root_raises_when_no_root():
+    index = DefinitionIndex(
+        [
+            make_node("Observation.status", "Observation.status"),
+            make_node("Observation.code", "Observation.code"),
+        ]
+    )
+    with pytest.raises(DefinitionIndexError):
+        index.root()
+
+
+def test_index_root_raises_for_multiple_roots():
+    index = DefinitionIndex(
+        [
+            make_node("Observation", "Observation"),
+            make_node("Patient", "Patient"),
+        ]
+    )
+    with pytest.raises(DefinitionIndexError):
+        index.root()
+
+
+# ------------------------------------------------------------------
+# Navigation — get_parent
+# ------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "id, expected_parent_id",
+    [
+        ("Observation.component", "Observation"),
+        ("Observation.component:systolic", "Observation"),
+        ("Observation.component.value[x]", "Observation.component"),
+    ],
+)
+def test_get_parent(slicing_index, id, expected_parent_id):
+    parent = slicing_index.get_parent(id)
+    assert parent.id == expected_parent_id
+
+
+def test_get_parent_raises_for_root(simple_index):
+    with pytest.raises(DefinitionIndexError):
+        simple_index.get_parent("Observation")
+
+
+# ------------------------------------------------------------------
+# Navigation — get_children
+# ------------------------------------------------------------------
+
+
+def test_get_children_returns_non_slice_children(simple_index):
+    children = simple_index.get_children("Observation")
+    ids = {n.id for n in children}
+    assert ids == {"Observation.status", "Observation.code"}
+
+
+def test_get_children_excludes_slices(slicing_index):
+    children = slicing_index.get_children("Observation")
+    ids = {n.id for n in children}
+    assert "Observation.component:systolic" not in ids
+    assert "Observation.component:diastolic" not in ids
+
+
+def test_get_children_empty_for_leaf(simple_index):
+    assert simple_index.get_children("Observation.code") == []
+
+
+# ------------------------------------------------------------------
+# Navigation — get_slices
+# ------------------------------------------------------------------
+
+
+def test_get_slices_returns_named_slices(slicing_index):
+    slices = slicing_index.get_slices("Observation.component")
+    ids = {n.id for n in slices}
+    assert ids == {"Observation.component:systolic", "Observation.component:diastolic"}
+
+
+def test_get_slices_raises_for_non_slice_entry(simple_index):
+    with pytest.raises(DefinitionIndexError):
+        simple_index.get_slices("Observation.code")
+
+
+# ------------------------------------------------------------------
+# Navigation — get_slice_children
+# ------------------------------------------------------------------
+
+
+def test_get_slice_children_returns_children_of_slice(slicing_index):
+    # Build an index where a named slice itself has child elements
+    index = DefinitionIndex(
+        [
+            make_node("Observation", "Observation"),
+            make_node(
+                "Observation.component", "Observation.component", slicing=MagicMock()
+            ),
+            make_node("Observation.component:systolic", "Observation.component"),
+            make_node(
+                "Observation.component:systolic.code", "Observation.component.code"
+            ),
+            make_node(
+                "Observation.component:systolic.value[x]",
+                "Observation.component.value[x]",
+                types=["String", "CodeableConcept"],
+            ),
+        ]
+    )
+    children = index.get_slice_children("Observation.component:systolic")
+    ids = {n.id for n in children}
+    assert ids == {
+        "Observation.component:systolic.code",
+        "Observation.component:systolic.value[x]",
+        "Observation.component:systolic.valueString",
+        "Observation.component:systolic.valueCodeableConcept",
+    }
+
+
+# ------------------------------------------------------------------
+# Navigation — get_subtree
+# ------------------------------------------------------------------
+
+
+@pytest.fixture
+def deep_index():
+    return DefinitionIndex(
+        [
+            ElementNode(
+                definition=CopyableMagickyMock(id="Observation", path="Observation")
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.component", path="Observation.component"
+                )
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.component.code", path="Observation.component.code"
+                )
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.component.valueCodableConcept",
+                    path="Observation.component.valueCodableConcept",
+                )
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.component.valueCodableConcept.coding",
+                    path="Observation.component.valueCodableConcept.coding",
+                )
+            ),
+            ElementNode(
+                definition=CopyableMagickyMock(
+                    id="Observation.extension", path="Observation.extension"
+                )
+            ),
+        ]
+    )
+
+
+def test_get_subtree_includes_root_and_descendants(deep_index: DefinitionIndex):
+    subtree_index = deep_index.get_subtree("Observation.component")
+    ids = {n.id for n in subtree_index}
+    print(ids)
+    assert subtree_index.root() is not None
+    assert ids == {
+        "Component",
+        "Component.code",
+        "Component.valueCodableConcept",
+        "Component.valueCodableConcept.coding",
+    }
+
+
+def test_get_subtree_excludes_unrelated_nodes(deep_index: DefinitionIndex):
+    subtree_index = deep_index.get_subtree("Observation.component")
+    ids = {n.id for n in subtree_index}
+    assert "Observation" not in ids
+
+
+def test_get_subtree_single_leaf(deep_index: DefinitionIndex):
+    subtree_index = deep_index.get_subtree("Observation.component.code")
+    ids = {n.id for n in subtree_index}
+    assert ids == {"Code"}
+
+
+def test_get_subtree_returns_definition_index(deep_index: DefinitionIndex):
+    subtree_index = deep_index.get_subtree("Observation")
+    assert isinstance(subtree_index, DefinitionIndex)
+
+
+# ------------------------------------------------------------------
+# repr
+# ------------------------------------------------------------------
+
+
+def test_repr_with_root(simple_index):
+    r = repr(simple_index)
+    assert "Observation" in r
+    assert "3" in r
+
+
+def test_repr_without_root():
+    index = DefinitionIndex(
+        [
+            make_node("A.x", "A.x"),
+            make_node("A.y", "A.y"),
+        ]
+    )
+    r = repr(index)
+    assert "size=" in r

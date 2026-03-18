@@ -5,6 +5,8 @@ import pytest
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.literals import Date, Quantity
 from fhircraft.fhir.path.engine.types import *
+from fhircraft.fhir.resources.datatypes.R4.core.observation import Observation
+from fhircraft.fhir.resources.datatypes.R4.core.practitioner import Practitioner
 
 env = {"%fhirRelease": "R4"}
 
@@ -46,6 +48,8 @@ test_cases = (
     ("invalid", "boolean", False),
     (Date("@2024"), "date", True),
     (Quantity(12, "g"), "Quantity", True),
+    (Practitioner(id="example"), "Practitioner", True),
+    (Observation(id="example"), "Observation", True),
 )
 
 

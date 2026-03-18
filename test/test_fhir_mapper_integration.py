@@ -22,11 +22,11 @@ class SimpleTarget(BaseModel):
 
 @pytest.fixture
 def engine():
-    return FHIRMapper()
+    return FHIRMapper(fhir_release="R4B")
 
 
 def test_parse_mapping_script(engine):
-    """Test parsing a simple mapping script."""
+
     script = """
     map 'http://example.org/test' = 'test'
     
@@ -210,7 +210,7 @@ def test_implicit_evluate_context(engine):
 
     # Arbitrary source data (not a FHIR resource)
     source_data = {
-        "id": "A:123-45-678",
+        "id": "A123-45-678",
     }
 
     # Mapping script - only declares FHIR target
@@ -229,7 +229,7 @@ def test_implicit_evluate_context(engine):
 
     # Verify the target is a valid FHIR Patient
     assert patient._type == "Patient"
-    assert patient.id == "B:123-45-678"
+    assert patient.id == "B123-45-678"
 
 
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
@@ -275,9 +275,9 @@ def test_reserved_words_as_identifiers(engine):
     """
     result = engine.execute_mapping(
         mapping_script,
-        {"group": "A:123-45-678"},
+        {"group": "A123-45-678"},
     )
-    assert result[0].id == "A:123-45-678"  # type: ignore
+    assert result[0].id == "A123-45-678"  # type: ignore
 
 
 @pytest.mark.parametrize(

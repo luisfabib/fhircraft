@@ -12,12 +12,12 @@ import warnings
 from datetime import date, datetime, time
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Type, Union
-
-from pydantic import TypeAdapter, BaseModel, ValidationError, create_model
 from typing_extensions import TypeAliasType
 
+from pydantic import TypeAdapter, BaseModel, ValidationError
+
 import fhircraft.fhir.resources.datatypes.primitives as primitives
-from fhircraft.utils import get_FHIR_release_from_version
+from fhircraft.fhir.resources.datatypes.registry import get_fhir_type
 
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel
@@ -31,88 +31,6 @@ class FHIRTypeError(Exception):
 
 # Cache for TypeAdapter instances to avoid repeated creation
 _type_adapter_cache: dict[int, TypeAdapter] = {}
-
-
-def get_fhir_primitive_type(type_str: str) -> type | None:
-    return getattr(primitives, type_str, None)
-
-
-def get_complex_FHIR_type(type_str: str, release="R4B") -> type:
-    # Dynamically import the complex types module for the specified FHIR release
-    complex_FHIR_types = importlib.import_module(
-        f"fhircraft.fhir.resources.datatypes.{release}.complex"
-    )
-    model: type[FHIRBaseModel] = getattr(complex_FHIR_types, type_str)
-    if not model.__pydantic_complete__:
-        model.model_rebuild()  # type: ignore
-    return model
-
-
-def get_fhir_resource_type(type_str: str, release="R4B") -> type:
-    # Convert CamelCase to snake_case for module lookup
-    resource_module = importlib.import_module(
-        f"fhircraft.fhir.resources.datatypes.{release}.core"
-    )
-
-    resource = getattr(resource_module, type_str, None)
-    if not resource:
-        # Try to get from factory cache using lazy import to avoid circular dependency
-        try:
-            from fhircraft.fhir.resources import factory
-
-            resource = next(
-                (
-                    model
-                    for model in factory.factory.construction_cache.values()
-                    if model.__name__ == type_str
-                    and release
-                    == get_FHIR_release_from_version(getattr(model, "fhirVersion", ""))
-                ),
-                None,
-            )
-        except ImportError:
-            # Factory not available, which is fine - we'll just fail gracefully
-            pass
-
-        if not resource:
-            raise AttributeError(f"Unknown {release} FHIR resource type: {type_str}")
-    return resource
-
-
-def get_fhir_type(type_str: str, release="R4B") -> Any:
-    """
-    Get the FHIR type (primitive, complex, or resource) by its string name.
-
-    Args:
-        type_str (str): The FHIR type name.
-        release (str): The FHIR release version (default: "R4B").
-
-    Returns:
-        type: The corresponding FHIR type class.
-
-    Raises:
-        AttributeError: If the type is not found.
-    """
-    # First check for primitive types
-    primitive_type = get_fhir_primitive_type(type_str)
-    if primitive_type:
-        return primitive_type
-
-    # Next check for complex types
-    try:
-        complex_type = get_complex_FHIR_type(type_str, release)
-        return complex_type
-    except AttributeError:
-        pass
-
-    # Finally check for resource types
-    try:
-        resource_type = get_fhir_resource_type(type_str, release)
-        return resource_type
-    except AttributeError:
-        pass
-
-    raise AttributeError(f"Unknown FHIR type: {type_str}")
 
 
 # Type checking functions
@@ -169,7 +87,9 @@ def is_fhir_primitive_type(
 
 
 def is_fhir_complex_type(
-    value: Any, fhir_type: "FHIRBaseModel | type | str", raise_on_error: bool = True
+    value: Any,
+    fhir_type: "type[FHIRBaseModel] | type | TypeAliasType | str",
+    release: str | None = None,
 ) -> bool:
     """
     Check if a value conforms to a complex FHIR type.
@@ -177,7 +97,6 @@ def is_fhir_complex_type(
     Args:
         value: The value to check
         fhir_type: The complex FHIR type (or name thereof) to check against
-        raise_on_error: Whether to raise FHIRTypeError on unknown type (default: True)
 
     Returns:
         bool: `True` if the value conforms to the type, `False` otherwise
@@ -186,25 +105,31 @@ def is_fhir_complex_type(
         FHIRTypeError: If the fhir_type is a string and does not correspond to a known complex type
     """
     if isinstance(fhir_type, str):
-        try:
-            fhir_type = get_complex_FHIR_type(fhir_type)
-        except AttributeError:
-            if raise_on_error:
-                raise FHIRTypeError(f"Unknown complex FHIR type: {fhir_type}")
-            else:
+        if not release:
+            raise FHIRTypeError(
+                f"Release must be specified when fhir_type is given as a string: '{fhir_type}'"
+            )
+        fhir_type = get_fhir_type(fhir_type, release)  # type: ignore
+
+    if isinstance(fhir_type, type) and issubclass(fhir_type, BaseModel):
+        if getattr(fhir_type, "_kind", None) != "complex-type":
+            return False
+        elif isinstance(value, fhir_type):
+            return True
+        else:
+            try:
+                fhir_type.model_validate(value)
+                return True
+            except ValidationError as e:
                 return False
-    if isinstance(value, BaseModel) and issubclass(fhir_type, BaseModel):
-        return isinstance(value, fhir_type)
-    try:
-        if hasattr(fhir_type, "model_validate"):
-            fhir_type.model_validate(value)  # type: ignore
-        return True
-    except ValidationError as e:
+    else:
         return False
 
 
 def is_fhir_resource_type(
-    value: Any, fhir_type: "FHIRBaseModel | type | str", raise_on_error: bool = True
+    value: Any,
+    fhir_type: "type[FHIRBaseModel] | type | TypeAliasType | str",
+    release: str | None = None,
 ) -> bool:
     """
     Check if a value conforms to a FHIR resource.
@@ -221,74 +146,76 @@ def is_fhir_resource_type(
         FHIRTypeError: If the fhir_type is a string and does not correspond to a known resource type
     """
     if isinstance(fhir_type, str):
-        try:
-            resource = get_fhir_resource_type(fhir_type)
-        except AttributeError as e:
-            if raise_on_error:
-                raise e
-            else:
-                return False
-        fhir_type = resource
+        if not release:
+            raise FHIRTypeError(
+                f"Release must be specified when fhir_type is given as a string: '{fhir_type}'"
+            )
+        fhir_type = get_fhir_type(fhir_type, release)  # type: ignore
 
-    try:
-        if hasattr(fhir_type, "model_validate"):
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                fhir_type.model_validate(value)  # type: ignore
-        return True
-    except ValidationError as e:
+    if isinstance(fhir_type, type) and issubclass(fhir_type, BaseModel):
+        if getattr(fhir_type, "_kind", None) != "resource":
+            return False
+        elif isinstance(value, fhir_type):
+            return True
+        else:
+            try:
+                fhir_type.model_validate(value)
+                return True
+            except ValidationError as e:
+                return False
+    else:
         return False
 
 
 def is_boolean(value: Any) -> bool:
     """Check if value is a valid FHIR Boolean."""
-    return is_fhir_primitive_type(value, primitives.Boolean)
+    return is_fhir_primitive_type(value, primitives.Boolean)  # type: ignore
 
 
 def is_integer(value: Any) -> bool:
     """Check if value is a valid FHIR Integer."""
-    return is_fhir_primitive_type(value, primitives.Integer)
+    return is_fhir_primitive_type(value, primitives.Integer)  # type: ignore
 
 
 def is_integer64(value: Any) -> bool:
     """Check if value is a valid FHIR Integer64."""
-    return is_fhir_primitive_type(value, primitives.Integer64)
+    return is_fhir_primitive_type(value, primitives.Integer64)  # type: ignore
 
 
 def is_decimal(value: Any) -> bool:
     """Check if value is a valid FHIR Decimal."""
-    return is_fhir_primitive_type(value, primitives.Decimal)
+    return is_fhir_primitive_type(value, primitives.Decimal)  # type: ignore
 
 
 def is_string(value: Any) -> bool:
     """Check if value is a valid FHIR String."""
-    return is_fhir_primitive_type(value, primitives.String)
+    return is_fhir_primitive_type(value, primitives.String)  # type: ignore
 
 
 def is_uri(value: Any) -> bool:
     """Check if value is a valid FHIR Uri."""
-    return is_fhir_primitive_type(value, primitives.Uri)
+    return is_fhir_primitive_type(value, primitives.Uri)  # type: ignore
 
 
 def is_url(value: Any) -> bool:
     """Check if value is a valid FHIR Url."""
-    return is_fhir_primitive_type(value, primitives.Url)
+    return is_fhir_primitive_type(value, primitives.Url)  # type: ignore
 
 
 def is_canonical(value: Any) -> bool:
     """Check if value is a valid FHIR Canonical."""
-    return is_fhir_primitive_type(value, primitives.Canonical)
+    return is_fhir_primitive_type(value, primitives.Canonical)  # type: ignore
 
 
 def is_base64binary(value: Any) -> bool:
     """Check if value is a valid FHIR Base64Binary."""
-    return is_fhir_primitive_type(value, primitives.Base64Binary)
+    return is_fhir_primitive_type(value, primitives.Base64Binary)  # type: ignore
 
 
 def is_instant(value: Any) -> bool:
     """Check if value is a valid FHIR Instant."""
     return (
-        is_fhir_primitive_type(value, primitives.Instant)
+        is_fhir_primitive_type(value, primitives.Instant)  # type: ignore
         if isinstance(value, str)
         else isinstance(value, datetime)
     )
@@ -297,7 +224,7 @@ def is_instant(value: Any) -> bool:
 def is_date(value: Any) -> bool:
     """Check if value is a valid FHIR Date."""
     return (
-        is_fhir_primitive_type(value, primitives.Date)
+        is_fhir_primitive_type(value, primitives.Date)  # type: ignore
         if isinstance(value, str)
         else isinstance(value, date) and not isinstance(value, datetime)
     )
@@ -306,7 +233,7 @@ def is_date(value: Any) -> bool:
 def is_datetime(value: Any) -> bool:
     """Check if value is a valid FHIR DateTime."""
     return (
-        is_fhir_primitive_type(value, primitives.DateTime)
+        is_fhir_primitive_type(value, primitives.DateTime)  # type: ignore
         if isinstance(value, str)
         else isinstance(value, datetime)
     )
@@ -315,7 +242,7 @@ def is_datetime(value: Any) -> bool:
 def is_time(value: Any) -> bool:
     """Check if value is a valid FHIR Time."""
     return (
-        is_fhir_primitive_type(value, primitives.Time)
+        is_fhir_primitive_type(value, primitives.Time)  # type: ignore
         if isinstance(value, str)
         else isinstance(value, time)
     )
@@ -323,37 +250,37 @@ def is_time(value: Any) -> bool:
 
 def is_code(value: Any) -> bool:
     """Check if value is a valid FHIR Code."""
-    return is_fhir_primitive_type(value, primitives.Code)
+    return is_fhir_primitive_type(value, primitives.Code)  # type: ignore
 
 
 def is_oid(value: Any) -> bool:
     """Check if value is a valid FHIR Oid."""
-    return is_fhir_primitive_type(value, primitives.Oid)
+    return is_fhir_primitive_type(value, primitives.Oid)  # type: ignore
 
 
 def is_id(value: Any) -> bool:
     """Check if value is a valid FHIR Id."""
-    return is_fhir_primitive_type(value, primitives.Id)
+    return is_fhir_primitive_type(value, primitives.Id)  # type: ignore
 
 
 def is_markdown(value: Any) -> bool:
     """Check if value is a valid FHIR Markdown."""
-    return is_fhir_primitive_type(value, primitives.Markdown)
+    return is_fhir_primitive_type(value, primitives.Markdown)  # type: ignore
 
 
 def is_unsigned_int(value: Any) -> bool:
     """Check if value is a valid FHIR UnsignedInt."""
-    return is_fhir_primitive_type(value, primitives.UnsignedInt)
+    return is_fhir_primitive_type(value, primitives.UnsignedInt)  # type: ignore
 
 
 def is_positive_int(value: Any) -> bool:
     """Check if value is a valid FHIR PositiveInt."""
-    return is_fhir_primitive_type(value, primitives.PositiveInt)
+    return is_fhir_primitive_type(value, primitives.PositiveInt)  # type: ignore
 
 
 def is_uuid(value: Any) -> bool:
     """Check if value is a valid FHIR Uuid."""
-    return is_fhir_primitive_type(value, primitives.Uuid)
+    return is_fhir_primitive_type(value, primitives.Uuid)  # type: ignore
 
 
 def is_fhir_primitive(value: Any) -> bool:
@@ -569,41 +496,6 @@ def to_string(value: Any) -> Union[str, None]:
         except Exception:
             return None
     else:
-        return None
-
-
-def to_quantity(value: Any) -> Union[Any, None]:
-    """
-    Convert value to FHIR Quantity.
-
-    Args:
-        value: Value to convert
-
-    Returns:
-        Quantity or None: Converted Quantity object or None if conversion fails
-    """
-    try:
-        # Import here to avoid circular imports
-        Quantity = get_complex_FHIR_type("Quantity")
-
-        if isinstance(value, str):
-            # Try to parse "value unit" format like "10.5 mg"
-            quantity_match = re.match(r"^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)$", value.strip())
-            if quantity_match:
-                val, unit = quantity_match.groups()
-                decimal_val = to_decimal(val)
-                if decimal_val is not None:
-                    return Quantity(value=decimal_val, unit=unit)  # type: ignore
-            return None
-        elif isinstance(value, (int, float)):
-            # Simple numeric value becomes quantity with unit "1"
-            return Quantity(value=float(value), unit="1")  # type: ignore
-        elif isinstance(value, bool):
-            # Boolean to quantity: True=1.0, False=0.0
-            return Quantity(value=float(value), unit="1")  # type: ignore
-        else:
-            return None
-    except Exception:
         return None
 
 

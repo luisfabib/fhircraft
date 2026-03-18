@@ -20,12 +20,11 @@ from pydantic import BaseModel
 from fhircraft.fhir.mapper.parser import FhirMappingLanguageParser
 from fhircraft.fhir.resources.datatypes.R5.core.concept_map import ConceptMap
 from fhircraft.fhir.resources.datatypes.R5.core.structure_map import StructureMap
-from fhircraft.fhir.resources.repository import (
-    CompositeStructureDefinitionRepository,
-    validate_structure_definition,
+from fhircraft.fhir.resources.definitions.registry import (
+    StructureDefinitionRegistry,
 )
 
-from .parser import FhirMappingLanguageParser
+from .parser import FhirMappingLanguageParser, StructureMapUnion
 
 __all__ = [
     # High-level API
@@ -62,7 +61,8 @@ class FHIRMapper:
 
     def __init__(
         self,
-        repository: Optional[CompositeStructureDefinitionRepository] = None,
+        repository: Optional[StructureDefinitionRegistry] = None,
+        fhir_release: str = "R5",
     ):
         """
         Initialize the FHIR mapper.
@@ -71,7 +71,10 @@ class FHIRMapper:
             repository: Structure definition repository for resolving canonical URLs.
                        If None, creates a default repository.
         """
-        self.repository = repository or CompositeStructureDefinitionRepository()
+        self.repository = repository or StructureDefinitionRegistry(
+            fhir_release=fhir_release
+        )
+        self.fhir_release = fhir_release
         self._engine = None  # Lazy-loaded
         self.parser = FhirMappingLanguageParser()
 
@@ -81,7 +84,9 @@ class FHIRMapper:
         if self._engine is None:
             from fhircraft.fhir.mapper.engine.core import FHIRMappingEngine
 
-            self._engine = FHIRMappingEngine(repository=self.repository)
+            self._engine = FHIRMappingEngine(
+                repository=self.repository, fhir_release=self.fhir_release
+            )
         return self._engine
 
     def load_structure_map(
@@ -136,7 +141,7 @@ class FHIRMapper:
 
         raise ValueError(f"Unsupported source type: {type(source)}")
 
-    def parse_mapping_script(self, script: str) -> StructureMap:
+    def parse_mapping_script(self, script: str) -> StructureMapUnion:
         """
         Parse a FHIR mapping language script into a StructureMap.
 
@@ -276,7 +281,9 @@ class FHIRMapper:
         Raises:
             ValueError: If structure definition is invalid or already exists
         """
-        structure_definition = validate_structure_definition(structure_definition)
+        structure_definition = self.repository._validate_structure_definition(
+            structure_definition
+        )
         self.repository.add(structure_definition, fail_if_exists=fail_if_exists)
 
     def add_structure_definitions_from_file(
@@ -310,7 +317,9 @@ class FHIRMapper:
         if isinstance(data, dict):
             if data.get("resourceType") == "StructureDefinition":
                 # Single StructureDefinition
-                structure_definition = validate_structure_definition(data)
+                structure_definition = self.repository._validate_structure_definition(
+                    data
+                )
                 self.repository.add(structure_definition, fail_if_exists=fail_if_exists)
                 count = 1
             elif data.get("resourceType") == "Bundle" and data.get("entry"):
@@ -318,7 +327,9 @@ class FHIRMapper:
                 for entry in data["entry"]:
                     resource = entry.get("resource", {})
                     if resource.get("resourceType") == "StructureDefinition":
-                        structure_definition = validate_structure_definition(resource)
+                        structure_definition = (
+                            self.repository._validate_structure_definition(resource)
+                        )
                         self.repository.add(
                             structure_definition, fail_if_exists=fail_if_exists
                         )
@@ -335,7 +346,7 @@ class FHIRMapper:
     def load_fhir_package(
         self,
         package_name: str,
-        package_version: Optional[str] = None,
+        package_version: str,
         fail_if_exists: bool = False,
     ) -> None:
         """
@@ -357,14 +368,7 @@ class FHIRMapper:
             raise RuntimeError(
                 "Package loading is not supported by the current repository configuration"
             )
-
-        package_repo = self.repository._package_repository
-        if package_repo is None:
-            raise RuntimeError("Package repository is not enabled")
-
-        package_repo.load_package(
-            package_name, package_version, fail_if_exists=fail_if_exists
-        )
+        self.repository.download_package(package_name, package_version)
 
     def has_structure_definition(
         self, canonical_url: str, version: Optional[str] = None
@@ -379,37 +383,4 @@ class FHIRMapper:
         Returns:
             True if the StructureDefinition is available
         """
-        return self.repository.has(canonical_url, version)
-
-    def list_loaded_packages(self) -> Dict[str, str]:
-        """
-        Get a dictionary of loaded FHIR packages and their versions.
-
-        Returns:
-            Dictionary mapping package names to versions
-
-        Raises:
-            RuntimeError: If package loading is not supported
-        """
-        if not hasattr(self.repository, "_package_repository"):
-            raise RuntimeError(
-                "Package loading is not supported by the current repository configuration"
-            )
-
-        package_repo = self.repository._package_repository
-        if package_repo is None:
-            raise RuntimeError("Package repository is not enabled")
-
-        return package_repo.get_loaded_packages()
-
-    def get_structure_definition_versions(self, canonical_url: str) -> List[str]:
-        """
-        Get all available versions of a StructureDefinition.
-
-        Args:
-            canonical_url: Canonical URL of the StructureDefinition
-
-        Returns:
-            List of available versions, sorted
-        """
-        return self.repository.get_versions(canonical_url)
+        return canonical_url in self.repository

@@ -7,7 +7,7 @@ from fhircraft.fhir.path.engine.additional import *
 from fhircraft.fhir.path.engine.core import *
 from fhircraft.fhir.path.engine.environment import EnvironmentVariable
 from fhircraft.fhir.path.engine.literals import Date, DateTime
-from fhircraft.fhir.resources.datatypes import get_complex_FHIR_type
+from fhircraft.fhir.resources.datatypes import get_fhir_type
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity as R4_Quantity,
     Age as R4_Age,
@@ -37,13 +37,13 @@ def test_extension_returns_empty_for_empty_collection():
 def test_extension_selects_correct_extension_by_url():
     resource = namedtuple("Resource", "extension")(
         extension=[
-            get_complex_FHIR_type("Extension")(
+            get_fhir_type("Extension", "R4")(
                 url="http://domain.org/extension1", valueInteger=1
             ),
-            get_complex_FHIR_type("Extension")(
+            get_fhir_type("Extension", "R4")(
                 url="http://domain.org/extension2", valueInteger=2
             ),
-            get_complex_FHIR_type("Extension")(
+            get_fhir_type("Extension", "R4")(
                 url="http://domain.org/extension3", valueInteger=3
             ),
         ]
@@ -87,7 +87,7 @@ def test_hasvalue_returns_true_for_singleton_collection_with_primitive_value(val
 def test_hasvalue_returns_false_for_singleton_collection_without_primitive_value():
     collection = [
         FHIRPathCollectionItem(
-            value=get_complex_FHIR_type("Extension")(
+            value=get_fhir_type("Extension", "R4")(
                 url="http://domain.org/extension1", valueInteger=1
             )
         )
@@ -142,7 +142,7 @@ def test_getvalue_returns_value_for_singleton_collection_with_primitive_value(va
 def test_getvalue_returns_empty_for_singleton_collection_without_primitive_value():
     collection = [
         FHIRPathCollectionItem(
-            value=get_complex_FHIR_type("Extension")(
+            value=get_fhir_type("Extension", "R4")(
                 url="http://domain.org/extension1", valueInteger=1
             )
         )

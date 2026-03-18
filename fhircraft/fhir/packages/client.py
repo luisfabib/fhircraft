@@ -7,6 +7,7 @@ from urllib.parse import urljoin
 
 import requests
 from pydantic import ValidationError
+import json
 
 from .models import PackageMetadata
 
@@ -50,6 +51,7 @@ class FHIRPackageRegistryClient:
         self.base_url = base_url or self.FHIR_ORG_BASE_URL
         self.timeout = timeout
         self.session = session or requests.Session()
+        self.history = set()  # To track loaded packages and avoid duplicates
 
         # Set default headers
         self.session.headers.update(
@@ -122,7 +124,7 @@ class FHIRPackageRegistryClient:
                 )
 
             response.raise_for_status()
-
+            self.history.add(f"{package_name}@{package_version}")
             if extract:
                 # Return extracted tarfile
                 return tarfile.open(fileobj=io.BytesIO(response.content), mode="r:gz")
@@ -170,6 +172,164 @@ class FHIRPackageRegistryClient:
             )
 
         return self.download_package(package_name, latest_version, extract=extract)
+
+    def load_resources_from_package(
+        self,
+        target_resource: str,
+        package_name: str,
+        package_version: Optional[str] = None,
+        install_dependencies: bool = True,
+        fail_if_exists: bool = False,
+    ) -> list[dict]:
+        """
+        Load a FHIR package from the registry and add all structure definitions.
+
+        Args:
+            package_name: Name of the package (e.g., "hl7.fhir.us.core")
+            package_version: Version of the package (defaults to latest)
+            install_dependencies: If True, checks and installs any dependencies of the package
+            fail_if_exists: If True, raise error if package already loaded
+
+        Raises:
+            PackageNotFoundError: If package or version not found
+            FHIRPackageRegistryError: If download fails
+            RuntimeError: If package processing fails
+        """
+
+        # Determine version to load
+        target_version = package_version
+        if not target_version:
+            try:
+                target_version = self.get_latest_version(package_name)
+            except (PackageNotFoundError, FHIRPackageRegistryError) as e:
+                raise PackageNotFoundError(
+                    f"Failed to get latest version for package {package_name}: {e}"
+                )
+
+        if not target_version:
+            raise PackageNotFoundError(
+                f"No latest version found for package {package_name}"
+            )
+
+        # Check if already loaded
+        package_key = f"{package_name}@{target_version}"
+        try:
+            # Download and extract package
+            result = self.download_package(package_name, target_version, extract=True)
+
+            # Ensure we got a TarFile object (should be guaranteed when extract=True)
+            if not isinstance(result, tarfile.TarFile):
+                raise RuntimeError(
+                    f"Expected TarFile object but got {type(result)} when downloading package"
+                )
+
+            try:
+                results, errors = self._process_package_tar(
+                    target_resource,
+                    result,
+                    install_dependencies,
+                )
+
+                if len(results) == 0:
+                    raise RuntimeError(
+                        f"No valid resources ({target_resource}) found in package"
+                    )
+
+                if errors:
+                    # Log errors but don't fail if we got some definitions
+                    error_summary = f"Loaded {len(results)} {target_resource} resources with {len(errors)} errors"
+                    print(f"Warning: {error_summary}")
+                    for error in errors[:5]:  # Show first 5 errors
+                        print(f"  - {error}")
+                    if len(errors) > 5:
+                        print(f"  ... and {len(errors) - 5} more errors")
+
+                return results
+
+            except (PackageNotFoundError, FHIRPackageRegistryError) as e:
+                raise e
+        except Exception as e:
+            raise RuntimeError(f"Failed to process package {package_key}: {e}")
+
+    def _process_package_tar(
+        self,
+        target_resource: str,
+        tar_file: tarfile.TarFile,
+        install_dependencies: bool = True,
+    ) -> tuple[list[dict], list[str]]:
+        """
+        Process a tar file and extract structure definitions.
+
+        Args:
+            tar_file: Opened tar file containing the package
+        """
+        results_count = 0
+        errors = []
+
+        # First, look for package.json to find dependencies
+        if install_dependencies:
+            package_json_member = None
+            for member in tar_file.getmembers():
+                if member.name.endswith("package.json") and member.isfile():
+                    package_json_member = member
+                    break
+            if package_json_member:
+                try:
+                    package_obj = tar_file.extractfile(package_json_member)
+                    if package_obj:
+                        content = package_obj.read().decode("utf-8")
+                        package_info = json.loads(content)
+                        # Download dependencies
+                        for dependency, version in package_info.get(
+                            "dependencies", {}
+                        ).items():
+                            # Check if dependency has already been loaded
+                            if f"{dependency}@{version}" in self.history:
+                                continue
+                            try:
+                                self.load_resources_from_package(
+                                    target_resource,
+                                    dependency,
+                                    version,
+                                    fail_if_exists=False,
+                                )
+                            except Exception as e:
+                                errors.append(
+                                    f"Failed to download and load dependency {dependency}: {e}"
+                                )
+                except Exception as e:
+                    errors.append(
+                        f"Error processing package.json looking for dependencies: {e}"
+                    )
+        results = []
+        for member in tar_file.getmembers():
+            if not member.isfile():
+                continue
+
+            # Look for StructureDefinition JSON files
+            # Common patterns: package/StructureDefinition-*.json, package/profiles/*.json, etc.
+            if member.name.endswith(".json") and (
+                target_resource in member.name
+                or "/profiles/" in member.name
+                or "/extensions/" in member.name
+                or "/types/" in member.name
+            ):
+                try:
+                    # Extract and parse the file
+                    file_obj = tar_file.extractfile(member)
+                    if file_obj:
+                        content = file_obj.read().decode("utf-8")
+                        json_data = json.loads(content)
+
+                        # Check if it's a StructureDefinition resource
+                        if json_data.get("resourceType") == target_resource:
+                            results.append(json_data)
+                            results_count += 1
+
+                except Exception as e:
+                    errors.append(f"Error processing {member.name}: {e}")
+
+        return results, errors
 
 
 # Convenience functions for common use cases

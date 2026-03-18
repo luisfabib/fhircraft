@@ -9,10 +9,10 @@ FHIR resources represent different types of healthcare data - patients, observat
 Fhircraft includes Pydantic models for all core FHIR resources. Here's how to create a [Patient resource from FHIR R5](https://hl7.org/fhir/patient.html):
 
 ```python
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+from fhircraft.fhir.resources import get_fhir_type
 
 # Get the Patient model for FHIR R5
-Patient = get_fhir_resource_type("Patient", "R5")
+Patient = get_fhir_type("Patient", "R5")
 
 # Create a patient with automatic validation
 patient = Patient(
@@ -103,13 +103,15 @@ Base FHIR resources are designed to work across all healthcare contexts, but rea
 Load [:material-fire: FHIR implementation guides](https://hl7.org/fhir/implementationguide.html) and create specialized resource models:
 
 ```python
-from fhircraft.fhir.resources.factory import factory
+from fhircraft.fhir.resources import FHIRModelFactory
+
+factory = FHIRModelFactory(fhir_release="R4")
 
 # Load an implementation guide (e.g., US Core)
-factory.load_package('hl7.fhir.us.core') # (1)!
+factory.register_package('hl7.fhir.us.core') # (1)!
 
 # Build a model from a profile
-USCorePatient = factory.construct_resource_model(
+USCorePatient = factory.build(
     canonical_url='http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient'
 )
 

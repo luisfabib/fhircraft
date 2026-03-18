@@ -69,10 +69,10 @@ pip install git+https://github.com/luisfabib/fhircraft.git
 To verify your installation:
 
 ```python
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+from fhircraft.fhir.resources import get_fhir_type
 
 # This should work without errors
-Patient = get_fhir_resource_type("Patient")
+Patient = get_fhir_type("Patient","R4B")
 print("✓ Fhircraft installed successfully!")
 ```
 
@@ -84,10 +84,10 @@ print("✓ Fhircraft installed successfully!")
 Work with pre-generated Pydantic models for all standard FHIR resources. Each model includes full validation rules from the FHIR specification:
 
 ```python
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+from fhircraft.fhir.resources import get_fhir_type
 
 # Get built-in Patient model for FHIR R5
-Patient = get_fhir_resource_type("Patient", "R5")
+Patient = get_fhir_type("Patient", "R5")
 
 # Create and validate a patient
 patient = Patient(
@@ -103,13 +103,16 @@ print(f"Created patient: {patient.name[0].given[0]} {patient.name[0].family}")
 Extend base FHIR models with implementation guide profiles loaded directly from the official FHIR package registry:
 
 ```python
-from fhircraft.fhir.resources.factory import factory
+from fhircraft.fhir.resources import FHIRModelFactory
+
+# Create a FHIR (R5 release) factory
+factory = FHIRModelFactory(fhir_release="R4")
 
 # Load US Core Implementation Guide
-factory.load_package("hl7.fhir.us.core", "5.0.1")
+factory.register_package("hl7.fhir.us.core", "5.0.1")
 
 # Create US Core Patient model with enhanced validation
-USCorePatient = factory.construct_resource_model(
+USCorePatient = factory.build(
     canonical_url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
 )
 
@@ -169,7 +172,7 @@ group main(source legacy, target patient: Patient) {
 """
 
 # Execute transformation
-mapper = FHIRMapper()
+mapper = FHIRMapper(fhir_release="R5")
 targets = mapper.execute_mapping(mapping_script, legacy_patient)
 fhir_patient = targets[0]
 

@@ -10,8 +10,7 @@ import pytest
 
 from fhircraft.config import with_config
 from fhircraft.fhir.resources.factory import (
-    ConstructionMode,
-    ResourceFactory,
+    FHIRModelFactory,
 )
 from fhircraft.fhir.resources.generator import CodeGenerator
 
@@ -58,38 +57,27 @@ fhir_resources_test_cases = {
 }
 
 
-@pytest.fixture
-def factory():
-    return ResourceFactory()
-
-
-def _assert_construct_core_resource(
-    version, resource_label, filename, factory: ResourceFactory
-):
-
+def _assert_construct_core_resource(fhir_release, resource_label, filename):
+    factory = FHIRModelFactory(fhir_release=fhir_release)
     with with_config(validation_mode="skip"):
         # Disable internet access to ensure we use local definitions
-        factory.disable_internet_access()
+        factory.definition_registry.disable_internet_access()
         # Load the FHIR resource definition from local files
-        factory.load_definitions_from_files(
+        with open(
             Path(CORE_DEFINITIONS_DIRECTORY)
-            / Path(version)
-            / Path(f"{resource_label.lower()}.profile.json")
-        )
-
-    fhir_version = {
-        "R4B": "4.3.0",
-        "R5": "5.0.0",
-    }.get(version, version)
-
-    # Generate source code for Pydantic FHIR model
-    resource = factory.construct_resource_model(
-        canonical_url=f"http://hl7.org/fhir/StructureDefinition/{resource_label}|{fhir_version}",
-        mode=ConstructionMode.SNAPSHOT,
-    )
+            / Path(fhir_release)
+            / Path(f"{resource_label.lower()}.profile.json"),
+            encoding="utf8",
+        ) as file:
+            struct_def = json.load(file)
+            struct_def["baseDefinition"] = None
+        # Generate source code for Pydantic FHIR model
+        resource = factory.build(struct_def, mode="snapshot")
     # Load example FHIR resource data
     with open(
-        os.path.join(os.path.abspath(f"{CORE_EXAMPLES_DIRECTORY}/{version}"), filename),
+        os.path.join(
+            os.path.abspath(f"{CORE_EXAMPLES_DIRECTORY}/{fhir_release}"), filename
+        ),
         encoding="utf8",
     ) as file:
         fhir_resource_data = json.load(file)
@@ -106,6 +94,7 @@ def _assert_construct_core_resource(
     with tempfile.TemporaryDirectory() as d:
 
         source_code = CodeGenerator().generate_resource_model_code(resource)
+        print(f"Generated code for {resource_label}:\n{source_code}")
         # Store source code in a file
         temp_file_name = os.path.join(d, "temp_test.py")
         with open(temp_file_name, "w") as test_file:
@@ -133,14 +122,14 @@ def _assert_construct_core_resource(
 
 @pytest.mark.integration
 @pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases["R4B"])
-def test_construct_R4B_core_resource(resource_label, filename, factory):
-    _assert_construct_core_resource("R4B", resource_label, filename, factory)
+def test_construct_R4B_core_resource(resource_label, filename):
+    _assert_construct_core_resource("R4B", resource_label, filename)
 
 
 @pytest.mark.integration
 @pytest.mark.parametrize("resource_label, filename", fhir_resources_test_cases["R5"])
-def test_construct_R5_core_resource(resource_label, filename, factory):
-    _assert_construct_core_resource("R5", resource_label, filename, factory)
+def test_construct_R5_core_resource(resource_label, filename):
+    _assert_construct_core_resource("R5", resource_label, filename)
 
 
 def _get_profiles_example_filenames(prefix):
@@ -167,33 +156,225 @@ fhir_profiles_test_cases = [
 
 
 @pytest.mark.integration
+@pytest.mark.parametrize("mode", ["differential", "snapshot"])
 @pytest.mark.parametrize(
-    "mode", [ConstructionMode.DIFFERENTIAL, ConstructionMode.SNAPSHOT]
+    "release, example_filename, definition_files",
+    [
+        # Conditions - mcode primary cancer condition (R4 / FHIR 4.0.1)
+        (
+            "R4",
+            "Condition-primary-cancer-condition-breast.json",
+            [
+                "mcode-primary-cancer-condition.json",
+                "mcode-histology-morphology-behavior.json",
+                "mcode-body-location-qualifier.json",
+                "mcode-laterality-qualifier.json",
+                "us-core-condition.json",
+                "fhir-condition-asserted-date.json",
+            ],
+        ),
+        (
+            "R4",
+            "Condition-primary-cancer-condition-jenny-m.json",
+            [
+                "mcode-primary-cancer-condition.json",
+                "mcode-histology-morphology-behavior.json",
+                "mcode-body-location-qualifier.json",
+                "mcode-laterality-qualifier.json",
+                "us-core-condition.json",
+                "fhir-condition-asserted-date.json",
+            ],
+        ),
+        (
+            "R4",
+            "Condition-primary-cancer-condition-nsclc.json",
+            [
+                "mcode-primary-cancer-condition.json",
+                "mcode-histology-morphology-behavior.json",
+                "mcode-body-location-qualifier.json",
+                "mcode-laterality-qualifier.json",
+                "us-core-condition.json",
+                "fhir-condition-asserted-date.json",
+            ],
+        ),
+        # Medication Administrations (R4 / FHIR 4.0.1)
+        (
+            "R4",
+            "MedicationAdministration-cancer-related-medication-admin-cyclophosphamide-brian-l.json",
+            [
+                "mcode-cancer-related-medication-administration.json",
+                "mcode-procedure-intent.json",
+                "mcode-normalization-basis.json",
+            ],
+        ),
+        (
+            "R4",
+            "MedicationAdministration-cancer-related-medication-admin-paclitaxel-jenny-m.json",
+            [
+                "mcode-cancer-related-medication-administration.json",
+                "mcode-procedure-intent.json",
+                "mcode-normalization-basis.json",
+            ],
+        ),
+        # Observations - vital signs (R5 / FHIR 5.0.0)
+        (
+            "R5",
+            "Observation-blood-pressure.json",
+            [
+                "observation-vital-signs.json",
+                "observation-blood-pressure.json",
+            ],
+        ),
+        (
+            "R5",
+            "Observation-simple-body-height.json",
+            [
+                "observation-vital-signs.json",
+                "observation-body-height.json",
+            ],
+        ),
+        # Observations - TNM category (R4 / FHIR 4.0.1)
+        (
+            "R4",
+            "Observation-tnm-clinical-distant-metastases-category-cM0.json",
+            [
+                "mcode-tnm-category.json",
+                "mcode-tnm-distant-metastases-category.json",
+                "us-core-simple-observation.json",
+            ],
+        ),
+        # Patients (R4 / FHIR 4.0.1)
+        (
+            "R4",
+            "Patient-cancer-patient-brian-l.json",
+            [
+                "us-core-patient.json",
+                "us-core-race.json",
+                "us-core-ethnicity.json",
+                "us-core-birthsex.json",
+                "us-core-sex.json",
+                "us-core-genderIdentity.json",
+                "us-core-tribal-affiliation.json",
+                "mcode-cancer-patient.json",
+            ],
+        ),
+        (
+            "R4",
+            "Patient-cancer-patient-jenny-m.json",
+            [
+                "us-core-patient.json",
+                "us-core-race.json",
+                "us-core-ethnicity.json",
+                "us-core-birthsex.json",
+                "us-core-sex.json",
+                "us-core-genderIdentity.json",
+                "us-core-tribal-affiliation.json",
+                "mcode-cancer-patient.json",
+            ],
+        ),
+        # Practitioners (R4 / FHIR 4.0.1)
+        (
+            "R4",
+            "Practitioner-us-core-practitioner-owen-oncologist.json",
+            [
+                "us-core-practitioner.json",
+            ],
+        ),
+        (
+            "R4",
+            "Practitioner-us-core-practitioner-peter-pathologist.json",
+            [
+                "us-core-practitioner.json",
+            ],
+        ),
+        # Procedures (R4 / FHIR 4.0.1)
+        (
+            "R4",
+            "Procedure-radiotherapy-treatment-summary-other-with-text.json",
+            [
+                "us-core-procedure.json",
+                "mcode-radiotherapy-course-summary.json",
+                "mcode-body-location-qualifier.json",
+                "mcode-laterality-qualifier.json",
+                "mcode-procedure-intent.json",
+                "mcode-treatment-termination-reason.json",
+                "mcode-radiotherapy-modality-and-technique.json",
+                "mcode-radiotherapy-modality.json",
+                "mcode-radiotherapy-technique.json",
+                "mcode-radiotherapy-sessions.json",
+                "mcode-radiotherapy-dose-delivered-to-volume.json",
+            ],
+        ),
+        (
+            "R4",
+            "Procedure-us-core-procedure-bone-marrow-aspiration-brian-l.json",
+            [
+                "us-core-procedure.json",
+            ],
+        ),
+        (
+            "R4",
+            "Procedure-us-core-procedure-lumbar-puncture-brian-l.json",
+            [
+                "us-core-procedure.json",
+            ],
+        ),
+        # Specimens (R4 / FHIR 4.0.1)
+        (
+            "R4",
+            "Specimen-human-specimen-lung.json",
+            [
+                "mcode-human-specimen.json",
+                "mcode-body-location-qualifier.json",
+                "mcode-laterality-qualifier.json",
+                "us-core-specimen.json",
+                "mcode-body-structure-identifier.json",
+            ],
+        ),
+        (
+            "R4",
+            "Specimen-tumor-specimen-left-breast-jenny-m.json",
+            [
+                "mcode-human-specimen.json",
+                "mcode-body-location-qualifier.json",
+                "mcode-laterality-qualifier.json",
+                "us-core-specimen.json",
+                "mcode-body-structure-identifier.json",
+            ],
+        ),
+    ],
 )
-@pytest.mark.parametrize("filename", fhir_profiles_test_cases)
 @pytest.mark.filterwarnings("ignore:.*eld-24.*")
-def test_construct_profiled_resource(mode, filename, factory):
+def test_construct_profiled_resource(mode, release, example_filename, definition_files):
     # Use the auto-generated model to validate a FHIR resource
     with open(
-        os.path.join(os.path.abspath(f"{PROFILES_EXAMPLES_DIRECTORY}"), filename),
+        os.path.join(
+            os.path.abspath(f"{PROFILES_EXAMPLES_DIRECTORY}"), example_filename
+        ),
         encoding="utf8",
     ) as file:
         fhir_resource = json.load(file)
 
+    factory = FHIRModelFactory(fhir_release=release)
+
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
         with with_config(validation_mode="skip"):
-            # Disable internet access to ensure we use local definitions
-            factory.disable_internet_access()
             # Load the FHIR resource definition from local files
-            factory.load_definitions_from_directory(Path(PROFILES_DEFINTIONS_DIRECTORY))
-            factory.clear_cache()
+            for file in definition_files:
+                with open(
+                    os.path.join(PROFILES_DEFINTIONS_DIRECTORY, file), encoding="utf8"
+                ) as def_file:
+                    struct_def = json.load(def_file)
+                    factory.definition_registry.from_dict(struct_def)
+            factory.reset_cache()
         # Generate source code for Pydantic FHIR model
-        resource = factory.construct_resource_model(
+        resource = factory.build(
             canonical_url=fhir_resource["meta"]["profile"][0],
             mode=mode,
         )
         source_code = CodeGenerator().generate_resource_model_code(resource)
+        print(source_code)
         assert (
             json.loads(resource.model_validate(fhir_resource).model_dump_json())
             == fhir_resource

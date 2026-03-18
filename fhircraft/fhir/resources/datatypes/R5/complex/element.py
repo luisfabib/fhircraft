@@ -24,11 +24,6 @@ class Element(Base):
         description="Unique id for inter-element referencing",
         default=None,
     )
-    id_ext: Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
-    )
     extension: Optional[List["Extension"]] = Field(
         description="Additional content defined by implementations",
         default=None,

@@ -22,7 +22,7 @@ T = TypeVar("T")
 import requests
 import yaml
 from dotenv import dotenv_values
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
 # URL regex pattern
@@ -127,6 +127,23 @@ def load_file(file_path: str) -> Dict:
             raise ValueError(
                 "Unsupported file format. Please provide a .yaml, .yml, or .json file."
             )
+
+
+def to_snake_case(name: str) -> str:
+    """
+    Convert a given string from CamelCase to snake_case.
+
+    Args:
+        name (str): The input string in CamelCase format.
+
+    Returns:
+        str: The converted string in snake_case format.
+    """
+    # Insert underscore before upper-after-lower transitions: "HumanName" -> "Human_Name"
+    s = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
+    # Insert underscore before final lower of an all-caps run: "URLParser" -> "URL_Parser"
+    s = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", s)
+    return s.lower()
 
 
 def load_url(url: str) -> Dict:

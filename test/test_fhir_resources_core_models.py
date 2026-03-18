@@ -3,7 +3,7 @@ import json
 import os
 import pytest
 
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+from fhircraft.fhir.resources.datatypes import get_fhir_type
 
 CORE_EXAMPLES_DIRECTORY = f"test/static/fhir-examples"
 
@@ -22,7 +22,7 @@ def _assert_core_resource_compliance(fhir_release, filepath):
     with open(filepath, encoding="utf8") as file:
         fhir_resource_data = json.load(file)
     resource_type = fhir_resource_data["resourceType"]
-    fhir_model = get_fhir_resource_type(resource_type, fhir_release)
+    fhir_model = get_fhir_type(resource_type, fhir_release)
 
     # Use the code-loaded model to validate the FHIR resource data
     assert (

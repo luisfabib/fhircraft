@@ -19,8 +19,8 @@ from fhircraft.fhir.resources.datatypes.R4B import core as R4B_models
 from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
 
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
-from fhircraft.fhir.resources.factory import ResourceFactory
-from fhircraft.fhir.resources.repository import CompositeStructureDefinitionRepository
+from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
+from fhircraft.fhir.resources.factory import FHIRModelFactory
 
 from .exceptions import (
     MappingError,
@@ -69,18 +69,23 @@ class FHIRMappingEngine:
     This engine validates, processes, and applies mapping rules defined in a StructureMap to transform source FHIR resources into target resources, supporting complex mapping logic, rule dependencies, and FHIRPath-based expressions.
 
     Attributes:
-        repository (CompositeStructureDefinitionRepository): Repository for FHIR StructureDefinitions.
-        factory (ResourceFactory): Factory for constructing FHIR resource models.
+        repository (StructureDefinitionRegistry): Registry for FHIR StructureDefinitions.
+        factory (FHIRModelFactory): Factory for constructing FHIR resource models.
         transformer (MappingTransformer): Executes FHIRPath-based transforms.
     """
 
     def __init__(
         self,
-        repository: CompositeStructureDefinitionRepository | None = None,
-        factory: ResourceFactory | None = None,
+        repository: StructureDefinitionRegistry | None = None,
+        factory: FHIRModelFactory | None = None,
+        fhir_release: str = "R5",
     ):
-        self.repository = repository or CompositeStructureDefinitionRepository()
-        self.factory = factory or ResourceFactory(repository=self.repository)
+        self.repository = repository or StructureDefinitionRegistry(
+            fhir_release=fhir_release
+        )
+        self.factory = factory or FHIRModelFactory(
+            registry=self.repository, fhir_release=fhir_release
+        )
 
     def execute(
         self,
@@ -356,21 +361,21 @@ class FHIRMappingEngine:
                 continue
             # Handle core FHIR types with known canonical URLs to avoid unnecessary repository lookups
             if canonical_url.startswith("http://hl7.org/fhir/StructureDefinition/"):
-                from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+                from fhircraft.fhir.resources.datatypes import get_fhir_type
 
                 core_type = canonical_url.removeprefix(
                     "http://hl7.org/fhir/StructureDefinition/"
                 )
                 try:
-                    resolved[s.alias or core_type] = get_fhir_resource_type(core_type)
+                    resolved[s.alias or core_type] = get_fhir_type(
+                        core_type, self.factory.fhir_release
+                    )
                     return resolved
                 except AttributeError:
                     pass
             try:
                 structure_def = self.repository.get(canonical_url)
-                model = self.factory.construct_resource_model(
-                    structure_definition=structure_def
-                )
+                model = self.factory.build(structure_def)
                 resolved[s.alias or structure_def.name] = model
             except (KeyError, ValueError, AttributeError) as e:
                 # If StructureDefinition not found, log warning but continue

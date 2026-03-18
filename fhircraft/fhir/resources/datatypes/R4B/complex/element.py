@@ -19,14 +19,9 @@ class Element(FHIRBaseModel):
     _kind = "complex-type"
     _fhir_release = "R4B"
 
-    id: Optional[String] = Field(
+    id: Optional[Id] = Field(
         description="Unique id for inter-element referencing",
         default=None,
-    )
-    id_ext: Optional["Element"] = Field(
-        description="Placeholder element for id extensions",
-        default=None,
-        alias="_id",
     )
     extension: Optional[List["Extension"]] = Field(
         description="Additional content defined by implementations",

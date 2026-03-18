@@ -58,9 +58,9 @@ FHIRPath also handles edge cases automatically - missing values, lists of values
 When working with Fhircraft FHIR resources, you can use FHIRPath expressions directly on the resource instances. This provides the most convenient way to query FHIR data since all Fhircraft models include built-in FHIRPath methods:
 
 ```python
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+from fhircraft.fhir.resources import get_fhir_type
 
-Patient = get_fhir_resource_type("Patient", "R5")
+Patient = get_fhir_type("Patient", "R5")
 
 patient = Patient(
     name=[{"given": ["Alice"], "family": "Johnson"}],
@@ -143,9 +143,9 @@ Additionally, Fhircraft enables updating values through FHIRPath operations, all
 !!! example "Working with Collections"
 
     ```python
-    from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+    from fhircraft.fhir.resources import get_fhir_type
 
-    Patient = get_fhir_resource_type("Patient", "R5")
+    Patient = get_fhir_type("Patient", "R5")
 
     patient = Patient(
         name=[
@@ -243,9 +243,9 @@ Fhircraft automatically provides these environment variables in all FHIRPath eva
 | `%fhirRelease` | The FHIR release version of the node being evaluated in the expression | `R4B` |
 
 ```python
-from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+from fhircraft.fhir.resources import get_fhir_type
 
-Patient = get_fhir_resource_type("Patient", "R5")
+Patient = get_fhir_type("Patient", "R5")
 
 patient = Patient(
     id="patient-123",
@@ -313,9 +313,9 @@ FHIRPath provides contextual variables that give you access to the current evalu
     The `$this` variable refers to the current item when iterating through collections:
 
     ```python
-    from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+    from fhircraft.fhir.resources import get_fhir_type
 
-    Patient = get_fhir_resource_type("Patient", "R5")
+    Patient = get_fhir_type("Patient", "R5")
 
     patient = Patient(
         name=[

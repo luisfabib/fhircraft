@@ -110,7 +110,17 @@ class FhirMappingLanguageParser(FhirPathParser):
         return StructureMapGroupRuleTargetParameter(**arg)
 
     def _get_model(self, model_name: str):
-        return get_fhir_type(model_name, release=self.fhir_release)
+        match self.fhir_release:
+            case "R4":
+                return getattr(R4_models, model_name)
+            case "R4B":
+                return getattr(R4B_models, model_name)
+            case "R5":
+                return getattr(R5_models, model_name)
+            case _:
+                raise FhirMappingLanguageParserError(
+                    f"Unsupported FHIR release: {self.fhir_release}"
+                )
 
     def _prepare_models(self):
         self.ConceptMap: (

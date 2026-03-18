@@ -13,12 +13,12 @@ from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
 from typing_extensions import TypeAliasType
 
-from fhircraft.fhir.resources.factory import ResourceFactory
+from fhircraft.fhir.resources.factory import FHIRModelFactory
 from fhircraft.utils import ensure_list, get_module_name
 
 __all__ = ["generator", "generate_resource_model_code", "CodeGenerator"]
 
-FACTORY_MODULE = get_module_name(ResourceFactory)
+FACTORY_MODULE = get_module_name(FHIRModelFactory)
 LEFT_TO_RIGHT_COMPLEX = "FieldInfo(annotation=NoneType, required=True, metadata=[_PydanticGeneralMetadata(union_mode='left_to_right')])"
 LEFT_TO_RIGHT_SIMPLE = "Field(union_mode='left_to_right')"
 
@@ -203,7 +203,7 @@ class CodeGenerator:
                     pass
 
             if is_factory_basemodel:
-                # If object was created by ResourceFactory, then serialize the model
+                # If object was created by FHIRModelFactory, then serialize the model
                 # But only if we're not already processing it (to prevent infinite recursion)
                 if type_obj not in self._processing_models:
                     self._serialize_model(type_obj)

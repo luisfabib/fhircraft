@@ -50,14 +50,9 @@ class Extension(Element):
 
     _type = "Extension"
 
-    url: Optional[String] = Field(
+    url: Optional[Uri] = Field(
         description="identifies the meaning of the extension",
         default=None,
-    )
-    url_ext: Optional["Element"] = Field(
-        description="Placeholder element for url extensions",
-        default=None,
-        alias="_url",
     )
     valueBase64Binary: Optional[Base64Binary] = Field(
         description="Value of extension",

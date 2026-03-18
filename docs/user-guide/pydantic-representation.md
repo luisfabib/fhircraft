@@ -301,12 +301,12 @@ During serialization, each resource automatically includes a `resourceType` fiel
     During deserialization, Fhircraft reads the `resourceType` discriminator and dynamically instantiates the correct Python class for each resource. This means that accessing `bundle.entry[0].resource` returns an actual `Patient` instance with all its specific methods and fields, not a generic `Resource` object. This polymorphic deserialization works recursively through the entire resource tree, ensuring that every nested resource maintains its precise type identity.
 
     ```python
-    from fhircraft.fhir.resources.datatypes import get_fhir_resource_type
+    from fhircraft.fhir.resources import get_fhir_type
 
     # Different resource types
-    Patient = get_fhir_resource_type("Patient", "R5") 
-    Practitioner = get_fhir_resource_type("Practitioner", "R5")
-    Bundle = get_fhir_resource_type("Bundle", "R5")
+    Patient = get_fhir_type("Patient", "R5") 
+    Practitioner = get_fhir_type("Practitioner", "R5")
+    Bundle = get_fhir_type("Bundle", "R5")
 
     # Create a bundle containing different resource types
     bundle = Bundle(
