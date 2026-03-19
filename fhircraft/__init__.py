@@ -43,31 +43,20 @@ def __getattr__(name):
         from fhircraft.fhir.path import FHIRPathCollectionItem
 
         return FHIRPathCollectionItem
+
     # Configuration system
-    elif name == "ValidationConfig":
-        from fhircraft.config import ValidationConfig
-
-        return ValidationConfig
-    elif name == "FhircraftConfig":
-        from fhircraft.config import FhircraftConfig
-
-        return FhircraftConfig
     elif name == "get_config":
         from fhircraft.config import get_config
 
         return get_config
-    elif name == "set_config":
-        from fhircraft.config import set_config
-
-        return set_config
     elif name == "configure":
         from fhircraft.config import configure
 
         return configure
-    elif name == "with_config":
-        from fhircraft.config import with_config
+    elif name == "context_config":
+        from fhircraft.config import context_config
 
-        return with_config
+        return context_config
     elif name == "disable_constraint":
         from fhircraft.config import disable_constraint
 

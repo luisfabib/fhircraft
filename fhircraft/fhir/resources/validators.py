@@ -50,29 +50,28 @@ def _validate_FHIR_element_constraint(
 
     # Check configuration for validation control
     config = get_config()
-    validation_config = config.validation
 
     # Skip validation if mode is 'skip'
-    if validation_config.mode == "skip":
+    if config.mode == "skip":
         return value
 
     # Skip if this specific constraint is disabled
-    if key in validation_config.disabled_constraints:
+    if key in config.disabled_fhir_constraints:
         return value
 
     # Skip if all warnings are disabled and this is a warning
     if severity == "warning" and (
-        validation_config.disable_warnings or validation_config.disable_warning_severity
+        config.disable_validation_warnings or config.disable_fhir_warnings
     ):
         return value
 
     # Skip if all errors are disabled and this is an error
-    if severity == "error" and validation_config.disable_errors:
+    if severity == "error" and config.disable_fhir_errors:
         return value
 
     # In lenient mode, convert errors to warnings
     effective_severity = severity
-    if validation_config.mode == "lenient" and severity == "error":
+    if config.mode == "lenient" and severity == "error":
         effective_severity = "warning"
 
     if value is None:

@@ -10,7 +10,7 @@ from fhircraft.fhir.mapper.engine.core import (
     FHIRMappingEngine,
     StructureMapModelMode,
 )
-from fhircraft.config import with_config
+from fhircraft.config import context_config
 from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
     StructureMap as R4B_StructureMap,
 )
@@ -84,7 +84,7 @@ def test_integration_tutorial_examples(directory):
                     os.path.join(os.path.abspath(EXAMPLES_DIRECTORY), directory, name),
                     encoding="utf8",
                 ) as file:
-                    with with_config(validation_mode="skip"):
+                    with context_config(validation_mode="skip"):
                         structure_definitions.append(
                             StructureDefinition(**json.load(file))
                         )
