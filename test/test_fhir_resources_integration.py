@@ -8,7 +8,7 @@ from pathlib import Path
 from pydantic import BaseModel
 import pytest
 
-from fhircraft.config import context_config
+from fhircraft.config import override_config
 from fhircraft.fhir.resources.factory import (
     FHIRModelFactory,
 )
@@ -59,7 +59,7 @@ fhir_resources_test_cases = {
 
 def _assert_construct_core_resource(fhir_release, resource_label, filename):
     factory = FHIRModelFactory(fhir_release=fhir_release)
-    with context_config(validation_mode="skip"):
+    with override_config(validation_mode="skip"):
         # Disable internet access to ensure we use local definitions
         factory.definition_registry.disable_internet_access()
         # Load the FHIR resource definition from local files
@@ -359,7 +359,7 @@ def test_construct_profiled_resource(mode, release, example_filename, definition
 
     # Create temp directory for storing generated code
     with tempfile.TemporaryDirectory() as d:
-        with context_config(validation_mode="skip"):
+        with override_config(validation_mode="skip"):
             # Load the FHIR resource definition from local files
             for file in definition_files:
                 with open(

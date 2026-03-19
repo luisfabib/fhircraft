@@ -109,7 +109,7 @@ def configure(
 
 
 @contextmanager
-def context_config(
+def override_config(
     *,
     disable_validation_warnings: bool | None = None,
     disable_fhir_warnings: bool | None = None,
@@ -160,7 +160,7 @@ def disable_constraint(*constraint_keys: str) -> None:
 
     Creates a new configuration with the given keys added to
     `disabled_fhir_constraints`; the change is visible to the current context
-    only and does not escape a surrounding `context_config` block.
+    only and does not escape a surrounding `override_config` block.
 
     Args:
         *constraint_keys: One or more constraint keys to disable (e.g., 'dom-6').
@@ -231,7 +231,7 @@ __all__ = [
     "FhircraftConfig",
     "get_config",
     "configure",
-    "context_config",
+    "override_config",
     "disable_constraint",
     "enable_constraint",
     "reset_config",
