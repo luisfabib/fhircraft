@@ -80,11 +80,27 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
     _enable_polymorphic_serialization: ClassVar[bool] = True
     _enable_polymorphic_deserialization: ClassVar[bool] = True
 
-    # Parent tracking attributes
+    # Parent tracking attributes (stored – others computed lazily)
     _parent: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
-    _root_resource: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
-    _resource: Union["FHIRBaseModel", None] = PrivateAttr(default=None)
     _index: Union[int, None] = PrivateAttr(default=None)
+
+    @property
+    def _root_resource(self) -> "FHIRBaseModel":
+        """Walk up the _parent chain to return the topmost node (the document root)."""
+        node = self
+        while node._parent is not None:
+            node = node._parent
+        return node
+
+    @property
+    def _resource(self) -> "Union[FHIRBaseModel, None]":
+        """Walk up the _parent chain to return the nearest enclosing resource/logical node."""
+        node: "Union[FHIRBaseModel, None]" = self
+        while node is not None:
+            if node._is_resource():
+                return node
+            node = node._parent
+        return None
 
     @classmethod
     def _is_resource(cls) -> bool:
@@ -317,47 +333,24 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         index: Union[int, None] = None,
     ):
         """
-        Set parent and root resource context for this instance.
+        Set parent and index context for this instance, then propagate to direct children.
+
+        ``_root_resource`` and ``_resource`` are computed lazily by walking ``_parent``,
+        so only ``_parent`` and ``_index`` need to be stored.  The ``root`` and
+        ``resource`` arguments are accepted for backwards-compatibility but ignored.
 
         Args:
             parent: The parent FHIRBaseModel instance (if this is a nested field)
-            root: The root resource instance (top-level resource)
-            resource: The immediate parent resource instance
+            root: Ignored – resolved lazily via the ``_root_resource`` property.
+            resource: Ignored – resolved lazily via the ``_resource`` property.
             index: The index of this instance in a list (if applicable)
         """
-        # Set parent
         object.__setattr__(self, "_parent", parent)
-
-        # Set index
         object.__setattr__(self, "_index", index)
 
-        # Set root: if root is provided, use it; otherwise if parent exists, use parent's root; otherwise self is root
-        if root is not None:
-            object.__setattr__(self, "_root_resource", root)
-        elif parent is not None and hasattr(parent, "_root_resource"):
-            object.__setattr__(
-                self, "_root_resource", getattr(parent, "_root_resource", parent)
-            )
-        else:
-            # This instance is the root
-            object.__setattr__(self, "_root_resource", self)
-
-        # Set resource: if this instance is a resource, it becomes the _resource
-        # otherwise inherit from parent or explicit resource parameter
-        if self._is_resource():
-            # This is a resource or logical model itself
-            object.__setattr__(self, "_resource", self)
-        elif resource is not None:
-            # Explicit resource provided
-            object.__setattr__(self, "_resource", resource)
-        elif parent is not None and hasattr(parent, "_resource"):
-            # Inherit resource from parent
-            object.__setattr__(self, "_resource", getattr(parent, "_resource", None))
-        else:
-            # No resource context
-            object.__setattr__(self, "_resource", None)
-
-        # Propagate context to all nested fields
+        # Propagate _parent / _index to direct children only.
+        # Deeper descendants were already wired by their own model_post_init call;
+        # they resolve _root_resource / _resource lazily via property traversal.
         for field_name in self.__class__.model_fields:
             value = getattr(self, field_name, None)
             if value is not None:
@@ -365,49 +358,29 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
 
     def _propagate_context_to_value(self, value: Any):
         """
-        Propagate parent context to a field value.
+        Propagate parent context to a direct child field value.
+
+        Only ``_parent`` and ``_index`` are written; ``_root_resource`` and
+        ``_resource`` are resolved lazily by property traversal.
 
         Args:
             value: The field value (can be FHIRBaseModel, list, or other)
         """
         if isinstance(value, FHIRBaseModel):
-            # Single FHIR model - set context
-            # Determine resource: if self is a resource, use self; otherwise use self's _resource
-            resource_context = (
-                self if self._is_resource() else getattr(self, "_resource", None)
-            )
-            value._set_resource_context(
-                parent=self,
-                root=getattr(self, "_root_resource", self),
-                resource=resource_context,
-                index=None,
-            )
+            # Set _parent directly – no recursive descent needed.
+            object.__setattr__(value, "_parent", self)
+            object.__setattr__(value, "_index", None)
         elif isinstance(value, list):
-            # Convert to FHIRList if not already
             if not isinstance(value, FHIRList):
-                # Replace the list with FHIRList
-                resource_context = (
-                    self if self._is_resource() else getattr(self, "_resource", None)
-                )
-                fhir_list = FHIRList(
-                    value,
-                    parent=self,
-                    root=getattr(self, "_root_resource", self),
-                    resource=resource_context,
-                )
-                # Find which field this list belongs to and replace it
+                # Wrap plain list in FHIRList to track future mutations.
+                fhir_list = FHIRList(value, parent=self)
                 for field_name in self.__class__.model_fields:
                     if getattr(self, field_name, None) is value:
                         object.__setattr__(self, field_name, fhir_list)
                         break
             else:
-                # Update context of existing FHIRList
-                resource_context = (
-                    self if self._is_resource() else getattr(self, "_resource", None)
-                )
+                # Re-point existing FHIRList at the current parent.
                 value._parent = self
-                value._root = getattr(self, "_root_resource", self)
-                value._resource = resource_context
                 value._propagate_context()
 
     def model_dump_json(self, *args, **kwargs):
@@ -631,14 +604,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             obj, strict=strict, from_attributes=from_attributes, context=context
         )
 
-        # Set up resource context for the root instance if it's a resource
-        if isinstance(instance, FHIRBaseModel):
-            instance._set_resource_context(
-                parent=None,
-                root=instance if instance._is_resource() else None,
-                resource=instance if instance._is_resource() else None,
-            )
-
+        # model_post_init already propagated _parent links bottom-up during
+        # construction; no additional traversal is required here.
         return instance
 
     @classmethod
@@ -663,12 +630,8 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
             json_data, strict=strict, context=context
         )
 
-        # Set up resource context for the root instance if it's a resource
-        if instance._is_resource():
-            instance._set_resource_context(
-                parent=None, root=instance, resource=instance
-            )
-
+        # model_post_init already propagated _parent links bottom-up during
+        # construction; no additional traversal is required here.
         return instance
 
     @classmethod
@@ -1085,65 +1048,47 @@ class FHIRList(list):
     """
 
     def __init__(self, items=None, parent=None, root=None, resource=None):
-        """Initialize FHIRList with items and context."""
+        """Initialize FHIRList with items and context.
+
+        ``root`` and ``resource`` are accepted for backwards-compatibility but
+        are no longer stored; they are resolved lazily via ``_parent`` on items.
+        """
         super().__init__(items or [])
         self._parent = parent
-        self._root = root
-        self._resource = resource
         self._propagate_context()
 
     def _propagate_context(self):
-        """Propagate context to all current items and their nested children."""
-        # Only propagate if we have a parent (otherwise we don't have context yet)
+        """Set _parent and _index on all current FHIRBaseModel items."""
         if self._parent is None:
             return
 
         for index, item in enumerate(self):
             if isinstance(item, FHIRBaseModel):
-                item._set_resource_context(
-                    parent=self._parent,
-                    root=self._root,
-                    resource=self._resource,
-                    index=index,
-                )
+                object.__setattr__(item, "_parent", self._parent)
+                object.__setattr__(item, "_index", index)
 
     def append(self, item):
         """Append item and propagate context."""
         super().append(item)
         if isinstance(item, FHIRBaseModel):
-            # Index is the last position
-            index = len(self) - 1
-            item._set_resource_context(
-                parent=self._parent,
-                root=self._root,
-                resource=self._resource,
-                index=index,
-            )
+            object.__setattr__(item, "_parent", self._parent)
+            object.__setattr__(item, "_index", len(self) - 1)
 
     def extend(self, items):
         """Extend list and propagate context to new items."""
         start_index = len(self)
         super().extend(items)
-        # Only propagate to newly added items
         for offset, item in enumerate(items):
             if isinstance(item, FHIRBaseModel):
-                item._set_resource_context(
-                    parent=self._parent,
-                    root=self._root,
-                    resource=self._resource,
-                    index=start_index + offset,
-                )
+                object.__setattr__(item, "_parent", self._parent)
+                object.__setattr__(item, "_index", start_index + offset)
 
     def insert(self, index, item):
         """Insert item and propagate context."""
         super().insert(index, item)
         if isinstance(item, FHIRBaseModel):
-            item._set_resource_context(
-                parent=self._parent,
-                root=self._root,
-                resource=self._resource,
-                index=index,
-            )
+            object.__setattr__(item, "_parent", self._parent)
+            object.__setattr__(item, "_index", index)
         # Re-index all items after insertion point
         for i in range(index + 1, len(self)):
             if isinstance(self[i], FHIRBaseModel):
@@ -1153,19 +1098,12 @@ class FHIRList(list):
         """Set item and propagate context."""
         super().__setitem__(index, item)
         if isinstance(item, FHIRBaseModel):
-            # Handle single item
             if isinstance(index, int):
-                item._set_resource_context(
-                    parent=self._parent,
-                    root=self._root,
-                    resource=self._resource,
-                    index=index,
-                )
+                object.__setattr__(item, "_parent", self._parent)
+                object.__setattr__(item, "_index", index)
             else:
-                # Handle slice assignment - can't easily track indices
-                # So we re-propagate to all items
+                # Slice assignment – re-propagate to fix indices.
                 self._propagate_context()
         elif isinstance(item, list):
-            # Handle slice assignment like lst[1:3] = [...]
-            # Re-propagate to all items to fix indices
+            # Slice assignment with a plain list – re-propagate to fix indices.
             self._propagate_context()
