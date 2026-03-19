@@ -312,6 +312,16 @@ def test_load_with_no_env_vars():
 # =========================================================================
 
 
+def test_validation_skips_invariants():
+    from fhircraft.fhir.resources.datatypes.R4.complex import Quantity
+
+    with override_config(validation_mode="skip"):
+        qty = Quantity.model_validate(
+            {"code": "mg"}
+        )  # This would normally raise an error due to missing system
+        assert qty.code == "mg"
+
+
 def test_validation_respects_disabled_warnings():
 
     configure(disable_validation_warnings=True)
