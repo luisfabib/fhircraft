@@ -929,7 +929,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         Returns:
             instance (Self): An instance of the model with the sliced elements constructed.
         """
-        from fhircraft.fhir.path import fhirpath
+        from fhircraft.fhir.path.parser import fhirpath
 
         instance = super().model_construct()
         for element, slices in cls.get_sliced_elements().items():
@@ -993,7 +993,7 @@ class FHIRBaseModel(BaseModel, FHIRPathMixin):
         Cleans up unused or incomplete slice instances within the given FHIR resource by iterating through the
         sliced elements of the class, identifying valid elements, and updating the resource with only the valid slices.
         """
-        from fhircraft.fhir.path import fhirpath
+        from fhircraft.fhir.path.parser import fhirpath
 
         # Remove unused/incomplete slices
         for element, slices in cls.get_sliced_elements().items():

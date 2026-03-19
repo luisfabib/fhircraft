@@ -22,7 +22,8 @@ from .utils import import_fhirpath_engine
 def __getattr__(name):
     """Lazy loading of resources components to avoid circular import issues."""
     if name == "fhirpath":
-        return FhirPathParser()
+        from .parser import fhirpath as _fhirpath
+        return _fhirpath
     else:
         raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 

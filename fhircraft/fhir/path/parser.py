@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 
 def parse(string):
-    return FhirPathParser().parse(string)
+    return fhirpath.parse(string)
 
 
 class FhirPathParser:
