@@ -9,7 +9,7 @@ from fhircraft.config import (
     get_config,
     load_config_from_env,
     reset_config,
-    context_config,
+    override_config,
 )
 from fhircraft.fhir.resources.validators import (
     _validate_FHIR_element_constraint,
@@ -136,27 +136,27 @@ def test_configure__disable_fhir_warnings():
 
 
 # =========================================================================
-# context_config()
+# override_config()
 # =========================================================================
 
 
-def test_context_config__temporary_change():
+def test_override_config__temporary_change():
     # Initial state
     assert get_config().disable_validation_warnings is False
 
     # Inside context
-    with context_config(disable_validation_warnings=True):
+    with override_config(disable_validation_warnings=True):
         assert get_config().disable_validation_warnings is True
 
     # After context
     assert get_config().disable_validation_warnings is False
 
 
-def test_context_config__nested():
-    with context_config(validation_mode="lenient"):
+def test_override_config__nested():
+    with override_config(validation_mode="lenient"):
         assert get_config().mode == "lenient"
 
-        with context_config(validation_mode="skip"):
+        with override_config(validation_mode="skip"):
             assert get_config().mode == "skip"
 
         assert get_config().mode == "lenient"
@@ -164,11 +164,11 @@ def test_context_config__nested():
     assert get_config().mode == "strict"
 
 
-def test_context_config__exception_handling():
+def test_override_config__exception_handling():
     assert get_config().mode == "strict"
 
     try:
-        with context_config(validation_mode="skip"):
+        with override_config(validation_mode="skip"):
             assert get_config().mode == "skip"
             raise ValueError("Test exception")
     except ValueError:
@@ -178,8 +178,8 @@ def test_context_config__exception_handling():
     assert get_config().mode == "strict"
 
 
-def test_context_config__returns_config():
-    with context_config(disable_validation_warnings=True) as config:
+def test_override_config__returns_config():
+    with override_config(disable_validation_warnings=True) as config:
         assert isinstance(config, FhircraftConfig)
         assert config.disable_validation_warnings is True
 
@@ -394,7 +394,7 @@ def test_validation_with_context_manager():
         warnings.simplefilter("always")
 
         # Temporarily disable warnings
-        with context_config(disable_validation_warnings=True):
+        with override_config(disable_validation_warnings=True):
             result = _validate_FHIR_element_constraint(
                 value={"test": "value"},
                 instance=None,
@@ -428,7 +428,7 @@ def test_context_isolation():
     ctx = copy_context()
 
     # Modify config in new context
-    with context_config(validation_mode="lenient"):
+    with override_config(validation_mode="lenient"):
         result_in_context = check_config_in_context()
 
     # Main context should be unchanged

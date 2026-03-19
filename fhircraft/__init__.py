@@ -53,10 +53,10 @@ def __getattr__(name):
         from fhircraft.config import configure
 
         return configure
-    elif name == "context_config":
-        from fhircraft.config import context_config
+    elif name == "override_config":
+        from fhircraft.config import override_config
 
-        return context_config
+        return override_config
     elif name == "disable_constraint":
         from fhircraft.config import disable_constraint
 
