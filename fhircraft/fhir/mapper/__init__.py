@@ -85,7 +85,8 @@ class FHIRMapper:
             from fhircraft.fhir.mapper.engine.core import FHIRMappingEngine
 
             self._engine = FHIRMappingEngine(
-                repository=self.repository, fhir_release=self.fhir_release
+                structure_definition_registry=self.repository,
+                fhir_release=self.fhir_release,
             )
         return self._engine
 

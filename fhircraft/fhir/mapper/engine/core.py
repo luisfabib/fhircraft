@@ -21,6 +21,7 @@ from fhircraft.fhir.resources.datatypes.R5 import core as R5_models
 from fhircraft.fhir.path.parser import fhirpath as fhirpath_parser
 from fhircraft.fhir.resources.definitions.registry import StructureDefinitionRegistry
 from fhircraft.fhir.resources.factory import FHIRModelFactory
+from .registry import StructureMapRegistry
 
 from .exceptions import (
     MappingError,
@@ -64,27 +65,35 @@ class StructureMapModelMode(str, enum.Enum):
 
 class FHIRMappingEngine:
     """
-    FHIRMappingEngine is responsible for executing FHIR StructureMap-based transformations between FHIR resources.
+    FHIRMappingEngine is responsible for executing FHIR StructureMap-based transformations
+    between FHIR resources.
 
-    This engine validates, processes, and applies mapping rules defined in a StructureMap to transform source FHIR resources into target resources, supporting complex mapping logic, rule dependencies, and FHIRPath-based expressions.
+    This engine validates, processes, and applies mapping rules defined in a StructureMap
+    to transform source FHIR resources into target resources, supporting complex mapping
+    logic, rule dependencies, and FHIRPath-based expressions.
 
     Attributes:
-        repository (StructureDefinitionRegistry): Registry for FHIR StructureDefinitions.
+        structure_definition_registry (StructureDefinitionRegistry): Registry for resolvingFHIR StructureDefinitions.
+        structure_map_registry (StructureMapRegistry): Registry for resolving FHIR StructureMaps.
         factory (FHIRModelFactory): Factory for constructing FHIR resource models.
-        transformer (MappingTransformer): Executes FHIRPath-based transforms.
     """
 
     def __init__(
         self,
-        repository: StructureDefinitionRegistry | None = None,
+        structure_definition_registry: StructureDefinitionRegistry | None = None,
+        structure_map_registry: StructureMapRegistry | None = None,
         factory: FHIRModelFactory | None = None,
         fhir_release: str = "R5",
     ):
-        self.repository = repository or StructureDefinitionRegistry(
-            fhir_release=fhir_release
+        self.structure_definition_registry = (
+            structure_definition_registry
+            or StructureDefinitionRegistry(fhir_release=fhir_release)
         )
         self.factory = factory or FHIRModelFactory(
-            registry=self.repository, fhir_release=fhir_release
+            registry=self.structure_definition_registry, fhir_release=fhir_release
+        )
+        self.structure_map_registry = structure_map_registry or StructureMapRegistry(
+            fhir_release=fhir_release
         )
 
     def execute(
@@ -374,7 +383,7 @@ class FHIRMappingEngine:
                 except AttributeError:
                     pass
             try:
-                structure_def = self.repository.get(canonical_url)
+                structure_def = self.structure_definition_registry.get(canonical_url)
                 model = self.factory.build(structure_def)
                 resolved[s.alias or structure_def.name] = model
             except (KeyError, ValueError, AttributeError) as e:
