@@ -136,9 +136,7 @@ def validate_element_constraint(
     """
 
     config = get_config()
-    if (
-        config.mode == "skip":
-    ):  # Skip element constraints since they are often violated by design and not worth the overhead of validation
+    if config.mode == "skip":
         return instance
 
     values = {}
