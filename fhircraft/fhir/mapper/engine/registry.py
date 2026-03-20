@@ -5,7 +5,7 @@ Provides an in-memory registry for managing StructureMap resources used by the
 FHIR Mapping Language engine, with optional internet-fallback resolution.
 """
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import requests
 from pydantic import BaseModel
@@ -20,12 +20,6 @@ from fhircraft.utils import load_env_variables
 
 StructureMapUnion = Union[
     R4_models.StructureMap, R4B_models.StructureMap, R5_models.StructureMap
-]
-
-StructureMapGroupUnion = Union[
-    R4_models.StructureMapGroup,
-    R4B_models.StructureMapGroup,
-    R5_models.StructureMapGroup,
 ]
 
 _RELEASE_STRUCTURE_MAP = {
@@ -167,58 +161,6 @@ class StructureMapRegistry:
             f"StructureMap not found for '{canonical_url}'. "
             "Either register it locally or enable internet access."
         )
-
-    def get_group(
-        self,
-        group_name: str,
-        structure_map_url: Optional[str] = None,
-    ) -> "StructureMapGroupUnion":
-        """
-        Retrieve a StructureMapGroup by name.
-
-        Args:
-            group_name: The ``name`` field of the target group.
-            structure_map_url: If provided, only search within the StructureMap
-                identified by this canonical URL.  If ``None``, all registered
-                StructureMaps are searched and the first match is returned.
-
-        Returns:
-            The matching StructureMapGroup.
-
-        Raises:
-            StructureMapNotFoundError: If *structure_map_url* is given but the
-                map cannot be resolved (see :meth:`get`).
-            KeyError: If no group with the given name is found.
-        """
-        if structure_map_url is not None:
-            structure_map = self.get(structure_map_url)
-            candidates: List["StructureMapUnion"] = [structure_map]
-        else:
-            candidates = list(self.structure_maps_by_url.values())
-
-        matches = []
-        for sm in candidates:
-            for group in sm.group or []:
-                if str(group.name) == group_name:
-                    matches.append((group, sm.url))
-
-        # Post-processing: Check for no matches or multiple matches
-        if len(matches) == 0:
-            if structure_map_url is not None:
-                raise KeyError(
-                    f"Group '{group_name}' not found in StructureMap '{structure_map_url}'."
-                )
-            else:
-                raise KeyError(
-                    f"Group '{group_name}' not found in any registered StructureMap."
-                )
-        elif len(matches) > 1:
-            raise KeyError(
-                f"Conflicting groups named '{group_name}' found in StructureMaps: "
-                f"{[str(url) for _, url in matches]}."
-            )
-        else:
-            return matches[0][0]
 
     # ------------------------------------------------------------------
     # Configuration

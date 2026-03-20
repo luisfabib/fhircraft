@@ -25,7 +25,7 @@ from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
 
 
 # ============================================================================
-# TEST MODELS
+# Helpers & Fixtures
 # ============================================================================
 
 
@@ -43,11 +43,6 @@ class PersonModel(BaseModel):
     id: str = "person-1"
     firstName: str = ""
     lastName: str = ""
-
-
-# ============================================================================
-# FIXTURES
-# ============================================================================
 
 
 @pytest.fixture
@@ -151,12 +146,11 @@ def mock_regular_rule():
 
 
 # ============================================================================
-# Group.__init__() Tests
+# Group.__init__()
 # ============================================================================
 
 
-def test_init_minimal_group(minimal_group_definition, mock_parent_group):
-    """Test initialization with minimal group definition."""
+def test_init__minimal_group_definition(minimal_group_definition, mock_parent_group):
     group = Group(minimal_group_definition, mock_parent_group)
 
     assert group.definition == minimal_group_definition
@@ -167,8 +161,7 @@ def test_init_minimal_group(minimal_group_definition, mock_parent_group):
     assert group.inputs[0].name == "src"
 
 
-def test_init_group_without_name(mock_parent_group):
-    """Test initialization generates name when none provided."""
+def test_init__without_name(mock_parent_group):
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name=None, input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -177,10 +170,9 @@ def test_init_group_without_name(mock_parent_group):
     assert group.definition == definition
 
 
-def test_init_with_multiple_inputs(
+def test_init__with_multiple_inputs(
     group_definition_with_multiple_inputs, mock_parent_group
 ):
-    """Test initialization with multiple input definitions."""
     group = Group(group_definition_with_multiple_inputs, mock_parent_group)
 
     assert len(group.inputs) == 2
@@ -190,8 +182,7 @@ def test_init_with_multiple_inputs(
     assert group.inputs[1].mode == "target"
 
 
-def test_init_with_rules(group_definition_with_rules, mock_parent_group):
-    """Test initialization creates Rule objects from rule definitions."""
+def test_init__with_rules(group_definition_with_rules, mock_parent_group):
     group = Group(group_definition_with_rules, mock_parent_group)
 
     assert len(group.rules) == 1
@@ -199,10 +190,9 @@ def test_init_with_rules(group_definition_with_rules, mock_parent_group):
     assert group.rules[0].parent_group == group
 
 
-def test_init_without_inputs_raises_error(
+def test_init__without_inputs_raises_error(
     group_definition_without_inputs, mock_parent_group
 ):
-    """Test initialization fails when group lacks input definitions."""
     with pytest.raises(
         MappingDigestionError, match="Group 'no-inputs-group' has no input definitions"
     ):
@@ -210,11 +200,11 @@ def test_init_without_inputs_raises_error(
 
 
 # ============================================================================
-# Group._organize_rules() Tests
+# Group._organize_rules()
 # ============================================================================
 
 
-def test_organize_rules_empty_list(minimal_group_definition, mock_parent_group):
+def test_organize_rules__without_rules(minimal_group_definition, mock_parent_group):
     """Test organizing rules when no rules are present."""
     group = Group(minimal_group_definition, mock_parent_group)
 
@@ -222,8 +212,7 @@ def test_organize_rules_empty_list(minimal_group_definition, mock_parent_group):
     assert len(group.rules) == 0
 
 
-def test_organize_rules_regular_rules_only(mock_parent_group):
-    """Test organizing rules with only regular rules."""
+def test_organize_rules__only_regular_rules(mock_parent_group):
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -243,8 +232,7 @@ def test_organize_rules_regular_rules_only(mock_parent_group):
     assert group.rules == [rule1, rule2]
 
 
-def test_organize_rules_with_first_and_last(mock_parent_group):
-    """Test organizing rules with first, regular, and last rules."""
+def test_organize_rules__with_first_and_last(mock_parent_group):
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -271,7 +259,7 @@ def test_organize_rules_with_first_and_last(mock_parent_group):
     assert group.rules == [first_rule, regular_rule, last_rule]
 
 
-def test_organize_rules_multiple_first_rules_raises_error(mock_parent_group):
+def test_organize_rules__multiple_first_rules_raises_error(mock_parent_group):
     """Test error when multiple rules have 'first' target list mode."""
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
@@ -294,7 +282,7 @@ def test_organize_rules_multiple_first_rules_raises_error(mock_parent_group):
         group._organize_rules()
 
 
-def test_organize_rules_multiple_last_rules_raises_error(mock_parent_group):
+def test_organize_rules__multiple_last_rules_raises_error(mock_parent_group):
     """Test error when multiple rules have 'last' target list mode."""
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
@@ -318,14 +306,13 @@ def test_organize_rules_multiple_last_rules_raises_error(mock_parent_group):
 
 
 # ============================================================================
-# Group.bind_parameters() Tests
+# Group.bind_parameters()
 # ============================================================================
 
 
-def test_bind_parameters_success(
+def test_bind_parameters__basic(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
-    """Test successful parameter binding."""
     group = Group(minimal_group_definition, None)
 
     group.bind_parameters(mapping_scope, [sample_fhirpath], is_dependent=False)
@@ -335,10 +322,9 @@ def test_bind_parameters_success(
     assert mapping_scope.variables["src"] == sample_fhirpath
 
 
-def test_bind_parameters_parameter_count_mismatch(
+def test_bind_parameters__parameter_count_mismatch(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
-    """Test error when parameter count doesn't match input count."""
     group = Group(minimal_group_definition, None)
 
     with pytest.raises(MappingError, match="Expected 1 parameters, got 2"):
@@ -347,8 +333,7 @@ def test_bind_parameters_parameter_count_mismatch(
         )
 
 
-def test_bind_parameters_target_input_missing_type_non_dependent(mock_parent_group):
-    """Test error when target input lacks type for non-dependent call."""
+def test_bind_parameters__target_input_missing_type_non_dependent(mock_parent_group):
     input_def = StructureMapGroupInput(name="tgt", type=None, mode="target")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -363,8 +348,7 @@ def test_bind_parameters_target_input_missing_type_non_dependent(mock_parent_gro
         group.bind_parameters(mapping_scope, [sample_fhirpath], is_dependent=False)
 
 
-def test_bind_parameters_target_input_no_type_dependent_allowed(mock_parent_group):
-    """Test that target input without type is allowed for dependent calls."""
+def test_bind_parameters__target_input_no_type_dependent_allowed(mock_parent_group):
     input_def = StructureMapGroupInput(name="tgt", type=None, mode="target")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -377,8 +361,7 @@ def test_bind_parameters_target_input_no_type_dependent_allowed(mock_parent_grou
     assert "tgt" in mapping_scope.variables
 
 
-def test_bind_parameters_unknown_input_type(mock_parent_group):
-    """Test error when input has unknown type."""
+def test_bind_parameters__unknown_input_type(mock_parent_group):
     input_def = StructureMapGroupInput(name="src", type="UnknownType", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)
     group = Group(definition, mock_parent_group)
@@ -394,11 +377,11 @@ def test_bind_parameters_unknown_input_type(mock_parent_group):
 
 
 # ============================================================================
-# Group.process() Tests
+# Group.process()
 # ============================================================================
 
 
-def test_process_success_minimal(
+def test_process__success_minimal(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
     """Test successful processing with minimal configuration."""
@@ -408,7 +391,7 @@ def test_process_success_minimal(
     group.process(mapping_scope, [sample_fhirpath], is_dependent=False)
 
 
-def test_process_creates_group_scope(
+def test_process__creates_group_scope(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
     """Test that process creates a group scope with correct parent."""
@@ -426,7 +409,7 @@ def test_process_creates_group_scope(
         )
 
 
-def test_process_calls_bind_parameters(
+def test_process__calls_bind_parameters(
     minimal_group_definition, mapping_scope, sample_fhirpath
 ):
     """Test that process calls bind_parameters with correct arguments."""
@@ -440,7 +423,7 @@ def test_process_calls_bind_parameters(
         assert mock_bind.call_args[0][2] == True  # is_dependent parameter
 
 
-def test_process_executes_all_rules(
+def test_process__executes_all_rules(
     group_definition_with_rules, mapping_scope, sample_fhirpath
 ):
     """Test that process executes all rules in the group."""
@@ -455,7 +438,7 @@ def test_process_executes_all_rules(
     group.rules[0].process.assert_called_once()
 
 
-def test_process_with_multiple_rules_execution_order(mock_parent_group):
+def test_process__with_multiple_rules_execution_order(mock_parent_group):
     """Test that rules are executed in the correct order."""
     input_def = StructureMapGroupInput(name="src", type="Person", mode="source")
     definition = StructureMapGroup(name="test-group", input=[input_def], rule=None)

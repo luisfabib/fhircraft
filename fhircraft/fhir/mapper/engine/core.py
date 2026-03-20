@@ -122,7 +122,8 @@ class FHIRMappingEngine:
             tuple: A tuple of resulting target instances after the transformation, which can be a mixture of BaseModel instances and/or dictionaries.
 
         Raises:
-            NotImplementedError: If StructureMap imports are present (not supported).
+            StructureMapNotFoundError: If a non-wildcard import URL is not registered in the
+                StructureMapRegistry.
             ValueError: If a constant in the StructureMap is missing a name or conflicts with a model name.
             RuntimeError: If the number of provided sources or targets does not match the group parameters, or if required targets are missing.
             TypeError: If provided sources or targets do not match the expected types for the group parameters.
@@ -132,8 +133,35 @@ class FHIRMappingEngine:
         if not isinstance(sources, tuple):
             sources = (sources,)
 
-        if structure_map.import_:
-            raise NotImplementedError("StructureMap imports are not implemented yet")
+        # Resolve imported StructureMaps
+        imported_maps = []
+        for import_url in structure_map.import_ or []:
+            import_url_str = str(import_url)
+            if "*" in import_url_str:
+                # Wildcard: resolve all registered maps whose URL matches the pattern
+                import re as _re
+                pattern = _re.compile(
+                    _re.escape(import_url_str).replace(r"\*", ".*") + "$"
+                )
+                matched = [
+                    sm
+                    for url, sm in self.structure_map_registry.structure_maps_by_url.items()
+                    if pattern.match(url)
+                ]
+                if not matched:
+                    logger.warning(
+                        f"Import wildcard '{import_url_str}' matched no registered StructureMaps."
+                    )
+                imported_maps.extend(matched)
+            else:
+                from fhircraft.fhir.mapper.engine.registry import StructureMapNotFoundError
+                try:
+                    imported_maps.append(self.structure_map_registry.get(import_url_str))
+                except StructureMapNotFoundError:
+                    raise StructureMapNotFoundError(
+                        f"StructureMap import failed: '{import_url_str}' is not registered. "
+                        "Register it via structure_map_registry.add() before executing."
+                    )
 
         # Resolve structure definitions
         source_models = self._resolve_structure_definitions(
@@ -177,6 +205,10 @@ class FHIRMappingEngine:
 
         # Build default mapping group registry
         self._build_default_group_registry(structure_map, global_scope)
+
+        # Attach imported StructureMaps and registry to global scope
+        global_scope.imported_maps = imported_maps
+        global_scope.structure_map_registry = self.structure_map_registry
 
         # Parse and validate constants
         for const in getattr(structure_map, "const", None) or []:

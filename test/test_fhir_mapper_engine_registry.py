@@ -300,70 +300,7 @@ def test_from_dict__respects_fail_if_exists():
 
 
 # ===========================================================================
-# StructureMapRegistry.get_group
-# ===========================================================================
-
-
-def test_get_group__finds_group_in_specific_map():
-    reg = make_registry()
-    group_a = make_group("GroupA")
-    sm = make_sm(groups=[group_a, make_group("GroupB")])
-    reg.structure_maps_by_url[SM_URL] = sm
-
-    result = reg.get_group("GroupA", structure_map_url=SM_URL)
-    assert result is group_a
-
-
-def test_get_group__finds_group_across_all_maps_when_no_url_given():
-    reg = make_registry()
-    grp = make_group("Shared")
-    sm1 = make_sm(url="http://example.org/Map1", groups=[grp])
-    sm2 = make_sm(url="http://example.org/Map2", groups=[make_group("Other")])
-    reg.structure_maps_by_url["http://example.org/Map1"] = sm1
-    reg.structure_maps_by_url["http://example.org/Map2"] = sm2
-
-    result = reg.get_group("Shared")
-    assert result is grp
-
-
-def test_get_group__raises_key_error_when_group_not_found_in_specific_map():
-    reg = make_registry()
-    sm = make_sm(groups=[make_group("GroupA")])
-    reg.structure_maps_by_url[SM_URL] = sm
-
-    with pytest.raises(KeyError, match="NonExistent"):
-        reg.get_group("NonExistent", structure_map_url=SM_URL)
-
-
-def test_get_group__raises_key_error_when_group_not_found_in_any_map():
-    reg = make_registry()
-    sm = make_sm(groups=[make_group("GroupA")])
-    reg.structure_maps_by_url[SM_URL] = sm
-
-    with pytest.raises(KeyError, match="NonExistent"):
-        reg.get_group("NonExistent")
-
-
-def test_get_group__raises_key_error_when_conflicting_groups_found():
-    reg = make_registry()
-    sm1 = make_sm(groups=[make_group("GroupA")])
-    reg.structure_maps_by_url["http://example.org/Map1"] = sm1
-    sm2 = make_sm(groups=[make_group("GroupA")])
-    reg.structure_maps_by_url["http://example.org/Map2"] = sm2
-
-    with pytest.raises(KeyError, match="Conflicting groups"):
-        reg.get_group("GroupA")
-
-
-def test_get_group__raises_structure_map_not_found_error_for_unknown_map_url():
-    reg = make_registry()
-
-    with pytest.raises(StructureMapNotFoundError):
-        reg.get_group("AnyGroup", structure_map_url="http://example.org/UnknownMap")
-
-
-# ===========================================================================
-# StructureMapRegistry.download_url  (static)
+# StructureMapRegistry.download_url
 # ===========================================================================
 
 
