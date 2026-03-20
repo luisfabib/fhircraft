@@ -240,6 +240,12 @@ class MappingScope:
             except MappingError:
                 pass
 
+        # Fall through: try resolving as a group from imported StructureMaps
+        try:
+            return self.resolve_group(identifier)
+        except MappingError:
+            pass
+
         raise MappingError(
             f"Symbol '{identifier}' not found in current or parent scopes."
         )

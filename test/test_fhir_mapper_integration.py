@@ -305,3 +305,55 @@ def test_constants_assignment(engine, constant, expected_type, expected_value):
     """
     result = engine.execute_mapping(mapping_script, {})
     assert getattr(result[0].extension[0], f"value{expected_type}") == expected_value
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_import_statement_exposes_reusable_group(engine):
+    """Test that a group defined in an imported StructureMap is callable from the main map.
+
+    Two FML scripts are used:
+    - 'lib' defines a group ``ReusableGroup`` that copies a single field.
+    - 'main' imports 'lib' and delegates the field copy to ``ReusableGroup``.
+    """
+
+    # -------------------------------------------------------------------
+    # Library map: defines ReusableGroup
+    # -------------------------------------------------------------------
+    lib_script = """
+    map 'http://example.org/lib' = 'lib'
+
+    uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
+    
+    group ReusableGroup(source src, target tgt: Patient) {
+        src.name as n -> tgt.name.text = n;
+    }
+    """
+
+    # -------------------------------------------------------------------
+    # Main map: imports the library and delegates to ReusableGroup
+    # -------------------------------------------------------------------
+    main_script = """
+    map 'http://example.org/main' = 'main'
+
+    uses "http://hl7.org/fhir/StructureDefinition/Patient" as target
+
+    imports 'http://example.org/lib'
+
+    group main(source src, target tgt: Patient) {
+        src -> tgt then ReusableGroup(src, tgt);
+    }
+    """
+
+    # Parse both maps
+    lib_map = engine.parse_mapping_script(lib_script)
+    main_map = engine.parse_mapping_script(main_script)
+
+    # Register the library map so the engine can resolve the import
+    engine.engine.structure_map_registry.add(lib_map)
+
+    # Execute the main map
+    source = {"name": "Jane Doe", "age": 25}
+    result = engine.execute_mapping(main_map, source)
+
+    assert len(result) == 1
+    assert result[0].name[0].text == "Jane Doe"  # type: ignore
