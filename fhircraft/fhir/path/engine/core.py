@@ -1026,12 +1026,43 @@ class TypeSpecifier(FHIRPath):
                     UserWarning,
                 )
                 release = "R4"
-            type = get_fhir_type(self.specifier, release=release)
+            resolved_type = get_fhir_type(self.specifier, release)
+        elif namespace == "System":
+            from fhircraft.fhir.path.engine.literals import (
+                Date,
+                DateTime,
+                Quantity,
+                Time,
+            )
+
+            match self.specifier:
+                case "String":
+                    resolved_type = str
+                case "Boolean":
+                    resolved_type = bool
+                case "Integer":
+                    resolved_type = int
+                case "Long":
+                    resolved_type = int
+                case "Decimal":
+                    resolved_type = float
+                case "Date":
+                    resolved_type = Date
+                case "DateTime":
+                    resolved_type = DateTime
+                case "Time":
+                    resolved_type = Time
+                case "Quantity":
+                    resolved_type = Quantity
+                case _:
+                    raise NameError(
+                        f"Unknown type specifier '{self.specifier}' in System namespace"
+                    )
         else:
             raise NameError(
                 f"Unknown namespace '{self.namespace}' for type specifier '{self.specifier}'"
             )
-        return [FHIRPathCollectionItem(value=type)]
+        return [FHIRPathCollectionItem(value=resolved_type)]
 
     def __str__(self):
         return (
