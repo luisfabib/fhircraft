@@ -15,41 +15,67 @@ env = {"%fhirRelease": "R4"}
 # -------------
 
 test_cases = (
-    ("ABC", "string", True),
-    ("123", "string", True),
-    ("", "string", True),
-    (123, "string", False),
-    # Integer type checking
-    (12, "integer", True),
-    ("12", "integer", True),
-    (-12, "integer", True),
-    # UnsignedInt type checking
-    (12, "unsignedInt", True),
-    ("12", "unsignedInt", True),
-    (0, "unsignedInt", True),
-    (-12, "unsignedInt", False),
-    ("-12", "unsignedInt", False),
-    # PositiveInt type checking
-    (12, "positiveInt", True),
-    ("12", "positiveInt", True),
-    (0, "positiveInt", False),
-    (-12, "positiveInt", False),
-    ("-12", "positiveInt", False),
-    # Decimal type checking
-    (23, "decimal", True),
-    (23.32, "decimal", True),
-    ("23.32", "decimal", True),
-    ("23", "decimal", True),
-    # Boolean type checking
-    (True, "boolean", True),
-    ("true", "boolean", True),
-    (False, "boolean", True),
-    ("false", "boolean", True),
-    ("invalid", "boolean", False),
-    (Date("@2024"), "date", True),
-    (Quantity(12, "g"), "Quantity", True),
-    (Practitioner(id="example"), "Practitioner", True),
-    (Observation(id="example"), "Observation", True),
+    # FHIR String type checking
+    ("ABC", "FHIR.string", True),
+    ("123", "FHIR.string", True),
+    ("", "FHIR.string", True),
+    (123, "FHIR.string", False),
+    # FHIR Integer type checking
+    (12, "FHIR.integer", True),
+    (-12, "FHIR.integer", True),
+    (0, "FHIR.integer", True),
+    ("12", "FHIR.integer", True),
+    ("-12", "FHIR.integer", True),
+    # FHIR UnsignedInt type checking
+    (12, "FHIR.unsignedInt", True),
+    ("12", "FHIR.unsignedInt", True),
+    (0, "FHIR.unsignedInt", True),
+    (-12, "FHIR.unsignedInt", False),
+    ("-12", "FHIR.unsignedInt", False),
+    # FHIR PositiveInt type checking
+    (12, "FHIR.positiveInt", True),
+    ("12", "FHIR.positiveInt", True),
+    (0, "FHIR.positiveInt", False),
+    (-12, "FHIR.positiveInt", False),
+    ("-12", "FHIR.positiveInt", False),
+    # System Integer type checking
+    (12, "System.Integer", True),
+    ("12", "System.Integer", False),
+    (0, "System.Integer", True),
+    (-12, "System.Integer", True),
+    ("-12", "System.Integer", False),
+    # FHIR Decimal type checking
+    (23, "FHIR.decimal", True),
+    (23.32, "FHIR.decimal", True),
+    ("23.32", "FHIR.decimal", True),
+    ("23", "FHIR.decimal", True),
+    # System Decimal type checking
+    (23, "System.Decimal", False),
+    (23.32, "System.Decimal", True),
+    ("23.32", "System.Decimal", False),
+    ("23", "System.Decimal", False),
+    # FHIR Boolean type checking
+    (True, "FHIR.boolean", True),
+    ("true", "FHIR.boolean", True),
+    (False, "FHIR.boolean", True),
+    ("false", "FHIR.boolean", True),
+    ("invalid", "FHIR.boolean", False),
+    # System Boolean type checking
+    (True, "System.Boolean", True),
+    ("true", "System.Boolean", False),
+    (False, "System.Boolean", True),
+    ("false", "System.Boolean", False),
+    ("invalid", "System.Boolean", False),
+    # FHIR Complex type checking
+    (Date("@2024"), "FHIR.date", True),
+    (Quantity(12, "g"), "FHIR.Quantity", True),
+    (Practitioner(id="example"), "FHIR.Practitioner", True),
+    (Observation(id="example"), "FHIR.Observation", True),
+    # System Complex type checking
+    (Date("@2024"), "System.Date", True),
+    (Quantity(12, "g"), "System.Quantity", True),
+    (Practitioner(id="example"), "System.Quantity", False),
+    (Observation(id="example"), "System.Quantity", False),
 )
 
 
