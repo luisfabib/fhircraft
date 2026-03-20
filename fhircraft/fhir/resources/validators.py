@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING, Any, List, TypeVar, Union, Sequence
 
 from pydantic import BaseModel
 
+from fhircraft.config import get_config
+from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
+
 if TYPE_CHECKING:
     from fhircraft.fhir.resources.base import FHIRBaseModel, FHIRSliceModel
-
-from fhircraft.utils import ensure_list, get_all_models_from_field, merge_dicts
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -133,6 +134,11 @@ def validate_element_constraint(
         AssertionError: If the validation fails and severity is not `warning`.
         Warning: If the validation fails and severity is `warning`.
     """
+
+    config = get_config()
+    if config.mode == "skip":
+        return instance
+
     values = {}
 
     def _get_path_value(obj: Any, element_path: str, current_path: str = "") -> None:
@@ -219,6 +225,9 @@ def validate_model_constraint(
         AssertionError: If the validation fails and severity is not `warning`.
         Warning: If the validation fails and severity is `warning`.
     """
+    config = get_config()
+    if config.mode == "skip":
+        return instance
     return _validate_FHIR_element_constraint(
         instance, instance, expression, human, key, severity
     )
@@ -245,20 +254,29 @@ def validate_FHIR_element_pattern(
     """
     from fhircraft.fhir.resources.base import FHIRBaseModel
 
+    config = get_config()
+    if config.mode == "skip":
+        return element
+
     if isinstance(pattern, list):
         pattern = pattern[0]
     _element = element[0] if isinstance(element, list) else element
-    if isinstance(_element, FHIRBaseModel):
-        assert (
-            merge_dicts(_element.model_dump(), pattern.model_dump())
-            == _element.model_dump()
-        ), f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2)}"
-    elif isinstance(_element, dict) and isinstance(pattern, dict):
-        assert (
-            merge_dicts(_element, pattern) == _element
-        ), f"Value does not fulfill pattern: {pattern}"
-    else:
-        assert _element == pattern, f"Value does not fulfill pattern: {pattern}"
+    try:
+        if isinstance(_element, FHIRBaseModel):
+            assert (
+                merge_dicts(_element.model_dump(), pattern.model_dump())
+                == _element.model_dump()
+            )
+        elif isinstance(_element, dict) and isinstance(pattern, dict):
+            assert merge_dicts(_element, pattern) == _element
+        else:
+            assert _element == pattern
+    except AssertionError:
+        error = f"Value does not fulfill pattern:\n{pattern.model_dump_json(indent=2) if isinstance(pattern, FHIRBaseModel) else pattern}"
+        if config.mode == "lenient":
+            warnings.warn(str(error))
+        else:
+            raise AssertionError(str(error))
     return element
 
 
@@ -303,17 +321,24 @@ def validate_FHIR_element_fixed_value(
     """
     from fhircraft.fhir.resources.base import FHIRBaseModel
 
+    config = get_config()
+    if config.mode == "skip":
+        return element
+
     if isinstance(constant, list):
         constant = constant[0]
     _element = element[0] if isinstance(element, list) else element
-    if isinstance(_element, FHIRBaseModel):
-        assert (
-            constant.model_dump() == _element.model_dump()
-        ), f"Value does not fulfill constant:\n{constant.model_dump_json(indent=2)}"
-    elif isinstance(_element, dict) and isinstance(constant, dict):
-        assert constant == _element, f"Value does not fulfill constant: {constant}"
-    else:
-        assert constant == _element, f"Value does not fulfill constant: {constant}"
+    try:
+        if isinstance(_element, FHIRBaseModel):
+            assert constant.model_dump() == _element.model_dump()
+        else:
+            assert constant == _element
+    except AssertionError as e:
+        error = f"Value does not fulfill constant:\n{constant.model_dump_json(indent=2) if isinstance(constant, FHIRBaseModel) else constant}"
+        if config.mode == "lenient":
+            warnings.warn(error)
+        else:
+            raise AssertionError(error)
     return element
 
 
@@ -360,6 +385,11 @@ def validate_type_choice_element(
     Raises:
         AssertionError: If more than one value is set for the type choice element or if a non-allowed type is set.
     """
+
+    config = get_config()
+    if config.mode == "skip":
+        return instance
+
     _field_types: List[str] = [
         field_type if isinstance(field_type, str) else str(field_type.__name__)
         for field_type in field_types
@@ -375,12 +405,22 @@ def validate_type_choice_element(
         is not None
         for field_type in _field_types
     )
-    assert (
-        types_set_count <= 1
-    ), f"Type choice element {field_name_base}[x] can only have one value set."
-    assert not required or (
-        required and types_set_count > 0
-    ), f"Type choice element {field_name_base}[x] must have one value set. Got {types_set_count}."
+
+    def _assert(condition: bool, message: str) -> None:
+        if not condition:
+            if config.mode == "lenient":
+                warnings.warn(message)
+            else:
+                raise AssertionError(message)
+
+    _assert(
+        types_set_count <= 1,
+        f"Type choice element {field_name_base}[x] can only have one value set.",
+    )
+    _assert(
+        not required or types_set_count > 0,
+        f"Type choice element {field_name_base}[x] must have one value set. Got {types_set_count}.",
+    )
     all_types = [
         field.replace(field_name_base, "")
         for field in instance.__class__.model_fields
@@ -400,9 +440,10 @@ def validate_type_choice_element(
                 else non_allowed_type.__name__
             )
             value = getattr(instance, field_name, None)
-            assert (
-                value is None
-            ), f"Type choice element {field_name_base}[x] cannot use non-allowed type '{non_allowed_type}'. "
+            _assert(
+                value is None,
+                f"Type choice element {field_name_base}[x] cannot use non-allowed type '{non_allowed_type}'. ",
+            )
 
     return instance
 
@@ -424,7 +465,12 @@ def validate_slicing_cardinalities(
     Raises:
         AssertionError: If cardinality constraints are violated for any slice.
     """
+    from fhircraft.config import get_config
     from fhircraft.fhir.resources.base import FHIRSliceModel
+
+    config = get_config()
+    if config.mode == "skip":
+        return values
 
     if values is None:
         return values
@@ -435,15 +481,21 @@ def validate_slicing_cardinalities(
         slice_instances_count = sum([isinstance(value, slice) for value in values])
         # Only validate cardinalities if there are instances of the slice present
         if slice_instances_count > 0:
-            assert (
-                slice_instances_count >= slice.min_cardinality
-            ), f"Slice '{slice.__name__}' for field '{field_name}' violates its min. cardinality. \
-                    Requires min. cardinality of {slice.min_cardinality}, but got {slice_instances_count}"
-            if slice.max_cardinality is not None:
+            try:
                 assert (
-                    slice_instances_count <= slice.max_cardinality
-                ), f"Slice '{slice.__name__}' for field '{field_name}' violates its max. cardinality. \
-                        Requires max. cardinality of {slice.max_cardinality}, but got {slice_instances_count}"
+                    slice_instances_count >= slice.min_cardinality
+                ), f"Slice '{slice.__name__}' for field '{field_name}' violates its min. cardinality. \
+                        Requires min. cardinality of {slice.min_cardinality}, but got {slice_instances_count}"
+                if slice.max_cardinality is not None:
+                    assert (
+                        slice_instances_count <= slice.max_cardinality
+                    ), f"Slice '{slice.__name__}' for field '{field_name}' violates its max. cardinality. \
+                            Requires max. cardinality of {slice.max_cardinality}, but got {slice_instances_count}"
+            except AssertionError as e:
+                if config.mode == "lenient":
+                    warnings.warn(str(e))
+                else:
+                    raise
     return values
 
 

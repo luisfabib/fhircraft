@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 
 def parse(string):
-    return FhirPathParser().parse(string)
+    return fhirpath.parse(string)
 
 
 class FhirPathParser:
@@ -85,9 +85,20 @@ class FhirPathParser:
             errorlog=logger,
         )
 
+        # Cache of parsed FHIRPath expressions
+        self._parse_cache: dict[str, FHIRPath] = {}
+
     def parse(self, string, lexer=None) -> FHIRPath | Any:
         self.string = string
-        return self.parse_token_stream(self.lexer.tokenize(string))
+        if string not in self._parse_cache:
+            self._parse_cache[string] = self.parse_token_stream(
+                self.lexer.tokenize(string)
+            )
+        return self._parse_cache[string]
+
+    def cache_info(self) -> dict:
+        """Return basic cache statistics (size and stored expression strings)."""
+        return {"size": len(self._parse_cache), "expressions": list(self._parse_cache)}
 
     def is_valid(self, string):
         try:

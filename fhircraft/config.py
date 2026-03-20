@@ -55,6 +55,7 @@ class FhircraftConfig:
 _config_context: ContextVar[FhircraftConfig | None] = ContextVar(
     "fhircraft_config", default=None
 )
+_DEFAULT_CONFIG = FhircraftConfig()
 
 
 def get_config() -> FhircraftConfig:
@@ -64,9 +65,7 @@ def get_config() -> FhircraftConfig:
         FhircraftConfig: The current configuration instance.
     """
     config = _config_context.get()
-    if config is None:
-        return FhircraftConfig()
-    return config
+    return config if config is not None else _DEFAULT_CONFIG
 
 
 def configure(

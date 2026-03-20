@@ -14,6 +14,7 @@ import requests
 from pydantic import BaseModel
 
 from pydantic_core import ValidationError
+from fhircraft.config import override_config
 from fhircraft.fhir.packages.client import FHIRPackageRegistryClient
 from fhircraft.fhir.resources.datatypes.R4.core import (
     StructureDefinition as StructureDefinitionR4,
@@ -241,9 +242,17 @@ class StructureDefinitionRegistry:
     def _validate_structure_definition(
         self, data: Dict[str, Any]
     ) -> "StructureDefinitionR4 | StructureDefinitionR4B | StructureDefinitionR5":
+        from fhircraft.fhir.resources.base import FHIRBaseModel
+
         StructureDefinition = get_fhir_type("StructureDefinition", self.fhir_release)
         try:
-            if isinstance(data, BaseModel):
+            if isinstance(data, StructureDefinition):
+                return data  # type: ignore
+            elif isinstance(data, FHIRBaseModel):
+                with override_config(validation_mode="skip"):
+                    data = data.model_dump()
+                    return StructureDefinition.model_validate(data)
+            elif isinstance(data, BaseModel):
                 data = data.model_dump()
             return StructureDefinition.model_validate(data)
         except ValidationError as e:
