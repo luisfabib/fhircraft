@@ -259,7 +259,7 @@ class FhirMappingLanguageParser(FhirPathParser):
     def p_error(self, t):
         if t is None:
             raise FhirMappingLanguageParserError(
-                f'FHIR Mapping Language parser error near the end of string "{self.string}"!'
+                f'FHIR Mapping Language parser error at EOF "{self.string}"'
             )
         raise FhirMappingLanguageParserError(
             f'FHIR Mapping Language parser error at {t.lineno}:{t.col} - Invalid token "{t.value}" ({t.type}):\n{_underline_error_in_fhir_path(self.string, t.value, t.col, t.lineno)}'
@@ -612,6 +612,15 @@ class FhirMappingLanguageParser(FhirPathParser):
         m_rules : '{' m_rule_list '}'
         """
         p[0] = p[2]
+
+    def p_mapper_rule_list_error(self, p):
+        """
+        m_rule_list : m_rule
+                    | m_rule_list m_rule
+        """
+        raise FhirMappingLanguageParserError(
+            f"A rule was not properly closed. Did you forget a ';' at the end of a rule?",
+        )
 
     def p_mapper_rule_list(self, p):
         """
