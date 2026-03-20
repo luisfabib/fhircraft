@@ -28,7 +28,10 @@ from .exceptions import MappingError
 
 if TYPE_CHECKING:
     from .group import Group
-    from fhircraft.fhir.mapper.engine.registry import StructureMapRegistry, StructureMapUnion
+    from fhircraft.fhir.mapper.engine.registry import (
+        StructureMapRegistry,
+        StructureMapUnion,
+    )
 
 # Type variable for generic lookups
 T = TypeVar("T")

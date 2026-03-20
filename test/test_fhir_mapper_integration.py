@@ -309,16 +309,6 @@ def test_constants_assignment(engine, constant, expected_type, expected_value):
 
 @pytest.mark.filterwarnings("ignore:.*dom-6.*")
 def test_import_statement_exposes_reusable_group(engine):
-    """Test that a group defined in an imported StructureMap is callable from the main map.
-
-    Two FML scripts are used:
-    - 'lib' defines a group ``ReusableGroup`` that copies a single field.
-    - 'main' imports 'lib' and delegates the field copy to ``ReusableGroup``.
-    """
-
-    # -------------------------------------------------------------------
-    # Library map: defines ReusableGroup
-    # -------------------------------------------------------------------
     lib_script = """
     map 'http://example.org/lib' = 'lib'
 
@@ -329,9 +319,6 @@ def test_import_statement_exposes_reusable_group(engine):
     }
     """
 
-    # -------------------------------------------------------------------
-    # Main map: imports the library and delegates to ReusableGroup
-    # -------------------------------------------------------------------
     main_script = """
     map 'http://example.org/main' = 'main'
 
@@ -357,3 +344,69 @@ def test_import_statement_exposes_reusable_group(engine):
 
     assert len(result) == 1
     assert result[0].name[0].text == "Jane Doe"  # type: ignore
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_extends_group_inherits_parent_rules(engine):
+    mapping_script = """
+    map 'http://example.org/extends-test' = 'extends_test'
+
+    uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as target
+
+    group BaseGroup(source src, target tgt: Patient) {
+        src.patientId as v -> tgt.id = v;
+    }
+
+    group ExtendedGroup(source src, target tgt: Patient) extends BaseGroup {
+        src.birthDate as v -> tgt.birthDate = v;
+    }
+    """
+
+    source = {"patientId": "pt-001", "birthDate": "1990-06-15"}
+    result = engine.execute_mapping(mapping_script, source, group="ExtendedGroup")
+
+    assert len(result) == 1
+    patient = result[0]
+    assert patient.id == "pt-001"  # inherited from BaseGroup
+    assert str(patient.birthDate) == "1990-06-15"  # own rule
+
+
+@pytest.mark.filterwarnings("ignore:.*dom-6.*")
+def test_extends_group_inherits_imported_parent_rules(engine):
+    base_script = """
+    map 'http://example.org/base' = 'base'
+
+    uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as target
+
+    group BaseGroup(source src, target tgt: Patient) {
+        src.patientId as v -> tgt.id = v;
+    }
+    """
+
+    mapping_script = """
+    map 'http://example.org/extends-test' = 'extends_test'
+
+    uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as target
+
+    imports 'http://example.org/base'
+
+    group ExtendedGroup(source src, target tgt: Patient) extends BaseGroup {
+        src.birthDate as v -> tgt.birthDate = v;
+    }
+    """
+
+    source = {"patientId": "pt-001", "birthDate": "1990-06-15"}
+
+    # Parse both maps
+    base_map = engine.parse_mapping_script(base_script)
+    main_map = engine.parse_mapping_script(mapping_script)
+
+    # Register the base map so the engine can resolve the import
+    engine.engine.structure_map_registry.add(base_map)
+
+    result = engine.execute_mapping(main_map, source, group="ExtendedGroup")
+
+    assert len(result) == 1
+    patient = result[0]
+    assert patient.id == "pt-001"  # inherited from BaseGroup
+    assert str(patient.birthDate) == "1990-06-15"  # own rule

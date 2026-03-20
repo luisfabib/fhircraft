@@ -140,6 +140,7 @@ class FHIRMappingEngine:
             if "*" in import_url_str:
                 # Wildcard: resolve all registered maps whose URL matches the pattern
                 import re as _re
+
                 pattern = _re.compile(
                     _re.escape(import_url_str).replace(r"\*", ".*") + "$"
                 )
@@ -154,9 +155,14 @@ class FHIRMappingEngine:
                     )
                 imported_maps.extend(matched)
             else:
-                from fhircraft.fhir.mapper.engine.registry import StructureMapNotFoundError
+                from fhircraft.fhir.mapper.engine.registry import (
+                    StructureMapNotFoundError,
+                )
+
                 try:
-                    imported_maps.append(self.structure_map_registry.get(import_url_str))
+                    imported_maps.append(
+                        self.structure_map_registry.get(import_url_str)
+                    )
                 except StructureMapNotFoundError:
                     raise StructureMapNotFoundError(
                         f"StructureMap import failed: '{import_url_str}' is not registered. "

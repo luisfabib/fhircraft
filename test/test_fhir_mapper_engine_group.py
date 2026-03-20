@@ -45,6 +45,11 @@ class PersonModel(BaseModel):
     lastName: str = ""
 
 
+def _gdef(name, inputs, rules=None, extends=None):
+    """Convenience builder for a StructureMapGroup definition."""
+    return StructureMapGroup(name=name, input=inputs, rule=rules or [], extends=extends)
+
+
 @pytest.fixture
 def minimal_group_definition():
     """Minimal group definition with just a name and input."""
@@ -476,3 +481,154 @@ def test_process__with_multiple_rules_execution_order(mock_parent_group):
 
     # Verify order by checking that rules are in expected sequence
     assert group.rules == [first_rule, regular_rule, last_rule]
+
+
+def test_process__with_extends_runs_parent_rules_first(mapping_scope, sample_fhirpath):
+    inp = StructureMapGroupInput(name="src", type="Person", mode="source")
+
+    parent = Group(_gdef("Parent", [inp]))
+    call_order = []
+    parent_rule = Mock()
+    parent_rule.has_first_target = False
+    parent_rule.has_last_target = False
+    parent_rule.process = Mock(side_effect=lambda _: call_order.append("parent"))
+    parent.rules = [parent_rule]
+
+    child = Group(_gdef("Child", [inp], extends="Parent"))
+    child_rule = Mock()
+    child_rule.has_first_target = False
+    child_rule.has_last_target = False
+    child_rule.process = Mock(side_effect=lambda _: call_order.append("child"))
+    child.rules = [child_rule]
+
+    mapping_scope.groups["Parent"] = parent
+
+    child.process(mapping_scope, [sample_fhirpath], is_dependent=False)
+
+    assert call_order == ["parent", "child"]
+
+
+def test_process__raises_error_for_unresolvable_extends(mapping_scope, sample_fhirpath):
+    inp = StructureMapGroupInput(name="src", type="Person", mode="source")
+    child = Group(_gdef("Child", [inp], extends="NonExistent"))
+    with pytest.raises(MappingError):
+        child.process(mapping_scope, [sample_fhirpath], is_dependent=False)
+
+
+# ============================================================================
+# Group._collect_rules
+# ============================================================================
+
+
+def test_collect_rules__without_extends_returns_own_rules(mapping_scope):
+    """Without extends, _collect_rules returns a copy of own rules."""
+    inp = StructureMapGroupInput(name="src", mode="source")
+    group = Group(_gdef("G", [inp]))
+    own_rule = Mock()
+    own_rule.has_first_target = False
+    own_rule.has_last_target = False
+    group.rules = [own_rule]
+    assert group._collect_rules(mapping_scope) == [own_rule]
+
+
+def test_collect_rules__parent_rules_before_child_rules(mapping_scope):
+    inp = StructureMapGroupInput(name="src", type="Person", mode="source")
+
+    parent = Group(_gdef("Parent", [inp]))
+    parent_rule = Mock()
+    parent_rule.has_first_target = False
+    parent_rule.has_last_target = False
+    parent.rules = [parent_rule]
+
+    child = Group(_gdef("Child", [inp], extends="Parent"))
+    child_rule = Mock()
+    child_rule.has_first_target = False
+    child_rule.has_last_target = False
+    child.rules = [child_rule]
+
+    mapping_scope.groups["Parent"] = parent
+
+    rules = child._collect_rules(mapping_scope)
+    assert rules == [parent_rule, child_rule]
+
+
+def test_collect_rules__chained_extension_inheritance(mapping_scope):
+    inp = StructureMapGroupInput(name="src", type="Person", mode="source")
+
+    grandparent = Group(_gdef("Grandparent", [inp]))
+    gp_rule = Mock()
+    gp_rule.has_first_target = False
+    gp_rule.has_last_target = False
+    grandparent.rules = [gp_rule]
+
+    parent = Group(_gdef("Parent", [inp], extends="Grandparent"))
+    p_rule = Mock()
+    p_rule.has_first_target = False
+    p_rule.has_last_target = False
+    parent.rules = [p_rule]
+
+    child = Group(_gdef("Child", [inp], extends="Parent"))
+    c_rule = Mock()
+    c_rule.has_first_target = False
+    c_rule.has_last_target = False
+    child.rules = [c_rule]
+
+    mapping_scope.groups["Grandparent"] = grandparent
+    mapping_scope.groups["Parent"] = parent
+
+    assert child._collect_rules(mapping_scope) == [gp_rule, p_rule, c_rule]
+
+
+# ============================================================================
+# Group._check_extends_compatibility
+# ============================================================================
+
+
+def test_check_compatibility__all_valid(mapping_scope):
+    inp = StructureMapGroupInput(name="src", mode="source")
+    parent = Group(_gdef("Parent", [inp]))
+    child = Group(_gdef("Child", [inp]))
+    child._check_extends_compatibility(parent, mapping_scope)  # must not raise
+
+
+def test_check_compatibility__allows_extra_child_inputs(mapping_scope):
+    inp_src = StructureMapGroupInput(name="src", mode="source")
+    inp_extra = StructureMapGroupInput(name="extra", mode="source")
+    parent = Group(_gdef("Parent", [inp_src]))
+    child = Group(_gdef("Child", [inp_src, inp_extra]))
+    child._check_extends_compatibility(parent, mapping_scope)  # must not raise
+
+
+def test_check_compatibility__raises_error_for_missing_parent_input(mapping_scope):
+    inp_src = StructureMapGroupInput(name="src", mode="source")
+    inp_tgt = StructureMapGroupInput(name="tgt", mode="target")
+    parent = Group(_gdef("Parent", [inp_src, inp_tgt]))
+    child = Group(_gdef("Child", [inp_src]))  # tgt is missing
+    with pytest.raises(MappingError, match="missing required input 'tgt'"):
+        child._check_extends_compatibility(parent, mapping_scope)
+
+
+def test_check_compatibility__raises_error_for_mode_mismatch(mapping_scope):
+    inp_parent = StructureMapGroupInput(name="x", mode="source")
+    inp_child = StructureMapGroupInput(name="x", mode="target")
+    parent = Group(_gdef("Parent", [inp_parent]))
+    child = Group(_gdef("Child", [inp_child]))
+    with pytest.raises(MappingError, match="mode"):
+        child._check_extends_compatibility(parent, mapping_scope)
+
+
+def test_check_compatibility__raises_error_for_type_mismatch(mapping_scope):
+    inp_parent = StructureMapGroupInput(name="src", mode="source", type="Patient")
+    inp_child = StructureMapGroupInput(name="src", mode="source", type="Person")
+    parent = Group(_gdef("Parent", [inp_parent]))
+    child = Group(_gdef("Child", [inp_child]))
+    with pytest.raises(MappingError, match="type"):
+        child._check_extends_compatibility(parent, mapping_scope)
+
+
+def test_check_compatibility__untyped_parent_allows_typed_child(mapping_scope):
+    inp_parent = StructureMapGroupInput(name="src", mode="source")  # no type
+    inp_child = StructureMapGroupInput(name="src", mode="source", type="Patient")
+    parent = Group(_gdef("Parent", [inp_parent]))
+    child = Group(_gdef("Child", [inp_child]))
+    child._check_extends_compatibility(parent, mapping_scope)  # must not raise
