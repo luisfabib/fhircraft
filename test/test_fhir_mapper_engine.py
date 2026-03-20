@@ -111,7 +111,7 @@ def test_integration_tutorial_examples(directory):
     for structure in structure_definitions:
         repository.add(structure)
 
-    engine = FHIRMappingEngine(repository=repository, fhir_release="R5")
+    engine = FHIRMappingEngine(structure_definition_registry=repository, fhir_release="R5")
 
     result = engine.execute(structure_map, input)
     assert isinstance(result[0], BaseModel)
@@ -651,7 +651,7 @@ def test_simple_mapping_scenarios(test_name, source_data, expected_target, rules
     repository.add(create_simple_target_structure_definition())
     repository.add(create_simple_source_structure_definition())
 
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     result = engine.execute(structure_map, source_data)
     assert isinstance(result[0], BaseModel)
@@ -688,7 +688,7 @@ def test_resolve_aliased_source_structure_definitions():
     repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_source_structure_definition())
 
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     resolved = engine._resolve_structure_definitions(
         structure_map, StructureMapModelMode.SOURCE
@@ -713,7 +713,7 @@ def test_resolve_unaliased_source_structure_definitions():
     repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_source_structure_definition())
 
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     resolved = engine._resolve_structure_definitions(
         structure_map, StructureMapModelMode.SOURCE
@@ -740,7 +740,7 @@ def test_resolve_aliased_target_structure_definitions():
     repository.add(create_simple_target_structure_definition())
     repository.add(create_simple_source_structure_definition())
 
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     resolved = engine._resolve_structure_definitions(
         structure_map, StructureMapModelMode.TARGET
@@ -766,7 +766,7 @@ def test_resolve_unaliased_target_structure_definitions():
     repository.add(create_simple_target_structure_definition())
     repository.add(create_simple_source_structure_definition())
 
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     resolved = engine._resolve_structure_definitions(
         structure_map, StructureMapModelMode.TARGET
@@ -782,7 +782,7 @@ def test_resolve_structure_definitions_empty_structure_map():
     structure_map = StructureMap(structure=None)
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     resolved = engine._resolve_structure_definitions(
         structure_map, StructureMapModelMode.SOURCE
@@ -804,7 +804,7 @@ def test_resolve_structure_definitions_missing_url():
     )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     resolved = engine._resolve_structure_definitions(
         structure_map, StructureMapModelMode.SOURCE
@@ -826,7 +826,7 @@ def test_resolve_structure_definitions_missing_url_no_alias():
     )
 
     repository = StructureDefinitionRegistry(fhir_release="R5")
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     resolved = engine._resolve_structure_definitions(
         structure_map, StructureMapModelMode.SOURCE
@@ -858,7 +858,7 @@ def test_resolve_structure_definitions_different_mode():
     repository.add(create_simple_source_structure_definition())
     repository.add(create_simple_target_structure_definition())
 
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     resolved = engine._resolve_structure_definitions(
         structure_map, StructureMapModelMode.SOURCE
@@ -898,7 +898,7 @@ def test_resolve_structure_definitions_mixed_scenarios():
     repository = StructureDefinitionRegistry(fhir_release="R5")
     repository.add(create_simple_source_structure_definition())
 
-    engine = FHIRMappingEngine(repository=repository)
+    engine = FHIRMappingEngine(structure_definition_registry=repository)
 
     resolved = engine._resolve_structure_definitions(
         structure_map, StructureMapModelMode.SOURCE

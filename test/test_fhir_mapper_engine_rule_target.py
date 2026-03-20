@@ -1,16 +1,8 @@
-"""
-Comprehensive test suite for the RuleTarget class.
-
-This module contains unit tests for the RuleTarget class and all its methods,
-using real FHIR objects instead of mocks for more intuitive testing.
-"""
-
 import pytest
 from pydantic import BaseModel
 
 from fhircraft.fhir.mapper.engine.target import RuleTarget
 from fhircraft.fhir.mapper.engine.scope import MappingScope
-from fhircraft.fhir.mapper.engine.rule import Rule
 from fhircraft.fhir.mapper.engine.exceptions import (
     MappingDigestionError,
     SourceProcessingError,
@@ -23,7 +15,7 @@ from fhircraft.fhir.resources.datatypes.R4B.core.structure_map import (
 
 
 # ============================================================================
-# TEST MODELS
+# Helpers & Fixtures
 # ============================================================================
 
 
@@ -41,11 +33,6 @@ class PersonModel(BaseModel):
     id: str = "person-1"
     firstName: str = ""
     lastName: str = ""
-
-
-# ============================================================================
-# FIXTURES
-# ============================================================================
 
 
 @pytest.fixture
@@ -119,12 +106,11 @@ def mapping_scope():
 
 
 # ============================================================================
-# __init__() Tests
+# RuleTarget.__init__()
 # ============================================================================
 
 
-def test_init_success_minimal(basic_target_definition, mock_rule):
-    """Test successful initialization with minimal required fields."""
+def test_init__with_minimal_required(basic_target_definition, mock_rule):
     target = RuleTarget(basic_target_definition, mock_rule)
 
     assert target.definition == basic_target_definition
@@ -134,14 +120,13 @@ def test_init_success_minimal(basic_target_definition, mock_rule):
     assert target.transform is None
 
 
-def test_init_success_with_variable(target_with_variable, mock_rule):
-    """Test initialization with custom variable name."""
+def test_init__with_custom_variable_name(target_with_variable, mock_rule):
     target = RuleTarget(target_with_variable, mock_rule)
 
     assert target.variable == "patient-var"
 
 
-def test_init_success_with_copy_transform(target_with_copy_transform, mock_rule):
+def test_init__with_copy_transform(target_with_copy_transform, mock_rule):
     """Test initialization with copy transform."""
     target = RuleTarget(target_with_copy_transform, mock_rule)
 
@@ -150,28 +135,54 @@ def test_init_success_with_copy_transform(target_with_copy_transform, mock_rule)
     assert target.definition.transform == "copy"
 
 
-def test_init_fails_missing_context(mock_rule):
-    """Test initialization fails when context is missing."""
-    target_def = StructureMapGroupRuleTarget(context=None)
-
-    with pytest.raises(MappingDigestionError, match="Source context is required"):
-        RuleTarget(target_def, mock_rule)
-
-
-def test_init_auto_generates_variable_name(basic_target_definition, mock_rule):
-    """Test that variable name is auto-generated when not provided."""
+def test_init__auto_generates_variable_name_if_missing(
+    basic_target_definition, mock_rule
+):
     target = RuleTarget(basic_target_definition, mock_rule)
 
     assert target.variable.startswith("target-")
     assert str(id(basic_target_definition)) in target.variable
 
 
+def test_init__raises_error_for_missing_context(mock_rule):
+    target_def = StructureMapGroupRuleTarget(context=None)
+
+    with pytest.raises(MappingDigestionError, match="Source context is required"):
+        RuleTarget(target_def, mock_rule)
+
+
+def test_init__raises_error_for_unsupported_transform(mock_rule):
+    """Test error for unsupported transform types."""
+    target_def = StructureMapGroupRuleTarget(
+        context="Patient", transform="invalid_transform"
+    )
+
+    with pytest.raises(
+        SourceProcessingError, match="Unsupported transform: invalid_transform"
+    ):
+        RuleTarget(target_def, mock_rule)
+
+
+def test_init__raises_error_for_transform_with_invalid_parameters(mock_rule):
+    target_def = StructureMapGroupRuleTarget(
+        context="Patient",
+        transform="copy",
+        parameter=[
+            StructureMapGroupRuleTargetParameter(valueString="value1"),
+            StructureMapGroupRuleTargetParameter(valueString="value2"),
+        ],
+    )
+
+    with pytest.raises(ValueError):
+        RuleTarget(target_def, mock_rule)
+
+
 # ============================================================================
-# process() Tests
+# RuleTarget.process()
 # ============================================================================
 
 
-def test_process_success_minimal(basic_target_definition, mock_rule, mapping_scope):
+def test_process__without_transform(basic_target_definition, mock_rule, mapping_scope):
     """Test basic successful processing without transform."""
     target = RuleTarget(basic_target_definition, mock_rule)
 
@@ -189,8 +200,7 @@ def test_process_success_minimal(basic_target_definition, mock_rule, mapping_sco
     assert target.variable in mapping_scope.variables
 
 
-def test_process_with_element(target_with_element, mock_rule, mapping_scope):
-    """Test processing with element path."""
+def test_process__with_element(target_with_element, mock_rule, mapping_scope):
     target = RuleTarget(target_with_element, mock_rule)
 
     # Mock resolve_fhirpath to return an Element
@@ -208,10 +218,9 @@ def test_process_with_element(target_with_element, mock_rule, mapping_scope):
     assert target.variable in mapping_scope.variables
 
 
-def test_process_with_copy_transform(
+def test_process__with_copy_transform(
     target_with_copy_transform, mock_rule, mapping_scope
 ):
-    """Test processing with copy transform."""
     target = RuleTarget(target_with_copy_transform, mock_rule)
 
     # Mock resolve_fhirpath to return an Element
@@ -230,114 +239,70 @@ def test_process_with_copy_transform(
 
 
 # ============================================================================
-# TRANSFORM RESOLUTION TESTS
+# RuleTarget._resolve_transform()
 # ============================================================================
 
 
-class TestTransformResolution:
-    """Tests for transform resolution functionality."""
-
-    @pytest.mark.parametrize(
-        "transform_name",
-        [
-            "copy",
-            "create",
-            "cast",
-            "append",
-            "cc",
-            "cp",
-            "qty",
-            "evaluate",
-        ],
-    )
-    def test_resolve_transform_success(
-        self, transform_name, basic_target_definition, mock_rule
-    ):
-        """Test successful transform resolution for all supported transforms."""
-        # Create target definition with transform
-        target_def = StructureMapGroupRuleTarget(
-            context="Patient",
-            transform=transform_name,
-            parameter=[StructureMapGroupRuleTargetParameter(valueString="test")],
-        )
-
-        target = RuleTarget(target_def, mock_rule)
-        result = target._resolve_transform(transform_name, target_def.parameter)
-
-        # Should return a transform instance
-        assert result is not None
-
-    def test_resolve_transform_none(self, basic_target_definition, mock_rule):
-        """Test that None transform returns None."""
-        target = RuleTarget(basic_target_definition, mock_rule)
-        result = target._resolve_transform(None, [])
-
-        assert result is None
-
-    def test_resolve_transform_unsupported(self, basic_target_definition, mock_rule):
-        """Test that unsupported transform raises exception."""
-        target = RuleTarget(basic_target_definition, mock_rule)
-
-        with pytest.raises(
-            SourceProcessingError, match="Unsupported transform: unsupported_transform"
-        ):
-            target._resolve_transform("unsupported_transform", [])
-
-    def test_copy_transform_with_string_parameter(self, mock_rule):
-        """Test copy transform with string parameter."""
-        target_def = StructureMapGroupRuleTarget(
-            context="Patient",
-            transform="copy",
-            parameter=[StructureMapGroupRuleTargetParameter(valueString="test_value")],
-        )
-
-        target = RuleTarget(target_def, mock_rule)
-        transform = target._resolve_transform("copy", target_def.parameter)
-
-        assert transform is not None
-        # The transform should be able to process
-        from fhircraft.fhir.mapper.engine.scope import MappingScope
-
-        scope = MappingScope(name="test")
-        result = transform.process(scope)
-        assert result == "test_value"
-
-
-# ============================================================================
-# ERROR HANDLING TESTS
-# ============================================================================
-
-
-def test_invalid_context_initialization(mock_rule):
-    """Test error when context is missing during initialization."""
-    target_def = StructureMapGroupRuleTarget(context=None)
-
-    with pytest.raises(MappingDigestionError, match="Source context is required"):
-        RuleTarget(target_def, mock_rule)
-
-
-def test_unsupported_transform_error(mock_rule):
-    """Test error for unsupported transform types."""
+@pytest.mark.parametrize(
+    "transform_name",
+    [
+        "copy",
+        "create",
+        "cast",
+        "append",
+        "cc",
+        "cp",
+        "qty",
+        "evaluate",
+    ],
+)
+def test_resolve_transform__supported_transform(transform_name, mock_rule):
+    # Create target definition with transform
     target_def = StructureMapGroupRuleTarget(
-        context="Patient", transform="invalid_transform"
+        context="Patient",
+        transform=transform_name,
+        parameter=[StructureMapGroupRuleTargetParameter(valueString="test")],
     )
+
+    target = RuleTarget(target_def, mock_rule)
+    result = target._resolve_transform(transform_name, target_def.parameter)
+
+    # Should return a transform instance
+    assert result is not None
+
+
+def test_resolve_transform__none_returns_none(basic_target_definition, mock_rule):
+    target = RuleTarget(basic_target_definition, mock_rule)
+    result = target._resolve_transform(None, [])
+
+    assert result is None
+
+
+def test_resolve_transform__raises_error_for_unsupported_transform(
+    basic_target_definition, mock_rule
+):
+    target = RuleTarget(basic_target_definition, mock_rule)
 
     with pytest.raises(
-        SourceProcessingError, match="Unsupported transform: invalid_transform"
+        SourceProcessingError, match="Unsupported transform: unsupported_transform"
     ):
-        RuleTarget(target_def, mock_rule)
+        target._resolve_transform("unsupported_transform", [])
 
 
-def test_copy_transform_with_invalid_parameters(mock_rule):
-    """Test copy transform with invalid parameter count."""
+def test_resolve_transform__copy_transform_with_string_parameter(mock_rule):
     target_def = StructureMapGroupRuleTarget(
         context="Patient",
         transform="copy",
-        parameter=[
-            StructureMapGroupRuleTargetParameter(valueString="value1"),
-            StructureMapGroupRuleTargetParameter(valueString="value2"),
-        ],
+        parameter=[StructureMapGroupRuleTargetParameter(valueString="test_value")],
     )
 
-    with pytest.raises(ValueError):
-        RuleTarget(target_def, mock_rule)
+    target = RuleTarget(target_def, mock_rule)
+    transform = target._resolve_transform("copy", target_def.parameter)
+
+    assert transform is not None
+    # The transform should be able to process
+    from fhircraft.fhir.mapper.engine.scope import MappingScope
+
+    scope = MappingScope(name="test")
+    result = transform.process(scope)
+    assert result == "test_value"

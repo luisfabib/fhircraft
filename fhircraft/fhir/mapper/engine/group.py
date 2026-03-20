@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Sequence
+from typing import TYPE_CHECKING, List, Optional, Sequence
 from fhircraft.fhir.mapper.engine.abstract import FHIRMappingEngineComponent
 from fhircraft.fhir.mapper.engine.exceptions import (
     MappingDigestionError,
@@ -58,6 +58,69 @@ class Group(FHIRMappingEngineComponent):
                 f"Group '{self.name}' has no input definitions."
             )
         self.inputs = self.definition.input
+        # Store the name of the group this group extends, resolved lazily at process() time
+        self.extends_name: Optional[str] = (
+            str(definition.extends) if definition.extends else None
+        )
+
+    def _collect_rules(self, scope: "MappingScope") -> "List[Rule]":
+        """
+        Collect the full ordered rule list for this group, prepending rules
+        inherited from the extended group chain (deepest ancestor first).
+
+        Resolved lazily at process() time via scope so forward references and
+        cross-map extends are supported.
+        """
+        if not self.extends_name:
+            return list(self.rules)
+        parent = scope.resolve_group(self.extends_name)
+        return parent._collect_rules(scope) + self.rules
+
+    def _check_extends_compatibility(
+        self, parent_group: "Group", scope: "MappingScope"
+    ) -> None:
+        """
+        Validate that this group's inputs are compatible with the parent group's inputs.
+
+        Called from process() once the scope is available so that type names can be
+        resolved via scope.get_type().
+
+        Per the FHIR spec the extending group SHALL have all of the parent's inputs
+        with the same name, mode, and type (when the parent specifies one). It MAY
+        add extra inputs.
+
+        Raises:
+            MappingError: If a required parent input is absent, or has a mismatched
+                mode or type.
+        """
+        parent_by_name = {str(inp.name): inp for inp in parent_group.inputs}
+        child_by_name = {str(inp.name): inp for inp in self.inputs}
+
+        for pname, pinp in parent_by_name.items():
+            cinp = child_by_name.get(pname)
+            if cinp is None:
+                raise MappingError(
+                    f"Group '{self.name}' extends '{parent_group.name}' but is "
+                    f"missing required input '{pname}'."
+                )
+            if str(cinp.mode) != str(pinp.mode):
+                raise MappingError(
+                    f"Group '{self.name}' input '{pname}' has mode '{cinp.mode}', "
+                    f"but parent group '{parent_group.name}' requires mode '{pinp.mode}'."
+                )
+            if pinp.type:
+                # Use the scope to resolve the required type (ensures it exists)
+                pinp_type = str(pinp.type)
+                cinp_type = str(cinp.type) if cinp.type else None
+                try:
+                    scope.get_type(pinp_type)
+                except MappingError:
+                    pass  # type not registered in scope; still enforce name match
+                if cinp_type != pinp_type:
+                    raise MappingError(
+                        f"Group '{self.name}' input '{pname}' has type '{cinp_type}', "
+                        f"but parent group '{parent_group.name}' requires type '{pinp_type}'."
+                    )
 
     def bind_parameters(
         self, scope: "MappingScope", parameters: Sequence[FHIRPath], is_dependent: bool
@@ -116,8 +179,16 @@ class Group(FHIRMappingEngineComponent):
 
         self.bind_parameters(group_scope, parameters, is_dependent)
 
-        # Process each rule
-        for rule in self.rules:
+        # Resolve extends chain: validate compatibility and collect inherited rules
+        if self.extends_name:
+            parent = scope.resolve_group(self.extends_name)
+            self._check_extends_compatibility(parent, group_scope)
+            all_rules = parent._collect_rules(scope) + self.rules
+        else:
+            all_rules = self.rules
+
+        # Process each rule (inherited first, then own)
+        for rule in all_rules:
             rule.process(group_scope)
 
     def _organize_rules(self):
