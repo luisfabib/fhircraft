@@ -22,7 +22,7 @@ Legacy systems often use different field names and value formats than FHIR expec
 
 ```python
 # Import the FHIR mapper
-from fhircraft.fhir.mapper import FHIRMapper
+from fhircraft.fhir.mapper import FHIRStructureMapper
 from fhircraft.fhir.resources.datatypes.R5.core.patient import Patient
 
 # Legacy system data with non-FHIR field names
@@ -54,8 +54,8 @@ group main(source legacy, target patient: Patient) {
 """
 
 # Create mapper and execute the transformation
-mapper = FHIRMapper()
-targets = mapper.execute_mapping(mapping_script, legacy_patient)
+mapper = FHIRStructureMapper()
+targets = mapper.map(mapping_script, legacy_patient)
 patient = targets[0]  # Get the transformed Patient resource
 
 print(f"Transformed: {patient.model_dump(exclude={'meta','resourceType'})}")
@@ -91,7 +91,7 @@ The map declaration identifies the mapping with a unique URL and human-readable 
 The simplest transformation type copies values directly from source fields to target fields without modification. This [:material-fire:  Identitty Transform](https://build.fhir.org/mapping-language.html#simple) approach works when source and target use compatible data types and the values need no transformation.
 
 ```python
-from fhircraft.fhir.mapper import FHIRMapper
+from fhircraft.fhir.mapper import FHIRStructureMapper
 
 # Define simple field-to-field mappings
 script = """
@@ -111,8 +111,8 @@ group main(source src, target tgt: Patient) {
 source_data = {"surname": "Smith", "sex": "female", "civilStatus": "divorced"}
 
 # Execute the mapping
-mapper = FHIRMapper()
-targets = mapper.execute_mapping(script, source_data)
+mapper = FHIRStructureMapper()
+targets = mapper.map(script, source_data)
 
 print(f"Transformed: {targets[0].model_dump(exclude={'meta','resourceType'})}")
 #> Transformed: {'name': [{'family': 'Smith'}], 'gender': 'female', 'maritalStatus': {'text': 'divorced'}}
@@ -154,7 +154,7 @@ legacy_data = {
 }
 
 # Execute mapping and get validated FHIR resource
-targets = mapper.execute_mapping(script, legacy_data)
+targets = mapper.map(script, legacy_data)
 patient = targets[0]  # This is a validated FHIR Patient resource
 
 print(f"Transformed: {patient.model_dump(exclude={'meta','resourceType'})}")
@@ -215,7 +215,7 @@ source_data = {
     }
 }
 
-targets = mapper.execute_mapping(script, source_data)
+targets = mapper.map(script, source_data)
 patient = targets[0] 
 
 print(f"Transformed: {patient.model_dump(exclude={'meta','resourceType'})}")
@@ -269,10 +269,10 @@ group identifiers(source src, target patient: Patient) {
 """
 
 # Execute the entire mapping (all groups)
-targets = mapper.execute_mapping(script, source_data)
+targets = mapper.map(script, source_data)
 
 # Or execute only a specific group for testing
-targets = mapper.execute_mapping(script, source_data, group="demographics")
+targets = mapper.map(script, source_data, group="demographics")
 ```
 
 ## Combining Multiple Data Sources
@@ -322,7 +322,7 @@ insurance_data = {
 }
 
 # Pass both sources as a tuple
-targets = mapper.execute_mapping(
+targets = mapper.map(
     script,
     (demo_data, insurance_data)
 )
@@ -339,23 +339,16 @@ While inline mapping scripts work well for examples and simple transformations, 
 Storing mappings in files separates transformation logic from application code, making it easier for healthcare informaticists to maintain mapping rules without changing Python code. Loading from URLs enables organizations to publish and share mapping definitions through FHIR servers or web endpoints:
 
 ```python
-from fhircraft.fhir.mapper import FHIRMapper
+from fhircraft.utils import load_file
+from fhircraft.fhir.mapper import FHIRStructureMapper
 
-mapper = FHIRMapper()
+mapper = FHIRStructureMapper()
 
 # Load mapping definition from a local JSON file
-structure_map = mapper.load_structure_map("patient-mapping.json")
+structure_map = load_file("patient-mapping.json")
 
-# Execute the loaded mapping
-targets = mapper.execute_mapping(structure_map, source_data)
-
-# Load mapping from a FHIR server or web URL
-structure_map = mapper.load_structure_map(
-    "https://example.org/fhir/StructureMap/PatientMapping"
-)
-
-# Execute mapping loaded from URL
-targets = mapper.execute_mapping(structure_map, source_data)
+# Execute the loaded mapping (dict is accepted directly)
+targets = mapper.map(structure_map, source_data)
 ```
 
 ## Common Problems and Solutions
@@ -368,4 +361,4 @@ targets = mapper.execute_mapping(structure_map, source_data)
 | Type conversion errors | Verify source and target data types are compatible. Add explicit conversion logic for incompatible types. Use transformation functions to convert between formats. |
 | Nested structure issues | Use then clauses to navigate into nested structures. Ensure intermediate objects are created with as clauses. Check that nested field paths are correct. |
 | Performance with large datasets | Load mappings once and reuse the mapper instance. Consider batch processing for very large datasets. Profile mapping execution to identify slow rules. |
-| Multiple target resources | Specify multiple target parameters in group definitions. The execute_mapping result contains all target resources in order. |
+| Multiple target resources | Specify multiple target parameters in group definitions. The `map()` result contains all target resources in order. |
