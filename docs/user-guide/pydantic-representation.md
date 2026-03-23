@@ -191,11 +191,10 @@ Fhircraft validates that exactly one type variant is set at a time—attempting 
     ```
 
     1. Set the `valueDateTime` variant of the choice element.
-    2. Access the specific typed field directly.
     3. The generic `value` property returns whichever variant is set.
-    4. Setting a different variant (`valueTime`) automatically clears others.
-    5. The previous variant (`valueDateTime`) must be set empty to avoid validation errors.
-    6. The generic property now returns the new variant.
+    4. Setting a different variant does not automatically clear the previous one; both will be set simultaneously, which violates the single-variant constraint.
+    5. The previous variant (`valueDateTime`) must be explicitly cleared to avoid a validation error.
+    6. The generic property now returns the remaining active variant.
 
 ### Backbone Elements
 

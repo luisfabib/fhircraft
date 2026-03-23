@@ -143,7 +143,7 @@ print(f"Updated patient: {family_names[0]}, Phone: {has_phone}")
 Convert external data sources into valid FHIR resources using declarative mapping scripts:
 
 ```python
-from fhircraft.fhir.mapper import FHIRMapper
+from fhircraft.fhir.mapper import FHIRStructureMapper
 
 # Legacy system data
 legacy_patient = {
@@ -172,8 +172,8 @@ group main(source legacy, target patient: Patient) {
 """
 
 # Execute transformation
-mapper = FHIRMapper(fhir_release="R5")
-targets = mapper.execute_mapping(mapping_script, legacy_patient)
+mapper = FHIRStructureMapper(fhir_release="R5")
+targets = mapper.map(mapping_script, legacy_patient)
 fhir_patient = targets[0]
 
 print(fhir_patient.model_dump(exclude={'meta','resourceType'}))
