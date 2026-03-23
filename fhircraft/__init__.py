@@ -13,10 +13,15 @@ from fhircraft.utils import capitalize, ensure_list, get_FHIR_release_from_versi
 # Use lazy imports for main components to avoid circular dependencies
 def __getattr__(name):
     """Lazy loading of main components to avoid circular import issues."""
-    if name == "FHIRMapper":
-        from fhircraft.fhir.mapper import FHIRMapper
+    if name == "FHIRStructureMapper":
+        from fhircraft.fhir.mapper import FHIRStructureMapper
 
-        return FHIRMapper
+        return FHIRStructureMapper
+    elif name == "FHIRMapper":
+        # Backward-compat alias — use FHIRStructureMapper instead.
+        from fhircraft.fhir.mapper import FHIRStructureMapper
+
+        return FHIRStructureMapper
     elif name == "FHIRModelFactory":
         from fhircraft.fhir.resources.factory import FHIRModelFactory
 
