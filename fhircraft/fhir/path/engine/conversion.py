@@ -325,10 +325,7 @@ class ToDate(FHIRTypeConversionFunction):
             else:
                 return []
         elif isinstance(value, (date, datetime)):
-            print(value.isoformat())
             return [FHIRPathCollectionItem.wrap(value.date().isoformat())]
-            # elif isinstance(value, datetime):
-            # return [FHIRPathCollectionItem.wrap(value.date().isoformat())]
         else:
             return []
 
