@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extended all assert-based validators (pattern, fixed-value, type-choice, cardinality) to respect configuration `mode = 'lenient'` by issuing warnings instead of raising errors, consistent with how FHIRPath constraint validators already behaved ([#299](https://github.com/luisfabib/fhircraft/pull/299))
 - Switched resource context computation in FHIR models and lists to be lazy, deferring work until the context is actually accessed rather than computing it at construction time ([#299](https://github.com/luisfabib/fhircraft/pull/299))
 - Renamed the `repository` attribute on `FHIRMappingEngine` to `structure_definition_registry` to better reflect its purpose and distinguish it from the new `structure_map_registry` ([#300](https://github.com/luisfabib/fhircraft/pull/300))
+- Introduced `FHIRStructureMapper` as the new public interface for the FHIR Mapping Language. The old `FHIRMapper` is replaced by `FHIRStructureMapper` ([#318](https://github.com/luisfabib/fhircraft/pull/318))
 
 ### Fixed
 
