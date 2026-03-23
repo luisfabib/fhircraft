@@ -185,7 +185,7 @@ Disabling internet access is recommended in production and in security-sensitive
 
     # Configure the factory to load multiple packages
     factory.register_package("hl7.fhir.us.core", "5.0.1")  # US healthcare standards
-    factory.register_package("hl7.fhir.us.mcode", "1.1.0"), # Minimal Common Oncology Data Elements
+    factory.register_package("hl7.fhir.us.mcode", "1.1.0")  # Minimal Common Oncology Data Elements
 
     # Create models from different packages
     USCorePatient = factory.build(
@@ -253,8 +253,8 @@ print(f"Created {len([patient, us_patient])} patient records")
 | Fhircraft cannot find a structure definition | Check that the canonical URL matches exactly. Make sure you have loaded the file, package, or enabled internet access. Verify the structure definition file is in the correct format (JSON). |
 | Package download fails | Verify your internet connection. Check that the package name and version are correct. Try loading the package again after a few minutes. Visit the [:material-fire: FHIR Package Registry](https://registry.fhir.org) to confirm the package exists. |
 | Loading takes a long time | Fhircraft caches downloaded packages after the first use. Subsequent loads will be much faster. Consider loading packages once at application startup rather than repeatedly. |
-| Wrong version of a structure definition is used | Specify the version explicitly in the canonical URL or as a parameter. Check loaded packages with `get_loaded_packages()` to verify versions. Clear the cache if you need to reload a different version. |
-| Running out of memory with many packages | Remove packages you no longer need using `remove_package()`. Load only the packages required for your current task. Clear the entire cache with `clear_package_cache()` when switching between different projects. |
+| Wrong version of a structure definition is used | Specify the version explicitly in the canonical URL or as a parameter. Check loaded definitions with `list_registered_definitions()` to verify which definitions are registered. Unregister the old definition with `unregister(url)` and re-register the new version, then call `reset_cache()` to force a fresh build. |
+| Running out of memory with many definitions | Unregister individual definitions you no longer need using `unregister(url)`. Load only the packages required for your current task. Clear the entire construction cache with `reset_cache()` when switching between different projects. |
 
 ## Further Resources
 

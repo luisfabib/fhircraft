@@ -376,9 +376,7 @@ factory.reset_cache()
 ```
 
 1. Both variables reference the same model class
-2. The cached results is obtained much faster than the original
-3. This reconstructs the model from scratch
-4. New variable no longer references the old class
+2. The cached result is obtained much faster than the original
 
 See the [:simple-pydantic: Pydantic performance documentation](https://docs.pydantic.dev/latest/concepts/performance/) for information about model validation performance.
 

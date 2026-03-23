@@ -96,25 +96,6 @@ def mock_factory_build(
         )
 
 
-def mock_load_structure_map(self, source):
-    """Mock load_structure_map to load local test files instead of downloading from internet."""
-    if source in [
-        "patient-mapping.json",
-        "https://example.org/fhir/StructureMap/PatientMapping",
-    ]:
-        test_file = (
-            Path(__file__).parent
-            / "static"
-            / "fhir-mapping-language"
-            / "patient-mapping-example.json"
-        )
-        with open(test_file, "r") as f:
-            return json.load(f)
-    else:
-        # For other sources, raise an error since we don't have mocks for them
-        raise NotImplementedError(f"Mock not implemented for package: {source}")
-
-
 def mock_load_file(filepath):
     """Mock load_file to return test data instead of reading arbitrary files."""
     if filepath == "patient.json" or filepath == "my_fhir_patient.json":
@@ -127,7 +108,18 @@ def mock_load_file(filepath):
         )
         with open(test_file, "r") as f:
             return json.load(f)
-
+    elif filepath in [
+        "patient-mapping.json",
+        "https://example.org/fhir/StructureMap/PatientMapping",
+    ]:
+        test_file = (
+            Path(__file__).parent
+            / "static"
+            / "fhir-mapping-language"
+            / "patient-mapping-example.json"
+        )
+        with open(test_file, "r") as f:
+            return json.load(f)
     elif (
         filepath == "patient.profile.json" or filepath == "custom-patient.profile.json"
     ):
@@ -171,7 +163,6 @@ def mock_open_func(file, mode="r", *args, **kwargs):
     "fhircraft.fhir.resources.factory.FHIRModelFactory.register_package",
     mock_load_package,
 )
-@patch("fhircraft.fhir.mapper.FHIRMapper.load_structure_map", mock_load_structure_map)
 @patch(
     "fhircraft.fhir.resources.factory.FHIRModelFactory.build",
     mock_factory_build,
