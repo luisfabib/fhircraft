@@ -4,7 +4,7 @@ that require a function in this section to be called explicitly.
 """
 
 import re
-
+from datetime import datetime, date, time
 import fhircraft.fhir.resources.datatypes.primitives as primitives
 from fhircraft.fhir.path.engine.literals import Quantity
 from fhircraft.fhir.path.engine.core import (
@@ -324,6 +324,11 @@ class ToDate(FHIRTypeConversionFunction):
                 return [FHIRPathCollectionItem.wrap(datetime_match.group(1))]
             else:
                 return []
+        elif isinstance(value, (date, datetime)):
+            print(value.isoformat())
+            return [FHIRPathCollectionItem.wrap(value.date().isoformat())]
+            # elif isinstance(value, datetime):
+            # return [FHIRPathCollectionItem.wrap(value.date().isoformat())]
         else:
             return []
 

@@ -1,6 +1,24 @@
 import pytest
 
-from fhircraft.fhir.path.engine.conversion import *
+from fhircraft.fhir.path.engine.conversion import (
+    Iif,
+    ToString,
+    ConvertsToString,
+    ToBoolean,
+    ConvertsToBoolean,
+    ToInteger,
+    ConvertsToInteger,
+    ToDecimal,
+    ConvertsToDecimal,
+    ToDate,
+    ConvertsToDate,
+    ToDateTime,
+    ConvertsToDateTime,
+    ToQuantity,
+    ConvertsToQuantity,
+    ToTime,
+    ConvertsToTime,
+)
 from fhircraft.fhir.path.engine.conversion import FHIRPathRuntimeError
 from fhircraft.fhir.path.engine.core import (
     Element,
@@ -8,8 +26,11 @@ from fhircraft.fhir.path.engine.core import (
 )
 from fhircraft.fhir.path.engine.existence import Empty, Exists
 from fhircraft.fhir.path.engine.literals import Quantity
-from fhircraft.fhir.resources.datatypes.R4.complex import Quantity as R4_Quantity, Age as R4_Age
-
+from fhircraft.fhir.resources.datatypes.R4.complex import (
+    Quantity as R4_Quantity,
+    Age as R4_Age,
+)
+from datetime import datetime, date, time
 
 env = dict()
 
@@ -410,6 +431,8 @@ todate_cases = (
     ("2014-02-01", "2014-02-01"),
     ("2014-02-01T:12:25", "2014-02-01"),
     ("2014-02-01T00:00:00.000Z", "2014-02-01"),
+    (date(2014, 2, 1), "2014-02-01"),
+    (datetime(2014, 2, 1, 0, 0), "2014-02-01"),
 )
 
 
@@ -454,6 +477,8 @@ convertstodate_cases = (
     ("2014-02-01"),
     ("2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z"),
+    (date(2000, 1, 1)),
+    (datetime(2000, 1, 1)),
 )
 
 
@@ -590,7 +615,10 @@ toquantity_cases = (
     (False, Quantity(value=0.0, unit="")),
     (Quantity(value=12.5, unit="mg"), Quantity(value=12.5, unit="mg")),
     (R4_Quantity(value=12.5, unit="mg"), Quantity(value=12.5, unit="mg")),
-    (R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org"), Quantity(value=12.5, unit="a")),
+    (
+        R4_Age(value=12.5, code="a", system="http://unitsofmeasure.org"),
+        Quantity(value=12.5, unit="a"),
+    ),
 )
 
 
