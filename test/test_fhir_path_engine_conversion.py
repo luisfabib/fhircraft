@@ -1,18 +1,36 @@
 import pytest
 
-from fhircraft.fhir.path.engine.conversion import *
+from fhircraft.fhir.path.engine.conversion import (
+    Iif,
+    ToString,
+    ConvertsToString,
+    ToBoolean,
+    ConvertsToBoolean,
+    ToInteger,
+    ConvertsToInteger,
+    ToDecimal,
+    ConvertsToDecimal,
+    ToDate,
+    ConvertsToDate,
+    ToDateTime,
+    ConvertsToDateTime,
+    ToQuantity,
+    ConvertsToQuantity,
+    ToTime,
+    ConvertsToTime,
+)
 from fhircraft.fhir.path.engine.conversion import FHIRPathRuntimeError
 from fhircraft.fhir.path.engine.core import (
     Element,
     FHIRPathCollectionItem,
 )
 from fhircraft.fhir.path.engine.existence import Empty, Exists
-from fhircraft.fhir.path.engine.literals import Quantity
+from fhircraft.fhir.path.engine.literals import Date, DateTime, Quantity, Time
 from fhircraft.fhir.resources.datatypes.R4.complex import (
     Quantity as R4_Quantity,
     Age as R4_Age,
 )
-
+from datetime import datetime, date, time
 
 env = dict()
 
@@ -419,6 +437,10 @@ todate_cases = (
     ("2014-02-01", "2014-02-01"),
     ("2014-02-01T:12:25", "2014-02-01"),
     ("2014-02-01T00:00:00.000Z", "2014-02-01"),
+    (date(2014, 2, 1), "2014-02-01"),
+    (datetime(2014, 2, 1, 0, 0), "2014-02-01"),
+    (Date("@2014-02-01"), "2014-02-01"),
+    (DateTime("@2014-02-01T00:00:00.000Z"), "2014-02-01"),
 )
 
 
@@ -463,6 +485,10 @@ convertstodate_cases = (
     ("2014-02-01"),
     ("2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z"),
+    (date(2000, 1, 1)),
+    (datetime(2000, 1, 1)),
+    (Date("@2014-02-01")),
+    (DateTime("@2014-02-01T00:00:00.000Z")),
 )
 
 
@@ -507,6 +533,10 @@ todatetime_cases = (
     ("2014-02-01", "2014-02-01"),
     ("2014-02-01T:12:25", "2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z", "2014-02-01T00:00:00.000Z"),
+    (date(2014, 2, 1), "2014-02-01"),
+    (datetime(2014, 2, 1), "2014-02-01T00:00:00"),
+    (Date("@2014-02-01"), "2014-02-01"),
+    (DateTime("@2014-02-01T00:00:00.000Z"), "2014-02-01T00:00:00"),
 )
 
 
@@ -514,6 +544,7 @@ todatetime_cases = (
 def test_todatetime_converts_correctly_for_valid_type(value, expected):
     collection = [FHIRPathCollectionItem(value=value)]
     result = ToDateTime().evaluate(collection, env)
+    print(result[0].value, expected)
     assert result == [FHIRPathCollectionItem.wrap(expected)]
 
 
@@ -551,6 +582,10 @@ convertstodatetime_cases = (
     ("2014-02-01"),
     ("2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z"),
+    (date(2014, 2, 1)),
+    (datetime(2014, 2, 1)),
+    (Date("@2014-02-01")),
+    (DateTime("@2014-02-01T00:00:00.000Z")),
 )
 
 
@@ -796,6 +831,8 @@ totime_cases = (
     ("2014-02-01", "2014-02-01"),
     ("2014-02-01T:12:25", "2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z", "2014-02-01T00:00:00.000Z"),
+    (time(12, 25), "12:25:00"),
+    (Time("@T12:25"), "12:25:00"),
 )
 
 
@@ -840,6 +877,8 @@ convertstotime_cases = (
     ("2014-02-01"),
     ("2014-02-01T:12:25"),
     ("2014-02-01T00:00:00.000Z"),
+    (time(12, 25)),
+    (Time("@T12:25")),
 )
 
 
